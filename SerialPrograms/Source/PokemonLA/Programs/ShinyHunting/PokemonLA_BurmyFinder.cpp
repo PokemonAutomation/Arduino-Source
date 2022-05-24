@@ -268,6 +268,185 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBase
     }
 }
 
+size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, TreeCounter& tree_counter){
+
+    size_t last_checked_tree = 0;
+
+    if(path != 0)
+        go_to_height_camp(env, context);
+
+    env.console.log("Currently Checking Path:" + std::to_string(path));
+
+    BattleMenuDetector battle_menu_detector(env.console, env.console, true);
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            switch (path) {
+            case 0:
+                // === Fly to the first tree on trip ===
+                env.console.log("Checking tree: 0");
+                pbf_move_left_joystick(context, 255, 90, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (5 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+
+                // Now on ground, move towards the tree
+                // change_mount(env.console, context, MountState::WYRDEER_OFF);
+                pbf_move_left_joystick(context, 0, 70, 20, (0.3 * TICKS_PER_SECOND));
+                // Change camera to face what player character faces
+                pbf_press_button(context, BUTTON_ZL, 20, (0.4 * TICKS_PER_SECOND));
+                // Move camera down
+                pbf_move_right_joystick(context, 128, 255, (0.3 * TICKS_PER_SECOND), (0.2 * TICKS_PER_SECOND));
+
+                // Now we should be on ground
+                disable_shiny_sound(context);
+                last_checked_tree = 0;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
+
+
+                // === Fly to the second tree on trip ===
+                // Mount on Braviary
+                env.console.log("Checking tree: 1");
+                pbf_press_button(context, BUTTON_PLUS, 20, 100);
+                enable_shiny_sound(context);
+
+                // Now face towards the next tree
+                pbf_move_left_joystick(context, 255, 200, 1 * TICKS_PER_SECOND, 0);
+                pbf_mash_button(context, BUTTON_B, 100);
+                pbf_press_button(context, BUTTON_Y, (2.1 * TICKS_PER_SECOND), 0);
+                // Get off Braviary
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                // Move camera down
+                pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
+
+                // Now we should be on ground
+                disable_shiny_sound(context);
+                last_checked_tree = 1;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
+
+
+                // === Fly to the third tree on trip ===
+                env.console.log("Checking tree: 2");
+                // Mount on Braviary
+                pbf_press_button(context, BUTTON_PLUS, 20, 100);
+                enable_shiny_sound(context);
+
+                // Now face towards the next tree
+                pbf_move_left_joystick(context, 255, 130, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, 80, 0);
+                pbf_press_button(context, BUTTON_Y, (2.2 * TICKS_PER_SECOND), 0);
+                // Get off Braviary
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                // Move camera down
+                pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
+
+                // Now we should be on ground
+                disable_shiny_sound(context);
+                last_checked_tree = 2;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
+
+
+                // === Fly to the fourth tree ===
+                env.console.log("Checking tree: 3");
+                // Mount on Braviary
+                pbf_press_button(context, BUTTON_PLUS, 20, 100);
+                enable_shiny_sound(context);
+
+                // Now face towards the next tree
+                pbf_move_left_joystick(context, 0, 60, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, 90, 0);
+                pbf_press_button(context, BUTTON_Y, (2.3 * TICKS_PER_SECOND), 0);
+                // Get off Braviary
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                // Move camera down
+                pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
+                // Now we should be on ground
+                context.wait_for_all_requests();
+                last_checked_tree = 3;
+            break;
+            }
+
+
+        },
+        {
+            {battle_menu_detector},
+        }
+    );
+
+    if (ret == 0){
+        if (handle_battle(env, context)){
+            env.console.log("Battle found before last tree in the path.");
+            tree_counter.tree[last_checked_tree]++;
+        }
+
+    } else{
+        // Check last tree
+        if (check_tree(env, context)){
+            tree_counter.tree[last_checked_tree]++;
+        }
+        env.console.log("Checked all trees in the path.");
+    }
+
+    return last_checked_tree;
+}
+
+void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
+    env.console.log("Last tree was: " + std::to_string(last_tree));
+
+    switch (path) {
+    case 0:
+        if(last_tree < 1){
+            env.console.log("Heading to tree 1");
+            go_to_height_camp(env, context);
+            pbf_move_left_joystick(context, 255, 110, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (7.2 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_Y, (4.5 * TICKS_PER_SECOND), 0);
+            pbf_move_left_joystick(context, 180, 0, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            if (check_tree(env, context)){
+                tree_counter.tree[1]++;
+            }
+        }
+
+        if(last_tree < 2){
+            env.console.log("Heading to tree 2");
+            go_to_height_camp(env, context);
+            pbf_move_left_joystick(context, 255, 147, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (6.6 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_Y, (4.4 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            if (check_tree(env, context)){
+                tree_counter.tree[2]++;
+            }
+        }
+
+        if(last_tree < 3){
+            env.console.log("Heading to tree 3");
+            go_to_height_camp(env, context);
+            pbf_move_left_joystick(context, 255, 158, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (9.5 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_Y, (4.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            if (check_tree(env, context)){
+                tree_counter.tree[3]++;
+            }
+        }
+    break;
+    }
+
+}
+
 void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
@@ -302,12 +481,20 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    size_t cur_tree = 0;
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            //  Tree 0
-            env.console.log("Heading to Tree 0");
+
+            for (int i = 0; i < 1; i++) {
+                size_t last_tree = grouped_path(env, context, i, tree_counter);
+                context.wait_for_all_requests();
+                single_path(env, context, i, last_tree, tree_counter);
+                context.wait_for_all_requests();
+            }
+
+            //  Tree 4
+            env.console.log("Heading to Tree 4");
+            go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 148, 255, 20, 20);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
@@ -319,11 +506,11 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
             if (check_tree(env, context)){
-                tree_counter.tree[0]++;
+                tree_counter.tree[4]++;
             }
 
-            //Tree 1
-            env.console.log("Heading to Tree 1");
+            //Tree 5
+            env.console.log("Heading to Tree 5");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 104, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -334,12 +521,12 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
             if (check_tree(env, context)){
-                tree_counter.tree[1]++;
+                tree_counter.tree[5]++;
             }
 
 
-            //Tree 2
-            env.console.log("Heading to Tree 2");
+            //Tree 6
+            env.console.log("Heading to Tree 6");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 108, 255, 20, 20);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -351,12 +538,12 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             context.wait_for_all_requests();
 
             if (check_tree(env, context)){
-                tree_counter.tree[2]++;
+                tree_counter.tree[6]++;
             }
 
 
-            //Tree 3
-            env.console.log("Heading to Tree 3");
+            //Tree 7
+            env.console.log("Heading to Tree 7");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 160, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -369,11 +556,11 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
             if (check_tree(env, context)){
-                tree_counter.tree[3]++;
+                tree_counter.tree[7]++;
             }
 
-            //Tree 4
-            env.console.log("Heading to Tree 4");
+            //Tree 8
+            env.console.log("Heading to Tree 8");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 240, 240, 20, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -387,11 +574,11 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
             if (check_tree(env, context)){
-                tree_counter.tree[4]++;
+                tree_counter.tree[8]++;
             }
 
-            //Tree 5
-            env.console.log("Heading to Tree 5");
+            //Tree 9
+            env.console.log("Heading to Tree 9");
             go_to_height_camp(env, context);
             //pbf_move_left_joystick(context, 255, 165, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_left_joystick(context, 255, 158, 20, (0.5 * TICKS_PER_SECOND));
@@ -407,107 +594,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             
             if (check_tree(env, context)){
-                tree_counter.tree[5]++;
-            }
-
-            // Tree 6-9
-            env.console.log("Heading to Tree 6-9");
-            go_to_height_camp(env, context);
-            const bool stop_on_detected = true;
-            BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-            int ret = run_until(
-                env.console, context,
-                [&](BotBaseContext& context){
-                    // === Fly to the first tree on trip ===
-                    cur_tree = 6;
-                    pbf_move_left_joystick(context, 255, 90, 20, (0.5 * TICKS_PER_SECOND));
-                    pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                    change_mount(env.console, context, MountState::BRAVIARY_ON);
-                    pbf_press_button(context, BUTTON_B, (5 * TICKS_PER_SECOND), 0);
-                    pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
-                    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-
-                    // Now on ground, move towards the tree
-                    // change_mount(env.console, context, MountState::WYRDEER_OFF);
-                    pbf_move_left_joystick(context, 0, 70, 20, (0.3 * TICKS_PER_SECOND));
-                    // Change camera to face what player character faces
-                    pbf_press_button(context, BUTTON_ZL, 20, (0.4 * TICKS_PER_SECOND));
-                    // Move camera down
-                    pbf_move_right_joystick(context, 128, 255, (0.3 * TICKS_PER_SECOND), (0.2 * TICKS_PER_SECOND));
-                    
-                    // Now we should be on ground
-                    disable_shiny_sound(context);
-                    check_tree_no_stop(env, context);
-
-                    // === Fly to the second tree on trip ===
-                    // Mount on Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, 100);
-                    enable_shiny_sound(context);
-
-                    // Now face towards the next tree
-                    pbf_move_left_joystick(context, 255, 200, 1 * TICKS_PER_SECOND, 0);
-                    pbf_mash_button(context, BUTTON_B, 100);
-                    pbf_press_button(context, BUTTON_Y, (2.1 * TICKS_PER_SECOND), 0);
-                    // Get off Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                    // Move camera down
-                    pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-                    
-                    // Now we should be on ground
-                    disable_shiny_sound(context);
-                    check_tree_no_stop(env, context);
-                    cur_tree = 7;
-                    
-                    // === Fly to the third tree on trip ===
-                    // Mount on Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, 100);
-                    enable_shiny_sound(context);
-
-                    // Now face towards the next tree
-                    pbf_move_left_joystick(context, 255, 130, 1 * TICKS_PER_SECOND, 0);
-                    pbf_press_button(context, BUTTON_B, 80, 0);
-                    pbf_press_button(context, BUTTON_Y, (2.2 * TICKS_PER_SECOND), 0);
-                    // Get off Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                    // Move camera down
-                    pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-
-                    // Now we should be on ground
-                    disable_shiny_sound(context);
-                    check_tree_no_stop(env, context);
-                    cur_tree = 8;
-
-                    // === Fly to the fifth tree ===
-                    // Mount on Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, 100);
-                    enable_shiny_sound(context);
-
-                    // Now face towards the next tree
-                    pbf_move_left_joystick(context, 0, 60, 1 * TICKS_PER_SECOND, 0);
-                    pbf_press_button(context, BUTTON_B, 90, 0);
-                    pbf_press_button(context, BUTTON_Y, (2.3 * TICKS_PER_SECOND), 0);
-                    // Get off Braviary
-                    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                    // Move camera down
-                    pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-                    // Now we should be on ground
-                },
-                {
-                    {battle_menu_detector},
-                }
-            );
-            
-            if (ret == 0){
-                env.log("Found battle during river-side traversal.");
-                if (handle_battle(env, context)){
-                    tree_counter.tree[cur_tree]++;
-                }
-                
-            } else{
-                // Check last tree
-                if (check_tree(env, context)){
-                    tree_counter.tree[9]++;
-                }
+                tree_counter.tree[9]++;
             }
 
             //  End

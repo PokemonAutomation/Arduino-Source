@@ -69,6 +69,14 @@ private:
     // battle. After that, try to go back to Height Camp again.
     void go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // From camp it will go to trees in sequence instead of heading to camp.
+    // It returns the last tree checked so the remain can be checked on single_path
+    size_t grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, TreeCounter& tree_counter);
+
+    // Check trees individually going from camp based on the last tree checked for each path
+    void single_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter);
+
+
 private:
     class Stats;
     class RunRoute;
