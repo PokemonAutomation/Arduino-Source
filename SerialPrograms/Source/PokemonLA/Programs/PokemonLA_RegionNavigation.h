@@ -20,6 +20,7 @@ namespace PokemonLA{
 
 
 void goto_professor(Logger& logger, BotBaseContext& context, Camp camp);
+
 void from_professor_return_to_jubilife(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 );

@@ -1,4 +1,4 @@
-/*  Arc Phone Detector
+/*  Dialogue Yellow Arrow Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

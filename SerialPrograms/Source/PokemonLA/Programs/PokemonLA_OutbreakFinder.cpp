@@ -14,6 +14,7 @@
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OutbreakReader.h"
@@ -91,21 +92,40 @@ std::unique_ptr<StatsTracker> OutbreakFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-
+//  Returns true if program should stop. (match found)
+//  "current_region" is set to the location of the cursor.
+//  If "current_region" is set to "MapRegion::NONE", it means an inference error.
 bool OutbreakFinder::read_outbreaks(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     MapRegion& current_region,
     const std::set<std::string>& desired
 ){
-    //  Returns true if program should stop. (match found)
-    //  "current_region" is set to the location of the cursor.
-    //  If "current_region" is set to "MapRegion::NONE", it means an inference error.
-
     Stats& stats = env.stats<Stats>();
 
     MapRegion start_region = MapRegion::NONE;
-    MapRegion no_outbreak = MapRegion::NONE;
 
+    current_region = detect_selected_region(env.console, context);
+    if (current_region == MapRegion::NONE){
+        env.console.log("Unable to detect selected region.", COLOR_RED);
+        return false;
+    }
+
+    MMOQuestionMarkDetector question_mark_detector(env.logger());
+    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+
+    // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
+    // wrong detection. So we have to check it's location again by moving the cursor to the next location
+    if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
+        // MapRegion starts with None and JUBILIFE. Skip those two, so -2.
+        size_t current_wild_area_index = (int)current_region - 2;
+        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        context.wait_for_all_requests();
+        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+        mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
+        // now mmo_appears should contain correct detection of MMO question marks.
+    }
+    
+    // reset current_region to start the looping of checking each wild area's outbreak pokemon name:
     current_region = MapRegion::NONE;
     size_t matches = 0;
     while (true){
@@ -117,23 +137,28 @@ bool OutbreakFinder::read_outbreaks(
         if (start_region == MapRegion::NONE){
             start_region = current_region;
         }else if (start_region == current_region){
+            // We've visited all the regions. Exit the loop.
             break;
         }
 
         if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
-            OutbreakReader reader(env.console, LANGUAGE, env.console);
-            OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
-            if (no_outbreak == MapRegion::NONE && result.results.empty()){
-                no_outbreak = current_region;
+            // MapRegion starts with None and JUBILIFE. Skip those two, so -2.
+            const int wild_region_index = (int)current_region - 2;
+            if (mmo_appears[wild_region_index]){
+                env.log(std::string(MAP_REGION_NAMES[(int)current_region]) + " have MMO.", COLOR_ORANGE);
             }
-            if (!result.results.empty()){
-                stats.outbreaks++;
-            }
-            for (const auto& item : result.results){
-                auto iter = desired.find(item.second.token);
-                if (iter != desired.end()){
-                    env.console.log("Found a match!", COLOR_BLUE);
-                    matches++;
+            else{
+                OutbreakReader reader(env.console, LANGUAGE, env.console);
+                OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
+                if (!result.results.empty()){
+                    stats.outbreaks++;
+                }
+                for (const auto& item : result.results){
+                    auto iter = desired.find(item.second.token);
+                    if (iter != desired.end()){
+                        env.console.log("Found a match!", COLOR_BLUE);
+                        matches++;
+                    }
                 }
             }
         }
@@ -148,19 +173,17 @@ bool OutbreakFinder::read_outbreaks(
         return true;
     }
 
-    //  Scroll to next region without an outbreak.
-    if (no_outbreak != MapRegion::NONE){
-        while (true){
-            current_region = detect_selected_region(env.console, context);
-            if (current_region == MapRegion::NONE){
-                env.console.log("Unable to detect selected region.", COLOR_RED);
-                return false;
-            }
-            if (current_region == no_outbreak){
-                break;
-            }
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
-            context.wait_for_all_requests();
+    while (true){
+        if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
+            break;
+        }
+        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        context.wait_for_all_requests();
+
+        current_region = detect_selected_region(env.console, context);
+        if (current_region == MapRegion::NONE){
+            env.console.log("Unable to detect selected region.", COLOR_RED);
+            return false;
         }
     }
 

@@ -48,7 +48,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     }
 
     m_object = extract_box_copy(reference, *best);
-//    m_object.save("test.png");
+    // m_object.save("test.png");
     m_matcher.reset(new ExactImageMatcher(m_object));
     m_area_ratio = best->area_ratio();
 }
@@ -77,7 +77,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
         return true;
     }
     double error = candidate_area_ratio / m_area_ratio;
-//    cout << "area = " << error << endl;
+    // cout << "area = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
 double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_image, const WaterfillObject& object) const{
@@ -106,11 +106,11 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_im
 }
 double WaterfillTemplateMatcher::rmsd_original(const ConstImageRef& original_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
-//        cout << "bad aspect ratio" << endl;
+        // cout << "bad aspect ratio" << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){
-//        cout << "bad area ratio" << endl;
+        // cout << "bad area ratio" << endl;
         return 99999.;
     }
 

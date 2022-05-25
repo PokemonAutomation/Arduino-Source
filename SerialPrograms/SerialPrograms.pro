@@ -445,6 +445,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
@@ -1148,6 +1149,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \

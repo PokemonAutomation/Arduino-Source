@@ -25,7 +25,14 @@ enum class MapRegion{
     ICELANDS,
     RETREAT,
 };
+
+// Map from int(MapRegion) to its region name
 extern const char* MAP_REGION_NAMES[];
+
+// from int [0, 1, 2, 3, 4] to short names of the five wild regions:
+// { "Fieldlands", "Mirelands", ... }
+// This is useful for logging purpose.
+extern const char* WILD_REGION_SHORT_NAMES[];
 
 
 enum class Camp{

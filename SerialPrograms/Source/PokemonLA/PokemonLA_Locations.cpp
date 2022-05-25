@@ -20,10 +20,17 @@ const char* MAP_REGION_NAMES[] = {
     "Crimson Mirelands",
     "Cobalt Coastlands",
     "Coronet Highlands",
-    "Alabaster Islands",
+    "Alabaster Icelands",
     "Ancient Retreat",
 };
 
+const char* WILD_REGION_SHORT_NAMES[] = {
+    "Fieldlands",
+    "Mirelands",
+    "Coastlands",
+    "Highlands",
+    "Icelands",
+};
 
 
 

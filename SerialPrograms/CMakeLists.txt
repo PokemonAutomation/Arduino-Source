@@ -889,6 +889,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h
+    Source/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.cpp
+    Source/PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp

@@ -10,8 +10,9 @@
 #include "CommonFramework/Language.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
-#include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
@@ -21,6 +22,9 @@
 #include <QImage>
 #include <iostream>
 #include <cmath>
+using std::cout;
+using std::cerr;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -80,16 +84,68 @@ int test_pokemonLA_BlackOutDetector(const QImage& image, bool target){
     return 0;
 }
 
+int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vector<std::string>& keywords){
+    
+    size_t keyword_index = 0;
+    bool hisui_found = false;
+    std::array<bool, 5> target_region_has_MMO = {false};
+    for(; keyword_index < keywords.size(); keyword_index++){
+        const std::string& word = keywords[keyword_index];
+        if (hisui_found == false){
+            if (word == "Hisui"){
+                hisui_found = true;
+            }
+            continue;
+        }
+
+        // We have found the "Hisui" keyword. So the next words will be the index of the region on the Hisui map
+        // that has MMO.
+        try{
+            int region = std::stoi(word);
+            if (region < 0 || region > 4){
+                cerr << "Error: wrong region number, must be [0, 4] but got " << region << endl;
+                return 1;
+            }
+            target_region_has_MMO[region] = true;
+        } catch(std::exception& e){
+            cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
+            return 1;
+        }
+    }
+
+    if (hisui_found == false){
+        cerr << "Error: need keyword \"Hisui\" in filename/" << endl;
+        return 1;
+    }
+
+    auto& logger = global_logger_command_line();
+
+    MMOQuestionMarkDetector detector(logger);
+
+    const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
+
+    for(size_t i = 0; i < 5; i++){
+        const bool result = region_has_MMO[i];
+        const bool target = target_region_has_MMO[i];
+        if (result != target) {
+            cerr << "Error: " << __func__ << " result on region " << i << " is " << result << " but should be " << target << "." << endl;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords){
     // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
     if (keywords.size() < 5){
-        std::cout << "Error: not enough number of keywords in the filename, found only " << keywords.size() << "." << std::endl;
+        cerr << "Error: not enough number of keywords in the filename, found only " << keywords.size() << "." << endl;
         return 1;
     }
 
     const Language language = language_code_to_enum(keywords[keywords.size()-5]);
     if (language == Language::None || language == Language::EndOfList){
-        std::cout << "Error: language keyword " << keywords[keywords.size()-5] << " is wrong." << std::endl;
+        cerr << "Error: language keyword " << keywords[keywords.size()-5] << " is wrong." << endl;
         return 1;
     }
 
@@ -102,7 +158,7 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
     } else if (shiny_word == "NotShiny"){
         is_shiny = false;
     } else{
-        std::cout << "Error: shiny keyword " << shiny_word << " is wrong. Must be \"Shiny\" or \"NotShiny\"." << std::endl;
+        cerr << "Error: shiny keyword " << shiny_word << " is wrong. Must be \"Shiny\" or \"NotShiny\"." << endl;
         return 1;
     }
 
@@ -113,7 +169,7 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
     } else if (alpha_word == "NotAlpha"){
         is_alpha = false;
     } else{
-        std::cout << "Error: alpha keyword " << alpha_word << " is wrong. Must be \"Alpha\" or \"NotAlpha\"." << std::endl;
+        cerr << "Error: alpha keyword " << alpha_word << " is wrong. Must be \"Alpha\" or \"NotAlpha\"." << endl;
         return 1;
     }
 
@@ -127,7 +183,7 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
     } else if (gender_word == "Genderless"){
         gender = Gender::Genderless;
     } else {
-        std:: cout << "Error: gender keyword " << gender_word << " is wrong. Must be \"Male\", \"Female\" or \"Genderless\"." << std::endl;
+        cerr << "Error: gender keyword " << gender_word << " is wrong. Must be \"Male\", \"Female\" or \"Genderless\"." << endl;
         return 1;
     }
 
@@ -148,11 +204,11 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
         }
     }
     if (found_name == false){
-        std::cout << "Error: " << __func__ << " name result is ";
+        cerr << "Error: " << __func__ << " name result is ";
         for(const auto& slg : details.name_candidates){
-            std::cout << slg << ", ";
+            cerr << slg << ", ";
         }
-        std::cout << "but should be " << pokemon_slug << "." << std::endl;
+        cerr << "but should be " << pokemon_slug << "." << endl;
         return 1;
     }
 

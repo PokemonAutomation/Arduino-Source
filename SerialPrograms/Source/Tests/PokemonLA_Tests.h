@@ -28,6 +28,8 @@ int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target)
 
 int test_pokemonLA_BlackOutDetector(const QImage& image, bool target);
 
+int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image,  const std::vector<std::string>& keywords);
+
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords);
 
 int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, float threshold);
