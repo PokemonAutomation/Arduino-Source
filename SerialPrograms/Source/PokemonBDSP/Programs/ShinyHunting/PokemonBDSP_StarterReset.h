@@ -43,6 +43,7 @@ private:
 
     Pokemon::PokemonNameSelect STARTER;
 
+    BooleanCheckBoxOption USE_SOUND_DETECTION;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
     EventNotificationOption NOTIFICATION_NONSHINY;
     EventNotificationOption NOTIFICATION_SHINY;

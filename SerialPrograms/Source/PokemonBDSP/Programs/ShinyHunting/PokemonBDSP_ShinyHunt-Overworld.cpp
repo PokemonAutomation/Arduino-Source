@@ -119,7 +119,8 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
             env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
-            std::chrono::seconds(30)
+            std::chrono::seconds(30),
+            ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
 //        result_wild.shiny_type = ShinyType::UNKNOWN_SHINY;

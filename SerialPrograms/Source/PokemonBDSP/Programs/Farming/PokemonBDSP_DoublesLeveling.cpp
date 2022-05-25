@@ -180,7 +180,8 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
             env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
-            std::chrono::seconds(30)
+            std::chrono::seconds(30),
+            ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
         bool stop = handler.handle_standard_encounter(result_wild);

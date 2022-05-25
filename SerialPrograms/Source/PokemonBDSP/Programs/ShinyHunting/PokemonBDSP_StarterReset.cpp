@@ -45,6 +45,8 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
         {"turtwig", "chimchar", "piplup"},
         "turtwig"
     )
+    , USE_SOUND_DETECTION("<b>Use sound detection:</b><br>Use sound to improve shiny detection. "
+        "<b>Make sure you have correct audio input set.</b>", false)
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
         true
@@ -69,6 +71,7 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
 //    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(STARTER);
+    PA_ADD_OPTION(USE_SOUND_DETECTION);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -189,7 +192,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             env.console, context,
             result_wild, result_own,
             YOUR_POKEMON,
-            std::chrono::seconds(30)
+            std::chrono::seconds(30),
+            USE_SOUND_DETECTION
         );
 
 //        if (result_wild.shiny_type == ShinyType::UNKNOWN || result_own.shiny_type == ShinyType::UNKNOWN){

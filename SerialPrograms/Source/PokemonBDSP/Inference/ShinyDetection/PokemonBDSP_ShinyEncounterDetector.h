@@ -121,9 +121,9 @@ void detect_shiny_battle(
     ShinyDetectionResult& your_result,
     const DetectionType& type,
     std::chrono::seconds timeout,
+    bool use_shiny_sound = false,
     double overall_threshold = 5.0,
-    double doubles_threshold = 3.0,
-    bool use_shiny_sound = false
+    double doubles_threshold = 3.0
 );
 
 

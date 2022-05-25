@@ -226,8 +226,8 @@ void detect_shiny_battle(
     ShinyDetectionResult& your_result,
     const DetectionType& type,
     std::chrono::seconds timeout,
-    double overall_threshold, double doubles_threshold,
-    bool use_shiny_sound
+    bool use_shiny_sound,
+    double overall_threshold, double doubles_threshold
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
