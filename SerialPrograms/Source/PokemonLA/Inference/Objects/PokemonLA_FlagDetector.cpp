@@ -104,7 +104,7 @@ FlagDetector::FlagDetector()
     )
 {}
 void FlagDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
-    if (object.area < 100){
+    if (object.area < 50){
         return;
     }
     if (object.height() > 0.04 * image.height()){
