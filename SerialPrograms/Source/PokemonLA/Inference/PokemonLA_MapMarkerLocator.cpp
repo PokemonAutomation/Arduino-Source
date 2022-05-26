@@ -49,13 +49,13 @@ float get_orientation_on_map(const QImage& screen, bool avoid_lava_area){
     Kernels::Waterfill::WaterfillObject red_marker_obj;
     bool found_red_marker = false;
     // Since the lava area in coastlands is also red, to avoid confusion, we avoid the lava area:
-    const int lava_min_x = screen.width() * 0.636;
-    const int lava_max_x = screen.width() * 0.7 + 0.5;
-    const int lava_min_y = screen.height() * 0.124;
-    const int lava_max_y = screen.height() * 0.243 + 0.5;
+    const size_t lava_min_x = (size_t)(screen.width() * 0.636);
+    const size_t lava_max_x = (size_t)(screen.width() * 0.7 + 0.5);
+    const size_t lava_min_y = (size_t)(screen.height() * 0.124);
+    const size_t lava_max_y = (size_t)(screen.height() * 0.243 + 0.5);
     while (finder->find_next(red_marker_obj, true)){
-        const int center_x = red_marker_obj.center_x();
-        const int center_y = red_marker_obj.center_y();
+        const size_t center_x = red_marker_obj.center_x();
+        const size_t center_y = red_marker_obj.center_y();
         if (center_x >= lava_min_x && center_x <= lava_max_x && center_y >= lava_min_y && center_y <= lava_max_y){
             // Skip lava area
             continue;
@@ -95,8 +95,8 @@ float get_orientation_on_map(const QImage& screen, bool avoid_lava_area){
     // The angle of each marker end relative to the marker center
     float end_angles[3] = {0.0f, 0.0f, 0.0f};
     for(int i = 0; i < 3; i++){
-        pxint_t x = (pxint_t)marker_ends[i].center_x() - local_marker_center_x;
-        pxint_t y = (pxint_t)marker_ends[i].center_y() - local_marker_center_y;
+        pxint_t x = (pxint_t)marker_ends[i].center_x() - (pxint_t)local_marker_center_x;
+        pxint_t y = (pxint_t)marker_ends[i].center_y() - (pxint_t)local_marker_center_y;
         float angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;
@@ -125,7 +125,7 @@ float get_orientation_on_map(const QImage& screen, bool avoid_lava_area){
     float red_marker_direction = end_angles[(min_angle_distance_index+2)%3];
     cout << "Found red marker direction " << red_marker_direction << endl;
 
-    output.setPixelColor(red_marker_obj.center_x(), red_marker_obj.center_y(), QColor(255, 0, 0));
+    output.setPixelColor((int)red_marker_obj.center_x(), (int)red_marker_obj.center_y(), QColor(255, 0, 0));
     output.save("./test_map_location.png");
 
     return red_marker_direction;

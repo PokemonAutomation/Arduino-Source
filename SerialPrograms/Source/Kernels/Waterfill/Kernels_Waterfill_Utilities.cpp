@@ -59,7 +59,7 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(const WaterfillObjec
         }
     }
 
-    return std::make_pair<PackedBinaryMatrix2, size_t>(std::move(matrix), distance_sqr_th);
+    return std::pair<PackedBinaryMatrix2, size_t>(std::move(matrix), distance_sqr_th);
 }
 
 
