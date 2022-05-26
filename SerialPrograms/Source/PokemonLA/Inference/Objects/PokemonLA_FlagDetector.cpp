@@ -214,7 +214,7 @@ std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObj
             best_digit = item.first;
         }
     }
-    if (best_rmsd > 80){
+    if (best_rmsd > 100){
         best_digit = -1;
     }
     return {best_rmsd, best_digit};
