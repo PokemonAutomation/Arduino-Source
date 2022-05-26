@@ -134,7 +134,7 @@ std::unique_ptr<StatsTracker> BurmyFinder::make_stats() const{
 
 
 struct BurmyFinder::TreeCounter{
-    std::array<uint64_t, 16> tree = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::array<uint64_t, 16> tree = {};
     
     void log(Logger& logger) const{
         std::ostringstream oss;
