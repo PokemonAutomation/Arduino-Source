@@ -188,11 +188,11 @@ void determine_shiny_status(
     }
     logger.log(
         "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
-        (wild_shiny_sound_detected ? "(shiny sound detected)" : "") +
+        (wild_shiny_sound_detected ? " (shiny sound detected)" : "") +
         ", Left Alpha = " + QString::number(alpha_wild_left) +
         ", Right Alpha = " + QString::number(alpha_wild_right) +
         ", Your Alpha = " + QString::number(alpha_own) + 
-        (own_shiny_sound_detected ? "(shiny sound detected)" : ""),
+        (own_shiny_sound_detected ? " (shiny sound detected)" : ""),
         COLOR_PURPLE
     );
 

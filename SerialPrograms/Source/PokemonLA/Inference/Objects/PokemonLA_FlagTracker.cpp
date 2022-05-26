@@ -96,7 +96,17 @@ bool FlagTracker::process_frame(const QImage& frame, WallClock timestamp){
         sample.x = (double)(flags[0].min_x + flags[0].max_x) / (frame.width() * 2);
         sample.y = (double)(flags[0].min_y + flags[0].max_y) / (frame.height() * 2);
         sample.distance = read_flag_distance(frame, sample.x, sample.y);
+
+#if 0
 //        cout << sample.distance << endl;
+        if (sample.distance > 0 && sample.distance < 10){
+            static int c = 0;
+            frame.save("test-" + QString::number(c++) + ".png");
+        }
+#endif
+    }else{
+//        frame.save("test.png");
+//        cout << "no flag" << endl;
     }
 
 

@@ -10,6 +10,10 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "SubObjectTemplateMatcher.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ImageMatch{
 

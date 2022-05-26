@@ -104,7 +104,7 @@ FlagDetector::FlagDetector()
     )
 {}
 void FlagDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
-    if (object.area < 100){
+    if (object.area < 50){
         return;
     }
     if (object.height() > 0.04 * image.height()){
@@ -117,9 +117,12 @@ void FlagDetector::process_object(const ConstImageRef& image, const WaterfillObj
         return;
     }
     ImagePixelBox object_box;
+
+//    cout << "left" << endl;
     if (FlagMatcher::left().matches(object_box, image, object)){
         m_left.emplace_back(object_box);
     }
+//    cout << "right" << endl;
     if (FlagMatcher::right().matches(object_box, image, object)){
         m_right.emplace_back(object_box);
     }
@@ -214,7 +217,8 @@ std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObj
             best_digit = item.first;
         }
     }
-    if (best_rmsd > 80){
+//    cout << best_rmsd << endl;
+    if (best_rmsd > 100){
         best_digit = -1;
     }
     return {best_rmsd, best_digit};
@@ -270,7 +274,10 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
                 ){
                     continue;
                 }
-//                extract_box(image, object).save("image-" + QString::number(c++) + ".png");
+
+//                static int c = 0;
+//                extract_box_reference(image, object).save("image-" + QString::number(c++) + ".png");
+
                 std::pair<double, int> digit = read_digit(image, object);
                 if (digit.second >= 0){
                     hits.emplace(
@@ -291,10 +298,11 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
         return -1;
     }
 
-//    for (const auto& item : hits){
-//        cout << item.first << " : " << item.second.min_x << " - " << item.second.max_x << endl;
-//    }
-
+#if 0
+    for (const auto& item : hits){
+        cout << item.first << " : " << item.second.min_x << " - " << item.second.max_x << " : " << item.second.digit << endl;
+    }
+#endif
 
 
     //  Remove overlapping detections by picking the one with strongest detection on each overlap.
