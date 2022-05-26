@@ -596,6 +596,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
@@ -905,6 +907,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h
+    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.cpp
+    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.h
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp

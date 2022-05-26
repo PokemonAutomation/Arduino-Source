@@ -19,6 +19,7 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 
 #include <QVideoFrame>
 
@@ -100,11 +101,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+    FlagTracker tracker(logger, overlay);
+
+    QImage image("test-57.png");
+    tracker.process_frame(image, current_time());
+
 
 
 //    InferenceBoxScope box(overlay, 0.843, 0.96, 0.075, 0.005);
 
-    is_pokemon_selection(overlay, feed.snapshot().frame);
+//    is_pokemon_selection(overlay, feed.snapshot().frame);
 
 
 

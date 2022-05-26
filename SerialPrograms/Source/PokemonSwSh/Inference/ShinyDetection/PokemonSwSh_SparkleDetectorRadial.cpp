@@ -8,6 +8,7 @@
 #include <set>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 
 #include <iostream>
@@ -35,48 +36,9 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
     if (object.area > 10000){
         return;
     }
-    m_matrix = object.packed_matrix();
-    size_t width = m_matrix.width();
-    size_t height = m_matrix.height();
-//    cout << m_matrix.dump() << endl;
 
-    //  Sort all pixels by distance from center.
-    size_t center_x = object.center_x() - object.min_x;
-    size_t center_y = object.center_y() - object.min_y;
-    std::map<uint64_t, size_t> distances;
-    for (size_t r = 0; r < height; r++){
-        for (size_t c = 0; c < width; c++){
-            if (m_matrix.get(c, r)){
-                size_t dist_x = c - center_x;
-                size_t dist_y = r - center_y;
-                uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
-                distances[distance_sqr]++;
-            }
-        }
-    }
-
-    //  Filter out the bottom 85%.
-    size_t stop = (size_t)(0.85 * object.area);
-    size_t count = 0;
-    uint64_t distance = 0;
-    for (auto& item : distances){
-        count += item.second;
-        if (count >= stop){
-            distance = item.first;
-            break;
-        }
-    }
-    m_radius_sqr = distance;
-    for (size_t r = 0; r < height; r++){
-        for (size_t c = 0; c < width; c++){
-            size_t dist_x = c - center_x;
-            size_t dist_y = r - center_y;
-            uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
-            if (distance_sqr < distance){
-                m_matrix.set(c, r, false);
-            }
-        }
-    }
+    const size_t stop = (size_t)(0.85 * object.area);
+    std::tie(m_matrix, m_radius_sqr) = remove_center_pixels(object, stop);
 
     //  Find new regions.
     PackedBinaryMatrix2 matrix = m_matrix.copy();

@@ -22,7 +22,7 @@ namespace PokemonLA{
 
 ItemCompatibility detect_item_compatibility(const QImage& screen){
     // The Compatible/Incompatible text region of the lead pokemon on the screen.
-    ImageFloatBox box(0.838, 0.1815, 0.090, 0.024);
+    const ImageFloatBox box(0.838, 0.1815, 0.090, 0.024);
 
     QImage region = extract_box_copy(screen, box);
 

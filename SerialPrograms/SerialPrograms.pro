@@ -305,6 +305,7 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -453,6 +454,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
@@ -995,6 +997,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
@@ -1154,6 +1157,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \

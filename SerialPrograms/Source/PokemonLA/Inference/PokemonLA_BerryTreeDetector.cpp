@@ -14,6 +14,7 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
@@ -33,35 +34,6 @@ using Kernels::DisjointSet;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-
-void set_color_to_image(const WaterfillObject& obj, const QColor& color, QImage& image, size_t offset_x, size_t offset_y){
-    for (size_t x = 0; x < obj.width(); x++){
-        for (size_t y = 0; y < obj.height(); y++){
-            if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                image.setPixelColor(
-                    (pxint_t)(offset_x + obj.min_x + x),
-                    (pxint_t)(offset_y + obj.min_y + y),
-                    color
-                );
-                // cout << "Set color at " << offset_x + object.min_x + obj.min_x + x << ", " << offset_y + object.min_y + obj.min_y + y << endl;
-            }
-        }
-    }
-}
-
-void set_color_to_image(const PackedBinaryMatrix2& matrix, const QColor& color, QImage& image, size_t offset_x, size_t offset_y){
-    for (size_t x = 0; x < matrix.width(); x++){
-        for (size_t y = 0; y < matrix.height(); y++){
-            if (matrix.get(x, y)){
-                image.setPixelColor(
-                    (pxint_t)(offset_x + x),
-                    (pxint_t)(offset_y + y),
-                    color
-                );
-            }
-        }
-    }
-}
 
 // Merge boxes that overlap with each other, meaning ImagePixelBox::overlap_with() return true.
 // return a vector of boxes that are merged versions of the input boxes.
@@ -116,23 +88,6 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
 
 bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, QImage* image, size_t offset_x, size_t offset_y){
     PackedBinaryMatrix2 matrix = object.packed_matrix();
-    size_t width = matrix.width();
-    size_t height = matrix.height();
-
-    //  Sort all pixels by distance from center.
-    size_t center_x = object.center_x() - object.min_x;
-    size_t center_y = object.center_y() - object.min_y;
-    std::map<uint64_t, size_t> distances;
-    for (size_t r = 0; r < height; r++){
-        for (size_t c = 0; c < width; c++){
-            if (matrix.get(c, r)){
-                size_t dist_x = c - center_x;
-                size_t dist_y = r - center_y;
-                uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
-                distances[distance_sqr]++;
-            }
-        }
-    }
 
     cout << "Object area in detection sphere: " << object.area << endl;
     double threshold = 0.3;
@@ -143,31 +98,10 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, QImage* im
         // threshold from 0.3 to 0.5.
         threshold = 0.3 + 0.2 * (std::sqrt(object.area) - 10.0) / 20.0;
     }
+    const size_t stop = (size_t)(threshold * object.area);
 
-    //  Filter out the bottom 30%-50%.
-    size_t stop = (size_t)(threshold * object.area);
-    size_t count = 0;
-    uint64_t distance = 0;
-    for (auto& item : distances){
-        count += item.second;
-        if (count >= stop){
-            distance = item.first;
-            break;
-        }
-    }
+    PackedBinaryMatrix2 matrix2 = remove_center_pixels(object, stop).first;
 
-    for (size_t r = 0; r < height; r++){
-        for (size_t c = 0; c < width; c++){
-            size_t dist_x = c - center_x;
-            size_t dist_y = r - center_y;
-            uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
-            if (distance_sqr < distance){
-                matrix.set(c, r, false);
-            }
-        }
-    }
-
-    PackedBinaryMatrix2 matrix2 = matrix.copy();
     auto session = Kernels::Waterfill::make_WaterfillSession(matrix2);
     auto finder = session->make_iterator(1);
     Kernels::Waterfill::WaterfillObject obj;
@@ -357,7 +291,7 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
             {combine_rgb(70, 30, 0), combine_rgb(160, 110, 100)}
         });
 
-        // set_color_to_image(full_color_matrix, QColor(0, 0, 255), debug_image, candidate_box.min_x, candidate_box.min_y);
+        // Kernels::Waterfill::draw_matrix_on_image(full_color_matrix, combine_rgb(0, 0, 255), debug_image, candidate_box.min_x, candidate_box.min_y);
 
         session->set_source(full_color_matrix);
         const size_t berry_min_area = core_color_min_area * 3;

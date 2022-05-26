@@ -40,7 +40,10 @@ extern const DetectionType YOUR_POKEMON;
 
 
 
-
+// Used by detect_shiny_battle to detect dialog timing and 
+// shiny sparkle animation to determine whether there is shiny pokemon
+// when battle starts.
+// See detect_shiny_battle() for more details.
 class ShinyEncounterTracker : public VisualInferenceCallback{
     using EncounterDialogTracker = PokemonSwSh::EncounterDialogTracker;
 
@@ -56,6 +59,9 @@ public:
     const ShinySparkleAggregator& sparkles_wild_right() const{ return m_best_wild_right; }
     const ShinySparkleAggregator& sparkles_own() const{ return m_best_own; }
 
+    const WallClock& wild_animtion_end_timestmap() const { return m_wild_animation_end_timestamp; }
+    const WallClock& your_animation_end_timestamp() const { return m_your_animation_end_timestamp; }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
@@ -70,6 +76,8 @@ private:
 
     BattleDialogDetector m_dialog_detector;
     EncounterDialogTracker m_dialog_tracker;
+    WallClock m_wild_animation_end_timestamp;
+    WallClock m_your_animation_end_timestamp;
 
     ImageFloatBox m_box_wild_left;
     ImageFloatBox m_box_wild_right;
@@ -105,20 +113,17 @@ private:
 // If the highest alpha detected on the cropped view of the left pokemon slot reaches 
 // `doubles_threshold`, it is considered a shiny on left. Same to the right slot.
 //
-// When `use_shiny_sound` is true, the function also use a shiny sound detector to improve
-// its detection on wild pokemon.
+// The function also use a shiny sound detector to improve its detection on wild pokemon.
 // When a shiny sound is detected, it adds 5.0 to the heighest overall alpha value.
-// Note: shiny sound will trigger a detection when your own shiny pokemon leads the battle.
-// Don't send shiny pokemon if you want to use shiny sound detection.
 void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,
     std::chrono::seconds timeout,
+    bool use_shiny_sound = false,
     double overall_threshold = 5.0,
-    double doubles_threshold = 3.0,
-    bool use_shiny_sound = false
+    double doubles_threshold = 3.0
 );
 
 

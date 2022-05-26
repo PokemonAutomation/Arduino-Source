@@ -22,7 +22,9 @@ namespace PokemonBDSP{
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions(bool enable_overrides, bool allow_autocatch)
-        : FILTER(enable_overrides, allow_autocatch)
+        : USE_SOUND_DETECTION("<b>Use sound detection:</b><br>Use sound to improve shiny detection.<br>"
+            "<b>Make sure you have correct audio input set.</b>", false)
+        , FILTER(enable_overrides, allow_autocatch)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
             true
@@ -49,10 +51,12 @@ public:
             {"Notifs"}
         )
     {
+        PA_ADD_OPTION(USE_SOUND_DETECTION);
         PA_ADD_OPTION(FILTER);
         PA_ADD_OPTION(VIDEO_ON_SHINY);
     }
 
+    BooleanCheckBoxOption USE_SOUND_DETECTION;
     EncounterFilterOption FILTER;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 

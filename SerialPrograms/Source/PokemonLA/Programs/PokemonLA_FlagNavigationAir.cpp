@@ -310,7 +310,11 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
 //        m_console.log("Flag not detected.", COLOR_ORANGE);
     }
 #if 1
-    if (m_flag_detected && m_flag_distance >= 0 && m_last_flag_print + std::chrono::seconds(1) <= timestamp){
+    if (true
+        && m_flag_detected
+        && m_flag_distance >= 0
+        && m_last_flag_print + std::chrono::seconds(1) <= timestamp
+    ){
         std::stringstream ss;
         ss << "Flag: Distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
            << ", x = " << m_flag_x << ", y = " << m_flag_y << std::endl;

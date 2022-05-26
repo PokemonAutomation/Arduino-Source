@@ -164,7 +164,8 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
-            std::chrono::seconds(30)
+            std::chrono::seconds(30),
+            ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
         bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);

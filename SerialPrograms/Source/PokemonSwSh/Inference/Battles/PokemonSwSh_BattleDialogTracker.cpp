@@ -37,10 +37,10 @@ void EncounterDialogTracker::make_overlays(VideoOverlaySet& items) const{
 bool EncounterDialogTracker::process_frame(const QImage& screen, WallClock timestamp){
     bool dialog_on = m_dialog_detector.detect(screen);
 //    cout << dialog_on << endl;
-    if (dialog_on == m_dialog_on){
+    if (dialog_on == m_dialog_on.load(std::memory_order_relaxed)){
         return false;
     }
-    m_dialog_on = dialog_on;
+    m_dialog_on.store(dialog_on, std::memory_order_release);
 
     if (!dialog_on){
         m_end_dialog = timestamp;
@@ -55,20 +55,21 @@ bool EncounterDialogTracker::process_frame(const QImage& screen, WallClock times
         COLOR_PURPLE
     );
 
-    switch (m_state){
+    EncounterState state = m_state.load(std::memory_order_relaxed);
+    switch (state){
     case EncounterState::BEFORE_ANYTHING:
-        m_state = (EncounterState)((size_t)m_state + 1);
+        m_state.store((EncounterState)((size_t)state + 1), std::memory_order_release);
         m_logger.log("DialogTracker: Starting wild animation.", COLOR_PURPLE);
         break;
     case EncounterState::WILD_ANIMATION:
-        m_state = (EncounterState)((size_t)m_state + 1);
-        m_logger.log("DialogTracker: Starting your animation.", COLOR_PURPLE);
         m_wild_animation_duration = gap_duration;
+        m_state.store((EncounterState)((size_t)state + 1), std::memory_order_release);
+        m_logger.log("DialogTracker: Starting your animation.", COLOR_PURPLE);
         break;
     case EncounterState::YOUR_ANIMATION:
-        m_state = (EncounterState)((size_t)m_state + 1);
-        m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
         m_your_animation_duration = gap_duration;
+        m_state.store((EncounterState)((size_t)state + 1), std::memory_order_release);
+        m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
         break;
     case EncounterState::POST_ENTRY:
         m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
@@ -83,7 +84,8 @@ void EncounterDialogTracker::push_end(WallClock timestamp){
         QString::number(gap_duration.count() / 1000.) + " seconds",
         COLOR_PURPLE
     );
-    switch (m_state){
+    EncounterState state = m_state.load(std::memory_order_relaxed);
+    switch (state){
     case EncounterState::BEFORE_ANYTHING:
         break;
     case EncounterState::WILD_ANIMATION:

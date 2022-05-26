@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <string>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -33,6 +34,8 @@ namespace PokemonAutomation{
 using ImageFilenameFunction = std::function<int(const QImage& image, const std::string& filename_base)>;
 
 using ImageBoolDetectorFunction = std::function<int(const QImage& image, bool target)>;
+
+using ImageFloatDetectorFunction = std::function<int(const QImage& image, float target, float threshold)>;
 
 using ImageKeywordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& keywords)>;
 
@@ -114,6 +117,34 @@ int image_keywords_detector_helper(ImageKeywordsDetectorFunction test_func, cons
     return image_filename_detector_helper(test_path, parse_filename_and_run_test);
 }
 
+// Helper for testing detector code that reads an image and returns a non-negative float that can be described
+// in the filename for example <name_base>-0.4.png.
+int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_func, const std::string& test_path){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& keywords) -> int{
+        if (keywords.size() < 2){
+            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
+            return 1;
+        }
+
+        auto parse_float = [&](const std::string& str, float& number) -> bool {
+            std::istringstream iss(str);
+            iss >> number;
+            return iss.eof() && !iss.fail();
+        };
+
+        float target_number = 0.0f, threshold = 0.0f;
+
+        if (parse_float(keywords[keywords.size()-2], target_number) == false || parse_float(keywords[keywords.size()-1], threshold) == false){
+            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
+            return 1;
+        }
+
+        return test_func(image, target_number, threshold);
+    };
+
+    return image_keywords_detector_helper(parse_filename_and_run_test, test_path);
+}
+
 
 // Helper for testing sdetector code that reads an image and returns nothing.
 // This is used for developing visual inference code where the developer writes custom
@@ -189,6 +220,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_BlackOutDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BlackOutDetector, _1)},
     {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
+    {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)}
 };
 
