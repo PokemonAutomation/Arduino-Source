@@ -55,7 +55,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image){
     Kernels::Waterfill::WaterfillObject object;
 
     // The MMO question mark is about 310 pixels on an 1080P image.
-    // It should be about 890 pixels on 720P image
+    // It should be about 130 pixels on 720P image
 
     const size_t min_area = 100;
     bool detected = false;
