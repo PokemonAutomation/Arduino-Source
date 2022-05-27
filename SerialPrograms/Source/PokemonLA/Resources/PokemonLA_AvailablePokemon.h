@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 const std::vector<std::string>& HISUI_DEX_SLUGS();
 
-
+// List of pokemon in Hisui dex order that appear in Massive Outbreak.
 const std::vector<std::string>& HISUI_OUTBREAK_SLUGS();
 
 

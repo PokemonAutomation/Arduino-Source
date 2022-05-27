@@ -21,9 +21,55 @@
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_OutbreakFinder.h"
 
+#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "Common/Qt/ImageOpener.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+
+namespace {
+
+Pokemon::ExtraNames load_mmo_names(){
+    Pokemon::ExtraNames names;
+
+    const std::string slugs[5] = {
+        "fieldlands-mmo",
+        "mirelands-mmo",
+        "coastlands-mmo",
+        "highlands-mmo",
+        "icelands-mmo"
+    };
+
+    const QString display_names[5] = {
+        "Fieldlands MMO",
+        "Mirelands MMO",
+        "Coastlands MMO",
+        "Highlands MMO",
+        "Icelands MMO"
+    };
+
+    QString mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
+    QImage mmo_sprite = open_image(mmo_symbol_path);
+    QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite));
+
+
+    for(size_t i = 0; i < 5; i++){
+        names.name_list.emplace_back(slugs[i]);
+        names.names.emplace(slugs[i], std::make_pair(display_names[i], mmo_pixmap));
+        names.display_name_to_slug.emplace(display_names[i], slugs[i]);
+    }
+
+    return names;
+}
+
+const Pokemon::ExtraNames& MMO_NAMES(){
+    const static Pokemon::ExtraNames mmo_names = load_mmo_names();
+    return mmo_names;
+}
+
+
+} // anonymous namespace
 
 
 OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
@@ -45,7 +91,8 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     , DESIRED_SLUGS(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
         ALL_POKEMON_ICONS(),
-        HISUI_OUTBREAK_SLUGS()
+        HISUI_OUTBREAK_SLUGS(),
+        &MMO_NAMES()
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(
@@ -73,17 +120,20 @@ public:
         : checks(m_stats["Checks"])
         , errors(m_stats["Errors"])
         , outbreaks(m_stats["Outbreaks"])
+        , mmos(m_stats["MMOs"])
         , matches(m_stats["Matches"])
     {
         m_display_order.emplace_back("Checks");
         m_display_order.emplace_back("Errors", true);
         m_display_order.emplace_back("Outbreaks");
+        m_display_order.emplace_back("MMOs");
         m_display_order.emplace_back("Matches", true);
     }
 
     std::atomic<uint64_t>& checks;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& outbreaks;
+    std::atomic<uint64_t>& mmos;
     std::atomic<uint64_t>& matches;
 };
 
@@ -124,12 +174,31 @@ bool OutbreakFinder::read_outbreaks(
         context.wait_for_all_requests();
         auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
+        if (new_mmo_read[current_wild_area_index]){
+            add_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
+        }
         // now mmo_appears should contain correct detection of MMO question marks.
     }
-    
+
     // reset current_region to start the looping of checking each wild area's outbreak pokemon name:
     current_region = MapRegion::NONE;
     size_t matches = 0;
+
+    // First, check whether we match MMOs:
+    const auto& mmo_names = MMO_NAMES();
+    for (int i = 0; i < 5; i++){
+        if (mmo_appears[i]){
+            auto iter = desired.find(mmo_names.name_list[i]);
+            if (iter != desired.end()){
+                env.console.log("Found a match!", COLOR_BLUE);
+                matches++;
+            }
+            stats.mmos++;
+        }
+    }
+    env.update_stats();
+    
+    // Next, go to each region, read the outbreak names:
     while (true){
         current_region = detect_selected_region(env.console, context);
         if (current_region == MapRegion::NONE){

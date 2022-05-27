@@ -42,7 +42,10 @@ public:
             parent,
             m_factory.m_icons,
             m_factory.m_slug_list,
-            m_slug
+            m_slug,
+            (m_factory.m_extra_names ? &m_factory.m_extra_names->names : nullptr),
+            (m_factory.m_extra_names ? &m_factory.m_extra_names->name_list : nullptr),
+            (m_factory.m_extra_names ? &m_factory.m_extra_names->display_name_to_slug : nullptr)
         );
         box->connect(
             box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -65,10 +68,13 @@ PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon
     : m_icons(icons)
     , m_slug_list(NATIONAL_DEX_SLUGS())
 {}
-PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list)
+PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
+    const ExtraNames* extra_names)
     : m_icons(icons)
     , m_slug_list(std::move(slug_list))
+    , m_extra_names(extra_names)
 {}
+
 QStringList PokemonNameListFactory::make_header() const{
     QStringList list;
     list << STRING_POKEMON;
@@ -85,8 +91,9 @@ PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIco
     : PokemonNameListFactory(icons)
     , EditableTableOption(std::move(label), *this)
 {}
-PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list)
-    : PokemonNameListFactory(icons, std::move(slug_list))
+PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
+    const ExtraNames* extra_names)
+    : PokemonNameListFactory(icons, std::move(slug_list), extra_names)
     , EditableTableOption(std::move(label), *this)
 {}
 
