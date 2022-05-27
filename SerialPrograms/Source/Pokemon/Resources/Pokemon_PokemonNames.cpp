@@ -116,6 +116,24 @@ const std::string& parse_pokemon_name_nothrow(const QString& display_name){
     return iter->second;
 }
 
+std::vector<std::string> load_pokemon_slug_json_list(const char* json_path){
+    QString path = RESOURCE_PATH() + json_path;
+    QJsonArray json = read_json_file(path).array();
+
+    std::vector<std::string> list;
+    for (const auto& item : json){
+        QString slug_qstr = item.toString();
+        if (slug_qstr.size() <= 0){
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                path.toStdString()
+            );
+        }
+        list.emplace_back(slug_qstr.toStdString());
+    }
+    return list;
+}
 
 }
 }

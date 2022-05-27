@@ -27,7 +27,6 @@ struct ExtraNames{
 
 class PokemonNameListFactory : public EditableTableFactory{
 public:
-    PokemonNameListFactory(const std::map<std::string, QIcon>& icons);
     PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
         const ExtraNames* extra_names = nullptr);
 
@@ -44,8 +43,14 @@ private:
 
 class PokemonNameList : public PokemonNameListFactory, public EditableTableOption{
 public:
-    // Show all pokemon and 
-    PokemonNameList(QString label, const std::map<std::string, QIcon>& icons);
+    // Config Widget that users can select zero to any number of pokemon in a table, where each table row
+    // is a dropdown menu to select a pokemon.
+    // label: explanatary text of the config widget.
+    // icons: pokemon slug -> pokemon image icon. The mapping to add pokemon icons on the UI.
+    // slug_list: list of pokemon slug to display on the UI for the user to choose. If a pokemon in this list does not
+    //   appear in `icons`, its icon will be missing on the UI.
+    // extra_names: optional non-pokemon items to choose on the UI. Those extra items will appear after all the available
+    //   pokemon on the UI. Example usage of `extra_names`: choose MMO along with other outbreak pokemon in LA.
     PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
         const ExtraNames* extra_names = nullptr);
 

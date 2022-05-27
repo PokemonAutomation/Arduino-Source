@@ -7,7 +7,6 @@
 #include <QJsonValue>
 #include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "Pokemon_NameSelectWidget.h"
 #include "Pokemon_NameListOption.h"
@@ -64,10 +63,6 @@ private:
 
 
 
-PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons)
-    : m_icons(icons)
-    , m_slug_list(NATIONAL_DEX_SLUGS())
-{}
 PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
     const ExtraNames* extra_names)
     : m_icons(icons)
@@ -87,10 +82,6 @@ std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
 
 
 
-PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons)
-    : PokemonNameListFactory(icons)
-    , EditableTableOption(std::move(label), *this)
-{}
 PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
     const ExtraNames* extra_names)
     : PokemonNameListFactory(icons, std::move(slug_list), extra_names)

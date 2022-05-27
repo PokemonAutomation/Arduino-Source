@@ -11,9 +11,10 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -23,6 +24,16 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+namespace{
+
+// All the pokemon in all three dexes (Galar, IoA, CT) in national dex order
+const std::vector<std::string>& DEX_SLUGS_COMBIMED(){
+    static const std::vector<std::string> database = Pokemon::load_pokemon_slug_json_list("PokemonSwSh/Pokedex-Combined.json");
+    return database;
+}
+
+}
 
 
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()
@@ -51,7 +62,8 @@ DexRecFilters::DexRecFilters()
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "
         "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want.",
-        ALL_POKEMON_ICONS()
+        ALL_POKEMON_ICONS(),
+        DEX_SLUGS_COMBIMED()
     )
 {
     PA_ADD_OPTION(LANGUAGE);
