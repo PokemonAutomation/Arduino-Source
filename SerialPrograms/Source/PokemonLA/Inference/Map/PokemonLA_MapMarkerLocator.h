@@ -8,7 +8,7 @@
 #ifndef PokemonAutomation_PokemonLA_MapLocation_H
 #define PokemonAutomation_PokemonLA_MapLocation_H
 
-#include <QImage>
+class QImage;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -1,0 +1,58 @@
+/*  Selected Region Detector
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <QImage>
+
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "PokemonLA_MapZoomLevelReader.h"
+
+#include <iostream>
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+int read_map_zoom_level(const QImage& screen){
+    
+    // The three locations of the yellow disk on the zoom gauge, from left to right.
+    // Left most is Hisui map, zoom level 0. Right most is local view, zoom level 2.
+    const ImageFloatBox boxes[3] = {
+        {0.780, 0.085, 0.008, 0.014},
+        {0.795, 0.082, 0.010, 0.019},
+        {0.807, 0.081, 0.014, 0.022},
+    };
+
+    float max_yellow = 0;
+    int max_yellow_index = -1;
+
+    for(int i = 0; i < 3; i++){
+        QImage region = extract_box_copy(screen, boxes[i]);
+        // Replacing non-yellow color with zero-alpha color so that they won't be counted in
+        // the following image_stats()
+        const bool replace_background = true;
+        filter_rgb32_range(region, combine_rgb(0, 0, 0), combine_rgb(200, 200, 255), Color(0), replace_background);
+
+        const auto stats = image_stats(region);
+
+        if (std::isnan(stats.average.r) == false && std::isnan(stats.average.g) == false){
+            const float yellow = (stats.average.r + stats.average.g) / 2.0;
+            if (yellow > max_yellow){
+                max_yellow_index = i;
+                max_yellow = yellow;
+            }
+        }
+        // std::cout << "Compability color " << stats.average << " " << stats.stddev << std::endl;
+    }
+
+    return max_yellow_index;
+}
+
+
+}
+}
+}

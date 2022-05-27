@@ -877,6 +877,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.h
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.cpp
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h
+    Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.cpp
+    Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.cpp
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.cpp

@@ -37,6 +37,8 @@ using ImageBoolDetectorFunction = std::function<int(const QImage& image, bool ta
 
 using ImageFloatDetectorFunction = std::function<int(const QImage& image, float target, float threshold)>;
 
+using ImageIntDetectorFunction = std::function<int(const QImage& image, int target)>;
+
 using ImageKeywordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& keywords)>;
 
 using ImageVoidDetectorFunction = std::function<void(const QImage& image)>;
@@ -145,6 +147,32 @@ int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_fun
     return image_keywords_detector_helper(parse_filename_and_run_test, test_path);
 }
 
+int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& keywords) -> int{
+        if (keywords.size() == 0){
+            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
+            return 1;
+        }
+
+        auto parse_int = [&](const std::string& str, int& number) -> bool {
+            std::istringstream iss(str);
+            iss >> number;
+            return iss.eof() && !iss.fail();
+        };
+
+        int target_number = 0;
+
+        if (parse_int(keywords[keywords.size()-1], target_number) == false){
+            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
+            return 1;
+        }
+
+        return test_func(image, target_number);
+    };
+
+    return image_keywords_detector_helper(parse_filename_and_run_test, test_path);
+}
+
 
 // Helper for testing sdetector code that reads an image and returns nothing.
 // This is used for developing visual inference code where the developer writes custom
@@ -222,6 +250,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_MMOQuestionMarkDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_MMOQuestionMarkDetector, _1)},
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
+    {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)}
 };
 
