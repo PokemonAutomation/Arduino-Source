@@ -111,7 +111,9 @@ bool OutbreakFinder::read_outbreaks(
     }
 
     MMOQuestionMarkDetector question_mark_detector(env.logger());
+    VideoOverlaySet mmo_overlay_set(env.console);
     std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+    add_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
     // wrong detection. So we have to check it's location again by moving the cursor to the next location

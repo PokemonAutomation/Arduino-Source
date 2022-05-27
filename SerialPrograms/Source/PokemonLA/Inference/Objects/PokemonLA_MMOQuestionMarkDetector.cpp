@@ -23,6 +23,18 @@ namespace PokemonLA{
 
 using namespace Kernels::Waterfill;
 
+namespace {
+
+// The boxes that cover the locations on the Hisui map that MMO question marks will appear.
+const std::array<ImageFloatBox, 5> hisui_map_boxes{{
+    {0.362, 0.670, 0.045, 0.075},
+    {0.683, 0.555, 0.039, 0.076},
+    {0.828, 0.372, 0.042, 0.082},
+    {0.485, 0.440, 0.044, 0.080},
+    {0.393, 0.144, 0.050, 0.084}
+}};
+}
+
 MMOQuestionMarkMatcher::MMOQuestionMarkMatcher()
     : WaterfillTemplateMatcher(
         "PokemonLA/MMOQuestionMark-Template.png",
@@ -85,26 +97,19 @@ bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image){
 
 MMOQuestionMarkDetector::MMOQuestionMarkDetector(LoggerQt& logger)
     : m_logger(logger)
-    , m_boxes{{
-        {0.362, 0.670, 0.045, 0.075},
-        {0.683, 0.555, 0.039, 0.076},
-        {0.828, 0.372, 0.042, 0.082},
-        {0.485, 0.440, 0.044, 0.080},
-        {0.393, 0.144, 0.050, 0.084}
-    }}
 {}
 
 
 void MMOQuestionMarkDetector::make_overlays(VideoOverlaySet& items) const{
-    for(size_t i = 0; i < m_boxes.size(); i++){
-        items.add(COLOR_RED, m_boxes[i]);
+    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+        items.add(COLOR_RED, hisui_map_boxes[i]);
     }
 }
 
 std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImage& frame){
     std::array<bool, 5> detected{false};
-    for(size_t i = 0; i < m_boxes.size(); i++){
-        auto cropped_frame = extract_box_reference(frame, m_boxes[i]);
+    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+        auto cropped_frame = extract_box_reference(frame, hisui_map_boxes[i]);
         detected[i] = detect_MMO_question_mark(cropped_frame);
     }
     
@@ -122,7 +127,13 @@ std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImag
     return detected;
 }
 
-
+void add_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items){
+    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+        if (detection_result[i]){
+            items.add(COLOR_CYAN, hisui_map_boxes[i]);
+        }
+    }
+}
 
 
 

@@ -2,11 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  When you leave the village to choose a destination with MMO happening,
- *  There are some texts shown on the upper left corner of the screen:
- *  "Massive Massive Outbreak"
- *  "??????"
- *  This detector detects this string of six question marks.
+ *  Detect MMO question mark symbol.
  */
 
 #ifndef PokemonAutomation_PokemonLA_MMOQuestionMarkDetector_H
@@ -44,16 +40,20 @@ public:
 
     void make_overlays(VideoOverlaySet& items) const;
 
+    // Detect the MMO question marks on the Hisui map when you leave village.
+    // Return an array of bool, each bool is whether MMO appears on one of the 
+    // wild region. The order of the bool is the same order as the game progession:
+    // Fieldlands, Mirelands, Coastlands, Highlands, Icelands.
     std::array<bool, 5> detect_MMO_on_hisui_map(const QImage& frame);
 
 private:
     LoggerQt& m_logger;
-
-    std::array<ImageFloatBox, 5> m_boxes;
 };
 
-
+// Detect the presense of MM question mark on an image
 bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image);
+
+void add_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items);
 
 
 }
