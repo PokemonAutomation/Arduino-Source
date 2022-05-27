@@ -1,7 +1,8 @@
 /*  Notification Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
- *
+ *  
+ *  Read overworld notification texts like when distortion appears.
  */
 
 #ifndef PokemonAutomation_PokemonLA_NotificationReader_H

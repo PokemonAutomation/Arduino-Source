@@ -437,6 +437,10 @@ SOURCES += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
@@ -454,13 +458,9 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
-    Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
@@ -1141,6 +1141,10 @@ HEADERS += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
@@ -1158,13 +1162,9 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_MapMarkerLocator.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
-    Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \

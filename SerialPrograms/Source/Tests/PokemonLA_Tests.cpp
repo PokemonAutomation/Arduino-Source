@@ -16,7 +16,7 @@
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
-#include "PokemonLA/Inference/PokemonLA_MapMarkerLocator.h"
+#include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 
 #include <QImage>

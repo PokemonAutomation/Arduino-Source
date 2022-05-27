@@ -10,7 +10,7 @@
 #include "PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
+#include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;

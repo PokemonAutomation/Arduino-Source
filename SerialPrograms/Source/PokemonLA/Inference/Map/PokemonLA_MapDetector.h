@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-
+// Detect whether the map is opened
 class MapDetector : public VisualInferenceCallback{
 public:
     MapDetector();

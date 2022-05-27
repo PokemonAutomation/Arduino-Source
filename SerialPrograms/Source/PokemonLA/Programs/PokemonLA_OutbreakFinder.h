@@ -12,7 +12,7 @@
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"
-#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

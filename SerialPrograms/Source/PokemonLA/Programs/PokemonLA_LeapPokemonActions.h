@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonLA_LeapPokemonActions_H
 
 #include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
-#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 #include "CommonFramework/OCR/OCR_StringMatchResult.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_RegionNavigation.h"
