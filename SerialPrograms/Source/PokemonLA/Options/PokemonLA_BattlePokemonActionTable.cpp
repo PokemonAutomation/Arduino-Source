@@ -252,14 +252,6 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 }
 
 
-
-const QString PokemonIndex_NAMES[] = {
-    "First " + STRING_POKEMON,
-    "Second " + STRING_POKEMON,
-    "Third " + STRING_POKEMON,
-    "Fourth " + STRING_POKEMON,
-};
-
 const QString MoveIndex_NAMES[] = {
     "First move",
     "Second move",
@@ -301,6 +293,13 @@ std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const
 
 std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent)
 {
+    const QString PokemonIndex_NAMES[] = {
+        "First " + STRING_POKEMON,
+        "Second " + STRING_POKEMON,
+        "Third " + STRING_POKEMON,
+        "Fourth " + STRING_POKEMON,
+    };
+
     std::vector<QWidget*> widgets;
     widgets.emplace_back(make_enum_table_cell(parent, 4, PokemonIndex_NAMES, pokemon_index));
     widgets.emplace_back(make_enum_table_cell(parent, 4, MoveIndex_NAMES, move_index));
