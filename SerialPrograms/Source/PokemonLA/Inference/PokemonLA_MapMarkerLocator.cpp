@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <QImage>
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"

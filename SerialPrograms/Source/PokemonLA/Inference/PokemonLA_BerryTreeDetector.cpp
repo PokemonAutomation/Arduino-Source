@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"

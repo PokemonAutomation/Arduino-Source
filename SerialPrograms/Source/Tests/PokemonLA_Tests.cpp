@@ -107,7 +107,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
                 return 1;
             }
             target_region_has_MMO[region] = true;
-        } catch(std::exception& e){
+        } catch(std::exception&){
             cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
             return 1;
         }

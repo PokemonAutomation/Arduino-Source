@@ -76,11 +76,11 @@ NameSelectWidget::NameSelectWidget(
             if (it == extra_names->end()){
                 global_logger_tagged().log("Missing sprite for extra slug: " + slug, COLOR_RED);
             }else{
-                this->setItemIcon((int)index+slugs.size(), it->second.second);
+                this->setItemIcon((int)(index + slugs.size()), it->second.second);
             }
 
             if (slug == current_slug){
-                this->setCurrentIndex((int)index+slugs.size());
+                this->setCurrentIndex((int)(index + slugs.size()));
             }
         }
     }
