@@ -14,8 +14,8 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-std::vector<std::string> load_hisui_dex(){
-    QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json";
+std::vector<std::string> load_pokemon_list_json(const char* json_path){
+    QString path = RESOURCE_PATH() + json_path;
     QJsonArray json = read_json_file(path).array();
 
     std::vector<std::string> list;
@@ -35,10 +35,14 @@ std::vector<std::string> load_hisui_dex(){
 
 
 const std::vector<std::string>& HISUI_DEX_SLUGS(){
-    static const std::vector<std::string> database = load_hisui_dex();
+    static const std::vector<std::string> database = load_pokemon_list_json("Pokemon/Pokedex/Pokedex-Hisui.json");
     return database;
 }
 
+const std::vector<std::string>& HISUI_OUTBREAK_SLUGS(){
+    static const std::vector<std::string> database = load_pokemon_list_json("PokemonLA/OutbreakList.json");
+    return database;
+}
 
 
 }

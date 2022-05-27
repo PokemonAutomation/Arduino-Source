@@ -45,7 +45,7 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     , DESIRED_SLUGS(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
         ALL_POKEMON_ICONS(),
-        HISUI_DEX_SLUGS()
+        HISUI_OUTBREAK_SLUGS()
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(

@@ -18,6 +18,9 @@ namespace PokemonLA{
 const std::vector<std::string>& HISUI_DEX_SLUGS();
 
 
+const std::vector<std::string>& HISUI_OUTBREAK_SLUGS();
+
+
 
 }
 }
