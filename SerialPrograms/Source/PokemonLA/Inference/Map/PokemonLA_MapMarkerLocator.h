@@ -25,10 +25,10 @@ enum class MapRegion;
 // Notes:
 // - The red arrow won't be occluded by lables on the map.
 // - Due to the lava being red on the map too, this function does not work if the player is inside
-//   the volcano area in the coastlands when viewing the map in median zoom scale. It also does not
-//   work if the player is near the volcano area when viewing the map in detailed zoom scale.
-//   If `avoid_lava_area` is true, skip the red pixels that are in the upper right area of the map,
-//   which is well the lava area is on the coastlands map in the median zoom scale.
+//   the volcano area in the coastlands when viewing the map in zoom level 1 (whole region view).
+//   It also does not work if the player is near the volcano area when viewing the map in zoom level
+//   2 (local area view). If `avoid_lava_area` is true, skip the red pixels that are in the upper right
+//   area of the map, which is well the lava area is on the coastlands map at zoom level 1.
 float get_orientation_on_map(const QImage& screen, bool avoid_lava_area = false);
 
 
