@@ -44,6 +44,7 @@ ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
@@ -163,6 +164,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         detect_shiny_battle(
             env.console, context,
             result_wild, result_own,
+            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
             WILD_POKEMON,
             std::chrono::seconds(30),
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION

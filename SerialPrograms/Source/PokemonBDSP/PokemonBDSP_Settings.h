@@ -44,8 +44,17 @@ public:
     TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
 
     SectionDividerOption m_advanced_options;
+    FloatingPointOption SHINY_ALPHA_OVERALL_THRESHOLD;
+    FloatingPointOption SHINY_ALPHA_SIDE_THRESHOLD;
+
+    FloatingPointOption BALL_SPARKLE_ALPHA;
+    FloatingPointOption STAR_SPARKLE_ALPHA;
+
+    FloatingPointOption SHINY_DIALOG_ALPHA;
+
     FloatingPointOption SHINY_SOUND_THRESHOLD;
     FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
+    FloatingPointOption SHINY_SOUND_ALPHA;
 
 //    SectionDividerOption m_experimental;
 //    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;

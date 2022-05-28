@@ -154,6 +154,31 @@ GameSettings::GameSettings()
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         "250"
     )
+    , m_shiny_detection("<font size=4><b>Shiny Detection:</b></font>")
+    , SHINY_ALPHA_THRESHOLD(
+        "<b>Shiny Threshold:</b><br>Threshold to detect a shiny encounter.",
+        2.0, 0
+    )
+    , BALL_SPARKLE_ALPHA(
+        "<b>Ball Sparkle Alpha:</b>",
+        0.4, 0
+    )
+    , STAR_SPARKLE_ALPHA(
+        "<b>Star Sparkle Alpha:</b>",
+        0.5, 0
+    )
+    , SQUARE_SPARKLE_ALPHA(
+        "<b>Ball Sparkle Alpha:</b>",
+        0.3, 0
+    )
+    , LINE_SPARKLE_ALPHA(
+        "<b>Star Sparkle Alpha:</b>",
+        0.3, 0
+    )
+    , SHINY_DIALOG_ALPHA(
+        "<b>Shiny Dialog Alpha:</b>",
+        1.2, 0
+    )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
 //    , USE_NEW_SHINY_DETECTOR(
 //        "<b>Use New Shiny Detector:</b><br>Use the new version of the shiny detection algorithm.",
@@ -207,6 +232,14 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(POKEMON_TO_BOX_DELAY);
     PA_ADD_OPTION(BOX_TO_POKEMON_DELAY);
     PA_ADD_OPTION(POKEMON_TO_MENU_DELAY);
+
+    PA_ADD_STATIC(m_shiny_detection);
+    PA_ADD_OPTION(SHINY_ALPHA_THRESHOLD);
+    PA_ADD_OPTION(BALL_SPARKLE_ALPHA);
+    PA_ADD_OPTION(STAR_SPARKLE_ALPHA);
+    PA_ADD_OPTION(SQUARE_SPARKLE_ALPHA);
+    PA_ADD_OPTION(LINE_SPARKLE_ALPHA);
+    PA_ADD_OPTION(SHINY_DIALOG_ALPHA);
 
 //    PA_ADD_STATIC(m_experimental);
 //    PA_ADD_OPTION(USE_NEW_SHINY_DETECTOR);

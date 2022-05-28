@@ -9,6 +9,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh_ShinySparkleSet.h"
@@ -72,10 +73,11 @@ void ShinySparkleSetSwSh::draw_boxes(
     }
 }
 void ShinySparkleSetSwSh::update_alphas(){
-    double ball_alpha   = 0.4 * balls.size();
-    double star_alpha   = 0.5 * stars.size();
-    double square_alpha = 0.3 * squares.size();
-    double line_alpha   = std::min(0.3 * lines.size(), square_alpha);
+    const GameSettings& settings = GameSettings::instance();
+    double ball_alpha   = settings.BALL_SPARKLE_ALPHA * balls.size();
+    double star_alpha   = settings.STAR_SPARKLE_ALPHA * stars.size();
+    double square_alpha = settings.SQUARE_SPARKLE_ALPHA * squares.size();
+    double line_alpha   = std::min(settings.LINE_SPARKLE_ALPHA * lines.size(), square_alpha);
     m_alpha_overall = ball_alpha + star_alpha + square_alpha + line_alpha;
     m_alpha_star = star_alpha;
     m_alpha_square = square_alpha + line_alpha;

@@ -71,8 +71,7 @@ ShinyType determine_shiny_status(
     LoggerQt& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
-    const ShinySparkleAggregator& sparkles,
-    double detection_threshold = 2.0
+    const ShinySparkleAggregator& sparkles
 );
 
 
@@ -81,8 +80,7 @@ ShinyType determine_shiny_status(
 ShinyDetectionResult detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     const ShinyDetectionBattle& battle_settings,
-    std::chrono::seconds timeout,
-    double detection_threshold = 2.0
+    std::chrono::seconds timeout
 );
 
 

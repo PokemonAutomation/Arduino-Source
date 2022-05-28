@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,6 +30,7 @@ public:
 private:
     EnumDropdownOption ENCOUNTER_TYPE;
 
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

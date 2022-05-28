@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -119,11 +121,10 @@ void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const DetectionType& type,
     std::chrono::seconds timeout,
-    bool use_shiny_sound = false,
-    double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
+    bool use_shiny_sound = false
 );
 
 

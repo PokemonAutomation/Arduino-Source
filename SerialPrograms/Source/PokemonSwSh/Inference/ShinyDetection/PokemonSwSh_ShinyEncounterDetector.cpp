@@ -81,8 +81,7 @@ ShinyType determine_shiny_status(
     LoggerQt& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
-    const ShinySparkleAggregator& sparkles,
-    double detection_threshold
+    const ShinySparkleAggregator& sparkles
 ){
     double alpha = sparkles.best_overall();
 
@@ -90,7 +89,7 @@ ShinyType determine_shiny_status(
     std::chrono::milliseconds min_delay = battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300);
     std::chrono::milliseconds max_delay = battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500);
     if (min_delay <= dialog_duration && dialog_duration <= max_delay){
-        alpha += 1.2;
+        alpha += GameSettings::instance().SHINY_DIALOG_ALPHA;
     }
 
     double best_star = sparkles.best_star();
@@ -103,7 +102,7 @@ ShinyType determine_shiny_status(
         COLOR_PURPLE
     );
 
-    if (alpha < detection_threshold){
+    if (alpha < GameSettings::instance().SHINY_ALPHA_THRESHOLD){
         logger.log("ShinyDetector: Not Shiny.", COLOR_PURPLE);
         return ShinyType::NOT_SHINY;
     }
@@ -124,8 +123,7 @@ ShinyType determine_shiny_status(
 ShinyDetectionResult detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     const ShinyDetectionBattle& battle_settings,
-    std::chrono::seconds timeout,
-    double detection_threshold
+    std::chrono::seconds timeout
 ){
     ShinyEncounterTracker tracker(console, console, battle_settings);
     int result = wait_until(
@@ -140,8 +138,7 @@ ShinyDetectionResult detect_shiny_battle(
         console,
         battle_settings,
         tracker.dialog_tracker(),
-        tracker.sparkles_wild(),
-        detection_threshold
+        tracker.sparkles_wild()
     );
     return ShinyDetectionResult{shiny_type, tracker.sparkles_wild().best_image()};
 }

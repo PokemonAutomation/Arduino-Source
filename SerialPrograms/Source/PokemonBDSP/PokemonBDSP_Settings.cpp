@@ -80,6 +80,26 @@ GameSettings::GameSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
+    , SHINY_ALPHA_OVERALL_THRESHOLD(
+        "<b>Shiny Threshold (overall):</b><br>Threshold to detect a shiny encounter.",
+        4.0, 0
+    )
+    , SHINY_ALPHA_SIDE_THRESHOLD(
+        "<b>Shiny Threshold (left/right):</b><br>Threshold to detect a left/right shiny.",
+        3.0, 0
+    )
+    , BALL_SPARKLE_ALPHA(
+        "<b>Ball Sparkle Alpha:</b>",
+        1.0, 0
+    )
+    , STAR_SPARKLE_ALPHA(
+        "<b>Star Sparkle Alpha:</b>",
+        1.0, 0
+    )
+    , SHINY_DIALOG_ALPHA(
+        "<b>Shiny Dialog Alpha:</b>",
+        1.2, 0
+    )
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
         0.87, 0, 1.0
@@ -87,6 +107,10 @@ GameSettings::GameSettings()
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         5000, 0, 48000
+    )
+    , SHINY_SOUND_ALPHA(
+        "<b>Shiny Sound Alpha:</b>",
+        5.0, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
 //    , USE_NEW_SHINY_DETECTOR(
@@ -115,8 +139,14 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(POKEMON_TO_MENU_DELAY);
 
     PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(SHINY_ALPHA_OVERALL_THRESHOLD);
+    PA_ADD_OPTION(SHINY_ALPHA_SIDE_THRESHOLD);
+    PA_ADD_OPTION(BALL_SPARKLE_ALPHA);
+    PA_ADD_OPTION(STAR_SPARKLE_ALPHA);
+    PA_ADD_OPTION(SHINY_DIALOG_ALPHA);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(SHINY_SOUND_ALPHA);
 
 //    PA_ADD_STATIC(m_experimental);
 //    PA_ADD_OPTION(USE_NEW_SHINY_DETECTOR);

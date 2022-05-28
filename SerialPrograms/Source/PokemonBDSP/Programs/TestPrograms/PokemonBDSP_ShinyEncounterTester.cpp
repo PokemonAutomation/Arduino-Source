@@ -35,8 +35,12 @@ ShinyEncounterTester::ShinyEncounterTester(const ShinyEncounterTester_Descriptor
         },
         1
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_ERROR_RECOVERABLE,
+    })
 {
     PA_ADD_OPTION(ENCOUNTER_TYPE);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -46,6 +50,7 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
     detect_shiny_battle(
         env.console, context,
         result_wild, result_own,
+        env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
         ENCOUNTER_TYPE == 0 ? YOUR_POKEMON : WILD_POKEMON,
         std::chrono::seconds(30)
     );

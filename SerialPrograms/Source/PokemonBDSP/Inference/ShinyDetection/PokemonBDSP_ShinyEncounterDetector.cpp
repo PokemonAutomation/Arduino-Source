@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
+#include "PokemonBDSP_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -125,11 +126,15 @@ void determine_shiny_status(
     LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const ShinyEncounterTracker& tracker,
-    const std::vector<WallClock>& shiny_sound_timestamps,
-    double overall_threshold,
-    double doubles_threshold
+    const std::vector<WallClock>& shiny_sound_timestamps
 ){
+    const double OVERALL_THRESHOLD = GameSettings::instance().SHINY_ALPHA_OVERALL_THRESHOLD;
+    const double DOUBLE_THRESHOLD = GameSettings::instance().SHINY_ALPHA_SIDE_THRESHOLD;
+    const double DIALOG_ALPHA = GameSettings::instance().SHINY_DIALOG_ALPHA;
+    const double SOUND_ALPHA = GameSettings::instance().SHINY_SOUND_ALPHA;
+
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker = tracker.dialog_tracker();
     const ShinySparkleAggregator& sparkles_wild_overall = tracker.sparkles_wild_overall();
     const ShinySparkleAggregator& sparkles_wild_left = tracker.sparkles_wild_left();
@@ -146,7 +151,7 @@ void determine_shiny_status(
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
         std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500);
         if (min_delay <= dialog_duration && dialog_duration <= max_delay){
-            alpha_wild_overall += 3.5;
+            alpha_wild_overall += DIALOG_ALPHA;
         }
     }
     
@@ -169,21 +174,21 @@ void determine_shiny_status(
         const auto dist_to_own = get_timestamp_distance(timestamp, own_end);
         if (dist_to_wild < dist_to_own){
             wild_shiny_sound_detected = true;
-        } else if (dist_to_own < dist_to_wild){
+        }else if (dist_to_own < dist_to_wild){
             own_shiny_sound_detected = true;
-        } else{
+        }else{
             throw OperationFailedException(logger, "Wrong shiny sound timing found.");
         }
     }
-    alpha_wild_overall += wild_shiny_sound_detected ? 5.0 : 0.0;
-    alpha_own += own_shiny_sound_detected ? 5.0 : 0.0;
+    alpha_wild_overall += wild_shiny_sound_detected ? SOUND_ALPHA : 0.0;
+    alpha_own += own_shiny_sound_detected ? SOUND_ALPHA : 0.0;
 
     {
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
         std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(2000);  //  Add headroom for happiness.
         if (min_delay <= dialog_duration && dialog_duration <= max_delay){
-            alpha_own += 3.5;
+            alpha_own += DIALOG_ALPHA;
         }
     }
     logger.log(
@@ -200,17 +205,29 @@ void determine_shiny_status(
     wild_result.left_is_shiny = false;
     wild_result.right_is_shiny = false;
 
-    if (alpha_wild_overall < overall_threshold){
+    if (alpha_wild_overall < OVERALL_THRESHOLD){
         logger.log("ShinyDetector: Wild not Shiny.", COLOR_PURPLE);
         wild_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
         logger.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
         wild_result.shiny_type = ShinyType::UNKNOWN_SHINY;
-        wild_result.left_is_shiny = alpha_wild_left >= doubles_threshold;
-        wild_result.right_is_shiny = alpha_wild_right >= doubles_threshold;
+        wild_result.left_is_shiny = alpha_wild_left >= DOUBLE_THRESHOLD;
+        wild_result.right_is_shiny = alpha_wild_right >= DOUBLE_THRESHOLD;
     }
 
-    if (alpha_own < overall_threshold){
+    if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
+        dump_image(logger, info, "LowShinyAlpha", wild_result.best_screenshot);
+        send_program_recoverable_error_notification(
+            logger, settings,
+            info,
+            "Low alpha shiny (alpha = " + QString::number(alpha_wild_overall) +
+            ").\nPlease report this image to the " + STRING_POKEMON + " Automation server.",
+            "",
+            wild_result.best_screenshot
+        );
+    }
+
+    if (alpha_own < OVERALL_THRESHOLD){
         logger.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
         your_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
@@ -224,10 +241,10 @@ void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const DetectionType& type,
     std::chrono::seconds timeout,
-    bool use_shiny_sound,
-    double overall_threshold, double doubles_threshold
+    bool use_shiny_sound
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
@@ -260,17 +277,16 @@ void detect_shiny_battle(
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return;
     }
-    determine_shiny_status(
-        console,
-        wild_result, your_result,
-        tracker,
-        shiny_sound_timestamps,
-        overall_threshold,
-        doubles_threshold
-    );
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
     your_result.best_screenshot = tracker.sparkles_own().best_image();
 //    your_result.best_screenshot.save("test.png");
+    determine_shiny_status(
+        console,
+        wild_result, your_result,
+        info, settings,
+        tracker,
+        shiny_sound_timestamps
+    );
 }
 
 
