@@ -284,236 +284,226 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
         [&](BotBaseContext& context){
             switch (path) {
             case 0:
-                // === Fly to the first tree on trip ===
+                //============ Tree 0=============//
                 env.console.log("Checking tree: 0");
-                pbf_move_left_joystick(context, 255, 90, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 85, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.6 * TICKS_PER_SECOND));
                 change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (5 * TICKS_PER_SECOND), 0);
+                pbf_wait(context, 0.7 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, (5.1 * TICKS_PER_SECOND), 0);
                 pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-
-                // Now on ground, move towards the tree
-                // change_mount(env.console, context, MountState::WYRDEER_OFF);
-                pbf_move_left_joystick(context, 0, 70, 20, (0.3 * TICKS_PER_SECOND));
-                // Change camera to face what player character faces
-                pbf_press_button(context, BUTTON_ZL, 20, (0.4 * TICKS_PER_SECOND));
-                // Move camera down
                 pbf_move_right_joystick(context, 128, 255, (0.3 * TICKS_PER_SECOND), (0.2 * TICKS_PER_SECOND));
-
-                // Now we should be on ground
                 disable_shiny_sound(context);
                 last_checked_tree = 0;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
 
-
-                // === Fly to the second tree on trip ===
-                // Mount on Braviary
+                //============ Tree 1=============//
                 env.console.log("Checking tree: 1");
-                pbf_press_button(context, BUTTON_PLUS, 20, 100);
-                enable_shiny_sound(context);
-
-                // Now face towards the next tree
-                pbf_move_left_joystick(context, 255, 200, 1 * TICKS_PER_SECOND, 0);
-                pbf_mash_button(context, BUTTON_B, 100);
-                pbf_press_button(context, BUTTON_Y, (2.1 * TICKS_PER_SECOND), 0);
-                // Get off Braviary
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                // Move camera down
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 255, 10, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, (0.6 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (2.7 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
                 pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-
-                // Now we should be on ground
                 disable_shiny_sound(context);
                 last_checked_tree = 1;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
 
-
-                // === Fly to the third tree on trip ===
+                //============ Tree 2=============//
                 env.console.log("Checking tree: 2");
-                // Mount on Braviary
                 pbf_press_button(context, BUTTON_PLUS, 20, 100);
                 enable_shiny_sound(context);
-
-                // Now face towards the next tree
                 pbf_move_left_joystick(context, 255, 130, 1 * TICKS_PER_SECOND, 0);
-                pbf_press_button(context, BUTTON_B, 80, 0);
-                pbf_press_button(context, BUTTON_Y, (2.2 * TICKS_PER_SECOND), 0);
-                // Get off Braviary
+                pbf_press_button(context, BUTTON_B, (0.6 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (2.4 * TICKS_PER_SECOND), 0);
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                // Move camera down
                 pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-
-                // Now we should be on ground
                 disable_shiny_sound(context);
                 last_checked_tree = 2;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
 
-
-                // === Fly to the fourth tree ===
+                //============ Tree 3=============//
                 env.console.log("Checking tree: 3");
-                // Mount on Braviary
                 pbf_press_button(context, BUTTON_PLUS, 20, 100);
                 enable_shiny_sound(context);
-
-                // Now face towards the next tree
-                pbf_move_left_joystick(context, 0, 60, 1 * TICKS_PER_SECOND, 0);
-                pbf_press_button(context, BUTTON_B, 90, 0);
+                pbf_move_left_joystick(context, 0, 95, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, 110, 0);
                 pbf_press_button(context, BUTTON_Y, (2.3 * TICKS_PER_SECOND), 0);
-                // Get off Braviary
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                // Move camera down
                 pbf_move_right_joystick(context, 128, 255, (0.1 * TICKS_PER_SECOND), (0.3 * TICKS_PER_SECOND));
-                // Now we should be on ground
-                context.wait_for_all_requests();
                 last_checked_tree = 3;
+                context.wait_for_all_requests();
                 break;
             case 1:
-            //============ Tree 4=============//
-            go_to_height_camp(env, context);
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 255, 168, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_B, (4.6 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 4;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 4=============//
+                env.console.log("Checking tree: 4");
+                pbf_move_left_joystick(context, 255, 165, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_wait(context, 0.6 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, (4.8 * TICKS_PER_SECOND), (0.6 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_Y, (1.7 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 4;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 5=============//
-            pbf_move_left_joystick(context, 255, 155, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (1.2 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_PLUS, 20, 0.5 * TICKS_PER_SECOND);
-            pbf_move_right_joystick(context, 127, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 5;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 5=============//
+                env.console.log("Checking tree: 5");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 255, 190, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, (0.5 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (2.6 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 5;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 6=============//
-            pbf_move_left_joystick(context, 0, 116, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (1.5 * TICKS_PER_SECOND), 0.5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_Y, (3 * TICKS_PER_SECOND), 0.5 * TICKS_PER_SECOND);
-            pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            context.wait_for_all_requests();
-            last_checked_tree = 6;
-
-            break;
+                //============ Tree 6=============//
+                env.console.log("Checking tree: 6");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 0, 130, 1 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_B, (1.3 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (3.2 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                last_checked_tree = 6;
+                context.wait_for_all_requests();
+                break;
             case 2:
-            //============ Tree 7=============//
-            go_to_height_camp(env, context);
-            pbf_move_left_joystick(context, 180, 255, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (7.2 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 0, 127, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, 20);
-            pbf_move_right_joystick(context, 127, 255, (0.4 * TICKS_PER_SECOND), 20);
-            last_checked_tree = 7;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 7=============//
+                env.console.log("Checking tree: 7");
+                pbf_move_left_joystick(context, 180, 255, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (7.2 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 0, 127, (1.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, 20);
+                pbf_move_right_joystick(context, 127, 255, (0.5 * TICKS_PER_SECOND), 20);
+                disable_shiny_sound(context);
+                last_checked_tree = 7;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 8=============//
-            pbf_move_left_joystick(context, 255, 150, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (0.5 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 255, 127, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, 20);
-            pbf_move_right_joystick(context, 127, 255, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 8;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 8=============//
+                env.console.log("Checking tree: 8");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 255, 230, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_Y, (1.7 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 8;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 9=============//
-            pbf_move_left_joystick(context, 0, 100, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (1.3 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 255, 127, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, 20);
-            pbf_move_right_joystick(context, 127, 255, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 9;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 9=============//
+                env.console.log("Checking tree: 8");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 90, 0, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_B, (0.6 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 9;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 10=============//
-            pbf_move_left_joystick(context, 225, 255, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (2.5 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 10;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 10=============//
+                env.console.log("Checking tree: 10");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 0, 235, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_B, (2.5 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 10;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 11=============//
-            pbf_move_left_joystick(context, 145, 0, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (2.5 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (2.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 11;
-            context.wait_for_all_requests();
-            break;
+                //============ Tree 11=============//
+                env.console.log("Checking tree: 11");
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 145, 0, (0.5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_B, (1.8 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (1.8 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                last_checked_tree = 11;
+                context.wait_for_all_requests();
+                break;
             case 3:
-            //============ Tree 12=============//
-            go_to_height_camp(env, context);
-            pbf_move_left_joystick(context, 148, 255, 20, 20);
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
-            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 12;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 12=============//
+                env.console.log("Checking tree: 12");
+                pbf_move_left_joystick(context, 148, 255, 20, 20);
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (9.7 * TICKS_PER_SECOND), 20);
+                pbf_press_button(context, BUTTON_Y, (2.2 * TICKS_PER_SECOND), 20);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 12;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 13=============//
-            pbf_move_left_joystick(context, 148, 0, 20, 20);
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (2 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (3 * TICKS_PER_SECOND), 0);
-            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 13;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 13=============//
+                env.console.log("Checking tree: 13");
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 148, 0, 20, 20);
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (2 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (3 * TICKS_PER_SECOND), 0);
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 13;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 14=============//
-            pbf_move_left_joystick(context, 255, 155, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 127, 0, (6.6 * TICKS_PER_SECOND), 20);
-            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 14;
-            check_tree_no_stop(env, context);
-            context.wait_for_all_requests();
+                //============ Tree 14=============//
+                env.console.log("Checking tree: 14");
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 255, 155, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_move_left_joystick(context, 127, 0, (6.6 * TICKS_PER_SECOND), 20);
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                disable_shiny_sound(context);
+                last_checked_tree = 14;
+                check_tree_no_stop(env, context);
+                context.wait_for_all_requests();
 
-            //============ Tree 15=============//
-            pbf_move_left_joystick(context, 200, 0, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_B, (1.7 * TICKS_PER_SECOND), 0);
-            pbf_press_button(context, BUTTON_Y, (3 * TICKS_PER_SECOND), 0);
-            pbf_move_right_joystick(context, 127, 255, (0.1 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            last_checked_tree = 15;
-            context.wait_for_all_requests();
-            break;
+                //============ Tree 15=============//
+                env.console.log("Checking tree: 15");
+                enable_shiny_sound(context);
+                pbf_move_left_joystick(context, 200, 0, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_B, (1.7 * TICKS_PER_SECOND), 0);
+                pbf_press_button(context, BUTTON_Y, (3 * TICKS_PER_SECOND), 0);
+                pbf_move_right_joystick(context, 127, 255, (0.1 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                last_checked_tree = 15;
+                context.wait_for_all_requests();
+                break;
             }
         },
         {
@@ -650,7 +640,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 218, 255, 20, (0.5 * TICKS_PER_SECOND));
             change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (10.3 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_B, (10.4 * TICKS_PER_SECOND), 0);
             pbf_press_button(context, BUTTON_Y, (3.8 * TICKS_PER_SECOND), 0);
             pbf_press_button(context, BUTTON_PLUS, 20, 20);
             if (check_tree(env, context)){
@@ -663,7 +653,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 230, 20, (0.5 * TICKS_PER_SECOND));
             change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (11.3 * TICKS_PER_SECOND), 0);
+            pbf_press_button(context, BUTTON_B, (11.4 * TICKS_PER_SECOND), 0);
             pbf_press_button(context, BUTTON_Y, (3.8 * TICKS_PER_SECOND), 0);
             pbf_press_button(context, BUTTON_PLUS, 20, 20);
             if (check_tree(env, context)){
@@ -762,7 +752,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.console, context,
         [&](BotBaseContext& context){
 
-            for (int path = 0; path < 4; path++) {
+            for (int path = 3; path < 4; path++) {
                 size_t last_tree = grouped_path(env, context, path, tree_counter);
                 context.wait_for_all_requests();
                 single_path(env, context, path, last_tree, tree_counter);
