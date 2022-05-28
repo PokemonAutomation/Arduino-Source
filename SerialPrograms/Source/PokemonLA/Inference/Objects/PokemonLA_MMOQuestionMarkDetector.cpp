@@ -121,7 +121,7 @@ bool detect_template_by_single_pass_waterfill(
     bool detected = false;
     session->set_source(matrix);
     auto finder = session->make_iterator(min_area);
-    const bool keep_object_matrix = true;
+    const bool keep_object_matrix = (debug_params != nullptr);
     while (finder->find_next(object, keep_object_matrix)){
         if (object.area > area_thresholds.second){
             continue;
@@ -223,7 +223,47 @@ std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImag
     return detected;
 }
 
-void add_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items){
+std::vector<std::pair<size_t, size_t>> MMOQuestionMarkDetector::detect_MMOs_on_region_map(const QImage& frame){
+    // Detect all the locations of the MMO question mark background
+    auto bg_matrix = compress_rgb32_to_binary_multirange(frame,
+        {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}}
+    );
+
+    std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
+    Kernels::Waterfill::WaterfillObject object;
+
+    const size_t bg_min_area = 550;
+    const size_t bg_max_area = 1500;
+
+    session->set_source(bg_matrix);
+    auto finder = session->make_iterator(bg_min_area);
+    const bool keep_object_bg_matrix = false;
+
+    std::vector<std::pair<size_t, size_t>> results;
+    while (finder->find_next(object, keep_object_bg_matrix)){
+        if (object.area > bg_max_area){
+            continue;
+        }
+        double rmsd = MMOQuestionMarkBackgroundMatcher::instance().rmsd_original(frame, object);
+        // if (debug_params){
+        //     cout << debug_params->base_filename << ": rmsd " << rmsd << " area " << object.area << endl;
+        // }
+        
+        if (rmsd < 90){
+            // if (debug_params){
+            //     draw_object_on_image(object, debug_params->match_color, *debug_image, 0, 0);
+            // }
+            results.emplace_back(object.center_x(), object.center_y());
+        }
+    }
+
+    return results;
+}
+
+
+
+
+void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items){
     for(size_t i = 0; i < hisui_map_boxes.size(); i++){
         if (detection_result[i]){
             items.add(COLOR_CYAN, hisui_map_boxes[i]);

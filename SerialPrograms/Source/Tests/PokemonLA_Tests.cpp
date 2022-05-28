@@ -19,6 +19,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/PokemonLA_Locations.h"
 
 #include <QImage>
 #include <iostream>
@@ -86,52 +87,91 @@ int test_pokemonLA_BlackOutDetector(const QImage& image, bool target){
 }
 
 int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vector<std::string>& keywords){
-    
-    size_t keyword_index = 0;
-    bool hisui_found = false;
-    std::array<bool, 5> target_region_has_MMO = {false};
-    for(; keyword_index < keywords.size(); keyword_index++){
+    bool hisui_kw_found = false;
+    std::array<bool, 5> target_hisui_region_has_MMO = {false};
+
+    bool region_kw_found = false;
+    int target_num_MMOs_on_region_map = -1;
+    int target_region_index = -1;
+
+    for(size_t keyword_index = 0; keyword_index < keywords.size(); keyword_index++){
         const std::string& word = keywords[keyword_index];
-        if (hisui_found == false){
-            if (word == "Hisui"){
-                hisui_found = true;
-            }
+        if (hisui_kw_found == false && word == "Hisui"){
+            hisui_kw_found = true;
+            continue;
+        }
+        if (region_kw_found == false && word == "Region"){
+            region_kw_found = true;
             continue;
         }
 
-        // We have found the "Hisui" keyword. So the next words will be the index of the region on the Hisui map
-        // that has MMO.
-        try{
-            int region = std::stoi(word);
-            if (region < 0 || region > 4){
-                cerr << "Error: wrong region number, must be [0, 4] but got " << region << endl;
+        if (hisui_kw_found){
+            // We have found the "Hisui" keyword. So the next words will be the index of the region on the Hisui map
+            // that has MMO.
+            try{
+                int region = std::stoi(word);
+                if (region < 0 || region > 4){
+                    cerr << "Error: wrong region number, must be [0, 4] but got " << region << endl;
+                    return 1;
+                }
+                target_hisui_region_has_MMO[region] = true;
+            } catch(std::exception&){
+                cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
                 return 1;
             }
-            target_region_has_MMO[region] = true;
-        } catch(std::exception&){
-            cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
-            return 1;
+        }
+        else if (region_kw_found){
+            // Found "Region" keyword, read a number as how many MMOs on the region map, and a region name.
+            if (target_region_index < 0){
+                for(size_t index = 0; index < 5; index++){
+                    if (word == WILD_REGION_SHORT_NAMES[index]){
+                        target_region_index = index;
+                        break;
+                    }
+                }
+                if (target_region_index >= 0){
+                    continue;
+                }
+            }
+            if (target_num_MMOs_on_region_map < 0){
+                try{
+                    int num_MMOs = std::stoi(word);
+                    if (num_MMOs < 0){
+                        cerr << "Error: wrong number " << num_MMOs << ", must be non-negative" << endl;
+                        return 1;
+                    }
+                    target_num_MMOs_on_region_map = num_MMOs;
+                } catch(std::exception&){}
+            }
         }
     }
 
-    if (hisui_found == false){
-        cerr << "Error: need keyword \"Hisui\" in filename/" << endl;
+    if (hisui_kw_found == false && region_kw_found == false){
+        cerr << "Error: need keyword \"Hisui\" or \"Region\" in filename/" << endl;
         return 1;
     }
 
     auto& logger = global_logger_command_line();
-
     MMOQuestionMarkDetector detector(logger);
 
-    const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
+    if (hisui_kw_found){
+        const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
 
-    for(size_t i = 0; i < 5; i++){
-        const bool result = region_has_MMO[i];
-        const bool target = target_region_has_MMO[i];
-        if (result != target) {
-            cerr << "Error: " << __func__ << " result on region " << i << " is " << result << " but should be " << target << "." << endl;
-            return 1;
+        for(size_t i = 0; i < 5; i++){
+            const bool result = region_has_MMO[i];
+            const bool target = target_hisui_region_has_MMO[i];
+            if (result != target) {
+                cerr << "Error: " << __func__ << " result on region " << i << " is " << result << " but should be " << target << "." << endl;
+                return 1;
+            }
         }
+    } else { // Region keyword found
+        if (target_region_index < 0 || target_num_MMOs_on_region_map < 0){
+            cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands-5.png)." << endl; 
+        }
+        const auto results = detector.detect_MMOs_on_region_map(image);
+
+        TEST_RESULT_EQUAL(results.size(), target_num_MMOs_on_region_map);
     }
 
     return 0;

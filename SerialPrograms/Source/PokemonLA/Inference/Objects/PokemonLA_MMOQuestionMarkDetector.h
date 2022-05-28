@@ -39,6 +39,8 @@ public:
     // Fieldlands, Mirelands, Coastlands, Highlands, Icelands.
     std::array<bool, 5> detect_MMO_on_hisui_map(const QImage& frame);
 
+    std::vector<std::pair<size_t, size_t>> detect_MMOs_on_region_map(const QImage& frame);
+
 private:
     LoggerQt& m_logger;
 };
@@ -46,7 +48,9 @@ private:
 // Detect the presense of MM question mark on an image
 bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image);
 
-void add_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items);
+
+// Show output of `MMOQuestionMarkDetector::detect_MMO_on_hisui_map()` to video overlay.
+void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items);
 
 
 }
