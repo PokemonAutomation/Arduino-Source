@@ -98,7 +98,7 @@ GameSettings::GameSettings()
     )
     , SHINY_DIALOG_ALPHA(
         "<b>Shiny Dialog Alpha:</b>",
-        1.2, 0
+        3.5, 0
     )
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
@@ -143,6 +143,8 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(SHINY_SOUND_ALPHA);
+
+//    PA_ADD_STATIC(m_experimental);
 }
 
 
