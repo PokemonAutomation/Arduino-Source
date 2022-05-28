@@ -55,9 +55,6 @@ public:
     FloatingPointOption SHINY_SOUND_THRESHOLD;
     FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
     FloatingPointOption SHINY_SOUND_ALPHA;
-
-//    SectionDividerOption m_experimental;
-//    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;
 };
 
 

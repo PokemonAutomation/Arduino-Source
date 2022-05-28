@@ -131,7 +131,7 @@ void determine_shiny_status(
     const std::vector<WallClock>& shiny_sound_timestamps
 ){
     const double OVERALL_THRESHOLD = GameSettings::instance().SHINY_ALPHA_OVERALL_THRESHOLD;
-    const double DOUBLE_THRESHOLD = GameSettings::instance().SHINY_ALPHA_SIDE_THRESHOLD;
+    const double DOUBLES_THRESHOLD = GameSettings::instance().SHINY_ALPHA_SIDE_THRESHOLD;
     const double DIALOG_ALPHA = GameSettings::instance().SHINY_DIALOG_ALPHA;
     const double SOUND_ALPHA = GameSettings::instance().SHINY_SOUND_ALPHA;
 
@@ -211,8 +211,8 @@ void determine_shiny_status(
     }else{
         logger.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
         wild_result.shiny_type = ShinyType::UNKNOWN_SHINY;
-        wild_result.left_is_shiny = alpha_wild_left >= DOUBLE_THRESHOLD;
-        wild_result.right_is_shiny = alpha_wild_right >= DOUBLE_THRESHOLD;
+        wild_result.left_is_shiny = alpha_wild_left >= DOUBLES_THRESHOLD;
+        wild_result.right_is_shiny = alpha_wild_right >= DOUBLES_THRESHOLD;
     }
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){

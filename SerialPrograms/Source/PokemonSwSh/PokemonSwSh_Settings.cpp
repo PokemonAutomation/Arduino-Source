@@ -180,10 +180,6 @@ GameSettings::GameSettings()
         1.2, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
-//    , USE_NEW_SHINY_DETECTOR(
-//        "<b>Use New Shiny Detector:</b><br>Use the new version of the shiny detection algorithm.",
-//        true
-//    )
 {
     PA_ADD_STATIC(m_egg_options);
     PA_ADD_OPTION(AUTO_DEPOSIT);
@@ -242,7 +238,6 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SHINY_DIALOG_ALPHA);
 
 //    PA_ADD_STATIC(m_experimental);
-//    PA_ADD_OPTION(USE_NEW_SHINY_DETECTOR);
 }
 
 

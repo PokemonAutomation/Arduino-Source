@@ -86,9 +86,6 @@ public:
     FloatingPointOption LINE_SPARKLE_ALPHA;
 
     FloatingPointOption SHINY_DIALOG_ALPHA;
-
-//    SectionDividerOption m_experimental;
-//    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;
 };
 
 
