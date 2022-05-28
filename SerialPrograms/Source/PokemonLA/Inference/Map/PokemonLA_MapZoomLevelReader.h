@@ -1,12 +1,12 @@
-/*  Selected Region Detector
+/*  Map Zoom Level Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 
-#ifndef PokemonAutomation_PokemonLA_SelectedRegionDetector_H
-#define PokemonAutomation_PokemonLA_SelectedRegionDetector_H
+#ifndef PokemonAutomation_PokemonLA_MapZoomLevelReader_H
+#define PokemonAutomation_PokemonLA_MapZoomLevelReader_H
 
 class QImage;
 
