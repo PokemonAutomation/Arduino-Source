@@ -209,6 +209,9 @@ void detect_shiny_battle(
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return;
     }
+    wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
+    your_result.best_screenshot = tracker.sparkles_own().best_image();
+//    your_result.best_screenshot.save("test.png");
     determine_shiny_status(
         console,
         wild_result, your_result,
@@ -219,9 +222,6 @@ void detect_shiny_battle(
         tracker.sparkles_wild_right(),
         tracker.sparkles_own()
     );
-    wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
-    your_result.best_screenshot = tracker.sparkles_own().best_image();
-//    your_result.best_screenshot.save("test.png");
 }
 
 
