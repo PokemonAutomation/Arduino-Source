@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -89,13 +91,12 @@ void determine_shiny_status(
     LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles_wild_overall,
     const ShinySparkleAggregator& sparkles_wild_left,
     const ShinySparkleAggregator& sparkles_wild_right,
-    const ShinySparkleAggregator& sparkles_own,
-    double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
+    const ShinySparkleAggregator& sparkles_own
 );
 
 
@@ -104,10 +105,9 @@ void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const DetectionType& type,
-    std::chrono::seconds timeout,
-    double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
+    std::chrono::seconds timeout
 );
 
 

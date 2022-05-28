@@ -5,8 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{
@@ -115,14 +116,16 @@ void determine_shiny_status(
     LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles_wild_overall,
     const ShinySparkleAggregator& sparkles_wild_left,
     const ShinySparkleAggregator& sparkles_wild_right,
-    const ShinySparkleAggregator& sparkles_own,
-    double overall_threshold,
-    double doubles_threshold
+    const ShinySparkleAggregator& sparkles_own
 ){
+    const double OVERALL_THRESHOLD = GameSettings::instance().SHINY_ALPHA_OVERALL_THRESHOLD;
+    const double DOUBLES_THRESHOLD = GameSettings::instance().SHINY_ALPHA_SIDE_THRESHOLD;
+
     double alpha_wild_overall = sparkles_wild_overall.best_overall();
     double alpha_wild_left = sparkles_wild_left.best_overall();
     double alpha_wild_right = sparkles_wild_right.best_overall();
@@ -156,17 +159,29 @@ void determine_shiny_status(
     wild_result.left_is_shiny = false;
     wild_result.right_is_shiny = false;
 
-    if (alpha_wild_overall < overall_threshold){
+    if (alpha_wild_overall < OVERALL_THRESHOLD){
         logger.log("ShinyDetector: Wild not Shiny.", COLOR_PURPLE);
         wild_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
         logger.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
         wild_result.shiny_type = ShinyType::UNKNOWN_SHINY;
-        wild_result.left_is_shiny = alpha_wild_left >= doubles_threshold;
-        wild_result.right_is_shiny = alpha_wild_right >= doubles_threshold;
+        wild_result.left_is_shiny = alpha_wild_left >= DOUBLES_THRESHOLD;
+        wild_result.right_is_shiny = alpha_wild_right >= DOUBLES_THRESHOLD;
     }
 
-    if (alpha_own < overall_threshold){
+    if (3.5 <= alpha_wild_overall && alpha_wild_overall < 5.0){
+        dump_image(logger, info, "LowShinyAlpha", wild_result.best_screenshot);
+        send_program_recoverable_error_notification(
+            logger, settings,
+            info,
+            "Low alpha shiny (alpha = " + QString::number(alpha_wild_overall) +
+            ").\nPlease report this image to the " + STRING_POKEMON + " Automation server.",
+            "",
+            wild_result.best_screenshot
+        );
+    }
+
+    if (alpha_own < OVERALL_THRESHOLD){
         logger.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
         your_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
@@ -180,9 +195,9 @@ void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
+    const ProgramInfo& info, EventNotificationOption& settings,
     const DetectionType& type,
-    std::chrono::seconds timeout,
-    double overall_threshold, double doubles_threshold
+    std::chrono::seconds timeout
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
@@ -197,6 +212,7 @@ void detect_shiny_battle(
     determine_shiny_status(
         console,
         wild_result, your_result,
+        info, settings,
         tracker.dialog_tracker(),
         tracker.sparkles_wild_overall(),
         tracker.sparkles_wild_left(),

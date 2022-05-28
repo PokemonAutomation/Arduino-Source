@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 
@@ -42,8 +43,9 @@ public:
     TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
     TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
 
-//    SectionDividerOption m_experimental;
-//    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;
+    SectionDividerOption m_advanced_options;
+    FloatingPointOption SHINY_ALPHA_OVERALL_THRESHOLD;
+    FloatingPointOption SHINY_ALPHA_SIDE_THRESHOLD;
 };
 
 

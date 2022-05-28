@@ -63,6 +63,7 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
     , NOTIFICATIONS({
         &NOTIFICATION_NONSHINY,
         &NOTIFICATION_SHINY,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -188,6 +189,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         detect_shiny_battle(
             env.console, context,
             result_wild, result_own,
+            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
             YOUR_POKEMON,
             std::chrono::seconds(30)
         );

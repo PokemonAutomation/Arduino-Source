@@ -51,6 +51,7 @@ DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
@@ -179,6 +180,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         detect_shiny_battle(
             env.console, context,
             result_wild, result_own,
+            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );
