@@ -369,6 +369,7 @@ SOURCES += \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
+    Source/Pokemon/Resources/Pokemon_PokemonIcons.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp \
@@ -445,6 +446,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
@@ -1077,6 +1079,7 @@ HEADERS += \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \
     Source/Pokemon/Resources/Pokemon_PokeballNames.h \
+    Source/Pokemon/Resources/Pokemon_PokemonIcons.h \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h \
@@ -1154,6 +1157,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h \
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h \
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \

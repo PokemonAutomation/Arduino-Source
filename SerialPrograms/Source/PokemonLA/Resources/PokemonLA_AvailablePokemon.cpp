@@ -26,6 +26,11 @@ const std::vector<std::string>& HISUI_OUTBREAK_SLUGS(){
     return database;
 }
 
+const std::vector<std::string>& MMO_SLUGS(){
+    static const std::vector<std::string> database = Pokemon::load_pokemon_slug_json_list("PokemonLA/MMOList.json");
+    return database;
+}
+
 
 }
 }

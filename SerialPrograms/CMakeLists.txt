@@ -734,6 +734,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_BerrySprites.h
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp
     Source/Pokemon/Resources/Pokemon_PokeballNames.h
+    Source/Pokemon/Resources/Pokemon_PokemonIcons.cpp
+    Source/Pokemon/Resources/Pokemon_PokemonIcons.h
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
@@ -889,6 +891,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.cpp
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h
+    Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.cpp
+    Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.cpp
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp

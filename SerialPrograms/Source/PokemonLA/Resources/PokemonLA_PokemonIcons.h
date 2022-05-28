@@ -19,6 +19,9 @@ namespace PokemonLA{
 const std::map<std::string, QIcon>& ALL_POKEMON_ICONS();
 
 
+const std::map<std::string, QIcon>& ALL_MMO_POKEMON_ICONS();
+
+
 }
 }
 }
