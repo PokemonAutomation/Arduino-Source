@@ -49,6 +49,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
 
     m_object = extract_box_copy(reference, *best);
     // m_object.save("test.png");
+    // cout << "object width height " << m_object.width() << " " << m_object.height() << endl;
     m_matcher.reset(new ExactImageMatcher(m_object));
     m_area_ratio = best->area_ratio();
 }
@@ -60,16 +61,14 @@ double WaterfillTemplateMatcher::rmsd(const ConstImageRef& object) const{
     return m_matcher->rmsd(object);
 }
 bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t candidate_height) const{
-//    double expected_aspect_ratio = (double)m_subobject_in_object_p.width() / m_subobject_in_object_p.height();
-//    double actual_aspect_ratio = (double)width / height;
-//    double error = actual_aspect_ratio / expected_aspect_ratio;
-
-//    cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
-//    cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
+    // double expected_aspect_ratio = (double)m_object.width() / m_object.height();
+    // double actual_aspect_ratio = (double)candidate_width / candidate_height;
+    // cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
+    // cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
 
     double error = (double)m_object.width() * candidate_height;
     error /= (double)m_object.height() * candidate_width;
-//    cout << "ratio = " << error << endl;
+    // cout << "ratio = " << error << endl;
     return m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
 }
 bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) const{
@@ -77,16 +76,16 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
         return true;
     }
     double error = candidate_area_ratio / m_area_ratio;
-    // cout << "area = " << error << endl;
+    // cout << "template area ratio " << m_area_ratio << " candidate " << candidate_area_ratio << " area error = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
 double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
-//        cout << "bad aspect ratio" << endl;
+        // cout << "bad aspect ratio" << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){
-//        cout << "bad area ratio" << endl;
+        // cout << "bad area ratio" << endl;
         return 99999.;
     }
 

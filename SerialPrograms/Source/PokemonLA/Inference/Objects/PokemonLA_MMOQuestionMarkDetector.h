@@ -26,13 +26,6 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class MMOQuestionMarkMatcher : public ImageMatch::WaterfillTemplateMatcher{
-public:
-    MMOQuestionMarkMatcher();
-    static const MMOQuestionMarkMatcher& instance();
-};
-
-
 
 class MMOQuestionMarkDetector {
 public:
