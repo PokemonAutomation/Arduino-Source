@@ -752,7 +752,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.console, context,
         [&](BotBaseContext& context){
 
-            for (int path = 3; path < 4; path++) {
+            for (int path = 0; path < 4; path++) {
                 size_t last_tree = grouped_path(env, context, path, tree_counter);
                 context.wait_for_all_requests();
                 single_path(env, context, path, last_tree, tree_counter);
