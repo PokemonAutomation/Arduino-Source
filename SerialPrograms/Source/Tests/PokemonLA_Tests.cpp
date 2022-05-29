@@ -18,6 +18,7 @@
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
+#include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
@@ -174,6 +175,12 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
         TEST_RESULT_EQUAL(results.size(), target_num_MMOs_on_region_map);
     }
 
+    return 0;
+}
+
+int test_pokemonLA_PokemonMapSpriteReader(const QImage& image, const std::string& target){
+    const auto result = match_pokemon_map_sprite(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 

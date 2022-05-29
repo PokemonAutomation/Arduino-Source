@@ -36,6 +36,8 @@ int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, flo
 
 int test_pokemonLA_MapZoomLevelReader(const QImage& image, int target);
 
+int test_pokemonLA_PokemonMapSpriteReader(const QImage& image, const std::string& target);
+
 void test_pokemonLA_BerryTreeDetector(const QImage& image);
 
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target);

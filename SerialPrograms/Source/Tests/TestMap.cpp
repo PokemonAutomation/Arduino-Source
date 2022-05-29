@@ -50,7 +50,7 @@ using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpect
 
 // Helper for testing code that reads an image and uses filename to get the target outcome for the code.
 // test_func: reads an image and the image filename base and returns an int code.
-int image_filename_detector_helper(const std::string& test_path, ImageFilenameFunction test_func){
+int image_filename_detector_helper(ImageFilenameFunction test_func, const std::string& test_path){
     const QString file_path = QString::fromStdString(test_path);
     QImageReader reader(file_path);
     if (reader.canRead() == false){
@@ -96,7 +96,7 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
         return test_func(image, target_bool);
     };
 
-    return image_filename_detector_helper(test_path, parse_filename_and_run_test);
+    return image_filename_detector_helper(parse_filename_and_run_test, test_path);
 }
 
 // Helper for testing detector code that reads an image and returns some custom data that can be described
@@ -116,7 +116,7 @@ int image_keywords_detector_helper(ImageKeywordsDetectorFunction test_func, cons
         return test_func(image, keywords);
     };
 
-    return image_filename_detector_helper(test_path, parse_filename_and_run_test);
+    return image_filename_detector_helper(parse_filename_and_run_test, test_path);
 }
 
 // Helper for testing detector code that reads an image and returns a non-negative float that can be described
@@ -184,7 +184,7 @@ const QString file_path = QString::fromStdString(test_path);
         return 0;
     };
 
-    return image_filename_detector_helper(test_path, run_test);
+    return image_filename_detector_helper(run_test, test_path);
 }
 
 
@@ -251,6 +251,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
     {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
+    {"PokemonLA_PokemonMapSpriteReader", std::bind(image_filename_detector_helper, test_pokemonLA_PokemonMapSpriteReader, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)}
 };
 
