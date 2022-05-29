@@ -58,22 +58,20 @@ void ImageMatchResult::add(double alpha, std::string slug){
 void ImageMatchResult::clear_beyond_spread(double max_alpha_spread){
     auto best = results.begin();
     while (results.size() > 1){
-        auto back = results.rbegin();
+        auto back = results.end();
+        --back;
         if (back->first <= best->first + max_alpha_spread){
             break;
         }
-        results.erase(back->first);
+        results.erase(back);
     }
 }
 void ImageMatchResult::clear_beyond_alpha(double max_alpha){
-    while (true){
-        if (results.empty()){
-            return;
-        }
+    while (!results.empty()){
         auto iter = results.end();
         --iter;
         if (iter->first <= max_alpha){
-            break;;
+            break;
         }
         results.erase(iter);
     }

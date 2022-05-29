@@ -21,17 +21,24 @@ namespace ImageMatch{
 
 
 
-
+// Generate candidate images to be matched against by translating the input image area
+// (`box` on `screen`) around.
+// The returned candidate images are scaled to match template shape `dimenstion`.
+// `tolerance`: how much translation variances to produce.
+//   e.g. tolerance of 1 means translating the candidate images around so that it can match
+//   the template with at most 1 pixel off on the template image. 
 std::vector<QImage> make_image_set(
     const ConstImageRef& screen,
     const ImageFloatBox& box,
     const QSize& dimensions,
     size_t tolerance
 ){
-    double reference = dimensions.width() * dimensions.height();
-    double image = screen.width() * box.width * screen.height() * box.height;
-//    cout << std::sqrt(image / reference) << endl;
-    pxint_t scale = (pxint_t)(std::sqrt(image / reference) + 0.5);
+    double num_template_pixels = dimensions.width() * dimensions.height();
+    double num_image_pixels = screen.width() * box.width * screen.height() * box.height;
+//    cout << std::sqrt(image / num_template_pixels) << endl;
+    // scale: roughly the relative size between the input image and the template.
+    // e.g. if the input image is 10 x 6 and template is 5 x 3, then `scale` is 2.
+    pxint_t scale = (pxint_t)(std::sqrt(num_image_pixels / num_template_pixels) + 0.5);
     scale = std::max(scale, 1);
 
     std::vector<QImage> ret;
@@ -128,6 +135,7 @@ ImageMatchResult ExactImageDictionaryMatcher::match(
         return results;
     }
 
+    // Translate the input image area a bit to careate matching candidates.
     std::vector<QImage> image_set = make_image_set(image, box, m_dimensions, tolerance);
     for (const auto& item : m_database){
 //        if (item.first != "linoone-galar"){

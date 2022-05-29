@@ -15,18 +15,37 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-//  Matching with brightness scaling only.
+//  Match images against a template.
+//  Before matching, resize the input image to the template shape and scale template brightness to
+//  match the input image. Alpha channels as used as masks in matching.
+//  No other treatment like tolerating translation or scaling based on stddevs, hence the name "Exact".
 class ExactImageMatcher{
 public:
-    ExactImageMatcher(QImage image);
-
+    ExactImageMatcher(QImage image_template);
+    
     const ImageStats& stats() const{ return m_stats; }
 
+    // Resize image to match the shape of the image template, scale the template brightness to match
+    // the input image, then compute their RMSD (root mean square deviation).
+    // The part of the image template where alpha is 0 is not used to compare with the corresponding
+    // part in the input image.
     double rmsd(const ConstImageRef& image) const;
+    // Resize image to match the shape of the image template, scale the template brightness to match
+    // the input image, then compute their RMSD (root mean square deviation).
+    // The part of the image template where alpha is 0 is replace with `background` color when comparing
+    // against the corresponding part in the input image.
     double rmsd(const ConstImageRef& image, QRgb background) const;
+    // Resize image to match the shape of the image template, scale the template brightness to match
+    // the input image, then compute their RMSD (root mean square deviation).
+    // Alpha channels from both the template and the input image are considered when computing RMSD.
+    // If only one of the two has alpha==255 on one pixel, that the deviation on that pixel is the max pixel
+    // distance.
+    // If both two images have alpha==0 on one pixel, that pixel is ignored.
     double rmsd_masked(const ConstImageRef& image) const;
 
 private:
+    // scale stored image template according to the brightness of `image`, assign
+    // the scaled template to `reference`.
     void process_images(QImage& reference, const ConstImageRef& image) const;
 
 public:
@@ -35,18 +54,31 @@ public:
 };
 
 
-//  Matching with custom weight.
+// Based on ExactImageMatcher, adds new stddev scaling.
+// An image template with higher stddev tends to have lots of detail. RMSD against an input image tends to
+// be high because high details will be skewered by stuff like compression artifacts and translational shifts.
+// So a template with high stddev tends to give higher RMSD than one with low stddev.
+// To compensate for this, when calling WeightedExactImageMatcher::diff...(), it scales the computed RMSD
+// based on template stddev, tunable by additional parameters defined in
+// WeightedExactImageMatcher::InverseStddevWeight.
 class WeightedExactImageMatcher : public ExactImageMatcher{
 public:
+    // Used to tune RMSD based on stddev of the template
+    // Equation:
+    // RMSD_scaled = RMSD_original / (template_stddev * `stddev_coefficient` + `offset`)
+    // where template_stddev is the sum of the stddev on all three channels (RGB) of the template.
     struct InverseStddevWeight{
         double stddev_coefficient;
         double offset;
     };
 
-    WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight);
+    WeightedExactImageMatcher(QImage image_template, const InverseStddevWeight& weight);
 
+    // Like ExactImageMatcher::rmsd(image) but scale based on template stddev.
     double diff(const ConstImageRef& image) const;
+    // Like ExactImageMatcher::rmsd(image, background) but scale based on template stddev.
     double diff(const ConstImageRef& image, QRgb background) const;
+    // Like ExactImageMatcher::rmsd_masked(image) but scale based on template stddev.
     double diff_masked(const ConstImageRef& image) const;
 
 public:
