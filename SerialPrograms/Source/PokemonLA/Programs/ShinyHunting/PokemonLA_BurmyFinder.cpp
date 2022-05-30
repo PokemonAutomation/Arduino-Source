@@ -69,6 +69,7 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
+        &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
         &MATCH_DETECTED_OPTIONS.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
