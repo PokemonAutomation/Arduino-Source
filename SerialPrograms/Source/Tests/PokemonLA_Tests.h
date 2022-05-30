@@ -42,6 +42,8 @@ void test_pokemonLA_BerryTreeDetector(const QImage& image);
 
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target);
 
+int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath);
+
 }
 
 #endif

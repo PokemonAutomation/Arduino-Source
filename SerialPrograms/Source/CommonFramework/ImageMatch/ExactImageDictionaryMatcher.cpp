@@ -149,8 +149,46 @@ ImageMatchResult ExactImageDictionaryMatcher::match(
     return results;
 }
 
+ImageMatchResult ExactImageDictionaryMatcher::subset_match(
+    const std::vector<std::string>& subset,
+    const ConstImageRef& image, const ImageFloatBox& box,
+    size_t tolerance,
+    double alpha_spread
+) const{
+    ImageMatchResult results;
+    if (!image){
+        return results;
+    }
 
+    // Translate the input image area a bit to careate matching candidates.
+    std::vector<QImage> image_set = make_image_set(image, box, m_dimensions, tolerance);
+    for (const auto& slug : subset){
+        const auto& matcher = image_matcher(slug);
+        double alpha = compare(matcher, image_set);
+        results.add(alpha, slug);
+        results.clear_beyond_spread(alpha_spread);
+    }
 
+    return results;
+}
+
+const QImage& ExactImageDictionaryMatcher::image_template(const std::string& slug) const{
+    auto it = m_database.find(slug);
+    if (it == m_database.end()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown slug: " + slug);
+    }
+
+    return it->second.image_template();
+}
+
+const WeightedExactImageMatcher& ExactImageDictionaryMatcher::image_matcher(const std::string& slug) const{
+    auto it = m_database.find(slug);
+    if (it == m_database.end()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown slug: " + slug);
+    }
+
+    return it->second;
+}
 
 
 }

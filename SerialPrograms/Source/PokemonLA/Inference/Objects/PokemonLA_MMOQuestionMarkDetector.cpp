@@ -103,6 +103,7 @@ bool detect_template_by_single_pass_waterfill(
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
     const std::pair<int, int> &area_thresholds,
     double rmsd_threshold,
+    std::function<bool(WaterfillObject& object)> stop_search,
     const WaterfillTemplateDetectionDebugParams* debug_params)
 {
     auto matrix = compress_rgb32_to_binary_multirange(image, filters);
@@ -114,8 +115,8 @@ bool detect_template_by_single_pass_waterfill(
         draw_matrix_on_image(matrix, debug_params->filter_color, *debug_image, 0, 0);
     }
 
-    std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
-    Kernels::Waterfill::WaterfillObject object;
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+    WaterfillObject object;
 
     const size_t min_area = area_thresholds.first;
     bool detected = false;
@@ -136,7 +137,10 @@ bool detect_template_by_single_pass_waterfill(
                 draw_object_on_image(object, debug_params->match_color, *debug_image, 0, 0);
             }
             detected = true;
-            break;
+            
+            if (stop_search(object)){
+                break;
+            }
         }
     }
 
@@ -167,6 +171,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image){
         // Should be at least 550 pixels on 720P image.
         {550, 1500},
         90,
+        [](WaterfillObject&) { return true; },
         debug_params.get()
     );
 
@@ -182,6 +187,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image){
             // Should be about 130 pixels on 720P image.
             {100, 450},
             100,
+            [](WaterfillObject&) { return true; },
             debug_params.get()
         );
     }
@@ -223,39 +229,42 @@ std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImag
     return detected;
 }
 
-std::vector<std::pair<size_t, size_t>> MMOQuestionMarkDetector::detect_MMOs_on_region_map(const QImage& frame){
-    // Detect all the locations of the MMO question mark background
-    auto bg_matrix = compress_rgb32_to_binary_multirange(frame,
-        {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}}
+std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(const QImage& frame){
+    ImageFloatBox map_view{0.261, 0.060, 0.481, 0.842};
+    size_t map_min_x = (size_t)(frame.width() * map_view.x + 0.5);
+    size_t map_min_y = (size_t)(frame.height() * map_view.y + 0.5);
+    size_t map_width = (size_t)(frame.width() * map_view.width + 0.5);
+    size_t map_height = (size_t)(frame.height() * map_view.height + 0.5);
+    ConstImageRef map_image(ConstImageRef(frame).sub_image(map_min_x, map_min_y, map_width, map_height));
+
+    std::unique_ptr<WaterfillTemplateDetectionDebugParams> debug_params = nullptr;
+
+#ifdef DEBUG_MMO_QUESTION_MARK
+    debug_params = std::make_unique<WaterfillTemplateDetectionDebugParams>();
+    debug_params->base_filename = "test_region_MMO_";
+#endif
+
+    std::vector<ImagePixelBox> results;
+
+    detect_template_by_single_pass_waterfill(
+        map_image,
+        MMOQuestionMarkBackgroundMatcher::instance(),
+        // {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
+        {{combine_rgb(0, 10, 30), combine_rgb(100, 130, 130)}},
+        // The dark blue background is about 1400-1500 pixels on 1080P.
+        // Should be at least 550 pixels on 720P image.
+        {550, 1800},
+        100,
+        [&](WaterfillObject& object){
+            int min_x = (int)object.min_x + map_min_x;
+            int min_y = (int)object.min_y + map_min_y;
+            int max_x = (int)object.max_x + map_min_x;
+            int max_y = (int)object.max_y + map_min_y;
+            results.emplace_back(min_x, min_y, max_x, max_y);
+            return false;
+        },
+        debug_params.get()
     );
-
-    std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
-    Kernels::Waterfill::WaterfillObject object;
-
-    const size_t bg_min_area = 550;
-    const size_t bg_max_area = 1500;
-
-    session->set_source(bg_matrix);
-    auto finder = session->make_iterator(bg_min_area);
-    const bool keep_object_bg_matrix = false;
-
-    std::vector<std::pair<size_t, size_t>> results;
-    while (finder->find_next(object, keep_object_bg_matrix)){
-        if (object.area > bg_max_area){
-            continue;
-        }
-        double rmsd = MMOQuestionMarkBackgroundMatcher::instance().rmsd_original(frame, object);
-        // if (debug_params){
-        //     cout << debug_params->base_filename << ": rmsd " << rmsd << " area " << object.area << endl;
-        // }
-        
-        if (rmsd < 90){
-            // if (debug_params){
-            //     draw_object_on_image(object, debug_params->match_color, *debug_image, 0, 0);
-            // }
-            results.emplace_back(object.center_x(), object.center_y());
-        }
-    }
 
     return results;
 }

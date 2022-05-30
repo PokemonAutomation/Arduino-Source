@@ -25,7 +25,6 @@ using TestFunction = std::function<int(const std::string& test_file_path)>;
 // See CommandLineTests.h for details on test space and test object.
 TestFunction find_test_function(const std::string& test_space, const std::string& test_obj_name);
 
-
 }
 
 #endif

@@ -1410,6 +1410,7 @@ file(GLOB MAIN_SOURCES
     Source/Tests/PokemonLA_Tests.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
+    Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
 )
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})

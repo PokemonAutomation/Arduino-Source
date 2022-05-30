@@ -178,12 +178,12 @@ FeatureVector compute_gradient_histogram(const ConstImageRef& image){
     return result;
 }
 
-FeatureVector compute_feature(const QImage& input_image){
+FeatureVector compute_feature(const ConstImageRef& input_image){
     static int count = 0;
 
     // int width = image.width();
     // int height = image.height();
-    QImage image = input_image.convertedTo(QImage::Format::Format_ARGB32);
+    QImage image = input_image.to_qimage().convertedTo(QImage::Format::Format_ARGB32);
     int width = image.width();
     int height = image.height();
     float r = (width + height) / 4.0;
@@ -198,7 +198,7 @@ FeatureVector compute_feature(const QImage& input_image){
         }
     }    
 
-    const int num_divisions = 3;
+    const int num_divisions = 2;
     const float portion = 1.0 / (float)num_divisions;
     FeatureVector result;
     for(int i = 0; i < num_divisions; i++){
@@ -214,7 +214,7 @@ FeatureVector compute_feature(const QImage& input_image){
             // result.push_back(actual.g);
             // result.push_back(actual.b);
 
-            FeatureType scale = 1.0 / 255;
+            FeatureType scale = 2.0 / 255;
             result.push_back(stats.average.r * scale);
             result.push_back(stats.average.g * scale);
             result.push_back(stats.average.b * scale);
@@ -237,14 +237,9 @@ FeatureVector compute_feature(const QImage& input_image){
     return result;
 }
 
-std::map<std::string, FeatureVector> compute_MMO_sprite_features(){
-    // cout << "compute_MMO_sprite_features" << endl;
-
-    std::map<std::string, FeatureVector> features;
-    
+void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, QImage& sprite)> visit_sprit){
     const char* sprite_path = "PokemonLA/MMOSprites.png";
     const char* json_path = "PokemonLA/MMOSprites.json";
-
     QImage sprites = open_image(RESOURCE_PATH() + sprite_path);
     QJsonObject json = read_json_file(
         RESOURCE_PATH() + json_path
@@ -259,8 +254,6 @@ std::map<std::string, FeatureVector> compute_MMO_sprite_features(){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", (RESOURCE_PATH() + json_path).toStdString());
     }
 
-    int count = 0;
-
     QJsonObject locations = json.find("spriteLocations")->toObject();
     for (auto iter = locations.begin(); iter != locations.end(); ++iter){
         // cout << "sprite " << count << endl;
@@ -269,33 +262,45 @@ std::map<std::string, FeatureVector> compute_MMO_sprite_features(){
         QJsonObject obj = iter.value().toObject();
         int y = obj.find("top")->toInt();
         int x = obj.find("left")->toInt();
-
         QImage sprite = sprites.copy(x, y, width, height);
 
-        int width = sprite.width();
-        int height = sprite.height();
-        float center_x  = (width-1) / 2.0f;
-        float center_y = (height-1) / 2.0f;
-        int r = width/2 - 3;
-        int r2 = r * r;
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
-                    sprite.setPixelColor(x, y, QColor(0, 0, 0, 0));
-                }
-            }
-        }
+        sprite = sprite.scaled(50, 50);
 
-        sprite = sprite.scaled(52, 52);
+        visit_sprit(slug, sprite);
+    }
+}
 
-        if (count == 0){
-            sprite.save("test_sprite.png");
-        }
+std::map<std::string, FeatureVector> compute_MMO_sprite_features(){
+    // cout << "compute_MMO_sprite_features" << endl;
 
-        count++;
+    std::map<std::string, FeatureVector> features;
+   
+    // int count = 0;
+
+    load_and_visit_MMO_sprite([&](const std::string& slug, QImage& sprite){
+
+        // if (count == 0){
+        //     sprite.save("test_sprite.png");
+        // }
+
+        // count++;
+
+        // int width = sprite.width();
+        // int height = sprite.height();
+        // float center_x = (width-1) / 2.0f;
+        // float center_y = (height-1) / 2.0f;
+        // int r = width/2 - 3;
+        // int r2 = r * r;
+        // for(int y = 0; y < height; y++){
+        //     for(int x = 0; x < width; x++){
+        //         if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
+        //             sprite.setPixelColor(x, y, QColor(0, 0, 0, 0));
+        //         }
+        //     }
+        // }
 
         features.emplace(slug, compute_feature(sprite));
-    }
+    });
 
     // check feature self distances:
     FeatureType closest_dist = FLT_MAX;
@@ -327,33 +332,54 @@ const std::map<std::string, FeatureVector>& MMO_SPRITE_FEATUES(){
 
 
 
-std::string match_pokemon_map_sprite(const QImage& image){
+std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef& image){
     const FeatureVector& image_feature = compute_feature(image);
 
 
     const std::map<std::string, FeatureVector>& features = MMO_SPRITE_FEATUES();
 
-    cout << "input image feature: " << feature_to_str(image_feature) << endl;
+    // cout << "input image feature: " << feature_to_str(image_feature) << endl;
 
-    FeatureType closest_dist = FLT_MAX;
-    std::string closest_slug = "";
+    // FeatureType closest_dist = FLT_MAX;
+    // std::string closest_slug = "";
+
+    std::multimap<double, std::string> result;
 
     for(const auto& p : features){
         const std::string& slug = p.first;
         const FeatureVector& feature = p.second;
         const FeatureType dist = feature_distance(image_feature, feature);
-        if (dist < closest_dist){
-            closest_dist = dist;
-            closest_slug = slug;
-        }
+        result.emplace(dist, slug);
     }
 
-    cout << "Closest feature distance " << closest_dist << ", slug " << closest_slug << endl;
-    cout << feature_to_str(features.find(closest_slug)->second) << endl;
+    // cout << "Closest feature distance " << closest_dist << ", slug " << closest_slug << endl;
+    // cout << feature_to_str(features.find(closest_slug)->second) << endl;
 
-    return closest_slug;
+    return result;
 }
 
+
+
+
+
+ImageMatch::ExactImageDictionaryMatcher build_MMO_sprite_matcher(){
+    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight stddev_weight;
+    stddev_weight.stddev_coefficient = 0.004;
+    // stddev_weight.stddev_coefficient = 0.1;
+    stddev_weight.offset = 1.0;
+    ImageMatch::ExactImageDictionaryMatcher matcher(stddev_weight);
+
+    load_and_visit_MMO_sprite([&](const std::string& slug, QImage& sprite){
+        matcher.add(slug, sprite);
+    });
+
+    return matcher;
+}
+
+const ImageMatch::ExactImageDictionaryMatcher& get_MMO_sprite_matcher(){
+    const static auto matcher = build_MMO_sprite_matcher();
+    return matcher;
+}
 
 
 }

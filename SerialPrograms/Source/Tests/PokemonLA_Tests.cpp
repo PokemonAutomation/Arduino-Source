@@ -7,6 +7,7 @@
 
 #include "PokemonLA_Tests.h"
 #include "TestUtils.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -22,9 +23,14 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
+#include <QFileInfo>
 #include <QImage>
-#include <iostream>
+#include <QDir>
 #include <cmath>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <map>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -171,7 +177,6 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
             cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands-5.png)." << endl; 
         }
         const auto results = detector.detect_MMOs_on_region_map(image);
-
         TEST_RESULT_EQUAL(results.size(), target_num_MMOs_on_region_map);
     }
 
@@ -180,7 +185,8 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
 
 int test_pokemonLA_PokemonMapSpriteReader(const QImage& image, const std::string& target){
     const auto result = match_pokemon_map_sprite(image);
-    TEST_RESULT_EQUAL(result, target);
+    auto slug = result.begin()->second;
+    TEST_RESULT_EQUAL(slug, target);
     return 0;
 }
 
@@ -299,6 +305,137 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
     return 0;
 }
 
+// Load an image with MMO question marks from an MMO event, with filename <XXX.png>
+// Load an image with MMO question marks revealed by Munchlax to show each pokemon sprite from the same MMO event, with filename <_XXX.png>
+// Load a text file with each line the pokemon in the MMO event, with filename <_XXX.txt>. If more than one pokemon of the same species appears,
+// add a number as the number of appearance at end of that line.
+int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
+    const QString full_path(filepath.c_str());
+    const QFileInfo fileinfo(full_path);
+    const QString filename = fileinfo.fileName();
+    const QDir parent_dir = fileinfo.dir();
 
+    const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
+    const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+
+    QImage question_mark_image(full_path);
+    QImage sprite_image(mmo_revealed_image_path);
+    
+    if (question_mark_image.isNull()){
+        cerr << "Error: cannot load MMO quesiton mark image file " << filepath << endl;
+        return 1;
+    }
+    if (sprite_image.isNull()){
+        cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path.toStdString() << endl;
+        return 1;
+    }
+
+    std::vector<std::string> target_sprites;
+    if (load_slug_list(mmo_revealed_txt_path.toStdString(), target_sprites) == false){
+        return 1;
+    }
+
+    cout << "Target sprites: " << target_sprites.size() << " total" << endl;
+    for(const auto& slug : target_sprites){
+        cout << "- " << slug << endl;
+    }
+
+    auto& logger = global_logger_command_line();
+    MMOQuestionMarkDetector detector(logger);
+
+    const auto quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
+    cout << "Detect MMO question marks:" << endl;
+    for(const auto& box : quest_results){
+        cout << "- " << box.center_x() << ", " << box.center_y() << " " << box.width() << " x " << box.height() << endl;
+    }
+
+    if (quest_results.size() != target_sprites.size()){
+        cerr << "Error: the number of MMO question marks detected is not correct: " << quest_results.size() << " should be " << 
+            target_sprites.size() << endl;
+        return 1;
+    }
+    
+    static int count = 0;
+    QImage output_sprite = sprite_image;
+    QImage output_quest = question_mark_image;
+    std::vector<ImagePixelBox> new_boxes;
+    for (size_t i = 0; i < quest_results.size(); i++){
+        auto box = quest_results[i];
+        draw_box(output_quest, box, combine_rgb(255, 0, 0));
+        draw_box(output_sprite, box, combine_rgb(255, 0, 0));
+
+        int radius = int((box.width() + box.height()) / 4 + 0.5);
+        int center_x = box.center_x();
+        int center_y = box.center_y();
+        auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
+        new_boxes.push_back(new_box);
+        
+        std::ostringstream os;
+        os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
+        std::string sprite_filename = os.str();
+        extract_box_reference(sprite_image, new_box).save(QString::fromStdString(sprite_filename));
+    }
+    output_quest.save("test_MMO_question_mark_detection_" + QString::number(count) + ".png");
+    output_sprite.save("test_sprite_detection_" + QString::number(count) + ".png");
+
+
+    const auto& matcher = get_MMO_sprite_matcher();
+
+    size_t success_count = 0;
+    for (size_t i = 0; i < quest_results.size(); i++){
+        cout << "Target slug: " << target_sprites[i] << endl;
+
+
+        auto feature_results = match_pokemon_map_sprite(extract_box_reference(sprite_image, new_boxes[i]));
+        std::vector<std::string> subset;
+        int subset_count = 0;
+        for(const auto& p : feature_results){
+            subset.push_back(p.second);
+            if (subset_count++ >= 5){
+                break;
+            }
+        }
+
+        ImageFloatBox box = pixelbox_to_floatbox(sprite_image, new_boxes[i]);
+        auto match_results = matcher.subset_match(subset, sprite_image, box, 1, 30);
+        int result_count = 0;
+        double top_score = 0.0;
+        double top_second_score_dif = 0.0;
+        for(const auto& p : match_results.results){
+            const auto& slug = p.second;
+            const auto& stats = matcher.image_matcher(slug).stats();
+            cout << p.first << " - " << slug << " " << stats.stddev.sum();
+            if (result_count == 0){
+                top_score = p.first;
+                if (slug == target_sprites[i]){
+                    success_count++;
+                    cout << " SUCCESS";
+                } else{
+                    cout << " FAILURE";
+
+                    matcher.image_template(slug).save(QString::fromStdString("test_sprite_" + slug + ".png"));
+                    matcher.image_template(target_sprites[i]).save(QString::fromStdString("test_sprite_" + target_sprites[i] + ".png"));
+                }
+            }
+            if (result_count == 1){
+                top_second_score_dif = p.first - top_score;
+            }
+            cout << endl;
+            result_count++;
+            if (result_count == 10){
+                break;
+            }
+        }
+
+        // break;
+        cout << "Score diff: " << top_second_score_dif << endl;
+    }
+    if (success_count == target_sprites.size()){
+        cout << "ALL SUCCESS" << endl;
+    }
+    count++;
+    
+    return 0;
+}
 
 }

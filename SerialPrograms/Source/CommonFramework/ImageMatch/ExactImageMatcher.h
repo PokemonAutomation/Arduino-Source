@@ -43,6 +43,8 @@ public:
     // If both two images have alpha==0 on one pixel, that pixel is ignored.
     double rmsd_masked(const ConstImageRef& image) const;
 
+    const QImage& image_template() const { return m_image; }
+
 private:
     // scale stored image template according to the brightness of `image`, assign
     // the scaled template to `reference`.

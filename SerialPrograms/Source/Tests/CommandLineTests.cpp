@@ -78,6 +78,12 @@ int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size
         first_test_file = false;
 
         const QString next_file = file_iter.next();
+        
+        // If filename starts with _, its considered a "hidden" file so skip it.
+        const QFileInfo file_info(next_file);
+        if (file_info.fileName().startsWith('_')){
+            continue;
+        }
         const std::string file_path = next_file.toStdString();
 
         // Check ignore list to determine whether to skip the test

@@ -10,6 +10,7 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 
@@ -39,7 +40,7 @@ public:
     // Fieldlands, Mirelands, Coastlands, Highlands, Icelands.
     std::array<bool, 5> detect_MMO_on_hisui_map(const QImage& frame);
 
-    std::vector<std::pair<size_t, size_t>> detect_MMOs_on_region_map(const QImage& frame);
+    std::vector<ImagePixelBox> detect_MMOs_on_region_map(const QImage& frame);
 
 private:
     LoggerQt& m_logger;

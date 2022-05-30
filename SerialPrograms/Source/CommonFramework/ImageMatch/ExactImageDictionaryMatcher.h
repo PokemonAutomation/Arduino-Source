@@ -9,6 +9,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"
@@ -48,6 +49,19 @@ public:
         size_t tolerance,
         double alpha_spread
     ) const;
+
+    // Match on a subset of the templates.
+    // See match() for deatils on how the matching is done against a template.
+    ImageMatchResult subset_match(
+        const std::vector<std::string>& subset,
+        const ConstImageRef& image, const ImageFloatBox& box,
+        size_t tolerance,
+        double alpha_spread
+    ) const;
+
+    const QImage& image_template(const std::string& slug) const;
+
+    const WeightedExactImageMatcher& image_matcher(const std::string& slug) const;
 
 
 private:

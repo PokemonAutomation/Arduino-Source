@@ -15,7 +15,6 @@
 #include <QImageReader>
 
 #include <iostream>
-#include <sstream>
 #include <algorithm>
 #include <string>
 using std::cout;
@@ -39,7 +38,7 @@ using ImageFloatDetectorFunction = std::function<int(const QImage& image, float 
 
 using ImageIntDetectorFunction = std::function<int(const QImage& image, int target)>;
 
-using ImageKeywordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& keywords)>;
+using ImageWordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& words)>;
 
 using ImageVoidDetectorFunction = std::function<void(const QImage& image)>;
 
@@ -59,21 +58,8 @@ int image_filename_detector_helper(ImageFilenameFunction test_func, const std::s
     }
 
     QFileInfo file_info(file_path);
-    std::string filename = file_info.fileName().toStdString();
-
-    // Search for the target test result from test filename.
-    const size_t target_pos = filename.rfind('.');
-    if (target_pos == std::string::npos){
-        cerr << "Error: image test file " << test_path << " has no \".\" in the filename." << endl;
-        return 1;
-    }
-
-    // cout << "Test file: " << test_path << endl;
-
-    const auto filename_base = filename.substr(0, target_pos);
-
     const QImage image = reader.read();
-    return test_func(image, filename_base);
+    return test_func(image, file_info.baseName().toStdString());
 }
 
 
@@ -100,20 +86,11 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
 }
 
 // Helper for testing detector code that reads an image and returns some custom data that can be described
-// by keywords included in the test filename.
-// The helper will split the filename by "-" into keywords and send it in the same order to the test function.
-int image_keywords_detector_helper(ImageKeywordsDetectorFunction test_func, const std::string& test_path){
+// by words included in the test filename.
+// The helper will split the filename by "-" into words and send it in the same order to the test function.
+int image_words_detector_helper(ImageWordsDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
-        const auto name_base = QString::fromStdString(filename_base);
-
-        std::vector<std::string> keywords;
-        std::istringstream is(filename_base);
-        std::string keyword;
-        while (getline(is, keyword, '-')){
-            keywords.push_back(keyword);
-        }
-
-        return test_func(image, keywords);
+        return test_func(image, parse_words(filename_base));
     };
 
     return image_filename_detector_helper(parse_filename_and_run_test, test_path);
@@ -122,21 +99,15 @@ int image_keywords_detector_helper(ImageKeywordsDetectorFunction test_func, cons
 // Helper for testing detector code that reads an image and returns a non-negative float that can be described
 // in the filename for example <name_base>-0.4.png.
 int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& keywords) -> int{
-        if (keywords.size() < 2){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& words) -> int{
+        if (words.size() < 2){
             cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
             return 1;
         }
 
-        auto parse_float = [&](const std::string& str, float& number) -> bool {
-            std::istringstream iss(str);
-            iss >> number;
-            return iss.eof() && !iss.fail();
-        };
-
         float target_number = 0.0f, threshold = 0.0f;
 
-        if (parse_float(keywords[keywords.size()-2], target_number) == false || parse_float(keywords[keywords.size()-1], threshold) == false){
+        if (parse_float(words[words.size()-2], target_number) == false || parse_float(words[words.size()-1], threshold) == false){
             cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
             return 1;
         }
@@ -144,25 +115,19 @@ int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_fun
         return test_func(image, target_number, threshold);
     };
 
-    return image_keywords_detector_helper(parse_filename_and_run_test, test_path);
+    return image_words_detector_helper(parse_filename_and_run_test, test_path);
 }
 
 int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& keywords) -> int{
-        if (keywords.size() == 0){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& words) -> int{
+        if (words.size() == 0){
             cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
             return 1;
         }
 
-        auto parse_int = [&](const std::string& str, int& number) -> bool {
-            std::istringstream iss(str);
-            iss >> number;
-            return iss.eof() && !iss.fail();
-        };
-
         int target_number = 0;
 
-        if (parse_int(keywords[keywords.size()-1], target_number) == false){
+        if (parse_int(words[words.size()-1], target_number) == false){
             cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
             return 1;
         }
@@ -170,7 +135,7 @@ int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const
         return test_func(image, target_number);
     };
 
-    return image_keywords_detector_helper(parse_filename_and_run_test, test_path);
+    return image_words_detector_helper(parse_filename_and_run_test, test_path);
 }
 
 
@@ -247,14 +212,14 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_DialogueYellowArrowDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogueYellowArrowDetector, _1)},
     {"PokemonLA_BlackOutDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BlackOutDetector, _1)},
     {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
-    {"PokemonLA_MMOQuestionMarkDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_MMOQuestionMarkDetector, _1)},
-    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
+    {"PokemonLA_MMOQuestionMarkDetector", std::bind(image_words_detector_helper, test_pokemonLA_MMOQuestionMarkDetector, _1)},
+    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
     {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
     {"PokemonLA_PokemonMapSpriteReader", std::bind(image_filename_detector_helper, test_pokemonLA_PokemonMapSpriteReader, _1)},
-    {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)}
+    {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)},
+    {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},
 };
-
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){
     const auto it = TEST_MAP.find(test_space + "_" + test_name);

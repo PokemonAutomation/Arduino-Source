@@ -699,7 +699,8 @@ SOURCES += \
     Source/PokemonSwSh/ShinyHuntTracker.cpp \
     Source/Tests/CommandLineTests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
-    Source/Tests/TestMap.cpp
+    Source/Tests/TestMap.cpp \
+    Source/Tests/TestUtils.cpp
 
 HEADERS += \
     ../ClientSource/Connection/BotBase.h \

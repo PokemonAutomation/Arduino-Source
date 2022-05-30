@@ -18,8 +18,30 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
+#include <map>
 
 namespace PokemonAutomation{
+
+// Parse filename base into words.
+// Words are separated by '_'.
+std::vector<std::string> parse_words(const std::string& filename_base);
+
+// Convert string to int. Return true if succeed.
+bool parse_int(const std::string& word, int& number);
+
+// Convert string to float. Return true if succeed.
+bool parse_float(const std::string& word, float& number);
+
+// Load sprite counts from a text file.
+// Each line is:
+// <slug> (optional number of slug count, default 1)
+bool load_sprite_count(const std::string& filepath, std::map<std::string, int>& sprites);
+
+// Load a list of slugs from a text file.
+// Each line is a slug.
+bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprites);
 
 
 // Implement the dummy interface of BotBase so that we can run the test code
@@ -92,6 +114,8 @@ public:
 
     void add_overlay(size_t startingStamp, size_t endStamp, Color color) override {}
 };
+
+
 
 
 #define TEST_RESULT_EQUAL(result, target) \

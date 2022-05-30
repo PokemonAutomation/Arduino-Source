@@ -106,6 +106,10 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_im
 double WaterfillTemplateMatcher::rmsd_original(const ConstImageRef& original_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
         // cout << "bad aspect ratio" << endl;
+        // double expected_aspect_ratio = (double)m_object.width() / m_object.height();
+        // double actual_aspect_ratio = (double)object.width() / object.height();
+        // cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
+        // cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){
