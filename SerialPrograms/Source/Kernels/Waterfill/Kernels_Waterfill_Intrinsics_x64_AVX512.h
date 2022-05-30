@@ -140,7 +140,8 @@ PA_FORCE_INLINE void transpose_64x8x4_inverse(
 PA_FORCE_INLINE __m512i transpose_1x8x8x8(__m512i x){
     __m512i r, L, H;
 
-    r = _mm512_shuffle_epi32(x, 78);
+//    r = _mm512_shuffle_epi32(x, 78);
+    r = _mm512_shuffle_epi32(x, _MM_PERM_BADC);
     L = _mm512_slli_epi64(r, 1);
     H = _mm512_srli_epi64(r, 1);
     r = _mm512_ternarylogic_epi64(L, H, _mm512_set1_epi8(0x55), 0xd8);
