@@ -117,6 +117,7 @@ void determine_shiny_status(
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const ProgramInfo& info, EventNotificationOption& settings,
+    BattleType battle_type,
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles_wild_overall,
     const ShinySparkleAggregator& sparkles_wild_left,
@@ -139,7 +140,7 @@ void determine_shiny_status(
             alpha_wild_overall += 3.5;
         }
     }
-    {
+    if (battle_type == BattleType::STARTER){
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
         std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(2000);  //  Add headroom for happiness.
@@ -216,6 +217,7 @@ void detect_shiny_battle(
         console,
         wild_result, your_result,
         info, settings,
+        battle_type,
         tracker.dialog_tracker(),
         tracker.sparkles_wild_overall(),
         tracker.sparkles_wild_left(),

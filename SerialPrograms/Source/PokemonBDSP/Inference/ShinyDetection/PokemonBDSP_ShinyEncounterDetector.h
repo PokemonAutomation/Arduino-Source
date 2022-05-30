@@ -87,18 +87,6 @@ private:
     ShinySparkleAggregator m_best_own;
 };
 
-void determine_shiny_status(
-    LoggerQt& logger,
-    DoublesShinyDetection& wild_result,
-    ShinyDetectionResult& your_result,
-    const ProgramInfo& info, EventNotificationOption& settings,
-    const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
-    const ShinySparkleAggregator& sparkles_wild_overall,
-    const ShinySparkleAggregator& sparkles_wild_left,
-    const ShinySparkleAggregator& sparkles_wild_right,
-    const ShinySparkleAggregator& sparkles_own
-);
-
 
 
 void detect_shiny_battle(
