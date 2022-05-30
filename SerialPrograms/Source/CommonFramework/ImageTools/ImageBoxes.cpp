@@ -250,17 +250,16 @@ QImage extract_object_from_inner_feature(
 }
 
 
-void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
+void draw_box(const ImageRef& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
     if (thickness == 0 || image.width() <= 0 || image.height() <= 0){
         return;
     }
 
-    Color c(color);
     auto clamp_x = [&](pxint_t x){
-        return std::min(std::max(x, 0), image.width()-1);
+        return std::min(std::max(x, 0), (int)image.width()-1);
     };
     auto clamp_y = [&](pxint_t y){
-        return std::min(std::max(y, 0), image.height()-1);
+        return std::min(std::max(y, 0), (int)image.height()-1);
     };
 
     auto draw_solid_rect = [&](pxint_t start_x, pxint_t start_y, pxint_t end_x, pxint_t end_y){
@@ -274,10 +273,10 @@ void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, siz
         if (start_y > end_y){
             std::swap(start_y, end_y);
         }
-        QColor qColor(c.r(), c.g(), c.b(), c.a());
         for (pxint_t y = start_y; y <= end_y; ++y){
             for (pxint_t x = start_x; x <= end_x; ++x){
-                image.setPixelColor(x, y, qColor);
+                // setPixelColor(x, y, qColor);
+                image.pixel(x, y) = color;
             }
         }
     };

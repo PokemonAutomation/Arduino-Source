@@ -17,6 +17,7 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/Globals.h"
 
 #include <map>
@@ -34,8 +35,31 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+namespace {
+
 using FeatureType = double;
 using FeatureVector = std::vector<FeatureType>;
+
+using ImageMatch::ExactImageDictionaryMatcher;
+
+// defined locally stored data for matching MMO sprites
+struct MMOSpriteMatchingData {
+    ExactImageDictionaryMatcher color_matcher;
+    ExactImageDictionaryMatcher gradient_matcher;
+    // sprite slug -> features
+    std::map<std::string, FeatureVector> features;
+
+    MMOSpriteMatchingData(
+        ExactImageDictionaryMatcher c_matcher,
+        ExactImageDictionaryMatcher g_matcher,
+        std::map<std::string, FeatureVector> f
+    )
+        : color_matcher(std::move(c_matcher))
+        , gradient_matcher(std::move(g_matcher))
+        , features(f) {}
+};
+
+
 
 FeatureType feature_distance(const FeatureVector& a, const FeatureVector& b){
     if (a.size() != b.size()){
@@ -64,44 +88,25 @@ std::string feature_to_str(const FeatureVector& a){
     return os.str();
 }
 
-FeatureVector compute_gradient_histogram(const ConstImageRef& image){
-    int width = image.width();
-    int height = image.height();
+void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(int x, int y, int sum_x[3], int sum_y[3])> proces_gradient){
+    const int width = image.width();
+    const int height = image.height();
     // Kernel for computing gradient along x axis
-    int kx[3][3] = {
+    const int kx[3][3] = {
         {-1, 0, 1},
         {-2, 0, 2},
         {-1, 0, 1},
     };
     // kernel for gradient along y axis
-    int ky[3][3] = {
+    const int ky[3][3] = {
         { 1,  2,  1},
         { 0,  0,  0},
         {-1, -2, -1},
     };
-    int ksz = 3; // kernel size
-    int x_end = width - ksz + 1;
-    int y_end = height - ksz + 1;
+    const int ksz = 3; // kernel size
+    const int x_end = width - ksz + 1;
+    const int y_end = height - ksz + 1;
 
-    const int num_angle_divisions = 8;
-    double division_angle = 2. * M_PI / num_angle_divisions;
-    double inverse_division_angle = 1.0 / division_angle;
-
-    std::array<int, num_angle_divisions> bin = {0};
-
-    static int count = 0;
-
-    std::unique_ptr<QImage> output_image;
-    if (count == 0){
-        output_image = std::make_unique<QImage>(image.to_qimage());
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                output_image->setPixelColor(x, y, QColor(0,0,0,0));
-            }
-        }
-    }
-
-    int num_grad = 0;
     for(int y = 0; y < y_end; y++){
         for(int x = 0; x < x_end; x++){
             int sum_x[3] = {0, 0, 0};
@@ -110,21 +115,17 @@ FeatureVector compute_gradient_histogram(const ConstImageRef& image){
             for(int sy = 0; sy < 3; sy++){
                 for(int sx = 0; sx < 3; sx++){
                     uint32_t p = image.pixel(x + sx, y + sy);
-                    if (count == 0 && x == 6 && y == 6){
-                        Color pc(p);
-                        cout << "(6,6) " << sx << " " << sy << ", " << (int)pc.a() << " " << (int)pc.r() << " " << (int)pc.g() << " " << (int)pc.b() << endl;
-                    }
                     int alpha = p >> 24;
                     if (alpha < 128){
+                        // We don't compute gradient when there is a pixel in the kernel
+                        // scope that is transparent
                         has_alpha_pixel = true;
                         break;
                     }
                     for(int ch = 0; ch < 3; ch++){ // rgb channel
                         int shift = ch * 8;
                         int c = (uint32_t(0xff) & p >> shift);
-                        // if (count == 0){
-                        //     cout << "c = " << c << endl;
-                        // }
+
                         sum_x[ch] += c * kx[sy][sx];
                         sum_y[ch] += c * ky[sy][sx];
                     }
@@ -136,56 +137,84 @@ FeatureVector compute_gradient_histogram(const ConstImageRef& image){
             if (has_alpha_pixel){
                 continue;
             }
-            
-            num_grad++;
 
-            int gx = sum_x[0] + sum_x[1] + sum_x[2];
-            int gy = sum_y[0] + sum_y[1] + sum_y[2];
-
-            if (gx*gx + gy*gy <= 2000){
-                continue;
-            }
-
-            if (count == 0){
-                // cout << "gxy " << sum_x[0] << " " << sum_x[1] << " " << sum_x[2] << ", " <<
-                //  sum_y[0] << " " << sum_y[1] << " " << sum_y[2] << endl;
-                
-                int gxc = std::min(std::abs(gx), 255);
-                int gyc = std::min(std::abs(gy), 255);
-
-                output_image->setPixelColor(x, y, QColor(gxc, gyc, 0));
-            }
-
-            double angle = std::atan2(gy, gx); // range in -pi, pi
-            int bin_idx = int((angle + M_PI) * inverse_division_angle);
-            // clamp bin to [0, 11]
-            bin_idx = std::min(std::max(bin_idx, 0), num_angle_divisions-1);
-            bin[bin_idx]++;
+            proces_gradient(x+1, y+1, sum_x, sum_y);
         }
     }
+}
+
+QImage compute_image_gradient(const ConstImageRef& image){
+    QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
+    result.fill(QColor(0,0,0,0));
+    ImageRef result_ref(result);
+
+    run_Sobel_gradient_filter(image, [&](int x, int y, int sum_x[3], int sum_y[3]){
+        int gx = (sum_x[0] + sum_x[1] + sum_x[2] + 1) / 3;
+        int gy = (sum_y[0] + sum_y[1] + sum_y[2] + 1) / 3;
+
+        // if (gx*gx + gy*gy <= 2000){
+        //     return;
+        // }
+
+        int gxc = std::min(std::abs(gx), 255);
+        int gyc = std::min(std::abs(gy), 255);
+
+        result_ref.pixel(x, y) = combine_rgb(gxc, gyc, 0);
+    });
+
+    return result;
+}
+
+FeatureVector compute_gradient_histogram(const ConstImageRef& image){
+    const int num_angle_divisions = 8;
+    double division_angle = 2. * M_PI / num_angle_divisions;
+    double inverse_division_angle = 1.0 / division_angle;
+
+    std::array<int, num_angle_divisions> bin = {0};
+
+    int num_grad = 0;
+
+    run_Sobel_gradient_filter(image, [&](int x, int y, int sum_x[3], int sum_y[3]){
+        int gx = sum_x[0] + sum_x[1] + sum_x[2];
+        int gy = sum_y[0] + sum_y[1] + sum_y[2];
+        if (gx*gx + gy*gy <= 2000){
+            return;
+        }
+        num_grad++;
+
+        // if (count == 0){
+        //     // cout << "gxy " << sum_x[0] << " " << sum_x[1] << " " << sum_x[2] << ", " <<
+        //     //  sum_y[0] << " " << sum_y[1] << " " << sum_y[2] << endl;
+        //     int gxc = std::min(std::abs(gx), 255);
+        //     int gyc = std::min(std::abs(gy), 255);
+
+        //     output_image->setPixelColor(x, y, QColor(gxc, gyc, 0));
+        // }
+
+        double angle = std::atan2(gy, gx); // range in -pi, pi
+        int bin_idx = int((angle + M_PI) * inverse_division_angle);
+        // clamp bin to [0, 11]
+        bin_idx = std::min(std::max(bin_idx, 0), num_angle_divisions-1);
+        bin[bin_idx]++;
+    });
 
     FeatureVector result(num_angle_divisions);
     for(size_t i = 0; i < num_angle_divisions; i++){
         result[i] = bin[i] / (FeatureType)num_grad;
     }
 
-    if (count == 0){
-        cout << "GRadient histogram " << feature_to_str(result) << endl; 
-        output_image->save("test_gradient_histogram.png");
-    }
-    count++;
-
     return result;
 }
 
-FeatureVector compute_feature(const ConstImageRef& input_image){
-    static int count = 0;
+} // end anonymous namespace
 
-    // int width = image.width();
-    // int height = image.height();
+FeatureVector compute_feature(const ConstImageRef& input_image){
     QImage image = input_image.to_qimage().convertedTo(QImage::Format::Format_ARGB32);
+    ImageRef image_ref(image);
     int width = image.width();
     int height = image.height();
+
+    // Set pixel outside the sprite circle to transparent:
     float r = (width + height) / 4.0;
     float center_x  = (width-1) / 2.0f;
     float center_y = (height-1) / 2.0f;
@@ -193,46 +222,32 @@ FeatureVector compute_feature(const ConstImageRef& input_image){
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
-                image.setPixelColor(x, y, QColor(0, 0, 0, 0));
+                image_ref.pixel(x, y) = 0;
             }
         }
     }    
 
+    // Divide the image into 4 areas, compute average color on each.
+    // Note: we skip the upper right area because that area may overlap with
+    // the berry or bonus wave symbol.
     const int num_divisions = 2;
     const float portion = 1.0 / (float)num_divisions;
     FeatureVector result;
     for(int i = 0; i < num_divisions; i++){
         for(int j = 0; j < num_divisions; j++){
+            if (i == 1 && j == 0){
+                continue; // skip the berry / bonus wave overlapping area
+            }
             ImageFloatBox box{i*portion, j*portion, portion, portion};
             auto sub_image = extract_box_reference(image, box);
 
             ImageStats stats = image_stats(sub_image);
 
-            // const double average = stats.average.sum();
-            // const FloatPixel actual = (std::isnan(average) || average == 0.0 ? FloatPixel() : stats.average / average);
-            // result.push_back(actual.r);
-            // result.push_back(actual.g);
-            // result.push_back(actual.b);
-
-            FeatureType scale = 2.0 / 255;
-            result.push_back(stats.average.r * scale);
-            result.push_back(stats.average.g * scale);
-            result.push_back(stats.average.b * scale);
-
-            auto sub_result = compute_gradient_histogram(sub_image);
-            result.insert(result.end(), sub_result.begin(), sub_result.end());
+            result.push_back(stats.average.r);
+            result.push_back(stats.average.g);
+            result.push_back(stats.average.b);
         }
     }
-    // auto gradient_result = compute_gradient_histogram(image);
-    // result.insert(result.end(), gradient_result.begin(), gradient_result.end());
-    // ImageStats stats = image_stats(image);
-
-
-    
-    if (count == 0){
-        image.save("test_compute_feature.png");
-    }
-    count++;
 
     return result;
 }
@@ -270,73 +285,48 @@ void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, QImag
     }
 }
 
-std::map<std::string, FeatureVector> compute_MMO_sprite_features(){
-    // cout << "compute_MMO_sprite_features" << endl;
+MMOSpriteMatchingData build_MMO_sprite_matching_data(){
+    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight color_stddev_weight;
+    color_stddev_weight.stddev_coefficient = 0.004;
+    // stddev_weight.stddev_coefficient = 0.1;
+    color_stddev_weight.offset = 1.0;
+    ExactImageDictionaryMatcher color_matcher(color_stddev_weight);
+
+    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight gradient_stddev_weight;
+    gradient_stddev_weight.stddev_coefficient = 0.000;
+    // stddev_weight.stddev_coefficient = 0.1;
+    gradient_stddev_weight.offset = 1.0;
+    ExactImageDictionaryMatcher gradient_matcher(gradient_stddev_weight);
 
     std::map<std::string, FeatureVector> features;
-   
-    // int count = 0;
 
     load_and_visit_MMO_sprite([&](const std::string& slug, QImage& sprite){
-
-        // if (count == 0){
-        //     sprite.save("test_sprite.png");
-        // }
-
-        // count++;
-
-        // int width = sprite.width();
-        // int height = sprite.height();
-        // float center_x = (width-1) / 2.0f;
-        // float center_y = (height-1) / 2.0f;
-        // int r = width/2 - 3;
-        // int r2 = r * r;
-        // for(int y = 0; y < height; y++){
-        //     for(int x = 0; x < width; x++){
-        //         if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
-        //             sprite.setPixelColor(x, y, QColor(0, 0, 0, 0));
-        //         }
-        //     }
-        // }
+        color_matcher.add(slug, sprite);
+        QImage sprite_gradient = compute_image_gradient(sprite);
+        gradient_matcher.add(slug, sprite_gradient);
 
         features.emplace(slug, compute_feature(sprite));
     });
 
-    // check feature self distances:
-    FeatureType closest_dist = FLT_MAX;
-    std::pair<std::string, std::string> closest_pair;
-    for(auto it = features.begin(); it != features.end(); it++){
-        auto it2 = it;
-        it2++;
-        for(; it2 != features.end(); it2++){
-            auto dist = feature_distance(it->second, it2->second);
-            if (dist < closest_dist){
-                closest_dist = dist;
-                closest_pair = std::make_pair(it->first, it2->first);
-            }
-        }
-    }
-
-    cout << "Closest distance " << closest_dist << " at " << endl;
-    cout << closest_pair.first << ": " << feature_to_str(features.find(closest_pair.first)->second) << endl;
-    cout << closest_pair.second << ": " << feature_to_str(features.find(closest_pair.second)->second) << endl;
-    cout << endl;
-    
-    return features;
+    return MMOSpriteMatchingData(
+        std::move(color_matcher),
+        std::move(gradient_matcher),
+        std::move(features)
+    );
 }
 
-const std::map<std::string, FeatureVector>& MMO_SPRITE_FEATUES(){
-    const static std::map<std::string, FeatureVector> features = compute_MMO_sprite_features();
-    return features;
-}
+const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
+    const static auto& sprite_matching_data = build_MMO_sprite_matching_data();
 
+    return sprite_matching_data;
+}
 
 
 std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef& image){
     const FeatureVector& image_feature = compute_feature(image);
 
 
-    const std::map<std::string, FeatureVector>& features = MMO_SPRITE_FEATUES();
+    const std::map<std::string, FeatureVector>& features = MMO_SPRITE_MATCHING_DATA().features;
 
     // cout << "input image feature: " << feature_to_str(image_feature) << endl;
 
@@ -362,25 +352,271 @@ std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef&
 
 
 
-ImageMatch::ExactImageDictionaryMatcher build_MMO_sprite_matcher(){
-    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight stddev_weight;
-    stddev_weight.stddev_coefficient = 0.004;
-    // stddev_weight.stddev_coefficient = 0.1;
-    stddev_weight.offset = 1.0;
-    ImageMatch::ExactImageDictionaryMatcher matcher(stddev_weight);
 
-    load_and_visit_MMO_sprite([&](const std::string& slug, QImage& sprite){
-        matcher.add(slug, sprite);
-    });
-
+const ExactImageDictionaryMatcher& get_MMO_sprite_matcher(){
+    const static auto matcher = MMO_SPRITE_MATCHING_DATA().color_matcher;
     return matcher;
 }
 
-const ImageMatch::ExactImageDictionaryMatcher& get_MMO_sprite_matcher(){
-    const static auto matcher = build_MMO_sprite_matcher();
+const ExactImageDictionaryMatcher& get_MMO_sprite_gradient_matcher(){
+    const static auto matcher = MMO_SPRITE_MATCHING_DATA().gradient_matcher;
     return matcher;
 }
 
+// For a sprite on the screenshot, create gradient image of it
+QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
+    QImage result = compute_image_gradient(image);
+    ImageRef result_ref(result);
+    
+    int width = image.width();
+    int height = image.height();
+    float r = (width + height) / 4.0;
+    float center_x  = (width-1) / 2.0f;
+    float center_y = (height-1) / 2.0f;
+    // -r/8 to remove some boundary areas
+    float dist2_th = (r - r/8) * (r - r/8);
+    for(int y = 0; y < height; y++){
+        for(int x = 0; x < width; x++){
+            if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= dist2_th){
+                // gradients outside of the sprite circle is set to zero
+                result_ref.pixel(x, y) = combine_argb(0,0,0,0);
+            }
+        }
+    }    
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_template, const ConstImageRef& gradient){
+    int tempt_width = gradient_template.width();
+    int tempt_height = gradient_template.height();
+
+    FloatPixel image_brightness = ImageMatch::pixel_average(gradient, gradient_template);
+    FloatPixel scale = image_brightness /  image_stats(gradient_template).average;
+
+//    cout << image_brightness << m_stats.average << scale << endl;
+
+    if (std::isnan(scale.r)) scale.r = 1.0;
+    if (std::isnan(scale.g)) scale.g = 1.0;
+    if (std::isnan(scale.b)) scale.b = 1.0;
+    scale.bound(0.8, 1.2);
+
+    QImage scaled_template = gradient_template.to_qimage();
+    ImageMatch::scale_brightness(scaled_template, scale);
+
+
+    static int count = 0;
+    QImage output(gradient.width(), gradient.height(), QImage::Format::Format_ARGB32);
+    output.fill(QColor(0,0,0,0));
+
+    // cout << "Size check " << tempt_width << " x " << tempt_height << ",  " <<
+    // gradient.width() << " x " << gradient.height() << endl;
+
+    float score = 0.0f;
+    int max_offset = 2;
+
+// #define USE_IMAGE_LEVEL_TRANSLATION
+// #define USE_PIXEL_LEVEL_TRANSLATION
+#define USE_BLOCK_LEVEL_TRANSLATION
+
+#ifdef USE_IMAGE_LEVEL_TRANSLATION
+    score = FLT_MAX;
+    for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+        for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+
+            float match_score = 0.0;
+            int num_gradients = 0;
+            for(int y = 0; y < gradient.height(); y++){
+                for(int x = 0; x < gradient.width(); x++){
+                    uint32_t g = gradient.pixel(x, y);
+                    uint32_t gx = uint32_t(0xff) & (g >> 16);
+                    uint32_t gy = uint32_t(0xff) & (g >> 8);
+                    uint32_t alpha = g >> 24;
+                    if (alpha < 128){
+                        continue;
+                    }
+
+                    int my = y + oy; // moved y
+                    int mx = x + ox; // moved x
+                    if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
+                        continue;
+                    }
+                    // int dist_x = std::abs(ox);
+                    // int dist_y = std::abs(oy);
+                    // int dist2 = dist_x * dist_x + dist_y * dist_y;
+                    uint32_t t_g = scaled_template.pixel(mx, my);
+                    uint32_t t_a = t_g >> 24;
+                    if (t_a < 128){
+                        continue;
+                    }
+
+                    num_gradients++;
+
+                    uint32_t t_gx = uint32_t(0xff) & (t_g >> 16);
+                    uint32_t t_gy = uint32_t(0xff) & (t_g >> 8);
+                    float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
+                    pixel_score /= 255;
+                    match_score += pixel_score;
+
+                    output.setPixelColor(x, y, QColor(
+                        std::min((int)std::sqrt(gx*gx+gy*gy),255),
+                        std::min((int)std::sqrt(t_gx*t_gx+t_gy*t_gy), 255),
+                        0
+                    ));
+                }
+            }
+
+            match_score = std::sqrt(match_score / num_gradients);
+            if (match_score < score){
+                score = match_score;
+            }
+        }
+    }
+#endif
+
+#ifdef USE_PIXEL_LEVEL_TRANSLATION
+    score = 0;
+    int num_gradients = 0;
+    for(int y = 0; y < gradient.height(); y++){
+        for(int x = 0; x < gradient.width(); x++){
+            uint32_t g = gradient.pixel(x, y);
+            uint32_t gx = uint32_t(0xff) & (g >> 16);
+            uint32_t gy = uint32_t(0xff) & (g >> 8);
+            uint32_t alpha = g >> 24;
+            if (alpha < 128){
+                continue;
+            }
+
+            float min_pixel_score = FLT_MAX;
+            for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+                for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+                    int my = y + oy; // moved y
+                    int mx = x + ox; // moved x
+                    if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
+                        continue;
+                    }
+                    // int dist_x = std::abs(ox);
+                    // int dist_y = std::abs(oy);
+                    // int dist2 = dist_x * dist_x + dist_y * dist_y;
+                    uint32_t t_g = scaled_template.pixel(mx, my);
+                    uint32_t t_a = t_g >> 24;
+                    if (t_a < 128){
+                        continue;
+                    }
+
+                    uint32_t t_gx = uint32_t(0xff) & (t_g >> 16);
+                    uint32_t t_gy = uint32_t(0xff) & (t_g >> 8);
+                    float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
+                    pixel_score /= 255;
+                    if (pixel_score < min_pixel_score){
+                        min_pixel_score = pixel_score;
+                    }
+
+                    if (ox == 0 && oy == 0){
+                        output.setPixelColor(x, y, QColor(
+                            std::min((int)std::sqrt(gx*gx+gy*gy),255),
+                            std::min((int)std::sqrt(t_gx*t_gx+t_gy*t_gy), 255),
+                            0
+                        ));
+                    }
+                }
+            } // end offset
+
+            if (min_pixel_score < FLT_MAX){
+                score += min_pixel_score;
+                num_gradients++;
+            }
+        }
+    }
+    score = std::sqrt(score / num_gradients);
+#endif
+
+#ifdef USE_BLOCK_LEVEL_TRANSLATION
+    int block_radius = 5;
+
+    score = 0;
+    int num_gradients = 0;
+
+    auto compute_pixel_dist = [](uint32_t t_g, uint32_t g){
+        uint32_t gx = uint32_t(0xff) & (g >> 16);
+        uint32_t gy = uint32_t(0xff) & (g >> 8);
+        uint32_t t_gx = uint32_t(0xff) & (t_g >> 16);
+        uint32_t t_gy = uint32_t(0xff) & (t_g >> 8);
+        float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
+        pixel_score /= 255;
+        return pixel_score;
+    };
+
+    auto is_transparent = [](uint32_t g){
+        return (g >> 24) < 128;
+    };
+
+    for(int y = 0; y < gradient.height(); y++){
+        for(int x = 0; x < gradient.width(); x++){
+            uint32_t g = gradient.pixel(x, y);
+            if (is_transparent(g)){
+                continue;
+            }
+
+            float min_block_score = FLT_MAX;
+            for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+                for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+
+                    float block_score = 0.0;
+                    int block_size = 0;
+                    for(int by = y - block_radius; by <= y + block_radius; by++){
+                        for(int bx = x - block_radius; bx <= x + block_radius; bx++){
+                            if (bx < 0 || bx >= gradient.width() || by < 0 || by >= gradient.height()){
+                                continue;
+                            }
+
+                            uint32_t bg = gradient.pixel(bx, by);
+                            if (is_transparent(bg)){
+                                continue;
+                            }
+
+                            int ty = by + oy; // template y
+                            int tx = bx + ox; // template x
+                            if (tx < 0 || tx >= tempt_width || ty < 0 || ty >= tempt_height){
+                                continue;
+                            }
+                            uint32_t t_bg = gradient_template.pixel(tx, ty);
+                            if (is_transparent(t_bg)){
+                                continue;
+                            }
+
+                            block_score += compute_pixel_dist(t_bg, bg);
+                            block_size++;
+                        }
+                    }
+                    block_score = block_score / block_size;
+                    min_block_score = std::min(min_block_score, block_score);
+                }
+            } // end offset
+
+            if (min_block_score < FLT_MAX){
+                score += min_block_score;
+                num_gradients++;
+            }
+        }
+    }
+    score = std::sqrt(score / num_gradients);
+#endif
+
+    // output.save("test_distance_alignment_" + QString::number(count) + ".png");
+    count++;
+
+    return score;
+}
 
 }
 }

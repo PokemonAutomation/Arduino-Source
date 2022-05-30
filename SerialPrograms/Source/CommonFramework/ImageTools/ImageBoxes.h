@@ -151,7 +151,7 @@ QImage extract_object_from_inner_feature(
 // save inference results to an image on the disk.
 // color: the color of the pixel. See Common/Cpp/Color.h:Color on the color format.
 // thickness: thickness (in unit of pixels) of the box border.
-void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness = 1);
+void draw_box(const ImageRef& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness = 1);
 
 
 

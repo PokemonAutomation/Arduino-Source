@@ -17,10 +17,6 @@ const std::map<std::string, QIcon>& ALL_POKEMON_ICONS(){
     return icons;
 }
 
-const std::map<std::string, QIcon>& ALL_MMO_POKEMON_ICONS(){
-    static std::map<std::string, QIcon> icons = Pokemon::load_pokemon_icons("PokemonLA/MMOSprites.png", "PokemonLA/MMOSprites.json");
-    return icons;
-}
 
 
 }

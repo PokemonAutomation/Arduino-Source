@@ -15,12 +15,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-
+// All pokemon sprites in LA
 const std::map<std::string, QIcon>& ALL_POKEMON_ICONS();
-
-
-const std::map<std::string, QIcon>& ALL_MMO_POKEMON_ICONS();
-
 
 }
 }
