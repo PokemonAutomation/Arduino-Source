@@ -29,7 +29,7 @@ void test_find_symbols(
     ProgramEnvironment& env,
     VideoOverlay& overlay,
     const ImageFloatBox& box,
-    const ConstImageRef& screen, double max_area_ratio
+    const ConstImageRef& screen, double max_area_ratio = 0.20
 );
 
 

@@ -246,7 +246,7 @@ void test_find_symbols(
 ){
     ConstImageRef image = extract_box_reference(screen, box);
 
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.20);
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, max_area_ratio);
 
 
     std::deque<InferenceBoxScope> hits;

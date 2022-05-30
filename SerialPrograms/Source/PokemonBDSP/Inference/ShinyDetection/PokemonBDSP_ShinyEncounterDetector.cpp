@@ -127,6 +127,7 @@ void determine_shiny_status(
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const ProgramInfo& info, EventNotificationOption& settings,
+    BattleType battle_type,
     const ShinyEncounterTracker& tracker,
     const std::vector<WallClock>& shiny_sound_timestamps
 ){
@@ -183,7 +184,7 @@ void determine_shiny_status(
     alpha_wild_overall += wild_shiny_sound_detected ? SOUND_ALPHA : 0.0;
     alpha_own += own_shiny_sound_detected ? SOUND_ALPHA : 0.0;
 
-    {
+    if (battle_type == BattleType::STARTER){
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
         std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(2000);  //  Add headroom for happiness.
@@ -284,6 +285,7 @@ void detect_shiny_battle(
         console,
         wild_result, your_result,
         info, settings,
+        battle_type,
         tracker,
         shiny_sound_timestamps
     );
