@@ -1394,8 +1394,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/ShinyHuntTracker.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
-    Source/Tests/PokemonLA_tests.cpp
-    Source/Tests/PokemonLA_tests.h
+    Source/Tests/PokemonLA_Tests.cpp
+    Source/Tests/PokemonLA_Tests.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.h
