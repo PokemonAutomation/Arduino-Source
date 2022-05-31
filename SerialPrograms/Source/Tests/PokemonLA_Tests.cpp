@@ -183,13 +183,6 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
     return 0;
 }
 
-int test_pokemonLA_PokemonMapSpriteReader(const QImage& image, const std::string& target){
-    const auto result = match_pokemon_map_sprite(image);
-    auto slug = result.begin()->second;
-    TEST_RESULT_EQUAL(slug, target);
-    return 0;
-}
-
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords){
     // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
     if (keywords.size() < 5){
@@ -378,10 +371,6 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     output_quest.save("test_MMO_question_mark_detection_" + QString::number(count) + ".png");
     output_sprite.save("test_sprite_detection_" + QString::number(count) + ".png");
 
-
-    const auto& matcher = get_MMO_sprite_matcher();
-    const auto& gradient_matcher = get_MMO_sprite_gradient_matcher();
-
     size_t success_count = 0;
     for (size_t i = 0; i < quest_results.size(); i++){
         // XXX
@@ -391,155 +380,15 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "--------------------------------------------------------------------" << endl;
         cout << i << ": Target slug: " << target_sprites[i] << endl;
 
-        auto feature_results = match_pokemon_map_sprite(extract_box_reference(sprite_image, new_boxes[i]));
-        std::vector<std::string> subset;
-        int subset_count = 0;
-        for(const auto& p : feature_results){
-            subset.push_back(p.second);
-            if (subset_count++ >= 20){
-                break;
-            }
-        }
-        cout << "Candidates after feature filtering: ";
-        for(const auto& slug : subset){
-            cout << slug << ", ";
-        }
-        cout << endl;
-
-
-        ImageFloatBox box = pixelbox_to_floatbox(sprite_image, new_boxes[i]);
-        cout << "Color matching..." << endl;
-        auto color_match_results = matcher.subset_match(subset, sprite_image, box, 1, 10);
-        std::map<std::string, double> color_match_sprite_scores;
-        int result_count = 0;
-        double top_score = 0.0;
-        double top_second_score_dif = 1000.0;
-        std::string final_slug;
-        for(const auto& p : color_match_results.results){
-            const auto& slug = p.second;
-            color_match_sprite_scores.emplace(slug, p.first);
-            const auto& stats = matcher.image_matcher(slug).stats();
-            cout << p.first << " - " << slug << " " << stats.stddev.sum();
-            if (result_count == 0){
-                top_score = p.first;
-                final_slug = slug;
-                if (slug == target_sprites[i]){
-                    cout << " SUCCESS";
-                } else{
-                    cout << " FAILURE";
-                    // matcher.image_template(slug).save(QString::fromStdString("test_sprite_" + slug + ".png"));
-                    // matcher.image_template(target_sprites[i]).save(QString::fromStdString("test_sprite_" + target_sprites[i] + ".png"));
-                }
-            }
-            if (result_count == 1){
-                top_second_score_dif = p.first - top_score;
-            }
-            cout << endl;
-            result_count++;
-            if (result_count == 5){
-                break;
-            }
-        }
-        cout << "Score diff: " << top_second_score_dif << endl;
-
-        if (top_second_score_dif < 10){
-            QImage gradient_image = compute_MMO_sprite_gradient(extract_box_reference(sprite_image, box));
-            cout << "Gradient matching..." << endl;
-
-            std::ostringstream os;
-            os << "test_sprite_gradient" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
-            std::string sprite_filename = os.str();
-            gradient_image.save(QString::fromStdString(sprite_filename));
-
-            // ImageFloatBox full_box(0, 0, 1, 1);
-            // auto match_results = gradient_matcher.subset_match(subset, gradient_image, full_box, 1, 30);
-            // int result_count = 0;
-            // double top_score = 0.0;
-            // double top_second_score_dif = 0.0;
-            // for(const auto& p : match_results.results){
-            //     const auto& slug = p.second;
-            //     const auto& stats = gradient_matcher.image_matcher(slug).stats();
-            //     cout << p.first << " - " << slug << " " << stats.stddev.sum();
-            //     if (result_count == 0){
-            //         top_score = p.first;
-            //         if (slug == target_sprites[i]){
-            //             success_count++;
-            //             cout << " SUCCESS";
-            //         } else{
-            //             cout << " FAILURE";
-
-            //             // gradient_matcher.image_template(slug).save(QString::fromStdString("test_sprite_gradient_" + slug + ".png"));
-            //             // gradient_matcher.image_template(target_sprites[i]).save(QString::fromStdString("test_sprite_gradient_" + target_sprites[i] + ".png"));
-            //         }
-            //     }
-            //     if (result_count == 1){
-            //         top_second_score_dif = p.first - top_score;
-            //     }
-            //     cout << endl;
-            //     result_count++;
-            //     if (result_count == 10){
-            //         break;
-            //     }
-            // }
-            // cout << "Score diff: " << top_second_score_dif << endl;
-
-            std::multimap<float, std::string> gradient_match_results;
-            for(const auto& p : color_match_results.results){
-                const auto& slug = p.second;
-                auto& template_gradient = gradient_matcher.image_template(slug);
-                float score = compute_MMO_sprite_gradient_distance(template_gradient, gradient_image);
-                gradient_match_results.emplace(score, slug);
-            }
-            {
-                auto it = gradient_match_results.begin();
-                final_slug = it->second;
-
-                auto it2 = it;
-                it2++;
-                // if first and second are close
-                if (it->first + 3 > it2->first){
-                    float grad_diff = it2->first - it->first;
-                    float color_diff = color_match_sprite_scores[it->second] - color_match_sprite_scores[it2->second];
-                    if (std::fabs(color_diff) > grad_diff * 2){
-                        // If color comparison is more confident, choose the color side
-                        if (color_diff > 0){
-                            final_slug = it2->second;
-                            cout << "Switch to more confident color result: " << final_slug << endl;
-                        }
-                    }
-                }
-            }
-
-            // cout << "Flexible gradient distance: " << endl;
-            result_count = 0;
-            for(const auto& p : gradient_match_results){
-                float score = p.first;
-                const auto& slug = p.second;
-                cout << score << "- " << slug;
-                if (result_count == 0){
-                    // top_score = p.first;
-                    if (slug == final_slug){
-                        if (slug == target_sprites[i]){
-                            cout << " SUCCESS";
-                        } else{
-                            cout << " FAILURE";
-                            // gradient_matcher.image_template(slug).save(QString::fromStdString("test_sprite_gradient_" + slug + ".png"));
-                            // gradient_matcher.image_template(target_sprites[i]).save(QString::fromStdString("test_sprite_gradient_" + target_sprites[i] + ".png"));
-                        }
-                    }
-                }
-                cout << endl;
-
-                result_count++;
-            }
-        }
-
-        // break;
-
-        if (final_slug == target_sprites[i]){
+        auto result = match_sprite_on_map(sprite_image, new_boxes[i]);
+        if (result.slug == target_sprites[i]){
             success_count++;
+            cout << "Match SUCCESS" << endl;
+        } else{
+            cout << "Match FAILURE" << endl;
         }
     }
+
     if (success_count == target_sprites.size()){
         cout << "ALL SUCCESS" << endl;
     }

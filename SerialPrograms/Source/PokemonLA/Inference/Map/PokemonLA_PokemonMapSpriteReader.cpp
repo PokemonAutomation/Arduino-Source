@@ -143,6 +143,31 @@ void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(in
     }
 }
 
+// QImage smooth_image(const ConstImageRef& image){
+//     QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
+//     result.fill(QColor(0,0,0,0));
+//     ImageRef result_ref(result);
+
+//     const float filter[5] = {0.062, 0.244, 0.388, 0.244, 0.062};
+
+//     for(int y = 0; y < image.height(); y++){
+//         for(int x = 0; x < image.width(); x++){
+//             float sum = 0;
+//             int num_pixels = 0;
+//             for(int i = 0; i < 5; i++){
+//                 int sx = x + i - 2;
+//                 if (sx < 0 || sx >= image.width()){
+//                     continue;
+//                 }
+//                 // transparent
+//                 // sum += filter[i] * image.pixel[]
+//             }
+//         }
+//     }
+//     return result;
+// }
+
+
 QImage compute_image_gradient(const ConstImageRef& image){
     QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
     result.fill(QColor(0,0,0,0));
@@ -151,10 +176,6 @@ QImage compute_image_gradient(const ConstImageRef& image){
     run_Sobel_gradient_filter(image, [&](int x, int y, int sum_x[3], int sum_y[3]){
         int gx = (sum_x[0] + sum_x[1] + sum_x[2] + 1) / 3;
         int gy = (sum_y[0] + sum_y[1] + sum_y[2] + 1) / 3;
-
-        // if (gx*gx + gy*gy <= 2000){
-        //     return;
-        // }
 
         int gxc = std::min(std::abs(gx), 255);
         int gyc = std::min(std::abs(gy), 255);
@@ -322,7 +343,7 @@ const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
 }
 
 
-std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef& image){
+std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image){
     const FeatureVector& image_feature = compute_feature(image);
 
 
@@ -348,20 +369,6 @@ std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef&
     return result;
 }
 
-
-
-
-
-
-const ExactImageDictionaryMatcher& get_MMO_sprite_matcher(){
-    const static auto matcher = MMO_SPRITE_MATCHING_DATA().color_matcher;
-    return matcher;
-}
-
-const ExactImageDictionaryMatcher& get_MMO_sprite_gradient_matcher(){
-    const static auto matcher = MMO_SPRITE_MATCHING_DATA().gradient_matcher;
-    return matcher;
-}
 
 // For a sprite on the screenshot, create gradient image of it
 QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
@@ -400,29 +407,30 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
     int tempt_width = gradient_template.width();
     int tempt_height = gradient_template.height();
 
-    FloatPixel image_brightness = ImageMatch::pixel_average(gradient, gradient_template);
-    FloatPixel scale = image_brightness /  image_stats(gradient_template).average;
-
-//    cout << image_brightness << m_stats.average << scale << endl;
-
-    if (std::isnan(scale.r)) scale.r = 1.0;
-    if (std::isnan(scale.g)) scale.g = 1.0;
-    if (std::isnan(scale.b)) scale.b = 1.0;
-    scale.bound(0.8, 1.2);
-
-    QImage scaled_template = gradient_template.to_qimage();
-    ImageMatch::scale_brightness(scaled_template, scale);
-
-
-    static int count = 0;
-    QImage output(gradient.width(), gradient.height(), QImage::Format::Format_ARGB32);
-    output.fill(QColor(0,0,0,0));
+    // static int count = 0;
+    // QImage output(gradient.width(), gradient.height(), QImage::Format::Format_ARGB32);
+    // output.fill(QColor(0,0,0,0));
 
     // cout << "Size check " << tempt_width << " x " << tempt_height << ",  " <<
     // gradient.width() << " x " << gradient.height() << endl;
 
     float score = 0.0f;
     int max_offset = 2;
+
+    auto compute_pixel_dist = [](uint32_t t_g, uint32_t g){
+        int gx = uint32_t(0xff) & (g >> 16);
+        int gy = uint32_t(0xff) & (g >> 8);
+        int t_gx = uint32_t(0xff) & (t_g >> 16);
+        int t_gy = uint32_t(0xff) & (t_g >> 8);
+        float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
+        pixel_score /= 255;
+        return pixel_score;
+    };
+
+    auto is_transparent = [](uint32_t g){
+        return (g >> 24) < 128;
+    };
+
 
 // #define USE_IMAGE_LEVEL_TRANSLATION
 // #define USE_PIXEL_LEVEL_TRANSLATION
@@ -438,40 +446,30 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
             for(int y = 0; y < gradient.height(); y++){
                 for(int x = 0; x < gradient.width(); x++){
                     uint32_t g = gradient.pixel(x, y);
-                    uint32_t gx = uint32_t(0xff) & (g >> 16);
-                    uint32_t gy = uint32_t(0xff) & (g >> 8);
-                    uint32_t alpha = g >> 24;
-                    if (alpha < 128){
+                    if (is_transparent(g)){
                         continue;
                     }
-
                     int my = y + oy; // moved y
                     int mx = x + ox; // moved x
                     if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
                         continue;
                     }
-                    // int dist_x = std::abs(ox);
-                    // int dist_y = std::abs(oy);
-                    // int dist2 = dist_x * dist_x + dist_y * dist_y;
-                    uint32_t t_g = scaled_template.pixel(mx, my);
-                    uint32_t t_a = t_g >> 24;
-                    if (t_a < 128){
+
+                    uint32_t t_g = gradient_template.pixel(mx, my);
+                    if (is_transparent(t_g)){
                         continue;
                     }
 
                     num_gradients++;
 
-                    uint32_t t_gx = uint32_t(0xff) & (t_g >> 16);
-                    uint32_t t_gy = uint32_t(0xff) & (t_g >> 8);
-                    float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
-                    pixel_score /= 255;
+                    float pixel_score = compute_pixel_dist(t_g, g);
                     match_score += pixel_score;
 
-                    output.setPixelColor(x, y, QColor(
-                        std::min((int)std::sqrt(gx*gx+gy*gy),255),
-                        std::min((int)std::sqrt(t_gx*t_gx+t_gy*t_gy), 255),
-                        0
-                    ));
+                    // output.setPixelColor(x, y, QColor(
+                    //     std::min((int)std::sqrt(gx*gx+gy*gy),255),
+                    //     std::min((int)std::sqrt(t_gx*t_gx+t_gy*t_gy), 255),
+                    //     0
+                    // ));
                 }
             }
 
@@ -481,6 +479,7 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
             }
         }
     }
+    score = std::sqrt(score);
 #endif
 
 #ifdef USE_PIXEL_LEVEL_TRANSLATION
@@ -546,20 +545,6 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
     score = 0;
     int num_gradients = 0;
 
-    auto compute_pixel_dist = [](uint32_t t_g, uint32_t g){
-        uint32_t gx = uint32_t(0xff) & (g >> 16);
-        uint32_t gy = uint32_t(0xff) & (g >> 8);
-        uint32_t t_gx = uint32_t(0xff) & (t_g >> 16);
-        uint32_t t_gy = uint32_t(0xff) & (t_g >> 8);
-        float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
-        pixel_score /= 255;
-        return pixel_score;
-    };
-
-    auto is_transparent = [](uint32_t g){
-        return (g >> 24) < 128;
-    };
-
     for(int y = 0; y < gradient.height(); y++){
         for(int x = 0; x < gradient.width(); x++){
             uint32_t g = gradient.pixel(x, y);
@@ -613,10 +598,179 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
 #endif
 
     // output.save("test_distance_alignment_" + QString::number(count) + ".png");
-    count++;
+    // count++;
 
     return score;
 }
+
+
+
+
+
+MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box){
+    const static auto& sprite_matching_data = MMO_SPRITE_MATCHING_DATA();
+    const ExactImageDictionaryMatcher& color_matcher = sprite_matching_data.color_matcher;
+    const ExactImageDictionaryMatcher& gradient_matcher = sprite_matching_data.gradient_matcher;
+
+    // configs for the algorithm:
+    const size_t num_feature_candidates = 20;
+    const double color_difference_threshold = 10.0;
+    const double gradient_confidence_threshold = 2.0;
+    const double color_to_gradient_confidence_scale = 2.0;
+
+    MapSpriteMatchResult result;
+    cout << "Map sprite matching:" << endl;
+
+    // This map has the match score for all sprites.
+    // This map must be not empty for subsequent computation.
+    const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box));
+    
+    for(const auto& p : feature_map){
+        result.candidates.push_back(p.second);
+        if (result.candidates.size() >= num_feature_candidates){
+            break;
+        }
+    }
+    cout << "  Candidates: ";
+    for(size_t i = 0; i < result.candidates.size(); i++){
+        if (i > 0){
+            cout << ", ";
+        }
+        cout << result.candidates[i];
+    }
+    cout << endl;
+
+    // Should not happen if we correctly loads the sprite data.
+    if (result.candidates.size() == 0){
+        return result;
+    }
+
+    cout << "Color matching..." << endl;
+    {
+        auto color_match_results = color_matcher.subset_match(result.candidates, screen,
+            pixelbox_to_floatbox(screen, box), 1, 10);
+    
+        result.color_match_results = std::move(color_match_results.results);
+    }
+
+
+    // Build a map from sprite to their color score and output scores for debugging
+    std::map<std::string, double> color_match_sprite_scores;
+    int result_count = 0;
+    for(const auto& p : result.color_match_results){
+        const auto& slug = p.second;
+        color_match_sprite_scores.emplace(slug, p.first);
+        if (result_count < 5){
+            const auto& stats = color_matcher.image_matcher(slug).stats();
+            cout << p.first << " - " << slug << " " << stats.stddev.sum() << endl;
+        }
+        if (result_count == 5){
+            size_t num_rest_results = result.color_match_results.size() - 5;
+            cout << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "") << endl;
+        }
+        result_count++;
+    }
+
+    auto color_top = result.color_match_results.begin();
+    const std::string& color_top_slug = color_top->second;
+    auto color_second = color_top;
+    color_second++;
+
+    result.slug = color_top_slug;
+    result.color_score = color_top->first;
+
+    if (color_second == result.color_match_results.end()){
+        // we only have one color match result.
+        result.color_lead = DBL_MAX;
+        cout << "Single color match result: " << color_top_slug << endl;
+        return result;
+    }
+
+    // We have some sprites which have closer scores to the top color match:
+    // Find the difference between the top and second match score
+    result.color_lead = color_second->first - result.color_score;
+
+    cout << "Top color score: " << result.color_score << " diff to second: " << result.color_lead << endl;
+
+    if (result.color_lead >= color_difference_threshold){
+        cout << "Color difference large enough. Good match." << endl;
+        result.second_slug = color_second->second;
+        return result;
+    }
+
+    cout << "Gradient matching..." << endl;
+    QImage gradient_image = compute_MMO_sprite_gradient(extract_box_reference(screen, box));
+    
+    // std::ostringstream os;
+    // os << "test_sprite_gradient" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
+    // std::string sprite_filename = os.str();
+    // gradient_image.save(QString::fromStdString(sprite_filename));
+
+    for(const auto& p : result.color_match_results){
+        const auto& slug = p.second;
+        auto& template_gradient = gradient_matcher.image_template(slug);
+        double score = compute_MMO_sprite_gradient_distance(template_gradient, gradient_image);
+        result.gradient_match_results.emplace(score, slug);
+    }
+
+    result_count = 0;
+    for(const auto& p : result.gradient_match_results){
+        if (result_count == 5){
+            size_t num_rest_results = result.gradient_match_results.size() - 5;
+            cout << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "") << endl;
+            break;
+        }
+        cout << p.first << " - " << p.second << endl;
+        result_count++;
+    }
+
+    // In case the gradient match is not confident, rely again on the color match:
+    auto gradient_top = result.gradient_match_results.begin();
+    const auto& gradient_top_slug = gradient_top->second;
+    auto gradient_second = gradient_top;
+    gradient_second++;
+    const auto& gradient_second_slug = gradient_second->second;
+
+    result.slug = gradient_top_slug;
+    result.gradient_score = gradient_top->first;
+    result.gradient_lead = gradient_second->first - gradient_top->first;
+    result.second_slug = gradient_second_slug;
+
+    cout << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead << endl;
+
+    if (result.gradient_lead >= gradient_confidence_threshold){
+        cout << "Gradient difference large enough. Good match." << endl;
+        return result;
+    }
+
+    // The diff between top and second gradient match is close
+    // Let's check their color score:
+    result.graident_top_color_score = color_match_sprite_scores[gradient_top_slug];
+    result.gradient_second_color_score = color_match_sprite_scores[gradient_second_slug];
+    double color_diff = result.gradient_second_color_score - result.graident_top_color_score;
+
+    cout << "Gradient difference not large enough. Check color difference: " << 
+        result.graident_top_color_score << " vs " << result.gradient_second_color_score << ", diff: " <<
+        color_diff << endl;
+    
+    // If color score is more confident in telling those two sprites apart
+    if (std::fabs(color_diff) > result.gradient_lead * color_to_gradient_confidence_scale){ 
+        if (color_diff < 0){ // second gradient sprite is better in color matching than the first graident sprite:
+            result.pick_gradient_second = true;
+            std::swap(result.slug, result.second_slug);
+            cout << "Switch to more confident color result: " << result.slug << endl;
+        }
+    }
+    else{
+        cout << "Low confidence match." << endl;
+    }
+
+    return result;
+}
+
+
+
+
 
 }
 }

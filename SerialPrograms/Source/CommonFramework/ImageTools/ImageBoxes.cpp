@@ -213,7 +213,7 @@ ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixel
         pixel_box.height() * image_inverse_height
     );
 }
-ImageFloatBox pixelbox_to_floatbox(const QImage& image, const ImagePixelBox& pixel_box){
+ImageFloatBox pixelbox_to_floatbox(const ConstImageRef& image, const ImagePixelBox& pixel_box){
     return pixelbox_to_floatbox(image.width(), image.height(), pixel_box);
 }
 

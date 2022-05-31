@@ -124,7 +124,7 @@ ImageFloatBox translate_to_parent(
 //  Given a ImagePixelBox within an image, get the ImageFloatBox for it.
 ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloatBox& float_box);
 ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixelBox& pixel_box);
-ImageFloatBox pixelbox_to_floatbox(const QImage& image, const ImagePixelBox& pixel_box);
+ImageFloatBox pixelbox_to_floatbox(const ConstImageRef& image, const ImagePixelBox& pixel_box);
 
 
 //  Given:

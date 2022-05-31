@@ -13,26 +13,42 @@
 #include "CommonFramework/ImageTypes/ImageReference.h"
 
 #include <map>
+#include <vector>
 
 class QImage;
+struct ImagePixelBox;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-// Given an image of a pokemon sprite during MMO, match it against a loaded sprite database.
-std::multimap<double, std::string> match_pokemon_map_sprite(const ConstImageRef& image);
+struct MapSpriteMatchResult{
+    std::string slug;
 
+    std::vector<std::string> candidates;
 
+    std::multimap<double, std::string> color_match_results;
 
-const ImageMatch::ExactImageDictionaryMatcher& get_MMO_sprite_matcher();
+    std::multimap<double, std::string> gradient_match_results;
 
-const ImageMatch::ExactImageDictionaryMatcher& get_MMO_sprite_gradient_matcher();
+    double color_score = 0.0;
+    
+    double color_lead = 0.0;
 
-QImage compute_MMO_sprite_gradient(const ConstImageRef& image);
+    double gradient_score = 0.0;
+    
+    double gradient_lead = 0.0;
 
-float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_template, const ConstImageRef& gradient);
+    double graident_top_color_score = 0.0;
+    
+    double gradient_second_color_score = 0.0;
+    
+    bool pick_gradient_second = false;
 
+    std::string second_slug;
+};
+
+MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box);
 
 
 }
