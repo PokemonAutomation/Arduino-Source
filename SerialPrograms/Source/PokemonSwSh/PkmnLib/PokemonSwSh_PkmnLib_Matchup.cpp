@@ -7,6 +7,10 @@
 #include <cmath>
 #include "PokemonSwSh_PkmnLib_Matchup.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -27,22 +31,28 @@ double calc_average_damage(
     double totalDamage = 0.0;
     size_t count = 0;
     double subTotalDamage = 0.0;
-    size_t subCount = 0;
 
     for (const Pokemon* attacker : attackers){
         for (const Pokemon* defender : defenders){
             // we're now iterating through attackers and defenders!
             subTotalDamage = 0.0;
-            subCount = 0;
             // so we need to go through the moves we have and calculate the damage they can do
             size_t numMoves = attacker->num_moves();
 
+#if 0
+            //  Assume the other players pick random moves.
             for (size_t ii = 0; ii < numMoves; ii++){
                 subTotalDamage += damage_score(*attacker, *defender, ii, field, multipleTargets);
-                subCount++;
             }
+            subTotalDamage /= numMoves;
+#else
+            //  Assume the other players pick the most damaging move.
+            for (size_t ii = 0; ii < numMoves; ii++){
+                subTotalDamage = std::max(subTotalDamage, damage_score(*attacker, *defender, ii, field, multipleTargets));
+            }
+#endif
 
-            totalDamage += subTotalDamage / subCount;
+            totalDamage += subTotalDamage;
             count++;
         }
     }
@@ -92,6 +102,11 @@ double calc_move_score(
     // replace it
     tempDefenderList[0] = &defender;
 
+    //  Disable the dmax HP bonus for this calculation. This actively hurts
+    //  multiplayer mode where other players can dmax.
+//    double dmax_hp_ratio = attacker.is_dynamax() ? 2.0 : 1.0;
+    double dmax_hp_ratio = 1.0;
+
     // iterate through defender moves for non-dynamax
     for (size_t ii = 0; ii < defenderNumMoves; ii++){
         const Move& defenderMove = defender.move(ii);
@@ -102,18 +117,20 @@ double calc_move_score(
                 receivedRegularDamage += 3 * calc_average_damage(tempDefenderList, teammates, field, true) / defenderNumMoves;
             }
         }else{
-            receivedRegularDamage += 0.25 * damage_score(defender, attacker, ii, field, false) / (attacker.is_dynamax() ? 2.0 : 1.0) / defenderNumMoves;
+            receivedRegularDamage += 0.25 * damage_score(defender, attacker, ii, field, false) / dmax_hp_ratio / defenderNumMoves;
             receivedRegularDamage += 0.75 * calc_average_damage(tempDefenderList, teammates, field, false) / defenderNumMoves;
         }
     }
+//    cout << "receivedRegularDamage = " << receivedRegularDamage << endl;
 
-    // thenm set up for max moves
+    // then set up for max moves
     defender.set_is_dynamax(true);
     tempDefenderList[0] = &defender;
     for (size_t ii = 0; ii < defenderNumMoves; ii++){
-        receivedMaxMoveDamage += 0.25 * damage_score(defender, attacker, ii, field, false) / (attacker.is_dynamax() ? 2.0 : 1.0);
+        receivedMaxMoveDamage += 0.25 * damage_score(defender, attacker, ii, field, false) / dmax_hp_ratio / defenderNumMoves;
         receivedMaxMoveDamage += 0.75 * calc_average_damage(tempDefenderList, teammates, field, false) / defenderNumMoves;
     }
+//    cout << "receivedMaxMoveDamage = " << receivedMaxMoveDamage << endl;
 
     // at the end restore defender dynamax state
     defender.set_is_dynamax(originalDefenderDynamax);
@@ -124,7 +141,10 @@ double calc_move_score(
     if (receivedDamage < 0.0001){
         return 1.0;
     }
-    return damageScore / receivedDamage;
+
+    double score = damageScore / receivedDamage;
+//    cout << attackerMove.name() << ":\t" << score << " - " << damageScore << " / " << receivedDamage << endl;
+    return score;
 }
 
 void select_best_move(
