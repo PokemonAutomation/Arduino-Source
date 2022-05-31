@@ -60,6 +60,7 @@
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 
 
 
@@ -155,6 +156,27 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    __m256 k1 = _mm256_set1_ps(-3.);
 //    __m256 k2 = _mm256_set1_ps(-2.);
 //    __m256 k3 = _mm256_set1_ps(-1.);
+
+
+    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+//    using GlobalState = NintendoSwitch::PokemonSwSh::MaxLairInternal::GlobalState;
+
+    GlobalState state;
+    state.adventure_started = true;
+    state.boss = "kyogre";
+    state.wins = 3;
+    state.lives_left = -1;
+
+    state.opponent = {"kyogre"};
+    state.players[0].pokemon = "charjabug";
+    state.players[1].pokemon = "rotom";
+    state.players[2].console_id = 0;
+    state.players[2].pokemon = "mantine";
+    state.players[2].can_dmax = true;
+    state.players[3].pokemon = "orbeetle";
+
+
+    select_move(env.logger(), state, 2);
 
 
 #if 0
