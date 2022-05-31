@@ -69,7 +69,7 @@ void VideoDisplayWidget::set_resolution(const QSize& resolution){
         return;
     }
     m_video->set_resolution(resolution);
-    update_size();
+    update_size(resolution);
 }
 VideoSnapshot VideoDisplayWidget::snapshot(){
     if (m_video == nullptr){
@@ -89,15 +89,22 @@ void VideoDisplayWidget::remove_box(const ImageFloatBox& box){
 
 
 
-void VideoDisplayWidget::update_size(){
+void VideoDisplayWidget::update_size(QSize resolution){
     if (m_video == nullptr){
         this->setFixedHeight(45);
         return;
     }
     int width = this->width();
-    QSize resolution = m_video->current_resolution();
-    int height = (int)(width * (double)resolution.height() / resolution.width());
-    this->setFixedHeight(height);
+    double aspect_ratio = 16. / 9;
+    if (!resolution.isValid()){
+        resolution = m_video->current_resolution();
+    }
+//    cout << "resolution: " << resolution.width() << " x " << resolution.height() << endl;
+    if (resolution.isValid()){
+        aspect_ratio = (double)resolution.height() / resolution.width();
+        int height = (int)(width * aspect_ratio);
+        this->setFixedHeight(height);
+    }
     m_video->setFixedSize(this->size());
     m_overlay->setFixedSize(this->size());
     m_overlay->update_size(this->size(), this->size());

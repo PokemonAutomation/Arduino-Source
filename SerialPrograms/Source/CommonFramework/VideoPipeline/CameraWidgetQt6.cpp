@@ -138,6 +138,8 @@ VideoWidget::VideoWidget(
         }
     }
 
+//    QCameraFormat format = m_camera->cameraFormat();
+//    cout << "width = " << format.resolution().width() << endl;
     m_camera->start();
 }
 VideoWidget::~VideoWidget(){}
@@ -155,9 +157,10 @@ std::vector<QSize> VideoWidget::supported_resolutions() const{
 }
 
 void VideoWidget::set_resolution(const QSize& size){
+//    cout << "set_resolution(): " << size.width() << " x " << size.height() << endl;
     std::lock_guard<std::mutex> lg(m_lock);
     {
-        const auto format = m_camera->cameraFormat();
+        const QCameraFormat format = m_camera->cameraFormat();
         if (format.resolution() == size){
             return;
         }
@@ -165,7 +168,9 @@ void VideoWidget::set_resolution(const QSize& size){
     bool formatSet = false;
     for(const auto& format : m_formats){
         if (format.resolution() == size){
+            m_camera->stop();
             m_camera->setCameraFormat(format);
+            m_camera->start();
             formatSet = true;
             break;
         }
@@ -225,14 +230,14 @@ void VideoWidget::resizeEvent(QResizeEvent* event){
 #if 0
     cout << "Widget = " << this->width() << " x " << this->height() << endl;
 
-    QSize size = m_camera_view->size();
-    cout << "Camera = " << size.width() << " x " << size.height() << endl;
+//    QSize size = m_camera_view->size();
+//    cout << "Camera = " << size.width() << " x " << size.height() << endl;
 
-    QSize hint = m_camera_view->sizeHint();
-    cout << "Hint = " << hint.width() << " x " << hint.height() << endl;
+//    QSize hint = m_camera_view->sizeHint();
+//    cout << "Hint = " << hint.width() << " x " << hint.height() << endl;
 #endif
 
-    this->setFixedSize(this->size());
+//    this->setFixedSize(this->size());
 }
 
 void VideoWidget::paintEvent(QPaintEvent* event){
@@ -243,6 +248,7 @@ void VideoWidget::paintEvent(QPaintEvent* event){
 //    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_last_frame.isValid()){
+//        cout << "frame: " << m_last_frame.width() << " x " << m_last_frame.height() << endl;
         QRect rect(0,0, this->width(), this->height());
         QVideoFrame::PaintOptions options;
         QPainter painter(this);

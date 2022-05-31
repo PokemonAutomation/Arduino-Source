@@ -49,7 +49,7 @@ private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;
     virtual void remove_box(const ImageFloatBox& box) override;
 
-    void update_size();
+    void update_size(QSize resolution = QSize());
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
