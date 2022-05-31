@@ -84,7 +84,18 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     size_t numSamples = len / sizeof(float);
 //    size_t numFrames = len / frameBytes;
     // We assert the data is always float with size of 4 bytes.
-    const float* floatData = reinterpret_cast<const float *>(data);
+    const float* floatData = reinterpret_cast<const float*>(data);
+
+#if 0
+    for (size_t c = 0; c < 20; c++){
+        cout << (int)data[c] << " ";
+    }
+    cout << endl;
+    for (size_t c = 0; c < 5; c++){
+        cout << floatData[c] << " ";
+    }
+    cout << endl;
+#endif
 
 //    static uint64_t c = 0;
 //    cout << c++ << " - [0] = " << floatData[0] << ", [1] = " << floatData[1] << endl;

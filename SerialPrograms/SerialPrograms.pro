@@ -73,6 +73,7 @@ SOURCES += \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
     ../Common/Cpp/CancellableScope.cpp \
+    ../Common/Cpp/CircularBuffer.cpp \
     ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
@@ -715,6 +716,7 @@ HEADERS += \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
     ../Common/Cpp/CancellableScope.h \
+    ../Common/Cpp/CircularBuffer.h \
     ../Common/Cpp/Color.h \
     ../Common/Cpp/CpuId.h \
     ../Common/Cpp/Exceptions.h \

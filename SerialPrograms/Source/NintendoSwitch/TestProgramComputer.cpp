@@ -10,6 +10,7 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/CircularBuffer.h"
 #include "Common/Cpp/CpuId.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
@@ -139,7 +140,15 @@ using namespace Kernels;
 
 
 
+class AudioBuffer{
+public:
 
+
+private:
+    size_t m_channels;
+//    size_t m_input
+
+};
 
 
 
@@ -152,12 +161,30 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+    CircularBuffer buffer(8);
+
+    char data[21] = {};
+
+    buffer.push_back("asdfqwer", 8);
+
+    cout << buffer.pop_front(data, 4) << endl;
+    cout << data << endl;
+
+//    cout << buffer.dump() << endl;
+
+    buffer.push_back("zxcvsdfg", 8);
+
+    cout << buffer.pop_front(data, 20) << endl;
+    cout << data << endl;
+
+
 //    __m256 k0 = _mm256_set1_ps(-4.);
 //    __m256 k1 = _mm256_set1_ps(-3.);
 //    __m256 k2 = _mm256_set1_ps(-2.);
 //    __m256 k3 = _mm256_set1_ps(-1.);
 
 
+#if 0
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 //    using GlobalState = NintendoSwitch::PokemonSwSh::MaxLairInternal::GlobalState;
 
@@ -177,7 +204,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
     select_move(env.logger(), state, 2);
-
+#endif
 
 #if 0
     alignas(PA_ALIGNMENT) float out[32];

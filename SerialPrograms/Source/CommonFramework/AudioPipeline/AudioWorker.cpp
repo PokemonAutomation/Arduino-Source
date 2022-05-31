@@ -115,7 +115,7 @@ void AudioWorker::startAudio(){
         // Load from audio input device:
 
         if (foundAudioInputInfo == false){
-            // std::cout << "Cannot build Qt6VideoWidget: cannot found audio device name matching: " << inputInfo.device_name() << std::endl;
+            // std::cout << "Cannot build Qt6VideoWidget: cannot find audio device name matching: " << inputInfo.device_name() << std::endl;
             return;
         }
 

@@ -66,6 +66,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AsyncDispatcher.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
+    ../Common/Cpp/CircularBuffer.cpp
+    ../Common/Cpp/CircularBuffer.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/CpuId.cpp
     ../Common/Cpp/CpuId.h

@@ -92,6 +92,9 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
     QAudioFormat preferred_format = info.preferredFormat();
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
+//    cout << "display_name = " << display_name.toStdString() << endl;
+//    cout << "bytesPerSample = " << preferred_format.sampleSize() << endl;
+//    cout << "sampleFormat = " << preferred_format.sampleType() << endl;
 
     std::vector<AudioFormat> ret;
     preferred_index = -1;

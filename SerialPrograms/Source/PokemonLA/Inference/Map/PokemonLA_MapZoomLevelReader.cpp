@@ -4,8 +4,8 @@
  *
  */
 
+#include <cmath>
 #include <QImage>
-
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -36,7 +36,7 @@ int read_map_zoom_level(const QImage& screen){
         // the following image_stats()
         const bool replace_background = true;
         size_t pixels_filtered = filter_rgb32_range(region, combine_rgb(0, 0, 0), combine_rgb(200, 200, 255), Color(0), replace_background);
-        if (pixels_filtered == region.width() * region.height()){
+        if (pixels_filtered == (size_t)region.width() * (size_t)region.height()){
             // All pixels are filtered out, so no yellow color. In this case, this is defenitiely not the location
             // of the yellow disk:
             // std::cout << "No yellow disk at " << i << std::endl;
