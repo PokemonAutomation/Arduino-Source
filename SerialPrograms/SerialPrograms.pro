@@ -256,6 +256,9 @@ SOURCES += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp \
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp \
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp \
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp \
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
@@ -947,6 +950,7 @@ HEADERS += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp \
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h \
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \

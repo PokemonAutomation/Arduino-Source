@@ -485,6 +485,10 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
@@ -1483,6 +1487,7 @@ endif()
 
 if (ARCH_FLAGS_09_Nehalem)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp

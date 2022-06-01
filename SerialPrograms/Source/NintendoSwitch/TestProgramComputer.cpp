@@ -62,6 +62,7 @@
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+#include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
 
 
 
@@ -93,7 +94,8 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 WallClock REFERENCE = current_time();
 
 
-void print(const float* ptr, size_t len){
+template <typename Type>
+void print(const Type* ptr, size_t len){
     cout << "{";
     bool first = true;
     for (size_t c = 0; c < len; c++){
@@ -102,6 +104,18 @@ void print(const float* ptr, size_t len){
         }
         first = false;
         cout << ptr[c];
+    }
+    cout << "}" << endl;
+}
+void print_u8(const uint8_t* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        cout << (unsigned)ptr[c];
     }
     cout << "}" << endl;
 }
@@ -139,14 +153,48 @@ void print_8x64(__m512i m){
 using namespace Kernels;
 
 
+enum class AudioStreamFormat{
+    SINT8,
+    UINT8,
+    SINT16,
+    UINT16,
+    SINT32,
+    UINT32,
+    FLOAT16,
+};
+
+
+class AudioStreamReader{
+public:
+    AudioStreamReader(size_t channels, AudioStreamFormat format);
+    size_t frames_available() const;
+    size_t read_frames(float* data, size_t frames);
+
+private:
+    AudioStreamFormat m_format;
+    size_t m_channels;
+    size_t m_sample_size;
+    size_t m_frame_size;
+    CircularBuffer m_buffer;
+};
+
+
+
+
+
+
 
 class AudioBuffer{
 public:
 
+    size_t frames_available() const;
+    size_t read_frames(float* data, size_t frames);
+    size_t pop_frames(size_t frames);
 
 private:
     size_t m_channels;
-//    size_t m_input
+    size_t m_frame_size;
+    CircularBuffer m_buffer;
 
 };
 
@@ -161,6 +209,34 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+    float f[10];
+    uint8_t i[10] = {};
+    i[0] = 1;
+    i[1] = 255;
+    i[2] = 0;
+    i[3] = 123;
+    i[9] = 123;
+
+    Kernels::AudioStreamConversion::convert_audio_uint8_to_float(f, i, 10);
+    print(f, 10);
+    memset(i, 0, sizeof(i));
+    Kernels::AudioStreamConversion::convert_audio_float_to_uint8(i, f, 10);
+    print_u8(i, 10);
+
+
+#if 0
+    union{
+        float f32;
+        int32_t i32;
+    };
+    f32 = 12582912.;
+    cout << i32 << endl;
+#endif
+
+
+//    cout << _mm_cvt_ss2si() << endl;
+
+#if 0
     CircularBuffer buffer(8);
 
     char data[21] = {};
@@ -176,6 +252,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     cout << buffer.pop_front(data, 20) << endl;
     cout << data << endl;
+#endif
 
 
 //    __m256 k0 = _mm256_set1_ps(-4.);
