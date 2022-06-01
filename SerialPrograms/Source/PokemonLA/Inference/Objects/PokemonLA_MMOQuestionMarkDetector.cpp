@@ -4,6 +4,7 @@
  *
  */
 
+#include <functional>
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"

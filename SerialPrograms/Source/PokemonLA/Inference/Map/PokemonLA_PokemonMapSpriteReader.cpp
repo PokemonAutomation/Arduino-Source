@@ -4,6 +4,11 @@
  *
  */
 
+#include <math.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include <QImage>
 
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -13,6 +18,7 @@
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
@@ -89,8 +95,8 @@ std::string feature_to_str(const FeatureVector& a){
 }
 
 void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(int x, int y, int sum_x[3], int sum_y[3])> proces_gradient){
-    const int width = image.width();
-    const int height = image.height();
+    const int width = (int)image.width();
+    const int height = (int)image.height();
     // Kernel for computing gradient along x axis
     const int kx[3][3] = {
         {-1, 0, 1},
@@ -169,7 +175,7 @@ void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(in
 
 
 QImage compute_image_gradient(const ConstImageRef& image){
-    QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
+    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
     result.fill(QColor(0,0,0,0));
     ImageRef result_ref(result);
 
@@ -230,7 +236,7 @@ FeatureVector compute_gradient_histogram(const ConstImageRef& image){
 } // end anonymous namespace
 
 FeatureVector compute_feature(const ConstImageRef& input_image){
-    QImage image = input_image.to_qimage().convertedTo(QImage::Format::Format_ARGB32);
+    QImage image = input_image.to_qimage().convertToFormat(QImage::Format::Format_ARGB32);
     ImageRef image_ref(image);
     int width = image.width();
     int height = image.height();
@@ -375,8 +381,8 @@ QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
     QImage result = compute_image_gradient(image);
     ImageRef result_ref(result);
     
-    int width = image.width();
-    int height = image.height();
+    int width = (int)image.width();
+    int height = (int)image.height();
     float r = (width + height) / 4.0;
     float center_x  = (width-1) / 2.0f;
     float center_y = (height-1) / 2.0f;
@@ -404,8 +410,8 @@ QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
 
 
 float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_template, const ConstImageRef& gradient){
-    int tempt_width = gradient_template.width();
-    int tempt_height = gradient_template.height();
+    int tempt_width = (int)gradient_template.width();
+    int tempt_height = (int)gradient_template.height();
 
     // static int count = 0;
     // QImage output(gradient.width(), gradient.height(), QImage::Format::Format_ARGB32);
@@ -545,8 +551,8 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
     score = 0;
     int num_gradients = 0;
 
-    for(int y = 0; y < gradient.height(); y++){
-        for(int x = 0; x < gradient.width(); x++){
+    for(int y = 0; y < (int)gradient.height(); y++){
+        for(int x = 0; x < (int)gradient.width(); x++){
             uint32_t g = gradient.pixel(x, y);
             if (is_transparent(g)){
                 continue;
@@ -560,7 +566,7 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
                     int block_size = 0;
                     for(int by = y - block_radius; by <= y + block_radius; by++){
                         for(int bx = x - block_radius; bx <= x + block_radius; bx++){
-                            if (bx < 0 || bx >= gradient.width() || by < 0 || by >= gradient.height()){
+                            if (bx < 0 || bx >= (int)gradient.width() || by < 0 || by >= (int)gradient.height()){
                                 continue;
                             }
 

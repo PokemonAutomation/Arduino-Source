@@ -132,7 +132,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
             if (target_region_index < 0){
                 for(size_t index = 0; index < 5; index++){
                     if (word == WILD_REGION_SHORT_NAMES[index]){
-                        target_region_index = index;
+                        target_region_index = (int)index;
                         break;
                     }
                 }
