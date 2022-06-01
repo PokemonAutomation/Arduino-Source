@@ -35,7 +35,7 @@ win32-g++{
 
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
-    DEFINES += PA_AutoDispatch_08_Nehalem
+    DEFINES += PA_AutoDispatch_x64_08_Nehalem
     LIBS += ../SerialPrograms/tesseractPA.lib
 
     DEFINES += WIN32
@@ -48,7 +48,7 @@ win32-msvc{
 
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
-    DEFINES += PA_AutoDispatch_08_Nehalem
+    DEFINES += PA_AutoDispatch_x64_08_Nehalem
     LIBS += ../SerialPrograms/tesseractPA.lib
 
     DEFINES += WIN32
@@ -58,7 +58,7 @@ win32-msvc{
 macx{
     QMAKE_CXXFLAGS += -std=c++14
 
-    DEFINES += PA_AutoDispatch_08_Nehalem
+    DEFINES += PA_AutoDispatch_x64_08_Nehalem
 
     QMAKE_INFO_PLIST = macos/Info.plist
 }
@@ -74,7 +74,7 @@ SOURCES += \
     ../Common/Cpp/AsyncDispatcher.cpp \
     ../Common/Cpp/CancellableScope.cpp \
     ../Common/Cpp/CircularBuffer.cpp \
-    ../Common/Cpp/CpuId.cpp \
+    ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/LifetimeSanitizer.cpp \
@@ -721,7 +721,9 @@ HEADERS += \
     ../Common/Cpp/CancellableScope.h \
     ../Common/Cpp/CircularBuffer.h \
     ../Common/Cpp/Color.h \
-    ../Common/Cpp/CpuId.h \
+    ../Common/Cpp/CpuId/CpuId.h \
+    ../Common/Cpp/CpuId/CpuId_x86.h \
+    ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \

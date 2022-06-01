@@ -5,7 +5,7 @@
  */
 
 #include <algorithm>
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Environment.h"
 
 namespace PokemonAutomation{

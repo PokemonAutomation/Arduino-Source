@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_64x16_x64_AVX2.h"

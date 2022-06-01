@@ -1,22 +1,22 @@
-/*  CPU ID
+/*  CPU ID (x86)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_CpuId_H
-#define PokemonAutomation_CpuId_H
+#ifndef PokemonAutomation_CpuId_x86_H
+#define PokemonAutomation_CpuId_x86_H
 
 #include <stdint.h>
 
 namespace PokemonAutomation{
-    
+
 
 void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx);
 
 
-struct CPU_x86_Features{
-    CPU_x86_Features& set_to_current();
+struct CPU_Features{
+    CPU_Features& set_to_current();
 
     //  CPU Compatibility
     bool OK_08_Nehalem  = false;
@@ -100,15 +100,13 @@ struct CPU_x86_Features{
 
 };
 
-extern const CPU_x86_Features CPU_CAPABILITY_NATIVE;
 
-extern const CPU_x86_Features CPU_CAPABILITY_NOTHING;
-extern const CPU_x86_Features CPU_CAPABILITY_09_NEHALEM;
-extern const CPU_x86_Features CPU_CAPABILITY_13_Haswell;
-extern const CPU_x86_Features CPU_CAPABILITY_17_Skylake;
-extern const CPU_x86_Features CPU_CAPABILITY_19_IceLake;
+extern const CPU_Features CPU_CAPABILITY_NOTHING;
+extern const CPU_Features CPU_CAPABILITY_09_NEHALEM;
+extern const CPU_Features CPU_CAPABILITY_13_Haswell;
+extern const CPU_Features CPU_CAPABILITY_17_Skylake;
+extern const CPU_Features CPU_CAPABILITY_19_IceLake;
 
-extern CPU_x86_Features CPU_CAPABILITY_CURRENT;
 
 
 

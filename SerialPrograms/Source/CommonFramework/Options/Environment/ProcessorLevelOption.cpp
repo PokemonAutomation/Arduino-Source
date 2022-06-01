@@ -15,47 +15,11 @@
 namespace PokemonAutomation{
 
 
-struct CpuCapabilityOption{
-    const char* label;
-    const CPU_x86_Features& features;
-    bool enabled;
-
-    CpuCapabilityOption(const char* p_label, const CPU_x86_Features& p_features, bool p_enabled)
-        : label(p_label)
-        , features(p_features)
-        , enabled(p_enabled)
-    {}
-};
-
-
-std::vector<CpuCapabilityOption> make_AVAILABLE_CAPABILITIES(){
-    std::vector<CpuCapabilityOption> list;
-    list.emplace_back("Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true);
-#ifdef PA_AutoDispatch_08_Nehalem
-    list.emplace_back("Intel Nehalem (x64 SSE4.2)",     CPU_CAPABILITY_09_NEHALEM,  CPU_CAPABILITY_NATIVE.OK_08_Nehalem);
-#endif
-#ifdef PA_AutoDispatch_13_Haswell
-    list.emplace_back("Intel Haswell (x64 AVX2)",       CPU_CAPABILITY_13_Haswell,  CPU_CAPABILITY_NATIVE.OK_13_Haswell);
-#endif
-#ifdef PA_AutoDispatch_17_Skylake
-    list.emplace_back("Intel Skylake (x64 AVX512)",     CPU_CAPABILITY_17_Skylake,  CPU_CAPABILITY_NATIVE.OK_17_Skylake);
-#endif
-#ifdef PA_AutoDispatch_19_IceLake
-    list.emplace_back("Intel Ice Lake (x64 AVX512-GF)", CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake);
-#endif
-    return list;
-}
-
-const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
-    static const std::vector<CpuCapabilityOption> LIST = make_AVAILABLE_CAPABILITIES();
-    return LIST;
-}
-
 
 std::vector<EnumDropdownOption::Option> make_processor_labels(){
     std::vector<EnumDropdownOption::Option> ret;
     for (const CpuCapabilityOption& option : AVAILABLE_CAPABILITIES()){
-        ret.emplace_back(option.label, option.enabled);
+        ret.emplace_back(option.label, option.available);
     }
     return ret;
 }
@@ -63,7 +27,7 @@ size_t get_default_ProcessorLevel_index(){
     const std::vector<CpuCapabilityOption>& LEVELS = AVAILABLE_CAPABILITIES();
     size_t best = 0;
     for (size_t c = 0; c < LEVELS.size(); c++){
-        if (LEVELS[c].enabled){
+        if (LEVELS[c].available){
             best = c;
         }
     }

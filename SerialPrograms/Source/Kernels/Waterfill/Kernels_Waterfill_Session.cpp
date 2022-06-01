@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_Waterfill_Routines.h"
 
 namespace PokemonAutomation{
@@ -23,7 +23,7 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession_64x64_x64_AVX512GF  (Pac
 std::unique_ptr<WaterfillSession> make_WaterfillSession(){
     BinaryMatrixType type = get_BinaryMatrixType();
     switch (type){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(nullptr);
@@ -37,11 +37,11 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
             return make_WaterfillSession_64x32_x64_AVX512(nullptr);
         }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
         return make_WaterfillSession_64x16_x64_AVX2(nullptr);
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(nullptr);
 #endif
@@ -51,7 +51,7 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
 }
 std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& matrix){
     switch (matrix.type()){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(&matrix);
@@ -65,11 +65,11 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& m
             return make_WaterfillSession_64x32_x64_AVX512(&matrix);
         }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
         return make_WaterfillSession_64x16_x64_AVX2(&matrix);
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(&matrix);
 #endif

@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include <immintrin.h>
 #include "Kernels/Kernels_x64_SSE41.h"

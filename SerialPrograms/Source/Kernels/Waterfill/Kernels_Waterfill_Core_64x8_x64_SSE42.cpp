@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_64x8_x64_SSE42.h"

@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels_SpikeConvolution_Routines.h"

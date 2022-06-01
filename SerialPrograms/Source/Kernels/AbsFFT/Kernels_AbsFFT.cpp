@@ -5,7 +5,7 @@
  */
 
 #include <stddef.h>
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_AbsFFT.h"
 
 namespace PokemonAutomation{
@@ -30,13 +30,13 @@ void fft_abs(int k, float* abs, float* real){
         throw "real must be aligned to 64 bytes.";
     }
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         fft_abs_x86_AVX2(k, abs, real);
         return;
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         fft_abs_x86_SSE41(k, abs, real);
         return;

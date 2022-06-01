@@ -69,8 +69,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CircularBuffer.cpp
     ../Common/Cpp/CircularBuffer.h
     ../Common/Cpp/Color.h
-    ../Common/Cpp/CpuId.cpp
-    ../Common/Cpp/CpuId.h
+    ../Common/Cpp/CpuId/CpuId.cpp
+    ../Common/Cpp/CpuId/CpuId.h
+    ../Common/Cpp/CpuId/CpuId_x86.h
+    ../Common/Cpp/CpuId/CpuId_x86.tpp
     ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
@@ -1441,10 +1443,10 @@ if (MSVC)
     set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
     #   Run-time ISA dispatching
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
 
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
@@ -1475,10 +1477,10 @@ else()
     set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
 
     #   Run-time ISA dispatching
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
 endif()
 
 

@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include <stdint.h>
 #include <cstddef>

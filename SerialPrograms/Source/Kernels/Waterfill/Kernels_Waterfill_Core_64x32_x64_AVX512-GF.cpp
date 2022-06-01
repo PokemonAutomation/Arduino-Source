@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_19_IceLake
+#ifdef PA_AutoDispatch_x64_19_IceLake
 
 #include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX512.h"

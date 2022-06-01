@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ProcessorLevelPption_H
 #define PokemonAutomation_ProcessorLevelPption_H
 
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{

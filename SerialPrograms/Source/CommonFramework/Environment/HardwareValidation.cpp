@@ -7,7 +7,7 @@
 #include <thread>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Environment.h"
 #include "HardwareValidation.h"
 

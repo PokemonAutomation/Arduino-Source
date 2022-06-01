@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include <smmintrin.h>
 #include "Common/Cpp/Exceptions.h"

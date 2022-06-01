@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
 
 #include "Kernels_PackedBinaryMatrixCore.tpp"
 #include "Kernels_SparseBinaryMatrixCore.tpp"

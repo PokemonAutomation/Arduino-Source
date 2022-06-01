@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"

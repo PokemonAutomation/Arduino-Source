@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_Basic.h"
 
@@ -38,7 +38,7 @@ size_t filter_rgb32_range(
     if (width * height > 0xffffffff){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return filter_rgb32_range_x64_AVX512(
             image, bytes_per_row, width, height,
@@ -46,7 +46,7 @@ size_t filter_rgb32_range(
         );
     }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return filter_rgb32_range_x64_AVX2(
             image, bytes_per_row, width, height,
@@ -54,7 +54,7 @@ size_t filter_rgb32_range(
         );
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return filter_rgb32_range_x64_SSE42(
             image, bytes_per_row, width, height,
@@ -98,19 +98,19 @@ void filter_rgb32_range(
     if (width * height > 0xffffffff){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         filter_rgb32_range_x64_AVX512(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         filter_rgb32_range_x64_AVX2(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         filter_rgb32_range_x64_SSE42(image, bytes_per_row, width, height, filter, filter_count);
         return;
@@ -147,17 +147,17 @@ size_t to_blackwhite_rgb32_range(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, bool in_range_black0
 ){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return to_blackwhite_rgb32_range_x64_AVX512(image, bytes_per_row, width, height, out0, bytes_per_row0, mins0, maxs0, in_range_black0);
     }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return to_blackwhite_rgb32_range_x64_AVX2(image, bytes_per_row, width, height, out0, bytes_per_row0, mins0, maxs0, in_range_black0);
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return to_blackwhite_rgb32_range_x64_SSE42(image, bytes_per_row, width, height, out0, bytes_per_row0, mins0, maxs0, in_range_black0);
     }
@@ -193,17 +193,17 @@ void to_blackwhite_rgb32_range(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     ToBlackWhiteRgb32RangeFilter* filter, size_t filter_count
 ){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return to_blackwhite_rgb32_range_x64_AVX512(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return to_blackwhite_rgb32_range_x64_AVX2(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return to_blackwhite_rgb32_range_x64_SSE42(image, bytes_per_row, width, height, filter, filter_count);
     }

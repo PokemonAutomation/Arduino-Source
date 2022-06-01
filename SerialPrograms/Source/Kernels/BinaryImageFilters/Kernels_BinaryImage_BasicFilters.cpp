@@ -66,7 +66,7 @@ void compress_rgb32_to_binary_range(
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 ){
     switch (matrix0.type()){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
@@ -74,12 +74,12 @@ void compress_rgb32_to_binary_range(
         compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
         compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
         compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
@@ -105,7 +105,7 @@ void compress_rgb32_to_binary_range(
         }
     }
     switch (type){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, filters, filter_count);
         return;
@@ -113,12 +113,12 @@ void compress_rgb32_to_binary_range(
         compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, filters, filter_count);
         return;
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
         compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, filters, filter_count);
         return;
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
         compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, filters, filter_count);
         return;
@@ -149,7 +149,7 @@ void filter_rgb32(
     bool replace_if_zero    //  If false, replace if one.
 ){
     switch (matrix.type()){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         filter_rgb32_64x64_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
@@ -157,12 +157,12 @@ void filter_rgb32(
         filter_rgb32_64x32_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
         filter_rgb32_64x16_x64_AVX2(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
         filter_rgb32_64x8_x64_SSE42(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;

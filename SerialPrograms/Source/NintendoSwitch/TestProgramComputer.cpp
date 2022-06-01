@@ -11,7 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "Common/Cpp/CircularBuffer.h"
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -154,12 +154,9 @@ using namespace Kernels;
 
 
 enum class AudioStreamFormat{
-    SINT8,
     UINT8,
     SINT16,
-    UINT16,
     SINT32,
-    UINT32,
     FLOAT16,
 };
 

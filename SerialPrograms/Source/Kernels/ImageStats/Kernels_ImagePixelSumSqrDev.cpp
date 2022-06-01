@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_ImagePixelSumSqrDev.h"
 
 namespace PokemonAutomation{
@@ -54,7 +54,7 @@ void sum_sqr_deviation(
     const uint32_t* img, size_t img_bytes_per_line,
     uint32_t background = 0
 ){
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         sum_sqr_deviation_x64_AVX512<mode>(
             count, sumsqrs,
@@ -66,7 +66,7 @@ void sum_sqr_deviation(
         return;
     }
 #endif
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         sum_sqr_deviation_x64_AVX2<mode>(
             count, sumsqrs,
@@ -78,7 +78,7 @@ void sum_sqr_deviation(
         return;
     }
 #endif
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         sum_sqr_deviation_x64_SSE41<mode>(
             count, sumsqrs,

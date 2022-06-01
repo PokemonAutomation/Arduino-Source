@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_08_Nehalem
+#ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_SpikeConvolution_Routines.h"

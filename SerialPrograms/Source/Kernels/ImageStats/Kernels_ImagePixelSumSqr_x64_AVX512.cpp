@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
 
 #include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"

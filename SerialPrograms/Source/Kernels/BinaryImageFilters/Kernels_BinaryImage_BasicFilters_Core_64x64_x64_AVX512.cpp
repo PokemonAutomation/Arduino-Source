@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
 
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h"

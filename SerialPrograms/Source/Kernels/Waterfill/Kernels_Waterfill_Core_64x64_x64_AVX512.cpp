@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_17_Skylake
+#ifdef PA_AutoDispatch_x64_17_Skylake
 
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_64x64_x64_AVX512.h"

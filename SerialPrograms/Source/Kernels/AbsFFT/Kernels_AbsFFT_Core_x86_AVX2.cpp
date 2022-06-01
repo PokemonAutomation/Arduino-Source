@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef PA_AutoDispatch_13_Haswell
+#ifdef PA_AutoDispatch_x64_13_Haswell
 
 #include "Kernels_AbsFFT_Arch_x86_AVX2.h"
 #include "Kernels_AbsFFT_BaseTransform_x86_AVX2.h"

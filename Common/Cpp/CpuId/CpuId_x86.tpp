@@ -1,4 +1,4 @@
-/*  CPU ID
+/*  CPU ID (x86)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -76,7 +76,7 @@ bool detect_OS_AVX512(){
 }
 
 
-CPU_x86_Features& CPU_x86_Features::set_to_current(){
+CPU_Features& CPU_Features::set_to_current(){
     //  OS Features
     OS_AVX = detect_OS_AVX();
     OS_AVX512 = detect_OS_AVX512();
@@ -162,7 +162,7 @@ CPU_x86_Features& CPU_x86_Features::set_to_current(){
     return *this;
 }
 
-void CPU_x86_Features::update_CPU_compatibility(){
+void CPU_Features::update_CPU_compatibility(){
     OK_08_Nehalem = true;
     OK_08_Nehalem &= HW_SSE42;
 
@@ -192,14 +192,14 @@ void CPU_x86_Features::update_CPU_compatibility(){
 }
 
 
-const CPU_x86_Features CPU_CAPABILITY_NATIVE = CPU_x86_Features().set_to_current();
+const CPU_Features CPU_CAPABILITY_NATIVE = CPU_Features().set_to_current();
 
 
 
-const CPU_x86_Features CPU_CAPABILITY_NOTHING;
+const CPU_Features CPU_CAPABILITY_NOTHING;
 
-CPU_x86_Features make_09_Nehalem(){
-    CPU_x86_Features ret;
+CPU_Features make_09_Nehalem(){
+    CPU_Features ret;
 
     ret.HW_MMX = true;
     ret.HW_x64 = true;
@@ -214,10 +214,10 @@ CPU_x86_Features make_09_Nehalem(){
     ret.update_CPU_compatibility();
     return ret;
 }
-const CPU_x86_Features CPU_CAPABILITY_09_NEHALEM = make_09_Nehalem();
+const CPU_Features CPU_CAPABILITY_09_NEHALEM = make_09_Nehalem();
 
-CPU_x86_Features make_13_Haswell(){
-    CPU_x86_Features ret;
+CPU_Features make_13_Haswell(){
+    CPU_Features ret;
 
     ret.OS_AVX = CPU_CAPABILITY_NATIVE.OS_AVX;
 
@@ -242,10 +242,10 @@ CPU_x86_Features make_13_Haswell(){
     ret.update_CPU_compatibility();
     return ret;
 }
-const CPU_x86_Features CPU_CAPABILITY_13_Haswell = make_13_Haswell();
+const CPU_Features CPU_CAPABILITY_13_Haswell = make_13_Haswell();
 
-CPU_x86_Features make_17_Skylake(){
-    CPU_x86_Features ret;
+CPU_Features make_17_Skylake(){
+    CPU_Features ret;
 
     ret.OS_AVX = CPU_CAPABILITY_NATIVE.OS_AVX;
     ret.OS_AVX512 = CPU_CAPABILITY_NATIVE.OS_AVX512;
@@ -281,10 +281,10 @@ CPU_x86_Features make_17_Skylake(){
     ret.update_CPU_compatibility();
     return ret;
 }
-const CPU_x86_Features CPU_CAPABILITY_17_Skylake = make_17_Skylake();
+const CPU_Features CPU_CAPABILITY_17_Skylake = make_17_Skylake();
 
-CPU_x86_Features make_19_IceLake(){
-    CPU_x86_Features ret;
+CPU_Features make_19_IceLake(){
+    CPU_Features ret;
 
     ret.OS_AVX = CPU_CAPABILITY_NATIVE.OS_AVX;
     ret.OS_AVX512 = CPU_CAPABILITY_NATIVE.OS_AVX512;
@@ -329,12 +329,38 @@ CPU_x86_Features make_19_IceLake(){
     ret.update_CPU_compatibility();
     return ret;
 }
-const CPU_x86_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();
+const CPU_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();
 
 
 
 
-CPU_x86_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
+CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
+
+
+
+
+std::vector<CpuCapabilityOption> make_AVAILABLE_CAPABILITIES(){
+    std::vector<CpuCapabilityOption> list;
+    list.emplace_back("Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true);
+#ifdef PA_AutoDispatch_x64_08_Nehalem
+    list.emplace_back("Intel Nehalem (x64 SSE4.2)",     CPU_CAPABILITY_09_NEHALEM,  CPU_CAPABILITY_NATIVE.OK_08_Nehalem);
+#endif
+#ifdef PA_AutoDispatch_x64_13_Haswell
+    list.emplace_back("Intel Haswell (x64 AVX2)",       CPU_CAPABILITY_13_Haswell,  CPU_CAPABILITY_NATIVE.OK_13_Haswell);
+#endif
+#ifdef PA_AutoDispatch_x64_17_Skylake
+    list.emplace_back("Intel Skylake (x64 AVX512)",     CPU_CAPABILITY_17_Skylake,  CPU_CAPABILITY_NATIVE.OK_17_Skylake);
+#endif
+#ifdef PA_AutoDispatch_x64_19_IceLake
+    list.emplace_back("Intel Ice Lake (x64 AVX512-GF)", CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake);
+#endif
+    return list;
+}
+
+const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
+    static const std::vector<CpuCapabilityOption> LIST = make_AVAILABLE_CAPABILITIES();
+    return LIST;
+}
 
 
 
