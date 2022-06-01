@@ -2,8 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Detect the black out screen as well as the dropped items screen after player
- *  character blacks out.
+ *  Detect the black out screen when player character blacks out.
  */
 
 #ifndef PokemonAutomation_PokemonLA_BlackOutDetector_H
@@ -11,6 +10,7 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+// #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -34,6 +34,8 @@ private:
     DialogueYellowArrowDetector m_yellow_arrow_detector;
     // The bottom white space of the "Return to Base Camp" button.
     // ImageFloatBox m_return_camp_bottom;
+
+    // ButtonDetector m_button_Y_detector;
 };
 
 
