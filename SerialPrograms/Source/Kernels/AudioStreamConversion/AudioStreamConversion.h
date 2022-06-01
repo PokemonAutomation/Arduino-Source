@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AudioStreamConversion_H
 #define PokemonAutomation_Kernels_AudioStreamConversion_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 namespace PokemonAutomation{

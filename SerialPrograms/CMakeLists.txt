@@ -95,6 +95,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SpinLock.cpp
     ../Common/Cpp/SpinLock.h
+    ../Common/Cpp/StreamConverters.cpp
+    ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/Unicode.cpp

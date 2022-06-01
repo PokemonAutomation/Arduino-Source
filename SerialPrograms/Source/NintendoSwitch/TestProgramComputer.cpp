@@ -63,6 +63,7 @@
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
+#include "Common/Cpp/StreamConverters.h"
 
 
 
@@ -157,27 +158,60 @@ enum class AudioStreamFormat{
     UINT8,
     SINT16,
     SINT32,
-    FLOAT16,
+    FLOAT32,
 };
 
+size_t sample_size(AudioStreamFormat format){
+    switch (format){
+    case AudioStreamFormat::UINT8:
+        return sizeof(uint8_t);
+    case AudioStreamFormat::SINT16:
+        return sizeof(int16_t);
+    case AudioStreamFormat::SINT32:
+        return sizeof(int32_t);
+    case AudioStreamFormat::FLOAT32:
+        return sizeof(float);
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioStreamFormat: " + std::to_string((size_t)format));
+}
 
+
+#if 0
 class AudioStreamReader{
 public:
     AudioStreamReader(size_t channels, AudioStreamFormat format);
     size_t frames_available() const;
-    size_t read_frames(float* data, size_t frames);
+    void push_bytes(const void* data, size_t bytes);
+    void read_frames(float* data, uint64_t frame_offset, size_t frames);
+    void pop_to(uint64_t frame_offset);
 
 private:
     AudioStreamFormat m_format;
     size_t m_channels;
     size_t m_sample_size;
     size_t m_frame_size;
-    CircularBuffer m_buffer;
+    StreamReader m_reader;
 };
 
-
-
-
+AudioStreamReader::AudioStreamReader(size_t channels, AudioStreamFormat format)
+    : m_format(format)
+    , m_channels(channels)
+    , m_sample_size(sample_size(format))
+    , m_frame_size(m_sample_size * channels)
+    , m_reader(m_frame_size * 16384)
+{}
+size_t AudioStreamReader::frames_available() const{
+    return m_reader.bytes_stored() / m_frame_size;
+}
+void AudioStreamReader::push_bytes(const void* data, size_t bytes){
+    m_reader.push_back(data, bytes);
+}
+void AudioStreamReader::read_frames(float* data, uint64_t frame_offset, size_t frames){
+    m_reader.read(data, frame_offset * m_frame_size, frames * m_frame_size);
+}
+void AudioStreamReader::pop_to(uint64_t frame_offset){
+    m_reader.pop_to(frame_offset * m_frame_size);
+}
 
 
 
@@ -191,9 +225,103 @@ public:
 private:
     size_t m_channels;
     size_t m_frame_size;
-    CircularBuffer m_buffer;
+    StreamReader m_buffer;
 
 };
+
+
+class AudioStreamReader2 : public ConvertedStreamReader{
+public:
+    AudioStreamReader2(size_t channels, AudioStreamFormat format);
+
+
+private:
+    virtual void convert(void* object, const void* raw, size_t count) override;
+
+private:
+    AudioStreamFormat m_format;
+    size_t m_channels;
+    size_t m_sample_size;
+    size_t m_frame_size;
+};
+AudioStreamReader2::AudioStreamReader2(size_t channels, AudioStreamFormat format)
+    : ConvertedStreamReader(sample_size(format), sizeof(float), 16384)
+    , m_format(format)
+    , m_sample_size(sample_size(format))
+    , m_frame_size(m_sample_size * channels)
+{}
+void AudioStreamReader2::convert(void* object, const void* raw, size_t count){
+    switch (m_format){
+    case AudioStreamFormat::UINT8:
+        Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)object, (const uint8_t*)raw, count * m_channels);
+        return;
+    case AudioStreamFormat::SINT16:
+        Kernels::AudioStreamConversion::convert_audio_sint16_to_float((float*)object, (const int16_t*)raw, count * m_channels);
+        return;
+    case AudioStreamFormat::SINT32:
+        Kernels::AudioStreamConversion::convert_audio_sint32_to_float((float*)object, (const int32_t*)raw, count * m_channels);
+        return;
+    case AudioStreamFormat::FLOAT32:
+        memcpy(object, raw, count * m_frame_size);
+        return;
+    }
+}
+#endif
+
+
+
+class AudioStreamReader : public MisalignedStreamConverter{
+public:
+    AudioStreamReader(size_t channels, AudioStreamFormat format);
+
+private:
+    virtual void convert(void* out, const void* in, size_t count) override;
+
+private:
+    AudioStreamFormat m_format;
+    size_t m_channels;
+    size_t m_sample_size;
+    size_t m_frame_size;
+};
+AudioStreamReader::AudioStreamReader(size_t channels, AudioStreamFormat format)
+    : MisalignedStreamConverter(sample_size(format), sizeof(float), 16384)
+    , m_format(format)
+    , m_channels(channels)
+    , m_sample_size(sample_size(format))
+    , m_frame_size(m_sample_size * channels)
+{}
+void AudioStreamReader::convert(void* out, const void* in, size_t count){
+    switch (m_format){
+    case AudioStreamFormat::UINT8:
+        Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)out, (const uint8_t*)in, count * m_channels);
+        return;
+    case AudioStreamFormat::SINT16:
+        Kernels::AudioStreamConversion::convert_audio_sint16_to_float((float*)out, (const int16_t*)in, count * m_channels);
+        return;
+    case AudioStreamFormat::SINT32:
+        Kernels::AudioStreamConversion::convert_audio_sint32_to_float((float*)out, (const int32_t*)in, count * m_channels);
+        return;
+    case AudioStreamFormat::FLOAT32:
+        memcpy(out, in, count * m_frame_size);
+        return;
+    }
+}
+
+
+
+
+
+class AudioListener : public StreamListener{
+public:
+    AudioListener()
+        : StreamListener(sizeof(float))
+    {}
+    virtual void on_objects(const void* data, size_t objects) override{
+        const float* samples = (const float*)data;
+        print(samples, objects);
+    }
+};
+
 
 
 
@@ -206,6 +334,50 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+    int16_t in[4] = {1, 1, 2, -2};
+    print_u8((uint8_t*)in, 8);
+
+
+
+    AudioStreamReader reader(2, AudioStreamFormat::SINT16);
+    AudioListener listener;
+    reader += listener;
+
+
+//    reader.push_bytes(in, 8);
+    reader.push_bytes((char*)in + 0, 3);
+    reader.push_bytes((char*)in + 3, 5);
+
+
+
+
+//    AudioStreamReader2 reader(2, AudioStreamFormat::SINT16);
+
+
+
+#if 0
+    char buffer[17] = {};
+    for (size_t c = 0; c < 16; c++){
+        buffer[c] = '=';
+    }
+
+    StreamReader reader(8);
+    cout << reader.dump() << endl;
+
+    reader.push_back("asdf", 4);
+    reader.pop_to(2);
+    reader.push_back("qwerzx", 6);
+    cout << reader.dump() << endl;
+
+    reader.push_back("sdfg", 4);
+    cout << reader.dump() << endl;
+
+//    reader.read(buffer, 4, 7);
+//    cout << buffer << endl;
+//    cout << reader.dump() << endl;
+#endif
+
+#if 0
     float f[10];
     uint8_t i[10] = {};
     i[0] = 1;
@@ -219,6 +391,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     memset(i, 0, sizeof(i));
     Kernels::AudioStreamConversion::convert_audio_float_to_uint8(i, f, 10);
     print_u8(i, 10);
+#endif
 
 
 #if 0
@@ -258,824 +431,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    __m256 k3 = _mm256_set1_ps(-1.);
 
 
-#if 0
-    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
-//    using GlobalState = NintendoSwitch::PokemonSwSh::MaxLairInternal::GlobalState;
 
-    GlobalState state;
-    state.adventure_started = true;
-    state.boss = "kyogre";
-    state.wins = 3;
-    state.lives_left = -1;
 
-    state.opponent = {"kyogre"};
-    state.players[0].pokemon = "charjabug";
-    state.players[1].pokemon = "rotom";
-    state.players[2].console_id = 0;
-    state.players[2].pokemon = "mantine";
-    state.players[2].can_dmax = true;
-    state.players[3].pokemon = "orbeetle";
 
 
-    select_move(env.logger(), state, 2);
-#endif
-
-#if 0
-    alignas(PA_ALIGNMENT) float out[32];
-    alignas(PA_ALIGNMENT) float in[32] = {3, 3, 3, 8, 9, 6, 9, 5, 7, 6, 3, 1, 4, 0, 4, 7, 9, 5, 1, 3, 1, 3, 8, \
-5, 2, 6, 1, 3, 3, 5, 3, 0};
-
-    float kernel[] = {1, 2, 3, 2, 1};
-
-    for (size_t c = 0; c < 32; c++){
-        out[c] = 9999;
-    }
-
-    SpikeConvolution::compute_spike_kernel(out, in, 32, kernel, 5);
-
-    print(out, 32);
-#endif
-
-
-
-
-
-#if 0
-    __m128 v0 = _mm_setr_ps(10, 11, 12, 13);
-    __m128 v1 = _mm_setr_ps(20, 21, 22, 23);
-
-    print(v0);
-    print(v1);
-//    print(_mm_unpacklo_ps(v0, v0));
-//    print(_mm_unpackhi_ps(v0, v0));
-    print(_mm_shuffle_ps(v0, v0, 78));
-    print(_mm_shuffle_ps(v0, v0, 177));
-
-    v0 = _mm_add_ps(v0, _mm_shuffle_ps(v0, v0, 78));
-    print(v0);
-    v0 = _mm_add_ps(v0, _mm_shuffle_ps(v0, v0, 177));
-    print(v0);
-
-
-
-    size_t length = 128;
-
-    AlignedVector<float> A(length);
-    AlignedVector<float> T(length);
-    AlignedVector<float> W(length);
-    for (size_t c = 0; c < length; c++){
-        A[c] = (float)rand() / RAND_MAX;
-        T[c] = (float)rand() / RAND_MAX;
-        W[c] = (float)rand() / RAND_MAX;
-    }
-
-#if 1
-    {
-        const float* ptrA = A.data() + 15;
-        const float* ptrT = T.data() + 15;
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 15, 1, &ptrA, &ptrT) << endl;
-    }
-    {
-        const float* ptrA = A.data() + 3;
-        const float* ptrT = T.data() + 3;
-        const float* ptrW = W.data() + 3;
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 3, 1, &ptrA, &ptrT, &ptrW) << endl;
-    }
-#endif
-    {
-        const float* ptrA = A.data() + 15;
-        const float* ptrT = T.data() + 15;
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_error(length - 15 , 1, 0.5, &ptrA, &ptrT) << endl;
-    }
-    {
-        const float* ptrA = A.data() + 3;
-        const float* ptrT = T.data() + 3;
-        const float* ptrW = W.data() + 3;
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_error(length - 3, 1, 0.5, &ptrA, &ptrT, &ptrW) << endl;
-    }
-#endif
-
-
-
-
-
-#if 0
-    QImage image("20220301-205136873076.jpg");
-
-    ImageFloatBox box(0.050, 0.177, 0.200, 0.038);
-
-    OCR::StringMatchResult result = OCR::multifiltered_OCR(
-        Language::English, Pokemon::PokemonNameReader::instance(), extract_box_reference(image, box),
-        {
-            {0xff808080, 0xffffffff},
-            {0xff909090, 0xffffffff},
-        },
-        1.0
-    );
-    result.log(env.logger(), -5);
-#endif
-
-
-#if 0
-    QImage image("20220301-205136873076.jpg");
-
-    auto ret = filter_rgb32_range(
-        image,
-        {
-            {0xff808080, 0xffffffff, Color(0xff000000), false},
-            {0xff909090, 0xffffffff, Color(0xff000000), false},
-            {0xffa0a0a0, 0xffffffff, Color(0xff000000), false},
-            {0xffb0b0b0, 0xffffffff, Color(0xff000000), false},
-        }
-    );
-    cout << ret[0].second << endl;
-    cout << ret[1].second << endl;
-    cout << ret[2].second << endl;
-    cout << ret[3].second << endl;
-
-//    ret[0].first.save("test0.png");
-//    ret[1].first.save("test1.png");
-//    ret[2].first.save("test2.png");
-//    ret[3].first.save("test3.png");
-
-//    cout << to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, false) << endl;
-//    image.save("test0.png");
-
-    auto ret1 = filter_rgb32_range(
-        image,
-        {
-            {0xff808080, 0xffffffff, false},
-            {0xff909090, 0xffffffff, false},
-            {0xffa0a0a0, 0xffffffff, false},
-            {0xffb0b0b0, 0xffffffff, false},
-        }
-    );
-    cout << ret1[0].second << endl;
-    cout << ret1[1].second << endl;
-    cout << ret1[2].second << endl;
-    cout << ret1[3].second << endl;
-    ret1[0].first.save("test0.png");
-    ret1[1].first.save("test1.png");
-    ret1[2].first.save("test2.png");
-    ret1[3].first.save("test3.png");
-
-#endif
-
-
-//    throw InternalProgramError(nullptr, "asdf", "qwer");
-
-//    cout << "asdfasdf" << endl;
-
-
-
-
-
-#if 0
-    std::function<void()> callback0 = []{ cout << "asdf" << endl; };
-    std::function<void()> callback1 = []{ cout << "qwer" << endl; };
-
-    CancellableHolder<ScheduledPrinter> runner(scope, env.inference_dispatcher());
-    runner.add_event(callback0, std::chrono::seconds(2));
-    runner.add_event(callback1, std::chrono::seconds(3));
-
-    scope.wait_for(std::chrono::seconds(10));
-#endif
-
-#if 0
-    PeriodicScheduler scheduler;
-    scheduler.add_event(&callback0, std::chrono::seconds(2));
-    scheduler.add_event(&callback1, std::chrono::seconds(3));
-    while (true){
-        scope.throw_if_cancelled();
-        void* ptr = scheduler.request_next_event();
-        if (ptr != nullptr){
-            cout << current_time_to_str() << ": ";
-            (*(std::function<void()>*)ptr)();
-        }
-    }
-#endif
-
-
-
-#if 0
-    QImage image("20220328-043030682479.jpg");
-    auto matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-    auto session = Waterfill::make_WaterfillSession(matrix);
-    auto iter = session->make_iterator(10);
-    WaterfillObject object;
-
-    std::multimap<size_t, WaterfillObject> map;
-    while (iter->find_next(object, false)){
-        map.emplace(object.area, object);
-    }
-
-    for (const auto& item : map){
-        cout << item.first << " : " << item.second.center_x() << ", " << item.second.center_y() << endl;
-    }
-#endif
-
-
-
-#if 0
-    __m512i r0 = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-    __m512i r1 = _mm512_setr_epi64(8, 9, 10, 11, 12, 13, 14, 15);
-    __m512i r2 = _mm512_setr_epi64(16, 17, 18, 19, 20, 21, 22, 23);
-    __m512i r3 = _mm512_setr_epi64(24, 25, 26, 27, 28, 29, 30, 31);
-
-    __m256i y0, y1, y2, y3, y4, y5, y6, y7;
-
-
-    transpose_64x8x4_forward(r0, r1, r2, r3, y0, y1, y2, y3, y4, y5, y6, y7);
-    transpose_64x8x4_inverse(r0, r1, r2, r3, y0, y1, y2, y3, y4, y5, y6, y7);
-
-    print_u64(r0);
-    print_u64(r1);
-    print_u64(r2);
-    print_u64(r3);
-#endif
-
-
-#if 0
-    __m256i m0 = _mm256_setr_epi64x(0, 1, 2, 3);
-    __m256i m1 = _mm256_setr_epi64x(4, 5, 6, 7);
-
-    __m256i f0 = _mm256_permute4x64_epi64(m0, 57);
-    __m256i f1 = _mm256_permute4x64_epi64(m1, 57);
-    __m256i i0 = _mm256_permute4x64_epi64(m0, 147);
-    __m256i i1 = _mm256_permute4x64_epi64(m1, 147);
-
-    print_u64(f0);
-    print_u64(f1);
-
-    print_u64(_mm256_blend_epi32(f0, f1, 0xc0));
-    print_u64(_mm256_blend_epi32(_mm256_setzero_si256(), i0, 0xfc));
-#endif
-
-
-#if 0
-    __m512i r0 = _mm512_setr_epi64(6421819613966474057, 1548476234046137462, 14049977668605968662, \
-708058441056082392, 11428559378587094239, 12213545342139629759, \
-17862567678864820755, 11987104709490241592);
-    __m512i r1 = _mm512_setr_epi64(7012288692411820516, 6973886362582395245, 11364415477305886278, \
-10322188229391563915, 3708453892541429721, 8855683905787960164, \
-2605976889027609101, 403416096811372768);
-    __m512i r2 = _mm512_setr_epi64(17665478609307226908, 16752009108812571050, 4454511097901708078, \
-12609186068992939628, 12108615882447791236, 15410920961313526119, \
-4023827012830538432, 7936743448756384845);
-    __m512i r3 = _mm512_setr_epi64(3537199782762716869, 14555250848951445739, 15852154872900097320, \
-10410088093334275802, 11385802811118213207, 17289061284642715804, \
-7799622589958222536, 14466268115045276806);
-    __m512i r4 = _mm512_setr_epi64(13769594536536065114, 12515743165021122815, 4161499395208112919, \
-18168754753082368138, 4817283361637148180, 7505890873922854790, \
-7303930153414137652, 1842561318276695663);
-    __m512i r5 = _mm512_setr_epi64(15976838521025854814, 7681872885215311593, 900077199972924276, \
-15389419866922739680, 13257707967426128688, 5781805437221625080, \
-430817187407044403, 15537562097183591203);
-    __m512i r6 = _mm512_setr_epi64(12804211154189096457, 8060644897201369778, 2802370319901243535, \
-9320484187102063985, 1250153720052910342, 16023311416566244278, \
-24977779547950565, 13830241077450685593);
-    __m512i r7 = _mm512_setr_epi64(5190206910167014533, 10216993842832427235, 3528454829789924720, \
-11269157269833931374, 17983684737911214650, 12805961291569691763, \
-9605022433230136624, 5249211048379677373);
-
-
-//    r0 = _mm512_set1_epi8(-1);
-    print_8x64(r0);
-//    print_8x64(r1);
-//    print_8x64(r2);
-//    print_8x64(r3);
-    cout << "---------" << endl;
-
-
-
-
-//    print_8x64(_mm512_ternarylogic_epi64(_mm512_set1_epi8(0), _mm512_set1_epi8(-1), _mm512_set1_epi8(-1), 0b11111000));
-
-//    print_8x64(_mm512_alignr_epi64(r0, _mm512_setzero_si512(), 7));
-//    print_8x64(_mm512_alignr_epi64(r1, r0, 1));
-
-//    Intrinsics_x64_AVX512::transpose_1x64x32(r0, r1, r2, r3);
-//    r0 = Intrinsics_x64_AVX512::bit_reverse(r0);
-//    r1 = Intrinsics_x64_AVX512::bit_reverse(r1);
-//    r2 = Intrinsics_x64_AVX512::bit_reverse(r2);
-//    r3 = Intrinsics_x64_AVX512::bit_reverse(r3);
-//    Intrinsics_x64_AVX512::transpose_1x64x32_bitreverse_in(r0, r1, r2, r3);
-
-//    transpose_8x2x2x4(r0, r1);
-//    r0 = transpose_1x8x8x8(r0);
-//    r0 = bit_reverse(r0);
-//    r0 = transpose_1x8x8x8_bitreverse_in(r0);
-//    r1 = transpose_1x8x8x8(r1);
-
-//    print_8x64(r0);
-//    print_8x64(r1);
-
-//    transpose_16x2x2x2(r0, r1, r2, r3);
-
-//    print_8x64(r0);
-//    print_8x64(r1);
-//    print_8x64(r2);
-//    print_8x64(r3);
-
-
-//    r0 = transpose_1x8x8x8(r0);
-//    r1 = transpose_1x8x8x8(r1);
-//    transpose_8x2x2x4(r0, r1);
-
-
-#if 0
-    __m512i r = _mm512_shuffle_epi32(r0, 78);
-
-    __m512i L = _mm512_slli_epi64(r, 1);
-    __m512i H = _mm512_srli_epi64(r, 1);
-
-    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa));
-    L = _mm512_and_si512(L, _mm512_setr_epi64(0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000));
-    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555));
-    r0 = _mm512_or_si512(r0, L);
-    r0 = _mm512_or_si512(r0, H);
-
-//    print_8x64(r0);
-
-    r = _mm512_shuffle_i64x2(r0, r0, 177);
-//    print_8x64(r);
-
-    L = _mm512_slli_epi64(r, 2);
-    H = _mm512_srli_epi64(r, 2);
-
-    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x3333333333333333, 0x3333333333333333, 0xcccccccccccccccc, 0xcccccccccccccccc, 0x3333333333333333, 0x3333333333333333, 0xcccccccccccccccc, 0xcccccccccccccccc));
-    L = _mm512_and_si512(L, _mm512_setr_epi64(0xcccccccccccccccc, 0xcccccccccccccccc, 0x0000000000000000, 0x0000000000000000, 0xcccccccccccccccc, 0xcccccccccccccccc, 0x0000000000000000, 0x0000000000000000));
-    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x0000000000000000, 0x3333333333333333, 0x3333333333333333, 0x0000000000000000, 0x0000000000000000, 0x3333333333333333, 0x3333333333333333));
-    r0 = _mm512_or_si512(r0, L);
-    r0 = _mm512_or_si512(r0, H);
-
-//    print_8x64(r0);
-
-    r = _mm512_shuffle_i64x2(r0, r0, 78);
-
-    L = _mm512_slli_epi64(r, 4);
-    H = _mm512_srli_epi64(r, 4);
-
-    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0));
-    L = _mm512_and_si512(L, _mm512_setr_epi64(0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000));
-    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f));
-    r0 = _mm512_or_si512(r0, L);
-    r0 = _mm512_or_si512(r0, H);
-
-    print_8x64(r0);
-
-
-
-//    print_8x64(r0);
-
-
-#endif
-
-#if 0
-    r0 = _mm512_shuffle_epi32(r0, 216);
-//    print_8x64(r0);
-
-    __m512i L = _mm512_srli_epi64(r0, 31);
-    __m512i H = _mm512_slli_epi64(r0, 31);
-    r0 = _mm512_and_si512(r0, _mm512_set1_epi64(0xaaaaaaaa55555555));
-    L = _mm512_and_si512(L, _mm512_set1_epi64(0x00000000aaaaaaaa));
-    H = _mm512_and_si512(H, _mm512_set1_epi64(0x5555555500000000));
-    r0 = _mm512_or_si512(r0, L);
-    r0 = _mm512_or_si512(r0, H);
-
-    L = _mm512_srli_epi64(r0, 30);
-    H = _mm512_slli_epi64(r0, 30);
-    r0 = _mm512_and_si512(r0, _mm512_set1_epi64(0xcccccccc33333333));
-    L = _mm512_and_si512(L, _mm512_set1_epi64(0x00000000cccccccc));
-    H = _mm512_and_si512(H, _mm512_set1_epi64(0x3333333300000000));
-    r0 = _mm512_or_si512(r0, L);
-    r0 = _mm512_or_si512(r0, H);
-
-    r0 = _mm512_shuffle_epi32(r0, 216);
-    print_8x64(r0);
-#endif
-
-
-
-
-
-#if 0
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-    cout << "---------" << endl;
-//    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r0, r1);
-//    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r2, r3);
-//    Intrinsics_x64_AVX512GF::transpose_16x2x2x2(r0, r1, r2, r3);
-    Intrinsics_x64_AVX512GF::transpose_1x64x32(r0, r1, r2, r3);
-    r0 = Intrinsics_x64_AVX512GF::bit_reverse(r0);
-    r1 = Intrinsics_x64_AVX512GF::bit_reverse(r1);
-    r2 = Intrinsics_x64_AVX512GF::bit_reverse(r2);
-    r3 = Intrinsics_x64_AVX512GF::bit_reverse(r3);
-    Intrinsics_x64_AVX512GF::transpose_1x64x32_bitreverse_in(r0, r1, r2, r3);
-
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-#endif
-
-//    r0 = bit_reverse(r0);
-//    r1 = bit_reverse(r1);
-//    transpose_1x16x16x4_bitreverse_in(r0, r1);
-
-//    print_8x64(r0);
-//    print_8x64(r1);
-
-
-#if 0
-    __m512i x = r0;
-    print_8x64(x);
-
-
-    const __m512i INDEX0 = _mm512_setr_epi8(
-        63, 55, 47, 39, 31, 23, 15,  7,
-        62, 54, 46, 38, 30, 22, 14,  6,
-        61, 53, 45, 37, 29, 21, 13,  5,
-        60, 52, 44, 36, 28, 20, 12,  4,
-        59, 51, 43, 35, 27, 19, 11,  3,
-        58, 50, 42, 34, 26, 18, 10,  2,
-        57, 49, 41, 33, 25, 17,  9,  1,
-        56, 48, 40, 32, 24, 16,  8,  0
-    );
-    const __m512i INDEX1 = _mm512_setr_epi8(
-         7, 15, 23, 31, 39, 47, 55, 63,
-         6, 14, 22, 30, 38, 46, 54, 62,
-         5, 13, 21, 29, 37, 45, 53, 61,
-         4, 12, 20, 28, 36, 44, 52, 60,
-         3, 11, 19, 27, 35, 43, 51, 59,
-         2, 10, 18, 26, 34, 42, 50, 58,
-         1,  9, 17, 25, 33, 41, 49, 57,
-         0,  8, 16, 24, 32, 40, 48, 56
-    );
-
-    x = bit_reverse(x);
-
-    x = _mm512_permutexvar_epi8(INDEX0, x);
-//    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
-
-    cout << "--------------" << endl;
-    print_8x64(x);
-    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
-    print_8x64(x);
-    cout << "--------------" << endl;
-    x = _mm512_permutexvar_epi8(INDEX1, x);
-
-    print_8x64(x);
-#endif
-
-
-#if 0
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-    print_8x64(r4);
-    print_8x64(r5);
-    print_8x64(r6);
-    print_8x64(r7);
-    cout << "------------" << endl;
-
-    transpose_1x16x16x4(r0, r1);
-    transpose_1x16x16x4(r2, r3);
-    transpose_1x16x16x4(r4, r5);
-    transpose_1x16x16x4(r6, r7);
-    transpose_16x2x2x2(r0, r1, r2, r3);
-    transpose_16x2x2x2(r4, r5, r6, r7);
-    transpose_32x2x2(r0, r1, r2, r3, r4, r5, r6, r7);
-
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-    print_8x64(r4);
-    print_8x64(r5);
-    print_8x64(r6);
-    print_8x64(r7);
-#endif
-
-#endif
-
-#if 0
-    __m512i r0 = _mm512_setr_epi16(
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-    );
-    __m512i r1 = _mm512_setr_epi16(
-        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63
-    );
-    __m512i r2 = _mm512_setr_epi16(
-        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
-    );
-    __m512i r3 = _mm512_setr_epi16(
-        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127
-    );
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-    cout << "------------" << endl;
-
-    transpose_16x2x2x2(r0, r1, r2, r3);
-    print_8x64(r0);
-    print_8x64(r1);
-    print_8x64(r2);
-    print_8x64(r3);
-#endif
-
-
-
-
-#if 0
-    __m512i INDEX = _mm512_setr_epi8(
-         0,  8, 16, 24, 32, 40, 48, 56,
-         1,  9, 17, 25, 33, 41, 49, 57,
-         2, 10, 18, 26, 34, 42, 50, 58,
-         3, 11, 19, 27, 35, 43, 51, 59,
-         4, 12, 20, 28, 36, 44, 52, 60,
-         5, 13, 21, 29, 37, 45, 53, 61,
-         6, 14, 22, 30, 38, 46, 54, 62,
-         7, 15, 23, 31, 39, 47, 55, 63
-    );
-    __m512i INDEX1 = _mm512_setr_epi8(
-        56, 48, 40, 32, 24, 16,  8,  0,
-        57, 49, 41, 33, 25, 17,  9,  1,
-        58, 50, 42, 34, 26, 18, 10,  2,
-        59, 51, 43, 35, 27, 19, 11,  3,
-        60, 52, 44, 36, 28, 20, 12,  4,
-        61, 53, 45, 37, 29, 21, 13,  5,
-        62, 54, 46, 38, 30, 22, 14,  6,
-        63, 55, 47, 39, 31, 23, 15,  7
-    );
-    __m512i INDEX2 = _mm512_setr_epi8(
-         7, 15, 23, 31, 39, 47, 55, 63,
-         6, 14, 22, 30, 38, 46, 54, 62,
-         5, 13, 21, 29, 37, 45, 53, 61,
-         4, 12, 20, 28, 36, 44, 52, 60,
-         3, 11, 19, 27, 35, 43, 51, 59,
-         2, 10, 18, 26, 34, 42, 50, 58,
-         1,  9, 17, 25, 33, 41, 49, 57,
-         0,  8, 16, 24, 32, 40, 48, 56
-    );
-
-    __m512i x = _mm512_setr_epi64(6421819613966474057, 1548476234046137462, 14049977668605968662, \
-708058441056082392, 11428559378587094239, 12213545342139629759, \
-17862567678864820755, 11987104709490241592);
-    print_8x64(x);
-
-    x = _mm512_permutexvar_epi8(INDEX1, x);
-
-    print_8x64(x);
-
-//    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x0102040810204080), x, 0);
-    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
-
-//    print_8x64(x);
-
-    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
-
-    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
-//    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x0102040810204080), x, 0);
-    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
-
-    print_8x64(x);
-
-//    x = _mm512_permutexvar_epi8(INDEX, x);
-
-    x = _mm512_permutexvar_epi8(INDEX2, x);
-    print_8x64(x);
-#endif
-
-
-
-
-#if 0
-    BitSet2D set(100, 30);
-    cout << set.get(10, 20) << endl;
-    set.set(10, 20);
-    cout << set.get(10, 20) << endl;
-
-    size_t x, y;
-    cout << set.pop(x, y) << endl;
-    cout << x << " " << y << endl;
-#endif
-
-
-#if 0
-    uint8_t x[32] = {
-         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-    };
-
-    PartialWordAccess_x64_SSE41 access(2);
-
-    access.store_no_past_end(x + 14, _mm_setr_epi8(100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115));
-
-    for (size_t c = 0; c < 32; c++){
-        cout << (int)x[c] << " ";
-    }
-    cout << endl;
-#endif
-
-#if 0
-    QImage src("20220315-055335301551.jpg");
-    while (true){
-//        src.scaled(src.width(), 500);
-        QImage dst(src.width(), 500, QImage::Format_ARGB32);
-        scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
-            src.width(),
-            (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-            (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-        );
-    }
-#endif
-
-#if 0
-    QImage src("20220315-055335301551.jpg");
-    src = src.scaled(96, 54);
-
-    size_t height = 33;
-
-//    QImage dst(src.width(), height, QImage::Format_ARGB32);
-//    cout << dst.width() << " x " << dst.height() << endl;
-
-    {
-        auto start = current_time();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink_Default(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = current_time();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = current_time();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst = src.scaled(src.width(), height);
-        }
-        auto end = current_time();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = current_time();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink<Uint8Scaler_x16_SSE41>(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = current_time();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = current_time();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = current_time();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-
-//    cout << dst.save("test.png") << endl;
-#endif
-
-
-
-
-#if 0
-    cout << (int)scale_Default(255, 256) << endl;
-    cout << (int)scale_Default(255, 128) << endl;
-
-    {
-        __m128i x = _mm_set1_epi8(255);
-        __m128i scale = _mm_set1_epi16(256);
-        x = scale_SSE2(x, scale);
-        print_u8(x);
-    }
-    {
-        __m128i x = _mm_set1_epi8(255);
-        __m128i scale = _mm_set1_epi16(128);
-        x = scale_SSE2(x, scale);
-        print_u8(x);
-    }
-
-
-
-
-    uint8_t src[15] = {4, 8, 9, 7, 6, 4, 8, 5, 0, 7, 9, 3, 6, 2, 4};
-    double dst[7];
-    memset(dst, 0, sizeof(dst));
-
-    size_t index_src = 0;
-    size_t index_dst = 0;
-    size_t stop_src = 15;
-    size_t stop_dst = 7;
-    double ratio = (double)stop_dst / stop_src;
-    for (; index_src < stop_src; index_src++){
-        double src_s = ratio * (double)index_src;
-        double src_e = ratio * (double)(index_src + 1);
-        size_t index = (size_t)src_s;
-        if (src_e <= index + 1){
-            dst[index] += src[index_src] * ratio;
-        }else{
-            double lower = index + 1 - src_s;
-            double upper = src_e - (index + 1);
-            dst[index + 0] += src[index_src] * lower;
-            dst[index + 1] += src[index_src] * upper;
-        }
-    }
-
-    for (size_t c = 0; c < stop_dst; c++){
-        cout << dst[c] << ", ";
-    }
-    cout << endl;
-#endif
-
-
-
-#if 0
-    QImage image("DetectionImages/20220322-210628266511-MountDetection.png");
-
-    MountDetector detector(MountDetectorLogging::LOG_ONLY);
-    detector.detect(image);
-#endif
-
-
-#if 0
-    cout << CPU_CAPABILITY_CURRENT.OK_08_Nehalem << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_13_Haswell << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_17_Skylake << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_19_IceLake << endl;
-#endif
-
-
-
-//    cout << (WallClock::min() < WallClock::max()) << endl;
-
-
-
-//    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "asdf");
-//    throw UserSetupError(env.logger(), "asdf");
-
-
-#if 0
-    BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
-
-    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), current_time());
-#endif
-
-#if 0
-    float data[25];
-    for (int c = 0; c < 25; c++){
-        data[c] = c;
-    }
-    print(data, 25);
-
-//    auto start = current_time();
-
-    TimeSampleBuffer<float> buffer(10, std::chrono::seconds(10));
-
-    buffer.push_samples(data +  0, 5, REFERENCE + std::chrono::milliseconds( 500));
-    buffer.push_samples(data +  5, 5, REFERENCE + std::chrono::milliseconds(1000));
-    buffer.push_samples(data + 10, 5, REFERENCE + std::chrono::milliseconds(1500));
-    buffer.push_samples(data + 15, 5, REFERENCE + std::chrono::milliseconds(2200));
-    buffer.push_samples(data + 20, 5, REFERENCE + std::chrono::milliseconds(2500));
-
-    cout << buffer.dump() << endl;
-
-
-
-    TimeSampleBufferReader reader(buffer);
-//    reader.set_to_timestamp(REFERENCE + std::chrono::milliseconds(2610));
-//    cout << "block = " << reader.m_current_block - REFERENCE << endl;
-//    cout << "index = " << reader.m_current_index << endl;
-
-#if 1
-    float read[25];
-    for (int c = 0; c < 25; c++){
-        read[c] = -1;
-    }
-    reader.read_samples(read, 25, REFERENCE + std::chrono::milliseconds(2500));
-
-    print(read, 25);
-#endif
-#endif
 }
 
 

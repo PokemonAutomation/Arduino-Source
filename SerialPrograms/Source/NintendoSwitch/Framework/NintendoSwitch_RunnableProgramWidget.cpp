@@ -146,7 +146,7 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
         m_setup->update_ui(state);
     }
     return RunnablePanelWidget::request_program_stop();
-   return true;
+//    return true;
 }
 
 void RunnableSwitchProgramWidget::run_program(){
