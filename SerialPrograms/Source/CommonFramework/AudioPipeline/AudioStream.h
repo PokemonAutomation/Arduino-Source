@@ -15,6 +15,7 @@ class QIODevice;
 
 namespace PokemonAutomation{
 
+class AudioIODevice;
 
 
 
@@ -42,6 +43,7 @@ private:
 
 
 
+//  Listen to an audio stream and pass it to an audio output.
 class AudioSinkWriter : public StreamListener{
 public:
     AudioSinkWriter(QIODevice& audio_sink, AudioStreamFormat format, size_t channels);
@@ -59,8 +61,8 @@ private:
 };
 
 
-class AudioIODevice;
 
+//  Listen to an audio stream and compute FFTs on it.
 class FFTRunner : public StreamListener{
 public:
     FFTRunner(

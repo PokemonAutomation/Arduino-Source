@@ -126,14 +126,8 @@ void AudioWorker::startAudio(){
 
         //  See if the default format is good.
         if (get_stream_format(inputAudioFormat) == AudioStreamFormat::INVALID){
-#if 0
-            //  If not, report error.
-            m_logger.log("Unsupported audio format.", COLOR_RED);
-            return;
-#else
             //  If not, force it to float.
             setSampleFormatToFloat(inputAudioFormat);
-#endif
         }
 
         outputAudioFormat = inputAudioFormat;

@@ -46,14 +46,14 @@ void PersistentSettings::write() const{
 //    cout << QJsonDocument(panels).toJson().data() << endl;
 
     try{
-        write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
+        write_json_file(QCoreApplication::applicationName() + "-Settings.json", QJsonDocument(root));
     }catch (FileException&){
     }
 }
 
 
 void PersistentSettings::read(){
-    QString path = QCoreApplication::applicationFilePath() + "-Settings.json";
+    QString path = QCoreApplication::applicationName() + "-Settings.json";
     QJsonDocument doc = read_json_file(path);
     if (!doc.isObject()){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", path.toStdString());

@@ -8,6 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <QImage>
+#include <QDir>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
@@ -181,6 +182,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+
+    cout << QDir::current().relativeFilePath(RESOURCE_PATH()).toStdString() << endl;
+
+
+
+#if 0
     int16_t in[4] = {1, 1, 2, -2};
     print_u8((uint8_t*)in, 8);
 
@@ -194,7 +201,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    reader.push_bytes(in, 8);
     reader.push_bytes((char*)in + 0, 5);
     reader.push_bytes((char*)in + 5, 3);
-
+#endif
 
 
 

@@ -7,12 +7,16 @@
 #include <memory>
 #include <deque>
 #include <QFile>
-#include <iostream>
+#include <QDir>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "TesseractPA.h"
 #include "OCR_RawOCR.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -36,7 +40,7 @@ public:
     TesseractPool(Language language)
         : m_language_code(language_data(language).code)
         , m_training_data_path(
-            RESOURCE_PATH().toStdString() + "Tesseract/"
+            QDir::current().relativeFilePath(RESOURCE_PATH() + "Tesseract/").toStdString()
         )
     {}
 
@@ -52,11 +56,25 @@ public:
                 }
             }
 
+#if 0
             //  Make sure training data exists.
             std::string path = m_training_data_path + m_language_code + ".traineddata";
             QFile file(QString::fromStdString(path));
             if (!file.exists()){
                 return QString();
+            }
+#endif
+
+//            cout << m_training_data_path << endl;
+
+            //  Check for non-ascii characters in path.
+            for (char ch : m_training_data_path){
+                if (ch < 0){
+                    throw InternalSystemError(
+                        nullptr, PA_CURRENT_FUNCTION,
+                        "Detected non-ASCII character in Tesseract path. Please move the program to a path with only ASCII characters."
+                    );
+                }
             }
 
             std::unique_ptr<TesseractAPI> api(
