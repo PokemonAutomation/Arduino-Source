@@ -85,6 +85,8 @@ void AudioIODevice::setAudioSinkDevice(QIODevice* audioSinkDevice, AudioStreamFo
 }
 
 
+
+
 qint64 AudioIODevice::writeData(const char* data, qint64 len){
     m_reader->push_bytes(data, len);
 //    m_audioSinkDevice->write(data, len);

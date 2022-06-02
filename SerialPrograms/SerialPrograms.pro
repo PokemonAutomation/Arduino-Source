@@ -735,6 +735,7 @@ HEADERS += \
     ../Common/Cpp/ParallelTaskRunner.h \
     ../Common/Cpp/PeriodicScheduler.h \
     ../Common/Cpp/PrettyPrint.h \
+    ../Common/Cpp/PrintDebuggers.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/StreamConverters.h \

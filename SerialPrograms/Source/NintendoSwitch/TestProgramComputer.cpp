@@ -97,31 +97,6 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 WallClock REFERENCE = current_time();
 
 
-template <typename Type>
-void print(const Type* ptr, size_t len){
-    cout << "{";
-    bool first = true;
-    for (size_t c = 0; c < len; c++){
-        if (!first){
-            cout << ", ";
-        }
-        first = false;
-        cout << ptr[c];
-    }
-    cout << "}" << endl;
-}
-void print_u8(const uint8_t* ptr, size_t len){
-    cout << "{";
-    bool first = true;
-    for (size_t c = 0; c < len; c++){
-        if (!first){
-            cout << ", ";
-        }
-        first = false;
-        cout << (unsigned)ptr[c];
-    }
-    cout << "}" << endl;
-}
 void print(uint64_t m){
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
@@ -155,7 +130,7 @@ using namespace Kernels;
 
 
 
-
+#if 0
 class AudioListener : public StreamListener{
 public:
     AudioListener(size_t channels)
@@ -170,7 +145,7 @@ public:
 private:
     size_t m_channels;
 };
-
+#endif
 
 
 

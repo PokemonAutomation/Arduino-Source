@@ -90,6 +90,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Pimpl.tpp
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
+    ../Common/Cpp/PrintDebuggers.h
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SpinLock.cpp
     ../Common/Cpp/SpinLock.h

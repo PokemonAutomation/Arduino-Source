@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_SIMD_Debuggers_H
-#define PokemonAutomation_SIMD_Debuggers_H
+#ifndef PokemonAutomation_SIMDDebuggers_H
+#define PokemonAutomation_SIMDDebuggers_H
 
 #include <stdint.h>
 #include <emmintrin.h>

@@ -120,6 +120,10 @@ void AudioWorker::startAudio(){
         }
 
         inputAudioFormat = chosenAudioInputDevice.preferredFormat();
+
+//        inputAudioFormat.setSampleSize(16);
+//        inputAudioFormat.setSampleType(QAudioFormat::SampleType::SignedInt);
+
         m_logger.log("Default input audio format: " + dumpAudioFormat(inputAudioFormat));
 
         set_format(inputAudioFormat, m_inputFormat);
