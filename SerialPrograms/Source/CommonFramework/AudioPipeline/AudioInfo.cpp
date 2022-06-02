@@ -77,7 +77,6 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
     }
-//    set_sample_type_float(native_format);
 }
 
 AudioStreamFormat get_stream_format(QAudioFormat& native_format){

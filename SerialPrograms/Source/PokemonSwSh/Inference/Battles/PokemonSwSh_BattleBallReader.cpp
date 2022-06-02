@@ -60,6 +60,10 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
             sprite_result.results.clear();
         }
     }
+    if (sprite_result.results.empty()){
+        dump_image(m_console, ProgramInfo(), "BattleBallReader-Sprite", screen);
+    }
+
     OCR::StringMatchResult name_result;
     {
         ConstImageRef cropped = extract_box_reference(screen, m_box_name);
@@ -68,12 +72,14 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
             OCR::WHITE_TEXT_FILTERS()
         );
     }
+    if (name_result.results.size() != 1){
+        dump_image(m_console, ProgramInfo(), "BattleBallReader-Name", screen);
+    }
 
     if (sprite_result.results.empty()){
         if (name_result.results.size() == 1){
             return name_result.results.begin()->second.token;
         }
-        dump_image(m_console, ProgramInfo(), "BattleBallReader", screen);
         return "";
     }
 
@@ -94,7 +100,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
         }
     }
     if (overlap.size() != 1){
-        dump_image(m_console, ProgramInfo(), "BattleBallReader", screen);
+        dump_image(m_console, ProgramInfo(), "BattleBallReader-SpriteNameMismatch", screen);
         return "";
     }
     return overlap[0];
