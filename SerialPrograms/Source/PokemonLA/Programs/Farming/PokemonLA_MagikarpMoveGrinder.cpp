@@ -9,8 +9,10 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -109,6 +111,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
@@ -178,6 +181,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 

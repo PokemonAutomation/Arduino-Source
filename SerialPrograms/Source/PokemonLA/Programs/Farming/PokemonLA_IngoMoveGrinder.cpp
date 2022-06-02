@@ -7,9 +7,11 @@
 #include "PokemonLA_IngoMoveGrinder.h"
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -205,7 +207,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-//            return true;
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
