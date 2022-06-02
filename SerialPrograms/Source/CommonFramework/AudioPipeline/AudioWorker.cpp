@@ -75,6 +75,7 @@ void AudioWorker::startAudio(){
 
     bool foundAudioInputInfo = false;
     bool foundAudioOutputInfo = false;
+
     QAudioFormat inputAudioFormat, outputAudioFormat;
 
     NativeAudioInfo chosenAudioInputDevice = m_inputInfo.native_info();
@@ -92,7 +93,6 @@ void AudioWorker::startAudio(){
 #endif
         inputAudioFormat.setSampleRate(48000);
         setSampleFormatToFloat(inputAudioFormat);
-        m_channelMode = ChannelMode::Stereo;
         m_inputFormat = AudioFormat::DUAL_48000;
 
         // Note: m_inputAbsoluteFilepath must be an absolute file path. Otherwise it may trigger a bug
@@ -123,6 +123,19 @@ void AudioWorker::startAudio(){
         m_logger.log("Default input audio format: " + dumpAudioFormat(inputAudioFormat));
 
         set_format(inputAudioFormat, m_inputFormat);
+
+        //  See if the default format is good.
+        if (get_stream_format(inputAudioFormat) == AudioStreamFormat::INVALID){
+#if 0
+            //  If not, report error.
+            m_logger.log("Unsupported audio format.", COLOR_RED);
+            return;
+#else
+            //  If not, force it to float.
+            setSampleFormatToFloat(inputAudioFormat);
+#endif
+        }
+
         outputAudioFormat = inputAudioFormat;
 
         switch (m_inputFormat){
@@ -141,25 +154,27 @@ void AudioWorker::startAudio(){
             outputAudioFormat.setSampleRate(48000);
             break;
         default:
-            m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)m_inputFormat]);
+            m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)m_inputFormat], COLOR_RED);
             return;
         }
 
 
         m_logger.log("Set input audio format to: " + dumpAudioFormat(inputAudioFormat));
         m_logger.log("Set output audio format to: " + dumpAudioFormat(outputAudioFormat));
-        
+
         if (!chosenAudioInputDevice.isFormatSupported(inputAudioFormat)){
-            std::cout << "Error: audio input device cannot support desired audio format" << std::endl;
+            m_logger.log("Error: audio input device cannot support desired audio format", COLOR_RED);
             return;
         }
 
+#if 0
         const int bytesPerSample = inputAudioFormat.bytesPerFrame() / inputAudioFormat.channelCount();
         if (bytesPerSample != sizeof(float)){
             std::cout << "Error: audio format is wrong. Set its sample format to float but the bytesPerSample is "
                 << bytesPerSample << ", different from float size " << sizeof(float) << std::endl;
             return;
         }
+#endif
 
         m_audioSource = new AudioSource(chosenAudioInputDevice, inputAudioFormat, this);
 
@@ -171,7 +186,9 @@ void AudioWorker::startAudio(){
         );
     } // end if load audio from input audio device
     
-    m_audioIODevice = new AudioIODevice(m_inputFormat);
+
+
+    m_audioIODevice = new AudioIODevice(m_inputFormat, get_stream_format(inputAudioFormat));
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
     
@@ -187,7 +204,7 @@ void AudioWorker::startAudio(){
             m_audioSink = new AudioSink(chosenAudioOutputDevice, outputAudioFormat, this);
             m_audioSink->setBufferSize(32768);
             m_audioSink->setVolume(m_volume);
-            m_audioIODevice->setAudioSinkDevice(m_audioSink->start());
+            m_audioIODevice->setAudioSinkDevice(m_audioSink->start(), get_stream_format(outputAudioFormat));
 
             connect(
                 m_audioSink, &AudioSink::stateChanged,
@@ -203,7 +220,7 @@ AudioWorker::~AudioWorker(){
     if (m_audioIODevice){
         // Close the connection between m_audioIODevice and 
         // m_audioSink.
-        m_audioIODevice->setAudioSinkDevice(nullptr);
+        m_audioIODevice->setAudioSinkDevice(nullptr, AudioStreamFormat::INVALID);
     }
 
     if (m_audioSink){

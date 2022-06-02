@@ -306,7 +306,7 @@ PA_FORCE_INLINE void compute_spike_kernel(
     float* out, const float* in, size_t lengthI,
     const float* kernel, size_t lengthK
 ){
-    constexpr size_t FLOAT_ALIGNMENT = PA_ALIGNMENT / sizeof(float);
+//    constexpr size_t FLOAT_ALIGNMENT = PA_ALIGNMENT / sizeof(float);
     using vtype = typename Context::vtype;
 //    constexpr size_t VECTOR_LENGTH = sizeof(vtype) / sizeof(float);
 

@@ -141,12 +141,6 @@ void print_8x8(uint64_t m){
     }
     cout << endl;
 }
-void print_8x64(__m512i m){
-    for (int i = 0; i < 8; i++){
-        print_8x8(((const uint64_t*)&m)[i]);
-    }
-    cout << endl;
-}
 
 
 
@@ -174,26 +168,6 @@ public:
 
 private:
     size_t m_channels;
-};
-
-
-
-template <typename Object>
-class FixedCircularBuffer{
-public:
-    FixedCircularBuffer(size_t capacity)
-        : m_buffer(capacity)
-    {}
-
-    size_t push(){
-
-    }
-
-private:
-    AlignedVector<Object> m_buffer;
-    size_t m_stored = 0;
-    size_t m_start = 0;
-    size_t m_end = 0;
 };
 
 

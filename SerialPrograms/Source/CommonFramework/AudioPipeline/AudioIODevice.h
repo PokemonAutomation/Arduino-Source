@@ -20,12 +20,6 @@
 namespace PokemonAutomation{
 
 
-enum class ChannelMode{
-    Mono,
-    Stereo,
-    Interleaved,
-};
-
 
 // QIODevice defines an interface for IO.
 // QAudioSource reads from an audio input device and writes data to a QIODevice.
@@ -42,7 +36,7 @@ class AudioIODevice : public QIODevice
     Q_OBJECT
 
 public:
-    AudioIODevice(AudioFormat format);
+    AudioIODevice(AudioFormat our_format, AudioStreamFormat input_format);
     virtual ~AudioIODevice();
 
     // Called by QAudioSource to write data to AudioIODevice's buffer.
@@ -56,7 +50,7 @@ public:
 
     bool isSequential() const override { return true; }
 
-    void setAudioSinkDevice(QIODevice* audioSinkDevice);
+    void setAudioSinkDevice(QIODevice* audioSinkDevice, AudioStreamFormat output_format);
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.

@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/StreamConverters.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "AudioInfo.h"
 
 class QIODevice;
 
@@ -16,17 +17,8 @@ namespace PokemonAutomation{
 
 
 
-enum class AudioStreamFormat{
-    UINT8,
-    SINT16,
-    SINT32,
-    FLOAT32,
-};
-size_t sample_size(AudioStreamFormat format);
 
-
-
-//  Listen in on an byte stream that contains audio samples.
+//  Listen in on a byte stream that contains audio samples.
 //  Even if the stream splits frames, this class will reconstruct them
 //  and present them as whole frames.
 class AudioSourceReader : public MisalignedStreamConverter{
@@ -62,6 +54,7 @@ private:
     size_t m_channels;
     size_t m_sample_size;
     size_t m_frame_size;
+    size_t m_buffer_size;
     AlignedVector<char> m_buffer;
 };
 

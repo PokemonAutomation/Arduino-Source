@@ -19,6 +19,10 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+//  Audio buffer size (measured in frames).
+const size_t AUDIO_BUFFER_SIZE = 4096;
+
+
 
 size_t sample_size(AudioStreamFormat format){
     switch (format){
@@ -30,8 +34,9 @@ size_t sample_size(AudioStreamFormat format){
         return sizeof(int32_t);
     case AudioStreamFormat::FLOAT32:
         return sizeof(float);
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioStreamFormat: " + std::to_string((size_t)format));
     }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioStreamFormat: " + std::to_string((size_t)format));
 }
 
 
@@ -41,7 +46,11 @@ AudioSourceReader::AudioSourceReader(
     size_t samples_per_frame,
     bool reverse_channels
 )
-    : MisalignedStreamConverter(sample_size(format) * samples_per_frame, sizeof(float) * samples_per_frame, 1024)
+    : MisalignedStreamConverter(
+        sample_size(format) * samples_per_frame,
+        sizeof(float) * samples_per_frame,
+        AUDIO_BUFFER_SIZE
+    )
     , m_format(format)
     , m_samples_per_frame(samples_per_frame)
     , m_reverse_channels(reverse_channels)
@@ -69,6 +78,8 @@ void AudioSourceReader::convert(void* out, const void* in, size_t count){
     case AudioStreamFormat::FLOAT32:
         memcpy(out, in, count * m_frame_size);
         break;
+    case AudioStreamFormat::INVALID:
+        break;
     }
     if (m_reverse_channels){
         float* ptr = (float*)out;
@@ -92,25 +103,48 @@ AudioSinkWriter::AudioSinkWriter(QIODevice& audio_sink, AudioStreamFormat format
     , m_channels(channels)
     , m_sample_size(sample_size(format))
     , m_frame_size(m_sample_size * channels)
-    , m_buffer(m_frame_size * 1024)
-{}
+    , m_buffer_size(AUDIO_BUFFER_SIZE)
+{
+    switch (format){
+    case AudioStreamFormat::INVALID:
+    case AudioStreamFormat::FLOAT32:
+        break;
+    default:
+        m_buffer = AlignedVector<char>(m_frame_size * m_buffer_size);
+    }
+}
 AudioSinkWriter::~AudioSinkWriter(){}
 void AudioSinkWriter::on_objects(const void* data, size_t frames){
-    switch (m_format){
-    case AudioStreamFormat::UINT8:
-        Kernels::AudioStreamConversion::convert_audio_float_to_uint8((uint8_t*)m_buffer.data(), (const float*)data, frames * m_channels);
-        break;
-    case AudioStreamFormat::SINT16:
-        Kernels::AudioStreamConversion::convert_audio_float_to_sint16((int16_t*)m_buffer.data(), (const float*)data, frames * m_channels);
-        break;
-    case AudioStreamFormat::SINT32:
-        Kernels::AudioStreamConversion::convert_audio_float_to_sint32((int32_t*)m_buffer.data(), (const float*)data, frames * m_channels);
-        break;
-    case AudioStreamFormat::FLOAT32:
+    if (m_format == AudioStreamFormat::INVALID){
+        return;
+    }
+    if (m_format == AudioStreamFormat::FLOAT32){
         m_audio_sink.write((const char*)data, frames * m_frame_size);
         return;
     }
-    m_audio_sink.write(m_buffer.data(), frames * m_frame_size);
+
+    while (frames > 0){
+        size_t block = std::min(frames, m_buffer_size);
+        switch (m_format){
+        case AudioStreamFormat::UINT8:
+            Kernels::AudioStreamConversion::convert_audio_float_to_uint8((uint8_t*)m_buffer.data(), (const float*)data, block * m_channels);
+            break;
+        case AudioStreamFormat::SINT16:
+            Kernels::AudioStreamConversion::convert_audio_float_to_sint16((int16_t*)m_buffer.data(), (const float*)data, block * m_channels);
+            break;
+        case AudioStreamFormat::SINT32:
+            Kernels::AudioStreamConversion::convert_audio_float_to_sint32((int32_t*)m_buffer.data(), (const float*)data, block * m_channels);
+            break;
+        case AudioStreamFormat::FLOAT32:
+            memcpy(m_buffer.data(), data, block * m_frame_size);
+            break;
+        default:
+            return;
+        }
+        m_audio_sink.write(m_buffer.data(), block * m_frame_size);
+        data = (const char*)data + block * m_frame_size;
+        frames -= block;
+    }
 }
 
 

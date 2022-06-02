@@ -30,6 +30,15 @@ using NativeAudioInfo = QAudioDevice;
 namespace PokemonAutomation{
 
 
+enum class AudioStreamFormat{
+    INVALID,
+    UINT8,
+    SINT16,
+    SINT32,
+    FLOAT32,
+};
+size_t sample_size(AudioStreamFormat format);
+
 
 enum class AudioFormat{
     NONE,
@@ -46,7 +55,7 @@ extern const char* AUDIO_FORMAT_LABELS[];
 //  Set the QAudioFormat to the our audio format enum.
 void set_format(QAudioFormat& native_format, AudioFormat format);
 
-
+AudioStreamFormat get_stream_format(QAudioFormat& native_format);
 
 
 

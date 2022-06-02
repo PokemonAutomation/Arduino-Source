@@ -27,6 +27,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+
 const char* AUDIO_FORMAT_LABELS[] = {
     "(none)",
     "1 x 48,000 Hz (Mono)",
@@ -76,14 +77,39 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
     }
-#if QT_VERSION_MAJOR == 5
-    native_format.setSampleType(QAudioFormat::SampleType::Float);
-    native_format.setSampleSize(32);
-#elif QT_VERSION_MAJOR == 6
-    native_format.setSampleFormat(QAudioFormat::SampleFormat::Float);
-#endif
+//    set_sample_type_float(native_format);
 }
 
+AudioStreamFormat get_stream_format(QAudioFormat& native_format){
+#if QT_VERSION_MAJOR == 5
+    if (native_format.sampleType() == QAudioFormat::SampleType::Float){
+        return AudioStreamFormat::FLOAT32;
+    }else if (native_format.sampleType() == QAudioFormat::SampleType::UnSignedInt && native_format.sampleSize() == 8){
+        return AudioStreamFormat::UINT8;
+    }else if (native_format.sampleType() == QAudioFormat::SampleType::SignedInt && native_format.sampleSize() == 16){
+        return AudioStreamFormat::SINT16;
+    }else if (native_format.sampleType() == QAudioFormat::SampleType::SignedInt && native_format.sampleSize() == 32){
+        return AudioStreamFormat::SINT32;
+    }else{
+        return AudioStreamFormat::INVALID;
+    }
+#elif QT_VERSION_MAJOR == 6
+    switch (native_format.sampleFormat()){
+    case QAudioFormat::SampleFormat::Float:
+        return AudioStreamFormat::FLOAT32;
+    case QAudioFormat::SampleFormat::UInt8:
+        return AudioStreamFormat::UINT8;
+    case QAudioFormat::SampleFormat::Int16:
+        return AudioStreamFormat::SINT16;
+    case QAudioFormat::SampleFormat::Int32:
+        return AudioStreamFormat::SINT32;
+    default:
+        return AudioStreamFormat::INVALID;
+    }
+#else
+#error "Unknown Qt version."
+#endif
+}
 
 
 //  Return a list of our formats that are supported by this device.
@@ -284,7 +310,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         if (device.preferred_format_index() >= 0){
             current_score += 100;
         }
-        if (current_score >= best_score){
+        if (current_score >= best_score || GlobalSettings::instance().SHOW_ALL_AUDIO_DEVICES){
             ret.emplace_back(std::move(device));
         }
     }

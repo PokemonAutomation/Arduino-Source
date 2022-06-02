@@ -98,8 +98,6 @@ private:
     QAudioSink* m_audioSink = nullptr;
 #endif
 
-    ChannelMode m_channelMode = ChannelMode::Mono;
-
     float m_volume = 1.0f;
 
     AudioFileLoader* m_FileLoader = nullptr;
