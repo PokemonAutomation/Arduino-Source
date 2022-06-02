@@ -11,7 +11,6 @@
 #include "AudioTemplate.h"
 #include "AudioFileLoader.h"
 #include "AudioFormatUtils.h"
-#include "FFTWorker.h"
 
 #include <iostream>
 using std::cout;

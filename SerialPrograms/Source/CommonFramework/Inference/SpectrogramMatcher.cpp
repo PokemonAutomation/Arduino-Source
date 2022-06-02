@@ -6,6 +6,7 @@
 #include <fstream>
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/AlignedVector.tpp"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"

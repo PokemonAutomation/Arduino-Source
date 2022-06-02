@@ -190,7 +190,8 @@ void AudioWorker::startAudio(){
 
     m_audioIODevice = new AudioIODevice(m_inputFormat, get_stream_format(inputAudioFormat));
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
-    connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
+//    connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
+    connect(m_audioIODevice, &AudioIODevice::fftOutputReady, this, &AudioWorker::fftOutputReady);
     
     if (m_audioSource){
         m_audioSource->start(m_audioIODevice);

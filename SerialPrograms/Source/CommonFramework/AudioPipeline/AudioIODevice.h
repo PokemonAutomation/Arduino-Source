@@ -54,7 +54,8 @@ public:
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.
-    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
+//    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
+    void fftOutputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftOutput);
 
 private:
     AudioFormat m_format;

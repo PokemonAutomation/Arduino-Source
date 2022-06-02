@@ -116,10 +116,10 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelector.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioStream.cpp \
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp \
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp \
     Source/CommonFramework/AudioPipeline/AudioWorker.cpp \
-    Source/CommonFramework/AudioPipeline/FFTWorker.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/AudioPipeline/WavFile.cpp \
@@ -788,10 +788,10 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/AudioNormalization.h \
     Source/CommonFramework/AudioPipeline/AudioSelector.h \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioStream.h \
     Source/CommonFramework/AudioPipeline/AudioTemplate.h \
     Source/CommonFramework/AudioPipeline/AudioThreadController.h \
     Source/CommonFramework/AudioPipeline/AudioWorker.h \
-    Source/CommonFramework/AudioPipeline/FFTWorker.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \

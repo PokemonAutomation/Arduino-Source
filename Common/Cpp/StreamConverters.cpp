@@ -26,6 +26,7 @@ StreamConverter::StreamConverter(
     , m_buffer_capacity(buffer_capacity)
     , m_buffer(object_size_out * buffer_capacity)
 {}
+StreamConverter::~StreamConverter(){}
 void StreamConverter::operator+=(StreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");
@@ -62,6 +63,7 @@ MisalignedStreamConverter::MisalignedStreamConverter(
     , m_buffer_capacity(buffer_capacity)
     , m_buffer(object_size_out * buffer_capacity)
 {}
+MisalignedStreamConverter::~MisalignedStreamConverter(){}
 void MisalignedStreamConverter::operator+=(StreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");

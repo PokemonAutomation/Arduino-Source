@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioIODevice.h"
 #include "AudioStream.h"
@@ -162,7 +163,7 @@ FFTRunner::FFTRunner(
     , m_fft_sample_size(average_pairs ? 2 : 1)
     , m_buffer(NUM_FFT_SAMPLES)
     , m_buffered(NUM_FFT_SAMPLES)
-//    , m_freq(m_buffer.size() / 2)
+    , m_fft_input(NUM_FFT_SAMPLES)
 {
     if (samples_per_frame == 0 || samples_per_frame > 2){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channels must be 1 or 2.");
@@ -210,8 +211,7 @@ void FFTRunner::convert(float* fft_input, const float* audio_stream, size_t fram
     }
 }
 void FFTRunner::run_fft(){
-    std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES);
-    float* ptr = out->data();
+    float* ptr = m_fft_input.data();
     size_t remaining = NUM_FFT_SAMPLES;
     size_t index = m_start;
     while (remaining > 0){
@@ -224,7 +224,9 @@ void FFTRunner::run_fft(){
             index = 0;
         }
     }
-    emit m_device.fftInputReady(m_sample_rate, std::move(out));
+    std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES / 2);
+    Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, out->data(), m_fft_input.data());
+    emit m_device.fftOutputReady(m_sample_rate, std::move(out));
 }
 void FFTRunner::drop_from_front(size_t frames){
     if (frames >= m_buffered){

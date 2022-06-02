@@ -21,7 +21,6 @@ namespace PokemonAutomation{
 class AudioDeviceInfo;
 class AudioDisplayWidget;
 class AudioWorker;
-class FFTWorker;
 
 
 // The class is responsible for the audio loop.
@@ -60,7 +59,6 @@ private:
     AudioWorker* m_AudioWorker = nullptr;
 
     QThread m_fftThread;
-    FFTWorker* m_fftWorker = nullptr;
 
     int m_sampleRate = 0;
 

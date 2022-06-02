@@ -9,7 +9,6 @@
 #include "AudioInfo.h"
 #include "AudioWorker.h"
 #include "AudioThreadController.h"
-#include "FFTWorker.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
@@ -49,23 +48,13 @@ AudioThreadController::AudioThreadController(
     // Connect this controller to the audio worker to start the audio initialization on the audio thread.
     connect(this, &AudioThreadController::operate, m_AudioWorker, &AudioWorker::startAudio);
 
-    m_fftWorker = new FFTWorker(FFT_LENGTH_POWER_OF_TWO);
-    m_fftWorker->moveToThread(&m_fftThread);
-    connect(&m_fftThread, &QThread::finished, m_fftWorker, &QObject::deleteLater);
-
-    // Connect the audio thread and fft thread to pass fft inputs.
-    connect(m_AudioWorker, &AudioWorker::fftInputReady, m_fftWorker, &FFTWorker::computeFFT);
-
-    // Connect fft thread to audio display widget to pass fft outputs.
-    connect(m_fftWorker, &FFTWorker::FFTFinished, parent, &AudioDisplayWidget::loadFFTOutput);
+    connect(m_AudioWorker, &AudioWorker::fftOutputReady, parent, &AudioDisplayWidget::loadFFTOutput);
 
     connect(parent, &AudioDisplayWidget::volumeChanged, m_AudioWorker, &AudioWorker::setVolume);
 
     m_audioThread.start();
-    m_fftThread.start();
 
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_audioThread);
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_fftThread);
 
     // Send the signal to start audio processing after the worker thread is started.
     emit operate();
@@ -73,10 +62,7 @@ AudioThreadController::AudioThreadController(
 
 AudioThreadController::~AudioThreadController(){
     m_audioThread.quit();
-    m_fftThread.quit();
-
     m_audioThread.wait();
-    m_fftThread.wait();
 
     // We shouldn't need to delete AudioWorker here as its deletion is connected to
     // QThread::finished.

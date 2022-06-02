@@ -87,7 +87,7 @@ private:
     size_t m_start = 0;
     size_t m_end = 0;
 
-//    AlignedVector<float> m_freq;
+    AlignedVector<float> m_fft_input;
 };
 
 

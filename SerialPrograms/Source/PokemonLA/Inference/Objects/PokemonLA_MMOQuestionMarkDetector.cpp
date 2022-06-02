@@ -102,7 +102,7 @@ bool detect_template_by_single_pass_waterfill(
     const PokemonAutomation::ConstImageRef &image,
     const ImageMatch::WaterfillTemplateMatcher &matcher,
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
-    const std::pair<int, int> &area_thresholds,
+    const std::pair<size_t, size_t> &area_thresholds,
     double rmsd_threshold,
     std::function<bool(WaterfillObject& object)> stop_search,
     const WaterfillTemplateDetectionDebugParams* debug_params)
@@ -257,11 +257,11 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
         {550, 1800},
         100,
         [&](WaterfillObject& object){
-            int min_x = (int)object.min_x + map_min_x;
-            int min_y = (int)object.min_y + map_min_y;
-            int max_x = (int)object.max_x + map_min_x;
-            int max_y = (int)object.max_y + map_min_y;
-            results.emplace_back(min_x, min_y, max_x, max_y);
+            size_t min_x = object.min_x + map_min_x;
+            size_t min_y = object.min_y + map_min_y;
+            size_t max_x = object.max_x + map_min_x;
+            size_t max_y = object.max_y + map_min_y;
+            results.emplace_back((pxint_t)min_x, (pxint_t)min_y, (pxint_t)max_x, (pxint_t)max_y);
             return false;
         },
         debug_params.get()

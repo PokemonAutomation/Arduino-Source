@@ -32,6 +32,7 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
+    ~StreamConverter();
 
     //  Attach/detach listeners.
     void operator+=(StreamListener& listener);
@@ -61,6 +62,7 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
+    ~MisalignedStreamConverter();
 
     //  Attach/detach listeners.
     void operator+=(StreamListener& listener);

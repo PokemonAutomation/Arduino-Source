@@ -76,7 +76,8 @@ signals:
     // The main work that passes around audio data is in m_audioIODevice. To expose this signal
     // to AudioThreadController, we have this signal in AudioWorker that serves as relaying the
     // signal from m_audioIODevice to anywhere that sees this AudioWorker.
-    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
+//    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
+    void fftOutputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftOutput);
 
 private:
     void handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType);
