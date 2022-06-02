@@ -5,6 +5,7 @@
  */
 
 
+#include "Common/Compiler.h"
 #include "PokemonLA_Tests.h"
 #include "TestUtils.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -177,7 +178,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
             cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands-5.png)." << endl; 
         }
         const auto results = detector.detect_MMOs_on_region_map(image);
-        TEST_RESULT_EQUAL(results.size(), target_num_MMOs_on_region_map);
+        TEST_RESULT_EQUAL((int)results.size(), target_num_MMOs_on_region_map);
     }
 
     return 0;

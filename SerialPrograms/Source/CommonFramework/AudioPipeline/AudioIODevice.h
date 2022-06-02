@@ -15,6 +15,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "AudioInfo.h"
+#include "AudioStream.h"
 
 namespace PokemonAutomation{
 
@@ -55,53 +56,22 @@ public:
 
     bool isSequential() const override { return true; }
 
-    void setAudioSinkDevice(QIODevice* audioSinkDevice) { m_audioSinkDevice = audioSinkDevice; }
+    void setAudioSinkDevice(QIODevice* audioSinkDevice);
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.
     void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
 
 private:
-    // how many more samples needed to file the next FFT
-    size_t computeNextFFTSamplesNeeded() const;
-
-    // move audio samples from m_fftCircularBuffer starting at m_fftStart to m_fftInputVector
-    // to ready for next FFT signal.
-    AlignedVector<float> moveDataToFFTInputVector();
-
-    void write_output(const float* data, size_t samples);
-
-
-private:
     AudioFormat m_format;
 
-    // Used as a temporal buffer to swap L and R channels in the interleaved mode.
-    std::vector<float> m_channelSwapBuffer;
-
-    std::vector<float> m_fft_input_buffer;
-
-    // A large circular buffer to store multiple sliding windows of FFT inputs.
-    // Because FFT windows may overlap, it may be more efficient to store
-    // them in this buffer.
-    std::vector<float> m_fftCircularBuffer;
-
-    // The index on m_fftCircularBuffer where to receive next incoming audio sample.
-    size_t m_bufferNext = 0;
-
-    // The index on the m_fftCircularBuffer as the next chunk of FFT input.
-    size_t m_fftStart = 0;
-
-//    // The vector to store the input of one fft call.
-//    QVector<float> m_fftInputVector;
+    std::unique_ptr<AudioSourceReader> m_reader;
+    std::unique_ptr<AudioSinkWriter> m_output;
+    std::unique_ptr<FFTRunner> m_fft_runner;
 
     QIODevice* m_audioSinkDevice = nullptr;
 
-    // Used to measure the frequency of the audio loop for debugging.
-    WallClock m_lastWriteTimepoint;
 
-#ifdef USE_FFTREAL
-    FFTRealWrapper m_fft;
-#endif
 };
 
 

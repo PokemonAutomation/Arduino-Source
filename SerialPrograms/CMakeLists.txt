@@ -66,8 +66,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AsyncDispatcher.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
-    ../Common/Cpp/CircularBuffer.cpp
-    ../Common/Cpp/CircularBuffer.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/CpuId/CpuId.cpp
     ../Common/Cpp/CpuId/CpuId.h
@@ -181,6 +179,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioSelector.h
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
+    Source/CommonFramework/AudioPipeline/AudioStream.cpp
+    Source/CommonFramework/AudioPipeline/AudioStream.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp

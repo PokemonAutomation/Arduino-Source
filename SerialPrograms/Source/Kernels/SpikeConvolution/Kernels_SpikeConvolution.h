@@ -16,7 +16,6 @@ namespace SpikeConvolution{
 
 //  Compute the Spike Kernel
 //      "out" is aligned to "PA_ALIGNMENT" bytes.
-//      lengthI % PA_ALIGNMENT == 0
 //      lengthI >= lengthK
 //      "in"  is valid for lengthI
 //      "out" is valid for (lengthI - lengthK + 1) rounded up to PA_ALIGNMENT/sizeof(float)

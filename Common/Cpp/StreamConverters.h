@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_StreamConverters_H
 #define PokemonAutomation_StreamConverters_H
 
-#include <stddef.h>
+#include <set>
 #include "AlignedVector.h"
 
 namespace PokemonAutomation{
@@ -32,7 +32,11 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
+
+    //  Attach/detach listeners.
     void operator+=(StreamListener& listener);
+    void operator-=(StreamListener& listener);
+
     void push_objects(const void* data, size_t objects);
 
 protected:
@@ -45,7 +49,7 @@ private:
     size_t m_buffer_capacity;
     AlignedVector<char> m_buffer;
 
-    AlignedVector<StreamListener*> m_listeners;
+    std::set<StreamListener*> m_listeners;
 };
 
 
@@ -57,7 +61,11 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
+
+    //  Attach/detach listeners.
     void operator+=(StreamListener& listener);
+    void operator-=(StreamListener& listener);
+
     void push_bytes(const void* data, size_t bytes);
 
 protected:
@@ -73,7 +81,7 @@ private:
     size_t m_buffer_capacity;
     AlignedVector<char> m_buffer;
 
-    AlignedVector<StreamListener*> m_listeners;
+    std::set<StreamListener*> m_listeners;
 };
 
 

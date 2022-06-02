@@ -8,6 +8,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioInfo.h"
 
 #include <iostream>
@@ -259,6 +260,10 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
     }
 #endif
+
+    if (GlobalSettings::instance().SHOW_ALL_AUDIO_DEVICES){
+        return list;
+    }
 
     //  Get map of best devices.
     std::map<QString, size_t> best_devices;

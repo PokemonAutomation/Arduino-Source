@@ -10,7 +10,6 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
-#include "Common/Cpp/CircularBuffer.h"
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
@@ -64,6 +63,8 @@
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
 #include "Common/Cpp/StreamConverters.h"
+#include "CommonFramework/AudioPipeline/AudioConstants.h"
+#include "CommonFramework/AudioPipeline/AudioStream.h"
 
 
 
@@ -154,158 +155,7 @@ void print_8x64(__m512i m){
 using namespace Kernels;
 
 
-enum class AudioStreamFormat{
-    UINT8,
-    SINT16,
-    SINT32,
-    FLOAT32,
-};
 
-size_t sample_size(AudioStreamFormat format){
-    switch (format){
-    case AudioStreamFormat::UINT8:
-        return sizeof(uint8_t);
-    case AudioStreamFormat::SINT16:
-        return sizeof(int16_t);
-    case AudioStreamFormat::SINT32:
-        return sizeof(int32_t);
-    case AudioStreamFormat::FLOAT32:
-        return sizeof(float);
-    }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioStreamFormat: " + std::to_string((size_t)format));
-}
-
-
-#if 0
-class AudioStreamReader{
-public:
-    AudioStreamReader(size_t channels, AudioStreamFormat format);
-    size_t frames_available() const;
-    void push_bytes(const void* data, size_t bytes);
-    void read_frames(float* data, uint64_t frame_offset, size_t frames);
-    void pop_to(uint64_t frame_offset);
-
-private:
-    AudioStreamFormat m_format;
-    size_t m_channels;
-    size_t m_sample_size;
-    size_t m_frame_size;
-    StreamReader m_reader;
-};
-
-AudioStreamReader::AudioStreamReader(size_t channels, AudioStreamFormat format)
-    : m_format(format)
-    , m_channels(channels)
-    , m_sample_size(sample_size(format))
-    , m_frame_size(m_sample_size * channels)
-    , m_reader(m_frame_size * 16384)
-{}
-size_t AudioStreamReader::frames_available() const{
-    return m_reader.bytes_stored() / m_frame_size;
-}
-void AudioStreamReader::push_bytes(const void* data, size_t bytes){
-    m_reader.push_back(data, bytes);
-}
-void AudioStreamReader::read_frames(float* data, uint64_t frame_offset, size_t frames){
-    m_reader.read(data, frame_offset * m_frame_size, frames * m_frame_size);
-}
-void AudioStreamReader::pop_to(uint64_t frame_offset){
-    m_reader.pop_to(frame_offset * m_frame_size);
-}
-
-
-
-class AudioBuffer{
-public:
-
-    size_t frames_available() const;
-    size_t read_frames(float* data, size_t frames);
-    size_t pop_frames(size_t frames);
-
-private:
-    size_t m_channels;
-    size_t m_frame_size;
-    StreamReader m_buffer;
-
-};
-
-
-class AudioStreamReader2 : public ConvertedStreamReader{
-public:
-    AudioStreamReader2(size_t channels, AudioStreamFormat format);
-
-
-private:
-    virtual void convert(void* object, const void* raw, size_t count) override;
-
-private:
-    AudioStreamFormat m_format;
-    size_t m_channels;
-    size_t m_sample_size;
-    size_t m_frame_size;
-};
-AudioStreamReader2::AudioStreamReader2(size_t channels, AudioStreamFormat format)
-    : ConvertedStreamReader(sample_size(format), sizeof(float), 16384)
-    , m_format(format)
-    , m_sample_size(sample_size(format))
-    , m_frame_size(m_sample_size * channels)
-{}
-void AudioStreamReader2::convert(void* object, const void* raw, size_t count){
-    switch (m_format){
-    case AudioStreamFormat::UINT8:
-        Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)object, (const uint8_t*)raw, count * m_channels);
-        return;
-    case AudioStreamFormat::SINT16:
-        Kernels::AudioStreamConversion::convert_audio_sint16_to_float((float*)object, (const int16_t*)raw, count * m_channels);
-        return;
-    case AudioStreamFormat::SINT32:
-        Kernels::AudioStreamConversion::convert_audio_sint32_to_float((float*)object, (const int32_t*)raw, count * m_channels);
-        return;
-    case AudioStreamFormat::FLOAT32:
-        memcpy(object, raw, count * m_frame_size);
-        return;
-    }
-}
-#endif
-
-
-
-class AudioStreamReader : public MisalignedStreamConverter{
-public:
-    AudioStreamReader(size_t channels, AudioStreamFormat format);
-
-private:
-    virtual void convert(void* out, const void* in, size_t count) override;
-
-private:
-    AudioStreamFormat m_format;
-    size_t m_channels;
-    size_t m_sample_size;
-    size_t m_frame_size;
-};
-AudioStreamReader::AudioStreamReader(size_t channels, AudioStreamFormat format)
-    : MisalignedStreamConverter(sample_size(format), sizeof(float), 16384)
-    , m_format(format)
-    , m_channels(channels)
-    , m_sample_size(sample_size(format))
-    , m_frame_size(m_sample_size * channels)
-{}
-void AudioStreamReader::convert(void* out, const void* in, size_t count){
-    switch (m_format){
-    case AudioStreamFormat::UINT8:
-        Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)out, (const uint8_t*)in, count * m_channels);
-        return;
-    case AudioStreamFormat::SINT16:
-        Kernels::AudioStreamConversion::convert_audio_sint16_to_float((float*)out, (const int16_t*)in, count * m_channels);
-        return;
-    case AudioStreamFormat::SINT32:
-        Kernels::AudioStreamConversion::convert_audio_sint32_to_float((float*)out, (const int32_t*)in, count * m_channels);
-        return;
-    case AudioStreamFormat::FLOAT32:
-        memcpy(out, in, count * m_frame_size);
-        return;
-    }
-}
 
 
 
@@ -313,15 +163,38 @@ void AudioStreamReader::convert(void* out, const void* in, size_t count){
 
 class AudioListener : public StreamListener{
 public:
-    AudioListener()
-        : StreamListener(sizeof(float))
+    AudioListener(size_t channels)
+        : StreamListener(sizeof(float) * channels)
+        , m_channels(channels)
     {}
     virtual void on_objects(const void* data, size_t objects) override{
         const float* samples = (const float*)data;
-        print(samples, objects);
+        print(samples, objects * m_channels);
     }
+
+private:
+    size_t m_channels;
 };
 
+
+
+template <typename Object>
+class FixedCircularBuffer{
+public:
+    FixedCircularBuffer(size_t capacity)
+        : m_buffer(capacity)
+    {}
+
+    size_t push(){
+
+    }
+
+private:
+    AlignedVector<Object> m_buffer;
+    size_t m_stored = 0;
+    size_t m_start = 0;
+    size_t m_end = 0;
+};
 
 
 
@@ -339,14 +212,14 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-    AudioStreamReader reader(2, AudioStreamFormat::SINT16);
-    AudioListener listener;
+    AudioSourceReader reader(AudioStreamFormat::SINT16, 1, false);
+    AudioListener listener(1);
     reader += listener;
 
 
 //    reader.push_bytes(in, 8);
-    reader.push_bytes((char*)in + 0, 3);
-    reader.push_bytes((char*)in + 3, 5);
+    reader.push_bytes((char*)in + 0, 5);
+    reader.push_bytes((char*)in + 5, 3);
 
 
 
