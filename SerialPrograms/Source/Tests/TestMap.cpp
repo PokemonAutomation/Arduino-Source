@@ -219,6 +219,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
     {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
+    {"PokemonLA_MapMissionTabReader", std::bind(image_bool_detector_helper, test_pokemonLA_MapMissionTabReader, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)},
     {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},
 };

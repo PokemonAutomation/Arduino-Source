@@ -251,11 +251,11 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
         map_image,
         MMOQuestionMarkBackgroundMatcher::instance(),
         // {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
-        {{combine_rgb(0, 10, 30), combine_rgb(100, 130, 130)}},
+        {{combine_rgb(0, 5, 30), combine_rgb(100, 130, 130)}},
         // The dark blue background is about 1400-1500 pixels on 1080P.
         // Should be at least 550 pixels on 720P image.
         {550, 1800},
-        100,
+        110,
         [&](WaterfillObject& object){
             size_t min_x = object.min_x + map_min_x;
             size_t min_y = object.min_y + map_min_y;

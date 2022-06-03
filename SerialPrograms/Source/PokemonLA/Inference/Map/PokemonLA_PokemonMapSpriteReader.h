@@ -11,6 +11,7 @@
 
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
+#include "PokemonLA/PokemonLA_Locations.h"
 
 #include <map>
 #include <vector>
@@ -48,7 +49,7 @@ struct MapSpriteMatchResult{
     std::string second_slug;
 };
 
-MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box);
+MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box, MapRegion region);
 
 
 }

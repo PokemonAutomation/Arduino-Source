@@ -9,8 +9,12 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#include <QImage>
-
+#include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -325,11 +329,33 @@ const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
 }
 
 
-std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image){
+std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image, MapRegion region){
     const FeatureVector& image_feature = compute_feature(image);
 
-
     const std::map<std::string, FeatureVector>& features = MMO_SPRITE_MATCHING_DATA().features;
+
+    const std::array<std::vector<std::string>, 5>& region_available_sprites = MMO_FIRST_WAVE_REGION_SPRITE_SLUGS();
+    int region_index = 0;
+    switch(region){
+    case MapRegion::FIELDLANDS:
+        region_index = 0;
+        break;
+    case MapRegion::MIRELANDS:
+        region_index = 1;
+        break;
+    case MapRegion::COASTLANDS:
+        region_index = 2;
+        break;
+    case MapRegion::HIGHLANDS:
+        region_index = 3;
+        break;
+    case MapRegion::ICELANDS:
+        region_index = 4;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid region.");
+        return {};
+    }
 
     // cout << "input image feature: " << feature_to_str(image_feature) << endl;
 
@@ -338,9 +364,13 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstI
 
     std::multimap<double, std::string> result;
 
-    for(const auto& p : features){
-        const std::string& slug = p.first;
-        const FeatureVector& feature = p.second;
+    for(const auto& slug : region_available_sprites[region_index]){
+        auto it = features.find(slug);
+        if (it == features.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Inconsistent sprite slug definitions in resource: " + slug);
+        }
+
+        const FeatureVector& feature = it->second;
         const FeatureType dist = feature_distance(image_feature, feature);
         result.emplace(dist, slug);
     }
@@ -589,13 +619,13 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
 
 
 
-MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box){
+MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box, MapRegion region){
     const static auto& sprite_matching_data = MMO_SPRITE_MATCHING_DATA();
     const ExactImageDictionaryMatcher& color_matcher = sprite_matching_data.color_matcher;
     const ExactImageDictionaryMatcher& gradient_matcher = sprite_matching_data.gradient_matcher;
 
     // configs for the algorithm:
-    const size_t num_feature_candidates = 20;
+    const size_t num_feature_candidates = 10;
     const double color_difference_threshold = 10.0;
     const double gradient_confidence_threshold = 2.0;
     const double color_to_gradient_confidence_scale = 2.0;
@@ -605,7 +635,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
 
     // This map has the match score for all sprites.
     // This map must be not empty for subsequent computation.
-    const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box));
+    const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box), region);
     
     for(const auto& p : feature_map){
         result.candidates.push_back(p.second);
@@ -675,7 +705,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
     cout << "Top color score: " << result.color_score << " diff to second: " << result.color_lead << endl;
 
     if (result.color_lead >= color_difference_threshold){
-        cout << "Color difference large enough. Good match." << endl;
+        cout << "Color difference large enough. Good match: " << result.slug << endl;
         result.second_slug = color_second->second;
         return result;
     }
@@ -721,7 +751,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
     cout << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead << endl;
 
     if (result.gradient_lead >= gradient_confidence_threshold){
-        cout << "Gradient difference large enough. Good match." << endl;
+        cout << "Gradient difference large enough. Good match: " << result.slug << endl;
         return result;
     }
 
@@ -744,7 +774,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
         }
     }
     else{
-        cout << "Low confidence match." << endl;
+        cout << "Low confidence match: " << result.slug << endl;
     }
 
     return result;
