@@ -92,11 +92,24 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
-    , DESIRED_SLUGS(
-        "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
+    , DESIRED_MO_SLUGS(
+        "<b>Desired Outbreak " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
         ALL_POKEMON_SPRITES(),
         HISUI_OUTBREAK_SLUGS(),
+        nullptr,
         &MMO_NAMES()
+    )
+    , DESIRED_MMO_SLUGS(
+        "<b>Desired first MMO wave " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
+        ALL_MMO_SPRITES(),
+        MMO_FIRST_WAVE_SPRITE_SLUGS(),
+        &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
+    )
+    , DESIRED_SHINY_MMO_SLUGS(
+        "<b>Desired first MMO wave " + STRING_POKEMON + " with shiny symbols:</b><br>Stop when anything on this list is found.",
+        ALL_MMO_SPRITES(),
+        MMO_FIRST_WAVE_SPRITE_SLUGS(),
+        &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(
@@ -113,7 +126,9 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(DESIRED_SLUGS);
+    PA_ADD_OPTION(DESIRED_MO_SLUGS);
+    PA_ADD_OPTION(DESIRED_MMO_SLUGS);
+    // PA_ADD_OPTION(DESIRED_SHINY_MMO_SLUGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -373,8 +388,8 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     Stats& stats = env.current_stats<Stats>();
 
     std::set<std::string> desired;
-    for (size_t c = 0; c < DESIRED_SLUGS.size(); c++){
-        desired.insert(DESIRED_SLUGS[c]);
+    for (size_t c = 0; c < DESIRED_MO_SLUGS.size(); c++){
+        desired.insert(DESIRED_MO_SLUGS[c]);
     }
 
 

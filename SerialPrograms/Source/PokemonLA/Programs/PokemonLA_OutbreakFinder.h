@@ -52,7 +52,9 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
 
-    Pokemon::PokemonNameList DESIRED_SLUGS;
+    Pokemon::PokemonNameList DESIRED_MO_SLUGS;
+    Pokemon::PokemonNameList DESIRED_MMO_SLUGS;
+    Pokemon::PokemonNameList DESIRED_SHINY_MMO_SLUGS;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_MATCHED;

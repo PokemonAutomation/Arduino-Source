@@ -14,6 +14,9 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
+const std::string PokemonNames::NULL_SLUG;
+
+
 struct PokemonNameDatabase{
     PokemonNameDatabase();
     static const PokemonNameDatabase& instance(){
@@ -21,11 +24,10 @@ struct PokemonNameDatabase{
         return database;
     }
 
-    static const std::string NULL_SLUG;
     std::map<std::string, PokemonNames> m_slug_to_data;
     std::map<std::string, std::string> m_display_name_to_slug;
 };
-const std::string PokemonNameDatabase::NULL_SLUG;
+
 
 PokemonNameDatabase::PokemonNameDatabase(){
     std::string path = RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json";
@@ -97,7 +99,7 @@ const std::string& parse_pokemon_name_nothrow(const std::string& display_name){
     const std::map<std::string, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);
     if (iter == database.end()){
-        return PokemonNameDatabase::NULL_SLUG;
+        return PokemonNames::NULL_SLUG;
     }
     return iter->second;
 }

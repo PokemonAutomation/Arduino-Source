@@ -17,6 +17,11 @@ const SpriteDatabase& ALL_POKEMON_SPRITES(){
 }
 
 
+const SpriteDatabase& ALL_MMO_SPRITES(){
+    static const SpriteDatabase database("PokemonLA/MMOSprites.png", "PokemonLA/MMOSprites.json");
+    return database;
+}
+
 
 }
 }

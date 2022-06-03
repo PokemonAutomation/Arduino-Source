@@ -23,10 +23,16 @@ NameSelectWidget::NameSelectWidget(
     const SpriteDatabase& icons,
     const std::vector<std::string>& slugs,
     const std::string& current_slug,
+    const std::map<std::string, std::string>* display_names,
+    const std::map<std::string, std::string>* display_name_to_slug,
     const std::map<std::string, std::pair<std::string, QIcon>>* extra_names,
     const std::vector<std::string>* extra_name_list,
     const std::map<std::string, std::string>* extra_display_name_to_slug
-){
+)
+    : NoWheelComboBox(&parent)
+    , m_display_name_to_slug(display_name_to_slug)
+    , m_extra_display_name_to_slug(extra_display_name_to_slug)
+{
     this->setEditable(true);
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
@@ -37,8 +43,18 @@ NameSelectWidget::NameSelectWidget(
 
     //  A more optimized version.
     QStringList list;
-    for (const std::string& slug : slugs){
-        list.append(QString::fromStdString(get_pokemon_name(slug).display_name()));
+    if (display_names == nullptr){
+        for (const std::string& slug : slugs){
+            list.append(QString::fromStdString(get_pokemon_name(slug).display_name()));
+        }
+    } else{
+        for (const std::string& slug : slugs){
+            auto it = display_names->find(slug);
+            if (it == display_names->end()){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "In display_names slug not found: " + slug);
+            }
+            list.append(QString::fromStdString(it->second));
+        }
     }
     if (extra_names && extra_name_list){
         for(const std::string& slug : *extra_name_list){
@@ -97,6 +113,13 @@ std::string NameSelectWidget::slug() const{
         if (it != m_extra_display_name_to_slug->end()){
             return it->second;
         }
+    }
+    if (m_display_name_to_slug){
+        auto it = m_display_name_to_slug->find(current_text);
+        if (it != m_display_name_to_slug->end()){
+            return it->second;
+        }
+        return PokemonNames::NULL_SLUG;
     }
     return parse_pokemon_name_nothrow(current_text);
 }

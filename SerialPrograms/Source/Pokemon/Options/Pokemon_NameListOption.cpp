@@ -41,6 +41,8 @@ public:
             m_factory.m_icons,
             m_factory.m_slug_list,
             m_slug,
+            (m_factory.m_display_name_mapping ? &m_factory.m_display_name_mapping->display_names : nullptr),
+            (m_factory.m_display_name_mapping ? &m_factory.m_display_name_mapping->display_name_to_slug : nullptr),
             (m_factory.m_extra_names ? &m_factory.m_extra_names->names : nullptr),
             (m_factory.m_extra_names ? &m_factory.m_extra_names->name_list : nullptr),
             (m_factory.m_extra_names ? &m_factory.m_extra_names->display_name_to_slug : nullptr)
@@ -65,10 +67,12 @@ private:
 PokemonNameListFactory::PokemonNameListFactory(
     const SpriteDatabase& icons,
     std::vector<std::string> slug_list,
+    const DisplayNameMapping* display_name_mapping,
     const ExtraNames* extra_names
 )
     : m_icons(icons)
     , m_slug_list(std::move(slug_list))
+    , m_display_name_mapping(display_name_mapping)
     , m_extra_names(extra_names)
 {}
 
@@ -88,9 +92,10 @@ PokemonNameList::PokemonNameList(
     std::string label,
     const SpriteDatabase& icons,
     std::vector<std::string> slug_list,
+    const DisplayNameMapping* display_name_mapping,
     const ExtraNames* extra_names
 )
-    : PokemonNameListFactory(icons, std::move(slug_list), extra_names)
+    : PokemonNameListFactory(icons, std::move(slug_list), display_name_mapping, extra_names)
     , EditableTableOption(std::move(label), *this)
 {}
 
