@@ -122,6 +122,16 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
 //    cout << "bytesPerSample = " << preferred_format.sampleSize() << endl;
 //    cout << "sampleFormat = " << preferred_format.sampleType() << endl;
 
+#if QT_VERSION_MAJOR == 6
+    //  On Qt6, "QAudioFormat::preferredFormat()" always returns stereo 44.1 kHz.
+    //  Unlike Qt5, it does not return the native format of the device
+    //  This actually makes it kind of impossible to figure out what the correct
+    //  format we need to use to give proper stereo. So instead, we just assume
+    //  mono 96000 which will be the case for standard capture cards.
+    preferred_channels = 1;
+    preferred_rate = 96000;
+#endif
+
     std::vector<AudioFormat> ret;
     preferred_index = -1;
 

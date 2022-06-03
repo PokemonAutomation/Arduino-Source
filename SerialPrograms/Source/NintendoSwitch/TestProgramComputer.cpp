@@ -97,26 +97,6 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 WallClock REFERENCE = current_time();
 
 
-void print(uint64_t m){
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++){
-            cout << (m & 1);
-            m >>= 1;
-        }
-        cout << endl;
-    }
-    cout << endl;
-}
-void print_8x8(uint64_t m){
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++){
-            cout << (m & 1);
-            m >>= 1;
-        }
-        cout << " ";
-    }
-    cout << endl;
-}
 
 
 

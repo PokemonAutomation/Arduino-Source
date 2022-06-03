@@ -27,8 +27,6 @@ void print_array(const Type* ptr, size_t len){
     }
     cout << "}" << endl;
 }
-
-
 inline void print_u8(const uint8_t* ptr, size_t len){
     cout << "{";
     bool first = true;
@@ -41,6 +39,29 @@ inline void print_u8(const uint8_t* ptr, size_t len){
     }
     cout << "}" << endl;
 }
+
+void print_bits(uint64_t m){
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            cout << (m & 1);
+            m >>= 1;
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+void print_8x8(uint64_t m){
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            cout << (m & 1);
+            m >>= 1;
+        }
+        cout << " ";
+    }
+    cout << endl;
+}
+
+
 
 
 
