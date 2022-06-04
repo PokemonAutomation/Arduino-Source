@@ -112,11 +112,11 @@ std::vector<std::unique_ptr<EditableTableRow>> BattlePokemonActionTable::make_de
 BattlePokemonActionTable::BattlePokemonActionTable()
     : m_table(
         "<b>" + STRING_POKEMON + " Action Table:</b><br>"
-        "Set what move styles to use and whether to switch the " + STRING_POKEMON + " after some turns. "
+        "Set what move styles to use and whether to switch the " + STRING_POKEMON + " after some turns.<br><br>"
         "Each row is the action for one " + STRING_POKEMON + ". "
         "The table follows the order that " + STRING_POKEMON + " are sent to battle.<br>"
-        "You can also set a target number of move attempts. After it is reached the program will finish the battle and stop.<br>"
-        "Note: if your second last " + STRING_POKEMON + " faints, the game will send your last " + STRING_POKEMON + " automatically for you. "
+        "You can also set a target number of move attempts. After it is reached the program will finish the battle and stop.<br><br>"
+        "Note: if your second last " + STRING_POKEMON + " faints, the game will send your last " + STRING_POKEMON + " automatically for you.<br>"
         "The program cannot detect this switch as there is no switch selection screen. "
         "Therefore the program will treat it as the same " + STRING_POKEMON + ".",
         m_factory, make_defaults()

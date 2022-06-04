@@ -40,7 +40,7 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
-        "<b>Game Language:</b>",
+        "<b>Game Language:</b><br>Required to read IVs.",
         IVCheckerReader::instance().languages(),
         false
     )

@@ -1479,10 +1479,9 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    target_compile_options(SerialPrograms PRIVATE -msse4.2)
-
     target_compile_options(SerialPrograms PRIVATE -Wall -Wpedantic)
 
+    target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
     set(ARCH_FLAGS_13_Haswell       -march=haswell)
     set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)

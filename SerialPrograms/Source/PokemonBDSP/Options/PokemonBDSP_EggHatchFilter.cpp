@@ -169,7 +169,7 @@ EggHatchFilterOption::EggHatchFilterOption()
         "If a hatchling matches one of these filters, the specified action will be performed. "
         "Otherwise, it will be released. "
         "If multiple entries apply and have conflicting actions, the program will stop.<br>"
-        "IV checking requires that your right panel be set to the IV Judge.",
+        "IV checking requires that your right panel be set to the IV Judge and that you have selected the correct game language above.",
         m_factory, make_defaults()
     )
 {}
