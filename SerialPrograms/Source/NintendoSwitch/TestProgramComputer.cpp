@@ -138,7 +138,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
-    cout << QDir::current().relativeFilePath(RESOURCE_PATH()).toStdString() << endl;
+
+//    cout << QDir::current().relativeFilePath(RESOURCE_PATH()).toStdString() << endl;
 
 
 

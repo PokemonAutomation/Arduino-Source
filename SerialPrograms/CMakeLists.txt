@@ -60,6 +60,8 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/Cpp/AbstractLogger.h
+    ../Common/Cpp/AlignedMalloc.cpp
+    ../Common/Cpp/AlignedMalloc.h
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AlignedVector.tpp
     ../Common/Cpp/AsyncDispatcher.cpp
@@ -94,6 +96,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SpinLock.cpp
     ../Common/Cpp/SpinLock.h
+    ../Common/Cpp/SpinPause.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/Time.cpp
@@ -203,8 +206,11 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
-    Source/CommonFramework/Environment/Environment_Linux.cpp
-    Source/CommonFramework/Environment/Environment_Windows.cpp
+    Source/CommonFramework/Environment/Environment_Linux.tpp
+    Source/CommonFramework/Environment/Environment_Windows.tpp
+    Source/CommonFramework/Environment/Environment_x86.tpp
+    Source/CommonFramework/Environment/Environment_x86_Linux.tpp
+    Source/CommonFramework/Environment/Environment_x86_Windows.tpp
     Source/CommonFramework/Environment/HardwareValidation.cpp
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/GlobalSettingsPanel.cpp

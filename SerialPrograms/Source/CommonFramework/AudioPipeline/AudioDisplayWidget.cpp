@@ -236,7 +236,8 @@ PA_FORCE_INLINE QRgb jetColorMap(float v){
         return qRgb(0,0,0);
     }
     else if (v < 0.125f){
-        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
+//        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
+        return qRgb(0, 0, int((0.0f + 8.f * v) * 255.f));
     }
     else if (v < 0.375f){
         return qRgb(0, int((v - 0.125f)*1020.f), 255);

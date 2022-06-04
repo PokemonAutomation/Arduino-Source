@@ -4,12 +4,9 @@
  *
  */
 
-#include <immintrin.h>
+#include "Common/CRC32.h"
+#include "CommonFramework/Environment/Environment.h"
 #include "PokemonSwSh_MaxLair_AI.h"
-
-#if _WIN32
-#include <intrin.h>
-#endif
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,35 +14,13 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-
-#if _WIN32
-uint64_t x86_rdtscp(){
-    unsigned int dummy;
-    return __rdtscp(&dummy);
-}
-#else
-uint64_t x86_rdtscp(){
-    unsigned int lo, hi;
-    __asm__ volatile (
-        "rdtscp"
-        : "=a" (lo), "=d" (hi)
-        :
-        : "ecx"
-    );
-    return ((uint64_t)hi << 32) | lo;
-}
-#endif
-
 int random(int min, int max){
-    uint64_t seed = _mm_crc32_u64(x86_rdtscp(), 0);
+//    uint64_t seed = x86_rdtsc();
+    uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    seed = pabb_crc32(0, &seed, sizeof(seed));
     seed %= (max - min + 1);
     return (int)seed + min;
 }
-
-
-
-
-
 
 
 }

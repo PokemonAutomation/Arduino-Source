@@ -67,9 +67,10 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
         {
         "Shiny",
         "Alpha",
-        "Shiny & Alpha",
-        "Stop on any non regular"
-        }, 0
+        "Stop or Alpha",
+        "Shiny and Alpha",
+        },
+        2
     )
     , EXIT_METHOD(
         "<b>Exit Battle Method:</b>",
@@ -235,11 +236,11 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         case 1: //  Alpha
             is_match = pokemon.is_alpha;
             break;
-        case 2: //  Shiny and Alpha
-            is_match = pokemon.is_alpha && pokemon.is_shiny;
-            break;
-        case 3: //  Shiny or Alpha
+        case 2: //  Shiny or Alpha
             is_match = pokemon.is_alpha || pokemon.is_shiny;
+            break;
+        case 3: //  Shiny and Alpha
+            is_match = pokemon.is_alpha && pokemon.is_shiny;
             break;
         }
 

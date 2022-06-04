@@ -12,6 +12,7 @@
 #include <thread>
 #include <windows.h>
 #include "Common/Compiler.h"
+#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/SpinLock.h"
@@ -192,7 +193,7 @@ private:
             if (millis_since_last_recv > 100){
                 Sleep(1);
             }else{
-                _mm_pause();
+                pause();
             }
 #endif
         }

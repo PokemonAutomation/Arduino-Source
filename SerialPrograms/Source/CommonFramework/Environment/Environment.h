@@ -7,13 +7,11 @@
 #ifndef PokemonAutomation_Environment_H
 #define PokemonAutomation_Environment_H
 
-#include <stdint.h>
 #include <string>
 #include <vector>
 #include <QString>
 #include <QThread>
-
-
+#include "Common/Cpp/CpuId/CpuId.h"
 
 namespace PokemonAutomation{
 
@@ -36,14 +34,7 @@ QThread::Priority to_qt_priority(int priority);
 
 
 
-uint64_t x86_rdtsc();
-
 std::string get_processor_name();
-
-uint64_t x86_measure_rdtsc_ticks_per_sec();
-uint64_t x86_rdtsc_ticks_per_sec();
-
-
 struct ProcessorSpecs{
     std::string name;
     size_t threads = 0;

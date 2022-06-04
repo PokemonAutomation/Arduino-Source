@@ -6,7 +6,7 @@
 
 #include "TestProgramSwitch.h"
 
-#include <immintrin.h>
+//#include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/PeriodicScheduler.h"

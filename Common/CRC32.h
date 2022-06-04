@@ -9,20 +9,22 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Common/Compiler.h"
 
 
 //  Basic Implementation
-uint32_t pabb_crc32_basic(uint32_t crc, const char* str, size_t length);
+uint32_t pabb_crc32_basic(uint32_t crc, const void* data, size_t length);
 
 //  Table Implementation
-uint32_t pabb_crc32_table(uint32_t crc, const char* str, size_t length);
+uint32_t pabb_crc32_table(uint32_t crc, const void* data, size_t length);
 
 //  SSE4.2
 #if _M_IX86 || _M_X64
 #include <nmmintrin.h>
-static inline uint32_t pabb_crc32_SSE42(uint32_t crc, const char* str, size_t length){
+PA_FORCE_INLINE uint32_t pabb_crc32_SSE42(uint32_t crc, const void* data, size_t length){
+    const char* ptr = (const char*)data;
     for (size_t c = 0; c < length; c++){
-        crc = _mm_crc32_u8(crc, str[c]);
+        crc = _mm_crc32_u8(crc, ptr[c]);
     }
     return crc;
 }
@@ -37,7 +39,7 @@ static inline uint32_t pabb_crc32_SSE42(uint32_t crc, const char* str, size_t le
 #define pabb_crc32      pabb_crc32_basic
 #endif
 
-void pabb_crc32_write_to_message(const char* ptr, size_t full_message_length);
+void pabb_crc32_write_to_message(const void* data, size_t full_message_length);
 
 
 #endif

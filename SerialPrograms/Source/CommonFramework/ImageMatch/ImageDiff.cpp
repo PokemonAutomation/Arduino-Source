@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <smmintrin.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SIMDDebuggers.h"

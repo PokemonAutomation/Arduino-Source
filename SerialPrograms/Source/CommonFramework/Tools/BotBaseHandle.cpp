@@ -4,9 +4,9 @@
  *
  */
 
-#include <emmintrin.h>
 #include <QtGlobal>
 #include <QMessageBox>
+#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
@@ -142,7 +142,7 @@ void BotBaseHandle::stop_unprotected(){
         }
         if (state == State::SHUTDOWN){
             while (m_state.load(std::memory_order_acquire) != State::NOT_CONNECTED){
-                _mm_pause();
+                pause();
             }
             return;
         }

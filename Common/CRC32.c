@@ -18,9 +18,10 @@ uint32_t pabb_crc32_byte_basic(uint32_t crc, uint8_t byte){
     crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
     return crc;
 }
-uint32_t pabb_crc32_basic(uint32_t crc, const char* str, size_t length){
+uint32_t pabb_crc32_basic(uint32_t crc, const void* data, size_t length){
+    const char* ptr = (const char*)data;
     for (size_t c = 0; c < length; c++){
-        crc = pabb_crc32_byte_basic(crc, str[c]);
+        crc = pabb_crc32_byte_basic(crc, ptr[c]);
     }
     return crc;
 }
@@ -53,10 +54,11 @@ void iterate_table(uint32_t* crc, uint8_t nibble){
 //    iterate_table(&crc, byte >> 4);
 //    return crc;
 //}
-uint32_t pabb_crc32_table(uint32_t crc, const char* str, size_t length){
+uint32_t pabb_crc32_table(uint32_t crc, const void* str, size_t length){
+    const char* ptr = (const char*)str;
     for (size_t c = 0; c < length; c++){
-//        crc = pabb_crc32_byte_table(crc, str[c]);
-        uint8_t byte = str[c];
+//        crc = pabb_crc32_byte_table(crc, ptr[c]);
+        uint8_t byte = ptr[c];
         iterate_table(&crc, byte);
         iterate_table(&crc, byte >> 4);
     }
@@ -107,13 +109,14 @@ uint32_t pabb_crc32_byte_table(uint32_t crc, uint8_t byte){
 #endif
     return entry ^ (crc >> 8);
 }
-uint32_t pabb_crc32_table(uint32_t crc, const char* str, size_t length){
+uint32_t pabb_crc32_table(uint32_t crc, const void* data, size_t length){
+    const char* ptr = (const char*)data;
     for (size_t c = 0; c < length; c++){
         uint32_t entry;
 #if __AVR__
-        memcpy_P(&entry, CRC32_TABLE8 + ((uint8_t)crc ^ (uint8_t)str[c]), sizeof(uint32_t));
+        memcpy_P(&entry, CRC32_TABLE8 + ((uint8_t)crc ^ (uint8_t)ptr[c]), sizeof(uint32_t));
 #else
-        entry = CRC32_TABLE8[(uint8_t)crc ^ (uint8_t)str[c]];
+        entry = CRC32_TABLE8[(uint8_t)crc ^ (uint8_t)ptr[c]];
 #endif
         crc = entry ^ (crc >> 8);
     }
@@ -123,7 +126,8 @@ uint32_t pabb_crc32_table(uint32_t crc, const char* str, size_t length){
 
 
 
-void pabb_crc32_write_to_message(const char* ptr, size_t full_message_length){
+void pabb_crc32_write_to_message(const void* data, size_t full_message_length){
+    const char* ptr = (const char*)data;
     size_t length_before_crc = full_message_length - sizeof(uint32_t);
     *(uint32_t*)(ptr + length_before_crc) = pabb_crc32(0xffffffff, ptr, length_before_crc);
 }

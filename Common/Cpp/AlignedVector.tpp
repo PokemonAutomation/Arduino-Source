@@ -10,8 +10,8 @@
 #include <new>
 #include <type_traits>
 #include <utility>
-#include <immintrin.h>
 #include "Common/Compiler.h"
+#include "AlignedMalloc.h"
 #include "AlignedVector.h"
 
 namespace PokemonAutomation{
@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 template <typename Object>
 AlignedVector<Object>::~AlignedVector(){
     clear();
-    _mm_free(m_ptr);
+    aligned_free(m_ptr);
     m_capacity = 0;
 }
 template <typename Object>
@@ -37,7 +37,7 @@ AlignedVector<Object>::AlignedVector(AlignedVector&& x)
 template <typename Object>
 void AlignedVector<Object>::operator=(AlignedVector&& x){
     clear();
-    _mm_free(m_ptr);
+    aligned_free(m_ptr);
     m_ptr = x.m_ptr;
     m_size = x.m_size;
     m_capacity = x.m_capacity;
@@ -58,7 +58,7 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
             break;
         }
     }
-    m_ptr = (Object*)_mm_malloc(m_capacity * sizeof(Object), 64);
+    m_ptr = (Object*)aligned_malloc(m_capacity * sizeof(Object), 64);
     if (m_ptr == nullptr){
         throw std::bad_alloc();
     }
@@ -71,7 +71,7 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
         }
     }catch (...){
         clear();
-        _mm_free(m_ptr);
+        aligned_free(m_ptr);
         throw;
     }
 }
@@ -88,7 +88,7 @@ void AlignedVector<Object>::operator=(const AlignedVector& x){
 
 template <typename Object>
 AlignedVector<Object>::AlignedVector(size_t items){
-    m_ptr = (Object*)_mm_malloc(items * sizeof(Object), PA_ALIGNMENT);
+    m_ptr = (Object*)aligned_malloc(items * sizeof(Object), PA_ALIGNMENT);
     if (m_ptr == nullptr){
         throw std::bad_alloc();
     }
@@ -107,7 +107,7 @@ AlignedVector<Object>::AlignedVector(size_t items){
         }
     }catch (...){
         clear();
-        _mm_free(m_ptr);
+        aligned_free(m_ptr);
         throw;
     }
 }
@@ -135,7 +135,7 @@ void AlignedVector<Object>::clear(){
 template <typename Object>
 PA_NO_INLINE void AlignedVector<Object>::expand(){
     size_t size = m_capacity == 0 ? 1 : m_capacity * 2;
-    Object* ptr = (Object*)_mm_malloc(size * sizeof(Object), PA_ALIGNMENT);
+    Object* ptr = (Object*)aligned_malloc(size * sizeof(Object), PA_ALIGNMENT);
     if (ptr == nullptr){
         throw std::bad_alloc();
     }
@@ -143,7 +143,7 @@ PA_NO_INLINE void AlignedVector<Object>::expand(){
         new (ptr + c) Object(std::move(m_ptr[c]));
         m_ptr[c].~Object();
     }
-    _mm_free(m_ptr);
+    aligned_free(m_ptr);
     m_ptr = ptr;
     m_capacity = size;
 }

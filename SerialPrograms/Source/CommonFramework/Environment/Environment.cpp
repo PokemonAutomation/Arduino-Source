@@ -8,6 +8,25 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Environment.h"
 
+#if _M_IX86 || _M_X64 || __i386__ || __x86_64__
+#include "Environment_x86.tpp"
+#endif
+
+#if _WIN32
+#include "Environment_Windows.tpp"
+#ifdef PA_ARCH_x86
+#include "Environment_x86_Windows.tpp"
+#endif
+#endif
+
+#if defined(__linux) || defined(__APPLE__)
+#include "Environment_Linux.tpp"
+#ifdef PA_ARCH_x86
+#include "Environment_x86_Linux.tpp"
+#endif
+#endif
+
+
 namespace PokemonAutomation{
 
 
@@ -26,39 +45,6 @@ int clip_priority(int priority){
 
 
 
-void x86_CleanCPUName(char name[49]){
-    size_t c0 = 0;
-    size_t c1 = 0;
-    bool space_flag = true;
-    while (c1 < 48){
-        if (space_flag && name[c1] == ' '){
-            c1++;
-            continue;
-        }
-        space_flag = name[c1] == ' ';
-        name[c0++] = name[c1++];
-    }
-
-    while (c0 < 48){
-        name[c0++] = '\0';
-    }
-}
-std::string get_processor_name(){
-    union{
-        uint32_t reg[12];
-        char name[49];
-    };
-    x86_cpuid(reg + 0, 0x80000002, 0);
-    x86_cpuid(reg + 4, 0x80000003, 0);
-    x86_cpuid(reg + 8, 0x80000004, 0);
-
-    x86_CleanCPUName(name);
-    return name;
-}
-uint64_t x86_rdtsc_ticks_per_sec(){
-    static uint64_t cached = x86_measure_rdtsc_ticks_per_sec();
-    return cached;
-}
 
 
 

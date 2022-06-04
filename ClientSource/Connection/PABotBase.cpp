@@ -5,7 +5,7 @@
  */
 
 #include <algorithm>
-#include <emmintrin.h>
+#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/MessageProtocol.h"
@@ -40,7 +40,7 @@ PABotBase::PABotBase(
 PABotBase::~PABotBase(){
     stop();
     while (m_state.load(std::memory_order_acquire) != State::STOPPED){
-        _mm_pause();
+        pause();
     }
 }
 

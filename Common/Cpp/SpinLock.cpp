@@ -4,11 +4,13 @@
  *
  */
 
-#include <emmintrin.h>
-#if _WIN32
+#include "CpuId/CpuId.h"
+
+#if _WIN32 && defined PA_ARCH_x86
 #include <intrin.h>
 #endif
 
+#include "SpinPause.h"
 #include "SpinLock.h"
 
 #include <iostream>
@@ -24,19 +26,19 @@ void SpinLock::spin_acquire(){
         if (!m_locked.load(std::memory_order_acquire) && m_locked.compare_exchange_weak(state, true)){
             break;
         }
-        _mm_pause();
+        pause();
     }
 }
 
 void SpinLock::spin_acquire(const char* label){
-#if _WIN32
+#if _WIN32 && defined PA_ARCH_x86
     uint64_t start = __rdtsc();
     while (true){
         bool state = false;
         if (!m_locked.load(std::memory_order_acquire) && m_locked.compare_exchange_weak(state, true)){
             break;
         }
-        _mm_pause();
+        pause();
 
         if (__rdtsc() - start > 10000000000){
             cout << "Slow SpinLock: " << label << endl;
