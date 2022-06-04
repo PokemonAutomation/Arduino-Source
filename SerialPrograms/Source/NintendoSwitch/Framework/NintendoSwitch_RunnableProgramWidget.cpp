@@ -177,10 +177,11 @@ void RunnableSwitchProgramWidget::run_program(){
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
         run_switch_program(program_info);
         m_setup->wait_for_all_requests();
-        m_logger.log("Ending Program...");
+        m_logger.log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException&){
+        m_logger.log("Program finished early!", COLOR_BLUE);
         std::string stats = stats_to_bar(m_logger, m_historical_stats.get(), m_current_stats.get());
         status_update(QString::fromStdString(stats));
         send_program_finished_notification(
@@ -191,6 +192,7 @@ void RunnableSwitchProgramWidget::run_program(){
         );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
+        m_logger.log("Program stopped with an exception!", COLOR_RED);
         QString message = QString::fromStdString(e.message());
         if (message.isEmpty()){
             message = e.name();

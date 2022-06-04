@@ -349,6 +349,7 @@ void RunnablePanelWidget::update_historical_stats(){
 }
 
 void RunnablePanelWidget::update_ui_after_program_state_change(){
+    m_logger.log("Updating UI after program state change...");
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_start_button == nullptr){
         return;
@@ -356,23 +357,28 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
     m_start_button->setEnabled(state != ProgramState::STOPPING);
     switch (state){
     case ProgramState::NOT_READY:
+        m_logger.log("Updating UI after program state change... Program not ready.");
         m_start_button->setText("Loading...");
         m_holder.on_busy(m_instance);
         break;
     case ProgramState::STOPPED:
+        m_logger.log("Updating UI after program state change... Program stopped.");
         m_start_button->setText("Start Program...");
 //        m_start_button->setEnabled(settings_valid());
         m_holder.on_idle(m_instance);
         break;
     case ProgramState::RUNNING:
+        m_logger.log("Updating UI after program state change... Program running.");
         m_start_button->setText("Stop Program...");
         m_holder.on_busy(m_instance);
         break;
 //    case ProgramState::FINISHED:
+//        m_logger.log("Updating UI after program state change... Program finished.");
 //        m_start_button->setText("Program Finished! Click to stop.");
 //        m_listener.on_busy(m_instance);
 //        break;
     case ProgramState::STOPPING:
+        m_logger.log("Updating UI after program state change... Program stopping.");
         m_start_button->setText("Stopping Program...");
         m_holder.on_busy(m_instance);
         break;

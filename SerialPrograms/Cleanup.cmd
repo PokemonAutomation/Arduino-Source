@@ -4,7 +4,7 @@ del Makefile*
 del object_script.*
 del users*
 del SerialPrograms.pro.user*
-del Settings.json
+del *Settings.json
 del *.png
 del *.jpg
 del CMakeLists.txt.user
