@@ -26,6 +26,10 @@ public:
     size_t numWindows() const{ return m_numWindows; }
     size_t numFrequencies() const{ return m_numFrequencies; }
 
+    //  Size of the buffer that holds this template.
+    //  This is "numFrequencies()", rounded up to the SIMD size.
+    size_t bufferSize() const{ return m_spectrogram.size(); }
+
     const float* getWindow(size_t windowIndex) const{
         return (const float*)((const char*)m_spectrogram.data() + windowIndex * m_bytes_per_spectrum);
     }

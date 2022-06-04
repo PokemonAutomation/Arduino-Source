@@ -81,8 +81,8 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_SSE41(
     if (width % 4){
         PartialWordAccess_x64_SSE41 loader(width * sizeof(uint32_t) % 16);
 
-        __m128i p = loader.load_i32_no_read_past_end(ptrI);
-        __m128i m = loader.load_i32_no_read_past_end(ptrA);
+        __m128i p = loader.load_int_no_read_past_end(ptrI);
+        __m128i m = loader.load_int_no_read_past_end(ptrA);
 
         m = _mm_srai_epi32(m, 31);
         p = _mm_and_si128(p, m);

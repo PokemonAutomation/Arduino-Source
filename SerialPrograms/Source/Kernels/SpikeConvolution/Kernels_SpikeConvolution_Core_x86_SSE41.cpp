@@ -24,6 +24,10 @@ struct Context_x86_SSE41{
         PartialWordAccess_x64_SSE41 access(length * sizeof(float));
         return access.load_f32_no_read_past_end(ptr);
     }
+    static PA_FORCE_INLINE void store_partial(float* ptr, __m128 x, size_t length){
+        PartialWordAccess_x64_SSE41 access(length * sizeof(float));
+        return access.store_f32_no_past_end(ptr, x);
+    }
 
     static PA_FORCE_INLINE __m128 multiply(__m128 k0, __m128 in){
         return _mm_mul_ps(k0, in);

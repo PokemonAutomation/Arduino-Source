@@ -17,6 +17,12 @@ struct Context_Default{
     static PA_FORCE_INLINE float broadcast(float x){
         return x;
     }
+    static PA_FORCE_INLINE float load_partial(const float* ptr, size_t length){
+        return ptr[0];
+    }
+    static PA_FORCE_INLINE void store_partial(float* ptr, float x, size_t length){
+        ptr[0] = x;
+    }
 
     static PA_FORCE_INLINE float multiply(float k0, float in){
         return k0 * in;

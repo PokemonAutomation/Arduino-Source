@@ -74,6 +74,7 @@ PA_FORCE_INLINE void accumulate_k1(
         }else{
             out0 = Context::multiply_partial(k0, in, lengthI);
         }
+//        Context::store_partial((float*)out, out0, lengthI);
         out[0] = out0;
     }
 }
@@ -139,6 +140,7 @@ PA_FORCE_INLINE void accumulate_k2(
             out0 = Context::multiply_partial(k0, in, lengthI);
         }
         Context::accumulate_partial(out0, k1, in + 1, lengthI);
+//        Context::store_partial((float*)out, out0, lengthI);
         out[0] = out0;
     }
 }
@@ -211,6 +213,7 @@ PA_FORCE_INLINE void accumulate_k3(
         }
         Context::accumulate_partial(out0, k1, in + 1, lengthI);
         Context::accumulate_partial(out0, k2, in + 2, lengthI);
+//        Context::store_partial((float*)out, out0, lengthI);
         out[0] = out0;
     }
 }
@@ -290,6 +293,7 @@ PA_FORCE_INLINE void accumulate_k4(
         Context::accumulate_partial(out0, k1, in + 1, lengthI);
         Context::accumulate_partial(out0, k2, in + 2, lengthI);
         Context::accumulate_partial(out0, k3, in + 3, lengthI);
+//        Context::store_partial((float*)out, out0, lengthI);
         out[0] = out0;
     }
 }

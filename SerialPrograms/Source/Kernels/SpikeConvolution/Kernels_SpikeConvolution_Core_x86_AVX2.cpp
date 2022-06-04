@@ -27,6 +27,13 @@ struct Context_x86_AVX2{
         );
         return _mm256_maskload_ps((const float*)ptr, mask);
     }
+    static PA_FORCE_INLINE void store_partial(float* ptr, __m256 x, size_t length){
+        __m256i mask = _mm256_cmpgt_epi32(
+            _mm256_set1_epi32((uint32_t)length),
+            _mm256_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7)
+        );
+        _mm256_maskstore_ps((float*)ptr, mask, x);
+    }
 
     static PA_FORCE_INLINE __m256 multiply(__m256 k0, __m256 in){
         return _mm256_mul_ps(k0, in);

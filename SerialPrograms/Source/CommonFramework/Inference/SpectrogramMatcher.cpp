@@ -201,7 +201,7 @@ bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
     case Mode::SPIKE_CONV:
     {
         // Do the conv on new spectrum too.
-        AlignedVector<float> convedSpectrum(m_template.numFrequencies());
+        AlignedVector<float> convedSpectrum(m_template.bufferSize());
         conv(spectrum.magnitudes->data() + m_originalFreqStart,
             m_originalFreqEnd - m_originalFreqStart, convedSpectrum.data());
         
@@ -210,7 +210,7 @@ bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
     }
     case Mode::AVERAGE_5:
     {
-        AlignedVector<float> avgedSpectrum(m_template.numFrequencies());
+        AlignedVector<float> avgedSpectrum(m_template.bufferSize());
         for(size_t j = 0; j < m_template.numFrequencies(); j++){
             const float * rawFreqMag = spectrum.magnitudes->data() + m_originalFreqStart + j*5;
             const float newMag = (rawFreqMag[0] + rawFreqMag[1] + rawFreqMag[2] + rawFreqMag[3] + rawFreqMag[4]) / 5.0f;

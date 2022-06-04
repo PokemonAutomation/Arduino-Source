@@ -14,7 +14,7 @@
 #include "AlignedMalloc.h"
 
 #define PA_ENABLE_MALLOC_CHECKING
-#define PA_ZERO_INITIALIZE
+//#define PA_ZERO_INITIALIZE
 
 const size_t BUFFER_CHECK_BOT = (size_t)0xea097be64bd0187d;
 const size_t BUFFER_CHECK_TOP = (size_t)0xc72bf73f0559cfe4;
@@ -65,25 +65,16 @@ void aligned_free(void* ptr){
         return;
     }
 
+    check_aligned_ptr(ptr);
+
     size_t* ret = (size_t*)ptr;
     size_t free_int = ret[-3];
-
-#ifdef PA_ENABLE_MALLOC_CHECKING
-    size_t bytes = ret[-2];
-    size_t check = ret[-1];
-    if (check != BUFFER_CHECK_BOT){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Memory buffer has been underrun.");
-    }
-    memcpy(&check, (char*)ptr + bytes, sizeof(size_t));
-    if (check != BUFFER_CHECK_TOP){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Memory buffer has been overrun.");
-    }
-#endif
 
     ptr = (void*)free_int;
     free(ptr);
 }
 void check_aligned_ptr(const void *ptr){
+#ifdef PA_ENABLE_MALLOC_CHECKING
     if (ptr == nullptr){
         return;
     }
@@ -94,12 +85,15 @@ void check_aligned_ptr(const void *ptr){
     size_t bytes = ret[-2];
     size_t check = ret[-1];
     if (check != BUFFER_CHECK_BOT){
+//        std::terminate();
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Memory buffer has been underrun.");
     }
     memcpy(&check, (const char*)ptr + bytes, sizeof(size_t));
     if (check != BUFFER_CHECK_TOP){
+//        std::terminate();
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Memory buffer has been overrun.");
     }
+#endif
 }
 
 
