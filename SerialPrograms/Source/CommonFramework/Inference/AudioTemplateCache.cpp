@@ -6,10 +6,12 @@
 
 #include <QFileInfo>
 #include <QString>
+#include "Common/Cpp/AlignedVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "AudioTemplateCache.h"
+
 
 namespace PokemonAutomation{
 

@@ -29,6 +29,7 @@ public:
         size_t samples_per_frame,   //  Typically the # of channels. Can be higher if you want to group more into each frame.
         bool reverse_channels       //  Only valid if "samples_per_frame == 2".
     );
+    virtual ~AudioSourceReader() {}
 
 private:
     virtual void convert(void* out, const void* in, size_t count) override;
@@ -47,7 +48,7 @@ private:
 class AudioSinkWriter : public StreamListener{
 public:
     AudioSinkWriter(QIODevice& audio_sink, AudioStreamFormat format, size_t channels);
-    ~AudioSinkWriter();
+    virtual ~AudioSinkWriter();
     virtual void on_objects(const void* data, size_t frames) override;
 
 private:
@@ -69,7 +70,7 @@ public:
         AudioIODevice& device, size_t sample_rate,
         size_t samples_per_frame, bool average_pairs
     );
-    ~FFTRunner();
+    virtual ~FFTRunner();
     virtual void on_objects(const void* data, size_t frames) override;
 
 private:
