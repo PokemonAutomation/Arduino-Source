@@ -114,8 +114,8 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(value.m_label, this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
 
     QVBoxLayout* right = new QVBoxLayout();
     layout->addLayout(right, 1);
@@ -124,8 +124,8 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     QLineEdit* box = new QLineEdit(current, this);
     right->addWidget(box);
     QLabel* under_text = new QLabel(sanitized_code(current), this);
-    right->addWidget(under_text);
     under_text->setWordWrap(true);
+    right->addWidget(under_text);
 
     connect(
         box, &QLineEdit::textChanged,

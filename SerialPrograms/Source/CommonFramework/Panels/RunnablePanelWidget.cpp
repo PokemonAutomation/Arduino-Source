@@ -199,6 +199,7 @@ BatchWidget* RunnablePanelWidget::make_options(QWidget& parent){
 }
 QLabel* RunnablePanelWidget::make_status_bar(QWidget& parent){
     QLabel* status_bar = new QLabel(&parent);
+    status_bar->setWordWrap(true);
     status_bar->setVisible(false);
     status_bar->setAlignment(Qt::AlignCenter);
 //    status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");

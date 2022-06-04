@@ -68,8 +68,8 @@ CatchabilitySelectorWidget::CatchabilitySelectorWidget(QWidget& parent, Catchabi
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.m_label, this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
     m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
     m_box->addItem("Always Catchable");

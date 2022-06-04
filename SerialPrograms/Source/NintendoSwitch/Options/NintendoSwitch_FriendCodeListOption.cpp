@@ -149,7 +149,9 @@ FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(value.m_label, this));
+    QLabel* label = new QLabel(value.m_label, this);
+    label->setWordWrap(true);
+    layout->addWidget(label);
     m_box = new Box(*this);
     layout->addWidget(m_box);
 

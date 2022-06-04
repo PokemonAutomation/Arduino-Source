@@ -112,7 +112,9 @@ BossActionWidget::BossActionWidget(QWidget& parent, BossActionOption& value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(new QLabel(m_value.m_label));
+    QLabel* label = new QLabel(m_value.m_label, this);
+    label->setWordWrap(true);
+    layout->addWidget(label);
     redraw_table();
 }
 void BossActionWidget::restore_defaults(){

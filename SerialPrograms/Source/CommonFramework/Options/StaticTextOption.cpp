@@ -71,8 +71,8 @@ StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
     layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel* text = new QLabel(value.m_label, this);
-    layout->addWidget(text);
     text->setWordWrap(true);
+    layout->addWidget(text);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
     text->setOpenExternalLinks(true);
 }
@@ -91,8 +91,8 @@ SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption
     frame->setFrameShape(QFrame::HLine);
 
     QLabel* text = new QLabel(value.m_label, this);
-    layout->addWidget(text);
     text->setWordWrap(true);
+    layout->addWidget(text);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
     text->setOpenExternalLinks(true);
 }

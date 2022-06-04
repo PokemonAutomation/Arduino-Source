@@ -109,7 +109,9 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     , m_table(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(m_value.m_label));
+    QLabel* label = new QLabel(m_value.m_label, this);
+    label->setWordWrap(true);
+    layout->addWidget(label);
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table);

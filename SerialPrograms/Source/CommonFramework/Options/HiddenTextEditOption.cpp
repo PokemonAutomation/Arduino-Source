@@ -128,7 +128,9 @@ HiddenTextEditWidget::HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
-    layout->addWidget(new QLabel(value.label(), this));
+    QLabel* label = new QLabel(value.label(), this);
+    label->setWordWrap(true);
+    layout->addWidget(label);
 
     QCheckBox* checkbox = new QCheckBox("Show Text (Do not show this to the public.)", this);
     checkbox->setChecked(value.get().isEmpty());

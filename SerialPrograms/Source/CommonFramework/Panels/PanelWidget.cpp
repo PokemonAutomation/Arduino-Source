@@ -38,6 +38,7 @@ CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
         name_text += " (" + make_text_url(path, "online documentation") + ")";
     }
     QLabel* name = new QLabel(name_text, description_box);
+    name->setWordWrap(true);
     name->setTextFormat(Qt::RichText);
     name->setTextInteractionFlags(Qt::TextBrowserInteraction);
     name->setOpenExternalLinks(true);
@@ -46,8 +47,8 @@ CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
     QString description = "<b>Description:</b> ";
     description += m_instance.descriptor().description();
     QLabel* text = new QLabel(description, description_box);
-    vbox->addWidget(text);
     text->setWordWrap(true);
+    vbox->addWidget(text);
 
 //    description_box->setContentLayout(*vbox);
     description_box->set_widget(body);
