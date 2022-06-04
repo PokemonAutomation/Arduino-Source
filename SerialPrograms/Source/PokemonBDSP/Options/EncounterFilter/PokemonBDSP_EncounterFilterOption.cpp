@@ -70,7 +70,7 @@ QJsonValue EncounterFilterOption::to_json() const{
     return obj;
 }
 void EncounterFilterOption::restore_defaults(){
-    m_shiny_filter_current.store(m_shiny_filter_default, std::memory_order_acquire);
+    m_shiny_filter_current.store(m_shiny_filter_default, std::memory_order_release);
     m_table.restore_defaults();
 }
 ConfigWidget* EncounterFilterOption::make_ui(QWidget& parent){
