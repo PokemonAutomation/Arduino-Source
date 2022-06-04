@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
@@ -30,6 +31,7 @@ public:
 private:
     EnumDropdownOption ENCOUNTER_TYPE;
 
+    BooleanCheckBoxOption USE_SOUND_DETECTION;
     EventNotificationsOption NOTIFICATIONS;
 };
 
