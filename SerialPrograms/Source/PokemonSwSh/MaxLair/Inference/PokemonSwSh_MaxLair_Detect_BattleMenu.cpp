@@ -445,7 +445,8 @@ bool dmax_circle_ready(QImage image){
             std::sqrt(variance.r),
             std::sqrt(variance.g),
             std::sqrt(variance.b)
-        )
+        ),
+        total
     };
 //    cout << stats.average << stats.stddev << endl;
 

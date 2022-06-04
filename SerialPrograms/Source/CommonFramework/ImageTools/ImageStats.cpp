@@ -26,7 +26,6 @@ FloatPixel image_average(const ConstImageRef& image){
         image.data(), image.bytes_per_row()
     );
 
-    ImageStats stats;
     FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
 
     return sum / sums.count;
@@ -58,18 +57,19 @@ ImageStats image_stats(const ConstImageRef& image){
         image.data(), image.bytes_per_row()
     );
 
-    ImageStats stats;
     FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
     FloatPixel sqr(sums.sqrR, sums.sqrG, sums.sqrB);
 
-    stats.average = sum / sums.count;
+    FloatPixel average = sum / sums.count;
 
     FloatPixel variance = (sqr - sum*sum / sums.count) / (sums.count - 1);
-    stats.stddev = FloatPixel(
+    FloatPixel stddev = FloatPixel(
         std::sqrt(variance.r),
         std::sqrt(variance.g),
         std::sqrt(variance.b)
     );
+
+    ImageStats stats(average, stddev, sums.count);
 
     return stats;
 }
@@ -117,7 +117,8 @@ ImageStats image_border_stats(const ConstImageRef& image){
             std::sqrt(variance.r),
             std::sqrt(variance.g),
             std::sqrt(variance.b)
-        )
+        ),
+        total
     };
 }
 

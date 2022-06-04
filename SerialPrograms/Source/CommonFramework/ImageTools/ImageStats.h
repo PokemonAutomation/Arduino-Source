@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 struct ImageStats{
     FloatPixel average;
     FloatPixel stddev;
+    uint64_t count;
+    ImageStats() : count(0) {}
+    ImageStats(FloatPixel a, FloatPixel s, uint64_t c) : average(a), stddev(s), count(c) {}
 };
 
 
