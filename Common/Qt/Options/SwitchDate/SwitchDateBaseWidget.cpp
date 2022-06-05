@@ -19,8 +19,8 @@ SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(value.label(), this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
 
     m_date_edit = new QDateEdit(m_value.get());
     layout->addWidget(m_date_edit, 1);

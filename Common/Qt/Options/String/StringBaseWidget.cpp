@@ -19,8 +19,8 @@ StringBaseWidget::StringBaseWidget(QWidget& parent, StringBaseOption& value)
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(value.label(), this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
 
     m_line_edit = new QLineEdit(m_value.get());
     m_line_edit->setPlaceholderText(value.placeholder_text());

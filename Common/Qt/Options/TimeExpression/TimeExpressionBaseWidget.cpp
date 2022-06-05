@@ -20,8 +20,8 @@ TimeExpressionBaseWidget<Type>::TimeExpressionBaseWidget(QWidget& parent, TimeEx
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.label(), this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
     QVBoxLayout* rows = new QVBoxLayout();
     layout->addLayout(rows, 1);
 

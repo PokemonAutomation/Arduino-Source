@@ -23,6 +23,9 @@ namespace PokemonAutomation{
 namespace PokemonAutomation{
 
 
+extern const char* PA_ARCH_STRING;
+
+
 extern const CPU_Features CPU_CAPABILITY_NATIVE;
 extern CPU_Features CPU_CAPABILITY_CURRENT;
 

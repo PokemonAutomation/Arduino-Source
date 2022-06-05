@@ -21,8 +21,8 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(value.label(), this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
     m_box = new QLineEdit(QString::number(m_value, 'f', 2), this);
 //    box->setInputMask("999999999");
 //    QDoubleValidator* validator = new QDoubleValidator(value.min_value(), value.max_value(), 2, this);

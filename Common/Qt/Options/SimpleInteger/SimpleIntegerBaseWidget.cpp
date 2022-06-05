@@ -20,8 +20,8 @@ SimpleIntegerBaseWidget<Type>::SimpleIntegerBaseWidget(QWidget& parent, SimpleIn
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.label(), this);
-    layout->addWidget(text, 1);
     text->setWordWrap(true);
+    layout->addWidget(text, 1);
     m_box = new QLineEdit(QString::number(m_value), this);
 //    box->setInputMask("999999999");
 //    QIntValidator* validator = new QIntValidator(value.m_min_value, value.m_max_value, box);

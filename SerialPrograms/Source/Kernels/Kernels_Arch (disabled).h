@@ -20,24 +20,6 @@
 #endif
 
 
-//  ISA Strings
-#if 0
-#elif defined PA_Arch_x64_AVX512GF
-#define PA_ARCH_STRING  "x64-AVX512GF"
-#elif defined PA_Arch_x64_AVX512
-#define PA_ARCH_STRING  "x64-AVX512"
-#elif defined PA_Arch_x64_AVX2
-#define PA_ARCH_STRING  "x64-AVX2"
-#elif defined PA_Arch_x64_SSE42
-#define PA_ARCH_STRING  "x64-SSE4.2"
-#elif defined PA_Arch_x64_SSE41
-#define PA_ARCH_STRING  "x64-SSE4.1"
-#elif defined PA_Arch_x64
-#define PA_ARCH_STRING  "x64"
-#endif
-
-
-
 
 //  Implied ISAs.
 

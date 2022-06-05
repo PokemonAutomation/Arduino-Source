@@ -22,6 +22,12 @@
 
 namespace PokemonAutomation{
 
+#if _M_X64 || __x86_64__
+const char* PA_ARCH_STRING = "x64";
+#else
+const char* PA_ARCH_STRING = "x86";
+#endif
+
 
 #if __GNUC__
 void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
@@ -331,34 +337,25 @@ CPU_Features make_19_IceLake(){
 }
 const CPU_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();
 
-
-
-
 CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
 
-
-
-
-std::vector<CpuCapabilityOption> make_AVAILABLE_CAPABILITIES(){
-    std::vector<CpuCapabilityOption> list;
-    list.emplace_back("Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true);
+const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
+//    static const std::vector<CpuCapabilityOption> LIST = make_AVAILABLE_CAPABILITIES();
+    static const std::vector<CpuCapabilityOption> LIST{
+        {"Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true},
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    list.emplace_back("Intel Nehalem (x64 SSE4.2)",     CPU_CAPABILITY_09_NEHALEM,  CPU_CAPABILITY_NATIVE.OK_08_Nehalem);
+        {"Intel Nehalem (x64 SSE4.2)",     CPU_CAPABILITY_09_NEHALEM,  CPU_CAPABILITY_NATIVE.OK_08_Nehalem},
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    list.emplace_back("Intel Haswell (x64 AVX2)",       CPU_CAPABILITY_13_Haswell,  CPU_CAPABILITY_NATIVE.OK_13_Haswell);
+        {"Intel Haswell (x64 AVX2)",       CPU_CAPABILITY_13_Haswell,  CPU_CAPABILITY_NATIVE.OK_13_Haswell},
 #endif
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    list.emplace_back("Intel Skylake (x64 AVX512)",     CPU_CAPABILITY_17_Skylake,  CPU_CAPABILITY_NATIVE.OK_17_Skylake);
+        {"Intel Skylake (x64 AVX512)",     CPU_CAPABILITY_17_Skylake,  CPU_CAPABILITY_NATIVE.OK_17_Skylake},
 #endif
 #ifdef PA_AutoDispatch_x64_19_IceLake
-    list.emplace_back("Intel Ice Lake (x64 AVX512-GF)", CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake);
+        {"Intel Ice Lake (x64 AVX512-GF)", CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake},
 #endif
-    return list;
-}
-
-const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
-    static const std::vector<CpuCapabilityOption> LIST = make_AVAILABLE_CAPABILITIES();
+    };
     return LIST;
 }
 

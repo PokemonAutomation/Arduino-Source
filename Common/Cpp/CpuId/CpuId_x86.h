@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
 
-
 void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx);
 
 

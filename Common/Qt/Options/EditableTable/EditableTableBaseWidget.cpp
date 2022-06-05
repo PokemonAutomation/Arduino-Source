@@ -27,7 +27,9 @@ EditableTableBaseWidget::EditableTableBaseWidget(QWidget& parent, EditableTableB
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    layout->addWidget(new QLabel(value.m_label, this));
+    QLabel* label = new QLabel(value.m_label, this);
+    label->setWordWrap(true);
+    layout->addWidget(label);
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);

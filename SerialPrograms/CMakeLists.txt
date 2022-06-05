@@ -566,7 +566,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/Kernels_Alignment.h
-    Source/Kernels/Kernels_Arch.h
     Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_BitSet.h
     Source/Kernels/Kernels_x64_AVX2.h

@@ -24,7 +24,6 @@
 #include "TestProgramComputer.h"
 #include "ClientSource/Libraries/Logging.h"
 
-#include "Kernels/Kernels_Arch.h"
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h"
 #include "Kernels/Kernels_x64_SSE41.h"
