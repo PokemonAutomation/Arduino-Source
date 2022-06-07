@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonLA_MapZoomLevelReader.h"
 
+#include <cmath>
 #include <iostream>
 
 namespace PokemonAutomation{

@@ -33,6 +33,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/SpinLock.h"
 

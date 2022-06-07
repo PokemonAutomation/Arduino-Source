@@ -142,9 +142,9 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
 
         m_table->setItem(c, 0, icon_item);
         m_table->setCellWidget(c, 1, make_count_box(*m_table, c, entry.second));
-        QLabel* label = new QLabel(QString::number(research_catch_count(entry.first)), m_table);
-        label->setAlignment(Qt::AlignCenter);
-        m_table->setCellWidget(c, 2, label);
+        QLabel* research_catch_count_label = new QLabel(QString::number(research_catch_count(entry.first)), m_table);
+        research_catch_count_label->setAlignment(Qt::AlignCenter);
+        m_table->setCellWidget(c, 2, research_catch_count_label);
     }
 
     m_table->resizeColumnsToContents();

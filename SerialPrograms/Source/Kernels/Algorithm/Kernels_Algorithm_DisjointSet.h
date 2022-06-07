@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_Algorithm_DisjointSet_H
 #define PokemonAutomation_Kernels_Algorithm_DisjointSet_H
 
+#include <cstddef>
 #include <vector>
 
 namespace PokemonAutomation{

@@ -20,7 +20,7 @@ void convert_audio_uint8_to_float_x86_SSE41(float* f, const uint8_t* i, size_t l
     const __m128 RCP = _mm_set1_ps(1 / 127.f);
     size_t lc = length / 4;
     while (lc--){
-#if __GNUC__ && __GNUC__ < 9
+#if __GNUC__
         __m128i i0 = _mm_cvtepu8_epi32(_mm_cvtsi32_si128(*(int32_t*)i));
 #else
         __m128i i0 = _mm_cvtepu8_epi32(_mm_loadu_si32(i));

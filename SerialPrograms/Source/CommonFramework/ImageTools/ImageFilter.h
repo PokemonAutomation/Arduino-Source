@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ImageFilter_H
 #define PokemonAutomation_CommonFramework_ImageFilter_H
 
+#include <cstddef>
 #include <vector>
 #include "Common/Cpp/Color.h"
 

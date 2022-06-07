@@ -32,10 +32,10 @@ QJsonValue EditableTableOption::to_json() const{
 
 QString EditableTableOption::check_validity() const{
     return EditableTableBaseOption::check_validity();
-};
+}
 void EditableTableOption::restore_defaults(){
     EditableTableBaseOption::restore_defaults();
-};
+}
 
 
 

@@ -82,44 +82,46 @@ struct PlayerState{
 
 
 
-//  Path 0
-//     X
-//   // \\
-//  X X X X
-//  \/ \\ /
-//   O   O
-//  /\\   \
-//  X X X X
-//   \//\/
-//    X  X
-//     \/
-//     X
+/*
+  Path 0
+     X
+   // \\
+  X X X X
+  \/ \\ /
+   O   O
+  /\\   \
+  X X X X
+   \//\/
+    X  X
+     \/
+     X
 
-//  Path 1
-//     X
-//   // \\
-//  X X X X
-//  \ //\/
-//   O   O
-//  / \ / \
-//  X X X X
-//   \/\\/
-//    X  X
-//     \/
-//     X
+  Path 1
+     X
+   // \\
+  X X X X
+  \ //\/
+   O   O
+  / \ / \
+  X X X X
+   \/\\/
+    X  X
+     \/
+     X
 
-//  Path 2
-//     X
-//   // \\
-//  X X X X
-//  \/ \\ /
-//   O   O
-//  /  // \
-//  X X X X
-//   \/ \/
-//    X  X
-//     \/
-//     X
+  Path 2
+     X
+   // \\
+  X X X X
+  \/ \\ /
+   O   O
+  /  // \
+  X X X X
+   \/ \/
+    X  X
+     \/
+     X
+*/
 
 struct PathMap{
     int8_t path_type = -1;
