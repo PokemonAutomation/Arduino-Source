@@ -21,6 +21,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
+#include "PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
@@ -28,8 +29,9 @@
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
-#include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_OutbreakFinder.h"
+#include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
+#include "PokemonLA/PokemonLA_Settings.h"
 
 #include <sstream>
 
@@ -113,7 +115,7 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
         MMO_FIRST_WAVE_SPRITE_SLUGS(),
         &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
     )
-    , DESIRED_SHINY_MMO_SLUGS(
+    , DESIRED_STAR_MMO_SLUGS(
         "<b>Desired first MMO wave " + STRING_POKEMON + " with shiny symbols:</b><br>Stop when anything on this list is found.",
         ALL_MMO_SPRITES(),
         MMO_FIRST_WAVE_SPRITE_SLUGS(),
@@ -136,7 +138,7 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(DESIRED_MO_SLUGS);
     PA_ADD_OPTION(DESIRED_MMO_SLUGS);
-    // PA_ADD_OPTION(DESIRED_SHINY_MMO_SLUGS);
+    PA_ADD_OPTION(DESIRED_STAR_MMO_SLUGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -148,12 +150,16 @@ public:
         , errors(m_stats["Errors"])
         , outbreaks(m_stats["Outbreaks"])
         , mmos(m_stats["MMOs"])
+        , mmo_pokemon(m_stats["MMO Pokemon"])
+        , stars(m_stats["Stars"])
         , matches(m_stats["Matches"])
     {
         m_display_order.emplace_back("Checks");
         m_display_order.emplace_back("Errors", true);
         m_display_order.emplace_back("Outbreaks");
         m_display_order.emplace_back("MMOs");
+        m_display_order.emplace_back("MMO Pokemon");
+        m_display_order.emplace_back("Stars");
         m_display_order.emplace_back("Matches", true);
     }
 
@@ -161,6 +167,8 @@ public:
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& outbreaks;
     std::atomic<uint64_t>& mmos;
+    std::atomic<uint64_t>& mmo_pokemon;
+    std::atomic<uint64_t>& stars; // MMO star symbols
     std::atomic<uint64_t>& matches;
 };
 
@@ -350,8 +358,10 @@ std::set<std::string> OutbreakFinder::read_MMOs(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const std::string& mmo_name,
     const std::set<std::string>& desired_MMOs,
-    const std::set<std::string>& desired_shiny_MMOs
+    const std::set<std::string>& desired_star_MMOs
 ){
+    Stats& stats = env.current_stats<Stats>();
+
     MapRegion region = MapRegion::NONE;
     TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
@@ -476,22 +486,56 @@ std::set<std::string> OutbreakFinder::read_MMOs(
     }
     env.console.log("Found revealed map thanks to Munchlax!");
 
+    VideoOverlaySet mmo_sprites_overlay(env.console);
+    for (size_t i = 0; i < new_boxes.size(); i++){
+        mmo_sprites_overlay.add(COLOR_BLUE, pixelbox_to_floatbox(question_mark_image, new_boxes[i]));
+    }
+
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
     pbf_move_left_joystick(context, 0, 0, 300, 30);
     context.wait_for_all_requests();
 
-    // Check results:
     std::set<std::string> found;
+
+    // Check MMO results:
+    std::vector<std::string> sprites;
     QImage sprites_screen = env.console.video().snapshot();
     for (size_t i = 0; i < new_boxes.size(); i++){
-        // XXX add sprite subset to reduce search space
         auto result = match_sprite_on_map(sprites_screen, new_boxes[i], region);
         env.console.log("Found sprite " + result.slug);
+        stats.mmo_pokemon++;
 
+        sprites.push_back(result.slug);
         if (desired_MMOs.find(result.slug) != desired_MMOs.end()){
             found.insert(result.slug);
         }
     }
+
+    // Check star MMO results:
+    std::vector<ImagePixelBox> star_boxes;
+    for (size_t i = 0; i < new_boxes.size(); i++){
+        const auto& sprite_box = new_boxes[i];
+        int radius = sprite_box.width() / 2;
+        int center_x = sprite_box.center_x();
+        int center_y = sprite_box.center_y();
+        ImagePixelBox star_box(center_x + radius/10, center_y - radius*16/10, center_x + radius * 5/4, center_y);
+        star_boxes.push_back(std::move(star_box));
+    }
+
+    MMOSpriteStarSymbolDetector star_detector(sprites_screen, star_boxes);
+
+    ret = wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});
+    for (size_t i = 0; i < new_boxes.size(); i++){
+        if (star_detector.is_star(i)){
+            stats.stars++;
+            env.log("Sprite " + sprites[i] + " has star.");
+            if (desired_star_MMOs.find(sprites[i]) != desired_star_MMOs.end()){
+                found.insert(sprites[i]);
+            }
+        }
+    }
+
+    env.update_stats();
 
     return found;
 }
@@ -502,7 +546,7 @@ bool OutbreakFinder::run_iteration(
     const std::set<std::string>& desired_hisui_map_events,
     const std::set<std::string>& desired_outbreaks,
     const std::set<std::string>& desired_MMOs,
-    const std::set<std::string>& desired_shiny_MMOs
+    const std::set<std::string>& desired_star_MMOs
 ){
     Stats& stats = env.current_stats<Stats>();
 
@@ -558,13 +602,14 @@ bool OutbreakFinder::run_iteration(
         save_game_from_overworld(env, env.console, context);
 
         for(const auto& mmo_name: found_hisui_map_events){
-            std::set<std::string> found_pokemon = read_MMOs(env, context, mmo_name, desired_MMOs, desired_shiny_MMOs);
+            std::set<std::string> found_pokemon = read_MMOs(env, context, mmo_name, desired_MMOs, desired_star_MMOs);
             if (found_pokemon.size() > 0){
                 stats.matches += found_pokemon.size();
                 return true;
             }
 
             env.log("No target MMO sprite found. Reset game...");
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
@@ -598,13 +643,13 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
     std::set<std::string> desired_MMOs = to_set(DESIRED_MMO_SLUGS);
-    std::set<std::string> desired_shiny_MMOs = to_set(DESIRED_SHINY_MMO_SLUGS);
+    std::set<std::string> desired_star_MMOs = to_set(DESIRED_STAR_MMO_SLUGS);
 
     std::set<std::string> desired_hisui_map_events = desired_outbreaks;
     std::map<std::string, int> MMO_targets;
     for(size_t i = 0; i < 5; i++){
         for(const std::string& sprite_slug: MMO_FIRST_WAVE_REGION_SPRITE_SLUGS()[i]){
-            if (desired_MMOs.find(sprite_slug) != desired_MMOs.end() || desired_shiny_MMOs.find(sprite_slug) != desired_shiny_MMOs.end()){
+            if (desired_MMOs.find(sprite_slug) != desired_MMOs.end() || desired_star_MMOs.find(sprite_slug) != desired_star_MMOs.end()){
                 MMO_targets[MMO_NAMES().name_list[i]]++;
             }
         }
@@ -623,7 +668,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
     while (true){
-        if (run_iteration(env, context, desired_hisui_map_events, desired_outbreaks, desired_MMOs, desired_shiny_MMOs)){
+        if (run_iteration(env, context, desired_hisui_map_events, desired_outbreaks, desired_MMOs, desired_star_MMOs)){
             break;
         }
     }

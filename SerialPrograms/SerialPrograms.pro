@@ -452,6 +452,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.cpp \
@@ -1185,6 +1186,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h \

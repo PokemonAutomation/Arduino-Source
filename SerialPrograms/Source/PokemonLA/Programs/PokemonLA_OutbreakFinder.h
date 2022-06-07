@@ -48,14 +48,14 @@ private:
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const std::string& mmo_name,
         const std::set<std::string>& desired_MMOs,
-        const std::set<std::string>& desired_shiny_MMOs
+        const std::set<std::string>& desired_star_MMOs
     );
 
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const std::set<std::string>& desired_hisui_map_events,
         const std::set<std::string>& desired_outbreaks,
         const std::set<std::string>& desired_MMOs,
-        const std::set<std::string>& desired_shiny_MMOs);
+        const std::set<std::string>& desired_star_MMOs);
 
 private:
     class Stats;
@@ -66,7 +66,7 @@ private:
 
     Pokemon::PokemonNameList DESIRED_MO_SLUGS;
     Pokemon::PokemonNameList DESIRED_MMO_SLUGS;
-    Pokemon::PokemonNameList DESIRED_SHINY_MMO_SLUGS;
+    Pokemon::PokemonNameList DESIRED_STAR_MMO_SLUGS;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_MATCHED;
