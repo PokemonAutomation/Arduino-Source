@@ -192,13 +192,13 @@ void on_match_found(
     }
 
     if (stop_program){
-        console.log("STOPPING...");
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        console.log("Stopping...");
+//        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
         throw ProgramFinishedException();
     }
 
-    console.log("CONTINUING...");
+    console.log("Continuing...");
 }
 
 

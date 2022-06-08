@@ -203,7 +203,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
             break;
         }
         else{
-            console.log("Attempt " + std::to_string(i) + "Found: " + MOUNT_STATE_STRINGS[(int)mount]);
+            console.log("Attempt " + std::to_string(i) + ". Found: " + MOUNT_STATE_STRINGS[(int)mount]);
             pbf_wait(context, 0.5 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
             snapshot = console.video().snapshot();
