@@ -43,10 +43,10 @@ QJsonValue TouchDateIntervalOption::to_json() const{
 }
 QString TouchDateIntervalOption::check_validity() const{
     return m_hours.check_validity();
-};
+}
 void TouchDateIntervalOption::restore_defaults(){
     m_hours.restore_defaults();
-};
+}
 void TouchDateIntervalOption::reset_state(){
     m_last_touch = WallClock::min();
 }

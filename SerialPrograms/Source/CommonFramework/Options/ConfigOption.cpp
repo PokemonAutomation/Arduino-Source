@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 QString ConfigOption::check_validity() const{
     return QString();
-};
+}
 
 
 ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)

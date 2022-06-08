@@ -95,11 +95,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    using namespace PokemonBDSP;
     using namespace PokemonLA;
 
-    LoggerQt& logger = env.logger();
-    ConsoleHandle& console = env.consoles[0];
-//    BotBase& botbase = env.consoles[0];
-    VideoFeed& feed = env.consoles[0];
-    VideoOverlay& overlay = env.consoles[0];
+    [[maybe_unused]] LoggerQt& logger = env.logger();
+    [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
+//    [[maybe_unused]] BotBase& botbase = env.consoles[0];
+    [[maybe_unused]] VideoFeed& feed = env.consoles[0];
+    [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
     FlagTracker tracker(logger, overlay);
 

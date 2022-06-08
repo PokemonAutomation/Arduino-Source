@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 std::string Exception::message() const{
     return "";
-};
+}
 std::string Exception::to_str() const{
     std::string str = name();
     std::string msg = message();

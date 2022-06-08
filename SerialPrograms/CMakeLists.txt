@@ -1439,12 +1439,11 @@ target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
 
 
 
-#enable MP with MSVC (Build with Multiple Processes)
 if (MSVC)
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
-    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY)
+    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
 
-    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4)
+    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
@@ -1478,7 +1477,7 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    target_compile_options(SerialPrograms PRIVATE -Wall -Wpedantic)
+    target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)

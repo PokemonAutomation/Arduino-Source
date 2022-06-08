@@ -47,7 +47,7 @@ QJsonValue RegiSelectorOption::to_json() const{
 
 void RegiSelectorOption::restore_defaults(){
     m_current = m_default;
-};
+}
 
 ConfigWidget* RegiSelectorOption::make_ui(QWidget& parent){
     return new RegiSelectorWidget(parent, *this);

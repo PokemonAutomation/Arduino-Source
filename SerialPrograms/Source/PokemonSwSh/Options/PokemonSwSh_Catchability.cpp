@@ -51,7 +51,7 @@ QJsonValue CatchabilitySelectorOption::to_json() const{
 
 void CatchabilitySelectorOption::restore_defaults(){
     m_current = m_default;
-};
+}
 
 ConfigWidget* CatchabilitySelectorOption::make_ui(QWidget& parent){
     return new CatchabilitySelectorWidget(parent, *this);

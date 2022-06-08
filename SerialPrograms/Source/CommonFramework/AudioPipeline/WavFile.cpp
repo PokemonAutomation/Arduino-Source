@@ -60,6 +60,7 @@
 **
 ****************************************************************************/
 
+#include <limits>
 #include <qendian.h>
 #include <QVector>
 #include <QDebug>
