@@ -8,6 +8,7 @@
 #include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP_EggHatchFilter.h"
 
 #include <iostream>
@@ -38,6 +39,19 @@ const std::map<QString, EggHatchShinyFilter> ShinyFilter_MAP{
     {EggHatchShinyFilter_NAMES[0], EggHatchShinyFilter::Anything},
     {EggHatchShinyFilter_NAMES[1], EggHatchShinyFilter::NotShiny},
     {EggHatchShinyFilter_NAMES[2], EggHatchShinyFilter::Shiny},
+};
+
+const QString EggHatchGenderFilter_NAMES[] = {
+    "Any",
+    "Male",
+    "Female",
+    "Genderless",
+};
+const std::map<QString, EggHatchGenderFilter> GenderFilter_MAP{
+    {EggHatchGenderFilter_NAMES[0], EggHatchGenderFilter::Any},
+    {EggHatchGenderFilter_NAMES[1], EggHatchGenderFilter::Male},
+    {EggHatchGenderFilter_NAMES[2], EggHatchGenderFilter::Female},
+    {EggHatchGenderFilter_NAMES[3], EggHatchGenderFilter::Genderless}
 };
 
 
@@ -97,6 +111,7 @@ std::vector<QWidget*> EggHatchFilterRow::make_widgets(QWidget& parent){
     widgets.emplace_back(make_iv_box(parent, iv_spatk));
     widgets.emplace_back(make_iv_box(parent, iv_spdef));
     widgets.emplace_back(make_iv_box(parent, iv_speed));
+    widgets.emplace_back(make_gender_box(parent));
     return widgets;
 }
 QWidget* EggHatchFilterRow::make_action_box(QWidget& parent){
@@ -143,12 +158,29 @@ QWidget* EggHatchFilterRow::make_iv_box(QWidget& parent, IVCheckerFilter& iv){
     return box;
 }
 
-
+QWidget* EggHatchFilterRow::make_gender_box(QWidget& parent){
+    QComboBox* box = new NoWheelComboBox(&parent);
+    box->addItem(EggHatchGenderFilter_NAMES[0]);
+    box->addItem(EggHatchGenderFilter_NAMES[1]);
+    box->addItem(EggHatchGenderFilter_NAMES[2]);
+    box->addItem(EggHatchGenderFilter_NAMES[3]);
+    box->setCurrentIndex((int)shiny);
+    box->connect(
+        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        box, [&](int index){
+            if (index < 0){
+                index = 0;
+            }
+            shiny = (EggHatchShinyFilter)index;
+        }
+    );
+    return box;
+}
 
 
 QStringList EggHatchFilterOptionFactory::make_header() const{
     QStringList list;
-    list << "Action" << "Shininess" << "HP" << "Attack" << "Defense" << "Sp. Attack" << "Sp. Defense" << "Speed";
+    list << "Action" << "Shininess" << "HP" << "Attack" << "Defense" << "Sp. Attack" << "Sp. Defense" << "Speed" << "Gender";
     return list;
 }
 std::unique_ptr<EditableTableRow> EggHatchFilterOptionFactory::make_row() const{
@@ -187,7 +219,7 @@ ConfigWidget* EggHatchFilterOption::make_ui(QWidget& parent){
     return m_table.make_ui(parent);
 }
 
-EggHatchAction EggHatchFilterOption::get_action(bool shiny, const IVCheckerReader::Results& IVs) const{
+EggHatchAction EggHatchFilterOption::get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const{
     EggHatchAction action = EggHatchAction::Release;
     for (size_t c = 0; c < m_table.size(); c++){
         const EggHatchFilterRow& filter = static_cast<const EggHatchFilterRow&>(m_table[c]);
@@ -215,6 +247,9 @@ EggHatchAction EggHatchFilterOption::get_action(bool shiny, const IVCheckerReade
         if (!IVChecker_filter_match(filter.iv_spatk, IVs.spatk)) continue;
         if (!IVChecker_filter_match(filter.iv_spdef, IVs.spdef)) continue;
         if (!IVChecker_filter_match(filter.iv_speed, IVs.speed)) continue;
+
+//        if(filter.gender == EggHatchGenderFilter::Any) continue;
+//        if (filter.gender ==  gender) continue;
 
         //  No action matched so far. Take the current action and continue.
         if (action == EggHatchAction::Release){
