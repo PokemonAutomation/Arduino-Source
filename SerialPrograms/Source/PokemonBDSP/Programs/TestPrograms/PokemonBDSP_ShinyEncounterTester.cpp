@@ -60,8 +60,8 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
         QString sending = "Sending: ";
             sending+=colour[i];
             env.log(sending);
-
-        read_gender(env.console, env.console, image, colour[i]);
+        BoxGenderDetector detector;
+        detector.read_gender(env.console, env.console, image, colour[i]);
     }
 
 

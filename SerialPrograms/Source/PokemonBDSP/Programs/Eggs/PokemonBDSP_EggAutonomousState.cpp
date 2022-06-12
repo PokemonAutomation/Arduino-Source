@@ -244,7 +244,7 @@ bool EggAutonomousState::process_party(){
         BoxGenderDetector gender_detector;
         EggHatchGenderFilter gender = gender_detector.read_gender(m_console, m_console, screen, "");
 
-        EggHatchAction action = m_filters.get_action(shiny, IVs);
+        EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
         switch (action){
         case EggHatchAction::StopProgram:
             m_console.log("Program stop requested...");
