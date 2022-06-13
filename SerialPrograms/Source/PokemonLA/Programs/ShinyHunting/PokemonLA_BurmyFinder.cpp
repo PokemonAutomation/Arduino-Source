@@ -209,6 +209,8 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 
 bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    context.wait_for_all_requests();
+
     disable_shiny_sound(context);
     bool battle_found = check_tree_or_ore_for_battle(env.console, context);
     env.stats<Stats>().trees++;
@@ -227,9 +229,11 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
 }
 
 void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
     env.stats<Stats>().trees++;
     env.update_stats();
     enable_shiny_sound(context);
