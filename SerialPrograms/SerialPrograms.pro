@@ -378,6 +378,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
@@ -1089,6 +1090,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
