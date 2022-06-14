@@ -117,7 +117,9 @@ bool cluster_fit_2(
     color1 = cluster[1].center().round();
     deviation = cluster_fit_2(image, color0, cluster[0], color1, cluster[1]);
 //    cout << "deviation = " << deviation << endl;
+//    cout << cluster[0].count() << " / " << cluster[1].count() << endl;
     if (deviation > deviation_threshold){
+//        cout << "deviation out" << endl;
         return false;
     }
 
@@ -138,6 +140,8 @@ bool cluster_fit_2(
 //        cout << "Color Ratio Diff: " << diff << endl;
         if (diff > ratio_threshold){
 //            cout << "Color Ratio Diff is Too Large: " << diff << endl;
+//            cout << "desired = " << count_ratio_desired[c] << endl;
+//            cout << "actual = " << count_ratio_actual[c] << endl;
             return false;
         }
 

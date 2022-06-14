@@ -20,6 +20,7 @@
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
 #include <QVideoFrame>
 
@@ -101,11 +102,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
+
+    QImage image("screenshot-20220613-170430686597.png");
+
+    VideoOverlaySet set(overlay);
+    PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
+    detector.make_overlays(set);
+
+    cout << detector.detect(image) << endl;
+
+
+
+#if 0
     FlagTracker tracker(logger, overlay);
 
     QImage image("test-57.png");
     tracker.process_frame(image, current_time());
-
+#endif
 
 
 //    InferenceBoxScope box(overlay, 0.843, 0.96, 0.075, 0.005);
