@@ -240,11 +240,11 @@ bool EggAutonomousState::process_party(){
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
 
-        //Check Gender HERE
         BoxGenderDetector gender_detector;
-        EggHatchGenderFilter gender = gender_detector.read_gender(m_console, m_console, screen, "");
+        EggHatchGenderFilter gender = gender_detector.identify_gender(m_console, m_console, screen);
 
         EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
+
         switch (action){
         case EggHatchAction::StopProgram:
             m_console.log("Program stop requested...");

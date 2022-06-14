@@ -8,12 +8,11 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-using namespace Pokemon;
 
 class BoxGenderDetector{
 
 public:
-EggHatchGenderFilter read_gender(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame, QString name);
+EggHatchGenderFilter identify_gender(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame);
 
 };
 }

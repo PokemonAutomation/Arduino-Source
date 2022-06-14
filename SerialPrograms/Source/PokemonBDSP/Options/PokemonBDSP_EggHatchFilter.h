@@ -11,7 +11,6 @@
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +34,7 @@ enum class EggHatchGenderFilter{
     Any,
     Male,
     Female,
-    Genderless,
+    Genderless
 };
 
 

@@ -46,34 +46,15 @@ ShinyEncounterTester::ShinyEncounterTester(const ShinyEncounterTester_Descriptor
 
 
 void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
-    //const char* colour[3] = { "Chikorita-M", "Chikorita-F", "Mew" };
-    const char* colour[6] = { "Chikorita", "Jigglypuff", "Starly", "Chikorita-M", "Chikorita-F", "Mew" };
-    QImage image;
-    for (int i = 0; i < 6; i++)
-    {
-        QString path = "D:\\Side-Projects\\PokemonAutomation\\PythonHelper\\images\\";
-            path+= colour[i];
-            path+= ".png";
-        image.load(path);
-
-        QString sending = "Sending: ";
-            sending+=colour[i];
-            env.log(sending);
-        BoxGenderDetector detector;
-        detector.read_gender(env.console, env.console, image, colour[i]);
-    }
-
-
-//    DoublesShinyDetection result_wild;
-//    ShinyDetectionResult result_own;
-//    detect_shiny_battle(
-//        env.console, context,
-//        result_wild, result_own,
-//        env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
-//        ENCOUNTER_TYPE == 0 ? YOUR_POKEMON : WILD_POKEMON,
-//        std::chrono::seconds(30)
-//    );
+    DoublesShinyDetection result_wild;
+    ShinyDetectionResult result_own;
+    detect_shiny_battle(
+        env.console, context,
+        result_wild, result_own,
+        env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
+        ENCOUNTER_TYPE == 0 ? YOUR_POKEMON : WILD_POKEMON,
+        std::chrono::seconds(30)
+    );
 }
 
 

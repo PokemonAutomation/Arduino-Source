@@ -45,13 +45,11 @@ const QString EggHatchGenderFilter_NAMES[] = {
     "Any",
     "Male",
     "Female",
-    "Genderless",
 };
 const std::map<QString, EggHatchGenderFilter> GenderFilter_MAP{
     {EggHatchGenderFilter_NAMES[0], EggHatchGenderFilter::Any},
     {EggHatchGenderFilter_NAMES[1], EggHatchGenderFilter::Male},
-    {EggHatchGenderFilter_NAMES[2], EggHatchGenderFilter::Female},
-    {EggHatchGenderFilter_NAMES[3], EggHatchGenderFilter::Genderless}
+    {EggHatchGenderFilter_NAMES[2], EggHatchGenderFilter::Female}
 };
 
 
@@ -85,6 +83,16 @@ void EggHatchFilterRow::load_json(const QJsonValue& json){
     iv_spatk = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-SpAtk"));
     iv_spdef = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-SpDef"));
     iv_speed = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-Speed"));
+
+    {
+        QString value;
+        if (json_get_string(value, obj, "Gender")){
+            auto iter = GenderFilter_MAP.find(value);
+            if (iter != GenderFilter_MAP.end()){
+                gender = iter->second;
+            }
+        }
+    }
 }
 QJsonValue EggHatchFilterRow::to_json() const{
     QJsonObject obj;
@@ -96,6 +104,8 @@ QJsonValue EggHatchFilterRow::to_json() const{
     obj.insert("IV-SpAtk", IVCheckerFilter_enum_to_string(iv_spatk));
     obj.insert("IV-SpDef", IVCheckerFilter_enum_to_string(iv_spdef));
     obj.insert("IV-Speed", IVCheckerFilter_enum_to_string(iv_speed));
+    obj.insert("Gender", EggHatchGenderFilter_NAMES[(size_t)gender]);
+
     return obj;
 }
 std::unique_ptr<EditableTableRow> EggHatchFilterRow::clone() const{
@@ -163,15 +173,14 @@ QWidget* EggHatchFilterRow::make_gender_box(QWidget& parent){
     box->addItem(EggHatchGenderFilter_NAMES[0]);
     box->addItem(EggHatchGenderFilter_NAMES[1]);
     box->addItem(EggHatchGenderFilter_NAMES[2]);
-    box->addItem(EggHatchGenderFilter_NAMES[3]);
-    box->setCurrentIndex((int)shiny);
+    box->setCurrentIndex((int)gender);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         box, [&](int index){
             if (index < 0){
                 index = 0;
             }
-            shiny = (EggHatchShinyFilter)index;
+            gender = (EggHatchGenderFilter)index;
         }
     );
     return box;
@@ -248,8 +257,9 @@ EggHatchAction EggHatchFilterOption::get_action(bool shiny, const IVCheckerReade
         if (!IVChecker_filter_match(filter.iv_spdef, IVs.spdef)) continue;
         if (!IVChecker_filter_match(filter.iv_speed, IVs.speed)) continue;
 
-//        if(filter.gender == EggHatchGenderFilter::Any) continue;
-//        if (filter.gender ==  gender) continue;
+        if(filter.gender != gender && filter.gender != EggHatchGenderFilter::Any){
+            continue;
+        }
 
         //  No action matched so far. Take the current action and continue.
         if (action == EggHatchAction::Release){
