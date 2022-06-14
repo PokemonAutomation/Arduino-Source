@@ -6,7 +6,6 @@
 
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP_ShinyEncounterTester.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
