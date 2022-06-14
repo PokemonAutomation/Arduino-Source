@@ -140,7 +140,7 @@ bool BattleMenuDetector::detect(const QImage& screen){
     if (!fight){
         fight = cluster_fit_2(   //  Cheer
             extract_box_reference(screen, m_icon_cheer),
-            qRgb(0, 0, 0), 2.2,
+            qRgb(0, 0, 0), 1.0,
             qRgb(9, 162, 218), 1.0
         );
 //        cout << "fight = " << fight << endl;
