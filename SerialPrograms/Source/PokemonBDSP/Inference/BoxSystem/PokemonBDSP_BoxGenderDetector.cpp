@@ -68,11 +68,11 @@ EggHatchGenderFilter BoxGenderDetector::identify_gender(LoggerQt& logger, VideoO
 {
     InferenceBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
 
-    QImage name_and_gender = extract_box_reference(frame, gender_box).to_qimage();
+    ConstImageRef name_and_gender = extract_box_reference(frame, gender_box);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(name_and_gender, 0, 130, 0, 130, 0, 255);
     //logger.log(matrix.dump());
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 200);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50);
     for (const WaterfillObject& object : objects){
         if (is_male(name_and_gender, object)){
             logger.log("Male", COLOR_BLUE);
@@ -82,7 +82,7 @@ EggHatchGenderFilter BoxGenderDetector::identify_gender(LoggerQt& logger, VideoO
 
     matrix = compress_rgb32_to_binary_range(name_and_gender, 0, 255, 0, 130, 0, 130);
     //logger.log(matrix.dump());
-    objects = find_objects_inplace(matrix, 200);
+    objects = find_objects_inplace(matrix, 50);
     for (const WaterfillObject& object : objects){
         if (is_female(name_and_gender, object)){
             logger.log("Female", COLOR_RED);
