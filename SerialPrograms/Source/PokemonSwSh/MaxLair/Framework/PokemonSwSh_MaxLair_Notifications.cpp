@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -60,6 +61,11 @@ void send_status_notification(
         status_str += label + " - " + QString::fromStdString(str) + "\n";
         embeds.emplace_back(std::move(label), QString::fromStdString(str));
     }
+    if (GlobalSettings::instance().ALL_STATS){
+        QString str = QString::fromStdString(env.historical_stats_str());
+        status_str += "Historical Stats: " + str + "\n";
+        embeds.emplace_back("Historical Stats", std::move(str));
+    }
     env.log(status_str);
     send_program_notification(
         env.logger(), runtime.notification_status,
@@ -70,7 +76,7 @@ void send_status_notification(
 }
 
 void send_raid_notification(
-    const ProgramInfo& program_info,
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -117,11 +123,15 @@ void send_raid_notification(
         embeds.emplace_back("Current Path", QString::fromStdString(path_stats.to_str()));
     }
     embeds.emplace_back("Session Stats", QString::fromStdString(session_stats.to_str()));
+    if (GlobalSettings::instance().ALL_STATS){
+        QString str = QString::fromStdString(env.historical_stats_str());
+        embeds.emplace_back("Historical Stats", std::move(str));
+    }
 
     send_program_notification(
         console, settings.NOTIFICATION,
         Color(),
-        program_info,
+        env.program_info(),
         "Max Lair Notification",
         embeds,
         screen, false
@@ -131,8 +141,8 @@ void send_raid_notification(
 
 
 void send_shiny_notification(
+    ProgramEnvironment& env,
     LoggerQt& logger, EventNotificationOption& settings,
-    const ProgramInfo& program_info,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,
     const PathStats& path_stats,
@@ -181,10 +191,14 @@ void send_shiny_notification(
         embeds.emplace_back("Current Path", QString::fromStdString(path_stats.to_str()));
     }
     embeds.emplace_back("Session Stats", QString::fromStdString(session_stats.to_str()));
+    if (GlobalSettings::instance().ALL_STATS){
+        QString str = QString::fromStdString(env.historical_stats_str());
+        embeds.emplace_back("Historical Stats", std::move(str));
+    }
 
     send_program_notification(
         logger, settings,
-        Pokemon::COLOR_STAR_SHINY, program_info,
+        Pokemon::COLOR_STAR_SHINY, env.program_info(),
         "Max Lair Shiny Notification",
         embeds,
         image, true

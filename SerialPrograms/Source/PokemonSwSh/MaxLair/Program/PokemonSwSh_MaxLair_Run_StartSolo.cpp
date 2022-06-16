@@ -195,7 +195,7 @@ bool start_raid_host_solo(
     }
 
     send_raid_notification(
-        env.program_info(),
+        env,
         console,
         settings.NOTIFICATIONS,
         has_code, code,

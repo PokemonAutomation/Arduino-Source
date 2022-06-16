@@ -32,7 +32,7 @@ void send_status_notification(
 );
 
 void send_raid_notification(
-    const ProgramInfo& program_info,
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -42,8 +42,8 @@ void send_raid_notification(
 );
 
 void send_shiny_notification(
+    ProgramEnvironment& env,
     LoggerQt& logger, EventNotificationOption& settings,
-    const ProgramInfo& program_info,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,
     const PathStats& path_stats,

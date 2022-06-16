@@ -101,12 +101,13 @@ bool on_shiny_callback(
     ss << "\n(Shiny may not be visible on the screen.)";
 
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.current_stats();
-    if (stats){
-        std::string str = stats->to_str();
-        if (!str.empty()){
-            embeds.emplace_back("Session Stats", QString::fromStdString(str));
-        }
+    const StatsTracker* current_stats = env.current_stats();
+    if (current_stats){
+        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    const StatsTracker* historical_stats = env.historical_stats();
+    if (historical_stats){
+        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
     }
     send_program_notification(
         console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
@@ -123,12 +124,13 @@ void on_shiny_sound(
     float error_coefficient
 ){
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.current_stats();
-    if (stats){
-        std::string str = stats->to_str();
-        if (!str.empty()){
-            embeds.emplace_back("Session Stats", QString::fromStdString(str));
-        }
+    const StatsTracker* current_stats = env.current_stats();
+    if (current_stats){
+        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    const StatsTracker* historical_stats = env.historical_stats();
+    if (historical_stats){
+        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
     }
 
     std::stringstream ss;
@@ -166,12 +168,13 @@ void on_match_found(
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.current_stats();
-    if (stats){
-        std::string str = stats->to_str();
-        if (!str.empty()){
-            embeds.emplace_back("Session Stats", QString::fromStdString(str));
-        }
+    const StatsTracker* current_stats = env.current_stats();
+    if (current_stats){
+        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    const StatsTracker* historical_stats = env.historical_stats();
+    if (historical_stats){
+        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
     }
 
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);

@@ -403,7 +403,7 @@ bool start_raid_host(
     }
 
     send_raid_notification(
-        env.program_info(),
+        env,
         host,
         settings.NOTIFICATIONS,
         has_code, code,

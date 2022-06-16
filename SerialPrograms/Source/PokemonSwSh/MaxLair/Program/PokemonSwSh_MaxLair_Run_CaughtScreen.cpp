@@ -123,8 +123,8 @@ StateMachineAction run_caught_screen(
 
         SpinLockGuard lg(runtime.m_lock);
         send_shiny_notification(
-            console, runtime.notification_shiny,
-            env.program_info(),
+            env, console,
+            runtime.notification_shiny,
             console_index, shinies.size(),
             nullptr,
             runtime.path_stats,
