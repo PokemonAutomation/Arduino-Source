@@ -30,6 +30,13 @@ enum class EggHatchShinyFilter{
     Shiny,
 };
 
+enum class EggHatchGenderFilter{
+    Any,
+    Male,
+    Female,
+    Genderless
+};
+
 
 class EggHatchFilterRow : public EditableTableRow{
 public:
@@ -43,10 +50,12 @@ private:
     QWidget* make_action_box(QWidget& parent);
     QWidget* make_shiny_box(QWidget& parent);
     QWidget* make_iv_box(QWidget& parent, IVCheckerFilter& iv);
+    QWidget* make_gender_box(QWidget& parent);
 
 public:
     EggHatchAction action = EggHatchAction::Keep;
     EggHatchShinyFilter shiny = EggHatchShinyFilter::Anything;
+    EggHatchGenderFilter gender = EggHatchGenderFilter::Any;
     IVCheckerFilter iv_hp = IVCheckerFilter::Anything;
     IVCheckerFilter iv_atk = IVCheckerFilter::Anything;
     IVCheckerFilter iv_def = IVCheckerFilter::Anything;
@@ -66,7 +75,7 @@ class EggHatchFilterOption : public ConfigOption{
 public:
     EggHatchFilterOption();
 
-    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs) const;
+    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const;
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;

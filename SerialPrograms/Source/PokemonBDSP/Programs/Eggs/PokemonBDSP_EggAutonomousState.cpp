@@ -19,6 +19,7 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -27,6 +28,7 @@
 #include "PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_EggFeedback.h"
 #include "PokemonBDSP_EggAutonomousState.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -238,7 +240,11 @@ bool EggAutonomousState::process_party(){
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
 
-        EggHatchAction action = m_filters.get_action(shiny, IVs);
+        BoxGenderDetector gender_detector;
+        EggHatchGenderFilter gender = gender_detector.identify_gender(m_console, m_console, screen);
+
+        EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
+
         switch (action){
         case EggHatchAction::StopProgram:
             m_console.log("Program stop requested...");
