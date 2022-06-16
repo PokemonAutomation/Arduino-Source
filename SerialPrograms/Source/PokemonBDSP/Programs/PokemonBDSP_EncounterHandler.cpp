@@ -139,14 +139,12 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
 
     update_frequencies(encounter);
     send_encounter_notification(
-        m_console,
+        m_env,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_env.program_info(),
         m_language != Language::None, is_likely_shiny(result.shiny_type),
         encounter_results,
         result.best_screenshot,
-        &m_session_stats,
         enable_names ? &m_frequencies : nullptr
     );
 
@@ -199,14 +197,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     update_frequencies(encounter);
     send_encounter_notification(
-        m_console,
+        m_env,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_env.program_info(),
         enable_names, is_likely_shiny(result.shiny_type),
         encounter_results,
         result.best_screenshot,
-        &m_session_stats,
         enable_names ? &m_frequencies : nullptr
     );
 

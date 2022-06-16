@@ -113,7 +113,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
+    ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
@@ -177,12 +177,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
 
 StopProgram:
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

@@ -85,14 +85,12 @@ void StandardEncounterHandler::run_away_and_update_stats(
         ? *candidates_ptr
         : std::set<std::string>();
     send_encounter_notification(
-        m_console,
+        m_env,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_env.program_info(),
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}},
         result.best_screenshot,
-        &m_session_stats,
         &m_frequencies
     );
 
@@ -147,14 +145,12 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         ? *candidates_ptr
         : std::set<std::string>();
     send_encounter_notification(
-        m_console,
+        m_env,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_env.program_info(),
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}},
         result.best_screenshot,
-        &m_session_stats,
         &m_frequencies
     );
 
@@ -207,14 +203,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         ? *candidates_ptr
         : std::set<std::string>();
     send_encounter_notification(
-        m_console,
+        m_env,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_env.program_info(),
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}},
         result.best_screenshot,
-        &m_session_stats,
         &m_frequencies
     );
 

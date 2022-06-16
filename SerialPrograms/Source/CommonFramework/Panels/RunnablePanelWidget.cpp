@@ -303,6 +303,7 @@ void RunnablePanelWidget::restore_defaults(){
 void RunnablePanelWidget::load_historical_stats(){
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
     std::unique_ptr<StatsTracker> stats = instance.make_stats();
+    std::string stats_str;
     if (stats){
         StatSet set;
         set.open_from_file(GlobalSettings::instance().STATS_FILE);
@@ -311,12 +312,14 @@ void RunnablePanelWidget::load_historical_stats(){
         if (list.size() != 0){
             list.aggregate(*stats);
         }
-        emit async_set_status(QString::fromStdString(stats->to_str()));
+        stats_str = stats->to_str();
+        emit async_set_status(QString::fromStdString(stats_str));
 //        m_status_bar->setText(QString::fromStdString(stats->to_str()));
 //        m_status_bar->setVisible(true);
     }
 
     std::lock_guard<std::mutex> lg(m_lock);
+//    m_historical_stats_str = std::move(stats_str);
     m_historical_stats = std::move(stats);
 }
 void RunnablePanelWidget::update_historical_stats(){

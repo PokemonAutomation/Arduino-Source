@@ -85,6 +85,10 @@ GlobalSettings::GlobalSettings()
         "PA-Stats.txt",
         "PA-Stats.txt"
     )
+    , ALL_STATS(
+        "<b>All Stats:</b><br>Include all-time stats for notifications.",
+        true
+    )
     , WINDOW_SIZE(
         "Window Size:",
         "Set the size of the window. Restart application to take effect.<br>"
@@ -145,6 +149,7 @@ GlobalSettings::GlobalSettings()
 {
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
     PA_ADD_OPTION(STATS_FILE);
+    PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
 

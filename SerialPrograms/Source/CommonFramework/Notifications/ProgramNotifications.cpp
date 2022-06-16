@@ -10,6 +10,8 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "ProgramNotifications.h"
@@ -200,21 +202,54 @@ void send_program_telemetry(
 
 
 
+#if 0
 void send_program_status_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
-    const std::string& stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     QImage image, bool keep_file
 ){
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+    }
     send_program_notification(
         logger, settings,
         Color(), info,
         "Program Status",
-        {
-            {"Message", message},
-            {"Session Stats", QString::fromStdString(stats)},
-        },
+        messages,
+        std::move(image), keep_file
+    );
+}
+#endif
+void send_program_status_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const QString& message,
+    QImage image, bool keep_file
+){
+    const StatsTracker* current_stats = env.current_stats();
+    const StatsTracker* historical_stats = env.historical_stats();
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(env.current_stats()->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(env.historical_stats()->to_str()));
+    }
+    send_program_notification(
+        env.logger(), settings,
+        Color(), env.program_info(),
+        "Program Status",
+        messages,
         std::move(image), keep_file
     );
 }
@@ -222,35 +257,72 @@ void send_program_finished_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
-    const std::string& stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     QImage image, bool keep_file
 ){
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+    }
     send_program_notification(
         logger, settings,
         COLOR_GREEN, info,
         "Program Finished",
-        {
-            {"Message", message},
-            {"Session Stats", QString::fromStdString(stats)},
-        },
+        messages,
+        std::move(image), keep_file
+    );
+}
+void send_program_finished_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const QString& message,
+    QImage image, bool keep_file
+){
+    const StatsTracker* current_stats = env.current_stats();
+    const StatsTracker* historical_stats = env.historical_stats();
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(env.current_stats()->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(env.historical_stats()->to_str()));
+    }
+    send_program_notification(
+        env.logger(), settings,
+        COLOR_GREEN, env.program_info(),
+        "Program Finished",
+        messages,
         std::move(image), keep_file
     );
 }
 void send_program_recoverable_error_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
+    ProgramEnvironment& env, EventNotificationOption& settings,
     const QString& message,
-    const std::string& stats,
     QImage image, bool keep_file
 ){
+    const StatsTracker* current_stats = env.current_stats();
+    const StatsTracker* historical_stats = env.historical_stats();
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(env.current_stats()->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(env.historical_stats()->to_str()));
+    }
     send_program_notification(
-        logger, settings,
-        COLOR_RED, info,
+        env.logger(), settings,
+        COLOR_RED, env.program_info(),
         "Program Error (Recoverable)",
-        {
-            {"Message", message},
-            {"Session Stats", QString::fromStdString(stats)},
-        },
+        messages,
         std::move(image), keep_file
     );
 }
@@ -258,17 +330,24 @@ void send_program_fatal_error_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
-    const std::string& stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     QImage image, bool keep_file
 ){
+    std::vector<std::pair<QString, QString>> messages{
+        {"Message", message},
+    };
+    if (current_stats){
+        messages.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+    }
     send_program_notification(
         logger, settings,
         COLOR_RED, info,
         "Program Stopped (Fatal Error)",
-        {
-            {"Message", message},
-            {"Session Stats", QString::fromStdString(stats)},
-        },
+        messages,
         std::move(image), keep_file
     );
 }

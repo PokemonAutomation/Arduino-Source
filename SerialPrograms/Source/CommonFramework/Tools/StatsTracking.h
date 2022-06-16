@@ -25,7 +25,7 @@ public:
     StatsTracker() = default;
     virtual ~StatsTracker() = default;
 
-    std::string to_str() const;
+    virtual std::string to_str() const;
 
     void parse_and_append_line(const std::string& line);
 

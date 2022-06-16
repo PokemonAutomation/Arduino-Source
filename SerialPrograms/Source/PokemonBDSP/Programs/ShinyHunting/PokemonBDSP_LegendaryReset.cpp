@@ -65,7 +65,7 @@ std::unique_ptr<StatsTracker> LegendaryReset::make_stats() const{
 
 
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
+    PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
         env, env.console, context,
@@ -126,9 +126,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env.console, context,
+            env, env.console, context,
             result_wild, result_own,
-            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
+            NOTIFICATION_ERROR_RECOVERABLE,
             WILD_POKEMON,
             std::chrono::seconds(30),
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
@@ -141,12 +141,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         lead_tracker.report_result(result_own.shiny_type);
     }
 
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

@@ -94,7 +94,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     stats.attempts++;
 
@@ -173,19 +173,14 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 
 void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context);
         }catch (OperationFailedException&){
@@ -196,12 +191,7 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

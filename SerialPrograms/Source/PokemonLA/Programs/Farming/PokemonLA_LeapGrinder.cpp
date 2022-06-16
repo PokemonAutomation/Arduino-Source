@@ -147,7 +147,7 @@ std::unique_ptr<StatsTracker> LeapGrinder::make_stats() const{
 
 bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     stats.attempts++;
 
     env.console.log("Starting route and shiny detection...");
@@ -263,19 +263,14 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             if(run_iteration(env, context)){
                 break;
@@ -291,12 +286,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
     env.update_stats();
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

@@ -62,7 +62,8 @@ std::unique_ptr<StatsTracker> DaySkipperJPN::make_stats() const{
 }
 
 void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    SkipperStats& stats = env.stats<SkipperStats>();
+    SkipperStats& stats = env.current_stats<SkipperStats>();
+    stats.total_skips = SKIPS;
     stats.runs++;
 
     //  Setup globals.
@@ -77,12 +78,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint8_t day = 1;
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_PROGRESS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str_current(remaining_skips)
-        );
+        send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
         skipper_increment_day(context, false);
 
@@ -94,7 +90,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             remaining_skips--;
             stats.issued++;
 //            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
-            env.update_stats(stats.to_str_current(remaining_skips));
+            env.update_stats(stats.to_str());
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
@@ -105,12 +101,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //  Prevent the Switch from sleeping and the time from advancing.
     context.wait_for_all_requests();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str_current(remaining_skips)
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
     pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){

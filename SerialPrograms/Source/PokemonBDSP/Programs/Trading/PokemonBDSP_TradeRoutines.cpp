@@ -136,12 +136,7 @@ void trade_current_box(
     for (size_t row = 0; row < 5; row++){
         for (size_t col = 0; col < 6; col++){
             env.update_stats();
-            send_program_status_notification(
-                env.logger(), notifications,
-                env.program_info(),
-                "",
-                stats.to_str()
-            );
+            send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
             env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

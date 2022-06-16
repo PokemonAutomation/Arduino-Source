@@ -132,7 +132,8 @@ bool date_increment_day(BotBaseContext& context, DateSmall* date, bool press){
 }
 
 void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    SkipperStats& stats = env.stats<SkipperStats>();
+    SkipperStats& stats = env.current_stats<SkipperStats>();
+    stats.total_skips = SKIPS;
     stats.runs++;
 
     //  Setup globals.
@@ -163,12 +164,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_PROGRESS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str_current(remaining_skips)
-        );
+        send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
         if (date_increment_day(context, &date, true)){
             correct_count++;
@@ -176,7 +172,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.issued++;
             env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd"));
 //            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
-            env.update_stats(stats.to_str_current(remaining_skips));
+            env.update_stats(stats.to_str());
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
@@ -187,12 +183,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     //  Prevent the Switch from sleeping and the time from advancing.
     context.wait_for_all_requests();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str_current(remaining_skips)
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
     pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){

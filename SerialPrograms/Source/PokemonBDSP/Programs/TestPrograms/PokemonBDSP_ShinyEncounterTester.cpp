@@ -54,9 +54,9 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
     DoublesShinyDetection result_wild;
     ShinyDetectionResult result_own;
     detect_shiny_battle(
-        env.console, context,
+        env, env.console, context,
         result_wild, result_own,
-        env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
+        NOTIFICATION_ERROR_RECOVERABLE,
         ENCOUNTER_TYPE == 0 ? YOUR_POKEMON : WILD_POKEMON,
         std::chrono::seconds(30),
         USE_SOUND_DETECTION

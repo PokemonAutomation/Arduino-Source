@@ -88,7 +88,7 @@ std::unique_ptr<StatsTracker> MagikarpMoveGrinder::make_stats() const{
 
 
 void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     env.log("Special case: grinding Mimic...");
 
     // Which pokemon in the party is not fainted
@@ -161,7 +161,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     // Which pokemon in the party is not fainted
     size_t cur_pokemon = 0;
@@ -236,7 +236,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
 
 
 void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
         throw OperationFailedException(env.console, "No Pokemon sepecified to grind.");
@@ -246,12 +246,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     env.update_stats();
-    send_program_status_notification(
-        env.logger(), NOTIFICATION_STATUS,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_status_notification(env, NOTIFICATION_STATUS);
     env.console.log("Grinding on Magikarp...");
 
     try{
@@ -270,12 +265,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

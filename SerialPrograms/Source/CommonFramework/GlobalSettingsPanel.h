@@ -67,6 +67,8 @@ public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;
 
     StringOption STATS_FILE;
+    BooleanCheckBoxOption ALL_STATS;
+
     ResolutionOption WINDOW_SIZE;
     ThemeSelectorOption THEME;
 

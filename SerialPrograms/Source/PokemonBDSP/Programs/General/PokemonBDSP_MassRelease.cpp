@@ -62,7 +62,7 @@ std::unique_ptr<StatsTracker> MassRelease::make_stats() const{
 
 
 void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     env.update_stats();
 
     //  Connect the controller.
@@ -90,12 +90,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

@@ -88,7 +88,7 @@ std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
 
 
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
     uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME0 + HATCH_DELAY;
@@ -100,12 +100,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     uint8_t column = 0;
     for (uint8_t c = 0; c < batches; c++){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (c == 0){
             withdraw_1st_column_from_overworld(context);
@@ -133,12 +128,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

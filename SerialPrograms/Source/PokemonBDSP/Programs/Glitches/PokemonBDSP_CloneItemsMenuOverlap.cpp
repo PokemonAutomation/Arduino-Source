@@ -189,7 +189,7 @@ void CloneItemsMenuOverlap::detach_items(ConsoleHandle& console, BotBaseContext&
 }
 
 void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_mash_button(context, BUTTON_B, 50);
@@ -198,12 +198,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
     uint16_t save_counter = 0;
     for (uint16_t batch = 0; batch < BATCHES; batch++){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         QImage start = activate_menu_overlap_from_overworld(env.console, context);
         if (start.isNull()){
@@ -266,12 +261,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

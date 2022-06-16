@@ -192,14 +192,8 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
         NOTIFICATION_SHINY
     );
 
-    Stats& stats = env.stats<Stats>();
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

@@ -198,7 +198,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
 
 
 bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::map<size_t, size_t>& pokemon_move_attempts){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     env.console.log("Starting battle...");
 
@@ -389,7 +389,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
 
 void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
@@ -409,12 +409,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             if (run_iteration(env, context, pokemon_move_attempts)){
                 break;
@@ -426,12 +421,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

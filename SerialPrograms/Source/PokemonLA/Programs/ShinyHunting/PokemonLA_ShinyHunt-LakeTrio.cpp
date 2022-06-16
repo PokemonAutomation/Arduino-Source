@@ -113,7 +113,7 @@ std::set<std::string> read_name(
 
 
 void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
+    PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
 
     //  Connect the controller.
@@ -168,11 +168,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     screen
                 );
                 send_program_recoverable_error_notification(
-                    env.logger(),
-                    NOTIFICATION_ERROR_RECOVERABLE,
-                    env.program_info(),
-                    "No encounter detected after 60 seconds.",
-                    stats.to_str()
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "No encounter detected after 60 seconds."
                 );
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
@@ -208,25 +205,21 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 stats.add_non_shiny();
                 env.log("Not shiny.", COLOR_PURPLE);
                 send_encounter_notification(
-                    env.console,
+                    env,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
-                    env.program_info(),
                     true, false, {{std::move(slugs), ShinyType::NOT_SHINY}},
-                    screen,
-                    &stats
+                    screen
                 );
             }else{
                 stats.add_unknown_shiny();
                 env.log("Detected Shiny!", COLOR_BLUE);
                 send_encounter_notification(
-                    env.console,
+                    env,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
-                    env.program_info(),
                     true, true, {{std::move(slugs), ShinyType::UNKNOWN_SHINY}},
-                    screen,
-                    &stats
+                    screen
                 );
                 if (VIDEO_ON_SHINY){
 //                    pbf_wait(context, 5 * TICKS_PER_SECOND);

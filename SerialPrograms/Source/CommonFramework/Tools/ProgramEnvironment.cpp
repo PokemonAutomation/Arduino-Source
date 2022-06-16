@@ -78,6 +78,9 @@ void ProgramEnvironment::update_stats(const std::string& override_current){
 }
 
 
+std::string ProgramEnvironment::historical_stats_str() const{
+    return m_historical_stats ? m_historical_stats->to_str() : "";
+}
 
 
 

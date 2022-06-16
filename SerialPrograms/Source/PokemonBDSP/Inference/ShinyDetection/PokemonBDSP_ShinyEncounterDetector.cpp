@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
@@ -123,10 +124,10 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
 }
 
 void determine_shiny_status(
-    LoggerQt& logger,
+    ProgramEnvironment& env,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    const ProgramInfo& info, EventNotificationOption& settings,
+    EventNotificationOption& settings,
     BattleType battle_type,
     const ShinyEncounterTracker& tracker,
     const std::vector<WallClock>& shiny_sound_timestamps
@@ -178,7 +179,7 @@ void determine_shiny_status(
         }else if (dist_to_own < dist_to_wild){
             own_shiny_sound_detected = true;
         }else{
-            throw OperationFailedException(logger, "Wrong shiny sound timing found.");
+            throw OperationFailedException(env.logger(), "Wrong shiny sound timing found.");
         }
     }
     alpha_wild_overall += wild_shiny_sound_detected ? SOUND_ALPHA : 0.0;
@@ -192,7 +193,7 @@ void determine_shiny_status(
             alpha_own += DIALOG_ALPHA;
         }
     }
-    logger.log(
+    env.log(
         "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
         (wild_shiny_sound_detected ? " (shiny sound detected)" : "") +
         ", Left Alpha = " + QString::number(alpha_wild_left) +
@@ -207,42 +208,41 @@ void determine_shiny_status(
     wild_result.right_is_shiny = false;
 
     if (alpha_wild_overall < OVERALL_THRESHOLD){
-        logger.log("ShinyDetector: Wild not Shiny.", COLOR_PURPLE);
+        env.log("ShinyDetector: Wild not Shiny.", COLOR_PURPLE);
         wild_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
-        logger.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
+        env.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
         wild_result.shiny_type = ShinyType::UNKNOWN_SHINY;
         wild_result.left_is_shiny = alpha_wild_left >= DOUBLES_THRESHOLD;
         wild_result.right_is_shiny = alpha_wild_right >= DOUBLES_THRESHOLD;
     }
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
-        dump_image(logger, info, "LowShinyAlpha", wild_result.best_screenshot);
+        dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.best_screenshot);
         send_program_recoverable_error_notification(
-            logger, settings,
-            info,
+            env, settings,
             "Low alpha shiny (alpha = " + QString::number(alpha_wild_overall) +
             ").\nPlease report this image to the " + STRING_POKEMON + " Automation server.",
-            "",
             wild_result.best_screenshot
         );
     }
 
     if (alpha_own < OVERALL_THRESHOLD){
-        logger.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
+        env.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
         your_result.shiny_type = ShinyType::NOT_SHINY;
     }else{
-        logger.log("ShinyDetector: Detected Lead Shiny!", COLOR_BLUE);
+        env.log("ShinyDetector: Detected Lead Shiny!", COLOR_BLUE);
         your_result.shiny_type = ShinyType::UNKNOWN_SHINY;
     }
 }
 
 
 void detect_shiny_battle(
+    ProgramEnvironment& env,
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    const ProgramInfo& info, EventNotificationOption& settings,
+    EventNotificationOption& settings,
     const DetectionType& type,
     std::chrono::seconds timeout,
     bool use_shiny_sound
@@ -282,9 +282,9 @@ void detect_shiny_battle(
     your_result.best_screenshot = tracker.sparkles_own().best_image();
 //    your_result.best_screenshot.save("test.png");
     determine_shiny_status(
-        console,
+        env,
         wild_result, your_result,
-        info, settings,
+        settings,
         battle_type,
         tracker,
         shiny_sound_timestamps

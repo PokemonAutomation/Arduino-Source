@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> NuggetFarmerHighlands::make_stats() const{
 
 
 bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Highlands_Mountain);
@@ -215,7 +215,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, B
 
 
 void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
@@ -225,12 +225,7 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBase
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             if (run_iteration(env, context)){
                 break;
@@ -243,12 +238,7 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBase
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

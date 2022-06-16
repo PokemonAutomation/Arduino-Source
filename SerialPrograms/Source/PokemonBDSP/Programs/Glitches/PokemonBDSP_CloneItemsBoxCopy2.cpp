@@ -79,7 +79,7 @@ std::unique_ptr<StatsTracker> CloneItemsBoxCopy2::make_stats() const{
 }
 
 void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
 //    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;
@@ -103,12 +103,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     for (uint16_t box = 0; box < BOXES; box++){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Select 1st mon.
         pbf_press_button(context, BUTTON_ZL, 20, 50);
@@ -184,12 +179,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

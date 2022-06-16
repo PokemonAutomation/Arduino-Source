@@ -141,7 +141,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     context.wait_for_all_requests();
 
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
 
     bool exit = false;
@@ -187,12 +187,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             break;
         }
 
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_RED_BEAM,
-            env.program_info(),
-            "Red Beam...",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_RED_BEAM, "Red Beam...");
 
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
@@ -203,10 +198,8 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
     context.wait_for(std::chrono::seconds(2));
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PURPLE_BEAM,
-        env.program_info(),
+        env, NOTIFICATION_PURPLE_BEAM,
         "Found a purple beam!",
-        stats.to_str(),
         env.console.video().snapshot()
     );
     while (true){

@@ -17,6 +17,9 @@
 
 namespace PokemonAutomation{
 
+class StatsTracker;
+class ProgramEnvironment;
+
 
 void send_program_notification(
     LoggerQt& logger, EventNotificationOption& settings,
@@ -35,32 +38,48 @@ void send_program_telemetry(
     const QString& file
 );
 
+#if 0
 void send_program_status_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
-    const QString& message = "",
-    const std::string& stats = "",
+    const QString& message,
+    const StatsTracker* current_stats = nullptr,
+    const StatsTracker* historical_stats = nullptr,
     QImage image = QImage(), bool keep_file = false
 );
+#endif
+void send_program_status_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const QString& message = "",
+    QImage image = QImage(), bool keep_file = false
+);
+
 void send_program_finished_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
-    const std::string& stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     QImage image = QImage(), bool keep_file = false
 );
+void send_program_finished_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const QString& message = "",
+    QImage image = QImage(), bool keep_file = false
+);
+
 void send_program_recoverable_error_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
+    ProgramEnvironment& env, EventNotificationOption& settings,
     const QString& message,
-    const std::string& stats = "",
     QImage image = QImage(), bool keep_file = false
 );
+
 void send_program_fatal_error_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
-    const std::string& stats = "",
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     QImage image = QImage(), bool keep_file = false
 );
 

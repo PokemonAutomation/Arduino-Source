@@ -83,7 +83,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     }
 
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     env.update_stats();
 
 

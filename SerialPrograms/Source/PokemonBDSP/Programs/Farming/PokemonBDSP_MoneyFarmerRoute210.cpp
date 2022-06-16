@@ -115,7 +115,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute210::make_stats() const{
 
 
 bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     env.log("Starting battle!");
 
@@ -317,7 +317,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     uint8_t pp0[4] = {
         MON0_MOVE1_PP,
@@ -349,12 +349,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     while (true){
         env.update_stats();
 
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
             pbf_move_left_joystick(context, 255, 128, 140, 0);

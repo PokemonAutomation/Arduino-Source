@@ -194,7 +194,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 
 
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     std::atomic<bool> listen_for_shiny(false);
     float shiny_coefficient = 1.0;
@@ -238,7 +238,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
@@ -266,12 +266,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             stats.attempts++;
 
@@ -289,12 +284,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

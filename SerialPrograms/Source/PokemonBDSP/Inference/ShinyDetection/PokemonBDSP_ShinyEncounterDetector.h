@@ -19,6 +19,7 @@
 namespace PokemonAutomation{
     class BotBaseContext;
     class ConsoleHandle;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 using namespace Pokemon;
@@ -118,10 +119,11 @@ private:
 // The function also use a shiny sound detector to improve its detection on wild pokemon.
 // When a shiny sound is detected, it adds 5.0 to the heighest overall alpha value.
 void detect_shiny_battle(
+    ProgramEnvironment& env,
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    const ProgramInfo& info, EventNotificationOption& settings,
+    EventNotificationOption& settings,
     const DetectionType& type,
     std::chrono::seconds timeout,
     bool use_shiny_sound = false

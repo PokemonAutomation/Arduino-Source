@@ -129,7 +129,7 @@ void loop_adventures(
     EventNotificationOption& notification_status,
     EventNotificationOption& notification_shiny
 ){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     AdventureRuntime runtime(
         host_index,

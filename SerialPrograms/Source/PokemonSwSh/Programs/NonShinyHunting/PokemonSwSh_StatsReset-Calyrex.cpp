@@ -146,7 +146,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     bool match_found = false;
     while (!match_found){
@@ -198,17 +198,13 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             if (calyrex_caught){
                 send_program_status_notification(
-                    env.logger(), NOTIFICATION_CATCH_SUCCESS,
-                    env.program_info(),
-                    "Threw " + QString::number(result.balls_used) + " ball(s) and caught it.",
-                    stats.to_str()
+                    env, NOTIFICATION_CATCH_SUCCESS,
+                    "Threw " + QString::number(result.balls_used) + " ball(s) and caught it."
                 );
             }else{
                 send_program_status_notification(
-                    env.logger(), NOTIFICATION_CATCH_FAILED,
-                    env.program_info(),
-                    "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it.",
-                    stats.to_str()
+                    env, NOTIFICATION_CATCH_FAILED,
+                    "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it."
                 );
             }
 
@@ -294,10 +290,8 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     env.log("Result Found!", COLOR_BLUE);
     env.update_stats();
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "Found a perfect match!",
-        stats.to_str()
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Found a perfect match!"
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -47,7 +48,7 @@ bool connect_to_internet(
 }
 
 void send_raid_notification(
-    const ProgramInfo& info,
+    const ProgramEnvironment& env,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -114,14 +115,21 @@ void send_raid_notification(
         embeds.emplace_back("Raid Code", QString::fromStdString(code_str));
     }
 
-    if (!screenshot.isNull()){
+//    if (!screenshot.isNull()){
         embeds.emplace_back("Session Stats", QString::fromStdString(stats_tracker.to_str()));
+//    }
+
+    if (GlobalSettings::instance().ALL_STATS){
+        const StatsTracker* historical_stats = env.historical_stats();
+        if (historical_stats){
+            embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+        }
     }
 
     send_program_notification(
         console, settings.NOTIFICATION,
         Color(),
-        info,
+        env.program_info(),
         "Raid Notification",
         embeds,
         screenshot, false
@@ -143,7 +151,7 @@ void run_autohost(
     uint16_t raid_start_to_exit_delay,
     uint16_t delay_to_select_move
 ){
-    AutoHostStats& stats = env.stats<AutoHostStats>();
+    AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
     roll_den(
         context,
@@ -201,7 +209,7 @@ void run_autohost(
 
         screen = console.video().snapshot();
         send_raid_notification(
-            env.program_info(),
+            env,
             console,
             notifications,
             has_code, code,

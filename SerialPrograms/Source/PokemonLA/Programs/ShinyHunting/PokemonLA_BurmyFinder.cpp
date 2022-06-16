@@ -150,7 +150,7 @@ struct BurmyFinder::TreeCounter{
 };
 
 bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
@@ -213,7 +213,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     disable_shiny_sound(context);
     bool battle_found = check_tree_or_ore_for_battle(env.console, context);
-    env.stats<Stats>().trees++;
+    env.current_stats<Stats>().trees++;
     env.update_stats();
 
     context.wait_for_all_requests();
@@ -234,7 +234,7 @@ void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBas
     // Throw pokemon
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    env.stats<Stats>().trees++;
+    env.current_stats<Stats>().trees++;
     env.update_stats();
     enable_shiny_sound(context);
 }
@@ -694,7 +694,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     stats.attempts++;
     env.update_stats();
     env.console.log("Starting route and shiny detection...");
@@ -763,7 +763,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
@@ -773,12 +773,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     while (true){
         env.update_stats();
         counters.log(env.logger());
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context, counters);
         }catch (OperationFailedException&){
@@ -789,12 +784,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

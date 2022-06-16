@@ -122,6 +122,7 @@ protected:
 //    bool m_destructing = false;
 
     std::mutex m_lock;
+//    std::string m_historical_stats_str;
     std::unique_ptr<StatsTracker> m_historical_stats;
     std::unique_ptr<StatsTracker> m_current_stats;
     CancellableScope* m_scope = nullptr;

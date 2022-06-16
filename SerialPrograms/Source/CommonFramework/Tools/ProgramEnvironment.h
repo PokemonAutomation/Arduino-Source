@@ -49,8 +49,11 @@ public:
     void update_stats(const std::string& override_current = "");
 
     template <typename StatsType>
-    StatsType& stats();
-    const StatsTracker* stats() const{ return m_current_stats; }
+    StatsType& current_stats();
+    const StatsTracker* current_stats() const{ return m_current_stats; }
+
+    const StatsTracker* historical_stats() const{ return m_historical_stats; }
+    std::string historical_stats_str() const;
 
 
 signals:
@@ -79,7 +82,7 @@ void ProgramEnvironment::log(Args&&... args){
 }
 
 template <typename StatsType>
-StatsType& ProgramEnvironment::stats(){
+StatsType& ProgramEnvironment::current_stats(){
     return *static_cast<StatsType*>(m_current_stats);
 }
 

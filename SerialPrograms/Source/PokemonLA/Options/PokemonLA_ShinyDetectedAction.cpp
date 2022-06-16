@@ -101,7 +101,7 @@ bool on_shiny_callback(
     ss << "\n(Shiny may not be visible on the screen.)";
 
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.stats();
+    const StatsTracker* stats = env.current_stats();
     if (stats){
         std::string str = stats->to_str();
         if (!str.empty()){
@@ -123,7 +123,7 @@ void on_shiny_sound(
     float error_coefficient
 ){
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.stats();
+    const StatsTracker* stats = env.current_stats();
     if (stats){
         std::string str = stats->to_str();
         if (!str.empty()){
@@ -166,7 +166,7 @@ void on_match_found(
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<QString, QString>> embeds;
-    const StatsTracker* stats = env.stats();
+    const StatsTracker* stats = env.current_stats();
     if (stats){
         std::string str = stats->to_str();
         if (!str.empty()){

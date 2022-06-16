@@ -99,7 +99,7 @@ bool SelfBoxTrade::move_to_next(
 
 
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    TradeStats& stats = env.stats<TradeStats>();
+    TradeStats& stats = env.current_stats<TradeStats>();
 
 
     //  Connect both controllers.
@@ -111,12 +111,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     uint8_t col = 0;
     for (uint8_t boxes = 0; boxes < BOXES_TO_TRADE;){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Make sure both consoles have selected something.
         std::atomic<bool> ok(true);
@@ -161,12 +156,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

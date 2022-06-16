@@ -94,12 +94,7 @@ void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for_all_requests();
     }
 
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        ""
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

@@ -113,7 +113,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     bool pokemon_caught = false;
     while (!pokemon_caught){
@@ -162,17 +162,13 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
 
         if (pokemon_caught){
             send_program_status_notification(
-                env.logger(), NOTIFICATION_CATCH_SUCCESS,
-                env.program_info(),
-                "Threw " + QString::number(result.balls_used) + " ball(s) and caught it.",
-                stats.to_str()
+                env, NOTIFICATION_CATCH_SUCCESS,
+                "Threw " + QString::number(result.balls_used) + " ball(s) and caught it."
             );
         }else{
             send_program_status_notification(
-                env.logger(), NOTIFICATION_CATCH_FAILED,
-                env.program_info(),
-                "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it.",
-                stats.to_str()
+                env, NOTIFICATION_CATCH_FAILED,
+                "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it."
             );
         }
 
@@ -188,10 +184,8 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
     env.log("Result Found!", COLOR_BLUE);
 
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "Caught the " + STRING_POKEMON,
-        stats.to_str()
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Caught the " + STRING_POKEMON
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }

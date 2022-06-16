@@ -62,7 +62,7 @@ std::unique_ptr<StatsTracker> SelfTouchTrade::make_stats() const{
 
 
 void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    TradeStats& stats = env.stats<TradeStats>();
+    TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
 
     BotBaseContext host(scope, env.consoles[HOSTING_SWITCH].botbase());
@@ -82,12 +82,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

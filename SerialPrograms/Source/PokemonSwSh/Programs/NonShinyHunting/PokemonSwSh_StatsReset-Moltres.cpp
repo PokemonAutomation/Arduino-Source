@@ -105,7 +105,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     while (true){
         context.wait_for_all_requests();
@@ -219,10 +219,8 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     env.update_stats();
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "Found a perfect match!",
-        stats.to_str()
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Found a perfect match!"
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }

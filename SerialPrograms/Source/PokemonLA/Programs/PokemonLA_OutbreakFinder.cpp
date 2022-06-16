@@ -150,7 +150,7 @@ bool OutbreakFinder::read_outbreaks(
     MapRegion& current_region,
     const std::set<std::string>& desired
 ){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     MapRegion start_region = MapRegion::NONE;
 
@@ -261,7 +261,7 @@ bool OutbreakFinder::read_outbreaks(
     return false;
 }
 void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MapRegion region){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     mash_A_to_change_region(env, env.console, context);
 
@@ -322,7 +322,7 @@ bool OutbreakFinder::run_iteration(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const std::set<std::string>& desired
 ){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Enter map.
     pbf_move_left_joystick(context, 128, 255, 200, 0);
@@ -355,12 +355,7 @@ bool OutbreakFinder::run_iteration(
     }
 
     env.update_stats();
-    send_program_status_notification(
-        env.console, NOTIFICATION_STATUS,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_status_notification(env, NOTIFICATION_STATUS);
 
     //  Go to region and return.
     goto_region_and_return(env, context, current_region);
@@ -371,7 +366,7 @@ bool OutbreakFinder::run_iteration(
 
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     std::set<std::string> desired;
     for (size_t c = 0; c < DESIRED_SLUGS.size(); c++){

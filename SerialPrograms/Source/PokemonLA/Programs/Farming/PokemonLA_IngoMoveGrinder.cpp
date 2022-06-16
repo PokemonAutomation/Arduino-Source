@@ -146,7 +146,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
 }
 
 bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     env.console.log("Starting battle...");
 
@@ -310,7 +310,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
 
 
 void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
@@ -324,12 +324,7 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             if (run_iteration(env, context)) {
                 break;
@@ -341,12 +336,7 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, BotBaseContext& context)

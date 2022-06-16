@@ -188,7 +188,8 @@ void RunnableSwitchProgramWidget::run_program(){
             m_logger, instance.NOTIFICATION_PROGRAM_FINISH,
             program_info,
             "",
-            m_current_stats ? m_current_stats->to_str() : ""
+            m_current_stats.get(),
+            m_historical_stats.get()
         );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
@@ -207,7 +208,8 @@ void RunnableSwitchProgramWidget::run_program(){
                 timestamp()
             ),
             std::move(message),
-            m_current_stats ? m_current_stats->to_str() : ""
+            m_current_stats.get(),
+            m_historical_stats.get()
         );
     }
 

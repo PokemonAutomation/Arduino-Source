@@ -105,7 +105,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
+    ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
 
     while (true){
         env.update_stats();
@@ -141,25 +141,21 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
         case SummaryShinySymbolDetector::NOT_SHINY:
             stats.add_non_shiny();
             send_encounter_notification(
-                env.console,
+                env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                env.program_info(),
                 false, false, {{{}, ShinyType::NOT_SHINY}},
-                QImage(),
-                &stats
+                QImage()
             );
             break;
         case SummaryShinySymbolDetector::SHINY:
             stats.add_unknown_shiny();
             send_encounter_notification(
-                env.console,
+                env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                env.program_info(),
                 false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
-                env.console.video().snapshot(),
-                &stats
+                env.console.video().snapshot()
             );
             if (VIDEO_ON_SHINY){
                 pbf_wait(context, 1 * TICKS_PER_SECOND);

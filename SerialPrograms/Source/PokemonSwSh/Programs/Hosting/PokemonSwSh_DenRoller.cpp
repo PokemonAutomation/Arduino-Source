@@ -109,7 +109,7 @@ void DenRoller::ring_bell(BotBaseContext& context, int count) const{
 }
 
 void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     std::string desired_slug = FILTER.slug();
 
@@ -184,10 +184,8 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 StopProgram:
     env.update_stats();
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
+        env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        stats.to_str(),
         screen, false
     );
 }

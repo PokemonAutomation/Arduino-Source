@@ -76,7 +76,7 @@ std::unique_ptr<StatsTracker> AmitySquarePickUpFarmer::make_stats() const{
 
 
 void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     env.update_stats();
 
     //  Connect the controller.
@@ -84,12 +84,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++) {
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++) {
             //  Move right
@@ -114,12 +109,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

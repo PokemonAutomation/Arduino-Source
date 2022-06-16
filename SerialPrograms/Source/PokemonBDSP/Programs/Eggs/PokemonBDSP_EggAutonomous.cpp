@@ -126,15 +126,8 @@ bool EggAutonomous::run_batch(
     EggAutonomousState& saved_state,
     EggAutonomousState& current_state
 ){
-    EggAutonomousStats& stats = env.stats<EggAutonomousStats>();
-
     env.update_stats();
-    send_program_status_notification(
-        env.logger(), NOTIFICATION_STATUS_UPDATE,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
     bool save = false;
     switch (AUTO_SAVING){
@@ -161,7 +154,7 @@ bool EggAutonomous::run_batch(
 }
 
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    EggAutonomousStats& stats = env.stats<EggAutonomousStats>();
+    EggAutonomousStats& stats = env.current_stats<EggAutonomousStats>();
     env.update_stats();
 
     //  Connect the controller.
@@ -220,12 +213,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

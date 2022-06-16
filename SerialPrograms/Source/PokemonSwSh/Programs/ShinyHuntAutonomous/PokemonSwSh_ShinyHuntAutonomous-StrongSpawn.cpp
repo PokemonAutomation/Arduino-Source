@@ -88,7 +88,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock(context);
 
-    ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
+    ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
@@ -127,12 +127,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

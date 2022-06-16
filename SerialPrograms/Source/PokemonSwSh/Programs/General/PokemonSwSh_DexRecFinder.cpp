@@ -179,7 +179,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         exclusions.insert(FILTERS.EXCLUSIONS[c]);
     }
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     while (true){
         home_to_date_time(context, true, true);
@@ -240,10 +240,8 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     env.update_stats();
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
+        env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        stats.to_str(),
         env.console.video().snapshot(), false
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);

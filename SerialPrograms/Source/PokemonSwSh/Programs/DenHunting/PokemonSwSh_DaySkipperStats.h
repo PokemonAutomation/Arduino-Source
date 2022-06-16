@@ -25,14 +25,19 @@ public:
         m_display_order.emplace_back(Stat("Skips Issued"));
     }
 
-    std::string to_str_current(uint64_t skips_remaining) const{
-        return
-            "Skips Issued: " + std::to_string(issued) +
-            " - Skips Remaining: " + tostr_u_commas(skips_remaining);
+    virtual std::string to_str() const override{
+        if (total_skips == 0){
+            return StatsTracker::to_str();
+        }else{
+            return
+                "Skips Issued: " + std::to_string(issued) +
+                " - Skips Remaining: " + tostr_u_commas(total_skips - issued.load(std::memory_order_relaxed));
+        }
     }
 
     std::atomic<uint64_t>& runs;
     std::atomic<uint64_t>& issued;
+    uint64_t total_skips = 0;
 };
 
 

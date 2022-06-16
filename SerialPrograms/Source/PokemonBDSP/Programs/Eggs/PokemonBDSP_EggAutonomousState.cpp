@@ -149,11 +149,9 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
         screen
     );
     send_program_recoverable_error_notification(
-        m_console,
+        m_env,
         m_notification_error,
-        m_env.program_info(),
         message,
-        m_stats.to_str(),
         std::move(screen)
     );
     throw OperationFailedException(m_console, message);
@@ -164,13 +162,11 @@ void EggAutonomousState::process_shiny(QImage screen){
     m_stats.m_shinies++;
     m_env.update_stats();
     send_encounter_notification(
-        m_console,
+        m_env,
         m_notification_noop,
         m_notification_shiny,
-        m_env.program_info(),
         false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
-        std::move(screen),
-        &m_stats
+        std::move(screen)
     );
 }
 
@@ -250,13 +246,11 @@ bool EggAutonomousState::process_party(){
             m_console.log("Program stop requested...");
             if (!shiny){
                 send_encounter_notification(
-                    m_console,
+                    m_env,
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
-                    m_env.program_info(),
                     false, false, {},
-                    screen,
-                    &m_stats
+                    screen
                 );
             }
             return true;
@@ -264,13 +258,11 @@ bool EggAutonomousState::process_party(){
             m_console.log("Moving Pokemon to keep box...", COLOR_BLUE);
             if (!shiny){
                 send_encounter_notification(
-                    m_console,
+                    m_env,
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
-                    m_env.program_info(),
                     false, false, {},
-                    screen,
-                    &m_stats
+                    screen
                 );
             }
             pbf_press_button(m_context, BUTTON_ZL, 20, 105);

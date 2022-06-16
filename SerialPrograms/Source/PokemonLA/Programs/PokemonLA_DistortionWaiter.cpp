@@ -82,7 +82,7 @@ std::unique_ptr<StatsTracker> DistortionWaiter::make_stats() const{
 
 
 void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
 
     //  Connect the controller.

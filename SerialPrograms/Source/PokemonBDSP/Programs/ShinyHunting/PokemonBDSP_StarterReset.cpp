@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 
 
 void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
@@ -190,9 +190,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env.console, context,
+            env, env.console, context,
             result_wild, result_own,
-            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
+            NOTIFICATION_ERROR_RECOVERABLE,
             YOUR_POKEMON,
             std::chrono::seconds(30),
             USE_SOUND_DETECTION
@@ -211,13 +211,11 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (wild_shiny){
             stats.m_shiny_starly++;
             send_encounter_notification(
-                env.console,
+                env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                env.program_info(),
                 true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}},
-                result_wild.best_screenshot,
-                &stats
+                result_wild.best_screenshot
             );
         }else{
 #if 0
@@ -237,25 +235,21 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (your_shiny){
             stats.add_unknown_shiny();
             send_encounter_notification(
-                env.console,
+                env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                env.program_info(),
                 true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}},
-                result_own.best_screenshot,
-                &stats
+                result_own.best_screenshot
             );
             break;
         }else{
             stats.add_non_shiny();
             send_encounter_notification(
-                env.console,
+                env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                env.program_info(),
                 true, false, {{{starter}, ShinyType::NOT_SHINY}},
-                result_own.best_screenshot,
-                &stats
+                result_own.best_screenshot
             );
         }
 

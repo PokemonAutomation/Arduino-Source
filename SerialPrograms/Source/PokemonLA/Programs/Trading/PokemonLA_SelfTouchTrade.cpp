@@ -80,7 +80,7 @@ bool SelfTouchTrade::trade_one(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     std::map<std::string, int>& trades_left
 ){
-    TradeStats& stats = env.stats<TradeStats>();
+    TradeStats& stats = env.current_stats<TradeStats>();
 
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
 //    ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
@@ -150,8 +150,6 @@ bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t&
 
 
 void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    TradeStats& stats = env.stats<TradeStats>();
-
     //  Build list of what's needed.
     std::map<std::string, int> trades_left;
     for (const std::pair<std::string, int>& item : TRADE_COUNTS.list()){
@@ -172,12 +170,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
 
     for (uint8_t boxes = 0; boxes < BOXES_TO_TRADE;){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Make sure both consoles have selected something.
         bool host_ok, recv_ok;
@@ -215,12 +208,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

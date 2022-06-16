@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 
 
 void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     // From game to Switch Home
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -142,19 +142,14 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
 
 void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context);
         }catch (OperationFailedException&){
@@ -167,12 +162,7 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

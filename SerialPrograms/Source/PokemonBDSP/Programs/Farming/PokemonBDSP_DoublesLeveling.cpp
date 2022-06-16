@@ -97,7 +97,7 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     env.log("Starting battle!");
 
@@ -150,7 +150,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
 void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
@@ -178,9 +178,9 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env.console, context,
+            env, env.console, context,
             result_wild, result_own,
-            env.program_info(), NOTIFICATION_ERROR_RECOVERABLE,
+            NOTIFICATION_ERROR_RECOVERABLE,
             WILD_POKEMON,
             std::chrono::seconds(30),
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
@@ -196,12 +196,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         }
     }
 
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

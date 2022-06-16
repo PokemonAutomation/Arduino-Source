@@ -110,7 +110,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     QImage screen;
     while (true){
@@ -180,10 +180,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 
     send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
+        env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        stats.to_str(),
         screen, false
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);

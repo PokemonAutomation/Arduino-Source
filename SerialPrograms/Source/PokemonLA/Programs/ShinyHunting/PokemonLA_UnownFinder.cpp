@@ -115,7 +115,7 @@ void enter_ruins(BotBaseContext& context){
 
 
 void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     stats.attempts++;
 
@@ -165,19 +165,14 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 
 void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context);
         }catch (OperationFailedException&){
@@ -188,12 +183,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     }
 
     env.update_stats();
-    send_program_finished_notification(
-        env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        env.program_info(),
-        "",
-        stats.to_str()
-    );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

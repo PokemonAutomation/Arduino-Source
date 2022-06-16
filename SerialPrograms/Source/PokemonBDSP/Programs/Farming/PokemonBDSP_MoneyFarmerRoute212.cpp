@@ -113,7 +113,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute212::make_stats() const{
 
 
 bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     if (man){
         env.log("Starting battle with man (left).");
@@ -279,7 +279,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 
 
 void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.stats<Stats>();
+    Stats& stats = env.current_stats<Stats>();
 
     uint8_t pp[4] = {
         MOVE1_PP,
@@ -305,12 +305,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     while (true){
         env.update_stats();
 
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
             charge_vs_seeker(context);
