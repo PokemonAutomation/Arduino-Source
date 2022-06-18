@@ -83,24 +83,29 @@ bool on_shiny_callback(
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
-    std::stringstream ss;
-    ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
-    console.log(ss.str(), COLOR_BLUE);
+    {
+        std::stringstream ss;
+        ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
+        console.log(ss.str(), COLOR_BLUE);
 
-    //  If we're not ignoring the shiny, return now. Actions will be deferred
-    //  until after the session ends.
-    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
-    if (action != ShinyDetectedAction::IGNORE){
-        return true;
+        //  If we're not ignoring the shiny, return now. Actions will be deferred
+        //  until after the session ends.
+        ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+        if (action != ShinyDetectedAction::IGNORE){
+            return true;
+        }
     }
 
     console.log("Ignoring shiny per user settings...", COLOR_RED);
 
+    std::vector<std::pair<QString, QString>> embeds;
+
+    std::stringstream ss;
     ss << "Error Coefficient: ";
     ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";
+    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
 
-    std::vector<std::pair<QString, QString>> embeds;
     const StatsTracker* current_stats = env.current_stats();
     if (current_stats){
         embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
@@ -124,6 +129,13 @@ void on_shiny_sound(
     float error_coefficient
 ){
     std::vector<std::pair<QString, QString>> embeds;
+
+    std::stringstream ss;
+    ss << "Error Coefficient: ";
+    ss << error_coefficient;
+    ss << "\n(Shiny may not be visible on the screen.)";
+    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
+
     const StatsTracker* current_stats = env.current_stats();
     if (current_stats){
         embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
@@ -132,13 +144,6 @@ void on_shiny_sound(
     if (historical_stats){
         embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
     }
-
-    std::stringstream ss;
-    ss << "Error Coefficient: ";
-    ss << error_coefficient;
-    ss << "\n(Shiny may not be visible on the screen.)";
-
-    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
 
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
