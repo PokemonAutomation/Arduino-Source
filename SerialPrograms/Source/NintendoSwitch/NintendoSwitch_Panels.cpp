@@ -27,7 +27,7 @@
 #include "NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
-
+#include "NintendoSwitch/TestPathMaker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -60,6 +60,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
         add_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>();
         add_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>();
         add_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>();
+        add_program<TestPathMaker_Descriptor, TestPathMaker>();
     }
 
 
