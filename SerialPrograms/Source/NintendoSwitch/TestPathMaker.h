@@ -1,11 +1,6 @@
 #ifndef TESTPATHMAKER_H
 #define TESTPATHMAKER_H
 
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/FloatingPointOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
 

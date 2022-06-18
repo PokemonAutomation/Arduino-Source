@@ -1,10 +1,4 @@
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "TestPathMaker.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
 

@@ -4,21 +4,13 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
-
-#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Options/EditableTableWidget.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
-#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
-
 #include <iostream>
 #include <fstream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -403,7 +395,7 @@ public:
 
         connect(dump_button,  &QPushButton::clicked, this,[&value](bool){
             std::ofstream myfile;
-            myfile.open("dump.txt");
+            myfile.open("dump_actions.txt");
             for (size_t action_index = 0; action_index < value.num_actions(); action_index++){
                 const auto& row = value.get_action(action_index);
                 switch(row.action){
