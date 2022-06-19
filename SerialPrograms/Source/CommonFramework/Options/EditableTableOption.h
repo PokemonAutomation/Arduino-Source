@@ -44,7 +44,7 @@ template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value)
 
 QWidget* make_double_table_cell(QWidget& parent, double& value, double min, double max);
 
-QWidget* make_limited_integer_table_cell(QWidget& parent, int& value, int min, int max);
+QWidget* make_limited_integer_table_cell(QWidget& parent, int32_t& value, int32_t min, int32_t max);
 
 // See EditableTableOption-EnumTableCell.h for template<typename T> QWidget* make_enum_table_cell(QWidget& parent, T& value);
 

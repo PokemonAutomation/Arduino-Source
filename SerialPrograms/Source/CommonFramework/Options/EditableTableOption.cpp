@@ -91,14 +91,14 @@ template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value)
 }
 
 
-QWidget* make_limited_integer_table_cell(QWidget& parent, int& value, int min, int max){
+QWidget* make_limited_integer_table_cell(QWidget& parent, int32_t& value, int32_t min, int32_t max){
     QLineEdit* box = new QLineEdit(QString::number(value), &parent);
     box->setAlignment(Qt::AlignHCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&value, box, min, max](const QString& text){
             bool ok = false;
-            const int current = (int)text.toLong(&ok);
+            const int current = (int32_t)text.toLong(&ok);
             QPalette palette;
             if (ok && current >= min && current <= max){
                 value = current;
