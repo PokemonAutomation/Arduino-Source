@@ -53,8 +53,8 @@ public:
 
     double wait_ticks = 0;
 
-    uint8_t x_axis = 0;
-    uint8_t y_axis = 0;
+    int x_axis = 0;
+    int y_axis = 0;
 };
 
 class TestPathMakerTableFactory : public EditableTableFactory{
