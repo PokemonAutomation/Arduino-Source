@@ -96,7 +96,7 @@ Yes, this is an unofficial work-around to the lack of an offline installer.
 
 1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for "Qt6.7z". Someone will provide you with a link.
 2. Download Qt6.7z and decompress it. You can use [7-zip](https://www.7-zip.org/) to decompress it. This will create a folder "Qt6" that is ***32 GB*** large.
-3. Move this folder to "C:\". It will probably ask you for permissions to do it.
+3. Move this folder to `C:\`. It will probably ask you for permissions to do it.
 4. Navigate to: `C:\Qt6\Tools\QtCreator\bin\` and create a shortcut to `qtcreator.exe`. Copy this shortcut to somewhere convenient. (By default this shortcut is named, `Qt Creator 7.0.2 (Community)`)
 
 ## Setup:
