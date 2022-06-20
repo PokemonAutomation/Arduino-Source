@@ -16,7 +16,8 @@
 #include <QThread>
 #include <QAudioFormat>
 #include "Common/Cpp/AlignedVector.h"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
+#include "Spectrograph.h"
+#include "AudioFeed.h"
 #include "AudioSelector.h"
 
 class QString;
@@ -108,14 +109,16 @@ private:
     const size_t m_numFreqWindows;
     // Num blocks of frequencies to visualize for one sliding window.
     const size_t m_numFreqVisBlocks;
+
     // The boundaries to separate each frequency vis block.
     // i-th freq vis block is made by frequencies whose indices in m_spectrums
     // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )
     std::vector<size_t> m_freqVisBlockBoundaries;
-    // Group nearby frequencies into blocks.
-    // Each block uses the log scaled averaged magnitude of the frequencies.
-    // stores those blocks together for visualization.
-    std::vector<float> m_freqVisBlocks;
+
+    std::vector<float> m_last_buckets;
+    std::vector<uint32_t> m_last_spectrum;
+    Spectrograph m_spectrograph;
+
     // The timestamp of each window that's been visualized.
     std::vector<size_t> m_freqVisStamps;
     // The index of the next window in m_freqVisBlocks.

@@ -96,11 +96,6 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 WallClock REFERENCE = current_time();
 
 
-
-
-
-
-
 using namespace Kernels;
 
 
@@ -109,22 +104,6 @@ using namespace Kernels;
 
 
 
-#if 0
-class AudioListener : public StreamListener{
-public:
-    AudioListener(size_t channels)
-        : StreamListener(sizeof(float) * channels)
-        , m_channels(channels)
-    {}
-    virtual void on_objects(const void* data, size_t objects) override{
-        const float* samples = (const float*)data;
-        print(samples, objects * m_channels);
-    }
-
-private:
-    size_t m_channels;
-};
-#endif
 
 
 

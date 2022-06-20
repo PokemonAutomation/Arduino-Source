@@ -191,6 +191,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioThreadController.h
     Source/CommonFramework/AudioPipeline/AudioWorker.cpp
     Source/CommonFramework/AudioPipeline/AudioWorker.h
+    Source/CommonFramework/AudioPipeline/Spectrograph.cpp
+    Source/CommonFramework/AudioPipeline/Spectrograph.h
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp

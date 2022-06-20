@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AlignedVector_TPP
 #define PokemonAutomation_AlignedVector_TPP
 
+#include <string.h>
 #include <new>
 #include <type_traits>
 #include <utility>

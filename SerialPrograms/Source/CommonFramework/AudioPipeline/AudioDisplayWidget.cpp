@@ -43,7 +43,9 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      , m_numFreqWindows(1000)
      , m_numFreqVisBlocks(96)
      , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
-     , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
+     , m_last_buckets(m_numFreqVisBlocks)
+     , m_last_spectrum(m_numFreqVisBlocks)
+     , m_spectrograph(m_numFreqVisBlocks, m_numFreqWindows)
      , m_freqVisStamps(m_numFreqWindows)
 {
     // We will display frequencies in log scale, so need to convert
@@ -109,7 +111,6 @@ void AudioDisplayWidget::clear(){
         m_audioThreadController = nullptr;
     }
 
-    m_freqVisBlocks.assign(m_freqVisBlocks.size(), 0.f);
     m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
@@ -154,6 +155,33 @@ void AudioDisplayWidget::set_audio(
     update_size();
     // Tell Qt to repaint the widget in the next drawing phase in the main loop.
     QWidget::update();
+}
+
+// TODO: move this to a common lib folder:
+PA_FORCE_INLINE QRgb jetColorMap(float v){
+    if (v <= 0.f){
+        return qRgb(0,0,0);
+    }
+    else if (v < 0.125f){
+//        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
+        return qRgb(0, 0, int((0.0f + 8.f * v) * 255.f));
+    }
+    else if (v < 0.375f){
+        return qRgb(0, int((v - 0.125f)*1020.f), 255);
+    }
+    else if (v < 0.625f){
+        int c = int((v - 0.375f) * 1020.f);
+        return qRgb(c, 255, 255-c);
+    }
+    else if (v < 0.875f){
+        return qRgb(255, 255 - int((v-0.625f) * 1020.f), 0);
+    }
+    else if (v <= 1.0){
+        return qRgb(255 - int((v-0.875)*1020.f), 0, 0);
+    }
+    else {
+        return qRgb(255, 255, 255);
+    }
 }
 
 void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput){
@@ -213,9 +241,11 @@ void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const 
             mag = std::max(mag, 0.0f);
         }
 
-        m_freqVisBlocks[m_nextFFTWindowIndex*m_numFreqVisBlocks + i] = mag;
+        m_last_buckets[i] = mag;
+        m_last_spectrum[i] = jetColorMap(mag);
         previous = mag;
     }
+    m_spectrograph.push_spectrum(m_last_spectrum.data());
     m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_numFreqWindows;
     // std::cout << "Computed FFT! "  << magSum << std::endl;
 
@@ -227,33 +257,6 @@ void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const 
             m_freqStream << output[i] << " ";
         }
         m_freqStream << std::endl;
-    }
-}
-
-// TODO: move this to a common lib folder:
-PA_FORCE_INLINE QRgb jetColorMap(float v){
-    if (v <= 0.f){
-        return qRgb(0,0,0);
-    }
-    else if (v < 0.125f){
-//        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
-        return qRgb(0, 0, int((0.0f + 8.f * v) * 255.f));
-    }
-    else if (v < 0.375f){
-        return qRgb(0, int((v - 0.125f)*1020.f), 255);
-    }
-    else if (v < 0.625f){
-        int c = int((v - 0.375f) * 1020.f);
-        return qRgb(c, 255, 255-c);
-    }
-    else if (v < 0.875f){
-        return qRgb(255, 255 - int((v-0.625f) * 1020.f), 0);
-    }
-    else if (v <= 1.0){
-        return qRgb(255 - int((v-0.875)*1020.f), 0, 0);
-    }
-    else {
-        return qRgb(255, 255, 255);
     }
 }
 
@@ -273,16 +276,17 @@ void AudioDisplayWidget::render_bars(){
 //        cout << "barHeight = " << barHeight << endl;
 
     for (size_t i = 0; i < m_numFreqVisBlocks; i++){
-        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
+//        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
 //            // +1 here to skip the freq-0 value
-        float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
+//        float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
+        float value = m_last_buckets[i];
         QRect bar = rect();
         bar.setLeft((int)(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth))));
         bar.setWidth((int)barWidth);
         bar.setTop((int)(rect().top() + gapWidth + (1.0 - value) * barHeight));
         bar.setBottom((int)(rect().bottom() - gapWidth));
 
-        painter.fillRect(bar, jetColorMap(value));
+        painter.fillRect(bar, m_last_spectrum[i]);
     }
 }
 void AudioDisplayWidget::render_spectrograph(){
@@ -291,6 +295,9 @@ void AudioDisplayWidget::render_spectrograph(){
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
 
+    QImage graph = m_spectrograph.to_image();
+
+#if 0
     int width = (int)m_numFreqWindows;
     int height = (int)m_numFreqVisBlocks;
     QImage graph(width, height, QImage::Format_RGB32);
@@ -307,7 +314,12 @@ void AudioDisplayWidget::render_spectrograph(){
         }
         pixels++;
     }
-    graph = graph.scaled(widgetWidth, widgetHeight);
+#endif
+    graph = graph.scaled(
+        widgetWidth, widgetHeight,
+        Qt::IgnoreAspectRatio
+        , Qt::SmoothTransformation
+    );
     painter.fillRect(rect(), graph);
 
     // Now render overlays:
