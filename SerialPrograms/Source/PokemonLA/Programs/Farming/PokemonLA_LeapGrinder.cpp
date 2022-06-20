@@ -65,10 +65,10 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     , STOP_ON(
         "<b>Stop On:</b>",
         {
-        "Shiny",
-        "Alpha",
-        "Stop or Alpha",
-        "Shiny and Alpha",
+            "Shiny",
+            "Alpha",
+            "Shiny or Alpha",
+            "Shiny and Alpha",
         },
         2
     )
