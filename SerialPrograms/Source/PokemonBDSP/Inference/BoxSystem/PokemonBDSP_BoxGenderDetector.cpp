@@ -37,7 +37,7 @@ public:
             male
                 ? "PokemonBDSP/M-Icon.png"
                 : "PokemonBDSP/F-Icon.png",
-            80
+            100
         )
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
