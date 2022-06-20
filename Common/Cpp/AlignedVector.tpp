@@ -64,7 +64,7 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
         throw std::bad_alloc();
     }
 
-    if (std::is_trivially_copyable<Object>::value){
+    if constexpr (std::is_trivially_copyable<Object>::value){
         memcpy(m_ptr, x.m_ptr, x.m_size * sizeof(Object));
         m_size = x.m_size;
         return;
@@ -101,7 +101,7 @@ AlignedVector<Object>::AlignedVector(size_t items){
     }
     m_capacity = items;
 
-    if (std::is_trivially_constructible<Object>::value){
+    if constexpr (std::is_trivially_constructible<Object>::value){
         m_size = items;
         return;
     }
@@ -134,7 +134,7 @@ void AlignedVector<Object>::pop_back(){
 }
 template <typename Object>
 void AlignedVector<Object>::clear(){
-    if (std::is_trivially_constructible<Object>::value){
+    if constexpr (std::is_trivially_constructible<Object>::value){
         m_size = 0;
     }else{
         while (m_size > 0){
@@ -150,7 +150,7 @@ PA_NO_INLINE void AlignedVector<Object>::expand(){
     if (ptr == nullptr){
         throw std::bad_alloc();
     }
-    if (std::is_trivially_copyable<Object>::value){
+    if constexpr (std::is_trivially_copyable<Object>::value){
         memcpy(ptr, m_ptr, m_size * sizeof(Object));
     }else{
         for (size_t c = 0; c < m_size; c++){
