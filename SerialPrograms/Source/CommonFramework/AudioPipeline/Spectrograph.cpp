@@ -15,6 +15,7 @@ Spectrograph::~Spectrograph(){}
 Spectrograph::Spectrograph(size_t buckets, size_t frames)
     : m_buckets(buckets)
     , m_frames(frames)
+    , m_current_index(0)
     , m_buffer(buckets * frames)
 {
     memset(m_buffer.data(), 0, m_buffer.size() * sizeof(uint32_t));
