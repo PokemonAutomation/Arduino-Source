@@ -668,6 +668,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/StartInGripMenuOption.h
     Source/NintendoSwitch/Options/SwitchDateOption.cpp
     Source/NintendoSwitch/Options/SwitchDateOption.h
+    Source/NintendoSwitch/Options/TestPathMakerTable.cpp
+    Source/NintendoSwitch/Options/TestPathMakerTable.h
     Source/NintendoSwitch/Options/TimeExpressionOption.cpp
     Source/NintendoSwitch/Options/TimeExpressionOption.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
@@ -688,6 +690,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h
+    Source/NintendoSwitch/TestPathMaker.cpp
+    Source/NintendoSwitch/TestPathMaker.h
     Source/NintendoSwitch/TestProgramComputer.cpp
     Source/NintendoSwitch/TestProgramComputer.h
     Source/NintendoSwitch/TestProgramSwitch.cpp

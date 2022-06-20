@@ -333,6 +333,7 @@ SOURCES += \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Options/SwitchDateOption.cpp \
+    Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
     Source/NintendoSwitch/Options/TimeExpressionOption.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
@@ -343,6 +344,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
+    Source/NintendoSwitch/TestPathMaker.cpp \
     Source/NintendoSwitch/TestProgramComputer.cpp \
     Source/NintendoSwitch/TestProgramSwitch.cpp \
     Source/PanelLists.cpp \
@@ -1051,6 +1053,7 @@ HEADERS += \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/SwitchDateOption.h \
+    Source/NintendoSwitch/Options/TestPathMakerTable.h \
     Source/NintendoSwitch/Options/TimeExpressionOption.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
@@ -1061,6 +1064,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
+    Source/NintendoSwitch/TestPathMaker.h \
     Source/NintendoSwitch/TestProgramComputer.h \
     Source/NintendoSwitch/TestProgramSwitch.h \
     Source/PanelLists.h \

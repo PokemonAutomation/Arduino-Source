@@ -90,6 +90,34 @@ template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value)
     return box;
 }
 
+
+QWidget* make_limited_integer_table_cell(QWidget& parent, int32_t& value, int32_t min, int32_t max){
+    QLineEdit* box = new QLineEdit(QString::number(value), &parent);
+    box->setAlignment(Qt::AlignHCenter);
+    box->connect(
+        box, &QLineEdit::textChanged,
+        box, [&value, box, min, max](const QString& text){
+            bool ok = false;
+            const int current = (int32_t)text.toLong(&ok);
+            QPalette palette;
+            if (ok && current >= min && current <= max){
+                value = current;
+                palette.setColor(QPalette::Text, Qt::black);
+            }else{
+                palette.setColor(QPalette::Text, Qt::red);
+            }
+            box->setPalette(palette);
+        }
+    );
+    box->connect(
+        box, &QLineEdit::editingFinished,
+        box, [&value, box](){
+            box->setText(QString::number(value));
+        }
+    );
+    return box;
+}
+
 QWidget* make_double_table_cell(QWidget& parent, double& value, double min, double max){
     QLineEdit* box = new QLineEdit(QString::number(value), &parent);
     box->setAlignment(Qt::AlignHCenter);
