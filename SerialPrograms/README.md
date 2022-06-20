@@ -92,8 +92,6 @@ If you repeatedly run into an error involving "SSL handshake failed", you will n
 
 If you are unable or unwilling to use the online installer, the alternative is to copy an installation directly into your system. To do this, you will need to download the installation from us, and copy it into your C drive.
 
-Yes, this is an unofficial work-around to the lack of an offline installer.
-
 1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for "Qt6.7z". Someone will provide you with a link.
 2. Download Qt6.7z and decompress it. You can use [7-zip](https://www.7-zip.org/) to decompress it. This will create a folder "Qt6" that is ***32 GB*** large.
 3. Move this folder to `C:\`. It will probably ask you for permissions to do it.
