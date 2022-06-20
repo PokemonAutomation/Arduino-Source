@@ -105,12 +105,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
     {
-        QImage image("screenshot-20220620-124801873847.png");
+        QImage image("WinMyPin-Female.png");
         EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
         cout << (int)gender << endl;
     }
     {
-        QImage image("screenshot-20220620-124803649339.png");
+        QImage image("WinMyPin-Male.png");
         EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
         cout << (int)gender << endl;
     }
