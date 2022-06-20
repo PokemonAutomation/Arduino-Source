@@ -1,5 +1,11 @@
-#ifndef TESTPATHMAKER_H
-#define TESTPATHMAKER_H
+/*  Test Program (Computer)
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Computer_TestPathMaker_H
+#define PokemonAutomation_Computer_TestPathMaker_H
 
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"

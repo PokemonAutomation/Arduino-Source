@@ -1,5 +1,11 @@
-#ifndef BOXSHINYDETECTOR_H
-#define BOXSHINYDETECTOR_H
+/*  Box Gender Detector
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonBDSP_BoxGenderDetector_H
+#define PokemonAutomation_PokemonBDSP_BoxGenderDetector_H
 
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
@@ -9,12 +15,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-class BoxGenderDetector{
 
-public:
-EggHatchGenderFilter identify_gender(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame);
+EggHatchGenderFilter read_gender_from_box(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame);
 
-};
+
+
+
 }
 }
 }

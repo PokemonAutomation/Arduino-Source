@@ -21,6 +21,7 @@
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 
 #include <QVideoFrame>
 
@@ -93,7 +94,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
+    using namespace PokemonBDSP;
     using namespace PokemonLA;
 
     [[maybe_unused]] LoggerQt& logger = env.logger();
@@ -103,6 +104,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    {
+        QImage image("screenshot-20220620-124801873847.png");
+        EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
+        cout << (int)gender << endl;
+    }
+    {
+        QImage image("screenshot-20220620-124803649339.png");
+        EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
+        cout << (int)gender << endl;
+    }
+
+
+#if 0
     QImage image("screenshot-20220613-170430686597.png");
 
     VideoOverlaySet set(overlay);
@@ -110,7 +124,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     detector.make_overlays(set);
 
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 #if 0

@@ -1,13 +1,19 @@
-#include "PokemonBDSP_BoxGenderDetector.h"
+/*  Box Gender Detector
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
 #include <QImage>
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
-#include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/Globals.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
+#include "PokemonBDSP_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,7 +70,7 @@ bool is_female(const ConstImageRef& image, const WaterfillObject& object){
 }
 
 
-EggHatchGenderFilter BoxGenderDetector::identify_gender(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame)
+EggHatchGenderFilter read_gender_from_box(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame)
 {
     InferenceBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
 

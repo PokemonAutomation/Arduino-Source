@@ -235,9 +235,7 @@ bool EggAutonomousState::process_party(){
             m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
-
-        BoxGenderDetector gender_detector;
-        EggHatchGenderFilter gender = gender_detector.identify_gender(m_console, m_console, screen);
+        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
 
         EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
 

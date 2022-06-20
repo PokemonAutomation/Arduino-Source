@@ -67,14 +67,10 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>();
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        add_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>();
-    }
+    add_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>();
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        add_program<LeapGrinder_Descriptor, LeapGrinder>();
-    }
+    add_program<LeapGrinder_Descriptor, LeapGrinder>();
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
