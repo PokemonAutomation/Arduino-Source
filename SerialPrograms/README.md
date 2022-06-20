@@ -79,7 +79,7 @@ Source code for the "Computer Control" programs.
 
 Unlike with Qt 5.12, there is no offline installer for it. So you have two options here, use the online installer, or use a copy of an installation.
 
-**Official Online Installer:**
+### Official Online Installer:
 
 1. Download the online installer from here: https://www.qt.io/download
 2. Select:
@@ -88,9 +88,9 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 
 If you repeatedly run into an error involving "SSL handshake failed", you will not be able to use the online installer. Please try the other option.
 
-**Unofficial Installation Copy:**
+### Unofficial Installation Copy:
 
-If you are unable to unwilling to use the online installer, the alternative is to copy an installation directly into your system. To do this, you will need to download the installation from us, and copy it into your C drive.
+If you are unable or unwilling to use the online installer, the alternative is to copy an installation directly into your system. To do this, you will need to download the installation from us, and copy it into your C drive.
 
 Yes, this is an unofficial work-around to the lack of an offline installer.
 
