@@ -81,7 +81,7 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 
 ### Official Online Installer:
 
-1. Download the online installer from here: https://www.qt.io/download
+1. Download the online installer from here: https://www.qt.io/download-qt-installer
 2. Select:
     1. Qt 6.3
     2. MSVC2019 64-bit
