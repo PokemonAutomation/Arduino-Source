@@ -82,9 +82,7 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 ### Official Online Installer:
 
 1. Download the online installer from here: https://www.qt.io/download-qt-installer
-2. Select:
-    1. Qt 6.3
-    2. MSVC2019 64-bit
+2. Select the following options: ![](../BuildSetup/Windows-Install-Qt6.3.1.png)
 
 If you repeatedly run into an error involving "SSL handshake failed", you will not be able to use the online installer. Please try the other option.
 
@@ -92,10 +90,10 @@ If you repeatedly run into an error involving "SSL handshake failed", you will n
 
 If you are unable or unwilling to use the online installer, the alternative is to copy an installation directly into your system. To do this, you will need to download the installation from us, and copy it into your C drive.
 
-1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for "Qt6.7z". Someone will provide you with a link.
-2. Download Qt6.7z and decompress it. You can use [7-zip](https://www.7-zip.org/) to decompress it. This will create a folder "Qt6" that is ***32 GB*** large.
+1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for the link to the Qt6 standalone. Someone will provide you with a link.
+2. Download `Qt6.3.1.7z` and decompress it. You can use [7-zip](https://www.7-zip.org/) to decompress it. This will create a folder with the same name.
 3. Move this folder to `C:\`. It will probably ask you for permissions to do it.
-4. Navigate to: `C:\Qt6\Tools\QtCreator\bin\` and create a shortcut to `qtcreator.exe`. Copy this shortcut to somewhere convenient. (By default this shortcut is named, `Qt Creator 7.0.2 (Community)`)
+4. Navigate to: `C:\Qt6.3.1\Tools\QtCreator\bin\` and create a shortcut to `qtcreator.exe`. Copy this shortcut to somewhere convenient. (By default this shortcut is named, `Qt Creator 7.0.2 (Community)`)
 
 ## Setup:
 
@@ -108,7 +106,7 @@ If you are unable or unwilling to use the online installer, the alternative is t
 4. Open Qt Creator.
 5. Click on `Projects` -> `Open`.
 6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
-7. It will then ask you to configure the project. Select `Desktop Qt 6.3.0 MSVC2019 64bit`.
+7. It will then ask you to configure the project. Select `Desktop Qt 6.3.1 MSVC2019 64bit`.
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
 9. Open up the file `CMakeLists.txt`. Change `QT_MAJOR` to `6`.![](../BuildSetup/QT_MAJOR-6.png)
 10. Click the upper green arrow to compile and launch the program.
