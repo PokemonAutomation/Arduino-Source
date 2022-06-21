@@ -189,7 +189,7 @@ void on_match_found(
     send_program_notification(
         console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
         env.program_info(),
-        "Match Found!",
+        "Match Found",
         embeds,
         screen, true
     );
