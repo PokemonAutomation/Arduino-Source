@@ -38,7 +38,7 @@ std::unique_ptr<SpectrogramMatcher> AlphaMusicDetector::build_spectrogram_matche
     const size_t templateSubdivision = 12;
     return std::make_unique<SpectrogramMatcher>(
         AudioTemplateCache::instance().get_throw("PokemonLA/AlphaMusic", sampleRate),
-        SpectrogramMatcher::Mode::AVERAGE_5, sampleRate,
+        SpectrogramMatcher::Mode::RAW, sampleRate,
         lowFrequencyFilter, templateSubdivision
     );
 }

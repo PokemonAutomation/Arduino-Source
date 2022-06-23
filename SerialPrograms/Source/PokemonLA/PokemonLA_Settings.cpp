@@ -74,7 +74,7 @@ GameSettings::GameSettings()
     )
     , ALPHA_MUSIC_THRESHOLD(
         "<b>Alpha Music Threshold:</b><br>Maximum error coefficient to trigger an alpha music detection.",
-        0.61, 0, 1.0
+        0.81, 0, 1.0
     )
     , ITEM_DROP_SOUND_THRESHOLD(
         "<b>Item Drop Sound Threshold:</b><br>Maximum error coefficient to trigger an item drop sound detection.",
@@ -104,6 +104,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(ALPHA_ROAR_THRESHOLD);
+    PA_ADD_OPTION(ALPHA_MUSIC_THRESHOLD);
     PA_ADD_OPTION(ITEM_DROP_SOUND_THRESHOLD);
     PA_ADD_OPTION(ITEM_DROP_SOUND_LOW_FREQUENCY);
 }
