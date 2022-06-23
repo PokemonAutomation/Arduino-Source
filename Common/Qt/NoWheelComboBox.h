@@ -21,7 +21,9 @@ public:
         m_cached_minimum_size = QComboBox::minimumSizeHint();
     }
 
-    virtual void wheelEvent(QWheelEvent*) override{}
+    virtual void wheelEvent(QWheelEvent* event) override{
+        QWidget::wheelEvent(event);
+    }
 
     virtual QSize sizeHint() const override{
         if (m_cached_size.isValid()){
