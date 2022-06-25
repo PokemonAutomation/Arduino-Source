@@ -28,7 +28,7 @@ If you repeatedly run into an error involving "SSL handshake failed", you will n
 
 If you are unable or unwilling to use the online installer, the alternative is to copy an installation directly into your system. To do this, you will need to download the installation from us, and copy it into your C drive.
 
-1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for the link to the Qt6 standalone. Someone will provide you with a link.
+1. Join our [Discord server](https://discord.gg/cQ4gWxN) and ask for the link to the Qt6 standalone. Someone will provide you with a link. (It is currently self-hosted and we don't want the server to be overrun.)
 2. Download `Qt6.3.1.7z` and decompress it. You can use [7-zip](https://www.7-zip.org/) to decompress it. This will create a folder with the same name.
 3. Move this folder to `C:\`. It will probably ask you for permissions to do it.
 4. Navigate to: `C:\Qt6.3.1\Tools\QtCreator\bin\` and create a shortcut to `qtcreator.exe`. Copy this shortcut to somewhere convenient. (By default this shortcut is named, `Qt Creator 7.0.2 (Community)`)
