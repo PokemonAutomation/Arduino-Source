@@ -144,7 +144,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                false, false, {{{}, ShinyType::NOT_SHINY}},
+                false, false, {{{}, ShinyType::NOT_SHINY}}, std::nan(""),
                 QImage()
             );
             break;
@@ -154,7 +154,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
+                false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
                 env.console.video().snapshot()
             );
             if (VIDEO_ON_SHINY){

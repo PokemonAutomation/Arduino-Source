@@ -78,12 +78,13 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
 }
 
 ShinyType determine_shiny_status(
+    double& alpha,
     LoggerQt& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles
 ){
-    double alpha = sparkles.best_overall();
+    alpha = sparkles.best_overall();
 
     std::chrono::milliseconds dialog_duration = dialog_tracker.wild_animation_duration();
     std::chrono::milliseconds min_delay = battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300);
@@ -132,15 +133,17 @@ ShinyDetectionResult detect_shiny_battle(
     );
     if (result < 0){
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
-        return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
+        return ShinyDetectionResult{ShinyType::UNKNOWN, 0, QImage()};
     }
+    double alpha;
     ShinyType shiny_type = determine_shiny_status(
+        alpha,
         console,
         battle_settings,
         tracker.dialog_tracker(),
         tracker.sparkles_wild()
     );
-    return ShinyDetectionResult{shiny_type, tracker.sparkles_wild().best_image()};
+    return ShinyDetectionResult{shiny_type, alpha, tracker.sparkles_wild().best_image()};
 }
 
 

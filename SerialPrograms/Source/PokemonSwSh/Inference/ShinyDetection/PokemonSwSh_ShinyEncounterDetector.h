@@ -68,6 +68,7 @@ private:
 };
 
 ShinyType determine_shiny_status(
+    double& alpha,
     LoggerQt& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,

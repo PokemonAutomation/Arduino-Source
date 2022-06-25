@@ -217,7 +217,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}},
+                true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}}, result_wild.alpha,
                 result_wild.best_screenshot
             );
         }else{
@@ -227,7 +227,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 env.program_info(),
-                true, false, {{{"starly"}, ShinyType::NOT_SHINY}},
+                true, false, {{{"starly"}, ShinyType::NOT_SHINY}}, result_wild.alpha,
                 result_wild.best_screenshot,
                 &stats
             );
@@ -241,7 +241,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}},
+                true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}}, result_own.alpha,
                 result_own.best_screenshot
             );
             break;
@@ -251,7 +251,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                true, false, {{{starter}, ShinyType::NOT_SHINY}},
+                true, false, {{{starter}, ShinyType::NOT_SHINY}}, result_own.alpha,
                 result_own.best_screenshot
             );
         }

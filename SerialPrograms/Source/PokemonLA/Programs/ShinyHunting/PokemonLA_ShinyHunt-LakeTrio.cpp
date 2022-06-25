@@ -208,7 +208,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     env,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
-                    true, false, {{std::move(slugs), ShinyType::NOT_SHINY}},
+                    true, false, {{std::move(slugs), ShinyType::NOT_SHINY}}, std::nan(""),
                     screen
                 );
             }else{
@@ -218,7 +218,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     env,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
-                    true, true, {{std::move(slugs), ShinyType::UNKNOWN_SHINY}},
+                    true, true, {{std::move(slugs), ShinyType::UNKNOWN_SHINY}}, std::nan(""),
                     screen
                 );
                 if (VIDEO_ON_SHINY){

@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <QJsonArray>
 #include <QJsonObject>
 #include "Common/Cpp/PrettyPrint.h"
@@ -70,134 +71,13 @@ QString pokemon_to_string(const EncounterResult& pokemon){
 
 
 
-#if 0
-void send_encounter_notification(
-    LoggerQt& logger,
-    EventNotificationOption& settings_nonshiny,
-    EventNotificationOption& settings_shiny,
-    const ProgramInfo& info,
-    bool enable_names, bool shiny_detected,
-    const std::vector<EncounterResult>& results,
-    QImage screenshot,
-    const StatsTracker* session_stats,
-    const EncounterFrequencies* frequencies,
-    const StatsTracker* alltime_stats
-){
-    ShinyType max_shiny_type = ShinyType::UNKNOWN;
-    size_t shiny_count = 0;
-
-    QString names;
-
-    bool first = true;
-    for (const EncounterResult& result : results){
-        if (!first){
-            names += "\n";
-        }
-        first = false;
-        names += pokemon_to_string(result);
-        max_shiny_type = max_shiny_type < result.shininess ? result.shininess : max_shiny_type;
-        shiny_count += is_confirmed_shiny(result.shininess) ? 1 : 0;
-    }
-    if (max_shiny_type == ShinyType::MAYBE_SHINY){
-        max_shiny_type = ShinyType::UNKNOWN_SHINY;
-    }
-    Color color = shiny_color(max_shiny_type);
-    bool has_shiny = is_likely_shiny(max_shiny_type) || shiny_detected;
-
-    QString shinies;
-    if (results.size() == 1){
-        QString symbol = shiny_symbol(results[0].shininess);
-        switch (results[0].shininess){
-        case ShinyType::UNKNOWN:
-            shinies = "Unknown";
-            break;
-        case ShinyType::NOT_SHINY:
-            shinies = "Not Shiny";
-            break;
-        case ShinyType::MAYBE_SHINY:
-            shinies = "Maybe Shiny";
-            break;
-        case ShinyType::UNKNOWN_SHINY:
-            shinies = symbol + QString(" Shiny ") + symbol;
-            break;
-        case ShinyType::STAR_SHINY:
-            shinies = symbol + QString(" Star Shiny ") + symbol;
-            break;
-        case ShinyType::SQUARE_SHINY:
-            shinies = symbol + QString(" Square Shiny ") + symbol;
-            break;
-        }
-    }else if (!results.empty()){
-        QString symbol = shiny_symbol(max_shiny_type);
-        switch (shiny_count){
-        case 0:
-            if (shiny_detected){
-                symbol = shiny_symbol(ShinyType::UNKNOWN_SHINY);
-                shinies = symbol + " Found Shiny! " + symbol + " (Unable to determine which.)";
-            }else{
-                shinies = "No Shinies";
-            }
-            break;
-        case 1:
-            shinies = symbol + " Found Shiny! " + symbol;
-            break;
-        default:
-            shinies += symbol + QString(" Multiple Shinies! ") + symbol;
-            break;
-        }
-    }
-
-    std::vector<std::pair<QString, QString>> embeds;
-    if (enable_names && !names.isEmpty()){
-        embeds.emplace_back("Species", std::move(names));
-    }
-    if (!shinies.isEmpty()){
-        embeds.emplace_back("Shininess", std::move(shinies));
-    }
-    {
-        QString session_stats_str;
-        if (session_stats){
-            session_stats_str += QString::fromStdString(session_stats->to_str());
-        }
-        if (frequencies && !frequencies->empty()){
-            if (!session_stats_str.isEmpty()){
-                session_stats_str += "\n";
-            }
-            session_stats_str += frequencies->dump_sorted_map("");
-        }
-        if (!session_stats_str.isEmpty()){
-            embeds.emplace_back("Session Stats", std::move(session_stats_str));
-        }
-    }
-    if (alltime_stats){
-        embeds.emplace_back("All Time Stats", QString::fromStdString(alltime_stats->to_str()));
-    }
-
-    if (has_shiny){
-        send_program_notification(
-            logger, settings_shiny,
-            color, info,
-            "Encounter Notification",
-            embeds,
-            std::move(screenshot), true
-        );
-    }else{
-        send_program_notification(
-            logger, settings_nonshiny,
-            color, info,
-            "Encounter Notification",
-            embeds,
-            std::move(screenshot), false
-        );
-    }
-}
-#endif
 void send_encounter_notification(
     ProgramEnvironment& env,
     EventNotificationOption& settings_nonshiny,
     EventNotificationOption& settings_shiny,
     bool enable_names, bool shiny_detected,
     const std::vector<EncounterResult>& results,
+    double alpha,
     QImage screenshot,
     const EncounterFrequencies* frequencies
 ){
@@ -270,6 +150,9 @@ void send_encounter_notification(
         embeds.emplace_back("Species", std::move(names));
     }
     if (!shinies.isEmpty()){
+        if (!std::isnan(alpha)){
+            shinies += "\n(Detection Alpha = " + QString::number(alpha) + ")";
+        }
         embeds.emplace_back("Shininess", std::move(shinies));
     }
     {

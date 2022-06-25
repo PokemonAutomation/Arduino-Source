@@ -62,8 +62,8 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
     if (frame.isNull()){
         return false;
     }
-    if (frame.height() < 1080){
-        throw UserSetupError(m_logger, "Video resolution must be at least 1080p.");
+    if (frame.height() < 720){
+        throw UserSetupError(m_logger, "Video resolution must be at least 720p.");
     }
     double aspect_ratio = (double)frame.width() / frame.height();
     if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
@@ -204,6 +204,7 @@ void determine_shiny_status(
     );
 
     wild_result.shiny_type = ShinyType::UNKNOWN;
+    wild_result.alpha = alpha_wild_overall;
     wild_result.left_is_shiny = false;
     wild_result.right_is_shiny = false;
 
@@ -227,6 +228,7 @@ void determine_shiny_status(
         );
     }
 
+    your_result.alpha = alpha_own;
     if (alpha_own < OVERALL_THRESHOLD){
         env.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
         your_result.shiny_type = ShinyType::NOT_SHINY;

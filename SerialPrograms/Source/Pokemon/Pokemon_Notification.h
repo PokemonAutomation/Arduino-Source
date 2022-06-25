@@ -34,26 +34,13 @@ struct EncounterResult{
 };
 
 
-#if 0
-void send_encounter_notification(
-    LoggerQt& logger,
-    EventNotificationOption& settings_nonshiny,
-    EventNotificationOption& settings_shiny,
-    const ProgramInfo& info,
-    bool enable_names, bool shiny_detected,
-    const std::vector<EncounterResult>& results,
-    QImage screenshot = QImage(),
-    const StatsTracker* session_stats = nullptr,
-    const EncounterFrequencies* frequencies = nullptr,
-    const StatsTracker* alltime_stats = nullptr
-);
-#endif
 void send_encounter_notification(
     ProgramEnvironment& env,
     EventNotificationOption& settings_nonshiny,
     EventNotificationOption& settings_shiny,
     bool enable_names, bool shiny_detected,
     const std::vector<EncounterResult>& results,
+    double alpha,   //  Set to std::nan("") to hide the field.
     QImage screenshot = QImage(),
     const EncounterFrequencies* frequencies = nullptr
 );

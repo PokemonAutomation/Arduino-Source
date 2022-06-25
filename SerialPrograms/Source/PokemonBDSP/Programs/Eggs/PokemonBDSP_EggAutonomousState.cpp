@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -165,7 +166,7 @@ void EggAutonomousState::process_shiny(QImage screen){
         m_env,
         m_notification_noop,
         m_notification_shiny,
-        false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
+        false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
         std::move(screen)
     );
 }
@@ -247,7 +248,7 @@ bool EggAutonomousState::process_party(){
                     m_env,
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
-                    false, false, {},
+                    false, false, {}, std::nan(""),
                     screen
                 );
             }
@@ -259,7 +260,7 @@ bool EggAutonomousState::process_party(){
                     m_env,
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
-                    false, false, {},
+                    false, false, {}, std::nan(""),
                     screen
                 );
             }

@@ -29,7 +29,7 @@ find_package(Threads REQUIRED)
 
 #find Qt
 if(NOT QT_MAJOR)
-    set(QT_MAJOR 5)
+    set(QT_MAJOR 6)
 endif()
 find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
 #disable deprecated Qt APIs

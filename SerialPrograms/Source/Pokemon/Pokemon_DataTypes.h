@@ -51,6 +51,7 @@ inline bool is_confirmed_shiny(ShinyType type){
 
 struct ShinyDetectionResult{
     ShinyType shiny_type = ShinyType::UNKNOWN;
+    double alpha = 0;
     QImage best_screenshot;
 };
 

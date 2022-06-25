@@ -40,7 +40,8 @@
 6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
 7. It will then ask you to configure the project. Select `Desktop Qt 5.12.12 MSVC2017 64bit`*.
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Click the upper green arrow** to compile and launch the program.
+9. Open up the file `CMakeLists.txt`. Change `QT_MAJOR` to `5`.![](../BuildSetup/QT_MAJOR-6.png)
+10. Click the upper green arrow** to compile and launch the program.
 
 ![](../BuildSetup/Windows-Configuration.png)
 
