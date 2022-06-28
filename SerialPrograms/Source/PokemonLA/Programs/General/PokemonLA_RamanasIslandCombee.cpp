@@ -1,0 +1,315 @@
+/*  Ramanas Island Combee Finder
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <array>
+#include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
+#include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Programs/PokemonLA_MountChange.h"
+#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h"
+#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonLA:Ramanas Island Combee Finder",
+        STRING_POKEMON + " LA", "Ramanas Combee Finder",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
+        "Check Ramanas Island Tree until a Combee is found",
+        FeedbackType::REQUIRED, false,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+
+RamanasCombeeFinder:: RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+    , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    , SHINY_DETECTED_ENROUTE(
+        "Enroute Shiny Action",
+        "This applies if a shiny is detected while traveling in the overworld.",
+        "0 * TICKS_PER_SECOND"
+    )
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS,
+        &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+    , SAVE_DEBUG_VIDEO(
+        "<b>Save debug videos to Switch:</b>", false
+          )
+{
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+    }
+}
+
+class RamanasCombeeFinder::Stats : public StatsTracker{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , trees(m_stats["Trees"])
+        , errors(m_stats["Errors"])
+        , blackouts(m_stats["Blackouts"])
+        , found(m_stats["Found"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Trees");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Blackouts", true);
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& trees;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& blackouts;
+    std::atomic<uint64_t>& found;
+    std::atomic<uint64_t>& enroute_shinies;
+};
+
+std::unique_ptr<StatsTracker> RamanasCombeeFinder::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    context.wait_for_all_requests();
+    disable_shiny_sound(context);
+    // Throw pokemon
+    pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
+    env.current_stats<Stats>().trees++;
+    env.update_stats();
+}
+
+bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    context.wait_for_all_requests();
+
+    disable_shiny_sound(context);
+    bool battle_found = check_tree_or_ore_for_battle(env.console, context);
+    env.current_stats<Stats>().trees++;
+    env.update_stats();
+
+    context.wait_for_all_requests();
+
+    bool ret = false;
+    if (battle_found){
+        ret = handle_battle(env, context);
+    }
+
+    enable_shiny_sound(context);
+
+    return ret;
+}
+
+
+void RamanasCombeeFinder::disable_shiny_sound(BotBaseContext& context){
+    context.wait_for_all_requests();
+    m_enable_shiny_sound.store(false, std::memory_order_release);
+}
+void RamanasCombeeFinder::enable_shiny_sound(BotBaseContext& context){
+    context.wait_for_all_requests();
+    m_enable_shiny_sound.store(true, std::memory_order_release);
+}
+
+bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    Stats& stats = env.current_stats<Stats>();
+
+    PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
+
+    pbf_press_button(context, BUTTON_B, 20, 225);
+
+    context.wait_for_all_requests();
+
+    if (pokemon.name_candidates.find("combee") == pokemon.name_candidates.end()){
+        env.console.log("Not a Combee, leaving battle.");
+        exit_battle(env.console, context);
+        return false;
+    }
+
+    env.console.log("Combee found");
+    stats.found++;
+    on_match_found(env, env.console, context, SHINY_DETECTED_ENROUTE, true);
+    return true;
+}
+
+void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    BattleMenuDetector battle_menu_detector(env.console, env.console, true);
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+
+            env.console.log("Checking Tree 1");
+            change_mount(env.console,context,MountState::BRAVIARY_ON);
+            pbf_move_left_joystick(context, 241, 0, 100, 20);
+            pbf_press_button(context, BUTTON_B, 2390, 0);
+            pbf_press_button(context, BUTTON_Y, 380, 0);
+            pbf_move_right_joystick(context, 127, 255, 90, 20);
+            check_tree_no_stop(env, context);
+
+            env.console.log("Checking Tree 2");
+            pbf_press_button(context, BUTTON_PLUS, 20, 200);
+            pbf_move_left_joystick(context, 242, 0, 100, 20);
+            enable_shiny_sound(context);
+            pbf_press_button(context, BUTTON_B, 420, 0);
+            pbf_press_button(context, BUTTON_Y, 380, 0);
+            pbf_move_right_joystick(context, 127, 255, 90, 20);
+            check_tree_no_stop(env, context);
+
+            env.console.log("Checking Tree 3");
+            pbf_press_button(context, BUTTON_PLUS, 20, 200);
+            pbf_move_left_joystick(context, 0, 60, 100, 20);
+            enable_shiny_sound(context);
+            pbf_press_button(context, BUTTON_B, 350, 0);
+            pbf_press_button(context, BUTTON_Y, 380, 0);
+            pbf_move_right_joystick(context, 127, 255, 90, 20);
+            check_tree_no_stop(env, context);
+
+            env.console.log("Checking Tree 4");
+            pbf_press_button(context, BUTTON_PLUS, 20, 200);
+            pbf_move_left_joystick(context, 50, 255, 100, 20);
+            enable_shiny_sound(context);
+            pbf_press_button(context, BUTTON_B, 375, 0);
+            pbf_press_button(context, BUTTON_Y, 380, 0);
+            pbf_move_right_joystick(context, 127, 255, 90, 20);
+            check_tree_no_stop(env, context);
+
+            env.console.log("Checking Tree 5");
+            pbf_press_button(context, BUTTON_PLUS, 20, 200);
+            pbf_move_left_joystick(context, 200, 0, 100, 20);
+            enable_shiny_sound(context);
+            pbf_press_button(context, BUTTON_B, 85, 0);
+            pbf_press_button(context, BUTTON_Y, 380, 0);
+            pbf_move_right_joystick(context, 127, 255, 90, 20);
+        },
+        {
+            {battle_menu_detector},
+        }
+    );
+
+    if (ret == 0){
+        if (handle_battle(env, context)){
+            env.console.log("Battle found before last tree in the path.");
+        }
+
+    } else{
+        check_tree(env, context);
+        env.console.log("Checked all trees in the path.");
+    }
+
+}
+
+void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    Stats& stats = env.current_stats<Stats>();
+    stats.attempts++;
+    env.update_stats();
+    env.console.log("Starting route and shiny detection...");
+
+    for (size_t c = 0; true; c++){
+        context.wait_for_all_requests();
+        if (is_pokemon_selection(env.console, env.console.video().snapshot().frame)){
+            break;
+        }
+        if (c >= 5){
+            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+        }
+        env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
+        pbf_press_button(context, BUTTON_X, 20, 230);
+    }
+
+    float shiny_coefficient = 1.0;
+
+    ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        if (!m_enable_shiny_sound.load()){
+            return false;
+        }
+        stats.enroute_shinies++;
+        shiny_coefficient = error_coefficient;
+        return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
+    });
+
+    BlackOutDetector black_out_detector(env.console, env.console);
+
+    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            grouped_path(env, context);
+            context.wait_for_all_requests();
+            goto_camp_from_overworld(env, env.console, context);
+            goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
+        },
+        {{shiny_detector, black_out_detector}}
+    );
+    shiny_detector.throw_if_no_sound();
+    if (ret == 0){
+        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
+    } else if (ret == 1){
+        env.log("Character blacks out");
+        // black out.
+        stats.blackouts++;
+        env.update_stats();
+        if (SAVE_DEBUG_VIDEO){
+            // Take a video to know why it blacks out
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+            context.wait_for_all_requests();
+        }
+        throw OperationFailedException(env.console, "Black out.");
+    }
+
+    from_professor_return_to_jubilife(env, env.console, context);
+}
+
+void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    Stats& stats = env.current_stats<Stats>();
+
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+
+    while (true){
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS);
+        try{
+            run_iteration(env, context);
+        }catch (OperationFailedException&){
+            stats.errors++;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }
+    }
+
+    env.update_stats();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+}
+}
+}

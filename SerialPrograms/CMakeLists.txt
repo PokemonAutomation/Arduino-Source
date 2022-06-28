@@ -997,6 +997,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h
+    Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp

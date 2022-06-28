@@ -494,6 +494,7 @@ SOURCES += \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
@@ -1218,6 +1219,7 @@ HEADERS += \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h \
+    Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \

@@ -1,0 +1,61 @@
+/*  Combee Finder
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonLA_RamanasIslandCombee_H
+#define PokemonAutomation_PokemonLA_RamanasIslandCombee_H
+
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+
+class RamanasCombeeFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    RamanasCombeeFinder_Descriptor();
+};
+
+
+class RamanasCombeeFinder: public SingleSwitchProgramInstance{
+public:
+    RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor);
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+
+private:
+    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void disable_shiny_sound(BotBaseContext& context);
+    void enable_shiny_sound(BotBaseContext& context);
+
+private:
+    class Stats;
+    class RunRoute;
+
+    std::atomic<bool> m_enable_shiny_sound{true};
+
+    OCR::LanguageOCR LANGUAGE;
+    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+
+    EventNotificationOption NOTIFICATION_STATUS;
+    EventNotificationsOption NOTIFICATIONS;
+
+    BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
+};
+
+}
+}
+}
+#endif
