@@ -406,34 +406,34 @@ public:
                     myfile << "pbf_move_right_joystick(context, " + std::to_string(row.x_axis) + ", " + std::to_string(row.y_axis) + ", " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::B:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_B, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_B, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::A:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_A, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_A, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::Y:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_Y, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_Y, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::X:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_X, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_X, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::R:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_R, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_R, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::L:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_L, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_L, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::ZR:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_ZR, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_ZR, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::ZL:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_ZL, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_ZL, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::PLUS:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_PLUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_PLUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::MINUS:
-                    myfile << "pbf_move_right_joystick(context, BUTTON_MINUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
+                    myfile << "pbf_press_button(context, BUTTON_MINUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
                     break;
                 case PathAction::DPADLEFT:
                     myfile << "pbf_press_dpad(context, DPAD_LEFT, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
