@@ -176,6 +176,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
             env.console.log("Checking Tree 2");
             pbf_press_button(context, BUTTON_PLUS, 20, 200);
             pbf_move_left_joystick(context, 242, 0, 100, 20);
+            context.wait_for_all_requests();
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 420, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
@@ -185,6 +186,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
             env.console.log("Checking Tree 3");
             pbf_press_button(context, BUTTON_PLUS, 20, 200);
             pbf_move_left_joystick(context, 0, 60, 100, 20);
+            context.wait_for_all_requests();
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 350, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
@@ -194,6 +196,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
             env.console.log("Checking Tree 4");
             pbf_press_button(context, BUTTON_PLUS, 20, 200);
             pbf_move_left_joystick(context, 50, 255, 100, 20);
+            context.wait_for_all_requests();
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 375, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
@@ -203,6 +206,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
             env.console.log("Checking Tree 5");
             pbf_press_button(context, BUTTON_PLUS, 20, 200);
             pbf_move_left_joystick(context, 200, 0, 100, 20);
+            context.wait_for_all_requests();
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 85, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
