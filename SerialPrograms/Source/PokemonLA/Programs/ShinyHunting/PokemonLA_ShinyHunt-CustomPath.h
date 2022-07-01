@@ -54,6 +54,8 @@ private:
 
     CustomPathTable PATH;
 
+    EnumDropdownOption RESET_METHOD;
+
     BooleanCheckBoxOption TEST_PATH;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;

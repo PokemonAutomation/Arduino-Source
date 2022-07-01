@@ -39,6 +39,14 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
 
 ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , RESET_METHOD(
+          "<b>Reset Method:</b>",
+          {
+              "Soft Reset",
+              "Go back to village",
+          },
+          0
+    )
     , TEST_PATH(
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
@@ -62,9 +70,11 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
 //    PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(PATH);
+    PA_ADD_STATIC(RESET_METHOD);
     PA_ADD_OPTION(TEST_PATH);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
@@ -273,8 +283,17 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             goto_camp_from_jubilife(env, env.console, context, PATH.travel_location());
             run_path(env, context);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            if(RESET_METHOD == 0){
+                env.console.log("Resetting by closing the game.");
+                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            }else{
+                env.console.log("Resetting by going to village.");
+                goto_camp_from_overworld(env, env.console, context);
+                goto_professor(env.console.logger(), context, PATH.travel_location());
+                from_professor_return_to_jubilife(env, env.console, context);
+            }
+
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

@@ -467,7 +467,32 @@ void goto_any_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& consol
 
 
 
+void goto_professor(Logger& logger, BotBaseContext& context, const TravelLocation& location){
 
+    Camp camp = Camp::FIELDLANDS_FIELDLANDS;
+
+    switch (location.region){
+    case MapRegion::FIELDLANDS:
+        camp = Camp::FIELDLANDS_FIELDLANDS;
+        break;
+    case MapRegion::MIRELANDS:
+        camp = Camp::MIRELANDS_MIRELANDS;
+        break;
+    case MapRegion::COASTLANDS:
+        camp = Camp::COASTLANDS_BEACHSIDE;
+        break;
+    case MapRegion::HIGHLANDS:
+        camp = Camp::HIGHLANDS_HIGHLANDS;
+        break;
+    case MapRegion::ICELANDS:
+        camp = Camp::ICELANDS_SNOWFIELDS;
+        break;
+    default:
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid region.");
+    }
+
+    goto_professor(logger, context, camp);
+}
 
 
 

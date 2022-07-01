@@ -44,6 +44,14 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
         "Keep in mind that the shiny sound radius is 30 and you will need some headroom.</font>",
         60
     )
+    , RESET_METHOD(
+          "<b>Reset Method:</b>",
+          {
+              "Soft Reset",
+              "Go back to village",
+          },
+          0
+    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the flag. (defined as being more than the \"Enroute Distance\" specified above)",
@@ -85,6 +93,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(ENROUTE_DISTANCE);
+    PA_ADD_OPTION(RESET_METHOD);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -162,10 +171,18 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
         if (ret == 0){
             on_shiny_sound(env, env.console, context, *shiny_action, shiny_coefficient);
         }
-    }
 
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if(RESET_METHOD == 0){
+            env.console.log("Resetting by closing the game.");
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }else{
+            env.console.log("Resetting by going to village.");
+            goto_camp_from_overworld(env, env.console, context);
+            goto_professor(env.console.logger(), context, TRAVEL_LOCATION);
+            from_professor_return_to_jubilife(env, env.console, context);
+        }
+    }
 }
 
 
