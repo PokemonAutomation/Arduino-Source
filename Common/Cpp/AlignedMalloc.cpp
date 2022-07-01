@@ -33,7 +33,7 @@ void* aligned_malloc(size_t bytes, size_t alignment){
 #endif
 
     size_t actual_bytes = bytes + alignment + sizeof(size_t)*4;
-    void *free_ptr = malloc(actual_bytes);
+    void* free_ptr = malloc(actual_bytes);
     if (free_ptr == nullptr){
         throw std::bad_alloc();
 //        return nullptr;
@@ -49,7 +49,7 @@ void* aligned_malloc(size_t bytes, size_t alignment){
     ret_address &= ~(size_t)(alignment - 1);
     ret_address += alignment;
 
-    size_t *ret = (size_t*)ret_address;
+    size_t* ret = (size_t*)ret_address;
     ret[-3] = free_address;
 
 #ifdef PA_ENABLE_MALLOC_CHECKING
@@ -73,7 +73,7 @@ void aligned_free(void* ptr){
     ptr = (void*)free_int;
     free(ptr);
 }
-void check_aligned_ptr(const void *ptr){
+void check_aligned_ptr(const void* ptr){
 #ifdef PA_ENABLE_MALLOC_CHECKING
     if (ptr == nullptr){
         return;
