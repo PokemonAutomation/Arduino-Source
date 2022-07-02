@@ -47,6 +47,7 @@ void goto_any_camp_from_overworld(
     const TravelLocation& location
 );
 
+void goto_professor(Logger& logger, BotBaseContext& context, const TravelLocation& location);
 
 
 }
