@@ -104,6 +104,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    QImage image("screenshot-20220703-124134719005.png");
+
+
+    InferenceBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
+
+    cout << is_pokemon_selection(overlay, image) << endl;
+
+
+#if 0
     {
         QImage image("screenshot-20220620-182701565112.png");
         EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
@@ -114,7 +123,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         EggHatchGenderFilter gender = read_gender_from_box(console, console, image);
         cout << (int)gender << endl;
     }
-
+#endif
 
 #if 0
     QImage image("screenshot-20220613-170430686597.png");

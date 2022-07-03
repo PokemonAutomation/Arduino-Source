@@ -4,7 +4,9 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonLA_OverworldDetector.h"
 
 #include <iostream>
@@ -38,14 +40,54 @@ bool OverworldDetector::process_frame(const QImage& frame, WallClock timestamp){
 
 
 bool is_pokemon_selection(VideoOverlay& overlay, const ConstImageRef& frame){
+#if 1
+    using namespace Kernels::Waterfill;
+
+    InferenceBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
+
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+        extract_box_reference(frame, box),
+        {
+            {0xff008000, 0xff40ffc0},
+        }
+    );
+//    cout << matrices[0].dump() << endl;
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+    for (PackedBinaryMatrix2& matrix : matrices){
+        session->set_source(matrix);
+        auto iter = session->make_iterator(200);
+        WaterfillObject object;
+        while (iter->find_next(object, false)){
+            //  Skip if it touches the boundary.
+//            cout << object.min_x << " , " << object.min_y << endl;
+            if (object.min_x == 0 || object.min_y == 0 ||
+                object.min_x >= matrix.width() - 1 || object.min_y >= matrix.height() - 1
+            ){
+                continue;
+            }
+
+            //  Too short.
+//            cout << object.width() << " x " << object.height() << endl;
+            if (object.width() < object.height() * 10){
+                continue;
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+#else
     InferenceBoxScope box(overlay, 0.843, 0.96, 0.075, 0.005);
     ImageStats stats = image_stats(extract_box_reference(frame, box));
-//    cout << stats.average << stats.stddev << endl;
-//    extract_box_reference(frame, box).save("test.png");
+    cout << stats.average << stats.stddev << endl;
+    extract_box_reference(frame, box).save("test.png");
     if (is_solid(stats, {0.0652401, 0.606812, 0.327948}, 0.15, 70)){
         return true;
     }
     return false;
+#endif
 }
 
 

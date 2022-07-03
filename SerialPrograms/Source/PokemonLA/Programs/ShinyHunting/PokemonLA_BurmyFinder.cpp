@@ -279,8 +279,9 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     size_t last_checked_tree = 0;
 
-    if(path != 0)
+    if (path != 0){
         go_to_height_camp(env, context);
+    }
 
     env.console.log("Currently Checking Path:" + std::to_string(path));
 
@@ -507,7 +508,6 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
             env.console.log("Battle found before last tree in the path.");
             tree_counter.tree[last_checked_tree]++;
         }
-
     } else{
         // Check last tree
         if (check_tree(env, context)){
@@ -524,7 +524,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     switch (path) {
     case 0:
-        if(last_tree < 1){
+        if (last_tree < 1){
             env.console.log("Heading to tree 1");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 110, 20, (0.5 * TICKS_PER_SECOND));
@@ -539,7 +539,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 2){
+        if (last_tree < 2){
             env.console.log("Heading to tree 2");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 147, 20, (0.5 * TICKS_PER_SECOND));
@@ -553,7 +553,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 3){
+        if (last_tree < 3){
             env.console.log("Heading to tree 3");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 158, 20, (0.5 * TICKS_PER_SECOND));
@@ -567,7 +567,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
         }
         break;
     case 1:
-        if(last_tree < 5){
+        if (last_tree < 5){
             env.console.log("Heading to Tree 5");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 240, 240, 20, (0.5 * TICKS_PER_SECOND));
@@ -585,7 +585,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 6){
+        if (last_tree < 6){
             env.console.log("Heading to Tree 6");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 235, 20, (0.5 * TICKS_PER_SECOND));
@@ -600,7 +600,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
         break;
 
     case 2:
-        if(last_tree < 8){
+        if (last_tree < 8){
             env.console.log("Heading to Tree 8");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 173, 255, 20, (0.5 * TICKS_PER_SECOND));
@@ -613,7 +613,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 9){
+        if (last_tree < 9){
             env.console.log("Heading to Tree 9");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 163, 255, 20, (0.5 * TICKS_PER_SECOND));
@@ -626,7 +626,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 10){
+        if (last_tree < 10){
             env.console.log("Heading to Tree 10");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 218, 255, 20, (0.5 * TICKS_PER_SECOND));
@@ -639,7 +639,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 11){
+        if (last_tree < 11){
             env.console.log("Heading to Tree 11");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 255, 230, 20, (0.5 * TICKS_PER_SECOND));
@@ -653,7 +653,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
         }
         break;
     case 3:
-        if(last_tree < 13){
+        if (last_tree < 13){
             env.console.log("Heading to Tree 13");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 104, 255, 30, 30);
@@ -668,7 +668,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
         }
 
-        if(last_tree < 14){
+        if (last_tree < 14){
             env.console.log("Heading to Tree 14");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 108, 255, 20, 20);
@@ -682,7 +682,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
                 tree_counter.tree[14]++;
             }
         }
-        if(last_tree < 15){
+        if (last_tree < 15){
             env.console.log("Heading to Tree 15");
             go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 160, 255, 30, 30);
@@ -758,7 +758,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
-    } else if (ret == 1){
+    }else if (ret == 1){
         env.log("Character blacks out");
         // black out.
         stats.blackouts++;
