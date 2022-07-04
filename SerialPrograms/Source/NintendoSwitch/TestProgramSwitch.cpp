@@ -22,6 +22,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 
 #include <QVideoFrame>
 
@@ -81,6 +82,47 @@ using namespace Kernels::Waterfill;
 
 
 
+class GreyDialogDetector : public VisualInferenceCallback{
+public:
+    GreyDialogDetector()
+        : VisualInferenceCallback("GreyDialogDetector")
+        , m_box0(0.180, 0.815, 0.015, 0.030)
+        , m_box1(0.785, 0.840, 0.030, 0.050)
+    {}
+
+    bool detect(const QImage& screen){
+        ConstImageRef box = extract_box_reference(screen, m_box0);
+        box.save("test.png");
+        for (size_t r = 0; r < box.height(); r++){
+            for (size_t c = 0; c < box.width(); c++){
+                cout << qRed(box.pixel(c, r)) << " ";
+            }
+            cout << endl;
+        }
+        ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
+        cout << stats0.average << stats0.stddev << endl;
+        if (!is_black(stats0)){
+            return false;
+        }
+        ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
+        cout << stats1.average << stats1.stddev << endl;
+        if (!is_black(stats1)){
+            return false;
+        }
+        return true;
+    }
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        items.add(COLOR_RED, m_box0);
+        items.add(COLOR_RED, m_box1);
+    }
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
+        return detect(frame);
+    }
+
+private:
+    ImageFloatBox m_box0;
+    ImageFloatBox m_box1;
+};
 
 
 
@@ -104,13 +146,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    QImage image("screenshot-20220704-205606227673.png");
+
+    GreyDialogDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+
+#if 0
     QImage image("screenshot-20220703-124134719005.png");
 
 
     InferenceBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
 
     cout << is_pokemon_selection(overlay, image) << endl;
-
+#endif
 
 #if 0
     {
