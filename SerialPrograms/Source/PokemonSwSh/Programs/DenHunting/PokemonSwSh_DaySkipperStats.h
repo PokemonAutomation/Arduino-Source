@@ -30,7 +30,7 @@ public:
             return StatsTracker::to_str();
         }else{
             return
-                "Skips Issued: " + std::to_string(issued) +
+                "Skips Issued: " + tostr_u_commas(issued) +
                 " - Skips Remaining: " + tostr_u_commas(total_skips - issued.load(std::memory_order_relaxed));
         }
     }
