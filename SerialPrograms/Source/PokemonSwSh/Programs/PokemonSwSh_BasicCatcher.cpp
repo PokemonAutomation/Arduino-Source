@@ -59,7 +59,7 @@ int16_t move_to_ball(
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, console, context, ball_slug, true, 50, 40);
+    int ret = move_to_ball(reader, console, context, ball_slug, true, 100, 40);
     if (ret < 0){
         return 0;
     }
