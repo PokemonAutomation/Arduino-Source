@@ -23,6 +23,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 
 #include <QVideoFrame>
 
@@ -101,12 +102,12 @@ public:
         }
         ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
         cout << stats0.average << stats0.stddev << endl;
-        if (!is_black(stats0)){
+        if (!is_grey(stats0, 0, 200)){
             return false;
         }
         ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
         cout << stats1.average << stats1.stddev << endl;
-        if (!is_black(stats1)){
+        if (!is_grey(stats1, 0, 200)){
             return false;
         }
         return true;
@@ -146,10 +147,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    QImage image("screenshot-20220704-205606227673.png");
+    QImage image("screenshot-20220706-164542803531.png");
 
-    GreyDialogDetector detector;
+    BattleMenuDetector detector(BattleType::STARTER);
     cout << detector.detect(image) << endl;
+
+
+
+//    GreyDialogDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
 
