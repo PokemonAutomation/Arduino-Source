@@ -34,6 +34,9 @@ public:
     virtual bool detect(const QImage& screen) const override;
 
 private:
+    bool is_battle_button(const QImage& screen) const;
+
+private:
     Color m_color;
     BattleType m_battle_type;
     ImageFloatBox m_left0_status;
