@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-22.04]
-        qt_version: ['5.12.12', '6.2.2']
+        qt_version: ['5.12.12', '6.3.1']
         include:
         # Windows / Qt 5.12.12
         - os: windows-latest
@@ -22,9 +22,9 @@ jobs:
           qt_arch_path: 'msvc2017_64'
           qt_modules: ''
 
-        # Windows / Qt 6.2.2
+        # Windows / Qt 6.3.1
         - os: windows-latest
-          qt_version: '6.2.2'
+          qt_version: '6.3.1'
           qt_version_major: '6'
           host: 'windows'
           cmake_args: '-G "Visual Studio 17 2022"'
@@ -42,9 +42,9 @@ jobs:
           qt_arch_path: 'clang_64'
           qt_modules: ''
           
-        # Mac / Qt 6.2.2
+        # Mac / Qt 6.3.1
         - os: macos-latest
-          qt_version: '6.2.2'
+          qt_version: '6.3.1'
           qt_version_major: '6'
           host: 'mac'
           cmake_args: ''
@@ -62,9 +62,9 @@ jobs:
           qt_arch_path: gcc_64
           qt_modules: ''
           
-        # Linux / Qt 6.2.2
+        # Linux / Qt 6.3.1
         - os: ubuntu-22.04
-          qt_version: '6.2.2'
+          qt_version: '6.3.1'
           qt_version_major: '6'
           host: 'linux'
           cmake_args: ''
