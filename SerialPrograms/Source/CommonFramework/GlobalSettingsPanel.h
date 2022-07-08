@@ -79,7 +79,7 @@ public:
 
     BooleanCheckBoxOption LOG_EVERYTHING;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
-    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
+//    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
 
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;

@@ -165,7 +165,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
-    ../Common/Qt/qdarkstyle/dark/style.qrc
+    ../Common/Qt/qdarkstyle/dark/darkstyle.qrc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h

@@ -114,7 +114,7 @@ GlobalSettings::GlobalSettings()
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
         true
     )
-    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
+//    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
     , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
@@ -241,7 +241,7 @@ void GlobalSettings::load_json(const QJsonValue& json){
 
 QJsonValue GlobalSettings::to_json() const{
     QJsonObject obj = BatchOption::to_json().toObject();
-    obj.insert("NAUGHTY_MODE", NAUGHTY_MODE_OPTION.to_json());
+    obj.insert("NAUGHTY_MODE", PreloadSettings::instance().NAUGHTY_MODE);
 
     QJsonObject command_line_test_obj;
     command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));

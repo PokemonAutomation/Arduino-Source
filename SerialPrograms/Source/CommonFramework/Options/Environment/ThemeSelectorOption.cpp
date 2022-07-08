@@ -28,7 +28,7 @@ void set_theme(size_t index){
     case 0:
         break;
     case 1:
-        stylesheet = ":qdarkstyle/dark/style.qss";
+        stylesheet = ":qdarkstyle/dark/darkstyle.qss";
         break;
     }
 
