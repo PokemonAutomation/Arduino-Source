@@ -44,7 +44,7 @@ QString PokemonEncounterSet::dump() const{
         return "None - Unable to detect";
     }
     if (m_set.size() == 1){
-        return get_pokemon_name(*m_set.begin()).display_name();
+        return QString::fromStdString(get_pokemon_name(*m_set.begin()).display_name());
     }
     if (m_set.size() <= 5){
         QString str = "Ambiguous (";
@@ -54,7 +54,7 @@ QString PokemonEncounterSet::dump() const{
                 str += ", ";
             }
             first = false;
-            str += get_pokemon_name(slug).display_name();
+            str += QString::fromStdString(get_pokemon_name(slug).display_name());
         }
         str += ")";
         return str;

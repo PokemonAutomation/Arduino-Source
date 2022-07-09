@@ -18,8 +18,8 @@ class DiscordWebhookUrl : public EditableTableRow{
 public:
     DiscordWebhookUrl();
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 

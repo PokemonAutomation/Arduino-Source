@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_Catchability.h"
@@ -40,13 +41,14 @@ CatchabilitySelectorOption::CatchabilitySelectorOption()
     , m_default(Catchability::ALWAYS_CATCHABLE)
     , m_current(Catchability::ALWAYS_CATCHABLE)
 {}
-void CatchabilitySelectorOption::load_json(const QJsonValue& json){
-    size_t index = json.toInt((int)m_default);
-    index = std::min(index, (size_t)2);
-    m_current = (Catchability)index;
+void CatchabilitySelectorOption::load_json(const JsonValue2& json){
+    int index;
+    if (json.read_integer(index, 0, 2)){
+        m_current = (Catchability)index;
+    }
 }
-QJsonValue CatchabilitySelectorOption::to_json() const{
-    return QJsonValue((int)m_current);
+JsonValue2 CatchabilitySelectorOption::to_json() const{
+    return (int)m_current;
 }
 
 void CatchabilitySelectorOption::restore_defaults(){

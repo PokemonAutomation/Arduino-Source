@@ -37,20 +37,20 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
         m_shininess = new NoWheelComboBox(this);
         hbox->addWidget(m_shininess);
         if (m_value.m_rare_stars){
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]);
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]));
         }else{
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]);
-            m_shininess->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOTHING]);
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]));
+            m_shininess->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::NOTHING]));
         }
         ShinyFilter current = m_value.m_shiny_filter_current;
         for (int c = 0; c < m_shininess->count(); c++){
-            if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
+            if (m_shininess->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
                 m_shininess->setCurrentIndex(c);
                 break;
             }
@@ -62,10 +62,10 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
                     return;
                 }
 
-                QString text = m_shininess->itemText(index);
+                std::string text = m_shininess->itemText(index).toStdString();
                 auto iter = ShinyFilter_MAP.find(text);
                 if (iter == ShinyFilter_MAP.end()){
-                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text);
                 }
                 m_value.m_shiny_filter_current = iter->second;
             }
@@ -85,7 +85,7 @@ void EncounterFilterWidget::restore_defaults(){
 void EncounterFilterWidget::update_ui(){
     ShinyFilter current = m_value.m_shiny_filter_current;
     for (int c = 0; c < m_shininess->count(); c++){
-        if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
+        if (m_shininess->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
             m_shininess->setCurrentIndex(c);
             break;
         }

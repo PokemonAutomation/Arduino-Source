@@ -4,10 +4,16 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "Panel.h"
 #include "PanelWidget.h"
+
+#include <QJsonDocument>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -38,15 +44,17 @@ PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
 {}
 
 void PanelInstance::from_json(){
-    from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(m_descriptor.identifier())]);
+    QJsonValue obj = PERSISTENT_SETTINGS().panels[QString::fromStdString(m_descriptor.identifier())];
+    JsonValue2 json = from_QJson(obj);
+    from_json(json);
 }
-QJsonValue PanelInstance::to_json() const{
-    return QJsonValue();
+JsonValue2 PanelInstance::to_json() const{
+    return JsonValue2();
 }
 void PanelInstance::save_settings() const{
     const std::string& identifier = m_descriptor.identifier();
     if (!identifier.empty()){
-        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = to_json();
+        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = to_QJson(to_json());
     }
     global_logger_tagged().log("Saving panel settings...");
     PERSISTENT_SETTINGS().write();

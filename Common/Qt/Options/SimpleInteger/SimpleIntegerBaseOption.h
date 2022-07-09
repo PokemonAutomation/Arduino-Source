@@ -16,6 +16,8 @@ class QJsonValue;
 
 namespace PokemonAutomation{
 
+class JsonValue2;
+
 
 template <typename Type>
 class SimpleIntegerBaseOption{
@@ -37,10 +39,10 @@ public:
     QString check_validity(Type x) const;
     void restore_defaults();
 
-    void load_default(const QJsonValue& json);
-    void load_current(const QJsonValue& json);
-    QJsonValue write_default() const;
-    QJsonValue write_current() const;
+    void load_default(const JsonValue2& json);
+    void load_current(const JsonValue2& json);
+    JsonValue2 write_default() const;
+    JsonValue2 write_current() const;
 
 
 protected:

@@ -10,6 +10,8 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QHeaderView>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"
@@ -35,10 +37,10 @@ int FossilTable_init = register_option(
 
 FossilTable::FossilTable(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , m_table(SingleStatementOption::m_label, m_factory, true)
+    , m_table(SingleStatementOption::m_label, m_factory)
 {
-    m_table.load_default(json_get_array_throw(obj, JSON_DEFAULT));
-    m_table.load_current(json_get_array_throw(obj, JSON_CURRENT));
+    m_table.load_default(from_QJson(json_get_array_throw(obj, JSON_DEFAULT)));
+    m_table.load_current(from_QJson(json_get_array_throw(obj, JSON_CURRENT)));
 }
 QString FossilTable::check_validity() const{
     return m_table.check_validity();
@@ -48,8 +50,8 @@ void FossilTable::restore_defaults(){
 }
 QJsonObject FossilTable::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, m_table.write_default());
-    root.insert(JSON_CURRENT, m_table.write_current());
+    root.insert(JSON_DEFAULT, to_QJson(m_table.write_default()));
+    root.insert(JSON_CURRENT, to_QJson(m_table.write_current()));
     return root;
 }
 std::string FossilTable::to_cpp() const{

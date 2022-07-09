@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h"
 #include "SimpleIntegerOption.h"
 
@@ -22,11 +22,11 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 {}
 
 template <typename Type>
-void SimpleIntegerOption<Type>::load_json(const QJsonValue& json){
+void SimpleIntegerOption<Type>::load_json(const JsonValue2& json){
     return this->load_current(json);
 }
 template <typename Type>
-QJsonValue SimpleIntegerOption<Type>::to_json() const{
+JsonValue2 SimpleIntegerOption<Type>::to_json() const{
     return this->write_current();
 }
 

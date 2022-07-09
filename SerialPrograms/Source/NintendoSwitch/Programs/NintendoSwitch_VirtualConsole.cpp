@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
@@ -27,10 +28,10 @@ VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switch(0, PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE, false)
 {}
-void VirtualConsole::from_json(const QJsonValue& json){
-    m_switch.load_json(json.toObject());
+void VirtualConsole::from_json(const JsonValue2& json){
+    m_switch.load_json(json);
 }
-QJsonValue VirtualConsole::to_json() const{
+JsonValue2 VirtualConsole::to_json() const{
     return m_switch.to_json();
 }
 QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){

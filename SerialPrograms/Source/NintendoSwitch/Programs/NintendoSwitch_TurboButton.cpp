@@ -49,7 +49,7 @@ TurboButton::TurboButton(const TurboButton_Descriptor& descriptor)
     )
     , PRESS_DURATION("<b>Press Duration:</b><br>Hold the button down for this long.", "5", 5)
     , RELEASE_DURATION("<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.", "3", 3)
-    , TOTAL_PRESSES("<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.", 0, 0)
+    , TOTAL_PRESSES("<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.", 0)
 {
     PA_ADD_OPTION(BUTTON);
     PA_ADD_OPTION(PRESS_DURATION);

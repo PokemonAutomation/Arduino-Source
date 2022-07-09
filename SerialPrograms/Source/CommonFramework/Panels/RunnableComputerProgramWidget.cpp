@@ -76,8 +76,9 @@ void RunnableComputerProgramWidget::run_program(){
         emit signal_error(QString::fromStdString(e.to_str()));
     }catch (...){
         std::lock_guard<std::mutex> lg(m_lock);
-        m_scope = nullptr;
+        emit signal_error("Unknown error.");
     }
+    m_scope = nullptr;
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);
     m_logger.log("Stopping Program...");

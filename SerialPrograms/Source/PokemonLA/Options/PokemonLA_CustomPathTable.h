@@ -31,7 +31,7 @@ enum class PathAction{
     END_LISTEN,
 };
 
-extern const QString PathAction_NAMES[];
+extern const std::string PathAction_NAMES[];
 
 enum class PathMount{
     NO_MOUNT,
@@ -56,8 +56,8 @@ class ActionParameterWidget;
 class CustomPathTableRow : public EditableTableRow{
 public:
     CustomPathTableRow();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 

@@ -56,7 +56,7 @@ ThemeSelectorOption::ThemeSelectorOption()
         0
     )
 {}
-void ThemeSelectorOption::load_json(const QJsonValue& json){
+void ThemeSelectorOption::load_json(const JsonValue2& json){
     EnumDropdownOption::load_json(json);
     set_theme(*this);
 }

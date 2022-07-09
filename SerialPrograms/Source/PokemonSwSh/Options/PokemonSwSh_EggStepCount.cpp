@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "PokemonSwSh_EggStepCount.h"
 
@@ -49,13 +50,11 @@ EggStepCountOption::EggStepCountOption()
     , m_default(3)
     , m_current(3)
 {}
-void EggStepCountOption::load_json(const QJsonValue& json){
-    size_t index = json.toInt((int)m_default);
-    index = std::min(index, STEP_COUNTS.size());
-    m_current = index;
+void EggStepCountOption::load_json(const JsonValue2& json){
+    json.read_integer(m_current, 0, STEP_COUNTS.size() - 1);
 }
-QJsonValue EggStepCountOption::to_json() const{
-    return QJsonValue((int)m_current);
+JsonValue2 EggStepCountOption::to_json() const{
+    return (int)m_current;
 }
 
 

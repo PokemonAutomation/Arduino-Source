@@ -23,8 +23,8 @@ struct EventNotificationSettings{
     std::vector<QString> tags;
     std::chrono::seconds rate_limit = std::chrono::seconds(0);
 
-    void load_json(bool enable_screenshot, const QJsonValue& json);
-    QJsonValue to_json(bool enable_screenshot) const;
+    void load_json(bool enable_screenshot, const JsonValue2& json);
+    JsonValue2 to_json(bool enable_screenshot) const;
 
 
     static QString sanitize_tag(const QString& token);
@@ -61,8 +61,8 @@ public:
     ImageAttachmentMode screenshot  () const{ return m_current.screenshot; }
     const std::vector<QString>& tags() const{ return m_current.tags; }
 
-    void load_json(const QJsonValue& json);
-    QJsonValue to_json() const;
+    void load_json(const JsonValue2& json);
+    JsonValue2 to_json() const;
 
     void restore_defaults();
     void reset_rate_limit();

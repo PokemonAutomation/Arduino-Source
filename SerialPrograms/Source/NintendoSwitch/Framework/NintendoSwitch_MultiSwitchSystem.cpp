@@ -4,7 +4,9 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_MultiSwitchSystem.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
@@ -33,7 +35,7 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
-    const QJsonValue& json
+    const JsonValue2& json
 )
     : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
@@ -45,33 +47,36 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
         resize(m_min_switches);
     }
 }
-void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    QJsonArray array = json_get_array_nothrow(obj, "DeviceList");
-    if (array.size() == 0 || (size_t)array.size() > MAX_SWITCHES){
+void MultiSwitchSystemFactory::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
         return;
     }
-    m_switches.clear();
-    for (int c = 0; c < array.size(); c++){
-        m_switches.emplace_back(
-            new SwitchSystemFactory(
-                c,
-                m_min_pabotbase,
-                m_feedback, m_allow_commands_while_running,
-                array[c]
-            )
-        );
+    const JsonArray2* array = obj->get_array("DeviceList");
+    if (array != nullptr && !array->empty() && array->size() <= MAX_SWITCHES){
+        m_switches.clear();
+        size_t items = array->size();
+        for (size_t c = 0; c < items; c++){
+            m_switches.emplace_back(
+                new SwitchSystemFactory(
+                    c,
+                    m_min_pabotbase,
+                    m_feedback, m_allow_commands_while_running,
+                    (*array)[c]
+                )
+            );
+        }
     }
-    json_get_int(m_active_switches, obj, "ActiveDevices", (int)m_min_switches, (int)m_max_switches);
+    obj->read_integer(m_active_switches, "ActiveDevices", m_min_switches, m_max_switches);
 }
-QJsonValue MultiSwitchSystemFactory::to_json() const{
-    QJsonObject obj;
-    obj.insert("ActiveDevices", QJsonValue((int)m_active_switches));
-    QJsonArray array;
+JsonValue2 MultiSwitchSystemFactory::to_json() const{
+    JsonObject2 obj;
+    obj["ActiveDevices"] = m_active_switches;
+    JsonArray2 array;
     for (const auto& item : m_switches){
         array.push_back(item->to_json());
     }
-    obj.insert("DeviceList", array);
+    obj["DeviceList"] = std::move(array);
     return obj;
 }
 void MultiSwitchSystemFactory::resize(size_t count){

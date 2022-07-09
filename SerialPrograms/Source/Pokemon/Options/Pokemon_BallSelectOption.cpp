@@ -48,7 +48,7 @@ PokemonBallSelect::PokemonBallSelect(
 {}
 
 const std::string& PokemonBallSelect::slug() const{
-    const QString& display = (const QString&)*this;
+    const std::string& display = (const std::string&)*this;
     return parse_pokeball_name(display);
 }
 

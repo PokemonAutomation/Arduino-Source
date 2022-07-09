@@ -13,6 +13,7 @@ This is the source code for all the main Arduino programs.
 # Dependencies:
 - Qt5 and Qt6 (LGPLv3)
 - [LUFA (MIT License)](https://github.com/abcminiuser/lufa)
+- [nlohmann json (MIT License)](https://github.com/nlohmann/json)
 - [Tesseract (Apache 2.0 License)](https://github.com/tesseract-ocr/tesseract)
 - [Tesseract for Windows (Apache 2.0 License)](https://github.com/peirick/Tesseract-OCR_for_Windows)
 - [QDarkStyleSheet (MIT License)](https://github.com/ColinDuquesnoy/QDarkStyleSheet)

@@ -89,7 +89,7 @@ PokemonNameSelect::PokemonNameSelect(
 {}
 
 const std::string& PokemonNameSelect::slug() const{
-    const QString& display = (const QString&)*this;
+    const std::string& display = (const std::string&)*this;
     return parse_pokemon_name(display);
 }
 

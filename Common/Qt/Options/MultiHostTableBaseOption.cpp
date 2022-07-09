@@ -4,16 +4,15 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QLineEdit>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "MultiHostTableBaseOption.h"
 
@@ -22,50 +21,56 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const QString MultiHostSlot::JSON_GAME_SLOT         = "game_slot";
-const QString MultiHostSlot::JSON_USER_SLOT         = "user_slot";
-const QString MultiHostSlot::JSON_SKIPS             = "skips";
-const QString MultiHostSlot::JSON_BACKUP_SAVE       = "backup_save";
-const QString MultiHostSlot::JSON_ALWAYS_CATCHABLE  = "always_catchable";
-const QString MultiHostSlot::JSON_USE_RAID_CODE     = "use_raid_code";
-const QString MultiHostSlot::JSON_ACCEPT_FRS        = "accept_FRs";
-const QString MultiHostSlot::JSON_MOVE_SLOT         = "move_slot";
-const QString MultiHostSlot::JSON_DYNAMAX           = "dynamax";
-const QString MultiHostSlot::JSON_POST_RAID_DELAY   = "post_raid_delay";
+const std::string MultiHostSlot::JSON_GAME_SLOT         = "game_slot";
+const std::string MultiHostSlot::JSON_USER_SLOT         = "user_slot";
+const std::string MultiHostSlot::JSON_SKIPS             = "skips";
+const std::string MultiHostSlot::JSON_BACKUP_SAVE       = "backup_save";
+const std::string MultiHostSlot::JSON_ALWAYS_CATCHABLE  = "always_catchable";
+const std::string MultiHostSlot::JSON_USE_RAID_CODE     = "use_raid_code";
+const std::string MultiHostSlot::JSON_ACCEPT_FRS        = "accept_FRs";
+const std::string MultiHostSlot::JSON_MOVE_SLOT         = "move_slot";
+const std::string MultiHostSlot::JSON_DYNAMAX           = "dynamax";
+const std::string MultiHostSlot::JSON_POST_RAID_DELAY   = "post_raid_delay";
 
 
 
 MultiHostSlot::MultiHostSlot(bool raid_code_option)
     : m_raid_code_option(raid_code_option)
 {}
-void MultiHostSlot::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    json_get_int(game_slot, obj, JSON_GAME_SLOT, 1, 2);
-    json_get_int(user_slot, obj, JSON_USER_SLOT, 1, 8);
-    json_get_int(skips, obj, JSON_SKIPS, 0, 7);
+void MultiHostSlot::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_integer(game_slot, JSON_GAME_SLOT, 1, 2);
+    obj->read_integer(user_slot, JSON_USER_SLOT, 1, 8);
+    obj->read_integer(skips, JSON_SKIPS, 1, 7);
 
-    json_get_bool(backup_save, obj, JSON_BACKUP_SAVE);
-    json_get_bool(always_catchable, obj, JSON_ALWAYS_CATCHABLE);
-    json_get_bool(use_raid_code, obj, JSON_USE_RAID_CODE);
-    json_get_bool(accept_FRs, obj, JSON_ACCEPT_FRS);
+    obj->read_boolean(backup_save, JSON_BACKUP_SAVE);
+    obj->read_boolean(always_catchable, JSON_ALWAYS_CATCHABLE);
+    obj->read_boolean(use_raid_code, JSON_USE_RAID_CODE);
+    obj->read_boolean(accept_FRs, JSON_ACCEPT_FRS);
 
-    json_get_int(move_slot, obj, JSON_MOVE_SLOT, 0, 4);
-    json_get_bool(dynamax, obj, JSON_DYNAMAX);
+    obj->read_integer(move_slot, JSON_MOVE_SLOT, 0, 4);
+    obj->read_boolean(dynamax, JSON_DYNAMAX);
 
-    json_get_string(post_raid_delay, obj, MultiHostSlot::JSON_POST_RAID_DELAY);
+    std::string str;
+    if (obj->read_string(str, MultiHostSlot::JSON_POST_RAID_DELAY)){
+        post_raid_delay = QString::fromStdString(str);
+    }
 }
-QJsonValue MultiHostSlot::to_json() const{
-    QJsonObject obj;
-    obj.insert(JSON_GAME_SLOT, game_slot);
-    obj.insert(JSON_USER_SLOT, user_slot);
-    obj.insert(JSON_SKIPS, skips);
-    obj.insert(JSON_BACKUP_SAVE, backup_save);
-    obj.insert(JSON_ALWAYS_CATCHABLE, always_catchable);
-    obj.insert(JSON_ACCEPT_FRS, accept_FRs);
-    obj.insert(JSON_USE_RAID_CODE, use_raid_code);
-    obj.insert(JSON_MOVE_SLOT, move_slot);
-    obj.insert(JSON_DYNAMAX, dynamax);
-    obj.insert(JSON_POST_RAID_DELAY, post_raid_delay);
+JsonValue2 MultiHostSlot::to_json() const{
+    JsonObject2 obj;
+    obj[JSON_GAME_SLOT] = game_slot;
+    obj[JSON_USER_SLOT] = user_slot;
+    obj[JSON_SKIPS] = skips;
+    obj[JSON_BACKUP_SAVE] = backup_save;
+    obj[JSON_ALWAYS_CATCHABLE] = always_catchable;
+    obj[JSON_ACCEPT_FRS] = accept_FRs;
+    obj[JSON_USE_RAID_CODE] = use_raid_code;
+    obj[JSON_MOVE_SLOT] = move_slot;
+    obj[JSON_DYNAMAX] = dynamax;
+    obj[JSON_POST_RAID_DELAY] = post_raid_delay.toStdString();
     return obj;
 }
 std::unique_ptr<EditableTableRow> MultiHostSlot::clone() const{

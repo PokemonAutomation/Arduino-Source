@@ -39,6 +39,8 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
+    ../3rdParty/nlohmann/json.hpp
+    ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp
@@ -80,6 +82,14 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/FixedLimitVector.tpp
+    ../Common/Cpp/Json/JsonTools.cpp
+    ../Common/Cpp/Json/JsonTools.h
+    ../Common/Cpp/Json/JsonValue.cpp
+    ../Common/Cpp/Json/JsonValue.h
+    ../Common/Cpp/Json/JsonArray.cpp
+    ../Common/Cpp/Json/JsonArray.h
+    ../Common/Cpp/Json/JsonObject.cpp
+    ../Common/Cpp/Json/JsonObject.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/PanicDump.cpp
@@ -165,7 +175,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
-    ../Common/Qt/qdarkstyle/dark/darkstyle.qrc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
@@ -373,8 +382,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/FixedCodeOption.h
     Source/CommonFramework/Options/FloatingPointOption.cpp
     Source/CommonFramework/Options/FloatingPointOption.h
-    Source/CommonFramework/Options/HiddenTextEditOption.cpp
-    Source/CommonFramework/Options/HiddenTextEditOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp

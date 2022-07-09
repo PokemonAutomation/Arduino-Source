@@ -226,15 +226,15 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
         run_overrides(action_right, overrides, m_pokemon_right, m_shininess_right);
     }
 
-    QString str_left = "Left " + STRING_POKEMON + ": " + action_left.to_str();
-    QString str_right = "Right " + STRING_POKEMON + ": " + action_right.to_str();
+    std::string str_left = "Left " + UTF8_STRING_POKEMON + ": " + action_left.to_str();
+    std::string str_right = "Right " + UTF8_STRING_POKEMON + ": " + action_right.to_str();
     m_console.log(str_left);
     m_console.log(str_right);
 
     if (action_left != action_right){
         throw OperationFailedException(
             m_console,
-            "Conflicting actions requested.\n" + str_left.toStdString() + "\n" + str_right.toStdString()
+            "Conflicting actions requested.\n" + str_left + "\n" + str_right
         );
     }
 

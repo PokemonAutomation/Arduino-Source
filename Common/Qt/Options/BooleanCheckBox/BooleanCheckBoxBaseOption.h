@@ -17,6 +17,8 @@ class QCheckBox;
 
 namespace PokemonAutomation{
 
+class JsonValue2;
+
 
 class BooleanCheckBoxBaseOption{
 public:
@@ -31,10 +33,10 @@ public:
     bool get() const{ return m_current.load(std::memory_order_relaxed); }
     void set(bool x){ m_current.store(x, std::memory_order_relaxed); }
 
-    void load_default(const QJsonValue& json);
-    void load_current(const QJsonValue& json);
-    QJsonValue write_default() const;
-    QJsonValue write_current() const;
+    void load_default(const JsonValue2& json);
+    void load_current(const JsonValue2& json);
+    JsonValue2 write_default() const;
+    JsonValue2 write_current() const;
 
     void restore_defaults();
 

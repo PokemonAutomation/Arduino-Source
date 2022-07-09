@@ -23,8 +23,8 @@ public:
 //    operator size_t() const{ return m_current; }
     operator Language() const{ return m_case_list[m_current].first; }
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;

@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "EditableTableOption.h"
 #include "EditableTableWidget.h"
 
@@ -23,10 +24,10 @@ EditableTableOption::EditableTableOption(
     : EditableTableBaseOption(std::move(label), factory, std::move(default_value))
 {}
 
-void EditableTableOption::load_json(const QJsonValue& json){
+void EditableTableOption::load_json(const JsonValue2& json){
     return EditableTableBaseOption::load_current(json);
 }
-QJsonValue EditableTableOption::to_json() const{
+JsonValue2 EditableTableOption::to_json() const{
     return EditableTableBaseOption::write_current();
 }
 

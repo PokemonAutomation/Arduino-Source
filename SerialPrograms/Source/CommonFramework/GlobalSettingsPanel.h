@@ -47,7 +47,7 @@ class PreloadSettings{
 public:
     static PreloadSettings& instance();
 
-    void load(const QJsonValue& json);
+    void load(const JsonValue2& json);
 
     bool NAUGHTY_MODE = false;
     bool DEVELOPER_MODE = false;
@@ -60,8 +60,8 @@ class GlobalSettings : public BatchOption{
 public:
     static GlobalSettings& instance();
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
 public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;

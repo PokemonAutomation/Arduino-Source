@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Pokemon_IVChecker_H
 #define PokemonAutomation_Pokemon_IVChecker_H
 
+#include <string>
 #include <vector>
-#include <QString>
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -37,9 +37,9 @@ enum class IVCheckerFilter{
     Fantastic,
     Best,
 };
-extern const std::vector<QString> IVCheckerFilter_NAMES;
-IVCheckerFilter IVCheckerFilter_string_to_enum(const QString& string);
-const QString& IVCheckerFilter_enum_to_string(IVCheckerFilter result);
+extern const std::vector<std::string> IVCheckerFilter_NAMES;
+IVCheckerFilter IVCheckerFilter_string_to_enum(const std::string& string);
+const std::string& IVCheckerFilter_enum_to_string(IVCheckerFilter result);
 
 
 bool IVChecker_filter_match(IVCheckerFilter filter, IVCheckerValue value);

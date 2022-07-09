@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const std::vector<QString> MARK_PRIORITY_STRINGS{
+const std::vector<std::string> MARK_PRIORITY_STRINGS{
     "Exclamation Marks Only (Ignore Question Marks)",
     "Prioritize Exclamation Marks",
     "No Preference",

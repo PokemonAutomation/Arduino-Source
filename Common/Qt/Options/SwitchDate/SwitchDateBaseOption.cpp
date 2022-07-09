@@ -8,11 +8,53 @@
 
 #include <QJsonValue>
 #include <QJsonArray>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "SwitchDateBaseOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+
+bool valid_switch_date(const QDate& date){
+    if (date < QDate(2000, 1, 1)){
+        return false;
+    }
+    if (date > QDate(2060, 12, 31)){
+        return false;
+    }
+    return true;
+}
+bool json_parse_date(QDate& date, const JsonValue2& value){
+    const JsonArray2* array = value.get_array();
+    if (array == nullptr || array->size() != 3){
+        return false;
+    }
+    int year, month, day;
+    if (!(*array)[0].read_integer(year)){
+        return false;
+    }
+    if (!(*array)[1].read_integer(month)){
+        return false;
+    }
+    if (!(*array)[2].read_integer(day)){
+        return false;
+    }
+    QDate try_date(year, month, day);
+    if (!try_date.isValid() || !valid_switch_date(try_date)){
+        return false;
+    }
+    date = try_date;
+    return true;
+}
+JsonArray2 json_write_date(const QDate& date){
+    JsonArray2 array;
+    array.push_back(date.year());
+    array.push_back(date.month());
+    array.push_back(date.day());
+    return array;
+}
 
 
 SwitchDateBaseOption::SwitchDateBaseOption(
@@ -53,17 +95,19 @@ void SwitchDateBaseOption::restore_defaults(){
     m_current = m_default;
 }
 
-void SwitchDateBaseOption::load_default(const QJsonValue& json){
+
+
+void SwitchDateBaseOption::load_default(const JsonValue2& json){
     json_parse_date(m_default, json);
 }
-void SwitchDateBaseOption::load_current(const QJsonValue& json){
+void SwitchDateBaseOption::load_current(const JsonValue2& json){
     SpinLockGuard lg(m_lock);
     json_parse_date(m_current, json);
 }
-QJsonValue SwitchDateBaseOption::write_default() const{
+JsonValue2 SwitchDateBaseOption::write_default() const{
     return json_write_date(m_default);
 }
-QJsonValue SwitchDateBaseOption::write_current() const{
+JsonValue2 SwitchDateBaseOption::write_current() const{
     SpinLockGuard lg(m_lock);
     return json_write_date(m_current);
 }

@@ -34,10 +34,10 @@ public:
         FeedbackType feedback, bool allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
-        const QJsonValue& json
+        const JsonValue2& json
     );
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     size_t count() const{ return m_active_switches; }
     void resize(size_t count);

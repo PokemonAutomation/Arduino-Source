@@ -24,15 +24,15 @@ enum class MoveStyle{
     Strong,
 };
 
-extern const QString MoveStyle_NAMES[3];
+extern const std::string MoveStyle_NAMES[3];
 
 // Used by IngoBattleGrinder, for each pokemon, set what style each move to use
 // and when to switch the pokemon.
 class BattlePokemonActionRow : public EditableTableRow{
 public:
     BattlePokemonActionRow();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -79,8 +79,8 @@ public:
     // num_move_attempts: number of move attempts made from this pokemon so far.
     bool stop_battle(size_t pokemon, size_t num_move_attempts) const;
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     virtual void restore_defaults() override;
 
@@ -101,8 +101,8 @@ private:
 class OneMoveBattlePokemonActionRow : public EditableTableRow{
 public:
     OneMoveBattlePokemonActionRow();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -133,8 +133,8 @@ public:
     // pokemon: pokemon index, range [0, 5]
     MoveStyle get_style(size_t pokemon);
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     virtual void restore_defaults() override;
 
@@ -152,15 +152,15 @@ private:
 
 class MoveGrinderActionRow : public EditableTableRow {
 public:
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
     size_t pokemon_index;
     size_t move_index;
     MoveStyle style = MoveStyle::NoStyle;
-    uint16_t attemps = 0;
+    uint16_t attempts = 0;
 };
 
 class MoveGrinderActionTableFactory : public EditableTableFactory {
@@ -171,7 +171,7 @@ public:
 
 struct Move{
     MoveStyle style;
-    uint16_t attemps;
+    uint16_t attempts;
 };
 
 class MoveGrinderActionTable : public ConfigOption {
@@ -180,8 +180,8 @@ public:
 
     Move get_move(size_t pokemon, size_t move) const;
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

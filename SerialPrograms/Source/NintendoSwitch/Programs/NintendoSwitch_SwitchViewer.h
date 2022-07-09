@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchViewer_H
 #define PokemonAutomation_NintendoSwitch_SwitchViewer_H
 
-#include <QJsonObject>
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/PanelWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystem.h"
@@ -30,8 +29,8 @@ public:
 
 public:
     //  Serialization
-    virtual void from_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void from_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
 private:
     friend class SwitchViewer_Widget;

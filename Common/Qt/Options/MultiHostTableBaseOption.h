@@ -15,22 +15,22 @@ namespace PokemonSwSh{
 
 
 class MultiHostSlot : public EditableTableRow{
-    static const QString JSON_GAME_SLOT;
-    static const QString JSON_USER_SLOT;
-    static const QString JSON_SKIPS;
-    static const QString JSON_BACKUP_SAVE;
-    static const QString JSON_ALWAYS_CATCHABLE;
-    static const QString JSON_USE_RAID_CODE;
-    static const QString JSON_ACCEPT_FRS;
-    static const QString JSON_MOVE_SLOT;
-    static const QString JSON_DYNAMAX;
-    static const QString JSON_POST_RAID_DELAY;
+    static const std::string JSON_GAME_SLOT;
+    static const std::string JSON_USER_SLOT;
+    static const std::string JSON_SKIPS;
+    static const std::string JSON_BACKUP_SAVE;
+    static const std::string JSON_ALWAYS_CATCHABLE;
+    static const std::string JSON_USE_RAID_CODE;
+    static const std::string JSON_ACCEPT_FRS;
+    static const std::string JSON_MOVE_SLOT;
+    static const std::string JSON_DYNAMAX;
+    static const std::string JSON_POST_RAID_DELAY;
 
 public:
     MultiHostSlot(bool raid_code_option);
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "PokemonSwSh_MultiHostTable.h"
 
@@ -34,10 +34,10 @@ MultiHostTableOption::MultiHostTableOption()
     : m_factory(true)
     , m_table("<b>Game List:</b>", m_factory)
 {}
-void MultiHostTableOption::load_json(const QJsonValue& json){
+void MultiHostTableOption::load_json(const JsonValue2& json){
     m_table.load_current(json);
 }
-QJsonValue MultiHostTableOption::to_json() const{
+JsonValue2 MultiHostTableOption::to_json() const{
     return m_table.write_current();
 }
 

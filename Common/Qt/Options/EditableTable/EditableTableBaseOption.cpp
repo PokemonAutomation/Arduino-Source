@@ -6,13 +6,16 @@
 
 #include <QJsonValue>
 #include <QJsonArray>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "EditableTableBaseOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
+
 
 
 EditableTableBaseOption::EditableTableBaseOption(
@@ -26,33 +29,37 @@ EditableTableBaseOption::EditableTableBaseOption(
     restore_defaults();
 }
 
-std::vector<std::unique_ptr<EditableTableRow>> EditableTableBaseOption::load_json(const QJsonValue& json){
+std::vector<std::unique_ptr<EditableTableRow>> EditableTableBaseOption::load_json(const JsonValue2& json){
+    const JsonArray2* array = json.get_array();
+    if (array == nullptr){
+        return {};
+    }
     std::vector<std::unique_ptr<EditableTableRow>> table;
-    for (const auto& row : json.toArray()){
+    for (const auto& item : *array){
         table.emplace_back(m_factory.make_row());
-        table.back()->load_json(row);
+        table.back()->load_json(item);
     }
     return table;
 }
-QJsonValue EditableTableBaseOption::to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const{
-    QJsonArray array;
+JsonValue2 EditableTableBaseOption::to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const{
+    JsonArray2 array;
     for (const std::unique_ptr<EditableTableRow>& row : table){
-        array.append(row->to_json());
+        array.push_back(row->to_json());
     }
     return array;
 }
-void EditableTableBaseOption::load_default(const QJsonValue& json){
+void EditableTableBaseOption::load_default(const JsonValue2& json){
     m_default = load_json(json);
 }
-void EditableTableBaseOption::load_current(const QJsonValue& json){
-    if (json.isArray()){
+void EditableTableBaseOption::load_current(const JsonValue2& json){
+    if (json.is_array()){
         m_current = load_json(json);
     }
 }
-QJsonValue EditableTableBaseOption::write_default() const{
+JsonValue2 EditableTableBaseOption::write_default() const{
     return to_json(m_default);
 }
-QJsonValue EditableTableBaseOption::write_current() const{
+JsonValue2 EditableTableBaseOption::write_current() const{
     return to_json(m_current);
 }
 

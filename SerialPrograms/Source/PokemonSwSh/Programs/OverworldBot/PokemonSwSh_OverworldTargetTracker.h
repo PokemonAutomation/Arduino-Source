@@ -34,7 +34,7 @@ enum class MarkPriority{
     PRIORITIZE_QUESTION,
     QUESTION_ONLY,
 };
-extern const std::vector<QString> MARK_PRIORITY_STRINGS;
+extern const std::vector<std::string> MARK_PRIORITY_STRINGS;
 
 struct OverworldTarget{
     OverworldMark mark;

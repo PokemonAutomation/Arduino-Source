@@ -18,8 +18,8 @@ namespace NintendoSwitch{
 class FriendCodeListOption : public ConfigOption{
 public:
     FriendCodeListOption(QString label, std::vector<QString> default_lines);
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     static std::vector<uint8_t> parse(const QString& line);
     const std::vector<QString>& lines() const{ return m_lines; }

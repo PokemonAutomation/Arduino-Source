@@ -4,8 +4,8 @@
  *
  */
 
-#include <QJsonValue>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "Pokemon_NameSelectWidget.h"
@@ -24,12 +24,11 @@ public:
 
     operator const std::string&() const{ return m_slug; }
 
-    virtual void load_json(const QJsonValue& json) override{
-        QString value = json.toString();
-        m_slug = value.toStdString();
+    virtual void load_json(const JsonValue2& json) override{
+        json.read_string(m_slug);
     }
-    virtual QJsonValue to_json() const override{
-        return QString::fromStdString(m_slug);
+    virtual JsonValue2 to_json() const override{
+        return m_slug;
     }
 
     virtual std::unique_ptr<EditableTableRow> clone() const override{

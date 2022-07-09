@@ -20,17 +20,17 @@ namespace PokemonAutomation{
 
 
 extern const int DEFAULT_PRIORITY_INDEX = 1;
-const std::vector<QString> PRIORITY_MODES{
+const std::vector<std::string> PRIORITY_MODES{
     "Max Priority",
     "Min Priority",
 };
-int priority_name_to_index(const QString& name){
+int priority_name_to_index(const std::string& name){
     for (size_t c = 0; c < PRIORITY_MODES.size(); c++){
         if (name == PRIORITY_MODES[c]){
             return (int)c;
         }
     }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority String: " + name.toStdString());
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority String: " + name);
 }
 bool set_priority_by_index(int index){
     int native_priority = sched_get_priority_min(SCHED_RR);

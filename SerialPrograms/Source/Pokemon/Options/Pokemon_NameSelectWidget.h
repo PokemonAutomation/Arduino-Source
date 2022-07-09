@@ -30,15 +30,15 @@ public:
         const std::map<std::string, QIcon>& icons,
         const std::vector<std::string>& slugs,
         const std::string& current_slug,
-        const std::map<std::string, std::pair<QString, QIcon>>* extra_names = nullptr,
+        const std::map<std::string, std::pair<std::string, QIcon>>* extra_names = nullptr,
         const std::vector<std::string>* extra_name_list = nullptr,
-        const std::map<QString, std::string>* extra_display_name_to_slug = nullptr
+        const std::map<std::string, std::string>* extra_display_name_to_slug = nullptr
     );
 
     std::string slug() const;
 
 private:
-    const std::map<QString, std::string>* m_extra_display_name_to_slug = nullptr;
+    const std::map<std::string, std::string>* m_extra_display_name_to_slug = nullptr;
 };
 
 

@@ -6,7 +6,8 @@
 
 #include <QJsonObject>
 #include "Common/Cpp/PanicDump.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Windows/MainWindow.h"
@@ -56,14 +57,20 @@ RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
 
 
 
-void RunnableSwitchProgramInstance::from_json(const QJsonValue& json){
-    const QJsonObject& obj = json.toObject();
-    m_setup->load_json(json_get_value_nothrow(obj, "SwitchSetup"));
+void RunnableSwitchProgramInstance::from_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    const JsonValue2* value = obj->get_value("SwitchSetup");
+    if (value){
+        m_setup->load_json(*value);
+    }
     RunnablePanelInstance::from_json(json);
 }
-QJsonValue RunnableSwitchProgramInstance::to_json() const{
-    QJsonObject obj = RunnablePanelInstance::to_json().toObject();
-    obj.insert("SwitchSetup", m_setup->to_json());
+JsonValue2 RunnableSwitchProgramInstance::to_json() const{
+    JsonObject2 obj = std::move(*RunnablePanelInstance::to_json().get_object());
+    obj["SwitchSetup"] = m_setup->to_json();
     return obj;
 }
 

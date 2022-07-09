@@ -4,7 +4,6 @@
  *
  */
 
-#include <QString>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonLA_TravelLocation.h"
 
@@ -23,11 +22,10 @@ TravelLocationOption::TravelLocationOption()
 
 TravelLocationOption::operator TravelLocation() const{
     size_t index = (size_t)*this;
-    const QString& label = this->case_name(index);
-    std::string str = label.toStdString();
-    const TravelLocation* location = TravelLocations::instance().get_from_name(str);
+    const std::string& label = this->case_name(index);
+    const TravelLocation* location = TravelLocations::instance().get_from_name(label);
     if (location == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid TravelLocation: " + str);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid TravelLocation: " + label);
     }
     return *location;
 }

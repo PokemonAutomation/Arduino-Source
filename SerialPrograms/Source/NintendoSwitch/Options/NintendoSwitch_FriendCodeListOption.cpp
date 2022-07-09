@@ -8,7 +8,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTextEdit>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "NintendoSwitch_FriendCodeListOption.h"
 
 namespace PokemonAutomation{
@@ -39,20 +40,24 @@ FriendCodeListOption::FriendCodeListOption(QString label, std::vector<QString> d
     , m_lines(m_default)
 {}
 
-void FriendCodeListOption::load_json(const QJsonValue& json){
+void FriendCodeListOption::load_json(const JsonValue2& json){
+    const JsonArray2* list = json.get_array();
+    if (list == nullptr){
+        return;
+    }
     m_lines.clear();
-    QJsonArray list = json.toArray();
-    for (const auto& line : list){
-        QString str = line.toString();
-        if (str.size() > 0){
-            m_lines.emplace_back(str);
+    for (const auto& line : *list){
+        const std::string* str = line.get_string();
+        if (str == nullptr || str->empty()){
+            continue;
         }
+        m_lines.emplace_back(QString::fromStdString(*str));
     }
 }
-QJsonValue FriendCodeListOption::to_json() const{
-    QJsonArray list;
+JsonValue2 FriendCodeListOption::to_json() const{
+    JsonArray2 list;
     for (const QString& line : m_lines){
-        list.append(line);
+        list.push_back(line.toStdString());
     }
     return list;
 }

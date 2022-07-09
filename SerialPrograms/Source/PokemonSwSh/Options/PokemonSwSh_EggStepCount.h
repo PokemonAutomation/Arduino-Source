@@ -19,8 +19,8 @@ extern const std::vector<uint16_t> STEP_COUNTS;
 class EggStepCountOption : public ConfigOption{
 public:
     EggStepCountOption();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     operator uint16_t() const{ return STEP_COUNTS[m_current]; }
     uint16_t value() const{ return STEP_COUNTS[m_current]; }

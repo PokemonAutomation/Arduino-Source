@@ -9,6 +9,9 @@
 #include <QLineEdit>
 #include <QHeaderView>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -59,17 +62,26 @@ TradeCountTableOption::TradeCountTableOption()
         m_list.emplace_back(slug, research_catch_count(slug));
     }
 }
-void TradeCountTableOption::load_json(const QJsonValue& json){
+void TradeCountTableOption::load_json(const JsonValue2& json){
+    const JsonArray2* array = json.get_array();
+    if (array == nullptr){
+        return;
+    }
     std::map<std::string, int> map;
-    for (const auto& item : json.toArray()){
-        QJsonObject obj = item.toObject();
-        QString slug;
-        json_get_string(slug, obj, "Slug");
+    for (const auto& item : *array){
+        const JsonObject2* obj = item.get_object();
+        if (obj == nullptr){
+            continue;
+        }
+        const std::string* slug = obj->get_string("Slug");
+        if (slug == nullptr){
+            continue;
+        }
         int count;
-        json_get_int(count, obj, "Count", 0, 25);
-
-        std::string slug_str = slug.toStdString();
-        map.emplace(slug_str, count);
+        if (!obj->read_integer(count, "Count", 0, 25)){
+            continue;
+        }
+        map.emplace(*slug, count);
     }
     for (std::pair<std::string, int>& filter : m_list){
         auto iter = map.find(filter.first);
@@ -79,13 +91,13 @@ void TradeCountTableOption::load_json(const QJsonValue& json){
         filter.second = iter->second;
     }
 }
-QJsonValue TradeCountTableOption::to_json() const{
-    QJsonArray array;
+JsonValue2 TradeCountTableOption::to_json() const{
+    JsonArray2 array;
     for (const auto& item : m_list){
-        QJsonObject obj;
-        obj.insert("Slug", QString::fromStdString(item.first));
-        obj.insert("Count", item.second);
-        array.append(obj);
+        JsonObject2 obj;
+        obj["Slug"] = item.first;
+        obj["Count"] = item.second;
+        array.push_back(std::move(obj));
     }
     return array;
 }
@@ -132,8 +144,8 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     int stop = (int)m_value.m_list.size();
     for (int c = 0; c < stop; c++){
         std::pair<std::string, int>& entry = m_value.m_list[c];
-        const QString& display_name = Pokemon::get_pokemon_name(entry.first).display_name();
-        QTableWidgetItem* icon_item = new QTableWidgetItem(display_name);
+        const std::string& display_name = Pokemon::get_pokemon_name(entry.first).display_name();
+        QTableWidgetItem* icon_item = new QTableWidgetItem(QString::fromStdString(display_name));
 
         auto iter = ICONS.find(entry.first);
         if (iter != ICONS.end()){

@@ -36,8 +36,8 @@ class ActionParameterWidget;
 class TestPathMakerTableRow : public EditableTableRow{
 public:
     TestPathMakerTableRow();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -51,7 +51,7 @@ public:
     uint16_t button_hold_ticks = 0;
     uint16_t button_release_ticks = 0;
 
-    double wait_ticks = 0;
+    uint16_t wait_ticks = 0;
 
     int32_t x_axis = 0;
     int32_t y_axis = 0;

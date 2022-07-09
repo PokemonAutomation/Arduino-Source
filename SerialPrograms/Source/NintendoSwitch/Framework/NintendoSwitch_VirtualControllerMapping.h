@@ -7,11 +7,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_VirtualControllerMapping_H
 #define PokemonAutomation_NintendoSwitch_VirtualControllerMapping_H
 
-#include <QJsonArray>
+#include <QKeyEvent>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
+class QString;
+
 namespace PokemonAutomation{
+    class JsonArray2;
 namespace NintendoSwitch{
 
 
@@ -25,8 +28,8 @@ const QString& controller_button_to_string(const ControllerButton& button);
 
 const ControllerButton* button_lookup(Qt::Key key);
 
-QJsonArray read_keyboard_mapping();
-void set_keyboard_mapping(const QJsonArray& json);
+JsonArray2 read_keyboard_mapping();
+void set_keyboard_mapping(const JsonArray2& json);
 
 
 

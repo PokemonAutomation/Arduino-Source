@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "PokemonSwSh_FossilTable.h"
 
@@ -35,10 +35,10 @@ public:
 FossilTableOption::FossilTableOption()
     : m_table("<b>Game List:</b>", m_factory)
 {}
-void FossilTableOption::load_json(const QJsonValue& json){
+void FossilTableOption::load_json(const JsonValue2& json){
     m_table.load_current(json);
 }
-QJsonValue FossilTableOption::to_json() const{
+JsonValue2 FossilTableOption::to_json() const{
     return m_table.write_current();
 }
 

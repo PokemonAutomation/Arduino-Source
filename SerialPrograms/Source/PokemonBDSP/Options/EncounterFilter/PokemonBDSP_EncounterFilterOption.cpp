@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 #include "PokemonBDSP_EncounterFilterOption.h"
@@ -42,29 +43,35 @@ std::vector<EncounterFilterOverride> EncounterFilterOption::overrides() const{
     }
     return ret;
 }
-void EncounterFilterOption::load_json(const QJsonValue& json){
+void EncounterFilterOption::load_json(const JsonValue2& json){
     using namespace Pokemon;
 
-    QJsonObject obj = json.toObject();
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
 
-    QString shiny_filter;
-    if (json_get_string(shiny_filter, obj, "ShinyFilter")){
-        auto iter = ShinyFilter_MAP.find(shiny_filter);
+    const std::string* str = obj->get_string("ShinyFilter");
+    if (str != nullptr){
+        auto iter = ShinyFilter_MAP.find(*str);
         if (iter != ShinyFilter_MAP.end()){
             m_shiny_filter_current.store(iter->second, std::memory_order_release);
         }
     }
 
     if (m_enable_overrides){
-        m_table.load_json(json_get_array_nothrow(obj, "Overrides"));
+        const JsonValue2* array = obj->get_value("Overrides");
+        if (array != nullptr){
+            m_table.load_json(*array);
+        }
     }
 }
-QJsonValue EncounterFilterOption::to_json() const{
-    QJsonObject obj;
-    obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)m_shiny_filter_current.load(std::memory_order_acquire)]);
+JsonValue2 EncounterFilterOption::to_json() const{
+    JsonObject2 obj;
+    obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)m_shiny_filter_current.load(std::memory_order_acquire)];
 
     if (m_enable_overrides){
-        obj.insert("Overrides", m_table.to_json());
+        obj["Overrides"] = m_table.to_json();
     }
 
     return obj;

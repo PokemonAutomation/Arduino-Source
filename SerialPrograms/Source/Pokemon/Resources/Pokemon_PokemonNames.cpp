@@ -22,7 +22,7 @@ struct PokemonNameDatabase{
 
     static const std::string NULL_SLUG;
     std::map<std::string, PokemonNames> m_slug_to_data;
-    std::map<QString, std::string> m_display_name_to_slug;
+    std::map<std::string, std::string> m_display_name_to_slug;
 };
 const std::string PokemonNameDatabase::NULL_SLUG;
 
@@ -45,7 +45,7 @@ PokemonNameDatabase::PokemonNameDatabase(){
         QJsonObject names = iter.value().toObject();
         PokemonNames data;
         for (auto iter1 = names.begin(); iter1 != names.end(); ++iter1){
-            data.m_display_names[language_code_to_enum(iter1.key().toUtf8().data())] = iter1.value().toString();
+            data.m_display_names[language_code_to_enum(iter1.key().toUtf8().data())] = iter1.value().toString().toStdString();
         }
 
 
@@ -73,7 +73,7 @@ PokemonNameDatabase::PokemonNameDatabase(){
 }
 
 
-const QString& PokemonNames::display_name(Language language) const{
+const std::string& PokemonNames::display_name(Language language) const{
     auto iter = m_display_names.find(language);
     if (iter == m_display_names.end()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No data loaded for this language.");
@@ -99,16 +99,16 @@ const PokemonNames* get_pokemon_name_nothrow(const std::string& slug){
     }
     return &iter->second;
 }
-const std::string& parse_pokemon_name(const QString& display_name){
-    const std::map<QString, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
+const std::string& parse_pokemon_name(const std::string& display_name){
+    const std::map<std::string, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);
     if (iter == database.end()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Display name not found in database: " + display_name.toStdString());
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Display name not found in database: " + display_name);
     }
     return iter->second;
 }
-const std::string& parse_pokemon_name_nothrow(const QString& display_name){
-    const std::map<QString, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
+const std::string& parse_pokemon_name_nothrow(const std::string& display_name){
+    const std::map<std::string, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);
     if (iter == database.end()){
         return PokemonNameDatabase::NULL_SLUG;

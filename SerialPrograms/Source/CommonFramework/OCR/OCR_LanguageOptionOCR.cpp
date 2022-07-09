@@ -4,13 +4,13 @@
  *
  */
 
-#include <QJsonValue>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -79,14 +79,14 @@ LanguageOCR::LanguageOCR(QString label, const LanguageSet& languages, bool requi
 
 
 
-void LanguageOCR::load_json(const QJsonValue& json){
-    if (!json.isString()){
+void LanguageOCR::load_json(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
-    QString str = json.toString();
     Language language;
     try{
-        language = language_code_to_enum(str.toStdString());
+        language = language_code_to_enum(*str);
     }catch (const InternalProgramError&){
         return;
     }
@@ -96,8 +96,8 @@ void LanguageOCR::load_json(const QJsonValue& json){
         m_current = iter->second;
     }
 }
-QJsonValue LanguageOCR::to_json() const{
-    return QJsonValue(QString::fromStdString(language_data(m_case_list[m_current].first).code));
+JsonValue2 LanguageOCR::to_json() const{
+    return language_data(m_case_list[m_current].first).code;
 }
 
 QString LanguageOCR::check_validity() const{

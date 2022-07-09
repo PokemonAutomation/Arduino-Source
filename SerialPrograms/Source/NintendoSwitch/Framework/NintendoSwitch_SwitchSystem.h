@@ -19,9 +19,9 @@ namespace NintendoSwitch{
 class SwitchSystemWidget;
 
 class SwitchSystemFactory : public SwitchSetupFactory{
-    static const QString JSON_SERIAL;
-    static const QString JSON_CAMERA;
-    static const QString JSON_AUDIO;
+    static const std::string JSON_SERIAL;
+    static const std::string JSON_CAMERA;
+    static const std::string JSON_AUDIO;
 
 public:
     SwitchSystemFactory(
@@ -33,10 +33,10 @@ public:
         size_t console_id,
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running,
-        const QJsonValue& json
+        const JsonValue2& json
     );
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     const QSerialPortInfo* port() const;
 

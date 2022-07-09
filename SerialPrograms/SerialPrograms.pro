@@ -8,7 +8,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 INCLUDEPATH += ../
 INCLUDEPATH += ../../Internal/
 INCLUDEPATH += Source/
-RESOURCES += ../Common/Qt/qdarkstyle/dark/style.qrc
+RESOURCES += ../3rdParty/qdarkstyle/dark/darkstyle.qrc
 
 CONFIG += force_debug_info
 
@@ -77,6 +77,10 @@ SOURCES += \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
+    ../Common/Cpp/Json/JsonArray.cpp \
+    ../Common/Cpp/Json/JsonObject.cpp \
+    ../Common/Cpp/Json/JsonTools.cpp \
+    ../Common/Cpp/Json/JsonValue.cpp \
     ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
@@ -202,7 +206,6 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/FixedCodeOption.cpp \
     Source/CommonFramework/Options/FloatingPointOption.cpp \
-    Source/CommonFramework/Options/HiddenTextEditOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/SimpleIntegerOption.cpp \
@@ -735,6 +738,10 @@ HEADERS += \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/FixedLimitVector.tpp \
+    ../Common/Cpp/Json/JsonArray.h \
+    ../Common/Cpp/Json/JsonObject.h \
+    ../Common/Cpp/Json/JsonTools.h \
+    ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
@@ -898,7 +905,6 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/FixedCodeOption.h \
     Source/CommonFramework/Options/FloatingPointOption.h \
-    Source/CommonFramework/Options/HiddenTextEditOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/SimpleIntegerOption.h \

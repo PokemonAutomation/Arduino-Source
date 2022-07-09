@@ -4,13 +4,10 @@
  *
  */
 
-#include <QString>
 #include <QWidget>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
-
-
 
 
 QString ConfigOption::check_validity() const{

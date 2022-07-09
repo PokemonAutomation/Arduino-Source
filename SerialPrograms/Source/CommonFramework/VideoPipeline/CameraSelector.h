@@ -11,11 +11,11 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
 
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{
 
+class JsonValue2;
 class VideoDisplayWidget;
 
 
@@ -26,15 +26,15 @@ class CameraSelectorWidget;
 // which directly modifies CameraSelector's internal state.
 // This separates state from UI.
 class CameraSelector{
-    static const QString JSON_CAMERA;
-    static const QString JSON_RESOLUTION;
+    static const std::string JSON_CAMERA;
+    static const std::string JSON_RESOLUTION;
 
 public:
     CameraSelector(QSize default_resolution);
-    CameraSelector(QSize default_resolution, const QJsonValue& json);
+    CameraSelector(QSize default_resolution, const JsonValue2& json);
 
-    void load_json(const QJsonValue& json);
-    QJsonValue to_json() const;
+    void load_json(const JsonValue2& json);
+    JsonValue2 to_json() const;
 
     CameraSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder);
 

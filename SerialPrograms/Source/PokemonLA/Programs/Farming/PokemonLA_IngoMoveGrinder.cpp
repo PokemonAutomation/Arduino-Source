@@ -42,7 +42,7 @@ IngoMoveGrinder::IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , OPPONENT(
         "<b>Opponent:</b>",
-        std::vector<QString>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
+        std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
         0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -215,7 +215,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
             env.console.log("Our turn!", COLOR_BLUE);
 
             Move move = POKEMON_ACTIONS.get_move(cur_pokemon, cur_move);
-            if (move_issued[cur_pokemon][cur_move] < move.attemps)
+            if (move_issued[cur_pokemon][cur_move] < move.attempts)
             {
                 // Press A to select moves
                 pbf_press_button(context, BUTTON_A, 10, 125);
@@ -296,7 +296,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
     {
         for (size_t j = 0; j < 4; ++j)
         {
-            if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attemps)
+            if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attempts)
             {
                 env.console.log("Grinding will continue." + debug_move_attempts_info());
                 return false;
@@ -373,7 +373,7 @@ size_t IngoMoveGrinder::get_next_move_to_switch_to() const
 {
     for (size_t i = cur_move + 1; i < 4; ++i)
     {
-        if (move_issued[cur_pokemon][i] < POKEMON_ACTIONS.get_move(cur_pokemon, i).attemps)
+        if (move_issued[cur_pokemon][i] < POKEMON_ACTIONS.get_move(cur_pokemon, i).attempts)
         {
             return i;
         }
@@ -388,7 +388,7 @@ size_t IngoMoveGrinder::get_next_pokemon_to_switch_to() const
     {
         for (size_t j = 0; j < 4; ++j)
         {
-            if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attemps)
+            if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attempts)
             {
                 return i;
             }
@@ -411,9 +411,9 @@ QString IngoMoveGrinder::debug_move_attempts_info() const
         for (size_t j = 0; j < 4; ++j)
         {
             Move move = POKEMON_ACTIONS.get_move(i, j);
-            if (move.attemps != 0)
+            if (move.attempts != 0)
             {
-                debug += "(pokemon : " + QString::number(i) + ", move : " + QString::number(j) + " did " + QString::number(move_issued[i][j]) + " out of " + QString::number(move.attemps) + ")\n";
+                debug += "(pokemon : " + QString::number(i) + ", move : " + QString::number(j) + " did " + QString::number(move_issued[i][j]) + " out of " + QString::number(move.attempts) + ")\n";
             }
         }
     }

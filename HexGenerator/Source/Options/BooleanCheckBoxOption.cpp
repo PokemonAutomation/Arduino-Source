@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
+#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "BooleanCheckBoxOption.h"
@@ -31,16 +32,16 @@ BooleanCheckBox::BooleanCheckBox(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , BooleanCheckBoxBaseOption(SingleStatementOption::m_label, false)
 {
-    load_default(json_get_value_throw(obj, JSON_DEFAULT));
-    load_current(json_get_value_throw(obj, JSON_CURRENT));
+    load_default(from_QJson(json_get_value_throw(obj, JSON_DEFAULT)));
+    load_current(from_QJson(json_get_value_throw(obj, JSON_CURRENT)));
 }
 void BooleanCheckBox::restore_defaults(){
     BooleanCheckBoxBaseOption::restore_defaults();
 }
 QJsonObject BooleanCheckBox::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, write_default());
-    root.insert(JSON_CURRENT, write_current());
+    root.insert(JSON_DEFAULT, to_QJson(write_default()));
+    root.insert(JSON_CURRENT, to_QJson(write_current()));
     return root;
 }
 std::string BooleanCheckBox::to_cpp() const{

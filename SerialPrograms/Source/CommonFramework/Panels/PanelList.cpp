@@ -7,7 +7,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "PanelList.h"
 
@@ -77,7 +77,7 @@ void PanelList::handle_panel_clicked(const QString text){
     try{
         std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
         const QString identifier = QString::fromStdString(descriptor->identifier());
-        panel->from_json(PERSISTENT_SETTINGS().panels[identifier]);
+        panel->from_json(from_QJson(PERSISTENT_SETTINGS().panels[identifier]));
         m_panel_holder.load_panel(std::move(panel));
 
         PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, iter->first);

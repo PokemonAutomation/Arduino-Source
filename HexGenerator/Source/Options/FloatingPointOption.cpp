@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QDoubleValidator>
 #include <QLineEdit>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "FloatingPointOption.h"
@@ -51,8 +53,8 @@ QJsonObject FloatingPoint::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
     root.insert(JSON_MIN_VALUE, QJsonValue(m_min_value));
     root.insert(JSON_MAX_VALUE, QJsonValue(m_max_value));
-    root.insert(JSON_DEFAULT, write_default());
-    root.insert(JSON_CURRENT, write_current());
+    root.insert(JSON_DEFAULT, to_QJson(write_default()));
+    root.insert(JSON_CURRENT, to_QJson(write_current()));
     return root;
 }
 std::string FloatingPoint::to_cpp() const{

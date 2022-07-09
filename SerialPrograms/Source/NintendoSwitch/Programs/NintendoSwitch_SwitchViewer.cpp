@@ -5,6 +5,7 @@
  */
 
 #include <QVBoxLayout>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
@@ -32,10 +33,10 @@ SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
         1, 4, 1
     )
 {}
-void SwitchViewer::from_json(const QJsonValue& json){
-    m_switches.load_json(json.toObject());
+void SwitchViewer::from_json(const JsonValue2& json){
+    m_switches.load_json(json);
 }
-QJsonValue SwitchViewer::to_json() const{
+JsonValue2 SwitchViewer::to_json() const{
     return m_switches.to_json();
 }
 QWidget* SwitchViewer::make_widget(QWidget& parent, PanelHolder& holder){

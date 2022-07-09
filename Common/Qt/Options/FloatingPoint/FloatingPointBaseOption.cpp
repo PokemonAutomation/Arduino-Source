@@ -5,12 +5,8 @@
  */
 
 #include <cmath>
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "FloatingPointBaseOption.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -39,28 +35,29 @@ void FloatingPointBaseOption::restore_defaults(){
     m_current = m_default;
 }
 
-void FloatingPointBaseOption::load_default(const QJsonValue& json){
-    if (!json.isDouble()){
+void FloatingPointBaseOption::load_default(const JsonValue2& json){
+    double value;
+    if (!json.read_float(value)){
         return;
     }
-    m_default = json.toDouble();
+    m_default = value;
     m_default = std::max(m_default, m_min_value);
     m_default = std::min(m_default, m_max_value);
 }
-void FloatingPointBaseOption::load_current(const QJsonValue& json){
-    if (!json.isDouble()){
+void FloatingPointBaseOption::load_current(const JsonValue2& json){
+    double value;
+    if (!json.read_float(value)){
         return;
     }
-    double current = json.toDouble();
-    current = std::max(current, m_min_value);
-    current = std::min(current, m_max_value);
-    m_current.store(current, std::memory_order_relaxed);
+    value = std::max(value, m_min_value);
+    value = std::min(value, m_max_value);
+    m_current.store(value, std::memory_order_relaxed);
 }
-QJsonValue FloatingPointBaseOption::write_default() const{
-    return QJsonValue(m_default);
+JsonValue2 FloatingPointBaseOption::write_default() const{
+    return m_default;
 }
-QJsonValue FloatingPointBaseOption::write_current() const{
-    return QJsonValue(m_current.load(std::memory_order_relaxed));
+JsonValue2 FloatingPointBaseOption::write_current() const{
+    return m_current.load(std::memory_order_relaxed);
 }
 
 QString FloatingPointBaseOption::check_validity() const{

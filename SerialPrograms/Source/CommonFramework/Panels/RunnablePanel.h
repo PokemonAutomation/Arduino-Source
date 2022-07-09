@@ -35,7 +35,7 @@ class RunnablePanelInstance : public PanelInstance{
 public:
     RunnablePanelInstance(const PanelDescriptor& descriptor);
 
-    void add_option(ConfigOption& option, QString serialization_string){
+    void add_option(ConfigOption& option, std::string serialization_string){
         m_options.add_option(option, std::move(serialization_string));
     }
 
@@ -51,8 +51,8 @@ public:
 
 public:
     //  Serialization
-    virtual void from_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void from_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
 private:
     friend class RunnablePanelWidget;

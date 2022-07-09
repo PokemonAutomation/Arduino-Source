@@ -18,11 +18,11 @@ namespace Pokemon{
 
 struct ExtraNames{
     // mapping from the slug of the extra names to their display names and icons
-    std::map<std::string, std::pair<QString, QIcon>> names;
+    std::map<std::string, std::pair<std::string, QIcon>> names;
     // list of extra name slugs to display on the widget, after all the pokemon names listed on the widget
     std::vector<std::string> name_list;
     // mapping from the display name of the extra names to their slugs.
-    std::map<QString, std::string> display_name_to_slug;
+    std::map<std::string, std::string> display_name_to_slug;
 };
 
 class PokemonNameListFactory : public EditableTableFactory{

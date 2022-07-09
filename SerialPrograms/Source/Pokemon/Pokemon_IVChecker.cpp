@@ -47,7 +47,7 @@ const std::string& IVCheckerValue_enum_to_string(IVCheckerValue result){
 }
 
 
-const std::vector<QString> IVCheckerFilter_NAMES{
+const std::vector<std::string> IVCheckerFilter_NAMES{
     "Anything (0-31)",
     "No Good (0)",
     "Decent (1-15)",
@@ -56,7 +56,7 @@ const std::vector<QString> IVCheckerFilter_NAMES{
     "Fantastic (30)",
     "Best (31)",
 };
-const std::map<QString, IVCheckerFilter> IVCheckerFilter_TOKEN_TO_ENUM{
+const std::map<std::string, IVCheckerFilter> IVCheckerFilter_TOKEN_TO_ENUM{
     {IVCheckerFilter_NAMES[0],  IVCheckerFilter::Anything},
     {IVCheckerFilter_NAMES[1],  IVCheckerFilter::NoGood},
     {IVCheckerFilter_NAMES[2],  IVCheckerFilter::Decent},
@@ -65,14 +65,14 @@ const std::map<QString, IVCheckerFilter> IVCheckerFilter_TOKEN_TO_ENUM{
     {IVCheckerFilter_NAMES[5],  IVCheckerFilter::Fantastic},
     {IVCheckerFilter_NAMES[6],  IVCheckerFilter::Best},
 };
-IVCheckerFilter IVCheckerFilter_string_to_enum(const QString& token){
+IVCheckerFilter IVCheckerFilter_string_to_enum(const std::string& token){
     auto iter = IVCheckerFilter_TOKEN_TO_ENUM.find(token);
     if (iter == IVCheckerFilter_TOKEN_TO_ENUM.end()){
         return IVCheckerFilter::Anything;
     }
     return iter->second;
 }
-const QString& IVCheckerFilter_enum_to_string(IVCheckerFilter result){
+const std::string& IVCheckerFilter_enum_to_string(IVCheckerFilter result){
     return IVCheckerFilter_NAMES[(size_t)result];
 }
 

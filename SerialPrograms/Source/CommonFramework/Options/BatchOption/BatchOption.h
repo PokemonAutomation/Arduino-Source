@@ -10,8 +10,8 @@
 #define PokemonAutomation_BatchOption_H
 
 #include <atomic>
+#include <string>
 #include <vector>
-#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -20,15 +20,15 @@ namespace PokemonAutomation{
 class BatchOption : public ConfigOption{
 public:
 //    BatchOption();
-    void add_option(ConfigOption& option, QString serialization_string);
+    void add_option(ConfigOption& option, std::string serialization_string);
 
 #define PA_ADD_OPTION(x)    add_option(x, #x)
 #define PA_ADD_STATIC(x)    add_option(x, "")
 
 
 public:
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     QString check_validity() const override;
     virtual void restore_defaults() override;
@@ -40,7 +40,7 @@ public:
 protected:
     friend class BatchWidget;
     friend class GroupWidget;
-    std::vector<std::pair<ConfigOption*, QString>> m_options;
+    std::vector<std::pair<ConfigOption*, std::string>> m_options;
 };
 
 

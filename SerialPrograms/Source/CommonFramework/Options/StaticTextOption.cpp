@@ -4,11 +4,10 @@
  *
  */
 
-#include <QJsonValue>
 #include <QVBoxLayout>
 #include <QFrame>
 #include <QLabel>
-#include "Common/Compiler.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "StaticTextOption.h"
 
 namespace PokemonAutomation{
@@ -36,10 +35,10 @@ public:
 StaticTextOption::StaticTextOption(QString label)
     : m_label(std::move(label))
 {}
-void StaticTextOption::load_json(const QJsonValue& json){
+void StaticTextOption::load_json(const JsonValue2&){
 }
-QJsonValue StaticTextOption::to_json() const{
-    return QJsonValue();
+JsonValue2 StaticTextOption::to_json() const{
+    return JsonValue2();
 }
 ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
     return new StaticTextWidget(parent, *this);
@@ -50,10 +49,10 @@ ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
 SectionDividerOption::SectionDividerOption(QString label)
     : m_label(std::move(label))
 {}
-void SectionDividerOption::load_json(const QJsonValue& json){
+void SectionDividerOption::load_json(const JsonValue2&){
 }
-QJsonValue SectionDividerOption::to_json() const{
-    return QJsonValue();
+JsonValue2 SectionDividerOption::to_json() const{
+    return JsonValue2();
 }
 
 ConfigWidget* SectionDividerOption::make_ui(QWidget& parent){

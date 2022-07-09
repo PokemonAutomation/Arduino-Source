@@ -26,6 +26,8 @@ extern const QString STRING_POKEMON;
 extern const QString STRING_POKEDEX;
 extern const QString STRING_POKEJOB;
 
+extern const std::string UTF8_STRING_POKEMON;
+
 const QString& RESOURCE_PATH();
 const QString& TRAINING_PATH();
 

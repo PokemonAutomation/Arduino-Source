@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "SettingsPanel.h"
 #include "SettingsPanelWidget.h"
 
@@ -13,10 +13,10 @@ namespace PokemonAutomation{
 
 
 
-void SettingsPanelInstance::from_json(const QJsonValue& json){
+void SettingsPanelInstance::from_json(const JsonValue2& json){
     m_options.load_json(json);
 }
-QJsonValue SettingsPanelInstance::to_json() const{
+JsonValue2 SettingsPanelInstance::to_json() const{
     return m_options.to_json();
 }
 QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelHolder& holder){

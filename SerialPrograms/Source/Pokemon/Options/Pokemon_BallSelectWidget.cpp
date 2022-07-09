@@ -30,7 +30,7 @@ BallSelectWidget::BallSelectWidget(
     //  A more optimized version.
     QStringList list;
     for (const std::string& slug : slugs){
-        list.append(get_pokeball_name(slug).display_name());
+        list.append(QString::fromStdString(get_pokeball_name(slug).display_name()));
     }
     this->addItems(list);
 
@@ -72,7 +72,7 @@ BallSelectWidget::BallSelectWidget(
     update_size_cache();
 }
 std::string BallSelectWidget::slug() const{
-    return parse_pokeball_name_nothrow(currentText());
+    return parse_pokeball_name_nothrow(currentText().toStdString());
 }
 
 

@@ -12,7 +12,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "ProgramNotifications.h"
 #include "EventNotificationsTable.h"
@@ -41,21 +42,21 @@ EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOp
         m_name_map.emplace(option->label(), option);
     }
 }
-void EventNotificationsTable::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+void EventNotificationsTable::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
     ScreenshotOption screenshot_option("");
     for (EventNotificationOption* option : m_options){
-        auto iter = obj.find(option->label());
-        if (iter == obj.end()){
+        auto iter = obj->find(option->label().toStdString());
+        if (iter == obj->end()){
             continue;
         }
-        option->load_json(*iter);
+        option->load_json(iter->second);
     }
 }
-QJsonValue EventNotificationsTable::to_json() const{
-    QJsonObject obj;
+JsonValue2 EventNotificationsTable::to_json() const{
+    JsonObject2 obj;
     for (EventNotificationOption* option : m_options){
-        obj.insert(option->label(), option->to_json());
+        obj[option->label().toStdString()] = option->to_json();
     }
     return obj;
 }
@@ -165,9 +166,9 @@ QWidget* EventNotificationsTableWidget::make_screenshot_box(EventNotificationOpt
     if (entry.screenshot_supported){
         QComboBox* box = new NoWheelComboBox(this);
         ScreenshotOption screenshot_option("");
-        box->addItem(screenshot_option.case_name(0));
-        box->addItem(screenshot_option.case_name(1));
-        box->addItem(screenshot_option.case_name(2));
+        box->addItem(QString::fromStdString(screenshot_option.case_name(0)));
+        box->addItem(QString::fromStdString(screenshot_option.case_name(1)));
+        box->addItem(QString::fromStdString(screenshot_option.case_name(2)));
         box->setCurrentIndex((int)entry.m_current.screenshot);
         box->connect(
             box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),

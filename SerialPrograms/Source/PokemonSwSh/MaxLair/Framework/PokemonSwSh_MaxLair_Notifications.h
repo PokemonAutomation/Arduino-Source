@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-QString pokemon_name(const std::string& slug, const QString& empty_string);
+std::string pokemon_name(const std::string& slug, const std::string& empty_string);
 
 
 

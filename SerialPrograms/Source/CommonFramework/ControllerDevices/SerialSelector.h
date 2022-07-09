@@ -13,13 +13,12 @@
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
-class QJsonValue;
 class QSerialPortInfo;
 class QWidget;
 
 namespace PokemonAutomation{
 
-
+class JsonValue2;
 class SerialSelectorWidget;
 
 
@@ -33,11 +32,11 @@ public:
     SerialSelector(
         QString label,
         PABotBaseLevel minimum_pabotbase,
-        const QJsonValue& json
+        const JsonValue2& json
     );
 
-    void load_json(const QJsonValue& json);
-    QJsonValue to_json() const;
+    void load_json(const JsonValue2& json);
+    JsonValue2 to_json() const;
 
     const QSerialPortInfo* port() const;
 

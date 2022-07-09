@@ -6,30 +6,37 @@
 
 #include <QVBoxLayout>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "BatchOption.h"
 #include "BatchWidget.h"
 
 namespace PokemonAutomation{
 
 //BatchOption::BatchOption(){}
-void BatchOption::add_option(ConfigOption& option, QString serialization_string){
+void BatchOption::add_option(ConfigOption& option, std::string serialization_string){
     m_options.emplace_back(&option, std::move(serialization_string));
 }
 
-void BatchOption::load_json(const QJsonValue& json){
-    const QJsonObject& obj = json.toObject();
+void BatchOption::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
     for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            item.first->load_json(json_get_value_nothrow(obj, item.second));
+        if (!item.second.empty()){
+            const JsonValue2* value = obj->get_value(item.second);
+            if (value){
+                item.first->load_json(*value);
+            }
         }
     }
 }
-QJsonValue BatchOption::to_json() const{
-    QJsonObject obj;
+JsonValue2 BatchOption::to_json() const{
+    JsonObject2 obj;
     for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            obj.insert(item.second, item.first->to_json());
+        if (!item.second.empty()){
+            obj[item.second] = item.first->to_json();
         }
     }
     return obj;

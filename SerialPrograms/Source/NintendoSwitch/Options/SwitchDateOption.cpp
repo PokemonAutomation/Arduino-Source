@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h"
 #include "SwitchDateOption.h"
 
@@ -34,10 +34,10 @@ SwitchDateOption::SwitchDateOption(
 )
     : SwitchDateBaseOption(std::move(label), default_value)
 {}
-void SwitchDateOption::load_json(const QJsonValue& json){
+void SwitchDateOption::load_json(const JsonValue2& json){
     return this->load_current(json);
 }
-QJsonValue SwitchDateOption::to_json() const{
+JsonValue2 SwitchDateOption::to_json() const{
     return this->write_current();
 }
 

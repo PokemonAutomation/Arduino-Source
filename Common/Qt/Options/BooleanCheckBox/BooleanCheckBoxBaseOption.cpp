@@ -5,11 +5,8 @@
  */
 
 #include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "BooleanCheckBoxBaseOption.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 
@@ -23,23 +20,24 @@ BooleanCheckBoxBaseOption::BooleanCheckBoxBaseOption(
     , m_current(default_value)
 {}
 
-void BooleanCheckBoxBaseOption::load_default(const QJsonValue& json){
-    if (!json.isBool()){
-        return;
+
+void BooleanCheckBoxBaseOption::load_default(const JsonValue2& json){
+    bool value;
+    if (json.read_boolean(value)){
+        m_default = value;
     }
-    m_default = json.toBool();
 }
-void BooleanCheckBoxBaseOption::load_current(const QJsonValue& json){
-    if (!json.isBool()){
-        return;
+void BooleanCheckBoxBaseOption::load_current(const JsonValue2& json){
+    bool value;
+    if (json.read_boolean(value)){
+        m_current.store(value, std::memory_order_relaxed);
     }
-    m_current.store(json.toBool(), std::memory_order_relaxed);
 }
-QJsonValue BooleanCheckBoxBaseOption::write_default() const{
-    return QJsonValue(m_default);
+JsonValue2 BooleanCheckBoxBaseOption::write_default() const{
+    return m_default;
 }
-QJsonValue BooleanCheckBoxBaseOption::write_current() const{
-    return QJsonValue(m_current.load(std::memory_order_relaxed));
+JsonValue2 BooleanCheckBoxBaseOption::write_current() const{
+    return m_current.load(std::memory_order_relaxed);
 }
 
 void BooleanCheckBoxBaseOption::restore_defaults(){

@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const QString PROGRAM_VERSION_BASE = "v0.16.2";
+const QString PROGRAM_VERSION_BASE = "v0.16.3";
 
 #ifdef PA_OFFICIAL
 const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE;
@@ -30,6 +30,7 @@ const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";
 const QString STRING_POKEDEX = QString("Pok") + QChar(0xe9) + "dex";
 const QString STRING_POKEJOB = QString("Pok") + QChar(0xe9) + " Job";
 
+const std::string UTF8_STRING_POKEMON = STRING_POKEMON.toStdString();
 
 
 QString get_resource_path(){

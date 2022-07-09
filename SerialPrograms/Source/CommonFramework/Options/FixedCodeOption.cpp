@@ -4,11 +4,11 @@
  *
  */
 
-#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
 
@@ -60,16 +60,17 @@ QString FixedCodeOption::set(QString x){
     return error;
 }
 
-void FixedCodeOption::load_json(const QJsonValue& json){
-    if (!json.isString()){
+void FixedCodeOption::load_json(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = json.toString();
+    m_current = QString::fromStdString(*str);
 }
-QJsonValue FixedCodeOption::to_json() const{
+JsonValue2 FixedCodeOption::to_json() const{
     SpinLockGuard lg(m_lock);
-    return QJsonValue(m_current);
+    return m_current.toStdString();
 }
 
 void FixedCodeOption::to_str(uint8_t* code) const{
@@ -121,24 +122,24 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     layout->addLayout(right, 1);
 
     QString current = m_value.get();
-    QLineEdit* box = new QLineEdit(current, this);
-    right->addWidget(box);
+    m_box = new QLineEdit(current, this);
+    right->addWidget(m_box);
     QLabel* under_text = new QLabel(sanitized_code(current), this);
     under_text->setWordWrap(true);
     right->addWidget(under_text);
 
     connect(
-        box, &QLineEdit::textChanged,
+        m_box, &QLineEdit::textChanged,
         this, [=](const QString& text){
             m_value.set(text);
             under_text->setText(sanitized_code(text));
         }
     );
     connect(
-        box, &QLineEdit::editingFinished,
-        this, [=](){
+        m_box, &QLineEdit::editingFinished,
+        m_box, [=](){
             QString current = m_value.get();
-            box->setText(current);
+            m_box->setText(current);
             under_text->setText(sanitized_code(current));
         }
     );

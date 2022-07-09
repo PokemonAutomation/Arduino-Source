@@ -5,7 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -26,43 +27,35 @@ EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
 //    , shininess(rare_stars ? ShinyFilter::SQUARE_ONLY : ShinyFilter::STAR_ONLY)
 {}
 
-void EncounterFilterOverride::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    {
-        QString value;
-        if (json_get_string(value, obj, "Action")){
-            auto iter = EncounterAction_MAP.find(value);
-            if (iter != EncounterAction_MAP.end()){
-                action = iter->second;
-            }
+void EncounterFilterOverride::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    const std::string* str;
+    str = obj->get_string("Action");
+    if (str != nullptr){
+        auto iter = EncounterAction_MAP.find(*str);
+        if (iter != EncounterAction_MAP.end()){
+            action = iter->second;
         }
     }
-    {
-        QString value;
-        json_get_string(value, obj, "Ball");
-        pokeball_slug = value.toUtf8().data();
-    }
-    {
-        QString value;
-        json_get_string(value, obj, "Species");
-        pokemon_slug = value.toStdString();
-    }
-    {
-        QString value;
-        if (json_get_string(value, obj, "ShinyFilter")){
-            auto iter = ShinyFilter_MAP.find(value);
-            if (iter != ShinyFilter_MAP.end()){
-                shininess = iter->second;
-            }
+    obj->read_string(pokeball_slug, "Ball");
+    obj->read_string(pokemon_slug, "Species");
+    str = obj->get_string("ShinyFilter");
+    if (str != nullptr){
+        auto iter = ShinyFilter_MAP.find(*str);
+        if (iter != ShinyFilter_MAP.end()){
+            shininess = iter->second;
         }
     }
 }
-QJsonValue EncounterFilterOverride::to_json() const{
-    QJsonObject obj;
-    obj.insert("Action", EncounterAction_NAMES[(size_t)action]);
-    obj.insert("Ball", QString::fromStdString(pokeball_slug));
-    obj.insert("Species", QString::fromStdString(pokemon_slug));
-    obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)shininess]);
+JsonValue2 EncounterFilterOverride::to_json() const{
+    JsonObject2 obj;
+    obj["Action"] = EncounterAction_NAMES[(size_t)action];
+    obj["Ball"] = pokeball_slug;
+    obj["Species"] = pokemon_slug;
+    obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)shininess];
     return obj;
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
@@ -79,8 +72,8 @@ std::vector<QWidget*> EncounterFilterOverride::make_widgets(QWidget& parent){
 }
 QWidget* EncounterFilterOverride::make_action_box(QWidget& parent, BallSelectWidget& ball_select){
     QComboBox* box = new NoWheelComboBox(&parent);
-    for (const QString& action : EncounterAction_NAMES){
-        box->addItem(action);
+    for (const std::string& action : EncounterAction_NAMES){
+        box->addItem(QString::fromStdString(action));
     }
     box->setCurrentIndex((int)action);
 
@@ -146,19 +139,19 @@ QWidget* EncounterFilterOverride::make_species_select(QWidget& parent){
 QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
     if (m_rare_stars){
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]);
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]));
     }else{
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]);
-        box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOTHING]);
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANYTHING]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::ANY_SHINY]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::STAR_ONLY]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::SQUARE_ONLY]));
+        box->addItem(QString::fromStdString(ShinyFilter_NAMES[(int)ShinyFilter::NOTHING]));
     }
     ShinyFilter current = shininess;
     for (int c = 0; c < box->count(); c++){
-        if (box->itemText(c) == ShinyFilter_NAMES[(int)current]){
+        if (box->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
             box->setCurrentIndex(c);
             break;
         }
@@ -169,10 +162,10 @@ QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
             if (index < 0){
                 return;
             }
-            QString text = box->itemText(index);
+            std::string text = box->itemText(index).toStdString();
             auto iter = ShinyFilter_MAP.find(text);
             if (iter == ShinyFilter_MAP.end()){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text);
             }
             shininess = iter->second;
         }

@@ -13,9 +13,12 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Options/EditableTableWidget.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
@@ -30,7 +33,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const QString PathAction_NAMES[] = {
+const std::string PathAction_NAMES[] = {
     "NO Action",
     "Change Mount",
 //    "Rotate Camera",
@@ -43,7 +46,7 @@ const QString PathAction_NAMES[] = {
     "End Listen",
 };
 
-const std::map<QString, PathAction> PathAction_MAP{
+const std::map<std::string, PathAction> PathAction_MAP{
     {PathAction_NAMES[0], PathAction::NO_ACTION},
     {PathAction_NAMES[1], PathAction::CHANGE_MOUNT},
 //    {PathAction_NAMES[2], PathAction::ROTATE_CAMERA},
@@ -57,7 +60,7 @@ const std::map<QString, PathAction> PathAction_MAP{
 };
 
 
-const QString PathMount_NAMES[] = {
+const std::string PathMount_NAMES[] = {
     "No Mount",
     "Wrydeer",
     "Ursaluna",
@@ -66,7 +69,7 @@ const QString PathMount_NAMES[] = {
     "Braviary",
 };
 
-const std::map<QString, PathMount> PathMount_MAP{
+const std::map<std::string, PathMount> PathMount_MAP{
     {PathMount_NAMES[0], PathMount::NO_MOUNT},
     {PathMount_NAMES[1], PathMount::WYRDEER},
     {PathMount_NAMES[2], PathMount::URSALUNA},
@@ -76,7 +79,7 @@ const std::map<QString, PathMount> PathMount_MAP{
 };
 
 
-const QString PathSpeed_NAMES[] = {
+const std::string PathSpeed_NAMES[] = {
     "Normal Speed",
     "Slow Speed",
     "Run on Foot",
@@ -85,7 +88,7 @@ const QString PathSpeed_NAMES[] = {
     "Dive on Braviary",
 };
 
-const std::map<QString, PathSpeed> PathSpeed_MAP{
+const std::map<std::string, PathSpeed> PathSpeed_MAP{
     {PathSpeed_NAMES[0], PathSpeed::NORMAL_SPEED},
     {PathSpeed_NAMES[1], PathSpeed::SLOW_SPEED},
     {PathSpeed_NAMES[2], PathSpeed::RUN},
@@ -98,92 +101,94 @@ const std::map<QString, PathSpeed> PathSpeed_MAP{
 
 CustomPathTableRow::CustomPathTableRow() {}
 
-void CustomPathTableRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    {
-        QString value;
-        if (json_get_string(value, obj, "Action")){
-            const auto iter = PathAction_MAP.find(value);
-            if (iter != PathAction_MAP.end()){
-                action = iter->second;
-            }
-        }
-        switch(action){
-        case PathAction::CHANGE_MOUNT:
-            if (json_get_string(value, obj, "Mount")){
-                const auto iter = PathMount_MAP.find(value);
-                if (iter != PathMount_MAP.end()){
-                    mount = iter->second;
-                }
-            }
-            break;
-#if 0
-        case PathAction::ROTATE_CAMERA:
-            json_get_int(camera_turn_ticks, obj, "CameraTurnTicks");
-            break;
-#endif
-        case PathAction::MOVE_FORWARD:
-            json_get_int(move_forward_ticks, obj, "MoveForwardTicks");
-            if (json_get_string(value, obj, "Speed")){
-                const auto iter = PathSpeed_MAP.find(value);
-                if (iter != PathSpeed_MAP.end()){
-                    move_speed = iter->second;
-                }
-            }
-            break;
-        case PathAction::MOVE_IN_DIRECTION:
-            json_get_int(move_forward_ticks, obj, "MoveForwardTicks");
-            if (json_get_string(value, obj, "Speed")){
-                const auto iter = PathSpeed_MAP.find(value);
-                if (iter != PathSpeed_MAP.end()){
-                    move_speed = iter->second;
-                }
-            }
-            json_get_double(left_x, obj, "MoveDirectionX");
-            json_get_double(left_y, obj, "MoveDirectionY");
-            break;
-        case PathAction::JUMP:
-            json_get_int(jump_wait_ticks, obj, "JumpWaitTicks");
-            break;
-        case PathAction::WAIT:
-            json_get_int(wait_ticks, obj, "WaitTicks");
-            break;
-        default:
-            break;
+void CustomPathTableRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+
+    const std::string* str = obj->get_string("Action");
+    if (str != nullptr){
+        const auto iter = PathAction_MAP.find(*str);
+        if (iter != PathAction_MAP.end()){
+            action = iter->second;
         }
     }
+
+    switch(action){
+    case PathAction::CHANGE_MOUNT:
+        str = obj->get_string("Mount");
+        if (str != nullptr){
+            const auto iter = PathMount_MAP.find(*str);
+            if (iter != PathMount_MAP.end()){
+                mount = iter->second;
+            }
+        }
+        break;
+    case PathAction::MOVE_FORWARD:
+        obj->read_integer(move_forward_ticks, "MoveForwardTicks");
+        str = obj->get_string("Speed");
+        if (str != nullptr){
+            const auto iter = PathSpeed_MAP.find(*str);
+            if (iter != PathSpeed_MAP.end()){
+                move_speed = iter->second;
+            }
+        }
+        break;
+    case PathAction::MOVE_IN_DIRECTION:
+        obj->read_integer(move_forward_ticks, "MoveForwardTicks");
+        str = obj->get_string("Speed");
+        if (str != nullptr){
+            const auto iter = PathSpeed_MAP.find(*str);
+            if (iter != PathSpeed_MAP.end()){
+                move_speed = iter->second;
+            }
+        }
+        obj->read_float(left_x, "MoveDirectionX");
+        obj->read_float(left_y, "MoveDirectionY");
+        break;
+    case PathAction::JUMP:
+        obj->read_integer(jump_wait_ticks, "JumpWaitTicks");
+        break;
+    case PathAction::WAIT:
+        obj->read_integer(wait_ticks, "WaitTicks");
+        break;
+    default:
+        break;
+    }
+
 
     // json_get_bool(switch_pokemon, obj, "Switch");
     // json_get_int(num_turns_to_switch, obj, "Turns", 0);
 }
 
-QJsonValue CustomPathTableRow::to_json() const{
-    QJsonObject obj;
-    obj.insert("Action", PathAction_NAMES[(size_t)action]);
+JsonValue2 CustomPathTableRow::to_json() const{
+    JsonObject2 obj;
+    obj["Action"] = PathAction_NAMES[(size_t)action];
     switch(action){
     case PathAction::CHANGE_MOUNT:
-        obj.insert("Mount", PathMount_NAMES[(size_t)mount]);
+        obj["Mount"] = PathMount_NAMES[(size_t)mount];
         break;
 #if 0
     case PathAction::ROTATE_CAMERA:
-        obj.insert("CameraTurnTicks", camera_turn_ticks);
+        obj["CameraTurnTicks"] = camera_turn_ticks);
         break;
 #endif
     case PathAction::MOVE_FORWARD:
-        obj.insert("MoveForwardTicks", move_forward_ticks);
-        obj.insert("Speed", PathSpeed_NAMES[(size_t)move_speed]);
+        obj["MoveForwardTicks"] = move_forward_ticks;
+        obj["Speed"] = PathSpeed_NAMES[(size_t)move_speed];
         break;
     case PathAction::MOVE_IN_DIRECTION:
-        obj.insert("MoveForwardTicks", move_forward_ticks);
-        obj.insert("Speed", PathSpeed_NAMES[(size_t)move_speed]);
-        obj.insert("MoveDirectionX", left_x);
-        obj.insert("MoveDirectionY", left_y);
+        obj["MoveForwardTicks"] = move_forward_ticks;
+        obj["Speed"] = PathSpeed_NAMES[(size_t)move_speed];
+        obj["MoveDirectionX"] = left_x;
+        obj["MoveDirectionY"] = left_y;
         break;
     case PathAction::JUMP:
-        obj.insert("JumpWaitTicks", jump_wait_ticks);
+        obj["JumpWaitTicks"] = jump_wait_ticks;
         break;
     case PathAction::WAIT:
-        obj.insert("WaitTicks", wait_ticks);
+        obj["WaitTicks"] = wait_ticks;
         break;
     default:
         break;
@@ -371,7 +376,7 @@ std::vector<QWidget*> CustomPathTableRow::make_widgets(QWidget& parent){
 QWidget* CustomPathTableRow::make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget){
     QComboBox* box = new NoWheelComboBox(&parent);
     for(size_t i = 0; i < PathAction_MAP.size(); i++){
-        box->addItem(PathAction_NAMES[i]);
+        box->addItem(QString::fromStdString(PathAction_NAMES[i]));
     }
     box->setCurrentIndex((int)action);
     box->connect(
@@ -501,7 +506,7 @@ public:
                     return;
                 }
                 QJsonValue obj = json_get_value_nothrow(root, "CUSTOM_PATH_TABLE");
-                value.load_json(obj);
+                value.load_json(from_QJson(obj));
                 if (m_table_widget == nullptr){
                     QMessageBox box;
                     box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
@@ -517,9 +522,9 @@ public:
             std::cout << "Save CustomPathTable from " << path.toStdString() << std::endl;
             if (path.size() > 0){
                 try{
-                    QJsonObject root;
-                    root.insert("CUSTOM_PATH_TABLE", value.to_json());
-                    write_json_file(path, QJsonDocument(root));
+                    JsonObject2 root;
+                    root["CUSTOM_PATH_TABLE"] = value.to_json();
+                    write_json_file(path, QJsonDocument(to_QJson(std::move(root)).toObject()));
                 }catch (FileException&){
                     QMessageBox box;
                     box.critical(nullptr, "Error", "Failed to save to file: " + path);

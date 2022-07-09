@@ -4,12 +4,12 @@
  *
  */
 
-#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <QCompleter>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "StringSelectOption.h"
 
@@ -40,8 +40,8 @@ private:
 
 StringSelectOption::StringSelectOption(
     QString label,
-    const std::vector<QString>& cases,
-    const QString& default_case
+    const std::vector<std::string>& cases,
+    const std::string& default_case
 )
     : m_label(std::move(label))
 //    , m_case_list(std::move(cases))
@@ -49,7 +49,7 @@ StringSelectOption::StringSelectOption(
     , m_current(0)
 {
     for (size_t index = 0; index < cases.size(); index++){
-        const QString& item = cases[index];
+        const std::string& item = cases[index];
         if (item == default_case){
             m_default = index;
         }
@@ -67,8 +67,8 @@ StringSelectOption::StringSelectOption(
 }
 StringSelectOption::StringSelectOption(
     QString label,
-    std::vector<std::pair<QString, QIcon>> cases,
-    const QString& default_case
+    std::vector<std::pair<std::string, QIcon>> cases,
+    const std::string& default_case
 )
     : m_label(std::move(label))
     , m_case_list(std::move(cases))
@@ -76,7 +76,7 @@ StringSelectOption::StringSelectOption(
     , m_current(0)
 {
     for (size_t index = 0; index < m_case_list.size(); index++){
-        const QString& item = m_case_list[index].first;
+        const std::string& item = m_case_list[index].first;
         if (item == default_case){
             m_default = index;
         }
@@ -92,18 +92,18 @@ StringSelectOption::StringSelectOption(
     m_current.store(m_default, std::memory_order_relaxed);
 }
 
-void StringSelectOption::load_json(const QJsonValue& json){
-    if (!json.isString()){
+void StringSelectOption::load_json(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
-    QString str = json.toString();
-    auto iter = m_case_map.find(str);
+    auto iter = m_case_map.find(*str);
     if (iter != m_case_map.end()){
         m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
-QJsonValue StringSelectOption::to_json() const{
-    return QJsonValue(m_case_list[(size_t)*this].first);
+JsonValue2 StringSelectOption::to_json() const{
+    return m_case_list[(size_t)*this].first;
 }
 
 void StringSelectOption::restore_defaults(){
@@ -134,7 +134,7 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
     m_box->completer()->setFilterMode(Qt::MatchContains);
 
     for (const auto& item : m_value.m_case_list){
-        m_box->addItem(item.second, item.first);
+        m_box->addItem(item.second, QString::fromStdString(item.first));
     }
     m_box->setCurrentIndex((int)m_value);
     m_box->update_size_cache();

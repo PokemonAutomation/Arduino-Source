@@ -5,14 +5,13 @@
  */
 
 #include <map>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
 #include <QLineEdit>
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "FossilTableBaseOption.h"
 
 namespace PokemonAutomation{
@@ -20,10 +19,10 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const QString FossilGame::JSON_GAME_SLOT    = "game_slot";
-const QString FossilGame::JSON_USER_SLOT    = "user_slot";
-const QString FossilGame::JSON_FOSSIL       = "fossil";
-const QString FossilGame::JSON_REVIVES      = "revives";
+const std::string FossilGame::JSON_GAME_SLOT    = "game_slot";
+const std::string FossilGame::JSON_USER_SLOT    = "user_slot";
+const std::string FossilGame::JSON_FOSSIL       = "fossil";
+const std::string FossilGame::JSON_REVIVES      = "revives";
 
 const std::vector<QString> FossilGame::FOSSIL_LIST{
     "Dracozolt",
@@ -42,27 +41,31 @@ const std::map<QString, int> FOSSIL_MAP{
 
 
 
-void FossilGame::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-
-    json_get_int(game_slot, obj, JSON_GAME_SLOT, 1, 2);
-    json_get_int(user_slot, obj, JSON_USER_SLOT, 1, 8);
-
-    QString str;
-    json_get_string(str, obj, JSON_FOSSIL);
-    auto iter = FOSSIL_MAP.find(str);
-    if (iter != FOSSIL_MAP.end()){
-        fossil = (Fossil)iter->second;
+void FossilGame::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
     }
 
-    json_get_int(revives, obj, JSON_REVIVES, 0, 965);
+    obj->read_integer(game_slot, JSON_GAME_SLOT, 1, 2);
+    obj->read_integer(user_slot, JSON_USER_SLOT, 1, 8);
+
+    const std::string* str = obj->get_string(JSON_FOSSIL);
+    if (str != nullptr){
+        auto iter = FOSSIL_MAP.find(QString::fromStdString(*str));
+        if (iter != FOSSIL_MAP.end()){
+            fossil = (Fossil)iter->second;
+        }
+    }
+
+    obj->read_integer(revives, JSON_REVIVES, 0, 965);
 }
-QJsonValue FossilGame::to_json() const{
-    QJsonObject obj;
-    obj.insert(JSON_GAME_SLOT, game_slot);
-    obj.insert(JSON_USER_SLOT, user_slot);
-    obj.insert(JSON_FOSSIL, FOSSIL_LIST[fossil]);
-    obj.insert(JSON_REVIVES, revives);
+JsonValue2 FossilGame::to_json() const{
+    JsonObject2 obj;
+    obj[JSON_GAME_SLOT] = game_slot;
+    obj[JSON_USER_SLOT] = user_slot;
+    obj[JSON_FOSSIL] = FOSSIL_LIST[fossil].toStdString();
+    obj[JSON_REVIVES] = revives;
     return obj;
 }
 std::unique_ptr<EditableTableRow> FossilGame::clone() const{

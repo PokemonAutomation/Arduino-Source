@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SwitchSystem.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
@@ -13,9 +14,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-const QString SwitchSystemFactory::JSON_SERIAL  = "Serial";
-const QString SwitchSystemFactory::JSON_CAMERA  = "Camera";
-const QString SwitchSystemFactory::JSON_AUDIO  = "Audio";
+const std::string SwitchSystemFactory::JSON_SERIAL  = "Serial";
+const std::string SwitchSystemFactory::JSON_CAMERA  = "Camera";
+const std::string SwitchSystemFactory::JSON_AUDIO   = "Audio";
 
 
 SwitchSystemFactory::SwitchSystemFactory(
@@ -35,7 +36,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
-    const QJsonValue& json
+    const JsonValue2& json
 )
     : SwitchSystemFactory(
           console_id,
@@ -45,19 +46,32 @@ SwitchSystemFactory::SwitchSystemFactory(
 {
     load_json(json);
 }
-void SwitchSystemFactory::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+void SwitchSystemFactory::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
 //    json_get_bool(m_settings_visible, obj, "SettingsVisible");
-    m_serial.load_json(json_get_value_nothrow(obj, JSON_SERIAL));
-    m_camera.load_json(json_get_value_nothrow(obj, JSON_CAMERA));
-    m_audio.load_json(json_get_value_nothrow(obj, JSON_AUDIO));
+    const JsonValue2* value;
+    value = obj->get_value(JSON_SERIAL);
+    if (value){
+        m_serial.load_json(*value);
+    }
+    value = obj->get_value(JSON_CAMERA);
+    if (value){
+        m_camera.load_json(*value);
+    }
+    value = obj->get_value(JSON_AUDIO);
+    if (value){
+        m_audio.load_json(*value);
+    }
 }
-QJsonValue SwitchSystemFactory::to_json() const{
-    QJsonObject root;
+JsonValue2 SwitchSystemFactory::to_json() const{
+    JsonObject2 root;
 //    root.insert("SettingsVisible", m_settings_visible);
-    root.insert(JSON_SERIAL, m_serial.to_json());
-    root.insert(JSON_CAMERA, m_camera.to_json());
-    root.insert(JSON_AUDIO, m_audio.to_json());
+    root[JSON_SERIAL] = m_serial.to_json();
+    root[JSON_CAMERA] = m_serial.to_json();
+    root[JSON_AUDIO] = m_serial.to_json();
     return root;
 }
 

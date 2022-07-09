@@ -12,12 +12,11 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{
 
-
+class JsonValue2;
 class PanelInstance;
 class PanelDescriptor;
 
@@ -87,8 +86,8 @@ public:
 public:
     //  Serialization
     void from_json();
-    virtual void from_json(const QJsonValue& json){}
-    virtual QJsonValue to_json() const;
+    virtual void from_json(const JsonValue2& json){}
+    virtual JsonValue2 to_json() const;
 
 protected:
     const PanelDescriptor& m_descriptor;

@@ -19,8 +19,8 @@ namespace PokemonSwSh{
 class MultiHostTableOption : public ConfigOption{
 public:
     MultiHostTableOption();
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     size_t size() const;
     const MultiHostSlot& operator[](size_t index) const;

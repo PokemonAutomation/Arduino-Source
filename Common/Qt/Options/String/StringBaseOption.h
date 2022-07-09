@@ -12,9 +12,9 @@
 #include <QString>
 #include "Common/Cpp/SpinLock.h"
 
-class QJsonValue;
-
 namespace PokemonAutomation{
+
+class JsonValue2;
 
 
 class StringBaseOption{
@@ -36,10 +36,10 @@ public:
 
     void restore_defaults();
 
-    void load_default(const QJsonValue& json);
-    void load_current(const QJsonValue& json);
-    QJsonValue write_default() const;
-    QJsonValue write_current() const;
+    void load_default(const JsonValue2& json);
+    void load_current(const JsonValue2& json);
+    JsonValue2 write_default() const;
+    JsonValue2 write_current() const;
 
 private:
     const QString m_label;

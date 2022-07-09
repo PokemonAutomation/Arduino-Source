@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "SimpleIntegerBaseOption.h"
 
 namespace PokemonAutomation{
@@ -48,32 +48,25 @@ void SimpleIntegerBaseOption<Type>::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
 }
 
+
 template <typename Type>
-void SimpleIntegerBaseOption<Type>::load_default(const QJsonValue& json){
-    if (!json.isDouble()){
-        return;
+void SimpleIntegerBaseOption<Type>::load_default(const JsonValue2& json){
+    json.read_integer(m_default, m_min_value, m_max_value);
+}
+template <typename Type>
+void SimpleIntegerBaseOption<Type>::load_current(const JsonValue2& json){
+    Type value;
+    if (json.read_integer(value, m_min_value, m_max_value)){
+        m_current.store(value, std::memory_order_relaxed);
     }
-    m_default = json.toInt();
-    m_default = std::max(m_default, m_min_value);
-    m_default = std::min(m_default, m_max_value);
 }
 template <typename Type>
-void SimpleIntegerBaseOption<Type>::load_current(const QJsonValue& json){
-    if (!json.isDouble()){
-        return;
-    }
-    Type current = json.toInt();
-    current = std::max(current, m_min_value);
-    current = std::min(current, m_max_value);
-    m_current.store(current, std::memory_order_relaxed);
+JsonValue2 SimpleIntegerBaseOption<Type>::write_default() const{
+    return m_default;
 }
 template <typename Type>
-QJsonValue SimpleIntegerBaseOption<Type>::write_default() const{
-    return QJsonValue((qint64)m_default);
-}
-template <typename Type>
-QJsonValue SimpleIntegerBaseOption<Type>::write_current() const{
-    return QJsonValue((qint64)m_current);
+JsonValue2 SimpleIntegerBaseOption<Type>::write_current() const{
+    return m_current.load(std::memory_order_relaxed);
 }
 
 template <typename Type>

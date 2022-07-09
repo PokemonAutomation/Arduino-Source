@@ -25,7 +25,7 @@ CaughtScreenActionOption::CaughtScreenActionOption(
         {
             "Stop Program",
             take_non_shiny
-                ? "Continue Running. (Take any shiny non-boss " + STRING_POKEMON + " along the way.)"
+                ? "Continue Running. (Take any shiny non-boss " + UTF8_STRING_POKEMON + " along the way.)"
                 : "Continue Running",
             !reset_if_high_winrate
                 ? "Reset Game"

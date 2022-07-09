@@ -23,9 +23,9 @@ NameSelectWidget::NameSelectWidget(
     const std::map<std::string, QIcon>& icons,
     const std::vector<std::string>& slugs,
     const std::string& current_slug,
-    const std::map<std::string, std::pair<QString, QIcon>>* extra_names,
+    const std::map<std::string, std::pair<std::string, QIcon>>* extra_names,
     const std::vector<std::string>* extra_name_list,
-    const std::map<QString, std::string>* extra_display_name_to_slug
+    const std::map<std::string, std::string>* extra_display_name_to_slug
 )
     : NoWheelComboBox(&parent)
     , m_extra_display_name_to_slug(extra_display_name_to_slug)
@@ -42,7 +42,7 @@ NameSelectWidget::NameSelectWidget(
     //  A more optimized version.
     QStringList list;
     for (const std::string& slug : slugs){
-        list.append(get_pokemon_name(slug).display_name());
+        list.append(QString::fromStdString(get_pokemon_name(slug).display_name()));
     }
     if (extra_names && extra_name_list){
         for(const std::string& slug : *extra_name_list){
@@ -50,7 +50,7 @@ NameSelectWidget::NameSelectWidget(
             if (it == extra_names->end()){
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Extra slug not found: " + slug);
             }
-            list.append(it->second.first);
+            list.append(QString::fromStdString(it->second.first));
         }
     }
     this->addItems(list);
@@ -113,7 +113,7 @@ NameSelectWidget::NameSelectWidget(
     update_size_cache();
 }
 std::string NameSelectWidget::slug() const{
-    QString current_text = currentText();
+    std::string current_text = currentText().toStdString();
     if (m_extra_display_name_to_slug){
         auto it = m_extra_display_name_to_slug->find(current_text);
         if (it != m_extra_display_name_to_slug->end()){

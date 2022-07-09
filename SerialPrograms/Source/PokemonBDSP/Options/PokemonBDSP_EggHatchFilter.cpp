@@ -6,7 +6,8 @@
 
 #include <QComboBox>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP_EggHatchFilter.h"
@@ -20,33 +21,33 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-const QString EggHatchAction_NAMES[] = {
+const std::string EggHatchAction_NAMES[] = {
     "Stop Program",
     "Keep",
 };
-const std::map<QString, EggHatchAction> EncounterAction_MAP{
+const std::map<std::string, EggHatchAction> EncounterAction_MAP{
     {EggHatchAction_NAMES[0], EggHatchAction::StopProgram},
     {EggHatchAction_NAMES[1], EggHatchAction::Keep},
 };
 
 
-const QString EggHatchShinyFilter_NAMES[] = {
+const std::string EggHatchShinyFilter_NAMES[] = {
     "Anything",
     "Not Shiny",
     "Shiny",
 };
-const std::map<QString, EggHatchShinyFilter> ShinyFilter_MAP{
+const std::map<std::string, EggHatchShinyFilter> ShinyFilter_MAP{
     {EggHatchShinyFilter_NAMES[0], EggHatchShinyFilter::Anything},
     {EggHatchShinyFilter_NAMES[1], EggHatchShinyFilter::NotShiny},
     {EggHatchShinyFilter_NAMES[2], EggHatchShinyFilter::Shiny},
 };
 
-const QString EggHatchGenderFilter_NAMES[] = {
+const std::string EggHatchGenderFilter_NAMES[] = {
     "Any",
     "Male",
     "Female",
 };
-const std::map<QString, EggHatchGenderFilter> GenderFilter_MAP{
+const std::map<std::string, EggHatchGenderFilter> GenderFilter_MAP{
     {EggHatchGenderFilter_NAMES[0], EggHatchGenderFilter::Any},
     {EggHatchGenderFilter_NAMES[1], EggHatchGenderFilter::Male},
     {EggHatchGenderFilter_NAMES[2], EggHatchGenderFilter::Female}
@@ -57,54 +58,62 @@ const std::map<QString, EggHatchGenderFilter> GenderFilter_MAP{
 EggHatchFilterRow::EggHatchFilterRow(EggHatchShinyFilter p_shiny)
     : shiny(p_shiny)
 {}
-void EggHatchFilterRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+void EggHatchFilterRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    const std::string* str;
     {
-        QString value;
-        if (json_get_string(value, obj, "Action")){
-            auto iter = EncounterAction_MAP.find(value);
+        str = obj->get_string("Action");
+        if (str!= nullptr){
+            auto iter = EncounterAction_MAP.find(*str);
             if (iter != EncounterAction_MAP.end()){
                 action = iter->second;
             }
         }
     }
     {
-        QString value;
-        if (json_get_string(value, obj, "Shininess")){
-            auto iter = ShinyFilter_MAP.find(value);
+        str = obj->get_string("Shininess");
+        if (str!= nullptr){
+            auto iter = ShinyFilter_MAP.find(*str);
             if (iter != ShinyFilter_MAP.end()){
                 shiny = iter->second;
             }
         }
     }
-    iv_hp = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-HP"));
-    iv_atk = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-Atk"));
-    iv_def = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-Def"));
-    iv_spatk = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-SpAtk"));
-    iv_spdef = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-SpDef"));
-    iv_speed = IVCheckerFilter_string_to_enum(json_get_string_nothrow(obj, "IV-Speed"));
+    str = obj->get_string("IV-HP");
+    if (str){ iv_hp     = IVCheckerFilter_string_to_enum(*str); }
+    str = obj->get_string("IV-Atk");
+    if (str){ iv_atk    = IVCheckerFilter_string_to_enum(*str); }
+    str = obj->get_string("IV-Def");
+    if (str){ iv_def    = IVCheckerFilter_string_to_enum(*str); }
+    str = obj->get_string("IV-SpAtk");
+    if (str){ iv_spatk  = IVCheckerFilter_string_to_enum(*str); }
+    str = obj->get_string("IV-SpDef");
+    if (str){ iv_spdef  = IVCheckerFilter_string_to_enum(*str); }
+    str = obj->get_string("IV-Speed");
+    if (str){ iv_speed  = IVCheckerFilter_string_to_enum(*str); }
 
-    {
-        QString value;
-        if (json_get_string(value, obj, "Gender")){
-            auto iter = GenderFilter_MAP.find(value);
-            if (iter != GenderFilter_MAP.end()){
-                gender = iter->second;
-            }
+    str = obj->get_string("Gender");
+    if (str != nullptr){
+        auto iter = GenderFilter_MAP.find(*str);
+        if (iter != GenderFilter_MAP.end()){
+            gender = iter->second;
         }
     }
 }
-QJsonValue EggHatchFilterRow::to_json() const{
-    QJsonObject obj;
-    obj.insert("Action", EggHatchAction_NAMES[(size_t)action]);
-    obj.insert("Shininess", EggHatchShinyFilter_NAMES[(size_t)shiny]);
-    obj.insert("IV-HP", IVCheckerFilter_enum_to_string(iv_hp));
-    obj.insert("IV-Atk", IVCheckerFilter_enum_to_string(iv_atk));
-    obj.insert("IV-Def", IVCheckerFilter_enum_to_string(iv_def));
-    obj.insert("IV-SpAtk", IVCheckerFilter_enum_to_string(iv_spatk));
-    obj.insert("IV-SpDef", IVCheckerFilter_enum_to_string(iv_spdef));
-    obj.insert("IV-Speed", IVCheckerFilter_enum_to_string(iv_speed));
-    obj.insert("Gender", EggHatchGenderFilter_NAMES[(size_t)gender]);
+JsonValue2 EggHatchFilterRow::to_json() const{
+    JsonObject2 obj;
+    obj["Action"] = EggHatchAction_NAMES[(size_t)action];
+    obj["Shininess"] = EggHatchShinyFilter_NAMES[(size_t)shiny];
+    obj["IV-HP"] = IVCheckerFilter_enum_to_string(iv_hp);
+    obj["IV-Atk"] = IVCheckerFilter_enum_to_string(iv_atk);
+    obj["IV-Def"] = IVCheckerFilter_enum_to_string(iv_def);
+    obj["IV-SpAtk"] = IVCheckerFilter_enum_to_string(iv_spatk);
+    obj["IV-SpDef"] = IVCheckerFilter_enum_to_string(iv_spdef);
+    obj["IV-Speed"] = IVCheckerFilter_enum_to_string(iv_speed);
+    obj["Gender"] = EggHatchGenderFilter_NAMES[(size_t)gender];
 
     return obj;
 }
@@ -126,8 +135,8 @@ std::vector<QWidget*> EggHatchFilterRow::make_widgets(QWidget& parent){
 }
 QWidget* EggHatchFilterRow::make_action_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(EggHatchAction_NAMES[0]);
-    box->addItem(EggHatchAction_NAMES[1]);
+    box->addItem(QString::fromStdString(EggHatchAction_NAMES[0]));
+    box->addItem(QString::fromStdString(EggHatchAction_NAMES[1]));
     box->setCurrentIndex((int)action);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -142,9 +151,9 @@ QWidget* EggHatchFilterRow::make_action_box(QWidget& parent){
 }
 QWidget* EggHatchFilterRow::make_shiny_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(EggHatchShinyFilter_NAMES[0]);
-    box->addItem(EggHatchShinyFilter_NAMES[1]);
-    box->addItem(EggHatchShinyFilter_NAMES[2]);
+    box->addItem(QString::fromStdString(EggHatchShinyFilter_NAMES[0]));
+    box->addItem(QString::fromStdString(EggHatchShinyFilter_NAMES[1]));
+    box->addItem(QString::fromStdString(EggHatchShinyFilter_NAMES[2]));
     box->setCurrentIndex((int)shiny);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -170,9 +179,9 @@ QWidget* EggHatchFilterRow::make_iv_box(QWidget& parent, IVCheckerFilter& iv){
 
 QWidget* EggHatchFilterRow::make_gender_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(EggHatchGenderFilter_NAMES[0]);
-    box->addItem(EggHatchGenderFilter_NAMES[1]);
-    box->addItem(EggHatchGenderFilter_NAMES[2]);
+    box->addItem(QString::fromStdString(EggHatchGenderFilter_NAMES[0]));
+    box->addItem(QString::fromStdString(EggHatchGenderFilter_NAMES[1]));
+    box->addItem(QString::fromStdString(EggHatchGenderFilter_NAMES[2]));
     box->setCurrentIndex((int)gender);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -215,10 +224,10 @@ EggHatchFilterOption::EggHatchFilterOption()
     )
 {}
 
-void EggHatchFilterOption::load_json(const QJsonValue& json){
+void EggHatchFilterOption::load_json(const JsonValue2& json){
     m_table.load_json(json);
 }
-QJsonValue EggHatchFilterOption::to_json() const{
+JsonValue2 EggHatchFilterOption::to_json() const{
     return m_table.to_json();
 }
 void EggHatchFilterOption::restore_defaults(){

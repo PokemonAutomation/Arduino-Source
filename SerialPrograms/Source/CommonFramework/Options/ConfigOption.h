@@ -13,6 +13,9 @@ class QWidget;
 
 namespace PokemonAutomation{
 
+class JsonValue2;
+class ConfigWidget;
+
 
 enum class ConfigOptionState{
     ENABLED,
@@ -20,8 +23,6 @@ enum class ConfigOptionState{
     HIDDEN,
 };
 
-
-class ConfigWidget;
 
 // An option of a program, like the number of boxes of eggs to hatch,
 // the number of frames to skip, or what type of pokeballs to throw.
@@ -32,8 +33,8 @@ class ConfigOption{
 public:
     virtual ~ConfigOption() = default;
 
-    virtual void load_json(const QJsonValue& json) = 0;
-    virtual QJsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue2& json) = 0;
+    virtual JsonValue2 to_json() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual QString check_validity() const;

@@ -4,10 +4,10 @@
  *
  */
 
-#include <QJsonValue>
 #include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QLabel>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "EnumDropdownOption.h"
 #include "EnumDropdownWidget.h"
@@ -30,7 +30,7 @@ EnumDropdownOption::EnumDropdownOption(
     size_t index = 0;
     for (auto iter = cases.begin(); iter != cases.end(); ++iter){
         m_case_list.emplace_back(*iter);
-        const QString& item = m_case_list.back().name;
+        const std::string& item = m_case_list.back().name;
         auto ret = m_case_map.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(item),
@@ -43,18 +43,18 @@ EnumDropdownOption::EnumDropdownOption(
 }
 
 
-void EnumDropdownOption::load_json(const QJsonValue& json){
-    if (!json.isString()){
+void EnumDropdownOption::load_json(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
-    QString str = json.toString();
-    auto iter = m_case_map.find(str);
+    auto iter = m_case_map.find(*str);
     if (iter != m_case_map.end() && m_case_list[iter->second].enabled){
         m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
-QJsonValue EnumDropdownOption::to_json() const{
-    return QJsonValue(m_case_list[m_current].name);
+JsonValue2 EnumDropdownOption::to_json() const{
+    return m_case_list[m_current].name;
 }
 
 void EnumDropdownOption::restore_defaults(){
@@ -81,7 +81,7 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
     layout->addWidget(m_box);
 
     for (const auto& item : m_value.m_case_list){
-        m_box->addItem(item.name);
+        m_box->addItem(QString::fromStdString(item.name));
         if (item.enabled){
             continue;
         }

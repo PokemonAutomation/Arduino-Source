@@ -5,8 +5,11 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Options/EditableTableWidget.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
+#include "CommonFramework/Options/EditableTableWidget.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
 #include <iostream>
@@ -59,12 +62,15 @@ const std::map<QString, PathAction> PathAction_MAP{
 
 TestPathMakerTableRow::TestPathMakerTableRow() {}
 
-void TestPathMakerTableRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+void TestPathMakerTableRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
     {
-        QString value;
-        if (json_get_string(value, obj, "Action")){
-            const auto iter = PathAction_MAP.find(value);
+        const std::string* str = obj->get_string("Action");
+        if (str != nullptr){
+            const auto iter = PathAction_MAP.find(QString::fromStdString(*str));
             if (iter != PathAction_MAP.end()){
                 action = iter->second;
             }
@@ -72,10 +78,10 @@ void TestPathMakerTableRow::load_json(const QJsonValue& json){
         switch(action){
         case PathAction::LEFT_JOYSTICK:
         case PathAction::RIGHT_JOYSTICK:
-            json_get_int(x_axis, obj, "MoveDirectionX");
-            json_get_int(y_axis, obj, "MoveDirectionY");
-            json_get_double(button_hold_ticks, obj, "Hold");
-            json_get_double(button_release_ticks, obj, "Release");
+            obj->read_integer(x_axis, "MoveDirectionX");
+            obj->read_integer(y_axis, "MoveDirectionY");
+            obj->read_integer(button_hold_ticks, "Hold");
+            obj->read_integer(button_release_ticks, "Release");
             break;
         case PathAction::B:
         case PathAction::A:
@@ -91,11 +97,11 @@ void TestPathMakerTableRow::load_json(const QJsonValue& json){
         case PathAction::DPADRIGHT:
         case PathAction::DPADUP:
         case PathAction::DPADDOWN:
-            json_get_double(button_hold_ticks, obj, "Hold");
-            json_get_double(button_release_ticks, obj, "Release");
+            obj->read_integer(button_hold_ticks, "Hold");
+            obj->read_integer(button_release_ticks, "Release");
             break;
         case PathAction::WAIT:
-            json_get_double(wait_ticks,obj,"Wait");
+            obj->read_integer(wait_ticks, "Wait");
         default:
             break;
         }
@@ -103,9 +109,9 @@ void TestPathMakerTableRow::load_json(const QJsonValue& json){
 
 }
 
-QJsonValue TestPathMakerTableRow::to_json() const{
-    QJsonObject obj;
-    obj.insert("Action", PathAction_NAMES[(size_t)action]);
+JsonValue2 TestPathMakerTableRow::to_json() const{
+    JsonObject2 obj;
+    obj["Action"] = PathAction_NAMES[(size_t)action].toStdString();
     switch(action){
     case PathAction::B:
     case PathAction::A:
@@ -121,18 +127,18 @@ QJsonValue TestPathMakerTableRow::to_json() const{
     case PathAction::DPADRIGHT:
     case PathAction::DPADUP:
     case PathAction::DPADDOWN:
-        obj.insert("Hold", button_hold_ticks);
-        obj.insert("Release", button_release_ticks);
+        obj["Hold"] = button_hold_ticks;
+        obj["Release"] = button_release_ticks;
         break;
     case PathAction::LEFT_JOYSTICK:
     case PathAction::RIGHT_JOYSTICK:
-        obj.insert("MoveDirectionX", x_axis);
-        obj.insert("MoveDirectionY", y_axis);
-        obj.insert("Hold", button_hold_ticks);
-        obj.insert("Release", button_release_ticks);
+        obj["MoveDirectionX"] = x_axis;
+        obj["MoveDirectionY"] = y_axis;
+        obj["Hold"] = button_hold_ticks;
+        obj["Release"] = button_release_ticks;
         break;
     case PathAction::WAIT:
-        obj.insert("Wait", wait_ticks);
+        obj["Wait"] = wait_ticks;
         break;
     default:
         break;
@@ -194,8 +200,8 @@ ActionParameterWidget::ActionParameterWidget(QWidget& parent, TestPathMakerTable
     m_axis_y_value->setMaximumWidth(80);
 
     m_wait_start_label = new QLabel("Wait for:");
-    m_wait_value = make_double_table_cell(*this, m_row.wait_ticks, -1.0, 100.0);
-    m_wait_end_label = new QLabel("seconds.");
+    m_wait_value = make_integer_table_cell<uint16_t>(*this, m_row.wait_ticks);
+    m_wait_end_label = new QLabel("ticks.");
 
     m_layout->addWidget(m_axis_x_label);
     m_layout->addWidget(m_axis_x_value);
@@ -367,7 +373,7 @@ public:
                     return;
                 }
                 QJsonValue obj = json_get_value_nothrow(root, "TEST_PATH_MAKER_TABLE");
-                value.load_json(obj);
+                value.load_json(from_QJson(obj));
                 if (m_table_widget == nullptr){
                     QMessageBox box;
                     box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
@@ -382,9 +388,10 @@ public:
             std::cout << "Save TestPath from " << path.toStdString() << std::endl;
             if (path.size() > 0){
                 try{
-                    QJsonObject root;
-                    root.insert("TEST_PATH_MAKER_TABLE", value.to_json());
-                    write_json_file(path, QJsonDocument(root));
+                    JsonObject2 root;
+                    root["TEST_PATH_MAKER_TABLE"] = value.to_json();
+                    QJsonObject obj = to_QJson(std::move(root)).toObject();
+                    write_json_file(path, QJsonDocument(obj));
                 }catch (FileException&){
                     QMessageBox box;
                     box.critical(nullptr, "Error", "Failed to save to file: " + path);

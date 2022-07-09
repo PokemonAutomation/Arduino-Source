@@ -7,6 +7,7 @@
 #include <QJsonValue>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
 #include "TimeExpressionBaseOption.h"
@@ -69,30 +70,32 @@ QString TimeExpressionBaseOption<Type>::time_string() const{
 }
 
 template <typename Type>
-void TimeExpressionBaseOption<Type>::load_default(const QJsonValue& json){
-    if (!json.isString()){
+void TimeExpressionBaseOption<Type>::load_default(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
-    m_default = json.toString();
+    m_default = QString::fromStdString(*str);
     m_error = process(m_current, m_value);
 }
 template <typename Type>
-void TimeExpressionBaseOption<Type>::load_current(const QJsonValue& json){
-    if (!json.isString()){
+void TimeExpressionBaseOption<Type>::load_current(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = json.toString();
+    m_current = QString::fromStdString(*str);
     m_error = process(m_current, m_value);
 }
 template <typename Type>
-QJsonValue TimeExpressionBaseOption<Type>::write_default() const{
-    return QJsonValue(m_default);
+JsonValue2 TimeExpressionBaseOption<Type>::write_default() const{
+    return m_default.toStdString();
 }
 template <typename Type>
-QJsonValue TimeExpressionBaseOption<Type>::write_current() const{
+JsonValue2 TimeExpressionBaseOption<Type>::write_current() const{
     SpinLockGuard lg(m_lock);
-    return QJsonValue(m_current);
+    return m_current.toStdString();
 }
 
 template <typename Type>

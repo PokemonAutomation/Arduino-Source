@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/String/StringBaseWidget.h"
 #include "StringOption.h"
 
@@ -27,10 +27,10 @@ StringOption::StringOption(
 {}
 
 
-void StringOption::load_json(const QJsonValue& json){
+void StringOption::load_json(const JsonValue2& json){
     load_current(json);
 }
-QJsonValue StringOption::to_json() const{
+JsonValue2 StringOption::to_json() const{
     return write_current();
 }
 

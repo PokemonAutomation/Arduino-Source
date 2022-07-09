@@ -13,10 +13,10 @@ namespace Pokemon{
 IVCheckerFilterWidget::IVCheckerFilterWidget(QWidget& parent, IVCheckerFilter current)
     : NoWheelComboBox(&parent)
 {
-    QString current_str = IVCheckerFilter_enum_to_string(current);
+    const std::string& current_str = IVCheckerFilter_enum_to_string(current);
     for (size_t index = 0; index < IVCheckerFilter_NAMES.size(); index++){
-        const QString& str = IVCheckerFilter_NAMES[index];
-        this->addItem(str);
+        const std::string& str = IVCheckerFilter_NAMES[index];
+        this->addItem(QString::fromStdString(str));
         if (str == current_str){
             this->setCurrentIndex((int)index);
         }

@@ -4,49 +4,60 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CameraSelector.h"
 #include "CameraSelectorWidget.h"
 
 namespace PokemonAutomation{
 
 
-const QString CameraSelector::JSON_CAMERA       = "Device";
-const QString CameraSelector::JSON_RESOLUTION   = "Resolution";
+const std::string CameraSelector::JSON_CAMERA       = "Device";
+const std::string CameraSelector::JSON_RESOLUTION   = "Resolution";
 
 
 CameraSelector::CameraSelector(QSize default_resolution)
     : m_default_resolution(default_resolution)
     , m_current_resolution(default_resolution)
 {}
-CameraSelector::CameraSelector(QSize default_resolution, const QJsonValue& json)
+CameraSelector::CameraSelector(QSize default_resolution, const JsonValue2& json)
     : CameraSelector(default_resolution)
 {
     load_json(json);
 }
 
-void CameraSelector::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    QString name;
-    if (!json_get_string(name, obj, JSON_CAMERA)){
+void CameraSelector::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
         return;
     }
-    m_camera = CameraInfo(name.toStdString());
-    QJsonArray res = json_get_array_nothrow(obj, JSON_RESOLUTION);
-    if (res.size() == 2 && res[0].isDouble() && res[1].isDouble()){
-        m_current_resolution = QSize(res[0].toInt(), res[1].toInt());
+    const std::string* name = obj->get_string(JSON_CAMERA);
+    if (name != nullptr){
+        m_camera = CameraInfo(*name);
+    }
+    const JsonArray2* res = obj->get_array(JSON_RESOLUTION);
+    if (res != nullptr && res->size() == 2){
+        do{
+            int width, height;
+            if (!(*res)[0].read_integer(width)){
+                break;
+            }
+            if (!(*res)[1].read_integer(height)){
+                break;
+            }
+            m_current_resolution = QSize(width, height);
+        }while (false);
     }
 }
-QJsonValue CameraSelector::to_json() const{
-    QJsonObject root;
-    root.insert(JSON_CAMERA, QString::fromStdString(m_camera.device_name()));
-    QJsonArray res;
-    res += m_current_resolution.width();
-    res += m_current_resolution.height();
-    root.insert(JSON_RESOLUTION, res);
+JsonValue2 CameraSelector::to_json() const{
+    JsonObject2 root;
+    root[JSON_CAMERA] = m_camera.device_name();
+    JsonArray2 res;
+    res.push_back(m_current_resolution.width());
+    res.push_back(m_current_resolution.height());
+    root[JSON_RESOLUTION] = std::move(res);
     return root;
 }
 

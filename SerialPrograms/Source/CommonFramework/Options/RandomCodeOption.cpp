@@ -5,14 +5,13 @@
  */
 
 #include <time.h>
-#include <QJsonObject>
 #include <QIntValidator>
 #include <QHBoxLayout>
-#include <QJsonValue>
 #include <QLabel>
 #include <QLineEdit>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCodeOption.h"
 
@@ -103,16 +102,23 @@ RandomCodeOption::RandomCodeOption(QString label, size_t random_digits, QString 
     , m_default(random_digits, std::move(code_string))
     , m_current(m_default)
 {}
-void RandomCodeOption::load_json(const QJsonValue& json){
-    QJsonObject root = json.toObject();
-    json_get_int(m_current.m_random_digits, root, "RandomDigits");
-    json_get_string(m_current.m_code, root, "RaidCode");
+void RandomCodeOption::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_integer(m_current.m_random_digits, "RandomDigits");
+
+    std::string code;
+    if (obj->read_string(code, "RaidCode")){
+        m_current.m_code = QString::fromStdString(code);
+    }
 }
-QJsonValue RandomCodeOption::to_json() const{
-    QJsonObject root;
-    root.insert("RandomDigits", (int)m_current.m_random_digits);
-    root.insert("RaidCode", m_current.m_code);
-    return root;
+JsonValue2 RandomCodeOption::to_json() const{
+    JsonObject2 obj;
+    obj["RandomDigits"] = m_current.m_random_digits;
+    obj["RaidCode"] = m_current.m_code.toStdString();
+    return obj;
 }
 
 bool RandomCodeOption::code_enabled() const{

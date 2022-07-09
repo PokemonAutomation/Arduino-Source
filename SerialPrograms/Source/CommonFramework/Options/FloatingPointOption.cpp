@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h"
 #include "FloatingPointOption.h"
 
@@ -21,10 +21,10 @@ FloatingPointOption::FloatingPointOption(
     : FloatingPointBaseOption(std::move(label), min_value, max_value, default_value)
 {}
 
-void FloatingPointOption::load_json(const QJsonValue& json){
+void FloatingPointOption::load_json(const JsonValue2& json){
     return this->load_current(json);
 }
-QJsonValue FloatingPointOption::to_json() const{
+JsonValue2 FloatingPointOption::to_json() const{
     return this->write_current();
 }
 

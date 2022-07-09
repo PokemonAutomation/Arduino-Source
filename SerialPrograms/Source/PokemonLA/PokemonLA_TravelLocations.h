@@ -48,7 +48,7 @@ public:
 
     const TravelLocation* get_from_name(const std::string& name) const;
 
-    std::vector<QString> all_location_names() const;
+    std::vector<std::string> all_location_names() const;
 
 
 public:

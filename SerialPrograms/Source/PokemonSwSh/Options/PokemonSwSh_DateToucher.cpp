@@ -5,6 +5,7 @@
  */
 
 #include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateToucher.h"
@@ -35,10 +36,10 @@ TouchDateIntervalOption::TouchDateIntervalOption()
 }
 
 
-void TouchDateIntervalOption::load_json(const QJsonValue& json){
+void TouchDateIntervalOption::load_json(const JsonValue2& json){
     m_hours.load_json(json);
 }
-QJsonValue TouchDateIntervalOption::to_json() const{
+JsonValue2 TouchDateIntervalOption::to_json() const{
     return m_hours.to_json();
 }
 QString TouchDateIntervalOption::check_validity() const{

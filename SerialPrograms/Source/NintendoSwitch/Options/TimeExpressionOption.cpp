@@ -4,7 +4,7 @@
  *
  */
 
-#include <QJsonValue>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h"
 #include "TimeExpressionOption.h"
 
@@ -42,11 +42,11 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 {}
 
 template <typename Type>
-void TimeExpressionOption<Type>::load_json(const QJsonValue& json){
+void TimeExpressionOption<Type>::load_json(const JsonValue2& json){
     this->load_current(json);
 }
 template <typename Type>
-QJsonValue TimeExpressionOption<Type>::to_json() const{
+JsonValue2 TimeExpressionOption<Type>::to_json() const{
     return this->write_current();
 }
 

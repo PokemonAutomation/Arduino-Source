@@ -5,7 +5,8 @@
  */
 
 #include <QJsonObject>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -46,22 +47,36 @@ ProcessorLevelOption::ProcessorLevelOption()
 {
     set_global();
 }
-void ProcessorLevelOption::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    QString processor_string = QString::fromStdString(get_processor_name());
+void ProcessorLevelOption::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+//    QJsonObject obj = json.toObject();
+    std::string processor_string = get_processor_name();
     global_logger_tagged().log("Processor String: " + processor_string);
-    if (processor_string == json_get_string_nothrow(obj, "ProcessorString")){
+
+    const std::string* saved_string = obj->get_string("ProcessorString");
+    if (saved_string == nullptr){
+        global_logger_tagged().log("No processor string saved.", COLOR_RED);
+        return;
+    }
+
+    if (processor_string == *saved_string){
         global_logger_tagged().log("Processor string matches. Using stored processor level.", COLOR_BLUE);
-        EnumDropdownOption::load_json(json_get_value_nothrow(obj, "Level"));
+        const JsonValue2* value = obj->get_value("Level");
+        if (value){
+            EnumDropdownOption::load_json(*value);
+        }
         set_global();
     }else{
         global_logger_tagged().log("Mismatched processor string. Will not load saved processor level.", COLOR_RED);
     }
 }
-QJsonValue ProcessorLevelOption::to_json() const{
-    QJsonObject obj;
-    obj.insert("Level", EnumDropdownOption::to_json());
-    obj.insert("ProcessorString", QString::fromStdString(get_processor_name()));
+JsonValue2 ProcessorLevelOption::to_json() const{
+    JsonObject2 obj;
+    obj["Level"] = EnumDropdownOption::to_json();
+    obj["ProcessorString"] = get_processor_name();
     return obj;
 }
 void ProcessorLevelOption::set_global(){

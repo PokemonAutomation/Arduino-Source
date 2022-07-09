@@ -24,7 +24,7 @@ struct PokeballNameDatabase{
     static const std::string NULL_SLUG;
     std::vector<std::string> ordered_list;
     std::map<std::string, PokeballNames> database;
-    std::map<QString, std::string> reverse_lookup;
+    std::map<std::string, std::string> reverse_lookup;
 };
 const std::string PokeballNameDatabase::NULL_SLUG;
 
@@ -58,7 +58,7 @@ PokeballNameDatabase::PokeballNameDatabase(){
             );
         }
 
-        QString display_name = iter1->toString();
+        std::string display_name = iter1->toString().toStdString();
         database[slug].m_display_name = display_name;
         reverse_lookup[display_name] = slug;
     }
@@ -72,16 +72,16 @@ const PokeballNames& get_pokeball_name(const std::string& slug){
     }
     return iter->second;
 }
-const std::string& parse_pokeball_name(const QString& display_name){
-    const std::map<QString, std::string>& database = PokeballNameDatabase::instance().reverse_lookup;
+const std::string& parse_pokeball_name(const std::string& display_name){
+    const std::map<std::string, std::string>& database = PokeballNameDatabase::instance().reverse_lookup;
     auto iter = database.find(display_name);
     if (iter == database.end()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Pokeball name not found in database: " + display_name.toStdString());
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Pokeball name not found in database: " + display_name);
     }
     return iter->second;
 }
-const std::string& parse_pokeball_name_nothrow(const QString& display_name){
-    const std::map<QString, std::string>& database = PokeballNameDatabase::instance().reverse_lookup;
+const std::string& parse_pokeball_name_nothrow(const std::string& display_name){
+    const std::map<std::string, std::string>& database = PokeballNameDatabase::instance().reverse_lookup;
     auto iter = database.find(display_name);
     if (iter == database.end()){
         return PokeballNameDatabase::NULL_SLUG;

@@ -31,7 +31,7 @@ namespace PokemonAutomation{
 
 
 
-bool set_priority_by_name(const QString& name){
+bool set_priority_by_name(const std::string& name){
     int index = priority_name_to_index(name);
     return set_priority_by_index(index);
 }

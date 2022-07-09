@@ -54,7 +54,7 @@ QString pokemon_to_string(const EncounterResult& pokemon){
     if (pokemon.slug_candidates.empty()){
         str = "Unable to detect.";
     }else if (pokemon.slug_candidates.size() == 1){
-        str += get_pokemon_name(*pokemon.slug_candidates.begin()).display_name();
+        str += QString::fromStdString(get_pokemon_name(*pokemon.slug_candidates.begin()).display_name());
     }else{
         str += "Ambiguous: ";
         bool first1 = true;
@@ -63,7 +63,7 @@ QString pokemon_to_string(const EncounterResult& pokemon){
                 str += ", ";
             }
             first1 = false;
-            str += get_pokemon_name(slug).display_name();
+            str += QString::fromStdString(get_pokemon_name(slug).display_name());
         }
     }
     return str;
@@ -213,7 +213,7 @@ void send_catch_notification(
         if (pokemon_slugs->empty()){
             str = "None - Unable to detect.";
         }else if (pokemon_slugs->size() == 1){
-            str += get_pokemon_name(*pokemon_slugs->begin()).display_name();
+            str += QString::fromStdString(get_pokemon_name(*pokemon_slugs->begin()).display_name());
         }else{
             str += "Ambiguous: ";
             bool first = true;
@@ -222,24 +222,24 @@ void send_catch_notification(
                     str += ", ";
                 }
                 first = false;
-                str += get_pokemon_name(slug).display_name();
+                str += QString::fromStdString(get_pokemon_name(slug).display_name());
             }
         }
         embeds.emplace_back("Species", std::move(str));
     }
     {
-        QString str;
+        std::string str;
         if (balls_used >= 0){
-            str += QString::number(balls_used);
+            str += std::to_string(balls_used);
         }
         if (!ball_slug.empty()){
-            if (!str.isEmpty()){
+            if (!str.empty()){
                 str += " x ";
             }
             str += get_pokeball_name(ball_slug).display_name();
         }
-        if (!str.isEmpty()){
-            embeds.emplace_back("Balls Used", std::move(str));
+        if (!str.empty()){
+            embeds.emplace_back("Balls Used", QString::fromStdString(str));
         }
     }
 

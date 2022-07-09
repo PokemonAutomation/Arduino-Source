@@ -22,6 +22,10 @@ win32-msvc{
 
 SOURCES += \
     ../Common/Cpp/Exceptions.cpp \
+    ../Common/Cpp/Json/JsonArray.cpp \
+    ../Common/Cpp/Json/JsonObject.cpp \
+    ../Common/Cpp/Json/JsonTools.cpp \
+    ../Common/Cpp/Json/JsonValue.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
@@ -74,6 +78,10 @@ SOURCES += \
 
 HEADERS += \
     ../Common/Cpp/Exceptions.h \
+    ../Common/Cpp/Json/JsonArray.h \
+    ../Common/Cpp/Json/JsonObject.h \
+    ../Common/Cpp/Json/JsonTools.h \
+    ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \

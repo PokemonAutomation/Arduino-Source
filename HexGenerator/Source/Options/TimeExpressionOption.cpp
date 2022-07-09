@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Tools/Tools.h"
@@ -42,7 +44,7 @@ TimeExpression::TimeExpression(const QJsonObject& obj)
         json_get_string_throw(obj, JSON_DEFAULT)
     )
 {
-    load_current(json_get_string_throw(obj, JSON_CURRENT));
+    load_current(from_QJson(json_get_string_throw(obj, JSON_CURRENT)));
 }
 
 QString TimeExpression::check_validity() const{
@@ -55,8 +57,8 @@ QJsonObject TimeExpression::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
     root.insert(JSON_MIN_VALUE, QJsonValue((qint64)min()));
     root.insert(JSON_MAX_VALUE, QJsonValue((qint64)max()));
-    root.insert(JSON_DEFAULT, write_default());
-    root.insert(JSON_CURRENT, write_current());
+    root.insert(JSON_DEFAULT, to_QJson(write_default()));
+    root.insert(JSON_CURRENT, to_QJson(write_current()));
     return root;
 }
 std::string TimeExpression::to_cpp() const{

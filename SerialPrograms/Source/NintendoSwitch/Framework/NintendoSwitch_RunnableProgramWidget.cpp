@@ -211,6 +211,21 @@ void RunnableSwitchProgramWidget::run_program(){
             m_current_stats.get(),
             m_historical_stats.get()
         );
+    }catch (...){
+        m_logger.log("Program stopped with an exception!", COLOR_RED);
+        emit signal_error("Unknown error.");
+        send_program_fatal_error_notification(
+            m_logger, instance.NOTIFICATION_ERROR_FATAL,
+            ProgramInfo(
+                instance.descriptor().identifier(),
+                instance.descriptor().category(),
+                instance.descriptor().display_name(),
+                timestamp()
+            ),
+            "Unknown rrror.",
+            m_current_stats.get(),
+            m_historical_stats.get()
+        );
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);

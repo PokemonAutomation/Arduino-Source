@@ -12,7 +12,7 @@
 #include <QString>
 #include "Common/Cpp/SpinLock.h"
 
-class QJsonValue;
+class JsonValue2;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,10 +37,10 @@ public:
     QString text() const;
     QString time_string() const;
 
-    void load_default(const QJsonValue& json);
-    void load_current(const QJsonValue& json);
-    QJsonValue write_default() const;
-    QJsonValue write_current() const;
+    void load_default(const JsonValue2& json);
+    void load_current(const JsonValue2& json);
+    JsonValue2 write_default() const;
+    JsonValue2 write_current() const;
 
     Type min() const{ return m_min_value; }
     Type max() const{ return m_max_value; }

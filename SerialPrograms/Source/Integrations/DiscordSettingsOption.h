@@ -43,7 +43,7 @@ inline ConfigWidget* DiscordMessageSettingsOption::make_ui(QWidget& parent){
 class DiscordSettingsOption : public BatchOption{
 public:
     DiscordSettingsOption();
-    virtual void load_json(const QJsonValue& json) override;
+//    virtual void load_json(const JsonValueRef& json) override;
 
     DiscordMessageSettingsOption message;
     DiscordWebhookSettingsOption webhooks;

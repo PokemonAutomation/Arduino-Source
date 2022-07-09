@@ -7,7 +7,9 @@
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLineEdit>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "DiscordIntegrationTable.h"
 
@@ -22,34 +24,53 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     , allow_commands(true)
 {}
 
-void DiscordIntegrationChannel::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    json_get_bool(enabled, obj, "Enabled");
-    json_get_string(label, obj, "Label");
-    json_get_bool(ping, obj, "Ping");
-    QJsonArray array = json_get_array_nothrow(obj, "Tags");
-    json_get_bool(allow_commands, obj, "Commands");
-    tags.clear();
-    for (const auto& tag : array){
-        QString token = EventNotificationSettings::sanitize_tag(tag.toString());
-        if (!token.isEmpty()){
-            tags.emplace_back(std::move(token));
+void DiscordIntegrationChannel::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_boolean(enabled, "Enabled");
+    {
+        std::string str;
+        if (obj->read_string(str, "Label")){
+            label = QString::fromStdString(str);
         }
     }
-    json_get_string(channel_id, obj, "Channel");
-}
-QJsonValue DiscordIntegrationChannel::to_json() const{
-    QJsonObject obj;
-    obj["Enabled"] = enabled;
-    obj["Label"] = label;
-    obj["Ping"] = ping;
-    QJsonArray array;
-    for (const QString& tag : tags){
-        array.append(tag);
+    obj->read_boolean(ping, "Label");
+    const JsonArray2* array = obj->get_array("Tags");
+    if (array != nullptr){
+        tags.clear();
+        for (const auto& tag : *array){
+            const std::string* str = tag.get_string();
+            if (str == nullptr){
+                continue;
+            }
+            QString token = EventNotificationSettings::sanitize_tag(QString::fromStdString(*str));
+            if (!token.isEmpty()){
+                tags.emplace_back(std::move(token));
+            }
+        }
     }
-    obj.insert("Tags", array);
+    obj->read_boolean(allow_commands, "Commands");
+    {
+        std::string str;
+        if (obj->read_string(str, "Channel")){
+            channel_id = QString::fromStdString(str);
+        }
+    }
+}
+JsonValue2 DiscordIntegrationChannel::to_json() const{
+    JsonObject2 obj;
+    obj["Enabled"] = enabled;
+    obj["Label"] = label.toStdString();
+    obj["Ping"] = ping;
+    JsonArray2 array;
+    for (const QString& tag : tags){
+        array.push_back(tag.toStdString());
+    }
+    obj["Tags"] = std::move(array);
     obj["Commands"] = allow_commands;
-    obj["Channel"] = channel_id;
+    obj["Channel"] = channel_id.toStdString();
     return obj;
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
@@ -171,7 +192,7 @@ DiscordIntegrationTable::DiscordIntegrationTable()
         *this
     )
 {}
-void DiscordIntegrationTable::load_json(const QJsonValue& json){
+void DiscordIntegrationTable::load_json(const JsonValue2& json){
     EditableTableOption::load_json(json);
     if (size() == 0){
         std::unique_ptr<DiscordIntegrationChannel> row;

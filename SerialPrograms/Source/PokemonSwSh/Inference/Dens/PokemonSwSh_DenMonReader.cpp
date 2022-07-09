@@ -121,7 +121,7 @@ DenMonSelectData::DenMonSelectData(){
     m_list.emplace_back("(none)", QIcon());
     for (const auto& item : all_pokemon_sprites()){
         m_list.emplace_back(
-            QString::fromStdString(item.first),
+            item.first,
             item.second.icon()
         );
     }

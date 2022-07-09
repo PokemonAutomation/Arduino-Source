@@ -6,11 +6,11 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QHeaderView>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
@@ -26,11 +26,11 @@ namespace MaxLairInternal{
 
 
 
-const QString BossAction_NAMES[] = {
+const std::string BossAction_NAMES[] = {
     "Always stop program.",
     "Stop if shiny.",
 };
-const std::map<QString, BossAction> BossAction_MAP{
+const std::map<std::string, BossAction> BossAction_MAP{
     {BossAction_NAMES[0], BossAction::CATCH_AND_STOP_PROGRAM},
     {BossAction_NAMES[1], BossAction::CATCH_AND_STOP_IF_SHINY},
 };
@@ -45,30 +45,37 @@ BossActionOption::BossActionOption()
     }
 }
 
-void BossActionOption::load_json(const QJsonValue& json){
+void BossActionOption::load_json(const JsonValue2& json){
+    const JsonArray2* array = json.get_array();
+    if (array == nullptr){
+        return;
+    }
     std::map<std::string, BossFilter> map;
-    for (const auto& item : json.toArray()){
-        QJsonObject obj = item.toObject();
-        QString slug;
-        json_get_string(slug, obj, "Slug");
-        QString action_str;
+    for (const auto& item : *array){
+        const JsonObject2* obj = item.get_object();
+        if (obj == nullptr){
+            continue;
+        }
+        const std::string* slug = obj->get_string("Slug");
+        if (slug == nullptr){
+            continue;
+        }
+        const std::string* action_str = obj->get_string("Action");
+        if (action_str == nullptr){
+            continue;
+        }
+        const std::string* ball = obj->get_string("Ball");
+        if (ball == nullptr){
+            continue;
+        }
         BossAction action = BossAction::CATCH_AND_STOP_IF_SHINY;
-        json_get_string(action_str, obj, "Action");
-        auto iter = BossAction_MAP.find(action_str);
+        auto iter = BossAction_MAP.find(*action_str);
         if (iter != BossAction_MAP.end()){
             action = iter->second;
         }
-        QString ball;
-        json_get_string(ball, obj, "Ball");
-
-        std::string slug_str = slug.toStdString();
         map.emplace(
-            slug_str,
-            BossFilter{
-                slug_str,
-                action,
-                ball.toStdString()
-            }
+            *slug,
+            BossFilter{*slug, action, *ball}
         );
     }
     for (BossFilter& filter : m_list){
@@ -79,14 +86,14 @@ void BossActionOption::load_json(const QJsonValue& json){
         filter = iter->second;
     }
 }
-QJsonValue BossActionOption::to_json() const{
-    QJsonArray array;
+JsonValue2 BossActionOption::to_json() const{
+    JsonArray2 array;
     for (const auto& item : m_list){
-        QJsonObject obj;
-        obj.insert("Slug", QString::fromStdString(item.slug));
-        obj.insert("Action", BossAction_NAMES[(size_t)item.action]);
-        obj.insert("Ball", QString::fromStdString(item.ball));
-        array.append(obj);
+        JsonObject2 obj;
+        obj["Slug"] = item.slug;
+        obj["Action"] = BossAction_NAMES[(size_t)item.action];
+        obj["Ball"] = item.ball;
+        array.push_back(std::move(obj));
     }
     return array;
 }
@@ -148,8 +155,8 @@ void BossActionWidget::redraw_table(){
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
         const QIcon& icon = get_pokemon_sprite(sprite_slug).icon();
-        const QString& display_name = get_pokemon_name(name_slug).display_name();
-        QTableWidgetItem* icon_item = new QTableWidgetItem(icon, display_name);
+        const std::string& display_name = get_pokemon_name(name_slug).display_name();
+        QTableWidgetItem* icon_item = new QTableWidgetItem(icon, QString::fromStdString(display_name));
 //        icon_item->setIcon(icon);
         m_table->setItem(c, 0, icon_item);
 
@@ -164,8 +171,8 @@ void BossActionWidget::redraw_table(){
 
 QComboBox* BossActionWidget::make_action_box(QWidget& parent, int row, BallSelectWidget& ball_select, BossAction action){
     QComboBox* box = new NoWheelComboBox(&parent);
-    for (const QString& name : BossAction_NAMES){
-        box->addItem(name);
+    for (const std::string& name : BossAction_NAMES){
+        box->addItem(QString::fromStdString(name));
     }
     box->setCurrentIndex((int)action);
 

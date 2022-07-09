@@ -10,14 +10,12 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
 
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{
 
+class JsonValue2;
 class AudioDisplayWidget;
-
-
 class AudioSelectorWidget;
 
 // Handles the state of audio: the audio source.
@@ -27,11 +25,11 @@ class AudioSelectorWidget;
 // TODO: if needed, can add state of FFT parameters (FFT length, sliding
 // window step, etc.) here.
 class AudioSelector{
-    static const QString JSON_INPUT_DEVICE;
-    static const QString JSON_INPUT_FORMAT;
-    static const QString JSON_OUTPUT_DEVICE;
-    static const QString JSON_AUDIO_VIS;
-    static const QString JSON_AUDIO_VOLUME;
+    static const std::string JSON_INPUT_DEVICE;
+    static const std::string JSON_INPUT_FORMAT;
+    static const std::string JSON_OUTPUT_DEVICE;
+    static const std::string JSON_AUDIO_VIS;
+    static const std::string JSON_AUDIO_VOLUME;
 
 public:
     enum class AudioDisplayType{
@@ -43,10 +41,10 @@ public:
     static std::string audioDisplayTypeToString(AudioDisplayType type);
 
     AudioSelector();
-    AudioSelector(const QJsonValue& json);
+    AudioSelector(const JsonValue2& json);
 
-    void load_json(const QJsonValue& json);
-    QJsonValue to_json() const;
+    void load_json(const JsonValue2& json);
+    JsonValue2 to_json() const;
 
     AudioSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, AudioDisplayWidget& holder);
 

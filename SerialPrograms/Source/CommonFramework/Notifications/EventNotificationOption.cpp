@@ -5,12 +5,10 @@
  */
 
 #include <QStringList>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "EventNotificationOption.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 
@@ -50,49 +48,51 @@ std::vector<QString> EventNotificationSettings::parse_tags(const QString& str){
 
 
 
-void EventNotificationSettings::load_json(bool enable_screenshot, const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    if (obj.empty()){
+void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
         return;
     }
-    json_get_bool(enabled, obj, "Enabled");
-    json_get_bool(ping, obj, "Ping");
+    obj->read_boolean(enabled, "Enabled");
+    obj->read_boolean(ping, "Ping");
     if (enable_screenshot){
-        ScreenshotOption screenshot_option("");
-        screenshot_option.load_json(json_get_value_nothrow(obj, "Screenshot"));
-        screenshot = screenshot_option;
+        const JsonValue2* value = obj->get_value("Screenshot");
+        if (value){
+            ScreenshotOption screenshot_option("");
+            screenshot_option.load_json(*value);
+            screenshot = screenshot_option;
+        }
     }
-    QJsonArray array = json_get_array_nothrow(obj, "Tags");
-    if (!array.empty()){
+    const JsonArray2* array = obj->get_array("Tags");
+    if (array){
         tags.clear();
-        for (const auto& tag : array){
-            QString token = sanitize_tag(tag.toString());
-            if (!token.isEmpty()){
-//                cout << token.toStdString() << endl;
-                tags.emplace_back(std::move(token));
+        for (const auto& tag : *array){
+            const std::string* token = tag.get_string();
+            if (token){
+                tags.emplace_back(QString::fromStdString(*token));
             }
         }
     }
     int rate_limit_seconds = 0;
-    json_get_int(rate_limit_seconds, obj, "RateLimitSeconds");
+    obj->read_integer(rate_limit_seconds, "RateLimitSeconds");
     rate_limit = std::chrono::seconds(rate_limit_seconds);
 }
-QJsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
-    QJsonObject obj;
-    obj.insert("Enabled", enabled);
-    obj.insert("Ping", ping);
+JsonValue2 EventNotificationSettings::to_json(bool enable_screenshot) const{
+    JsonObject2 obj;
+    obj["Enabled"] = enabled;
+    obj["Ping"] = ping;
     if (enable_screenshot){
         ScreenshotOption screenshot_option("");
         screenshot_option = screenshot;
-        obj.insert("Screenshot", screenshot_option.to_json());
+        obj["Screenshot"] = screenshot_option.to_json();
     }
-    QJsonArray array;
+    JsonArray2 array;
     for (const QString& tag : tags){
 //        cout << tag.toStdString() << endl;
-        array.append(tag);
+        array.push_back(tag.toStdString());
     }
-    obj.insert("Tags", array);
-    obj.insert("RateLimitSeconds", (qint64)rate_limit.count());
+    obj["Tags"] = std::move(array);
+    obj["RateLimitSeconds"] = rate_limit.count();
     return obj;
 }
 
@@ -152,10 +152,10 @@ EventNotificationOption::EventNotificationOption(
 }
 
 
-void EventNotificationOption::load_json(const QJsonValue& json){
+void EventNotificationOption::load_json(const JsonValue2& json){
     m_current.load_json(screenshot_supported, json);
 }
-QJsonValue EventNotificationOption::to_json() const{
+JsonValue2 EventNotificationOption::to_json() const{
     return m_current.to_json(screenshot_supported);
 }
 void EventNotificationOption::restore_defaults(){

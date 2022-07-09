@@ -7,7 +7,9 @@
 #include <iostream>
 #include <set>
 #include <QCryptographicHash>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -49,19 +51,20 @@ PreloadSettings& PreloadSettings::instance(){
     static PreloadSettings settings;
     return settings;
 }
-void PreloadSettings::load(const QJsonValue& json){
-    const QJsonObject obj = json.toObject();
+void PreloadSettings::load(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
 
     //  Naughty mode.
-    json_get_bool(NAUGHTY_MODE, obj, "NAUGHTY_MODE");
+    obj->read_boolean(NAUGHTY_MODE, "NAUGHTY_MODE");
 
     //  Developer mode stuff.
-    QString dev_token;
-    json_get_string(dev_token, obj, "DEVELOPER_TOKEN");
-    {
-        std::string token = dev_token.toStdString();
+    const std::string* dev_token = obj->get_string("DEVELOPER_TOKEN");
+    if (dev_token){
         QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
-        hash.addData(token.c_str(), (int)token.size());
+        hash.addData(dev_token->c_str(), (int)dev_token->size());
         DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
     }
 }
@@ -176,8 +179,11 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 }
 
-void GlobalSettings::load_json(const QJsonValue& json){
-    const QJsonObject obj = json.toObject();
+void GlobalSettings::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
 
     PreloadSettings::instance().load(json);
 
@@ -194,29 +200,36 @@ void GlobalSettings::load_json(const QJsonValue& json){
 
     COMMAND_LINE_TEST_LIST.clear();
     COMMAND_LINE_IGNORE_LIST.clear();
-    const QJsonObject command_line_tests_setting = json_get_object_nothrow(obj, "COMMAND_LINE_TESTS");
-    if (!command_line_tests_setting.isEmpty()){
-        json_get_bool(COMMAND_LINE_TEST_MODE, command_line_tests_setting, "RUN");
+    const JsonObject2* command_line_tests_setting = obj->get_object("COMMAND_LINE_TESTS");
+    if (command_line_tests_setting){
+        command_line_tests_setting->read_boolean(COMMAND_LINE_TEST_MODE, "RUN");
 
-        QString folder;
-        if (json_get_string(folder, command_line_tests_setting, "FOLDER")){
-            COMMAND_LINE_TEST_FOLDER = folder.toStdString();
-        } else{
+        if (!command_line_tests_setting->read_string(COMMAND_LINE_TEST_FOLDER, "FOLDER")){
             COMMAND_LINE_TEST_FOLDER = "CommandLineTests";
         }
 
-        const QJsonArray test_list = json_get_array_nothrow(command_line_tests_setting, "TEST_LIST");
-        for(const auto& value: test_list){
-            const std::string test_name = value.toString().toStdString();
-            if (test_name.size() > 0){
-                COMMAND_LINE_TEST_LIST.emplace_back(std::move(test_name));
+        const JsonArray2* test_list = command_line_tests_setting->get_array("TEST_LIST");
+        if (test_list){
+            for (const auto& value: *test_list){
+                if (!value.is_string()){
+                    continue;
+                }
+                const std::string* test_name = value.get_string();
+                if (test_name != nullptr && !test_name->empty()){
+                    COMMAND_LINE_TEST_LIST.emplace_back(*test_name);
+                }
             }
         }
-        const QJsonArray ignore_list = json_get_array_nothrow(command_line_tests_setting, "IGNORE_LIST");
-        for(const auto& value: ignore_list){
-            const std::string test_name = value.toString().toStdString();
-            if (test_name.size() > 0){
-                COMMAND_LINE_IGNORE_LIST.emplace_back(std::move(test_name));
+        const JsonArray2* ignore_list = command_line_tests_setting->get_array("IGNORE_LIST");
+        if (ignore_list){
+            for (const auto& value: *ignore_list){
+                if (!value.is_string()){
+                    continue;
+                }
+                const std::string* test_name = value.get_string();
+                if (test_name != nullptr && !test_name->empty()){
+                    COMMAND_LINE_IGNORE_LIST.emplace_back(*test_name);
+                }
             }
         }
 
@@ -239,31 +252,31 @@ void GlobalSettings::load_json(const QJsonValue& json){
 }
 
 
-QJsonValue GlobalSettings::to_json() const{
-    QJsonObject obj = BatchOption::to_json().toObject();
-    obj.insert("NAUGHTY_MODE", PreloadSettings::instance().NAUGHTY_MODE);
+JsonValue2 GlobalSettings::to_json() const{
+    JsonObject2 obj = std::move(*BatchOption::to_json().get_object());
+    obj["NAUGHTY_MODE"] = PreloadSettings::instance().NAUGHTY_MODE;
 
-    QJsonObject command_line_test_obj;
-    command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));
-    command_line_test_obj.insert("FOLDER", QJsonValue(QString::fromStdString(COMMAND_LINE_TEST_FOLDER)));
+    JsonObject2 command_line_test_obj;
+    command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
+    command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
 
     {
-        QJsonArray test_list;
+        JsonArray2 test_list;
         for(const auto& name : COMMAND_LINE_TEST_LIST){
-            test_list.append(QJsonValue(name.c_str()));
+            test_list.push_back(name);
         }
-        command_line_test_obj.insert("TEST_LIST", test_list);
+        command_line_test_obj["TEST_LIST"] = std::move(test_list);
     }
 
     {
-        QJsonArray ignore_list;
+        JsonArray2 ignore_list;
         for(const auto& name : COMMAND_LINE_IGNORE_LIST){
-            ignore_list.append(QJsonValue(name.c_str()));
+            ignore_list.push_back(name);
         }
-        command_line_test_obj.insert("IGNORE_LIST", ignore_list);
+        command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);
     }
 
-    obj.insert("COMMAND_LINE_TESTS", command_line_test_obj);
+    obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
 
     return obj;
 }

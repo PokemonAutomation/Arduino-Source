@@ -93,7 +93,7 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
     : SingleSwitchProgramInstance(descriptor)
     , OPPONENT(
         "<b>Opponent:</b>",
-        std::vector<QString>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
+        std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
         0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

@@ -36,12 +36,12 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
 
         m_shininess = new NoWheelComboBox(this);
         hbox->addWidget(m_shininess);
-        for (const QString& item : ShinyFilter_NAMES){
-            m_shininess->addItem(item);
+        for (const std::string& item : ShinyFilter_NAMES){
+            m_shininess->addItem(QString::fromStdString(item));
         }
         ShinyFilter current = m_value.m_shiny_filter_current.load(std::memory_order_acquire);
         for (int c = 0; c < m_shininess->count(); c++){
-            if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
+            if (m_shininess->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
                 m_shininess->setCurrentIndex(c);
                 break;
             }
@@ -53,10 +53,10 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
                     return;
                 }
 
-                QString text = m_shininess->itemText(index);
+                std::string text = m_shininess->itemText(index).toStdString();
                 auto iter = ShinyFilter_MAP.find(text);
                 if (iter == ShinyFilter_MAP.end()){
-                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text);
                 }
                 m_value.m_shiny_filter_current.store(iter->second, std::memory_order_release);
             }
@@ -76,7 +76,7 @@ void EncounterFilterWidget::restore_defaults(){
 void EncounterFilterWidget::update_ui(){
     ShinyFilter current = m_value.m_shiny_filter_current.load(std::memory_order_acquire);
     for (int c = 0; c < m_shininess->count(); c++){
-        if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
+        if (m_shininess->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
             m_shininess->setCurrentIndex(c);
             break;
         }

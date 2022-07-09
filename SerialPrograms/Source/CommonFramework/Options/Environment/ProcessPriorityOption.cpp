@@ -52,8 +52,8 @@ ConfigWidget* ProcessPriorityOption::make_ui(QWidget& parent){
 
 
 
-std::vector<QString> make_thread_priority_list(){
-    std::vector<QString> ret;
+std::vector<std::string> make_thread_priority_list(){
+    std::vector<std::string> ret;
     for (int priority = THREAD_PRIORITY_MIN; priority <= THREAD_PRIORITY_MAX; priority++){
         ret.emplace_back(thread_priority_name(priority));
     }
@@ -62,7 +62,8 @@ std::vector<QString> make_thread_priority_list(){
 ThreadPriorityOption::ThreadPriorityOption(QString label, int default_priority)
     : EnumDropdownOption(
         std::move(label),
-        make_thread_priority_list(), clip_priority(default_priority) - THREAD_PRIORITY_MIN
+        make_thread_priority_list(),
+        clip_priority(default_priority) - THREAD_PRIORITY_MIN
     )
 {}
 void ThreadPriorityOption::set_on_this_thread() const{

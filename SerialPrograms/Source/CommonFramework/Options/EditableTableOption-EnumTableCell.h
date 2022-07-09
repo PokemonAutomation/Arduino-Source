@@ -22,11 +22,11 @@ namespace PokemonAutomation{
 // Pass the member var of EditableTableRow as `value` so that user editing this UI widget in a table
 // row changes the value of the EditableTableRow automatically.
 // T must be an enum that is based on int starting at 0.
-template<typename T> QWidget* make_enum_table_cell(QWidget& parent, size_t num_enum_names, const QString* enum_names, T& value){
+template<typename T> QWidget* make_enum_table_cell(QWidget& parent, size_t num_enum_names, const std::string* enum_names, T& value){
     QComboBox* box = new NoWheelComboBox(&parent);
 //    box->setContentsMargins(0, 0, 0, 0);
     for(size_t i = 0; i < num_enum_names; i++){
-        box->addItem(enum_names[i]);
+        box->addItem(QString::fromStdString(enum_names[i]));
     }
     box->setCurrentIndex((int)value);
     box->connect(

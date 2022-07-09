@@ -7,7 +7,9 @@
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLineEdit>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "DiscordWebhookSettings.h"
 
@@ -22,38 +24,51 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     , tags({"Notifs", "Showcase", "LiveHost"})
 {}
 
-void DiscordWebhookUrl::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    json_get_bool(enabled, obj, "Enabled");
-    json_get_string(label, obj, "Label");
-    json_get_bool(ping, obj, "Ping");
-    QJsonArray array = json_get_array_nothrow(obj, "Tags");
-    tags.clear();
-    for (const auto& tag : array){
-        QString token = EventNotificationSettings::sanitize_tag(tag.toString());
-        if (!token.isEmpty()){
-            tags.emplace_back(std::move(token));
+void DiscordWebhookUrl::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_boolean(enabled, "Enabled");
+    {
+        std::string str;
+        if (obj->read_string(str, "Label")){
+            label = QString::fromStdString(str);
         }
     }
-#if 0
-    if (tags.empty()){
-        tags.emplace_back("Notifs");
-        tags.emplace_back("Showcase");
+    obj->read_boolean(ping, "Ping");
+    const JsonArray2* array = obj->get_array("Tags");
+    if (array){
+        tags.clear();
+        for (const auto& tag : *array){
+            const std::string* str = tag.get_string();
+            if (str == nullptr){
+                continue;
+            }
+            QString token = EventNotificationSettings::sanitize_tag(QString::fromStdString(*str));
+            if (!token.isEmpty()){
+                tags.emplace_back(std::move(token));
+            }
+        }
     }
-#endif
-    json_get_string(url, obj, "URL");
+    {
+        std::string str;
+        if (obj->read_string(str, "URL")){
+            url = QString::fromStdString(str);
+        }
+    }
 }
-QJsonValue DiscordWebhookUrl::to_json() const{
-    QJsonObject obj;
+JsonValue2 DiscordWebhookUrl::to_json() const{
+    JsonObject2 obj;
     obj["Enabled"] = enabled;
-    obj["Label"] = label;
+    obj["Label"] = label.toStdString();
     obj["Ping"] = ping;
-    QJsonArray array;
+    JsonArray2 array;
     for (const QString& tag : tags){
-        array.append(tag);
+        array.push_back(tag.toStdString());
     }
-    obj.insert("Tags", array);
-    obj["URL"] = url;
+    obj["Tags"] = std::move(array);
+    obj["URL"] = url.toStdString();
     return obj;
 }
 std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{

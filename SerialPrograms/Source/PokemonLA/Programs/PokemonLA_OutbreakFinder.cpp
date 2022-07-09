@@ -41,7 +41,7 @@ Pokemon::ExtraNames load_mmo_names(){
         "icelands-mmo"
     };
 
-    const QString display_names[5] = {
+    const std::string display_names[5] = {
         "Fieldlands MMO",
         "Mirelands MMO",
         "Coastlands MMO",

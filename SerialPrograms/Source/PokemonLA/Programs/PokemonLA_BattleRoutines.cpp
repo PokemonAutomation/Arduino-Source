@@ -87,7 +87,7 @@ void use_move_blindly(ConsoleHandle& console, BotBaseContext& context, MoveStyle
     if (style == MoveStyle::Agile){
         // Agile style
         pbf_press_button(context, BUTTON_L, 10, 125);
-    } else if (style == MoveStyle::Strong){
+    }else if (style == MoveStyle::Strong){
         // Strong style
         pbf_press_button(context, BUTTON_R, 10, 125);
     }
@@ -95,8 +95,10 @@ void use_move_blindly(ConsoleHandle& console, BotBaseContext& context, MoveStyle
     // Use the move
     pbf_press_button(context, BUTTON_A, 10, 125);
 
-    console.log("Using pokemon " + QString::number(cur_pokemon) + " move " + QString::number(cur_move) + 
-        " style " + MoveStyle_NAMES[(int)style]);
+    console.log(
+        "Using pokemon " + std::to_string(cur_pokemon) + " move " + std::to_string(cur_move) +
+        " style " + MoveStyle_NAMES[(int)style]
+    );
 
     pbf_wait(context, 1 * TICKS_PER_SECOND);
     context.wait_for_all_requests();

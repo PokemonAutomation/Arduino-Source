@@ -42,8 +42,8 @@ const TravelLocation* TravelLocations::get_from_name(const std::string& name) co
     }
     return nullptr;
 }
-std::vector<QString> TravelLocations::all_location_names() const{
-    std::vector<QString> ret;
+std::vector<std::string> TravelLocations::all_location_names() const{
+    std::vector<std::string> ret;
     for (const TravelLocation* item : m_list){
         ret.emplace_back(item->label);
     }

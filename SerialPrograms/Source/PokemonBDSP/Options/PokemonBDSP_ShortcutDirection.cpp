@@ -12,9 +12,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-namespace{
-std::vector<QString> buildShortcutValues(bool required){
-    std::vector<QString> values;
+std::vector<std::string> buildShortcutValues(bool required){
+    std::vector<std::string> values;
     if (!required){
         values.emplace_back("None");
     }
@@ -24,14 +23,15 @@ std::vector<QString> buildShortcutValues(bool required){
     values.emplace_back("Left");
     return values;
 }
-}
+
 
 ShortcutDirection::ShortcutDirection(QString label, bool required)
     : EnumDropdownOption(
         std::move(label),
         buildShortcutValues(required),
         0
-    ), m_required(required)
+    )
+    , m_required(required)
 {}
 
 void ShortcutDirection::run(BotBaseContext& context, uint16_t delay){

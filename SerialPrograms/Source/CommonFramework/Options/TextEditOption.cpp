@@ -4,10 +4,11 @@
  *
  */
 
-#include <QJsonValue>
+#include <QStyle>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTextEdit>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "TextEditOption.h"
 
 namespace PokemonAutomation{
@@ -52,13 +53,17 @@ void TextEditOption::set(QString x){
 }
 
 
-void TextEditOption::load_json(const QJsonValue& json){
+void TextEditOption::load_json(const JsonValue2& json){
+    const std::string* str = json.get_string();
+    if (str == nullptr){
+        return;
+    }
     SpinLockGuard lg(m_lock);
-    m_current = json.toString();
+    m_current = QString::fromStdString(*str);
 }
-QJsonValue TextEditOption::to_json() const{
+JsonValue2 TextEditOption::to_json() const{
     SpinLockGuard lg(m_lock);
-    return m_current;
+    return m_current.toStdString();
 }
 void TextEditOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
@@ -82,6 +87,23 @@ public:
         this->setAcceptRichText(false);
         this->setFocusPolicy(Qt::StrongFocus);
         this->setPlaceholderText(parent.m_value.placeholder_text());
+
+//        QPalette palette = this->palette();
+//        palette.setColor(QPalette::Text, "blue");
+//        palette.setColor(QPalette::PlaceholderText, "red");
+//        this->setPalette(palette);
+
+//        QColor default_color = this->textColor();
+
+#if 0
+        connect(
+            this, &QTextEdit::textChanged,
+            [=]{
+                style()->polish(this);
+            }
+        );
+#endif
+
 //        this->hide();
     }
 

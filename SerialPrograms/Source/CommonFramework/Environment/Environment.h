@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <QString>
 #include <QThread>
 #include "Common/Cpp/CpuId/CpuId.h"
 
@@ -18,10 +17,10 @@ namespace PokemonAutomation{
 
 
 extern const int DEFAULT_PRIORITY_INDEX;
-extern const std::vector<QString> PRIORITY_MODES;
-int priority_name_to_index(const QString& name);
+extern const std::vector<std::string> PRIORITY_MODES;
+int priority_name_to_index(const std::string& name);
 bool set_priority_by_index(int index);
-bool set_priority_by_name(const QString& name);
+bool set_priority_by_name(const std::string& name);
 int read_priority_index();
 
 

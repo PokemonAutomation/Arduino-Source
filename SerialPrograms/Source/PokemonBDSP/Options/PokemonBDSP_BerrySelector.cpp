@@ -7,7 +7,8 @@
 #include <QComboBox>
 #include <QString>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Pokemon/Options/Pokemon_BerrySelectWidget.h"
 #include "Pokemon/Resources/Pokemon_BerryNames.h"
 #include "PokemonBDSP_BerrySelector.h"
@@ -22,15 +23,16 @@ BerrySelectorRow::BerrySelectorRow()
 {
     berry_slug = BERRY_SLUGS()[0];
 }
-void BerrySelectorRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    QString value;
-    json_get_string(value, obj, "Berry");
-    berry_slug = value.toStdString();
+void BerrySelectorRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_string(berry_slug, "Berry");
 }
-QJsonValue BerrySelectorRow::to_json() const{
-    QJsonObject obj;
-    obj.insert("Berry", QString::fromStdString(berry_slug));
+JsonValue2 BerrySelectorRow::to_json() const{
+    JsonObject2 obj;
+    obj["Berry"] = berry_slug;
     return obj;
 }
 std::unique_ptr<EditableTableRow> BerrySelectorRow::clone() const{
@@ -78,10 +80,10 @@ BerrySelectorOption::BerrySelectorOption(QString label)
     )
 {}
 
-void BerrySelectorOption::load_json(const QJsonValue& json){
+void BerrySelectorOption::load_json(const JsonValue2& json){
     m_table.load_json(json);
 }
-QJsonValue BerrySelectorOption::to_json() const{
+JsonValue2 BerrySelectorOption::to_json() const{
     return m_table.to_json();
 }
 void BerrySelectorOption::restore_defaults(){

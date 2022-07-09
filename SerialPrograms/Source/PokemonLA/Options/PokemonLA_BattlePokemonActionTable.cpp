@@ -6,7 +6,8 @@
 
 
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "CommonFramework/Options/EnumDropdownWidget.h"
@@ -23,12 +24,12 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const QString MoveStyle_NAMES[] = {
+const std::string MoveStyle_NAMES[] = {
     "No Style",
     "Agile",
     "Strong",
 };
-const std::map<QString, MoveStyle> MoveStyle_MAP{
+const std::map<std::string, MoveStyle> MoveStyle_MAP{
     {MoveStyle_NAMES[0], MoveStyle::NoStyle},
     {MoveStyle_NAMES[1], MoveStyle::Agile},
     {MoveStyle_NAMES[2], MoveStyle::Strong},
@@ -37,36 +38,39 @@ const std::map<QString, MoveStyle> MoveStyle_MAP{
 
 BattlePokemonActionRow::BattlePokemonActionRow() {}
 
-void BattlePokemonActionRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+void BattlePokemonActionRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
     {
-        QString value;
+        const std::string* str;
         for(int i = 0; i < 4; i++){
-            if (json_get_string(value, obj, "Style" + QString::number(i))){
-                const auto iter = MoveStyle_MAP.find(value);
-                if (iter != MoveStyle_MAP.end()){
-                    style[i] = iter->second;
-                }
+            str = obj->get_string("Style" + std::to_string(i));
+            if (str == nullptr){
+                continue;
+            }
+            const auto iter = MoveStyle_MAP.find(*str);
+            if (iter != MoveStyle_MAP.end()){
+                style[i] = iter->second;
             }
         }
     }
-
-    json_get_bool(switch_pokemon, obj, "Switch");
-    json_get_int(num_turns_to_switch, obj, "Turns", 0);
-    json_get_bool(stop_after_num_moves, obj, "StopAfterNumMoves");
-    json_get_int(num_moves_to_stop, obj, "NumMovesToStop", 0);
+    obj->read_boolean(switch_pokemon, "Switch");
+    obj->read_integer(num_turns_to_switch, "Turns", 0, 65535);
+    obj->read_boolean(stop_after_num_moves, "StopAfterNumMoves");
+    obj->read_integer(num_moves_to_stop, "NumMovesToStop", 0, 65535);
 }
-
-QJsonValue BattlePokemonActionRow::to_json() const{
-    QJsonObject obj;
+JsonValue2 BattlePokemonActionRow::to_json() const{
+    JsonObject2 obj;
     for(int i = 0; i < 4; i++){
-        obj.insert("Style"+QString::number(i), MoveStyle_NAMES[(size_t)style[i]]);
+        obj["Style" + std::to_string(i)] = MoveStyle_NAMES[(size_t)style[i]];
     }
     
-    obj.insert("Switch", switch_pokemon);
-    obj.insert("Turns", num_turns_to_switch);
-    obj.insert("StopAfterNumMoves", stop_after_num_moves);
-    obj.insert("NumMovesToStop", num_moves_to_stop);
+    obj["Switch"] = switch_pokemon;
+    obj["Turns"] = num_turns_to_switch;
+    obj["StopAfterNumMoves"] = stop_after_num_moves;
+    obj["NumMovesToStop"] = num_moves_to_stop;
     return obj;
 }
 
@@ -123,11 +127,11 @@ BattlePokemonActionTable::BattlePokemonActionTable()
     )
 {}
 
-void BattlePokemonActionTable::load_json(const QJsonValue& json){
+void BattlePokemonActionTable::load_json(const JsonValue2& json){
     m_table.load_json(json);
 }
 
-QJsonValue BattlePokemonActionTable::to_json() const{
+JsonValue2 BattlePokemonActionTable::to_json() const{
     return m_table.to_json();
 }
 
@@ -170,22 +174,23 @@ bool BattlePokemonActionTable::stop_battle(size_t pokemon, size_t num_move_attem
 
 OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow() {}
 
-void OneMoveBattlePokemonActionRow::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
-    {
-        QString value;
-        if (json_get_string(value, obj, "Style")){
-            const auto iter = MoveStyle_MAP.find(value);
-            if (iter != MoveStyle_MAP.end()){
-                style = iter->second;
-            }
+void OneMoveBattlePokemonActionRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    const std::string* str = obj->get_string("Style");
+    if (str != nullptr){
+        const auto iter = MoveStyle_MAP.find(*str);
+        if (iter != MoveStyle_MAP.end()){
+            style = iter->second;
         }
     }
 }
 
-QJsonValue OneMoveBattlePokemonActionRow::to_json() const{
-    QJsonObject obj;
-    obj.insert("Style", MoveStyle_NAMES[(size_t)style]);
+JsonValue2 OneMoveBattlePokemonActionRow::to_json() const{
+    JsonObject2 obj;
+    obj["Style"] = MoveStyle_NAMES[(size_t)style];
     return obj;
 }
 
@@ -230,11 +235,11 @@ OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
     )
 {}
 
-void OneMoveBattlePokemonActionTable::load_json(const QJsonValue& json){
+void OneMoveBattlePokemonActionTable::load_json(const JsonValue2& json){
     m_table.load_json(json);
 }
 
-QJsonValue OneMoveBattlePokemonActionTable::to_json() const{
+JsonValue2 OneMoveBattlePokemonActionTable::to_json() const{
     return m_table.to_json();
 }
 
@@ -252,71 +257,68 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 }
 
 
-const QString MoveIndex_NAMES[] = {
+const std::string MoveIndex_NAMES[] = {
     "First move",
     "Second move",
     "Third move",
     "Fourth move",
 };
 
-void MoveGrinderActionRow::load_json(const QJsonValue& json)
-{
-    QJsonObject obj = json.toObject();
-    json_get_int(pokemon_index, obj, "PokemonIndex", 0);
-    json_get_int(move_index, obj, "MoveIndex", 0);
+void MoveGrinderActionRow::load_json(const JsonValue2& json){
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+    obj->read_integer(pokemon_index, "PokemonIndex", 0, 5);
+    obj->read_integer(move_index, "MoveIndex", 0, 3);
     {
-        QString value;
-        if (json_get_string(value, obj, "Style")) {
-            const auto iter = MoveStyle_MAP.find(value);
+        const std::string* str = obj->get_string("Style");
+        if (str != nullptr){
+            const auto iter = MoveStyle_MAP.find(*str);
             if (iter != MoveStyle_MAP.end()) {
                 style = iter->second;
             }
         }
     }
-    json_get_int(attemps, obj, "Attempts", 0);
+    obj->read_integer(attempts, "Attempts", 0, 65535);
 }
 
-QJsonValue MoveGrinderActionRow::to_json() const
-{
-    QJsonObject obj;
-    obj.insert("PokemonIndex", static_cast<uint16_t>(pokemon_index));
-    obj.insert("MoveIndex", static_cast<uint16_t>(move_index));
-    obj.insert("Style", MoveStyle_NAMES[(size_t)style]);
-    obj.insert("Attempts", attemps);
+JsonValue2 MoveGrinderActionRow::to_json() const{
+    JsonObject2 obj;
+    obj["PokemonIndex"] = static_cast<uint16_t>(pokemon_index);
+    obj["MoveIndex"] = static_cast<uint16_t>(move_index);
+    obj["Style"] = MoveStyle_NAMES[(size_t)style];
+    obj["Attempts"] = attempts;
     return obj;
 }
 
-std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const
-{
+std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
     return std::unique_ptr<EditableTableRow>(new MoveGrinderActionRow(*this));
 }
 
-std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent)
-{
-    const QString PokemonIndex_NAMES[] = {
-        "First " + STRING_POKEMON,
-        "Second " + STRING_POKEMON,
-        "Third " + STRING_POKEMON,
-        "Fourth " + STRING_POKEMON,
+std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent){
+    const std::string PokemonIndex_NAMES[] = {
+        "First " + UTF8_STRING_POKEMON,
+        "Second " + UTF8_STRING_POKEMON,
+        "Third " + UTF8_STRING_POKEMON,
+        "Fourth " + UTF8_STRING_POKEMON,
     };
 
     std::vector<QWidget*> widgets;
     widgets.emplace_back(make_enum_table_cell(parent, 4, PokemonIndex_NAMES, pokemon_index));
     widgets.emplace_back(make_enum_table_cell(parent, 4, MoveIndex_NAMES, move_index));
     widgets.emplace_back(make_enum_table_cell(parent, MoveStyle_MAP.size(), MoveStyle_NAMES, style));
-    widgets.emplace_back(make_integer_table_cell(parent, attemps));
+    widgets.emplace_back(make_integer_table_cell(parent, attempts));
     return widgets;
 }
 
-QStringList MoveGrinderActionTableFactory::make_header() const
-{
+QStringList MoveGrinderActionTableFactory::make_header() const{
     QStringList list;
     list << "Pokemon index" << "Move index" << "Move Style" << "Move Attempts";
     return list;
 }
 
-std::unique_ptr<EditableTableRow> MoveGrinderActionTableFactory::make_row() const
-{
+std::unique_ptr<EditableTableRow> MoveGrinderActionTableFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new MoveGrinderActionRow());
 }
 
@@ -324,35 +326,30 @@ MoveGrinderActionTable::MoveGrinderActionTable()
     : m_table("For every move you want to perform, input the style and the number of attemps you want to achieve.", m_factory)
 {}
 
-Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const
-{
+Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{
     // Pokemon index 4 is gonna be Arceus with powerful moves, just use them with normal style and hope you'll win the battle
-    if (pokemon == 4)
-    {
-        return {MoveStyle::NoStyle, std::numeric_limits<decltype(Move::attemps)>::max()};
+    if (pokemon == 4){
+        return {MoveStyle::NoStyle, std::numeric_limits<decltype(Move::attempts)>::max()};
 
     }
-    for (size_t i = 0; i < m_table.size(); ++i)
-    {
+    for (size_t i = 0; i < m_table.size(); ++i){
         const MoveGrinderActionRow& action = static_cast<const MoveGrinderActionRow&>(m_table[i]);
-        if (action.pokemon_index != pokemon)
-        {
+        if (action.pokemon_index != pokemon){
             continue;
         }
-        if (action.move_index != move)
-        {
+        if (action.move_index != move){
             continue;
         }
-        return {action.style , action.attemps};
+        return {action.style , action.attempts};
     }
     return {MoveStyle::NoStyle, 0};
 }
 
-void MoveGrinderActionTable::load_json(const QJsonValue& json) {
+void MoveGrinderActionTable::load_json(const JsonValue2& json) {
     m_table.load_json(json);
 }
 
-QJsonValue MoveGrinderActionTable::to_json() const {
+JsonValue2 MoveGrinderActionTable::to_json() const {
     return m_table.to_json();
 }
 

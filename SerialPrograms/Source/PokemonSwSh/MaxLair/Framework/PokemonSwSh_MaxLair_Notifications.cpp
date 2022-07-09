@@ -22,7 +22,7 @@ namespace MaxLairInternal{
 using namespace Pokemon;
 
 
-QString pokemon_name(const std::string& slug, const QString& empty_string){
+std::string pokemon_name(const std::string& slug, const std::string& empty_string){
     if (slug.empty()){
         return empty_string;
     }
@@ -37,7 +37,7 @@ void send_status_notification(
     QString status_str = "Status:\n";
     std::vector<std::pair<QString, QString>> embeds;
     {
-        QString str = pokemon_name(runtime.last_boss, "N/A");
+        QString str = QString::fromStdString(pokemon_name(runtime.last_boss, "N/A"));
         status_str += "Last Boss: " + str + "\n";
         embeds.emplace_back("Last Boss", std::move(str));
     }
@@ -99,7 +99,7 @@ void send_raid_notification(
 
     embeds.emplace_back(
         "Current " + STRING_POKEMON,
-        pokemon_name(slug, "Unable to detect.")
+        QString::fromStdString(pokemon_name(slug, "Unable to detect."))
     );
 
     {
@@ -164,7 +164,7 @@ void send_shiny_notification(
 //                str += get_pokemon_name(*slugs->begin()).display_name();
             const PokemonNames* names = get_pokemon_name_nothrow(*slugs->begin());
             if (names){
-                str += names->display_name();
+                str += QString::fromStdString(names->display_name());
             }else{
                 str += QString::fromStdString(*slugs->begin());
             }
@@ -179,7 +179,7 @@ void send_shiny_notification(
 //                    str += get_pokemon_name(slug).display_name();
                 const PokemonNames* names = get_pokemon_name_nothrow(slug);
                 if (names){
-                    str += names->display_name();
+                    str += QString::fromStdString(names->display_name());
                 }else{
                     str += QString::fromStdString(slug);
                 }

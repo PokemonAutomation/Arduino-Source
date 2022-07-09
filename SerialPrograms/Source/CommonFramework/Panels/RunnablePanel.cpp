@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "RunnablePanel.h"
 
@@ -33,10 +33,10 @@ std::unique_ptr<StatsTracker> RunnablePanelInstance::make_stats() const{
     return nullptr;
 }
 
-void RunnablePanelInstance::from_json(const QJsonValue& json){
+void RunnablePanelInstance::from_json(const JsonValue2& json){
     m_options.load_json(json);
 }
-QJsonValue RunnablePanelInstance::to_json() const{
+JsonValue2 RunnablePanelInstance::to_json() const{
     return m_options.to_json();
 }
 

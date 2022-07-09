@@ -35,8 +35,8 @@ public:
     using SimpleIntegerBaseOption<Type>::get;
     using SimpleIntegerBaseOption<Type>::set;
 
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
+    virtual void load_json(const JsonValue2& json) override;
+    virtual JsonValue2 to_json() const override;
 
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;

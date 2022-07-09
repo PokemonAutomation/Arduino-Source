@@ -17,7 +17,7 @@ class ThemeSelectorOption : public EnumDropdownOption{
 public:
     ThemeSelectorOption();
 
-    virtual void load_json(const QJsonValue& json) override;
+    virtual void load_json(const JsonValue2& json) override;
 
 private:
     virtual ConfigWidget* make_ui(QWidget& parent) override;

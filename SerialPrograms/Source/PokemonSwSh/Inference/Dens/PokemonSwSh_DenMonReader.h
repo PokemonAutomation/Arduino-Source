@@ -55,10 +55,10 @@ private:
 
 struct DenMonSelectData{
     DenMonSelectData();
-    const std::vector<std::pair<QString, QIcon>>& cases() const{ return m_list; }
+    const std::vector<std::pair<std::string, QIcon>>& cases() const{ return m_list; }
 
 protected:
-    std::vector<std::pair<QString, QIcon>> m_list;
+    std::vector<std::pair<std::string, QIcon>> m_list;
 };
 
 class DenMonSelectOption : private DenMonSelectData, public StringSelectOption{

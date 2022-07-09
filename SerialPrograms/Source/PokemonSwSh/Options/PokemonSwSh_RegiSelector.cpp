@@ -4,10 +4,10 @@
  *
  */
 
-#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "PokemonSwSh_RegiSelector.h"
 
@@ -36,13 +36,14 @@ RegiSelectorOption::RegiSelectorOption()
     , m_default(RegiGolem::Registeel)
     , m_current(RegiGolem::Registeel)
 {}
-void RegiSelectorOption::load_json(const QJsonValue& json){
-    size_t index = json.toInt((int)m_default);
-    index = std::min(index, (size_t)4);
-    m_current = (RegiGolem)index;
+void RegiSelectorOption::load_json(const JsonValue2& json){
+    int index;
+    if (json.read_integer(index, 0, 4)){
+        m_current = (RegiGolem)index;
+    }
 }
-QJsonValue RegiSelectorOption::to_json() const{
-    return QJsonValue((int)m_current);
+JsonValue2 RegiSelectorOption::to_json() const{
+    return (int)m_current;
 }
 
 void RegiSelectorOption::restore_defaults(){

@@ -8,7 +8,8 @@
 #include <QLabel>
 #include <QGroupBox>
 #include "Common/Compiler.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "GroupOption.h"
 #include "GroupWidget.h"
 
@@ -31,19 +32,24 @@ inline ConfigWidget* GroupOption::make_ui(QWidget& parent){
 bool GroupOption::enabled() const{
     return m_enabled.load(std::memory_order_relaxed);
 }
-void GroupOption::load_json(const QJsonValue& json){
+void GroupOption::load_json(const JsonValue2& json){
     BatchOption::load_json(json);
+    const JsonObject2* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
     if (m_toggleable){
-        bool enabled = true;
-        json_get_bool(enabled, json.toObject(), "Enabled");
-        m_enabled.store(enabled, std::memory_order_relaxed);
-        on_set_enabled(enabled);
+        bool enabled;
+        if (obj->read_boolean(enabled, "Enabled")){
+            m_enabled.store(enabled, std::memory_order_relaxed);
+            on_set_enabled(enabled);
+        }
     }
 }
-QJsonValue GroupOption::to_json() const{
-    QJsonObject obj = BatchOption::to_json().toObject();
+JsonValue2 GroupOption::to_json() const{
+    JsonObject2 obj = std::move(*BatchOption::to_json().get_object());
     if (m_toggleable){
-        obj.insert("Enabled", m_enabled.load(std::memory_order_relaxed));
+        obj["Enabled"] = m_enabled.load(std::memory_order_relaxed);
     }
     return obj;
 }

@@ -8,7 +8,9 @@
 #include <map>
 #include <QJsonObject>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 #include <iostream>
@@ -257,34 +259,37 @@ const ControllerButton* button_lookup(Qt::Key key){
 
 
 
-QJsonArray read_keyboard_mapping(){
-    QJsonArray array;
+JsonArray2 read_keyboard_mapping(){
+    JsonArray2 array;
     for (const auto& item : keyboard_mapping){
-        QJsonObject pair;
-        pair.insert("Qt::Key", item.first);
-        pair.insert("Button", controller_button_to_string(item.second));
-        array.append(pair);
+        JsonObject2 pair;
+        pair["Qt::Key"] = (int64_t)item.first;
+        pair["Button"] = controller_button_to_string(item.second).toStdString();
+        array.push_back(std::move(pair));
     }
     return array;
 }
-void set_keyboard_mapping(const QJsonArray& json){
-    if (json.isEmpty()){
+void set_keyboard_mapping(const JsonArray2& json){
+    if (json.empty()){
         return;
     }
 
     std::vector<std::pair<Qt::Key, const ControllerButton&>> mapping;
 
     for (const auto& item : json){
-        QJsonObject pair = item.toObject();
+        const JsonObject2* obj = item.get_object();
+        if (obj == nullptr){
+            continue;
+        }
         int key;
-        if (!json_get_int(key, pair, "Qt::Key")){
+        if (!obj->read_integer(key, "Qt::Key")){
             continue;
         }
-        QString button_name;
-        if (!json_get_string(button_name, pair, "Button")){
+        const std::string* button_name = obj->get_string("Button");
+        if (button_name == nullptr){
             continue;
         }
-        const ControllerButton* button = string_to_controller_button(button_name);
+        const ControllerButton* button = string_to_controller_button(QString::fromStdString(*button_name));
         if (button == nullptr){
             continue;
         }
