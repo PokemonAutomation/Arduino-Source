@@ -4,21 +4,7 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QHeaderView>
-#include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/Globals.h"
-#include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "Pokemon/Resources/Pokemon_PokeballNames.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

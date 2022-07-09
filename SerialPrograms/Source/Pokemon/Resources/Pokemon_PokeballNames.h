@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <QString>
 
 namespace PokemonAutomation{
 namespace Pokemon{

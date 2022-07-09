@@ -79,8 +79,6 @@ enum SleepyRequest {
 #ifdef __cplusplus
 }
 
-class QJsonArray;
-class QJsonObject;
 class QString;
 
 namespace PokemonAutomation{
@@ -89,7 +87,7 @@ namespace SleepyDiscordRunner{
 
     bool is_running();
     bool is_connected();
-    void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, QJsonObject& embed, std::shared_ptr<PendingFileSend> file);
+    void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file);
     void sleepy_response(int response, char* message);
     void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y);
     void sleepy_connect();

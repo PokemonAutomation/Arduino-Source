@@ -5,8 +5,6 @@
  */
 
 #include <cmath>
-#include <QJsonArray>
-#include <QJsonObject>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

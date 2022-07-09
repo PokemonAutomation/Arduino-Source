@@ -21,7 +21,6 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_StatsReset-Moltres.h"
 
-#include <QJsonArray>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -26,6 +26,7 @@ extern const QString STRING_POKEMON;
 extern const QString STRING_POKEDEX;
 extern const QString STRING_POKEJOB;
 
+extern const std::string UTF8_PROGRAM_VERSION;
 extern const std::string UTF8_STRING_POKEMON;
 
 const QString& RESOURCE_PATH();
@@ -45,21 +46,6 @@ enum class FeedbackType{
     OPTIONAL_,  //  Naming conflict with macro.
     REQUIRED,
 };
-
-
-#if 0
-template <typename Lambda>
-void run_on_main_thread(std::atomic<size_t>& reference_counter, Lambda&& lambda){
-    reference_counter.fetch_add(1);
-    QMetaObject::invokeMethod(
-        application.get(),
-        [&, lambda = std::move(lambda)]{
-            lambda();
-            reference_counter.fetch_sub(1);
-        }
-    );
-}
-#endif
 
 
 

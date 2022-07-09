@@ -17,8 +17,6 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_AutonomousBallThrower.h"
 
-#include <QJsonArray>
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{

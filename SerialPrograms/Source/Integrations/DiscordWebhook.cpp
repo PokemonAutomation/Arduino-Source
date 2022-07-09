@@ -5,16 +5,15 @@
  */
 
 #include <deque>
+#include <QString>
 #include <QFile>
 #include <QHttpMultiPart>
 #include <QEventLoop>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QNetworkAccessManager>
-#include <QString>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "DiscordWebhook.h"
@@ -60,11 +59,11 @@ DiscordWebhookSender& DiscordWebhookSender::instance(){
     return sender;
 }
 
-void DiscordWebhookSender::send_json(LoggerQt& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file){
+void DiscordWebhookSender::send_json(LoggerQt& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(
         url,
-        QJsonDocument(obj).toJson(),
+        QByteArray::fromStdString(obj.dump()),
         file
     );
     logger.log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
@@ -220,7 +219,7 @@ void send_message(
     bool should_ping,
     const std::vector<QString>& tags,
     const QString& message,
-    const QJsonArray& embeds,
+    JsonArray embeds,
     std::shared_ptr<PendingFileSend> file
 ){
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
@@ -291,9 +290,9 @@ void send_message(
             str += message;
         }
 
-        QJsonObject jsonContent;
-        jsonContent["content"] = str;
-        jsonContent["embeds"] = embeds;
+        JsonObject jsonContent;
+        jsonContent["content"] = str.toStdString();
+        jsonContent["embeds"] = std::move(embeds);
 
 //        cout << QJsonDocument(jsonContent).toJson().data() << endl;
 

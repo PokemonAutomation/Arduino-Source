@@ -4,8 +4,6 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

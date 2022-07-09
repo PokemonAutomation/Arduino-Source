@@ -6,8 +6,6 @@
  *
  */
 
-#include <QJsonValue>
-#include <QJsonArray>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "SwitchDateBaseOption.h"

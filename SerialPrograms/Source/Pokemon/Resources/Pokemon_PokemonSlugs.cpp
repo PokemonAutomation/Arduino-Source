@@ -5,7 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon_PokemonSlugs.h"
 
@@ -24,22 +25,25 @@ struct PokemonSlugDatabase{
         return data;
     }
     PokemonSlugDatabase(){
-        QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
-        QJsonArray json = read_json_file(path).array();
+        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-National.json";
+        JsonValue json = load_json_file(path);
+        JsonArray* slugs = json.get_array();
+        if (slugs == nullptr){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
+        }
 
-        for (const auto& item : json){
-            QString slug_qstr = item.toString();
-            if (slug_qstr.size() <= 0){
+        for (auto& item : *slugs){
+            std::string* slug = item.get_string();
+            if (slug == nullptr || slug->empty()){
                 throw FileException(
                     nullptr, PA_CURRENT_FUNCTION,
                     "Expected non-empty string for Pokemon slug.",
-                    path.toStdString()
+                    std::move(path)
                 );
             }
-            std::string slug = slug_qstr.toStdString();
-            all_slugs.insert(slug);
-            national_dex.emplace_back(slug);
-            slugs_to_dex[slug] = national_dex.size();
+            all_slugs.insert(*slug);
+            national_dex.emplace_back(*slug);
+            slugs_to_dex[*slug] = national_dex.size();
         }
     }
 };

@@ -14,69 +14,25 @@ namespace PokemonAutomation{
 
 
 
-
-struct JsonNode{
-    virtual ~JsonNode() = default;
-};
-struct JsonNodeBoolean : public JsonNode{
-    bool value;
-    JsonNodeBoolean(bool x)
-        : value(x)
-    {}
-};
-struct JsonNodeInteger : public JsonNode{
-    int64_t value;
-    JsonNodeInteger(int64_t x)
-        : value(x)
-    {}
-};
-struct JsonNodeFloat : public JsonNode{
-    double value;
-    JsonNodeFloat(double x)
-        : value(x)
-    {}
-};
-struct JsonNodeString : public JsonNode{
-    std::string value;
-    JsonNodeString(std::string x)
-        : value(std::move(x))
-    {}
-};
-struct JsonNodeArray : public JsonNode{
-    JsonArray value;
-    JsonNodeArray(JsonArray x)
-        : value(std::move(x))
-    {}
-};
-struct JsonNodeObject : public JsonNode{
-    JsonObject value;
-    JsonNodeObject(JsonObject x)
-        : value(std::move(x))
-    {}
-};
-
-
-
-
 JsonValue::~JsonValue(){
-    delete m_node;
+    clear();
 }
 JsonValue::JsonValue(JsonValue&& x)
-    : m_type(x.m_type)
-    , m_node(x.m_node)
+//    : m_type(x.m_type)
+//    , m_node(x.m_node)
 {
+    memcpy(this, &x, sizeof(JsonValue));
     x.m_type = JsonType::EMPTY;
-    x.m_node = nullptr;
 }
 void JsonValue::operator=(JsonValue&& x){
     if (this == &x){
         return;
     }
-    delete m_node;
-    m_type = x.m_type;
-    m_node = x.m_node;
+    clear();
+    memcpy(this, &x, sizeof(JsonValue));
+//    m_type = x.m_type;
+//    m_node = x.m_node;
     x.m_type = JsonType::EMPTY;
-    x.m_node = nullptr;
 }
 JsonValue::JsonValue(const JsonValue& x)
     : m_type(x.m_type)
@@ -85,22 +41,22 @@ JsonValue::JsonValue(const JsonValue& x)
     case JsonType::EMPTY:
         break;
     case JsonType::BOOLEAN:
-        m_node = new JsonNodeBoolean((static_cast<const JsonNodeBoolean*>(x.m_node))->value);
+        m_bool = x.m_bool;
         break;
     case JsonType::INTEGER:
-        m_node = new JsonNodeInteger((static_cast<const JsonNodeInteger*>(x.m_node))->value);
+        m_integer = x.m_integer;
         break;
     case JsonType::FLOAT:
-        m_node = new JsonNodeFloat((static_cast<const JsonNodeFloat*>(x.m_node))->value);
+        m_float = x.m_float;
         break;
     case JsonType::STRING:
-        m_node = new JsonNodeString((static_cast<const JsonNodeString*>(x.m_node))->value);
+        m_string = new std::string(*x.m_string);
         break;
     case JsonType::ARRAY:
-        m_node = new JsonNodeArray((static_cast<const JsonNodeArray*>(x.m_node))->value);
+        m_array = new JsonArray(*x.m_array);
         break;
     case JsonType::OBJECT:
-        m_node = new JsonNodeObject((static_cast<const JsonNodeObject*>(x.m_node))->value);
+        m_object = new JsonObject(*x.m_object);
         break;
     }
 }
@@ -114,70 +70,85 @@ void JsonValue::operator=(const JsonValue& x){
 JsonValue JsonValue::clone() const{
     return *this;
 }
+void JsonValue::clear(){
+    switch (m_type){
+    case JsonType::STRING:
+        delete m_string;
+        break;
+    case JsonType::ARRAY:
+        delete m_array;
+        break;
+    case JsonType::OBJECT:
+        delete m_object;
+        break;
+    default:;
+    }
+    m_type = JsonType::EMPTY;
+}
 
 JsonValue::JsonValue(bool x)
     : m_type(JsonType::BOOLEAN)
-    , m_node(new JsonNodeBoolean(x))
+    , m_bool(x)
 {}
 JsonValue::JsonValue(int64_t x)
     : m_type(JsonType::INTEGER)
-    , m_node(new JsonNodeInteger(x))
+    , m_integer(x)
 {}
 JsonValue::JsonValue(double x)
     : m_type(JsonType::FLOAT)
-    , m_node(new JsonNodeFloat(x))
+    , m_float(x)
 {}
 JsonValue::JsonValue(const char* x)
     : m_type(JsonType::STRING)
-    , m_node(new JsonNodeString(x))
+    , m_string(new std::string(x))
 {}
 JsonValue::JsonValue(std::string x)
     : m_type(JsonType::STRING)
-    , m_node(new JsonNodeString(std::move(x)))
+    , m_string(new std::string(std::move(x)))
 {}
 JsonValue::JsonValue(JsonArray&& x)
     : m_type(JsonType::ARRAY)
-    , m_node(new JsonNodeArray(std::move(x)))
+    , m_array(new JsonArray(std::move(x)))
 {}
 JsonValue::JsonValue(JsonObject&& x)
     : m_type(JsonType::OBJECT)
-    , m_node(new JsonNodeObject(std::move(x)))
+    , m_object(new JsonObject(std::move(x)))
 {}
 bool JsonValue::read_boolean(bool& value) const{
     if (m_type == JsonType::BOOLEAN){
-        value = (static_cast<const JsonNodeBoolean*>(m_node))->value;
+        value = m_bool;
         return true;
     }
     return false;
 }
 bool JsonValue::read_integer(int64_t& value) const{
     if (m_type == JsonType::INTEGER){
-        value = (static_cast<const JsonNodeInteger*>(m_node))->value;
+        value = m_integer;
         return true;
     }
     return false;
 }
 bool JsonValue::read_integer(uint64_t& value) const{
     if (m_type == JsonType::INTEGER){
-        value = (static_cast<const JsonNodeInteger*>(m_node))->value;
+        value = m_integer;
         return true;
     }
     return false;
 }
 bool JsonValue::read_float(double& value) const{
     if (m_type == JsonType::INTEGER){
-        value = (double)(static_cast<const JsonNodeInteger*>(m_node))->value;
+        value = (double)m_integer;
         return true;
     }
     if (m_type == JsonType::FLOAT){
-        value = (static_cast<const JsonNodeFloat*>(m_node))->value;
+        value = m_float;
         return true;
     }
     return false;
 }
 bool JsonValue::read_string(std::string& value) const{
     if (m_type == JsonType::STRING){
-        value = (static_cast<const JsonNodeString*>(m_node))->value;
+        value = *m_string;
         return true;
     }
     return false;
@@ -186,37 +157,25 @@ const std::string* JsonValue::get_string() const{
     if (m_type != JsonType::STRING){
         return nullptr;
     }
-    return &static_cast<JsonNodeString*>(m_node)->value;
+    return m_string;
 }
 std::string* JsonValue::get_string(){
     if (m_type != JsonType::STRING){
         return nullptr;
     }
-    return &static_cast<JsonNodeString*>(m_node)->value;
+    return m_string;
 }
 const JsonArray* JsonValue::get_array() const{
-    if (m_type != JsonType::ARRAY){
-        return nullptr;
-    }
-    return &static_cast<JsonNodeArray*>(m_node)->value;
+    return m_type == JsonType::ARRAY ? m_array : nullptr;
 }
 JsonArray* JsonValue::get_array(){
-    if (m_type != JsonType::ARRAY){
-        return nullptr;
-    }
-    return &static_cast<JsonNodeArray*>(m_node)->value;
+    return m_type == JsonType::ARRAY ? m_array : nullptr;
 }
 const JsonObject* JsonValue::get_object() const{
-    if (m_type != JsonType::OBJECT){
-        return nullptr;
-    }
-    return &static_cast<JsonNodeObject*>(m_node)->value;
+    return m_type == JsonType::OBJECT ? m_object : nullptr;
 }
 JsonObject* JsonValue::get_object(){
-    if (m_type != JsonType::OBJECT){
-        return nullptr;
-    }
-    return &static_cast<JsonNodeObject*>(m_node)->value;
+    return m_type == JsonType::OBJECT ? m_object : nullptr;
 }
 
 

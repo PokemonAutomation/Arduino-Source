@@ -27,7 +27,6 @@ enum class JsonType{
 };
 
 
-struct JsonNode;
 class JsonValue;
 class JsonArray;
 class JsonObject;
@@ -62,6 +61,8 @@ public:
     JsonValue(Type x)
         : JsonValue((int64_t)x)
     {}
+
+    void clear();
 
     std::string dump(int indent = 4) const;
     void dump(const std::string& filename, int indent = 4) const;
@@ -104,7 +105,14 @@ public:
 
 private:
     JsonType m_type = JsonType::EMPTY;
-    JsonNode* m_node = nullptr;
+    union{
+        bool m_bool;
+        int64_t m_integer;
+        double m_float;
+        std::string* m_string;
+        JsonArray* m_array;
+        JsonObject* m_object;
+    };
 };
 
 JsonValue parse_json(const std::string& str);

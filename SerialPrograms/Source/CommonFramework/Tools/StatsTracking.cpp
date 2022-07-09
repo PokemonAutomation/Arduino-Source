@@ -8,12 +8,6 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "StatsTracking.h"
 
-#include <iostream>
-#include <QJsonArray>
-#include <QJsonObject>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 
 

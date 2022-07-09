@@ -17,11 +17,11 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
-class QJsonArray;
-class QJsonObject;
 class QString;
 
 namespace PokemonAutomation{
+    class JsonArray;
+    class JsonObject;
 namespace Integration{
 namespace DiscordWebhook{
 
@@ -47,7 +47,7 @@ private:
 
 
 public:
-    void send_json(LoggerQt& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file);
+    void send_json(LoggerQt& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file);
     void send_file(LoggerQt& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
 
     static DiscordWebhookSender& instance();
@@ -80,7 +80,7 @@ void send_message(
     bool should_ping,
     const std::vector<QString>& tags,
     const QString& message,
-    const QJsonArray& embeds,
+    JsonArray embeds,
     std::shared_ptr<PendingFileSend> file
 );
 

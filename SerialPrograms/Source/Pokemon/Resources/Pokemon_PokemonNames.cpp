@@ -5,7 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon_PokemonNames.h"
 
@@ -27,25 +29,42 @@ struct PokemonNameDatabase{
 const std::string PokemonNameDatabase::NULL_SLUG;
 
 PokemonNameDatabase::PokemonNameDatabase(){
-    QString path = RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json";
-    QJsonObject displays = read_json_file(path).object();
+    std::string path = RESOURCE_PATH().toStdString() + "Pokemon/PokemonNameDisplay.json";
+    JsonValue json = load_json_file(path);
+    JsonObject* displays = json.get_object();
+    if (displays == nullptr){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
+    }
 
-    for (auto iter = displays.begin(); iter != displays.end(); ++iter){
-        QString slug_qstr = iter.key();
-        if (slug_qstr.size() <= 0){
+    for (auto& item0 : *displays){
+        const std::string& slug = item0.first;
+        if (slug.empty()){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
                 "Expected non-empty string for Pokemon slug.",
-                path.toStdString()
+                std::move(path)
             );
         }
 
-        std::string slug = slug_qstr.toStdString();
-
-        QJsonObject names = iter.value().toObject();
+        JsonObject* names = item0.second.get_object();
+        if (names == nullptr){
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "No data for slug: " + slug,
+                std::move(path)
+            );
+        }
         PokemonNames data;
-        for (auto iter1 = names.begin(); iter1 != names.end(); ++iter1){
-            data.m_display_names[language_code_to_enum(iter1.key().toUtf8().data())] = iter1.value().toString().toStdString();
+        for (auto& item1 : *names){
+            std::string* name = item1.second.get_string();
+            if (name == nullptr){
+                throw FileException(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    "Expected string for display name: " + slug,
+                    std::move(path)
+                );
+            }
+            data.m_display_names[language_code_to_enum(item1.first)] = std::move(*name);
         }
 
 
@@ -54,21 +73,15 @@ PokemonNameDatabase::PokemonNameDatabase(){
         if (iter2 == data.m_display_names.end()){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
-                "Missing English translation for: " + slug_qstr.toStdString(),
-                path.toStdString()
+                "Missing English translation: " + slug,
+                std::move(path)
             );
         }
         data.m_display_name = iter2->second;
 
 
-        m_display_name_to_slug.emplace(
-            data.m_display_name,
-            slug
-        );
-        m_slug_to_data.emplace(
-            slug,
-            std::move(data)
-        );
+        m_display_name_to_slug.emplace(data.m_display_name, slug);
+        m_slug_to_data.emplace(slug, std::move(data));
     }
 }
 
@@ -117,20 +130,21 @@ const std::string& parse_pokemon_name_nothrow(const std::string& display_name){
 }
 
 std::vector<std::string> load_pokemon_slug_json_list(const char* json_path){
-    QString path = RESOURCE_PATH() + json_path;
-    QJsonArray json = read_json_file(path).array();
+    std::string path = RESOURCE_PATH().toStdString() + json_path;
+    JsonValue json = load_json_file(path);
+    JsonArray* array = json.get_array();
 
     std::vector<std::string> list;
-    for (const auto& item : json){
-        QString slug_qstr = item.toString();
-        if (slug_qstr.size() <= 0){
+    for (auto& item : *array){
+        std::string* slug = item.get_string();
+        if (slug == nullptr || slug->empty()){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
                 "Expected non-empty string for Pokemon slug.",
-                path.toStdString()
+                std::move(path)
             );
         }
-        list.emplace_back(slug_qstr.toStdString());
+        list.emplace_back(std::move(*slug));
     }
     return list;
 }

@@ -4,17 +4,11 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "AudioSelector.h"
 #include "AudioSelectorWidget.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 

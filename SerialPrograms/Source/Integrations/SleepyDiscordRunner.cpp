@@ -493,7 +493,7 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
     }
 }
 
-void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, QJsonObject& embed, std::shared_ptr<PendingFileSend> file) {
+void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file) {
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
 //        //  TODO: Once file cleanup works, remove this.
@@ -575,7 +575,7 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
             messages += (i + 1 == channel_vector.size() ? "" : "|");
         }
 
-        std::string json = QJsonDocument(embed).toJson().toStdString();
+        std::string json = embed.dump();
         sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
         m_sleepy_client->send(json, chanStr, messages, file == nullptr ? nullptr : std::move(file));
     }

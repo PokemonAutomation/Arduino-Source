@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <QString>
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -18,18 +17,18 @@ namespace Pokemon{
 
 class BerryNames{
 public:
-    const QString& display_name() const{ return m_display_name; }
+    const std::string& display_name() const{ return m_display_name; }
 
 private:
     friend struct BerryNameDatabase;
 
-    QString m_display_name;
+    std::string m_display_name;
 };
 
 
 const BerryNames& get_berry_name(const std::string& slug);
-const std::string& parse_berry_name(const QString& display_name);
-const std::string& parse_berry_name_nothrow(const QString& display_name);
+const std::string& parse_berry_name(const std::string& display_name);
+const std::string& parse_berry_name_nothrow(const std::string& display_name);
 
 const std::vector<std::string>& BERRY_SLUGS();
 

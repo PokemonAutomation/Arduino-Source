@@ -4,15 +4,9 @@
  *
  */
 
-#include <QJsonValue>
-#include <QJsonArray>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "EditableTableBaseOption.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 

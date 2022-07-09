@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonArray>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTextEdit>

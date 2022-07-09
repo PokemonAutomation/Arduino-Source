@@ -17,6 +17,7 @@ const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE;
 #else
 const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE + "u";
 #endif
+const std::string UTF8_PROGRAM_VERSION = PROGRAM_VERSION.toStdString();
 
 const QString DISCORD_LINK = "discord.gg/PokemonAutomation";
 const QString DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"

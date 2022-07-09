@@ -31,14 +31,12 @@ BerrySelectWidget::BerrySelectWidget(
 
         const BerrySprite* sprite = get_berry_sprite_nothrow(slug);
         if (sprite == nullptr){
-            this->addItem(
-                get_berry_name(slug).display_name()
-            );
+            this->addItem(QString::fromStdString(get_berry_name(slug).display_name()));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             this->addItem(
                 sprite->icon(),
-                get_berry_name(slug).display_name()
+                QString::fromStdString(get_berry_name(slug).display_name())
             );
         }
 
@@ -48,7 +46,7 @@ BerrySelectWidget::BerrySelectWidget(
     }
 }
 std::string BerrySelectWidget::slug() const{
-    return parse_berry_name_nothrow(currentText());
+    return parse_berry_name_nothrow(currentText().toStdString());
 }
 
 

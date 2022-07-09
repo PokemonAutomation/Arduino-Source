@@ -12,8 +12,6 @@
 #include <map>
 #include <atomic>
 
-class QJsonArray;
-
 namespace PokemonAutomation{
 
 class Logger;
