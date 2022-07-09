@@ -45,24 +45,24 @@ void string_to_file(const std::string& filename, const std::string& str){
 
 
 
-JsonValue2 from_nlohmann(const nlohmann::json& json){
+JsonValue from_nlohmann(const nlohmann::json& json){
     if (json.is_null()){
-        return JsonValue2();
+        return JsonValue();
     }
     if (json.is_boolean()){
-        return JsonValue2((bool)json);
+        return JsonValue((bool)json);
     }
     if (json.is_number_integer()){
-        return JsonValue2((int64_t)json);
+        return JsonValue((int64_t)json);
     }
     if (json.is_number()){
-        return JsonValue2((double)json);
+        return JsonValue((double)json);
     }
     if (json.is_string()){
-        return JsonValue2((std::string)json);
+        return JsonValue((std::string)json);
     }
     if (json.is_array()){
-        JsonArray2 array;
+        JsonArray array;
         size_t size = json.size();
         for (size_t c = 0; c < size; c++){
             array.push_back(from_nlohmann(json[c]));
@@ -70,15 +70,15 @@ JsonValue2 from_nlohmann(const nlohmann::json& json){
         return array;
     }
     if (json.is_object()){
-        JsonObject2 object;
+        JsonObject object;
         for (auto it = json.begin(); it != json.end(); ++it){
             object[it.key()] = from_nlohmann(it.value());
         }
         return object;
     }
-    return JsonValue2();
+    return JsonValue();
 }
-nlohmann::json to_nlohmann(const JsonValue2& json){
+nlohmann::json to_nlohmann(const JsonValue& json){
     if (json.is_null()){
         return nlohmann::json();
     }
@@ -124,24 +124,24 @@ nlohmann::json to_nlohmann(const JsonValue2& json){
 }
 
 
-JsonValue2 from_QJson(const QJsonValue& json){
+JsonValue from_QJson(const QJsonValue& json){
     if (json.isNull()){
-        return JsonValue2();
+        return JsonValue();
     }
     if (json.isBool()){
-        return JsonValue2(json.toBool());
+        return JsonValue(json.toBool());
     }
     if (json.isDouble()){
         double value = json.toDouble();
         return value == (int64_t)value
-            ? JsonValue2(json.toInt())
-            : JsonValue2(value);
+            ? JsonValue(json.toInt())
+            : JsonValue(value);
     }
     if (json.isString()){
-        return JsonValue2(json.toString().toStdString());
+        return JsonValue(json.toString().toStdString());
     }
     if (json.isArray()){
-        JsonArray2 array;
+        JsonArray array;
         for (const auto& item : json.toArray()){
             array.push_back(from_QJson(item));
         }
@@ -149,15 +149,15 @@ JsonValue2 from_QJson(const QJsonValue& json){
     }
     if (json.isObject()){
         QJsonObject obj = json.toObject();
-        JsonObject2 object;
+        JsonObject object;
         for (auto it = obj.begin(); it != obj.end(); ++it){
             object[it.key().toStdString()] = from_QJson(it.value());
         }
         return object;
     }
-    return JsonValue2();
+    return JsonValue();
 }
-QJsonValue to_QJson(const JsonValue2& json){
+QJsonValue to_QJson(const JsonValue& json){
     if (json.is_null()){
         return QJsonValue();
     }
@@ -168,7 +168,7 @@ QJsonValue to_QJson(const JsonValue2& json){
         }
     }
     {
-        int64_t value;
+        qint64 value;
         if (json.read_integer(value)){
             return value;
         }

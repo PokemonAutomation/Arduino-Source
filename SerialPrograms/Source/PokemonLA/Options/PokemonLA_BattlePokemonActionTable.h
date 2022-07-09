@@ -31,8 +31,8 @@ extern const std::string MoveStyle_NAMES[3];
 class BattlePokemonActionRow : public EditableTableRow{
 public:
     BattlePokemonActionRow();
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -79,8 +79,8 @@ public:
     // num_move_attempts: number of move attempts made from this pokemon so far.
     bool stop_battle(size_t pokemon, size_t num_move_attempts) const;
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 
@@ -101,8 +101,8 @@ private:
 class OneMoveBattlePokemonActionRow : public EditableTableRow{
 public:
     OneMoveBattlePokemonActionRow();
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -133,8 +133,8 @@ public:
     // pokemon: pokemon index, range [0, 5]
     MoveStyle get_style(size_t pokemon);
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 
@@ -152,8 +152,8 @@ private:
 
 class MoveGrinderActionRow : public EditableTableRow {
 public:
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -180,8 +180,8 @@ public:
 
     Move get_move(size_t pokemon, size_t move) const;
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

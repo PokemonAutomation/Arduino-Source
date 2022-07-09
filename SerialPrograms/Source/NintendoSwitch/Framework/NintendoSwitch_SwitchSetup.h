@@ -15,7 +15,7 @@ class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{
-    class JsonValue2;
+    class JsonValue;
 namespace NintendoSwitch{
 
 
@@ -33,8 +33,8 @@ public:
     {}
     virtual ~SwitchSetupFactory() = default;
 
-    virtual void load_json(const JsonValue2& json) = 0;
-    virtual JsonValue2 to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
+    virtual JsonValue to_json() const = 0;
 
     virtual SwitchSetupWidget* make_ui(QWidget& parent, LoggerQt& logger, uint64_t program_id) = 0;
 

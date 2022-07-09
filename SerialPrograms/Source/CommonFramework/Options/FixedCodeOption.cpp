@@ -60,7 +60,7 @@ QString FixedCodeOption::set(QString x){
     return error;
 }
 
-void FixedCodeOption::load_json(const JsonValue2& json){
+void FixedCodeOption::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -68,7 +68,7 @@ void FixedCodeOption::load_json(const JsonValue2& json){
     SpinLockGuard lg(m_lock);
     m_current = QString::fromStdString(*str);
 }
-JsonValue2 FixedCodeOption::to_json() const{
+JsonValue FixedCodeOption::to_json() const{
     SpinLockGuard lg(m_lock);
     return m_current.toStdString();
 }

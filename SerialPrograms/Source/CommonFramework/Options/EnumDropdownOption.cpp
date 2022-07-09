@@ -43,7 +43,7 @@ EnumDropdownOption::EnumDropdownOption(
 }
 
 
-void EnumDropdownOption::load_json(const JsonValue2& json){
+void EnumDropdownOption::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -53,7 +53,7 @@ void EnumDropdownOption::load_json(const JsonValue2& json){
         m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
-JsonValue2 EnumDropdownOption::to_json() const{
+JsonValue EnumDropdownOption::to_json() const{
     return m_case_list[m_current].name;
 }
 

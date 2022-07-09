@@ -26,8 +26,8 @@ public:
     const QString label() const{ return m_label; }
     bool enabled() const;
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 

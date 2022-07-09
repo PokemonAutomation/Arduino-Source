@@ -14,7 +14,7 @@
 class QString;
 
 namespace PokemonAutomation{
-    class JsonArray2;
+    class JsonArray;
 namespace NintendoSwitch{
 
 
@@ -28,8 +28,8 @@ const QString& controller_button_to_string(const ControllerButton& button);
 
 const ControllerButton* button_lookup(Qt::Key key);
 
-JsonArray2 read_keyboard_mapping();
-void set_keyboard_mapping(const JsonArray2& json);
+JsonArray read_keyboard_mapping();
+void set_keyboard_mapping(const JsonArray& json);
 
 
 

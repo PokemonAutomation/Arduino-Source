@@ -41,7 +41,7 @@ PersistentSettings::PersistentSettings(){}
 
 
 void PersistentSettings::write() const{
-    JsonObject2 root;
+    JsonObject root;
 
     root["20-GlobalSettings"] = GlobalSettings::instance().to_json();
     root["50-SwitchKeyboardMapping"] = NintendoSwitch::read_keyboard_mapping();
@@ -62,12 +62,12 @@ void PersistentSettings::read(){
     if (!doc.isObject()){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", path.toStdString());
     }
-    JsonValue2 root = from_QJson(doc.object());
-    const JsonObject2* obj = root.get_object();
+    JsonValue root = from_QJson(doc.object());
+    const JsonObject* obj = root.get_object();
 
     //  Need to load this subset of settings first because they will affect how
     //  "GlobalSettings" is constructed.
-    const JsonValue2* settings = obj->get_value("20-GlobalSettings");
+    const JsonValue* settings = obj->get_value("20-GlobalSettings");
     if (settings){
         PreloadSettings::instance().load(*settings);
         GlobalSettings::instance().load_json(*settings);
@@ -77,13 +77,13 @@ void PersistentSettings::read(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
 
     {
-        const JsonArray2* array = obj->get_array("50-SwitchKeyboardMapping");
+        const JsonArray* array = obj->get_array("50-SwitchKeyboardMapping");
         if (array){
             NintendoSwitch::set_keyboard_mapping(*array);
         }
     }
     {
-        const JsonValue2* value = obj->get_value("99-Panels");
+        const JsonValue* value = obj->get_value("99-Panels");
         if (value){
             panels = to_QJson(*value).toObject();
         }

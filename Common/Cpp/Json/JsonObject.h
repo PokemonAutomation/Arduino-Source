@@ -13,13 +13,13 @@
 namespace PokemonAutomation{
 
 
-class JsonObject2{
+class JsonObject{
 public:
-    JsonObject2() = default;
-    JsonObject2(JsonObject2&&) = default;
-    JsonObject2& operator=(JsonObject2&&) = delete;
-    JsonObject2(const JsonObject2&) = delete;
-    void operator=(const JsonObject2&) = delete;
+    JsonObject() = default;
+    JsonObject(JsonObject&&) = default;
+    JsonObject& operator=(JsonObject&&) = delete;
+    JsonObject(const JsonObject&) = delete;
+    void operator=(const JsonObject&) = delete;
 
 public:
     std::string dump(int indent = 4) const;
@@ -28,8 +28,8 @@ public:
     bool    empty   () const{ return m_data.empty(); }
     size_t  size    () const{return m_data.size(); }
 
-    JsonValue2& operator[](const std::string& key){ return m_data[key]; }
-    JsonValue2& operator[](     std::string&& key){ return m_data[std::move(key)]; }
+    JsonValue& operator[](const std::string& key){ return m_data[key]; }
+    JsonValue& operator[](     std::string&& key){ return m_data[std::move(key)]; }
 
     bool read_boolean(bool& value, const std::string& key) const;
     bool read_float(double& value, const std::string& key) const;
@@ -44,16 +44,16 @@ public:
 
     const std::string* get_string(const std::string& key) const;
           std::string* get_string(const std::string& key);
-    const JsonArray2* get_array(const std::string& key) const;
-          JsonArray2* get_array(const std::string& key);
-    const JsonObject2* get_object(const std::string& key) const;
-          JsonObject2* get_object(const std::string& key);
-    const JsonValue2* get_value(const std::string& key) const;
-          JsonValue2* get_value(const std::string& key);
+    const JsonArray* get_array(const std::string& key) const;
+          JsonArray* get_array(const std::string& key);
+    const JsonObject* get_object(const std::string& key) const;
+          JsonObject* get_object(const std::string& key);
+    const JsonValue* get_value(const std::string& key) const;
+          JsonValue* get_value(const std::string& key);
 
 public:
-    using const_iterator = std::map<std::string, JsonValue2>::const_iterator;
-    using iterator = std::map<std::string, JsonValue2>::iterator;
+    using const_iterator = std::map<std::string, JsonValue>::const_iterator;
+    using iterator = std::map<std::string, JsonValue>::iterator;
 
     const_iterator find(const std::string& key) const{ return m_data.find(key); }
           iterator find(const std::string& key)      { return m_data.find(key); }
@@ -67,14 +67,14 @@ public:
           iterator end  ()      { return m_data.end(); }
 
 private:
-    friend class JsonValue2;
-    std::map<std::string, JsonValue2> m_data;
+    friend class JsonValue;
+    std::map<std::string, JsonValue> m_data;
 };
 
 
 
 template <typename Type>
-bool JsonObject2::read_integer(Type& value, const std::string& key, int64_t min, int64_t max) const{
+bool JsonObject::read_integer(Type& value, const std::string& key, int64_t min, int64_t max) const{
     static_assert(std::is_integral<Type>::value);
     auto iter = m_data.find(key);
     if (iter == m_data.end()){

@@ -32,9 +32,9 @@ inline ConfigWidget* GroupOption::make_ui(QWidget& parent){
 bool GroupOption::enabled() const{
     return m_enabled.load(std::memory_order_relaxed);
 }
-void GroupOption::load_json(const JsonValue2& json){
+void GroupOption::load_json(const JsonValue& json){
     BatchOption::load_json(json);
-    const JsonObject2* obj = json.get_object();
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -46,8 +46,8 @@ void GroupOption::load_json(const JsonValue2& json){
         }
     }
 }
-JsonValue2 GroupOption::to_json() const{
-    JsonObject2 obj = std::move(*BatchOption::to_json().get_object());
+JsonValue GroupOption::to_json() const{
+    JsonObject obj = std::move(*BatchOption::to_json().get_object());
     if (m_toggleable){
         obj["Enabled"] = m_enabled.load(std::memory_order_relaxed);
     }

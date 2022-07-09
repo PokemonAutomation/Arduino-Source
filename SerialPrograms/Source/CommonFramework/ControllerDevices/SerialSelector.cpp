@@ -24,20 +24,20 @@ SerialSelector::SerialSelector(
 SerialSelector::SerialSelector(
     QString label,
     PABotBaseLevel minimum_pabotbase,
-    const JsonValue2& json
+    const JsonValue& json
 )
     : SerialSelector(std::move(label), minimum_pabotbase)
 {
     load_json(json);
 }
-void SerialSelector::load_json(const JsonValue2& json){
+void SerialSelector::load_json(const JsonValue& json){
     const std::string* name = json.get_string();
     if (name == nullptr || name->empty()){
         return;
     }
     m_port = QSerialPortInfo(QString::fromStdString(*name));
 }
-JsonValue2 SerialSelector::to_json() const{
+JsonValue SerialSelector::to_json() const{
     return m_port->isNull() ? "" : m_port->portName().toStdString();
 }
 

@@ -37,8 +37,8 @@ const std::string MultiHostSlot::JSON_POST_RAID_DELAY   = "post_raid_delay";
 MultiHostSlot::MultiHostSlot(bool raid_code_option)
     : m_raid_code_option(raid_code_option)
 {}
-void MultiHostSlot::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void MultiHostSlot::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -59,8 +59,8 @@ void MultiHostSlot::load_json(const JsonValue2& json){
         post_raid_delay = QString::fromStdString(str);
     }
 }
-JsonValue2 MultiHostSlot::to_json() const{
-    JsonObject2 obj;
+JsonValue MultiHostSlot::to_json() const{
+    JsonObject obj;
     obj[JSON_GAME_SLOT] = game_slot;
     obj[JSON_USER_SLOT] = user_slot;
     obj[JSON_SKIPS] = skips;

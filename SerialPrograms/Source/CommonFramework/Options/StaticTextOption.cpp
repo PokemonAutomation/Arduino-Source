@@ -35,10 +35,10 @@ public:
 StaticTextOption::StaticTextOption(QString label)
     : m_label(std::move(label))
 {}
-void StaticTextOption::load_json(const JsonValue2&){
+void StaticTextOption::load_json(const JsonValue&){
 }
-JsonValue2 StaticTextOption::to_json() const{
-    return JsonValue2();
+JsonValue StaticTextOption::to_json() const{
+    return JsonValue();
 }
 ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
     return new StaticTextWidget(parent, *this);
@@ -49,10 +49,10 @@ ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
 SectionDividerOption::SectionDividerOption(QString label)
     : m_label(std::move(label))
 {}
-void SectionDividerOption::load_json(const JsonValue2&){
+void SectionDividerOption::load_json(const JsonValue&){
 }
-JsonValue2 SectionDividerOption::to_json() const{
-    return JsonValue2();
+JsonValue SectionDividerOption::to_json() const{
+    return JsonValue();
 }
 
 ConfigWidget* SectionDividerOption::make_ui(QWidget& parent){

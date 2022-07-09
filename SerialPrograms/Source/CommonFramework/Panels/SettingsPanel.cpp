@@ -13,10 +13,10 @@ namespace PokemonAutomation{
 
 
 
-void SettingsPanelInstance::from_json(const JsonValue2& json){
+void SettingsPanelInstance::from_json(const JsonValue& json){
     m_options.load_json(json);
 }
-JsonValue2 SettingsPanelInstance::to_json() const{
+JsonValue SettingsPanelInstance::to_json() const{
     return m_options.to_json();
 }
 QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelHolder& holder){

@@ -35,7 +35,7 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
-    const JsonValue2& json
+    const JsonValue& json
 )
     : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
@@ -47,12 +47,12 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
         resize(m_min_switches);
     }
 }
-void MultiSwitchSystemFactory::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void MultiSwitchSystemFactory::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
-    const JsonArray2* array = obj->get_array("DeviceList");
+    const JsonArray* array = obj->get_array("DeviceList");
     if (array != nullptr && !array->empty() && array->size() <= MAX_SWITCHES){
         m_switches.clear();
         size_t items = array->size();
@@ -69,10 +69,10 @@ void MultiSwitchSystemFactory::load_json(const JsonValue2& json){
     }
     obj->read_integer(m_active_switches, "ActiveDevices", m_min_switches, m_max_switches);
 }
-JsonValue2 MultiSwitchSystemFactory::to_json() const{
-    JsonObject2 obj;
+JsonValue MultiSwitchSystemFactory::to_json() const{
+    JsonObject obj;
     obj["ActiveDevices"] = m_active_switches;
-    JsonArray2 array;
+    JsonArray array;
     for (const auto& item : m_switches){
         array.push_back(item->to_json());
     }

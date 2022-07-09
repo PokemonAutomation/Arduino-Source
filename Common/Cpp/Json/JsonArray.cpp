@@ -11,14 +11,14 @@ namespace PokemonAutomation{
 
 
 
-std::string JsonArray2::dump(int indent) const{
+std::string JsonArray::dump(int indent) const{
     nlohmann::json::array_t ret;
     for (const auto& item : *this){
         ret.emplace_back(to_nlohmann(item));
     }
     return nlohmann::json(ret).dump(indent);
 }
-void JsonArray2::dump(const std::string& filename, int indent) const{
+void JsonArray::dump(const std::string& filename, int indent) const{
     string_to_file(filename, dump(indent));
 }
 

@@ -17,8 +17,8 @@ class DiscordIntegrationChannel : public EditableTableRow{
 public:
     DiscordIntegrationChannel();
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -50,7 +50,7 @@ class DiscordIntegrationTable : public DiscordIntegrationTableFactory, public Ed
 public:
     DiscordIntegrationTable();
 
-    virtual void load_json(const JsonValue2& json) override;
+    virtual void load_json(const JsonValue& json) override;
 
     size_t size() const;
     const DiscordIntegrationChannel& operator[](size_t index) const;

@@ -53,8 +53,8 @@ public:
     operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
     void set(size_t index){ m_current.store(index, std::memory_order_relaxed); }
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 

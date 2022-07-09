@@ -16,15 +16,15 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 
 
 class EditableTableRow{
 public:
     virtual ~EditableTableRow() = default;
 
-    virtual void load_json(const JsonValue2& json) = 0;
-    virtual JsonValue2 to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
+    virtual JsonValue to_json() const = 0;
 
     virtual std::unique_ptr<EditableTableRow> clone() const = 0;
 
@@ -51,10 +51,10 @@ public:
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 
-    void load_default(const JsonValue2& json);
-    void load_current(const JsonValue2& json);
-    JsonValue2 write_default() const;
-    JsonValue2 write_current() const;
+    void load_default(const JsonValue& json);
+    void load_current(const JsonValue& json);
+    JsonValue write_default() const;
+    JsonValue write_current() const;
 
     size_t size() const{ return m_current.size(); }
     const EditableTableRow& operator[](size_t index) const;
@@ -67,8 +67,8 @@ public:
     void remove_row(size_t index);
 
 private:
-    std::vector<std::unique_ptr<EditableTableRow>> load_json(const JsonValue2& json);
-    JsonValue2 to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const;
+    std::vector<std::unique_ptr<EditableTableRow>> load_json(const JsonValue& json);
+    JsonValue to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const;
 
 private:
     friend class EditableTableBaseWidget;

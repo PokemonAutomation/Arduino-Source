@@ -92,7 +92,7 @@ StringSelectOption::StringSelectOption(
     m_current.store(m_default, std::memory_order_relaxed);
 }
 
-void StringSelectOption::load_json(const JsonValue2& json){
+void StringSelectOption::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -102,7 +102,7 @@ void StringSelectOption::load_json(const JsonValue2& json){
         m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
-JsonValue2 StringSelectOption::to_json() const{
+JsonValue StringSelectOption::to_json() const{
     return m_case_list[(size_t)*this].first;
 }
 

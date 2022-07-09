@@ -14,13 +14,13 @@ namespace PokemonAutomation{
 
 
 
-class JsonArray2{
+class JsonArray{
 public:
-    JsonArray2() = default;
-    JsonArray2(JsonArray2&&) = default;
-    JsonArray2& operator=(JsonArray2&&) = delete;
-    JsonArray2(const JsonArray2&) = delete;
-    void operator=(const JsonArray2&) = delete;
+    JsonArray() = default;
+    JsonArray(JsonArray&&) = default;
+    JsonArray& operator=(JsonArray&&) = delete;
+    JsonArray(const JsonArray&) = delete;
+    void operator=(const JsonArray&) = delete;
 
 public:
     std::string dump(int indent = 4) const;
@@ -29,14 +29,14 @@ public:
     bool    empty   () const{ return m_data.empty(); }
     size_t  size    () const{return m_data.size(); }
 
-    const JsonValue2& operator[](size_t index) const{ return m_data[index]; }
-          JsonValue2& operator[](size_t index)      { return m_data[index]; }
+    const JsonValue& operator[](size_t index) const{ return m_data[index]; }
+          JsonValue& operator[](size_t index)      { return m_data[index]; }
 
-    void push_back(JsonValue2&& x){ m_data.emplace_back(std::move(x)); }
+    void push_back(JsonValue&& x){ m_data.emplace_back(std::move(x)); }
 
 public:
-    using const_iterator = std::vector<JsonValue2>::const_iterator;
-    using iterator = std::vector<JsonValue2>::iterator;
+    using const_iterator = std::vector<JsonValue>::const_iterator;
+    using iterator = std::vector<JsonValue>::iterator;
 
     const_iterator cbegin   () const{ return m_data.cbegin(); }
     const_iterator begin    () const{ return m_data.begin(); }
@@ -47,8 +47,8 @@ public:
           iterator end  ()      { return m_data.end(); }
 
 private:
-    friend class JsonValue2;
-    std::vector<JsonValue2> m_data;
+    friend class JsonValue;
+    std::vector<JsonValue> m_data;
 };
 
 

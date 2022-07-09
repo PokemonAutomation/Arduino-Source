@@ -58,8 +58,8 @@ const std::map<std::string, EggHatchGenderFilter> GenderFilter_MAP{
 EggHatchFilterRow::EggHatchFilterRow(EggHatchShinyFilter p_shiny)
     : shiny(p_shiny)
 {}
-void EggHatchFilterRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void EggHatchFilterRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -103,8 +103,8 @@ void EggHatchFilterRow::load_json(const JsonValue2& json){
         }
     }
 }
-JsonValue2 EggHatchFilterRow::to_json() const{
-    JsonObject2 obj;
+JsonValue EggHatchFilterRow::to_json() const{
+    JsonObject obj;
     obj["Action"] = EggHatchAction_NAMES[(size_t)action];
     obj["Shininess"] = EggHatchShinyFilter_NAMES[(size_t)shiny];
     obj["IV-HP"] = IVCheckerFilter_enum_to_string(iv_hp);
@@ -224,10 +224,10 @@ EggHatchFilterOption::EggHatchFilterOption()
     )
 {}
 
-void EggHatchFilterOption::load_json(const JsonValue2& json){
+void EggHatchFilterOption::load_json(const JsonValue& json){
     m_table.load_json(json);
 }
-JsonValue2 EggHatchFilterOption::to_json() const{
+JsonValue EggHatchFilterOption::to_json() const{
     return m_table.to_json();
 }
 void EggHatchFilterOption::restore_defaults(){

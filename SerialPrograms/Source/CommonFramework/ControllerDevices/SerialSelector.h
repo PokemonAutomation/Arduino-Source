@@ -18,7 +18,7 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 class SerialSelectorWidget;
 
 
@@ -32,11 +32,11 @@ public:
     SerialSelector(
         QString label,
         PABotBaseLevel minimum_pabotbase,
-        const JsonValue2& json
+        const JsonValue& json
     );
 
-    void load_json(const JsonValue2& json);
-    JsonValue2 to_json() const;
+    void load_json(const JsonValue& json);
+    JsonValue to_json() const;
 
     const QSerialPortInfo* port() const;
 

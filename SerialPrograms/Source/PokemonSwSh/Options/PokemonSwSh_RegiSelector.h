@@ -26,8 +26,8 @@ enum class RegiGolem{
 class RegiSelectorOption : public ConfigOption{
 public:
     RegiSelectorOption();
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     operator RegiGolem() const{ return m_current; }
     RegiGolem value() const{ return m_current; }

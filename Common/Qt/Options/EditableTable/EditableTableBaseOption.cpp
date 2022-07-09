@@ -29,8 +29,8 @@ EditableTableBaseOption::EditableTableBaseOption(
     restore_defaults();
 }
 
-std::vector<std::unique_ptr<EditableTableRow>> EditableTableBaseOption::load_json(const JsonValue2& json){
-    const JsonArray2* array = json.get_array();
+std::vector<std::unique_ptr<EditableTableRow>> EditableTableBaseOption::load_json(const JsonValue& json){
+    const JsonArray* array = json.get_array();
     if (array == nullptr){
         return {};
     }
@@ -41,25 +41,25 @@ std::vector<std::unique_ptr<EditableTableRow>> EditableTableBaseOption::load_jso
     }
     return table;
 }
-JsonValue2 EditableTableBaseOption::to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const{
-    JsonArray2 array;
+JsonValue EditableTableBaseOption::to_json(const std::vector<std::unique_ptr<EditableTableRow>>& table) const{
+    JsonArray array;
     for (const std::unique_ptr<EditableTableRow>& row : table){
         array.push_back(row->to_json());
     }
     return array;
 }
-void EditableTableBaseOption::load_default(const JsonValue2& json){
+void EditableTableBaseOption::load_default(const JsonValue& json){
     m_default = load_json(json);
 }
-void EditableTableBaseOption::load_current(const JsonValue2& json){
+void EditableTableBaseOption::load_current(const JsonValue& json){
     if (json.is_array()){
         m_current = load_json(json);
     }
 }
-JsonValue2 EditableTableBaseOption::write_default() const{
+JsonValue EditableTableBaseOption::write_default() const{
     return to_json(m_default);
 }
-JsonValue2 EditableTableBaseOption::write_current() const{
+JsonValue EditableTableBaseOption::write_current() const{
     return to_json(m_current);
 }
 

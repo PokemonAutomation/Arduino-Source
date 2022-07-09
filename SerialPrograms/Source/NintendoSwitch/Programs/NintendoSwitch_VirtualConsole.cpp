@@ -28,10 +28,10 @@ VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switch(0, PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE, false)
 {}
-void VirtualConsole::from_json(const JsonValue2& json){
+void VirtualConsole::from_json(const JsonValue& json){
     m_switch.load_json(json);
 }
-JsonValue2 VirtualConsole::to_json() const{
+JsonValue VirtualConsole::to_json() const{
     return m_switch.to_json();
 }
 QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){

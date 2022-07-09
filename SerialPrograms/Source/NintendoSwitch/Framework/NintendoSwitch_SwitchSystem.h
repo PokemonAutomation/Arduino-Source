@@ -33,10 +33,10 @@ public:
         size_t console_id,
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running,
-        const JsonValue2& json
+        const JsonValue& json
     );
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     const QSerialPortInfo* port() const;
 

@@ -21,10 +21,10 @@ FloatingPointOption::FloatingPointOption(
     : FloatingPointBaseOption(std::move(label), min_value, max_value, default_value)
 {}
 
-void FloatingPointOption::load_json(const JsonValue2& json){
+void FloatingPointOption::load_json(const JsonValue& json){
     return this->load_current(json);
 }
-JsonValue2 FloatingPointOption::to_json() const{
+JsonValue FloatingPointOption::to_json() const{
     return this->write_current();
 }
 

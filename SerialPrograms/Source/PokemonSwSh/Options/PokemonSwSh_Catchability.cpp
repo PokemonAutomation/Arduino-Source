@@ -41,13 +41,13 @@ CatchabilitySelectorOption::CatchabilitySelectorOption()
     , m_default(Catchability::ALWAYS_CATCHABLE)
     , m_current(Catchability::ALWAYS_CATCHABLE)
 {}
-void CatchabilitySelectorOption::load_json(const JsonValue2& json){
+void CatchabilitySelectorOption::load_json(const JsonValue& json){
     int index;
     if (json.read_integer(index, 0, 2)){
         m_current = (Catchability)index;
     }
 }
-JsonValue2 CatchabilitySelectorOption::to_json() const{
+JsonValue CatchabilitySelectorOption::to_json() const{
     return (int)m_current;
 }
 

@@ -13,7 +13,7 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 class ConfigWidget;
 
 
@@ -33,8 +33,8 @@ class ConfigOption{
 public:
     virtual ~ConfigOption() = default;
 
-    virtual void load_json(const JsonValue2& json) = 0;
-    virtual JsonValue2 to_json() const = 0;
+    virtual void load_json(const JsonValue& json) = 0;
+    virtual JsonValue to_json() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual QString check_validity() const;

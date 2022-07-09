@@ -42,8 +42,8 @@ EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOp
         m_name_map.emplace(option->label(), option);
     }
 }
-void EventNotificationsTable::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void EventNotificationsTable::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     ScreenshotOption screenshot_option("");
     for (EventNotificationOption* option : m_options){
         auto iter = obj->find(option->label().toStdString());
@@ -53,8 +53,8 @@ void EventNotificationsTable::load_json(const JsonValue2& json){
         option->load_json(iter->second);
     }
 }
-JsonValue2 EventNotificationsTable::to_json() const{
-    JsonObject2 obj;
+JsonValue EventNotificationsTable::to_json() const{
+    JsonObject obj;
     for (EventNotificationOption* option : m_options){
         obj[option->label().toStdString()] = option->to_json();
     }

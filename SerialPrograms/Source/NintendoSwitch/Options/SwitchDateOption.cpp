@@ -34,10 +34,10 @@ SwitchDateOption::SwitchDateOption(
 )
     : SwitchDateBaseOption(std::move(label), default_value)
 {}
-void SwitchDateOption::load_json(const JsonValue2& json){
+void SwitchDateOption::load_json(const JsonValue& json){
     return this->load_current(json);
 }
-JsonValue2 SwitchDateOption::to_json() const{
+JsonValue SwitchDateOption::to_json() const{
     return this->write_current();
 }
 

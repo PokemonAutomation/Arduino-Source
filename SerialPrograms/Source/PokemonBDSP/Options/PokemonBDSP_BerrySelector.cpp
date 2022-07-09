@@ -23,15 +23,15 @@ BerrySelectorRow::BerrySelectorRow()
 {
     berry_slug = BERRY_SLUGS()[0];
 }
-void BerrySelectorRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void BerrySelectorRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
     obj->read_string(berry_slug, "Berry");
 }
-JsonValue2 BerrySelectorRow::to_json() const{
-    JsonObject2 obj;
+JsonValue BerrySelectorRow::to_json() const{
+    JsonObject obj;
     obj["Berry"] = berry_slug;
     return obj;
 }
@@ -80,10 +80,10 @@ BerrySelectorOption::BerrySelectorOption(QString label)
     )
 {}
 
-void BerrySelectorOption::load_json(const JsonValue2& json){
+void BerrySelectorOption::load_json(const JsonValue& json){
     m_table.load_json(json);
 }
-JsonValue2 BerrySelectorOption::to_json() const{
+JsonValue BerrySelectorOption::to_json() const{
     return m_table.to_json();
 }
 void BerrySelectorOption::restore_defaults(){

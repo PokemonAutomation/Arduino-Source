@@ -16,7 +16,7 @@ class QJsonValue;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 
 
 class FloatingPointBaseOption{
@@ -40,10 +40,10 @@ public:
     QString check_validity(double x) const;
     void restore_defaults();
 
-    void load_default(const JsonValue2& json);
-    void load_current(const JsonValue2& json);
-    JsonValue2 write_default() const;
-    JsonValue2 write_current() const;
+    void load_default(const JsonValue& json);
+    void load_current(const JsonValue& json);
+    JsonValue write_default() const;
+    JsonValue write_current() const;
 
 protected:
     const QString m_label;

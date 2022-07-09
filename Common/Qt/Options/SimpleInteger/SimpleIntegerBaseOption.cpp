@@ -50,22 +50,22 @@ void SimpleIntegerBaseOption<Type>::restore_defaults(){
 
 
 template <typename Type>
-void SimpleIntegerBaseOption<Type>::load_default(const JsonValue2& json){
+void SimpleIntegerBaseOption<Type>::load_default(const JsonValue& json){
     json.read_integer(m_default, m_min_value, m_max_value);
 }
 template <typename Type>
-void SimpleIntegerBaseOption<Type>::load_current(const JsonValue2& json){
+void SimpleIntegerBaseOption<Type>::load_current(const JsonValue& json){
     Type value;
     if (json.read_integer(value, m_min_value, m_max_value)){
         m_current.store(value, std::memory_order_relaxed);
     }
 }
 template <typename Type>
-JsonValue2 SimpleIntegerBaseOption<Type>::write_default() const{
+JsonValue SimpleIntegerBaseOption<Type>::write_default() const{
     return m_default;
 }
 template <typename Type>
-JsonValue2 SimpleIntegerBaseOption<Type>::write_current() const{
+JsonValue SimpleIntegerBaseOption<Type>::write_current() const{
     return m_current.load(std::memory_order_relaxed);
 }
 

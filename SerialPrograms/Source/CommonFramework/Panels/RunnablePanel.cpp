@@ -33,10 +33,10 @@ std::unique_ptr<StatsTracker> RunnablePanelInstance::make_stats() const{
     return nullptr;
 }
 
-void RunnablePanelInstance::from_json(const JsonValue2& json){
+void RunnablePanelInstance::from_json(const JsonValue& json){
     m_options.load_json(json);
 }
-JsonValue2 RunnablePanelInstance::to_json() const{
+JsonValue RunnablePanelInstance::to_json() const{
     return m_options.to_json();
 }
 

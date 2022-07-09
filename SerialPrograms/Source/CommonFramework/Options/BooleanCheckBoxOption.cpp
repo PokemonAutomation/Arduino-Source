@@ -29,10 +29,10 @@ public:
 
 
 
-void BooleanCheckBoxOption::load_json(const JsonValue2& json){
+void BooleanCheckBoxOption::load_json(const JsonValue& json){
     load_current(json);
 }
-JsonValue2 BooleanCheckBoxOption::to_json() const{
+JsonValue BooleanCheckBoxOption::to_json() const{
     return write_current();
 }
 

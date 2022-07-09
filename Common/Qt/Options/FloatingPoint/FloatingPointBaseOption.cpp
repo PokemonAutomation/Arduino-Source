@@ -35,7 +35,7 @@ void FloatingPointBaseOption::restore_defaults(){
     m_current = m_default;
 }
 
-void FloatingPointBaseOption::load_default(const JsonValue2& json){
+void FloatingPointBaseOption::load_default(const JsonValue& json){
     double value;
     if (!json.read_float(value)){
         return;
@@ -44,7 +44,7 @@ void FloatingPointBaseOption::load_default(const JsonValue2& json){
     m_default = std::max(m_default, m_min_value);
     m_default = std::min(m_default, m_max_value);
 }
-void FloatingPointBaseOption::load_current(const JsonValue2& json){
+void FloatingPointBaseOption::load_current(const JsonValue& json){
     double value;
     if (!json.read_float(value)){
         return;
@@ -53,10 +53,10 @@ void FloatingPointBaseOption::load_current(const JsonValue2& json){
     value = std::min(value, m_max_value);
     m_current.store(value, std::memory_order_relaxed);
 }
-JsonValue2 FloatingPointBaseOption::write_default() const{
+JsonValue FloatingPointBaseOption::write_default() const{
     return m_default;
 }
-JsonValue2 FloatingPointBaseOption::write_current() const{
+JsonValue FloatingPointBaseOption::write_current() const{
     return m_current.load(std::memory_order_relaxed);
 }
 

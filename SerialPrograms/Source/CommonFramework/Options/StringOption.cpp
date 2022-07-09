@@ -27,10 +27,10 @@ StringOption::StringOption(
 {}
 
 
-void StringOption::load_json(const JsonValue2& json){
+void StringOption::load_json(const JsonValue& json){
     load_current(json);
 }
-JsonValue2 StringOption::to_json() const{
+JsonValue StringOption::to_json() const{
     return write_current();
 }
 

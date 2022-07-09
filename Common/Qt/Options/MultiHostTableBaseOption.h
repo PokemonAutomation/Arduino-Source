@@ -29,8 +29,8 @@ class MultiHostSlot : public EditableTableRow{
 public:
     MultiHostSlot(bool raid_code_option);
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 

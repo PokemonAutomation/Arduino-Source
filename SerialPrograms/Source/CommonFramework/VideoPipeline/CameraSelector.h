@@ -15,7 +15,7 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 class VideoDisplayWidget;
 
 
@@ -31,10 +31,10 @@ class CameraSelector{
 
 public:
     CameraSelector(QSize default_resolution);
-    CameraSelector(QSize default_resolution, const JsonValue2& json);
+    CameraSelector(QSize default_resolution, const JsonValue& json);
 
-    void load_json(const JsonValue2& json);
-    JsonValue2 to_json() const;
+    void load_json(const JsonValue& json);
+    JsonValue to_json() const;
 
     CameraSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder);
 

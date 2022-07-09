@@ -27,8 +27,8 @@ EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
 //    , shininess(rare_stars ? ShinyFilter::SQUARE_ONLY : ShinyFilter::STAR_ONLY)
 {}
 
-void EncounterFilterOverride::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void EncounterFilterOverride::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -50,8 +50,8 @@ void EncounterFilterOverride::load_json(const JsonValue2& json){
         }
     }
 }
-JsonValue2 EncounterFilterOverride::to_json() const{
-    JsonObject2 obj;
+JsonValue EncounterFilterOverride::to_json() const{
+    JsonObject obj;
     obj["Action"] = EncounterAction_NAMES[(size_t)action];
     obj["Ball"] = pokeball_slug;
     obj["Species"] = pokemon_slug;

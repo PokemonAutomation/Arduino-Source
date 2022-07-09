@@ -62,14 +62,14 @@ TradeCountTableOption::TradeCountTableOption()
         m_list.emplace_back(slug, research_catch_count(slug));
     }
 }
-void TradeCountTableOption::load_json(const JsonValue2& json){
-    const JsonArray2* array = json.get_array();
+void TradeCountTableOption::load_json(const JsonValue& json){
+    const JsonArray* array = json.get_array();
     if (array == nullptr){
         return;
     }
     std::map<std::string, int> map;
     for (const auto& item : *array){
-        const JsonObject2* obj = item.get_object();
+        const JsonObject* obj = item.get_object();
         if (obj == nullptr){
             continue;
         }
@@ -91,10 +91,10 @@ void TradeCountTableOption::load_json(const JsonValue2& json){
         filter.second = iter->second;
     }
 }
-JsonValue2 TradeCountTableOption::to_json() const{
-    JsonArray2 array;
+JsonValue TradeCountTableOption::to_json() const{
+    JsonArray array;
     for (const auto& item : m_list){
-        JsonObject2 obj;
+        JsonObject obj;
         obj["Slug"] = item.first;
         obj["Count"] = item.second;
         array.push_back(std::move(obj));

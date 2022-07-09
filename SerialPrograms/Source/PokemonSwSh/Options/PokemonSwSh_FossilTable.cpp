@@ -35,10 +35,10 @@ public:
 FossilTableOption::FossilTableOption()
     : m_table("<b>Game List:</b>", m_factory)
 {}
-void FossilTableOption::load_json(const JsonValue2& json){
+void FossilTableOption::load_json(const JsonValue& json){
     m_table.load_current(json);
 }
-JsonValue2 FossilTableOption::to_json() const{
+JsonValue FossilTableOption::to_json() const{
     return m_table.write_current();
 }
 

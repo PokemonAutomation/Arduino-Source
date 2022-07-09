@@ -36,10 +36,10 @@ TouchDateIntervalOption::TouchDateIntervalOption()
 }
 
 
-void TouchDateIntervalOption::load_json(const JsonValue2& json){
+void TouchDateIntervalOption::load_json(const JsonValue& json){
     m_hours.load_json(json);
 }
-JsonValue2 TouchDateIntervalOption::to_json() const{
+JsonValue TouchDateIntervalOption::to_json() const{
     return m_hours.to_json();
 }
 QString TouchDateIntervalOption::check_validity() const{

@@ -28,35 +28,35 @@ enum class JsonType{
 
 
 struct JsonNode;
-class JsonValue2;
-class JsonArray2;
-class JsonObject2;
+class JsonValue;
+class JsonArray;
+class JsonObject;
 
 
-class JsonValue2{
+class JsonValue{
 public:
-    ~JsonValue2();
-    JsonValue2(JsonValue2&& x);
-    void operator=(JsonValue2&& x);
-    JsonValue2(const JsonValue2& x) = delete;
-    void operator=(const JsonValue2& x) = delete;
+    ~JsonValue();
+    JsonValue(JsonValue&& x);
+    void operator=(JsonValue&& x);
+    JsonValue(const JsonValue& x) = delete;
+    void operator=(const JsonValue& x) = delete;
 
 public:
-    JsonValue2() = default;
-    JsonValue2(bool x);
-    JsonValue2(int64_t x);
-    JsonValue2(double x);
-    JsonValue2(const char* x);
-    JsonValue2(std::string x);
-    JsonValue2(JsonArray2&& x);
-    JsonValue2(JsonObject2&& x);
+    JsonValue() = default;
+    JsonValue(bool x);
+    JsonValue(int64_t x);
+    JsonValue(double x);
+    JsonValue(const char* x);
+    JsonValue(std::string x);
+    JsonValue(JsonArray&& x);
+    JsonValue(JsonObject&& x);
 
     template <typename Type>
-    JsonValue2(Type*) = delete;
+    JsonValue(Type*) = delete;
 
     template <typename Type, typename = std::enable_if<std::is_integral<Type>::value>>
-    JsonValue2(Type x)
-        : JsonValue2((int64_t)x)
+    JsonValue(Type x)
+        : JsonValue((int64_t)x)
     {}
 
     std::string dump(int indent = 4) const;
@@ -86,22 +86,22 @@ public:
 
     const std::string* get_string() const;
           std::string* get_string();
-    const JsonArray2* get_array() const;
-          JsonArray2* get_array();
-    const JsonObject2* get_object() const;
-          JsonObject2* get_object();
+    const JsonArray* get_array() const;
+          JsonArray* get_array();
+    const JsonObject* get_object() const;
+          JsonObject* get_object();
 
 private:
     JsonType m_type = JsonType::EMPTY;
     JsonNode* m_node = nullptr;
 };
 
-JsonValue2 parse_json(const std::string& str);
+JsonValue parse_json(const std::string& str);
 
 
 
 template <typename Type>
-bool JsonValue2::read_integer(Type& value, int64_t min, int64_t max) const{
+bool JsonValue::read_integer(Type& value, int64_t min, int64_t max) const{
     static_assert(std::is_integral<Type>::value);
     if (std::is_unsigned<Type>::value){
         uint64_t tmp;

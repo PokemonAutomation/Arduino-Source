@@ -22,11 +22,11 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 {}
 
 template <typename Type>
-void SimpleIntegerOption<Type>::load_json(const JsonValue2& json){
+void SimpleIntegerOption<Type>::load_json(const JsonValue& json){
     return this->load_current(json);
 }
 template <typename Type>
-JsonValue2 SimpleIntegerOption<Type>::to_json() const{
+JsonValue SimpleIntegerOption<Type>::to_json() const{
     return this->write_current();
 }
 

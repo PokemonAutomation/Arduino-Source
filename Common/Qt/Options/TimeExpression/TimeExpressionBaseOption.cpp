@@ -70,7 +70,7 @@ QString TimeExpressionBaseOption<Type>::time_string() const{
 }
 
 template <typename Type>
-void TimeExpressionBaseOption<Type>::load_default(const JsonValue2& json){
+void TimeExpressionBaseOption<Type>::load_default(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -79,7 +79,7 @@ void TimeExpressionBaseOption<Type>::load_default(const JsonValue2& json){
     m_error = process(m_current, m_value);
 }
 template <typename Type>
-void TimeExpressionBaseOption<Type>::load_current(const JsonValue2& json){
+void TimeExpressionBaseOption<Type>::load_current(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -89,11 +89,11 @@ void TimeExpressionBaseOption<Type>::load_current(const JsonValue2& json){
     m_error = process(m_current, m_value);
 }
 template <typename Type>
-JsonValue2 TimeExpressionBaseOption<Type>::write_default() const{
+JsonValue TimeExpressionBaseOption<Type>::write_default() const{
     return m_default.toStdString();
 }
 template <typename Type>
-JsonValue2 TimeExpressionBaseOption<Type>::write_current() const{
+JsonValue TimeExpressionBaseOption<Type>::write_current() const{
     SpinLockGuard lg(m_lock);
     return m_current.toStdString();
 }

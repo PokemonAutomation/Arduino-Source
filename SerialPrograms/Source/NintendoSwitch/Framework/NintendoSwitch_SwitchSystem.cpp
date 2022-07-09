@@ -36,7 +36,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
-    const JsonValue2& json
+    const JsonValue& json
 )
     : SwitchSystemFactory(
           console_id,
@@ -46,13 +46,13 @@ SwitchSystemFactory::SwitchSystemFactory(
 {
     load_json(json);
 }
-void SwitchSystemFactory::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void SwitchSystemFactory::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
 //    json_get_bool(m_settings_visible, obj, "SettingsVisible");
-    const JsonValue2* value;
+    const JsonValue* value;
     value = obj->get_value(JSON_SERIAL);
     if (value){
         m_serial.load_json(*value);
@@ -66,8 +66,8 @@ void SwitchSystemFactory::load_json(const JsonValue2& json){
         m_audio.load_json(*value);
     }
 }
-JsonValue2 SwitchSystemFactory::to_json() const{
-    JsonObject2 root;
+JsonValue SwitchSystemFactory::to_json() const{
+    JsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
     root[JSON_SERIAL] = m_serial.to_json();
     root[JSON_CAMERA] = m_serial.to_json();

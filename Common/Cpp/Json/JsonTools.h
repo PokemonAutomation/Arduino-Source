@@ -18,11 +18,11 @@ namespace PokemonAutomation{
 
 void string_to_file(const std::string& filename, const std::string& str);
 
-JsonValue2 from_nlohmann(const nlohmann::json& json);
-nlohmann::json to_nlohmann(const JsonValue2& json);
+JsonValue from_nlohmann(const nlohmann::json& json);
+nlohmann::json to_nlohmann(const JsonValue& json);
 
-JsonValue2 from_QJson(const QJsonValue& json);
-QJsonValue to_QJson(const JsonValue2& json);
+JsonValue from_QJson(const QJsonValue& json);
+QJsonValue to_QJson(const JsonValue& json);
 
 
 }

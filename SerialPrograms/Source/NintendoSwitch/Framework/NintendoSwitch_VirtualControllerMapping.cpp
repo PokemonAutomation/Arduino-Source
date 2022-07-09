@@ -259,17 +259,17 @@ const ControllerButton* button_lookup(Qt::Key key){
 
 
 
-JsonArray2 read_keyboard_mapping(){
-    JsonArray2 array;
+JsonArray read_keyboard_mapping(){
+    JsonArray array;
     for (const auto& item : keyboard_mapping){
-        JsonObject2 pair;
+        JsonObject pair;
         pair["Qt::Key"] = (int64_t)item.first;
         pair["Button"] = controller_button_to_string(item.second).toStdString();
         array.push_back(std::move(pair));
     }
     return array;
 }
-void set_keyboard_mapping(const JsonArray2& json){
+void set_keyboard_mapping(const JsonArray& json){
     if (json.empty()){
         return;
     }
@@ -277,7 +277,7 @@ void set_keyboard_mapping(const JsonArray2& json){
     std::vector<std::pair<Qt::Key, const ControllerButton&>> mapping;
 
     for (const auto& item : json){
-        const JsonObject2* obj = item.get_object();
+        const JsonObject* obj = item.get_object();
         if (obj == nullptr){
             continue;
         }

@@ -33,8 +33,8 @@ public:
     QString check_validity(const QString& x) const;
     virtual void restore_defaults() override;
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

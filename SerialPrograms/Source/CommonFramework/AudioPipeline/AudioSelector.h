@@ -14,7 +14,7 @@ class QWidget;
 
 namespace PokemonAutomation{
 
-class JsonValue2;
+class JsonValue;
 class AudioDisplayWidget;
 class AudioSelectorWidget;
 
@@ -41,10 +41,10 @@ public:
     static std::string audioDisplayTypeToString(AudioDisplayType type);
 
     AudioSelector();
-    AudioSelector(const JsonValue2& json);
+    AudioSelector(const JsonValue& json);
 
-    void load_json(const JsonValue2& json);
-    JsonValue2 to_json() const;
+    void load_json(const JsonValue& json);
+    JsonValue to_json() const;
 
     AudioSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, AudioDisplayWidget& holder);
 

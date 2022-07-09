@@ -50,10 +50,10 @@ EggStepCountOption::EggStepCountOption()
     , m_default(3)
     , m_current(3)
 {}
-void EggStepCountOption::load_json(const JsonValue2& json){
+void EggStepCountOption::load_json(const JsonValue& json){
     json.read_integer(m_current, 0, STEP_COUNTS.size() - 1);
 }
-JsonValue2 EggStepCountOption::to_json() const{
+JsonValue EggStepCountOption::to_json() const{
     return (int)m_current;
 }
 

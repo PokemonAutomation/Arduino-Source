@@ -51,8 +51,8 @@ PreloadSettings& PreloadSettings::instance(){
     static PreloadSettings settings;
     return settings;
 }
-void PreloadSettings::load(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void PreloadSettings::load(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -179,8 +179,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 }
 
-void GlobalSettings::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void GlobalSettings::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -200,7 +200,7 @@ void GlobalSettings::load_json(const JsonValue2& json){
 
     COMMAND_LINE_TEST_LIST.clear();
     COMMAND_LINE_IGNORE_LIST.clear();
-    const JsonObject2* command_line_tests_setting = obj->get_object("COMMAND_LINE_TESTS");
+    const JsonObject* command_line_tests_setting = obj->get_object("COMMAND_LINE_TESTS");
     if (command_line_tests_setting){
         command_line_tests_setting->read_boolean(COMMAND_LINE_TEST_MODE, "RUN");
 
@@ -208,7 +208,7 @@ void GlobalSettings::load_json(const JsonValue2& json){
             COMMAND_LINE_TEST_FOLDER = "CommandLineTests";
         }
 
-        const JsonArray2* test_list = command_line_tests_setting->get_array("TEST_LIST");
+        const JsonArray* test_list = command_line_tests_setting->get_array("TEST_LIST");
         if (test_list){
             for (const auto& value: *test_list){
                 if (!value.is_string()){
@@ -220,7 +220,7 @@ void GlobalSettings::load_json(const JsonValue2& json){
                 }
             }
         }
-        const JsonArray2* ignore_list = command_line_tests_setting->get_array("IGNORE_LIST");
+        const JsonArray* ignore_list = command_line_tests_setting->get_array("IGNORE_LIST");
         if (ignore_list){
             for (const auto& value: *ignore_list){
                 if (!value.is_string()){
@@ -252,16 +252,16 @@ void GlobalSettings::load_json(const JsonValue2& json){
 }
 
 
-JsonValue2 GlobalSettings::to_json() const{
-    JsonObject2 obj = std::move(*BatchOption::to_json().get_object());
+JsonValue GlobalSettings::to_json() const{
+    JsonObject obj = std::move(*BatchOption::to_json().get_object());
     obj["NAUGHTY_MODE"] = PreloadSettings::instance().NAUGHTY_MODE;
 
-    JsonObject2 command_line_test_obj;
+    JsonObject command_line_test_obj;
     command_line_test_obj["RUN"] = COMMAND_LINE_TEST_MODE;
     command_line_test_obj["FOLDER"] = COMMAND_LINE_TEST_FOLDER;
 
     {
-        JsonArray2 test_list;
+        JsonArray test_list;
         for(const auto& name : COMMAND_LINE_TEST_LIST){
             test_list.push_back(name);
         }
@@ -269,7 +269,7 @@ JsonValue2 GlobalSettings::to_json() const{
     }
 
     {
-        JsonArray2 ignore_list;
+        JsonArray ignore_list;
         for(const auto& name : COMMAND_LINE_IGNORE_LIST){
             ignore_list.push_back(name);
         }

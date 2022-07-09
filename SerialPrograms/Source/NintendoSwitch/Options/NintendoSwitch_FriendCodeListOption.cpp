@@ -40,8 +40,8 @@ FriendCodeListOption::FriendCodeListOption(QString label, std::vector<QString> d
     , m_lines(m_default)
 {}
 
-void FriendCodeListOption::load_json(const JsonValue2& json){
-    const JsonArray2* list = json.get_array();
+void FriendCodeListOption::load_json(const JsonValue& json){
+    const JsonArray* list = json.get_array();
     if (list == nullptr){
         return;
     }
@@ -54,8 +54,8 @@ void FriendCodeListOption::load_json(const JsonValue2& json){
         m_lines.emplace_back(QString::fromStdString(*str));
     }
 }
-JsonValue2 FriendCodeListOption::to_json() const{
-    JsonArray2 list;
+JsonValue FriendCodeListOption::to_json() const{
+    JsonArray list;
     for (const QString& line : m_lines){
         list.push_back(line.toStdString());
     }

@@ -40,7 +40,7 @@ void StringBaseOption::restore_defaults(){
     m_current = m_default;
 }
 
-void StringBaseOption::load_default(const JsonValue2& json){
+void StringBaseOption::load_default(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr) {
         return;
@@ -48,7 +48,7 @@ void StringBaseOption::load_default(const JsonValue2& json){
     SpinLockGuard lg(m_lock);
     m_default = QString::fromStdString(*str);
 }
-void StringBaseOption::load_current(const JsonValue2& json){
+void StringBaseOption::load_current(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr) {
         return;
@@ -56,11 +56,11 @@ void StringBaseOption::load_current(const JsonValue2& json){
     SpinLockGuard lg(m_lock);
     m_current = QString::fromStdString(*str);
 }
-JsonValue2 StringBaseOption::write_default() const{
+JsonValue StringBaseOption::write_default() const{
     SpinLockGuard lg(m_lock);
     return m_default.toStdString();
 }
-JsonValue2 StringBaseOption::write_current() const{
+JsonValue StringBaseOption::write_current() const{
     SpinLockGuard lg(m_lock);
     return m_current.toStdString();
 }

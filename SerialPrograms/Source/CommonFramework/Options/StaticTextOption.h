@@ -20,8 +20,8 @@ public:
 
     const QString& label() const{ return m_label; }
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
@@ -35,8 +35,8 @@ private:
 class SectionDividerOption : public ConfigOption{
 public:
     SectionDividerOption(QString label);
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

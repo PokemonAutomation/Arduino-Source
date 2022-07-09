@@ -21,22 +21,22 @@ BooleanCheckBoxBaseOption::BooleanCheckBoxBaseOption(
 {}
 
 
-void BooleanCheckBoxBaseOption::load_default(const JsonValue2& json){
+void BooleanCheckBoxBaseOption::load_default(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
         m_default = value;
     }
 }
-void BooleanCheckBoxBaseOption::load_current(const JsonValue2& json){
+void BooleanCheckBoxBaseOption::load_current(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
         m_current.store(value, std::memory_order_relaxed);
     }
 }
-JsonValue2 BooleanCheckBoxBaseOption::write_default() const{
+JsonValue BooleanCheckBoxBaseOption::write_default() const{
     return m_default;
 }
-JsonValue2 BooleanCheckBoxBaseOption::write_current() const{
+JsonValue BooleanCheckBoxBaseOption::write_current() const{
     return m_current.load(std::memory_order_relaxed);
 }
 

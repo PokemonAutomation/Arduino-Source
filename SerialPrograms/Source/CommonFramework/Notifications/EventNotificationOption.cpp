@@ -48,22 +48,22 @@ std::vector<QString> EventNotificationSettings::parse_tags(const QString& str){
 
 
 
-void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
     obj->read_boolean(enabled, "Enabled");
     obj->read_boolean(ping, "Ping");
     if (enable_screenshot){
-        const JsonValue2* value = obj->get_value("Screenshot");
+        const JsonValue* value = obj->get_value("Screenshot");
         if (value){
             ScreenshotOption screenshot_option("");
             screenshot_option.load_json(*value);
             screenshot = screenshot_option;
         }
     }
-    const JsonArray2* array = obj->get_array("Tags");
+    const JsonArray* array = obj->get_array("Tags");
     if (array){
         tags.clear();
         for (const auto& tag : *array){
@@ -77,8 +77,8 @@ void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValu
     obj->read_integer(rate_limit_seconds, "RateLimitSeconds");
     rate_limit = std::chrono::seconds(rate_limit_seconds);
 }
-JsonValue2 EventNotificationSettings::to_json(bool enable_screenshot) const{
-    JsonObject2 obj;
+JsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
+    JsonObject obj;
     obj["Enabled"] = enabled;
     obj["Ping"] = ping;
     if (enable_screenshot){
@@ -86,7 +86,7 @@ JsonValue2 EventNotificationSettings::to_json(bool enable_screenshot) const{
         screenshot_option = screenshot;
         obj["Screenshot"] = screenshot_option.to_json();
     }
-    JsonArray2 array;
+    JsonArray array;
     for (const QString& tag : tags){
 //        cout << tag.toStdString() << endl;
         array.push_back(tag.toStdString());
@@ -152,10 +152,10 @@ EventNotificationOption::EventNotificationOption(
 }
 
 
-void EventNotificationOption::load_json(const JsonValue2& json){
+void EventNotificationOption::load_json(const JsonValue& json){
     m_current.load_json(screenshot_supported, json);
 }
-JsonValue2 EventNotificationOption::to_json() const{
+JsonValue EventNotificationOption::to_json() const{
     return m_current.to_json(screenshot_supported);
 }
 void EventNotificationOption::restore_defaults(){

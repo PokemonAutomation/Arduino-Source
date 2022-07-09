@@ -41,8 +41,8 @@ enum class EggHatchGenderFilter{
 class EggHatchFilterRow : public EditableTableRow{
 public:
     EggHatchFilterRow(EggHatchShinyFilter p_shiny = EggHatchShinyFilter::Anything);
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
@@ -77,8 +77,8 @@ public:
 
     EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const;
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 

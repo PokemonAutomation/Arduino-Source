@@ -24,8 +24,8 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     , tags({"Notifs", "Showcase", "LiveHost"})
 {}
 
-void DiscordWebhookUrl::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void DiscordWebhookUrl::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -37,7 +37,7 @@ void DiscordWebhookUrl::load_json(const JsonValue2& json){
         }
     }
     obj->read_boolean(ping, "Ping");
-    const JsonArray2* array = obj->get_array("Tags");
+    const JsonArray* array = obj->get_array("Tags");
     if (array){
         tags.clear();
         for (const auto& tag : *array){
@@ -58,12 +58,12 @@ void DiscordWebhookUrl::load_json(const JsonValue2& json){
         }
     }
 }
-JsonValue2 DiscordWebhookUrl::to_json() const{
-    JsonObject2 obj;
+JsonValue DiscordWebhookUrl::to_json() const{
+    JsonObject obj;
     obj["Enabled"] = enabled;
     obj["Label"] = label.toStdString();
     obj["Ping"] = ping;
-    JsonArray2 array;
+    JsonArray array;
     for (const QString& tag : tags){
         array.push_back(tag.toStdString());
     }

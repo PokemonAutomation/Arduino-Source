@@ -41,8 +41,8 @@ const std::map<QString, int> FOSSIL_MAP{
 
 
 
-void FossilGame::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void FossilGame::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -60,8 +60,8 @@ void FossilGame::load_json(const JsonValue2& json){
 
     obj->read_integer(revives, JSON_REVIVES, 0, 965);
 }
-JsonValue2 FossilGame::to_json() const{
-    JsonObject2 obj;
+JsonValue FossilGame::to_json() const{
+    JsonObject obj;
     obj[JSON_GAME_SLOT] = game_slot;
     obj[JSON_USER_SLOT] = user_slot;
     obj[JSON_FOSSIL] = FOSSIL_LIST[fossil].toStdString();

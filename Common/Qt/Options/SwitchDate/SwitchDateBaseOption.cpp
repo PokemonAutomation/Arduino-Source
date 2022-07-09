@@ -26,8 +26,8 @@ bool valid_switch_date(const QDate& date){
     }
     return true;
 }
-bool json_parse_date(QDate& date, const JsonValue2& value){
-    const JsonArray2* array = value.get_array();
+bool json_parse_date(QDate& date, const JsonValue& value){
+    const JsonArray* array = value.get_array();
     if (array == nullptr || array->size() != 3){
         return false;
     }
@@ -48,8 +48,8 @@ bool json_parse_date(QDate& date, const JsonValue2& value){
     date = try_date;
     return true;
 }
-JsonArray2 json_write_date(const QDate& date){
-    JsonArray2 array;
+JsonArray json_write_date(const QDate& date){
+    JsonArray array;
     array.push_back(date.year());
     array.push_back(date.month());
     array.push_back(date.day());
@@ -97,17 +97,17 @@ void SwitchDateBaseOption::restore_defaults(){
 
 
 
-void SwitchDateBaseOption::load_default(const JsonValue2& json){
+void SwitchDateBaseOption::load_default(const JsonValue& json){
     json_parse_date(m_default, json);
 }
-void SwitchDateBaseOption::load_current(const JsonValue2& json){
+void SwitchDateBaseOption::load_current(const JsonValue& json){
     SpinLockGuard lg(m_lock);
     json_parse_date(m_current, json);
 }
-JsonValue2 SwitchDateBaseOption::write_default() const{
+JsonValue SwitchDateBaseOption::write_default() const{
     return json_write_date(m_default);
 }
-JsonValue2 SwitchDateBaseOption::write_current() const{
+JsonValue SwitchDateBaseOption::write_current() const{
     SpinLockGuard lg(m_lock);
     return json_write_date(m_current);
 }

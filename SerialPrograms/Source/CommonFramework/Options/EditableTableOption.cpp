@@ -24,10 +24,10 @@ EditableTableOption::EditableTableOption(
     : EditableTableBaseOption(std::move(label), factory, std::move(default_value))
 {}
 
-void EditableTableOption::load_json(const JsonValue2& json){
+void EditableTableOption::load_json(const JsonValue& json){
     return EditableTableBaseOption::load_current(json);
 }
-JsonValue2 EditableTableOption::to_json() const{
+JsonValue EditableTableOption::to_json() const{
     return EditableTableBaseOption::write_current();
 }
 

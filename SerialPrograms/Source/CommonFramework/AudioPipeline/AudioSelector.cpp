@@ -47,12 +47,12 @@ std::string AudioSelector::audioDisplayTypeToString(AudioSelector::AudioDisplayT
 }
 
 AudioSelector::AudioSelector() {}
-AudioSelector::AudioSelector(const JsonValue2& json){
+AudioSelector::AudioSelector(const JsonValue& json){
     load_json(json);
 }
 
-void AudioSelector::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void AudioSelector::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -85,8 +85,8 @@ void AudioSelector::load_json(const JsonValue2& json){
     }
 }
 
-JsonValue2 AudioSelector::to_json() const{
-    JsonObject2 root;
+JsonValue AudioSelector::to_json() const{
+    JsonObject root;
     root[JSON_INPUT_DEVICE] = m_inputDevice.device_name();
     root[JSON_INPUT_FORMAT] = AUDIO_FORMAT_LABELS[(size_t)m_inputFormat];
     root[JSON_OUTPUT_DEVICE] = m_outputDevice.device_name();

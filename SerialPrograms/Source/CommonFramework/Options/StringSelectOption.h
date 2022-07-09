@@ -34,8 +34,8 @@ public:
     operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
     operator const std::string&() const{ return m_case_list[(size_t)*this].first; }
 
-    virtual void load_json(const JsonValue2& json) override;
-    virtual JsonValue2 to_json() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
 

@@ -42,11 +42,11 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 {}
 
 template <typename Type>
-void TimeExpressionOption<Type>::load_json(const JsonValue2& json){
+void TimeExpressionOption<Type>::load_json(const JsonValue& json){
     this->load_current(json);
 }
 template <typename Type>
-JsonValue2 TimeExpressionOption<Type>::to_json() const{
+JsonValue TimeExpressionOption<Type>::to_json() const{
     return this->write_current();
 }
 

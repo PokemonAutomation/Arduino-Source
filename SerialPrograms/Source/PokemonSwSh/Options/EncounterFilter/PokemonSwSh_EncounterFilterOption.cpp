@@ -74,10 +74,10 @@ std::vector<EncounterFilterOverride> EncounterFilterOption::overrides() const{
     }
     return ret;
 }
-void EncounterFilterOption::load_json(const JsonValue2& json){
+void EncounterFilterOption::load_json(const JsonValue& json){
     using namespace Pokemon;
 
-    const JsonObject2* obj = json.get_object();
+    const JsonObject* obj = json.get_object();
 
     const std::string* str = obj->get_string("ShinyFilter");
     if (str != nullptr){
@@ -88,14 +88,14 @@ void EncounterFilterOption::load_json(const JsonValue2& json){
     }
 
     if (m_enable_overrides){
-        const JsonValue2* value = obj->get_value("Overrides");
+        const JsonValue* value = obj->get_value("Overrides");
         if (value != nullptr){
             m_table.load_json(*value);
         }
     }
 }
-JsonValue2 EncounterFilterOption::to_json() const{
-    JsonObject2 obj;
+JsonValue EncounterFilterOption::to_json() const{
+    JsonObject obj;
     obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)m_shiny_filter_current];
     if (m_enable_overrides){
         obj["Overrides"] = m_table.to_json();

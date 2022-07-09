@@ -79,7 +79,7 @@ LanguageOCR::LanguageOCR(QString label, const LanguageSet& languages, bool requi
 
 
 
-void LanguageOCR::load_json(const JsonValue2& json){
+void LanguageOCR::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -96,7 +96,7 @@ void LanguageOCR::load_json(const JsonValue2& json){
         m_current = iter->second;
     }
 }
-JsonValue2 LanguageOCR::to_json() const{
+JsonValue LanguageOCR::to_json() const{
     return language_data(m_case_list[m_current].first).code;
 }
 

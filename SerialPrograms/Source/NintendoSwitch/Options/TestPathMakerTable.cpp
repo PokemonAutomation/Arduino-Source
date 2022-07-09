@@ -62,8 +62,8 @@ const std::map<QString, PathAction> PathAction_MAP{
 
 TestPathMakerTableRow::TestPathMakerTableRow() {}
 
-void TestPathMakerTableRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void TestPathMakerTableRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -109,8 +109,8 @@ void TestPathMakerTableRow::load_json(const JsonValue2& json){
 
 }
 
-JsonValue2 TestPathMakerTableRow::to_json() const{
-    JsonObject2 obj;
+JsonValue TestPathMakerTableRow::to_json() const{
+    JsonObject obj;
     obj["Action"] = PathAction_NAMES[(size_t)action].toStdString();
     switch(action){
     case PathAction::B:
@@ -388,7 +388,7 @@ public:
             std::cout << "Save TestPath from " << path.toStdString() << std::endl;
             if (path.size() > 0){
                 try{
-                    JsonObject2 root;
+                    JsonObject root;
                     root["TEST_PATH_MAKER_TABLE"] = value.to_json();
                     QJsonObject obj = to_QJson(std::move(root)).toObject();
                     write_json_file(path, QJsonDocument(obj));

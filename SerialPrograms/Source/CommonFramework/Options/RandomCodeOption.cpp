@@ -102,8 +102,8 @@ RandomCodeOption::RandomCodeOption(QString label, size_t random_digits, QString 
     , m_default(random_digits, std::move(code_string))
     , m_current(m_default)
 {}
-void RandomCodeOption::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void RandomCodeOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -114,8 +114,8 @@ void RandomCodeOption::load_json(const JsonValue2& json){
         m_current.m_code = QString::fromStdString(code);
     }
 }
-JsonValue2 RandomCodeOption::to_json() const{
-    JsonObject2 obj;
+JsonValue RandomCodeOption::to_json() const{
+    JsonObject obj;
     obj["RandomDigits"] = m_current.m_random_digits;
     obj["RaidCode"] = m_current.m_code.toStdString();
     return obj;

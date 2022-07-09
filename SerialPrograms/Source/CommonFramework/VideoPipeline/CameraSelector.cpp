@@ -22,14 +22,14 @@ CameraSelector::CameraSelector(QSize default_resolution)
     : m_default_resolution(default_resolution)
     , m_current_resolution(default_resolution)
 {}
-CameraSelector::CameraSelector(QSize default_resolution, const JsonValue2& json)
+CameraSelector::CameraSelector(QSize default_resolution, const JsonValue& json)
     : CameraSelector(default_resolution)
 {
     load_json(json);
 }
 
-void CameraSelector::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void CameraSelector::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -37,7 +37,7 @@ void CameraSelector::load_json(const JsonValue2& json){
     if (name != nullptr){
         m_camera = CameraInfo(*name);
     }
-    const JsonArray2* res = obj->get_array(JSON_RESOLUTION);
+    const JsonArray* res = obj->get_array(JSON_RESOLUTION);
     if (res != nullptr && res->size() == 2){
         do{
             int width, height;
@@ -51,10 +51,10 @@ void CameraSelector::load_json(const JsonValue2& json){
         }while (false);
     }
 }
-JsonValue2 CameraSelector::to_json() const{
-    JsonObject2 root;
+JsonValue CameraSelector::to_json() const{
+    JsonObject root;
     root[JSON_CAMERA] = m_camera.device_name();
-    JsonArray2 res;
+    JsonArray res;
     res.push_back(m_current_resolution.width());
     res.push_back(m_current_resolution.height());
     root[JSON_RESOLUTION] = std::move(res);

@@ -47,8 +47,8 @@ ProcessorLevelOption::ProcessorLevelOption()
 {
     set_global();
 }
-void ProcessorLevelOption::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void ProcessorLevelOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -64,7 +64,7 @@ void ProcessorLevelOption::load_json(const JsonValue2& json){
 
     if (processor_string == *saved_string){
         global_logger_tagged().log("Processor string matches. Using stored processor level.", COLOR_BLUE);
-        const JsonValue2* value = obj->get_value("Level");
+        const JsonValue* value = obj->get_value("Level");
         if (value){
             EnumDropdownOption::load_json(*value);
         }
@@ -73,8 +73,8 @@ void ProcessorLevelOption::load_json(const JsonValue2& json){
         global_logger_tagged().log("Mismatched processor string. Will not load saved processor level.", COLOR_RED);
     }
 }
-JsonValue2 ProcessorLevelOption::to_json() const{
-    JsonObject2 obj;
+JsonValue ProcessorLevelOption::to_json() const{
+    JsonObject obj;
     obj["Level"] = EnumDropdownOption::to_json();
     obj["ProcessorString"] = get_processor_name();
     return obj;

@@ -24,8 +24,8 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     , allow_commands(true)
 {}
 
-void DiscordIntegrationChannel::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void DiscordIntegrationChannel::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -37,7 +37,7 @@ void DiscordIntegrationChannel::load_json(const JsonValue2& json){
         }
     }
     obj->read_boolean(ping, "Label");
-    const JsonArray2* array = obj->get_array("Tags");
+    const JsonArray* array = obj->get_array("Tags");
     if (array != nullptr){
         tags.clear();
         for (const auto& tag : *array){
@@ -59,12 +59,12 @@ void DiscordIntegrationChannel::load_json(const JsonValue2& json){
         }
     }
 }
-JsonValue2 DiscordIntegrationChannel::to_json() const{
-    JsonObject2 obj;
+JsonValue DiscordIntegrationChannel::to_json() const{
+    JsonObject obj;
     obj["Enabled"] = enabled;
     obj["Label"] = label.toStdString();
     obj["Ping"] = ping;
-    JsonArray2 array;
+    JsonArray array;
     for (const QString& tag : tags){
         array.push_back(tag.toStdString());
     }
@@ -192,7 +192,7 @@ DiscordIntegrationTable::DiscordIntegrationTable()
         *this
     )
 {}
-void DiscordIntegrationTable::load_json(const JsonValue2& json){
+void DiscordIntegrationTable::load_json(const JsonValue& json){
     EditableTableOption::load_json(json);
     if (size() == 0){
         std::unique_ptr<DiscordIntegrationChannel> row;

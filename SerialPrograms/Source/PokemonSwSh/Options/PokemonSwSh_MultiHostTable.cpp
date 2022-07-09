@@ -34,10 +34,10 @@ MultiHostTableOption::MultiHostTableOption()
     : m_factory(true)
     , m_table("<b>Game List:</b>", m_factory)
 {}
-void MultiHostTableOption::load_json(const JsonValue2& json){
+void MultiHostTableOption::load_json(const JsonValue& json){
     m_table.load_current(json);
 }
-JsonValue2 MultiHostTableOption::to_json() const{
+JsonValue MultiHostTableOption::to_json() const{
     return m_table.write_current();
 }
 

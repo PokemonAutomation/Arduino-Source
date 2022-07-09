@@ -101,8 +101,8 @@ const std::map<std::string, PathSpeed> PathSpeed_MAP{
 
 CustomPathTableRow::CustomPathTableRow() {}
 
-void CustomPathTableRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void CustomPathTableRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -162,8 +162,8 @@ void CustomPathTableRow::load_json(const JsonValue2& json){
     // json_get_int(num_turns_to_switch, obj, "Turns", 0);
 }
 
-JsonValue2 CustomPathTableRow::to_json() const{
-    JsonObject2 obj;
+JsonValue CustomPathTableRow::to_json() const{
+    JsonObject obj;
     obj["Action"] = PathAction_NAMES[(size_t)action];
     switch(action){
     case PathAction::CHANGE_MOUNT:
@@ -522,7 +522,7 @@ public:
             std::cout << "Save CustomPathTable from " << path.toStdString() << std::endl;
             if (path.size() > 0){
                 try{
-                    JsonObject2 root;
+                    JsonObject root;
                     root["CUSTOM_PATH_TABLE"] = value.to_json();
                     write_json_file(path, QJsonDocument(to_QJson(std::move(root)).toObject()));
                 }catch (FileException&){

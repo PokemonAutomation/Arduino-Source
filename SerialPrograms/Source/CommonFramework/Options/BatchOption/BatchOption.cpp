@@ -18,22 +18,22 @@ void BatchOption::add_option(ConfigOption& option, std::string serialization_str
     m_options.emplace_back(&option, std::move(serialization_string));
 }
 
-void BatchOption::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void BatchOption::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
     for (auto& item : m_options){
         if (!item.second.empty()){
-            const JsonValue2* value = obj->get_value(item.second);
+            const JsonValue* value = obj->get_value(item.second);
             if (value){
                 item.first->load_json(*value);
             }
         }
     }
 }
-JsonValue2 BatchOption::to_json() const{
-    JsonObject2 obj;
+JsonValue BatchOption::to_json() const{
+    JsonObject obj;
     for (auto& item : m_options){
         if (!item.second.empty()){
             obj[item.second] = item.first->to_json();

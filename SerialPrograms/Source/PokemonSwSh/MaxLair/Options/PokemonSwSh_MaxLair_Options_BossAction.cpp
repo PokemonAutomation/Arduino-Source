@@ -45,14 +45,14 @@ BossActionOption::BossActionOption()
     }
 }
 
-void BossActionOption::load_json(const JsonValue2& json){
-    const JsonArray2* array = json.get_array();
+void BossActionOption::load_json(const JsonValue& json){
+    const JsonArray* array = json.get_array();
     if (array == nullptr){
         return;
     }
     std::map<std::string, BossFilter> map;
     for (const auto& item : *array){
-        const JsonObject2* obj = item.get_object();
+        const JsonObject* obj = item.get_object();
         if (obj == nullptr){
             continue;
         }
@@ -86,10 +86,10 @@ void BossActionOption::load_json(const JsonValue2& json){
         filter = iter->second;
     }
 }
-JsonValue2 BossActionOption::to_json() const{
-    JsonArray2 array;
+JsonValue BossActionOption::to_json() const{
+    JsonArray array;
     for (const auto& item : m_list){
-        JsonObject2 obj;
+        JsonObject obj;
         obj["Slug"] = item.slug;
         obj["Action"] = BossAction_NAMES[(size_t)item.action];
         obj["Ball"] = item.ball;

@@ -36,13 +36,13 @@ RegiSelectorOption::RegiSelectorOption()
     , m_default(RegiGolem::Registeel)
     , m_current(RegiGolem::Registeel)
 {}
-void RegiSelectorOption::load_json(const JsonValue2& json){
+void RegiSelectorOption::load_json(const JsonValue& json){
     int index;
     if (json.read_integer(index, 0, 4)){
         m_current = (RegiGolem)index;
     }
 }
-JsonValue2 RegiSelectorOption::to_json() const{
+JsonValue RegiSelectorOption::to_json() const{
     return (int)m_current;
 }
 

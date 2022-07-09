@@ -24,10 +24,10 @@ public:
 
     operator const std::string&() const{ return m_slug; }
 
-    virtual void load_json(const JsonValue2& json) override{
+    virtual void load_json(const JsonValue& json) override{
         json.read_string(m_slug);
     }
-    virtual JsonValue2 to_json() const override{
+    virtual JsonValue to_json() const override{
         return m_slug;
     }
 

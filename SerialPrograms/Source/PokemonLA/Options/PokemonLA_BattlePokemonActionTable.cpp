@@ -38,8 +38,8 @@ const std::map<std::string, MoveStyle> MoveStyle_MAP{
 
 BattlePokemonActionRow::BattlePokemonActionRow() {}
 
-void BattlePokemonActionRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void BattlePokemonActionRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -61,8 +61,8 @@ void BattlePokemonActionRow::load_json(const JsonValue2& json){
     obj->read_boolean(stop_after_num_moves, "StopAfterNumMoves");
     obj->read_integer(num_moves_to_stop, "NumMovesToStop", 0, 65535);
 }
-JsonValue2 BattlePokemonActionRow::to_json() const{
-    JsonObject2 obj;
+JsonValue BattlePokemonActionRow::to_json() const{
+    JsonObject obj;
     for(int i = 0; i < 4; i++){
         obj["Style" + std::to_string(i)] = MoveStyle_NAMES[(size_t)style[i]];
     }
@@ -127,11 +127,11 @@ BattlePokemonActionTable::BattlePokemonActionTable()
     )
 {}
 
-void BattlePokemonActionTable::load_json(const JsonValue2& json){
+void BattlePokemonActionTable::load_json(const JsonValue& json){
     m_table.load_json(json);
 }
 
-JsonValue2 BattlePokemonActionTable::to_json() const{
+JsonValue BattlePokemonActionTable::to_json() const{
     return m_table.to_json();
 }
 
@@ -174,8 +174,8 @@ bool BattlePokemonActionTable::stop_battle(size_t pokemon, size_t num_move_attem
 
 OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow() {}
 
-void OneMoveBattlePokemonActionRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void OneMoveBattlePokemonActionRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -188,8 +188,8 @@ void OneMoveBattlePokemonActionRow::load_json(const JsonValue2& json){
     }
 }
 
-JsonValue2 OneMoveBattlePokemonActionRow::to_json() const{
-    JsonObject2 obj;
+JsonValue OneMoveBattlePokemonActionRow::to_json() const{
+    JsonObject obj;
     obj["Style"] = MoveStyle_NAMES[(size_t)style];
     return obj;
 }
@@ -235,11 +235,11 @@ OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
     )
 {}
 
-void OneMoveBattlePokemonActionTable::load_json(const JsonValue2& json){
+void OneMoveBattlePokemonActionTable::load_json(const JsonValue& json){
     m_table.load_json(json);
 }
 
-JsonValue2 OneMoveBattlePokemonActionTable::to_json() const{
+JsonValue OneMoveBattlePokemonActionTable::to_json() const{
     return m_table.to_json();
 }
 
@@ -264,8 +264,8 @@ const std::string MoveIndex_NAMES[] = {
     "Fourth move",
 };
 
-void MoveGrinderActionRow::load_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void MoveGrinderActionRow::load_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
@@ -283,8 +283,8 @@ void MoveGrinderActionRow::load_json(const JsonValue2& json){
     obj->read_integer(attempts, "Attempts", 0, 65535);
 }
 
-JsonValue2 MoveGrinderActionRow::to_json() const{
-    JsonObject2 obj;
+JsonValue MoveGrinderActionRow::to_json() const{
+    JsonObject obj;
     obj["PokemonIndex"] = static_cast<uint16_t>(pokemon_index);
     obj["MoveIndex"] = static_cast<uint16_t>(move_index);
     obj["Style"] = MoveStyle_NAMES[(size_t)style];
@@ -345,11 +345,11 @@ Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{
     return {MoveStyle::NoStyle, 0};
 }
 
-void MoveGrinderActionTable::load_json(const JsonValue2& json) {
+void MoveGrinderActionTable::load_json(const JsonValue& json) {
     m_table.load_json(json);
 }
 
-JsonValue2 MoveGrinderActionTable::to_json() const {
+JsonValue MoveGrinderActionTable::to_json() const {
     return m_table.to_json();
 }
 

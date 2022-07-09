@@ -57,19 +57,19 @@ RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
 
 
 
-void RunnableSwitchProgramInstance::from_json(const JsonValue2& json){
-    const JsonObject2* obj = json.get_object();
+void RunnableSwitchProgramInstance::from_json(const JsonValue& json){
+    const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
-    const JsonValue2* value = obj->get_value("SwitchSetup");
+    const JsonValue* value = obj->get_value("SwitchSetup");
     if (value){
         m_setup->load_json(*value);
     }
     RunnablePanelInstance::from_json(json);
 }
-JsonValue2 RunnableSwitchProgramInstance::to_json() const{
-    JsonObject2 obj = std::move(*RunnablePanelInstance::to_json().get_object());
+JsonValue RunnableSwitchProgramInstance::to_json() const{
+    JsonObject obj = std::move(*RunnablePanelInstance::to_json().get_object());
     obj["SwitchSetup"] = m_setup->to_json();
     return obj;
 }
