@@ -8,11 +8,7 @@
 #ifndef PokemonAutomation_PersistentSettings_H
 #define PokemonAutomation_PersistentSettings_H
 
-#include <QSize>
-#include <QString>
-#include <QJsonObject>
-//#include "Tools/StatsDatabase.h"
-#include "Integrations/DiscordSettingsOption.h"
+#include "Common/Cpp/Json/JsonObject.h"
 
 namespace PokemonAutomation{
 
@@ -34,7 +30,7 @@ public:
     void read();
 
 public:
-    QJsonObject panels;
+    JsonObject panels;
 };
 
 // Return the singleton PersistentSettings.

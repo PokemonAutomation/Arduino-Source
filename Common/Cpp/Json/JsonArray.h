@@ -17,17 +17,21 @@ namespace PokemonAutomation{
 class JsonArray{
 public:
     JsonArray() = default;
-    JsonArray(JsonArray&&) = default;
-    JsonArray& operator=(JsonArray&&) = delete;
-    JsonArray(const JsonArray&) = delete;
-    void operator=(const JsonArray&) = delete;
+    JsonArray(JsonArray&& x) = default;
+    JsonArray& operator=(JsonArray&& x) = default;
+private:
+    //  Private to avoid accidental copying.
+    JsonArray(const JsonArray& x);
+    JsonArray& operator=(const JsonArray& x);
+public:
+    JsonArray clone() const;
 
 public:
     std::string dump(int indent = 4) const;
     void dump(const std::string& filename, int indent = 4) const;
 
     bool    empty   () const{ return m_data.empty(); }
-    size_t  size    () const{return m_data.size(); }
+    size_t  size    () const{ return m_data.size(); }
 
     const JsonValue& operator[](size_t index) const{ return m_data[index]; }
           JsonValue& operator[](size_t index)      { return m_data[index]; }
@@ -36,7 +40,7 @@ public:
 
 public:
     using const_iterator = std::vector<JsonValue>::const_iterator;
-    using iterator = std::vector<JsonValue>::iterator;
+    using       iterator = std::vector<JsonValue>::iterator;
 
     const_iterator cbegin   () const{ return m_data.cbegin(); }
     const_iterator begin    () const{ return m_data.begin(); }

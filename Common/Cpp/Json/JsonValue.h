@@ -38,8 +38,12 @@ public:
     ~JsonValue();
     JsonValue(JsonValue&& x);
     void operator=(JsonValue&& x);
-    JsonValue(const JsonValue& x) = delete;
-    void operator=(const JsonValue& x) = delete;
+private:
+    //  Private to avoid accidental copying.
+    JsonValue(const JsonValue& x);
+    void operator=(const JsonValue& x);
+public:
+    JsonValue clone() const;
 
 public:
     JsonValue() = default;
@@ -52,9 +56,9 @@ public:
     JsonValue(JsonObject&& x);
 
     template <typename Type>
-    JsonValue(Type*) = delete;
+    JsonValue(const Type*) = delete;
 
-    template <typename Type, typename = std::enable_if<std::is_integral<Type>::value>>
+    template <typename Type, class = typename std::enable_if<std::is_integral<Type>::value>::type>
     JsonValue(Type x)
         : JsonValue((int64_t)x)
     {}
@@ -71,12 +75,16 @@ public:
     bool is_array   () const{ return m_type == JsonType::ARRAY; }
     bool is_object  () const{ return m_type == JsonType::OBJECT; }
 
+    //  Attempt to read this value as a specific type.
+    //  If the type matches, the value is assigned to "value" and returns true.
+    //  Otherwise returns false and "value" remains unchanged.
     bool read_boolean(bool& value) const;
     bool read_integer(int64_t& value) const;
     bool read_integer(uint64_t& value) const;
     bool read_float(double& value) const;
     bool read_string(std::string& value) const;
 
+    //  Same as the above, but will saturate the value to the specific min/max.
     template <typename Type>
     bool read_integer(
         Type& value,
@@ -84,6 +92,9 @@ public:
         int64_t max = std::numeric_limits<Type>::max()
     ) const;
 
+    //  Get a pointer to the data for this value.
+    //  If the type matches, returns the pointer.
+    //  If the type does match, returns nullptr.
     const std::string* get_string() const;
           std::string* get_string();
     const JsonArray* get_array() const;
@@ -97,7 +108,7 @@ private:
 };
 
 JsonValue parse_json(const std::string& str);
-
+JsonValue load_json_file(const std::string& str);
 
 
 template <typename Type>

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 class PanelList : public QListWidget{
 public:
-    static const QString JSON_PROGRAM_PANEL;
+    static const std::string JSON_PROGRAM_PANEL;
 
 public:
     PanelList(QTabWidget& parent, QString label, PanelHolder& holder);

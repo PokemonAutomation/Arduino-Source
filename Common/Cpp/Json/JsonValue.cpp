@@ -78,6 +78,43 @@ void JsonValue::operator=(JsonValue&& x){
     x.m_type = JsonType::EMPTY;
     x.m_node = nullptr;
 }
+JsonValue::JsonValue(const JsonValue& x)
+    : m_type(x.m_type)
+{
+    switch (m_type){
+    case JsonType::EMPTY:
+        break;
+    case JsonType::BOOLEAN:
+        m_node = new JsonNodeBoolean((static_cast<const JsonNodeBoolean*>(x.m_node))->value);
+        break;
+    case JsonType::INTEGER:
+        m_node = new JsonNodeInteger((static_cast<const JsonNodeInteger*>(x.m_node))->value);
+        break;
+    case JsonType::FLOAT:
+        m_node = new JsonNodeFloat((static_cast<const JsonNodeFloat*>(x.m_node))->value);
+        break;
+    case JsonType::STRING:
+        m_node = new JsonNodeString((static_cast<const JsonNodeString*>(x.m_node))->value);
+        break;
+    case JsonType::ARRAY:
+        m_node = new JsonNodeArray((static_cast<const JsonNodeArray*>(x.m_node))->value);
+        break;
+    case JsonType::OBJECT:
+        m_node = new JsonNodeObject((static_cast<const JsonNodeObject*>(x.m_node))->value);
+        break;
+    }
+}
+void JsonValue::operator=(const JsonValue& x){
+    if (this == &x){
+        return;
+    }
+    JsonValue tmp(x);
+    operator=(std::move(tmp));
+}
+JsonValue JsonValue::clone() const{
+    return *this;
+}
+
 JsonValue::JsonValue(bool x)
     : m_type(JsonType::BOOLEAN)
     , m_node(new JsonNodeBoolean(x))
@@ -186,7 +223,10 @@ JsonObject* JsonValue::get_object(){
 
 
 JsonValue parse_json(const std::string& str){
-    return from_nlohmann(nlohmann::json::parse(str));
+    return from_nlohmann(nlohmann::json::parse(str, nullptr, false));
+}
+JsonValue load_json_file(const std::string& str){
+    return parse_json(file_to_string(str));
 }
 std::string JsonValue::dump(int indent) const{
     return to_nlohmann(*this).dump(indent);

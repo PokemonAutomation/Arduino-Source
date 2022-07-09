@@ -17,7 +17,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-const QString PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
+const std::string PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
 PanelList::PanelList(QTabWidget& parent, QString label, PanelHolder& holder)
     : QListWidget(&parent)
@@ -67,7 +67,7 @@ void PanelList::finish_panel_setup(){
 void PanelList::handle_panel_clicked(const QString text){
     auto iter = m_panel_map.find(text);
     if (iter == m_panel_map.end()){
-        PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, "");
+        PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = "";
         return;
     }
     const PanelDescriptor* descriptor = iter->second;
@@ -76,11 +76,10 @@ void PanelList::handle_panel_clicked(const QString text){
     }
     try{
         std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
-        const QString identifier = QString::fromStdString(descriptor->identifier());
-        panel->from_json(from_QJson(PERSISTENT_SETTINGS().panels[identifier]));
+        panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
         m_panel_holder.load_panel(std::move(panel));
 
-        PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, iter->first);
+        PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = iter->first.toStdString();
     }catch (const Exception& error){
         QMessageBox box;
         box.critical(

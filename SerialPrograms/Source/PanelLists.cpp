@@ -23,8 +23,8 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-const QString JSON_TAB = "ProgramTab";
-const std::array<QString, 4> JSON_TAB_NAMES = {
+const std::string JSON_TAB = "ProgramTab";
+const std::array<std::string, 4> JSON_TAB_NAMES = {
     "Switch",
     "SwSh",
     "BDSP",
@@ -42,23 +42,25 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
 
     connect(this, &ProgramTabs::currentChanged, this, [&](int index){
         if (index >= 0 && (size_t)index < JSON_TAB_NAMES.size()){
-            PERSISTENT_SETTINGS().panels.insert(JSON_TAB, JSON_TAB_NAMES[index]);
+            PERSISTENT_SETTINGS().panels[JSON_TAB] = JSON_TAB_NAMES[index];
         }
     });
 }
 
 void ProgramTabs::load_persistent_panel(){
-    QString str;
-    if (json_get_string(str, PERSISTENT_SETTINGS().panels, JSON_TAB)){
-        for(size_t i = 0; i < JSON_TAB_NAMES.size(); i++){
-            if (str == JSON_TAB_NAMES[i]){
-                setCurrentIndex((int)i);
-                break;
-            }
+    const std::string* str = PERSISTENT_SETTINGS().panels.get_string(JSON_TAB);
+    if (str == nullptr){
+        return;
+    }
+    for(size_t i = 0; i < JSON_TAB_NAMES.size(); i++){
+        if (*str == JSON_TAB_NAMES[i]){
+            setCurrentIndex((int)i);
+            break;
         }
-        if (json_get_string(str, PERSISTENT_SETTINGS().panels, PanelList::JSON_PROGRAM_PANEL)){
-            m_lists[currentIndex()]->set_panel(str);
-        }
+    }
+    str = PERSISTENT_SETTINGS().panels.get_string(PanelList::JSON_PROGRAM_PANEL);
+    if (str != nullptr){
+        m_lists[currentIndex()]->set_panel(QString::fromStdString(*str));
     }
 }
 

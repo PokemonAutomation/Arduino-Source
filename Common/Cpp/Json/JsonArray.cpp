@@ -10,6 +10,20 @@
 namespace PokemonAutomation{
 
 
+JsonArray::JsonArray(const JsonArray& x){
+    for (const auto& item : x.m_data){
+        m_data.emplace_back(item.clone());
+    }
+}
+JsonArray& JsonArray::operator=(const JsonArray& x){
+    JsonArray tmp(x);
+    return operator=(std::move(tmp));
+}
+JsonArray JsonArray::clone() const{
+    return *this;
+}
+
+
 
 std::string JsonArray::dump(int indent) const{
     nlohmann::json::array_t ret;

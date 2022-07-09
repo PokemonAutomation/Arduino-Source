@@ -10,6 +10,20 @@
 namespace PokemonAutomation{
 
 
+JsonObject::JsonObject(const JsonObject& x){
+    for (const auto& item : x.m_data){
+        m_data.emplace(item.first, item.second.clone());
+    }
+}
+JsonObject& JsonObject::operator=(const JsonObject& x){
+    JsonObject tmp(x);
+    return operator=(std::move(tmp));
+}
+JsonObject JsonObject::clone() const{
+    return *this;
+}
+
+
 bool JsonObject::read_boolean(bool& value, const std::string& key) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){

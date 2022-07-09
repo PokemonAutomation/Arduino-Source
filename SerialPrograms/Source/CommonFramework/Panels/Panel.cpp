@@ -44,9 +44,11 @@ PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
 {}
 
 void PanelInstance::from_json(){
-    QJsonValue obj = PERSISTENT_SETTINGS().panels[QString::fromStdString(m_descriptor.identifier())];
-    JsonValue json = from_QJson(obj);
-    from_json(json);
+    JsonValue* node = PERSISTENT_SETTINGS().panels.get_value(m_descriptor.identifier());
+    if (node == nullptr){
+        return;
+    }
+    from_json(*node);
 }
 JsonValue PanelInstance::to_json() const{
     return JsonValue();
@@ -54,7 +56,7 @@ JsonValue PanelInstance::to_json() const{
 void PanelInstance::save_settings() const{
     const std::string& identifier = m_descriptor.identifier();
     if (!identifier.empty()){
-        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = to_QJson(to_json());
+        PERSISTENT_SETTINGS().panels[m_descriptor.identifier()] = to_json();
     }
     global_logger_tagged().log("Saving panel settings...");
     PERSISTENT_SETTINGS().write();
