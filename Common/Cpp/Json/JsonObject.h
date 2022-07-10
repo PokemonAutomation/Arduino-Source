@@ -35,6 +35,29 @@ public:
     JsonValue& operator[](const std::string& key){ return m_data[key]; }
     JsonValue& operator[](     std::string&& key){ return m_data[std::move(key)]; }
 
+    //  Get the value. Throws if the type doesn't match.
+    bool                get_boolean_throw   (const std::string& key, const std::string& filename = std::string()) const;
+    int64_t             get_integer_throw   (const std::string& key, const std::string& filename = std::string()) const;
+    double              get_double_throw    (const std::string& key, const std::string& filename = std::string()) const;
+    const std::string&  get_string_throw    (const std::string& key, const std::string& filename = std::string()) const;
+          std::string&  get_string_throw    (const std::string& key, const std::string& filename = std::string());
+    const JsonArray&    get_array_throw     (const std::string& key, const std::string& filename = std::string()) const;
+          JsonArray&    get_array_throw     (const std::string& key, const std::string& filename = std::string());
+    const JsonObject&   get_object_throw    (const std::string& key, const std::string& filename = std::string()) const;
+          JsonObject&   get_object_throw    (const std::string& key, const std::string& filename = std::string());
+
+    //  Get a pointer to the value at the specified key.
+    //  If the key exists and the type matches, returns the pointer.
+    //  If the type does match, returns nullptr.
+    const std::string*  get_string  (const std::string& key) const;
+          std::string*  get_string  (const std::string& key);
+    const JsonArray*    get_array   (const std::string& key) const;
+          JsonArray*    get_array   (const std::string& key);
+    const JsonObject*   get_object  (const std::string& key) const;
+          JsonObject*   get_object  (const std::string& key);
+    const JsonValue*    get_value   (const std::string& key) const;
+          JsonValue*    get_value   (const std::string& key);
+
     //  Convert to the specified type. If the type doesn't match, return the default.
     bool        to_boolean  (const std::string& key, bool default_value = false) const;
     int64_t     to_integer  (const std::string& key, int64_t default_value = 0) const;
@@ -55,18 +78,6 @@ public:
         int64_t min = std::numeric_limits<Type>::min(),
         int64_t max = std::numeric_limits<Type>::max()
     ) const;
-
-    //  Get a pointer to the value at the specified key.
-    //  If the key exists and the type matches, returns the pointer.
-    //  If the type does match, returns nullptr.
-    const std::string* get_string(const std::string& key) const;
-          std::string* get_string(const std::string& key);
-    const JsonArray* get_array(const std::string& key) const;
-          JsonArray* get_array(const std::string& key);
-    const JsonObject* get_object(const std::string& key) const;
-          JsonObject* get_object(const std::string& key);
-    const JsonValue* get_value(const std::string& key) const;
-          JsonValue* get_value(const std::string& key);
 
 public:
     using const_iterator = std::map<std::string, JsonValue>::const_iterator;

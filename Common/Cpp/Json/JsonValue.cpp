@@ -13,6 +13,63 @@
 namespace PokemonAutomation{
 
 
+const std::string& get_typename(JsonType type){
+    static const std::string NAMES[] = {
+        "null",
+        "Boolean",
+        "Integer",
+        "Float",
+        "String",
+        "Array",
+        "Object",
+    };
+    return NAMES[(int)type];
+}
+
+JsonParseException::JsonParseException(
+    const std::string& filename,
+    JsonType expected_type,
+    JsonType actual_type
+){
+    m_message += "Expected: " + get_typename(expected_type) + "\n";
+    m_message += "Actual: " + get_typename(actual_type);
+    if (!filename.empty()){
+        m_message += "\n\n";
+        m_message += filename;
+    }
+}
+JsonParseException::JsonParseException(
+    const std::string& filename,
+    const std::string& key
+)
+    : ParseException("Key not Found: " + key)
+{
+    if (!filename.empty()){
+        m_message += "\n\n";
+        m_message += filename;
+    }
+}
+JsonParseException::JsonParseException(
+    const std::string& filename,
+    const std::string& key,
+    JsonType expected_type,
+    JsonType actual_type
+)
+    : ParseException("Key: " + key + "\n\n")
+{
+    m_message += "Expected: " + get_typename(expected_type) + "\n";
+    m_message += "Actual: " + get_typename(actual_type);
+    if (!filename.empty()){
+        m_message += "\n\n";
+        m_message += filename;
+    }
+}
+
+
+
+
+
+//  RAII
 
 JsonValue::~JsonValue(){
     clear();
@@ -84,6 +141,10 @@ void JsonValue::clear(){
     m_type = JsonType::EMPTY;
 }
 
+
+
+//  Constructors
+
 JsonValue::JsonValue(bool x)
     : m_type(JsonType::BOOLEAN)
 {
@@ -119,6 +180,134 @@ JsonValue::JsonValue(JsonObject&& x)
 {
     u.m_object = new JsonObject(std::move(x));
 }
+
+
+
+//  Get with exception.
+
+bool JsonValue::get_boolean_throw(const std::string& filename) const{
+    if (m_type == JsonType::BOOLEAN){
+        return u.m_bool;
+    }
+    throw JsonParseException(filename, JsonType::BOOLEAN, m_type);
+}
+int64_t JsonValue::get_integer_throw(const std::string& filename) const{
+    if (m_type == JsonType::INTEGER){
+        return u.m_integer;
+    }
+    throw JsonParseException(filename, JsonType::INTEGER, m_type);
+}
+double JsonValue::get_double_throw(const std::string& filename) const{
+    if (m_type == JsonType::INTEGER){
+        return (double)u.m_integer;
+    }
+    if (m_type == JsonType::FLOAT){
+        return u.m_float;
+    }
+    throw JsonParseException(filename, JsonType::FLOAT, m_type);
+}
+const std::string& JsonValue::get_string_throw(const std::string& filename) const{
+    if (m_type == JsonType::STRING){
+        return *u.m_string;
+    }
+    throw JsonParseException(filename, JsonType::STRING, m_type);
+}
+std::string& JsonValue::get_string_throw(const std::string& filename){
+    if (m_type == JsonType::STRING){
+        return *u.m_string;
+    }
+    throw JsonParseException(filename, JsonType::STRING, m_type);
+}
+const JsonArray& JsonValue::get_array_throw(const std::string& filename) const{
+    if (m_type == JsonType::ARRAY){
+        return *u.m_array;
+    }
+    throw JsonParseException(filename, JsonType::ARRAY, m_type);
+}
+JsonArray& JsonValue::get_array_throw(const std::string& filename){
+    if (m_type == JsonType::ARRAY){
+        return *u.m_array;
+    }
+    throw JsonParseException(filename, JsonType::ARRAY, m_type);
+}
+const JsonObject& JsonValue::get_object_throw(const std::string& filename) const{
+    if (m_type == JsonType::OBJECT){
+        return *u.m_object;
+    }
+    throw JsonParseException(filename, JsonType::OBJECT, m_type);
+}
+JsonObject& JsonValue::get_object_throw(const std::string& filename){
+    if (m_type == JsonType::OBJECT){
+        return *u.m_object;
+    }
+    throw JsonParseException(filename, JsonType::OBJECT, m_type);
+}
+
+
+
+//  Get pointer.
+
+const std::string* JsonValue::get_string() const{
+    if (m_type != JsonType::STRING){
+        return nullptr;
+    }
+    return u.m_string;
+}
+std::string* JsonValue::get_string(){
+    if (m_type != JsonType::STRING){
+        return nullptr;
+    }
+    return u.m_string;
+}
+const JsonArray* JsonValue::get_array() const{
+    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
+}
+JsonArray* JsonValue::get_array(){
+    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
+}
+const JsonObject* JsonValue::get_object() const{
+    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
+}
+JsonObject* JsonValue::get_object(){
+    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
+}
+
+
+
+//  Get with default.
+
+bool JsonValue::get_boolean_default(bool default_value) const{
+    if (m_type == JsonType::BOOLEAN){
+        return u.m_bool;
+    }
+    return default_value;
+}
+int64_t JsonValue::get_integer_default(int64_t default_value) const{
+    if (m_type == JsonType::INTEGER){
+        return u.m_integer;
+    }
+    return default_value;
+}
+double JsonValue::get_double_default(double default_value) const{
+    if (m_type == JsonType::INTEGER){
+        return (double)u.m_integer;
+    }
+    if (m_type == JsonType::FLOAT){
+        return u.m_float;
+    }
+    return default_value;
+}
+std::string JsonValue::get_string_default(const char* default_value) const{
+    if (m_type == JsonType::STRING){
+        return *u.m_string;
+    }
+    return default_value;
+}
+
+
+
+//  Read if matching.
+
 bool JsonValue::read_boolean(bool& value) const{
     if (m_type == JsonType::BOOLEAN){
         value = u.m_bool;
@@ -157,30 +346,6 @@ bool JsonValue::read_string(std::string& value) const{
         return true;
     }
     return false;
-}
-const std::string* JsonValue::get_string() const{
-    if (m_type != JsonType::STRING){
-        return nullptr;
-    }
-    return u.m_string;
-}
-std::string* JsonValue::get_string(){
-    if (m_type != JsonType::STRING){
-        return nullptr;
-    }
-    return u.m_string;
-}
-const JsonArray* JsonValue::get_array() const{
-    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
-}
-JsonArray* JsonValue::get_array(){
-    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
-}
-const JsonObject* JsonValue::get_object() const{
-    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
-}
-JsonObject* JsonValue::get_object(){
-    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
 }
 
 

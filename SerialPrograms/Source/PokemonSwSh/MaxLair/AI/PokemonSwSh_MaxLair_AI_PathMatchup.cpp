@@ -6,7 +6,9 @@
 
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
@@ -29,40 +31,63 @@ struct PathMatchDatabase{
 
 private:
     PathMatchDatabase(){
-        QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLair/path_tree.json");
-        QJsonObject json = read_json_file(path).object();
-        if (json.empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Json is either empty or invalid.",
-                path.toStdString()
-            );
+        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLair/path_tree.json";
+        JsonValue json = load_json_file(path);
+        JsonObject* root = json.get_object();
+        if (root == nullptr){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
         }
 
         {
-            QJsonObject obj = json_get_object_throw(json, "rental_by_type");
+            JsonObject* obj = root->get_object("rental_by_type");
+            if (obj == nullptr){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object.", std::move(path));
+            }
             for (const auto& type : TYPE_ENUM_TO_SLUG){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }
-                QJsonArray array = json_get_array_throw(obj, QString::fromStdString(type.second));
+                JsonArray* array = obj->get_array(type.second);
+                if (array == nullptr){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Type not found.", std::move(path));
+                }
                 std::set<std::string>& set = rentals_by_type[type.first];
-                for (const auto& item : array){
-                    set.insert(item.toString().toStdString());
+                for (auto& item : *array){
+                    std::string* str = item.get_string();
+                    if (str == nullptr){
+                        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected a string for type: " + type.second, std::move(path));
+                    }
+                    set.insert(std::move(*str));
                 }
             }
         }
 
-        json = json_get_object_throw(json, "base_node");
-        json = json_get_object_throw(json, "hash_table");
-        for (auto iter = json.begin(); iter != json.end(); ++iter){
-            std::map<PokemonType, double>& boss = type_vs_boss[iter.key().toStdString()];
-            QJsonObject obj = json_get_object_throw(iter.value().toObject(), "hash_table");
+        JsonObject* node = root->get_object("base_node");
+        if (node == nullptr){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: base_node", std::move(path));
+        }
+        node = root->get_object("hash_table");
+        if (node == nullptr){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: hash_table", std::move(path));
+        }
+
+        for (auto& item : *node){
+            std::map<PokemonType, double>& boss = type_vs_boss[item.first];
+
+            JsonObject* obj = item.second.get_object();
+            if (obj == nullptr){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: " + item.first, std::move(path));
+            }
+
             for (const auto& type : TYPE_ENUM_TO_SLUG){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }
-                boss[type.first] = json_get_double_throw(obj, QString::fromStdString(type.second));
+                double value;
+                if (!obj->read_float(value, type.second)){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected a float: " + type.second, std::move(path));
+                }
+                boss[type.first] = value;
             }
         }
     }

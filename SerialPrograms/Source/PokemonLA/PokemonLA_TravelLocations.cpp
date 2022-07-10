@@ -88,7 +88,7 @@ TravelLocations::TravelLocations()
     )
     , Mirelands_Arena(
         "Crimson Mirelands - Brava Arena",
-        MapRegion::MIRELANDS, 1, 3, nullptr
+        MapRegion::MIRELANDS, 0, 3, nullptr
     )
 
     , Coastlands_Beachside(

@@ -12,6 +12,7 @@
 #include <limits>
 #include <type_traits>
 #include <string>
+#include "Common/Cpp/Exceptions.h"
 
 namespace PokemonAutomation{
 
@@ -24,6 +25,29 @@ enum class JsonType{
     STRING,
     ARRAY,
     OBJECT,
+};
+const std::string& get_typename(JsonType type);
+
+
+class JsonParseException : public ParseException{
+public:
+    JsonParseException( //  Mismatching Type
+        const std::string& filename,
+        JsonType expected_type,
+        JsonType actual_type
+    );
+    JsonParseException( //  Missing Key
+        const std::string& filename,
+        const std::string& key
+    );
+    JsonParseException( //  Mismatching Type through an object.
+        const std::string& filename,
+        const std::string& key,
+        JsonType expected_type,
+        JsonType actual_type
+    );
+    virtual const char* name() const override{ return "JsonParseException"; }
+    virtual std::string message() const override{ return m_message; }
 };
 
 
@@ -76,11 +100,32 @@ public:
     bool is_array   () const{ return m_type == JsonType::ARRAY; }
     bool is_object  () const{ return m_type == JsonType::OBJECT; }
 
+    //  Get the value. Throws if the type doesn't match.
+    bool                get_boolean_throw   (const std::string& filename = std::string()) const;
+    int64_t             get_integer_throw   (const std::string& filename = std::string()) const;
+    double              get_double_throw    (const std::string& filename = std::string()) const;
+    const std::string&  get_string_throw    (const std::string& filename = std::string()) const;
+          std::string&  get_string_throw    (const std::string& filename = std::string());
+    const JsonArray&    get_array_throw     (const std::string& filename = std::string()) const;
+          JsonArray&    get_array_throw     (const std::string& filename = std::string());
+    const JsonObject&   get_object_throw    (const std::string& filename = std::string()) const;
+          JsonObject&   get_object_throw    (const std::string& filename = std::string());
+
+    //  Get a pointer to the data for this value.
+    //  If the type matches, returns the pointer.
+    //  If the type does match, returns nullptr.
+    const std::string*  get_string  () const;
+          std::string*  get_string  ();
+    const JsonArray*    get_array   () const;
+          JsonArray*    get_array   ();
+    const JsonObject*   get_object  () const;
+          JsonObject*   get_object  ();
+
     //  Convert to the specified type. If the type doesn't match, return the default.
-    bool        to_boolean  (bool default_value = false) const;
-    int64_t     to_integer  (int64_t default_value = 0) const;
-    double      to_double   (double default_value = 0) const;
-    std::string to_string   (const char* default_value = "") const;
+    bool        get_boolean_default (bool default_value = false) const;
+    int64_t     get_integer_default (int64_t default_value = 0) const;
+    double      get_double_default  (double default_value = 0) const;
+    std::string get_string_default  (const char* default_value = "") const;
 
     //  Attempt to read this value as a specific type.
     //  If the type matches, the value is assigned to "value" and returns true.
@@ -98,16 +143,6 @@ public:
         int64_t min = std::numeric_limits<Type>::min(),
         int64_t max = std::numeric_limits<Type>::max()
     ) const;
-
-    //  Get a pointer to the data for this value.
-    //  If the type matches, returns the pointer.
-    //  If the type does match, returns nullptr.
-    const std::string* get_string() const;
-          std::string* get_string();
-    const JsonArray* get_array() const;
-          JsonArray* get_array();
-    const JsonObject* get_object() const;
-          JsonObject* get_object();
 
 private:
     JsonType m_type = JsonType::EMPTY;

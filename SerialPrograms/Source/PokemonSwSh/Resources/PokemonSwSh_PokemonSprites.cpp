@@ -5,7 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "PokemonSwSh_PokemonSprites.h"
@@ -18,8 +20,6 @@ namespace PokemonSwSh{
 
 
 struct PokemonSpriteDatabase{
-    QString m_sprite_path;
-    QString m_sprite_silhouette;
     QImage m_sprites;
     QImage m_silhouettes;
     std::map<std::string, PokemonSprite> m_slug_to_data;
@@ -29,30 +29,28 @@ struct PokemonSpriteDatabase{
         return data;
     }
     PokemonSpriteDatabase()
-        : m_sprite_path(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png")
-        , m_sprite_silhouette(RESOURCE_PATH() + "PokemonSwSh/PokemonSilhouettes.png")
-        , m_sprites(m_sprite_path)
-        , m_silhouettes(m_sprite_silhouette)
+        : m_sprites(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png")
+        , m_silhouettes(RESOURCE_PATH() + "PokemonSwSh/PokemonSilhouettes.png")
     {
-        QJsonObject json = read_json_file(
-            RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.json"
-        ).object();
+        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/PokemonSprites.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& root = json.get_object_throw(path);
 
-        int width = json.find("spriteWidth")->toInt();
-        int height = json.find("spriteHeight")->toInt();
+        int width = (int)root.get_integer_throw("spriteWidth", path);
+        int height = (int)root.get_integer_throw("spriteHeight", path);
         if (width <= 0){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", m_sprite_path.toStdString());
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", path);
         }
         if (height <= 0){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", m_sprite_path.toStdString());
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", path);
         }
 
-        QJsonObject locations = json.find("spriteLocations")->toObject();
-        for (auto iter = locations.begin(); iter != locations.end(); ++iter){
-            std::string slug = iter.key().toStdString();
-            QJsonObject obj = iter.value().toObject();
-            int y = obj.find("top")->toInt();
-            int x = obj.find("left")->toInt();
+        JsonObject& locations = root.get_object_throw("spriteLocations", path);
+        for (auto& item : locations){
+            const std::string& slug = item.first;
+            JsonObject& obj = item.second.get_object_throw(path);
+            int y = obj.get_integer_throw("top", path);
+            int x = obj.get_integer_throw("left", path);
 
             PokemonSprite sprite;
             sprite.m_sprite = m_sprites.copy(x, y, width, height);
@@ -72,10 +70,7 @@ struct PokemonSpriteDatabase{
 //            cout << width << " x " << height << endl;
 //            cout << slug << ": " << sprite.m_sprite.width() << " x " << sprite.m_sprite.height() << endl;
 
-            m_slug_to_data.emplace(
-                slug,
-                std::move(sprite)
-            );
+            m_slug_to_data.emplace(slug, std::move(sprite));
         }
     }
 };

@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
@@ -27,23 +26,13 @@ struct PokemonSlugDatabase{
     PokemonSlugDatabase(){
         std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-National.json";
         JsonValue json = load_json_file(path);
-        JsonArray* slugs = json.get_array();
-        if (slugs == nullptr){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
-        }
+        JsonArray& slugs = json.get_array_throw(path);
 
-        for (auto& item : *slugs){
-            std::string* slug = item.get_string();
-            if (slug == nullptr || slug->empty()){
-                throw FileException(
-                    nullptr, PA_CURRENT_FUNCTION,
-                    "Expected non-empty string for Pokemon slug.",
-                    std::move(path)
-                );
-            }
-            all_slugs.insert(*slug);
-            national_dex.emplace_back(*slug);
-            slugs_to_dex[*slug] = national_dex.size();
+        for (auto& item : slugs){
+            std::string& slug = item.get_string_throw(path);
+            all_slugs.insert(slug);
+            national_dex.emplace_back(slug);
+            slugs_to_dex[std::move(slug)] = national_dex.size();
         }
     }
 };

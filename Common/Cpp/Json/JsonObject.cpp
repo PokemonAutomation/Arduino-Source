@@ -10,6 +10,9 @@
 namespace PokemonAutomation{
 
 
+
+//  RAII
+
 JsonObject::JsonObject(const JsonObject& x){
     for (const auto& item : x.m_data){
         m_data.emplace(item.first, item.second.clone());
@@ -24,45 +27,77 @@ JsonObject JsonObject::clone() const{
 }
 
 
-bool JsonObject::to_boolean(const std::string& key, bool default_value) const{
-    read_boolean(default_value, key);
-    return default_value;
+
+//  Get with exception.
+
+bool JsonObject::get_boolean_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_boolean_throw(filename);
 }
-int64_t JsonObject::to_integer(const std::string& key, int64_t default_value) const{
-    read_integer(default_value, key);
-    return default_value;
+int64_t JsonObject::get_integer_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_integer_throw(filename);
 }
-double JsonObject::to_double(const std::string& key, double default_value) const{
-    read_float(default_value, key);
-    return default_value;
+double JsonObject::get_double_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_double_throw(filename);
 }
-std::string JsonObject::to_string(const std::string& key, const char* default_value) const{
-    const std::string* str = get_string(key);
-    return str == nullptr ? default_value : *str;
+const std::string& JsonObject::get_string_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_string_throw(filename);
+}
+std::string& JsonObject::get_string_throw(const std::string& key, const std::string& filename){
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_string_throw(filename);
+}
+const JsonArray& JsonObject::get_array_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_array_throw(filename);
+}
+JsonArray& JsonObject::get_array_throw(const std::string& key, const std::string& filename){
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_array_throw(filename);
+}
+const JsonObject& JsonObject::get_object_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_object_throw(filename);
+}
+JsonObject& JsonObject::get_object_throw(const std::string& key, const std::string& filename){
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second.get_object_throw(filename);
 }
 
 
-bool JsonObject::read_boolean(bool& value, const std::string& key) const{
-    auto iter = m_data.find(key);
-    if (iter == m_data.end()){
-        return false;
-    }
-    return iter->second.read_boolean(value);
-}
-bool JsonObject::read_float(double& value, const std::string& key) const{
-    auto iter = m_data.find(key);
-    if (iter == m_data.end()){
-        return false;
-    }
-    return iter->second.read_float(value);
-}
-bool JsonObject::read_string(std::string& value, const std::string& key) const{
-    auto iter = m_data.find(key);
-    if (iter == m_data.end()){
-        return false;
-    }
-    return iter->second.read_string(value);
-}
+
+//  Get pointer.
+
 const std::string* JsonObject::get_string(const std::string& key) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
@@ -118,6 +153,47 @@ JsonValue* JsonObject::get_value(const std::string& key){
         return nullptr;
     }
     return &iter->second;
+}
+
+
+bool JsonObject::to_boolean(const std::string& key, bool default_value) const{
+    read_boolean(default_value, key);
+    return default_value;
+}
+int64_t JsonObject::to_integer(const std::string& key, int64_t default_value) const{
+    read_integer(default_value, key);
+    return default_value;
+}
+double JsonObject::to_double(const std::string& key, double default_value) const{
+    read_float(default_value, key);
+    return default_value;
+}
+std::string JsonObject::to_string(const std::string& key, const char* default_value) const{
+    const std::string* str = get_string(key);
+    return str == nullptr ? default_value : *str;
+}
+
+
+bool JsonObject::read_boolean(bool& value, const std::string& key) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        return false;
+    }
+    return iter->second.read_boolean(value);
+}
+bool JsonObject::read_float(double& value, const std::string& key) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        return false;
+    }
+    return iter->second.read_float(value);
+}
+bool JsonObject::read_string(std::string& value, const std::string& key) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        return false;
+    }
+    return iter->second.read_string(value);
 }
 
 

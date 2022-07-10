@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -33,66 +32,21 @@ const std::string PokeballNameDatabase::NULL_SLUG;
 PokeballNameDatabase::PokeballNameDatabase(){
     std::string path_slugs = RESOURCE_PATH().toStdString() + "Pokemon/ItemListBalls.json";
     JsonValue json_slugs = load_json_file(path_slugs);
-    JsonArray* slugs = json_slugs.get_array();
-    if (slugs == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path_slugs));
-    }
+    JsonArray& slugs = json_slugs.get_array_throw(path_slugs);
 
     std::string path_disp = RESOURCE_PATH().toStdString() + "Pokemon/ItemNameDisplay.json";
     JsonValue json_disp = load_json_file(path_disp);
-    JsonObject* item_disp = json_disp.get_object();
-    if (item_disp == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path_disp));
-    }
+    JsonObject& item_disp = json_disp.get_object_throw(path_disp);
 
-    for (auto& item : *slugs){
-        std::string* slug = item.get_string();
-        if (slug == nullptr || slug->empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Expected non-empty string for Pokemon slug.",
-                std::move(path_slugs)
-            );
-        }
-        ordered_list.emplace_back(*slug);
+    for (auto& item : slugs){
+        std::string& slug = item.get_string_throw(path_slugs);
+        ordered_list.emplace_back(slug);
 
-        auto iter0 = item_disp->find(*slug);
-        if (iter0 == item_disp->end()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Unknown item slug: " + *slug,
-                std::move(path_slugs)
-            );
-        }
+        JsonObject& languages = item_disp.get_object_throw(slug, path_disp);
+        std::string& display_name = languages.get_string_throw("eng", path_disp);
 
-        JsonObject* languages = iter0->second.get_object();
-        if (languages == nullptr){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "No display names found: " + *slug,
-                std::move(path_disp)
-            );
-        }
-        auto iter1 = languages->find("eng");
-        if (iter1 == languages->end()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "English display not found for: " + *slug,
-                std::move(path_disp)
-            );
-        }
-
-        std::string* display_name = iter1->second.get_string();
-        if (display_name == nullptr || display_name->empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Expected non-empty string for slug: *slug",
-                std::move(path_disp)
-            );
-        }
-
-        database[*slug].m_display_name = *display_name;
-        reverse_lookup[*display_name] = *slug;
+        database[slug].m_display_name = display_name;
+        reverse_lookup[std::move(display_name)] = std::move(slug);
     }
 }
 

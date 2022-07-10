@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
 namespace PokemonAutomation{
 namespace Pokemon{

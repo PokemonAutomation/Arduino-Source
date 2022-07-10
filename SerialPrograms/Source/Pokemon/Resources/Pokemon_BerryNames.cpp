@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+#include <map>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -37,10 +37,7 @@ BerryNameDatabase::BerryNameDatabase()
     // ["cheri-berry", "chesto-berry", ... ]
     std::string path_slugs = RESOURCE_PATH().toStdString() + "Pokemon/ItemListBerries.json";
     JsonValue json_slugs = load_json_file(path_slugs);
-    JsonArray* slugs = json_slugs.get_array();
-    if (slugs == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path_slugs));
-    }
+    JsonArray& slugs = json_slugs.get_array_throw(path_slugs);
 
     // Load a map of berry slugs to berry names in all languages, e.g.:
     // {
@@ -53,58 +50,16 @@ BerryNameDatabase::BerryNameDatabase()
     // }
     std::string path_disp = RESOURCE_PATH().toStdString() + "Pokemon/ItemNameDisplay.json";
     JsonValue json_disp = load_json_file(path_disp);
-    JsonObject* item_disp = json_disp.get_object();
-    if (item_disp == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path_disp));
-    }
+    JsonObject& item_disp = json_disp.get_object_throw(path_disp);
 
-    for (auto& item : *slugs){
-        std::string* slug = item.get_string();
-        if (slug == nullptr || slug->empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Expected non-empty string for Pokemon slug.",
-                std::move(path_slugs)
-            );
-        }
+    for (auto& item : slugs){
+        std::string& slug = item.get_string_throw(path_slugs);
 
-        const auto berry_name_dict_iter = item_disp->find(*slug);
-        if (berry_name_dict_iter == item_disp->end()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Fail to find berry: " + *slug,
-                std::move(path_disp)
-            );
-        }
+        JsonObject& berry_name_dict = item_disp.get_object_throw(slug, path_disp);
+        std::string& display_name = berry_name_dict.get_string_throw("eng", path_disp);
 
-        JsonObject* berry_name_dict = berry_name_dict_iter->second.get_object();
-        if (berry_name_dict == nullptr){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "No display names found: " + *slug,
-                std::move(path_disp)
-            );
-        }
-        auto berry_eng_name_iter = berry_name_dict->find("eng");
-        if (berry_eng_name_iter == berry_name_dict->end()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Fail to find English display name for: " + *slug,
-                std::move(path_disp)
-            );
-        }
-
-        std::string* display_name = berry_eng_name_iter->second.get_string();
-        if (display_name == nullptr || display_name->empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Expected non-empty string for slug: *slug",
-                std::move(path_disp)
-            );
-        }
-
-        ordered_list.push_back(*slug);
-        database[*slug].m_display_name = std::move(*display_name);
+        ordered_list.push_back(slug);
+        database[std::move(slug)].m_display_name = std::move(display_name);
 
         // std::cout << "Berry: " << slug_str << " -> " << display_name.toStdString() << std::endl;
     }

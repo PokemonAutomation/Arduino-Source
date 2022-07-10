@@ -5,8 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/ImageOpener.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "Pokemon_BerrySprites.h"
@@ -18,7 +19,6 @@ namespace Pokemon{
 
 
 struct BerrySpriteDatabase{
-    QString m_path;
     QImage m_sprites;
     std::map<std::string, BerrySprite> m_slug_to_data;
 
@@ -27,24 +27,25 @@ struct BerrySpriteDatabase{
         return data;
     }
     BerrySpriteDatabase()
-        : m_path(RESOURCE_PATH() + "Pokemon/BerrySprites.png")
-        , m_sprites(open_image(m_path))
+        : m_sprites(open_image(RESOURCE_PATH() + "Pokemon/BerrySprites.png"))
     {
-        const QJsonObject json = read_json_file(RESOURCE_PATH() + "Pokemon/BerrySprites.json").object();
+        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/BerrySprites.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& root = json.get_object_throw(path);
 
-        const QJsonObject locations = json.find("spriteLocations")->toObject();
-        for (auto iter = locations.begin(); iter != locations.end(); ++iter){
-            const std::string slug = iter.key().toStdString();
-            const QJsonObject obj = iter.value().toObject();
-            const int y = obj.find("top")->toInt();
-            const int x = obj.find("left")->toInt();
-            const int width = obj.find("width")->toInt();
-            const int height = obj.find("height")->toInt();
+        JsonObject& locations = root.get_object_throw("spriteLocations");
+        for (auto& item : locations){
+            const std::string& slug = item.first;
+            JsonObject& obj = item.second.get_object_throw(path);
+            const int y = obj.get_integer_throw("top", path);
+            const int x = obj.get_integer_throw("left", path);
+            const int width = obj.get_integer_throw("width", path);
+            const int height = obj.get_integer_throw("height", path);
             if (width <= 0){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", m_path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", path);
             }
             if (height <= 0){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", m_path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", path);
             }
 
             BerrySprite sprite;
@@ -56,10 +57,7 @@ struct BerrySpriteDatabase{
 
             sprite.m_icon = QIcon(QPixmap::fromImage(ImageMatch::trim_image_alpha(sprite.m_sprite)));
 
-            m_slug_to_data.emplace(
-                slug,
-                std::move(sprite)
-            );
+            m_slug_to_data.emplace(slug, std::move(sprite));
         }
     }
 };

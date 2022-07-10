@@ -21,6 +21,8 @@
 #include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
 #include "ClientSource/Libraries/Logging.h"
@@ -118,8 +120,22 @@ using namespace Kernels;
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonLA;
+    using namespace NintendoSwitch::PokemonSwSh;
     using namespace Pokemon;
+
+    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+    GlobalState state;
+    state.boss = "dialga";
+    state.players[0].pokemon = "cradily";
+    state.players[1].console_id = 0;
+    state.players[1].pokemon = "heatmor";
+    state.players[2].pokemon = "crawdaunt";
+    state.players[3].pokemon = "marowak-alola";
+    state.opponent = {"flareon"};
+
+
+    select_move(env.logger(), state, 1);
 
 #if 0
     using namespace nlohmann;
