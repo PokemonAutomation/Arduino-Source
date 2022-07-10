@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <QImage>
+#include "CommonFramework/ImageTypes/ImageReference.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -16,7 +17,8 @@ namespace ImageMatch{
 
 //  Shrink image so that it perfectly fits the object.
 //  The alpha channel is used to determine what is object vs. background.
-QImage trim_image_alpha(const QImage& image);
+ConstImageRef trim_image_alpha_ref(const ConstImageRef& image);
+QImage trim_image_alpha(const ConstImageRef& image);
 
 
 //  Shrink image so that it perfectly fits the object.

@@ -44,8 +44,8 @@ public:
 
 DenSpriteMatcher make_DEN_SPRITE_MATCHER(){
     DenSpriteMatcher matcher;
-    for (const auto& item : all_pokemon_sprites()){
-        matcher.add(item.first, item.second.silhouette());
+    for (const auto& item : ALL_POKEMON_SILHOUETTES()){
+        matcher.add(item.first, item.second.sprite.to_qimage());
     }
     return matcher;
 }
@@ -119,11 +119,8 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
 
 DenMonSelectData::DenMonSelectData(){
     m_list.emplace_back("(none)", QIcon());
-    for (const auto& item : all_pokemon_sprites()){
-        m_list.emplace_back(
-            item.first,
-            item.second.icon()
-        );
+    for (const auto& item : ALL_POKEMON_SPRITES()){
+        m_list.emplace_back(item.first, item.second.icon);
     }
 }
 DenMonSelectOption::DenMonSelectOption(QString label)

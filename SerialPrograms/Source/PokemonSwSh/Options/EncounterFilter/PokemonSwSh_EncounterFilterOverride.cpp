@@ -12,7 +12,7 @@
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Options/Pokemon_BallSelectWidget.h"
 #include "Pokemon/Options/Pokemon_NameSelectWidget.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh_EncounterFilterOverride.h"
 
@@ -124,7 +124,7 @@ QWidget* EncounterFilterOverride::make_species_select(QWidget& parent){
     using namespace Pokemon;
     NameSelectWidget* box = new NameSelectWidget(
         parent,
-        PokemonSwSh::ALL_POKEMON_ICONS(),
+        PokemonSwSh::ALL_POKEMON_SPRITES(),
         NATIONAL_DEX_SLUGS(),
         pokemon_slug
     );

@@ -223,6 +223,7 @@ SOURCES += \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
+    Source/CommonFramework/Resources/SpriteDatabase.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ConsoleHandle.cpp \
@@ -374,7 +375,6 @@ SOURCES += \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
-    Source/Pokemon/Resources/Pokemon_PokemonIcons.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp \
@@ -526,7 +526,7 @@ SOURCES += \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
-    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp \
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -699,7 +699,6 @@ SOURCES += \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
-    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
@@ -922,6 +921,7 @@ HEADERS += \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
+    Source/CommonFramework/Resources/SpriteDatabase.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
@@ -1101,7 +1101,6 @@ HEADERS += \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \
     Source/Pokemon/Resources/Pokemon_PokeballNames.h \
-    Source/Pokemon/Resources/Pokemon_PokemonIcons.h \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h \
@@ -1254,7 +1253,7 @@ HEADERS += \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
-    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h \
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \
@@ -1434,7 +1433,6 @@ HEADERS += \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
-    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \

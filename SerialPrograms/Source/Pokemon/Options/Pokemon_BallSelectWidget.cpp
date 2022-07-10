@@ -26,7 +26,6 @@ BallSelectWidget::BallSelectWidget(
     this->completer()->setFilterMode(Qt::MatchContains);
     this->setIconSize(QSize(25, 25));
 
-#if 1
     //  A more optimized version.
     QStringList list;
     for (const std::string& slug : slugs){
@@ -39,35 +38,13 @@ BallSelectWidget::BallSelectWidget(
 
         const std::string& slug = slugs[index];
 
-        const PokeballSprite* sprites = get_pokeball_sprite_nothrow(slug);
-        this->setItemIcon((int)index, sprites->icon());
+        const SpriteDatabase::Sprite& sprite = ALL_POKEBALL_SPRITES().get_throw(slug);
+        this->setItemIcon((int)index, sprite.icon);
 
         if (slug == current_slug){
             this->setCurrentIndex((int)index);
         }
     }
-#else
-    for (size_t index = 0; index < slugs.size(); index++){
-        using namespace NintendoSwitch::PokemonSwSh;
-
-        const std::string& slug = slugs[index];
-        const PokeballSprite* sprites = get_pokeball_sprite_nothrow(slug);
-        if (sprites == nullptr){
-            this->addItem(
-                get_pokeball_name(slug).display_name()
-            );
-            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
-        }else{
-            this->addItem(
-                sprites->icon(),
-                get_pokeball_name(slug).display_name()
-            );
-        }
-        if (slug == current_slug){
-            this->setCurrentIndex((int)index);
-        }
-    }
-#endif
 
     update_size_cache();
 }

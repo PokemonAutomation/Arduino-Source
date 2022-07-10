@@ -16,7 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -416,6 +416,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/SettingsPanelWidget.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
+    Source/CommonFramework/Resources/SpriteDatabase.cpp
+    Source/CommonFramework/Resources/SpriteDatabase.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
     Source/CommonFramework/Tools/BlackBorderCheck.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
@@ -753,8 +755,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_BerrySprites.h
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp
     Source/Pokemon/Resources/Pokemon_PokeballNames.h
-    Source/Pokemon/Resources/Pokemon_PokemonIcons.cpp
-    Source/Pokemon/Resources/Pokemon_PokemonIcons.h
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
@@ -1062,8 +1062,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
-    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp
-    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
@@ -1417,8 +1417,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h
-    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.cpp
-    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp

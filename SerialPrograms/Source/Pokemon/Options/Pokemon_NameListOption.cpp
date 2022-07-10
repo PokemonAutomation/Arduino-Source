@@ -7,7 +7,6 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Globals.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "Pokemon_NameSelectWidget.h"
 #include "Pokemon_NameListOption.h"
 
@@ -62,8 +61,11 @@ private:
 
 
 
-PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
-    const ExtraNames* extra_names)
+PokemonNameListFactory::PokemonNameListFactory(
+    const SpriteDatabase& icons,
+    std::vector<std::string> slug_list,
+    const ExtraNames* extra_names
+)
     : m_icons(icons)
     , m_slug_list(std::move(slug_list))
     , m_extra_names(extra_names)
@@ -81,8 +83,12 @@ std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
 
 
 
-PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
-    const ExtraNames* extra_names)
+PokemonNameList::PokemonNameList(
+    QString label,
+    const SpriteDatabase& icons,
+    std::vector<std::string> slug_list,
+    const ExtraNames* extra_names
+)
     : PokemonNameListFactory(icons, std::move(slug_list), extra_names)
     , EditableTableOption(std::move(label), *this)
 {}

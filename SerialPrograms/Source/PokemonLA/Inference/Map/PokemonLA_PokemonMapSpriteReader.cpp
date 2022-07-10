@@ -16,7 +16,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"

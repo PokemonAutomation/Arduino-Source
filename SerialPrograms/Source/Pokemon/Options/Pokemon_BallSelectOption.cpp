@@ -22,15 +22,12 @@ PokemonBallSelectData::PokemonBallSelectData(const std::vector<std::string>& slu
 
         using namespace NintendoSwitch::PokemonSwSh;
         const PokeballNames& data = get_pokeball_name(slug);
-        const PokeballSprite* sprites = get_pokeball_sprite_nothrow(slug);
-        if (sprites == nullptr){
+        const SpriteDatabase::Sprite* sprite = ALL_POKEBALL_SPRITES().get_nothrow(slug);
+        if (sprite == nullptr){
             m_list.emplace_back(data.display_name(), QIcon());
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            m_list.emplace_back(
-                data.display_name(),
-                sprites->icon()
-           );
+            m_list.emplace_back(data.display_name(), sprite->icon);
         }
     }
 }

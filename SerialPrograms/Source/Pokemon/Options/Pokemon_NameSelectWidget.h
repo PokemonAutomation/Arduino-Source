@@ -8,6 +8,7 @@
 #define PokemonAutomation_Pokemon_PokemonNameSelectWidget_H
 
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Resources/SpriteDatabase.h"
 
 class QString;
 
@@ -27,7 +28,7 @@ public:
     // extra_display_name_to_slug: the mapping from the display name of the extra names to their slugs.
     NameSelectWidget(
         QWidget& parent,
-        const std::map<std::string, QIcon>& icons,
+        const SpriteDatabase& icons,
         const std::vector<std::string>& slugs,
         const std::string& current_slug,
         const std::map<std::string, std::pair<std::string, QIcon>>* extra_names = nullptr,

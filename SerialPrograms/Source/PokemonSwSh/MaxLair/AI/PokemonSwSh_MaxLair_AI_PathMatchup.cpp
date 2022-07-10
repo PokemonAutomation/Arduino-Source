@@ -33,61 +33,34 @@ private:
     PathMatchDatabase(){
         std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLair/path_tree.json";
         JsonValue json = load_json_file(path);
-        JsonObject* root = json.get_object();
-        if (root == nullptr){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
-        }
+        JsonObject& root = json.get_object_throw(path);
 
         {
-            JsonObject* obj = root->get_object("rental_by_type");
-            if (obj == nullptr){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object.", std::move(path));
-            }
+            JsonObject& obj = root.get_object_throw("rental_by_type", path);
             for (const auto& type : TYPE_ENUM_TO_SLUG){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }
-                JsonArray* array = obj->get_array(type.second);
-                if (array == nullptr){
-                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Type not found.", std::move(path));
-                }
+                JsonArray& array = obj.get_array_throw(type.second, path);
                 std::set<std::string>& set = rentals_by_type[type.first];
-                for (auto& item : *array){
-                    std::string* str = item.get_string();
-                    if (str == nullptr){
-                        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected a string for type: " + type.second, std::move(path));
-                    }
-                    set.insert(std::move(*str));
+                for (auto& item : array){
+                    std::string& str = item.get_string_throw(path);
+                    set.insert(std::move(str));
                 }
             }
         }
 
-        JsonObject* node = root->get_object("base_node");
-        if (node == nullptr){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: base_node", std::move(path));
-        }
-        node = root->get_object("hash_table");
-        if (node == nullptr){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: hash_table", std::move(path));
-        }
-
-        for (auto& item : *node){
+        JsonObject& node = root.get_object_throw("base_node", path).get_object_throw("hash_table");
+        for (auto& item : node){
             std::map<PokemonType, double>& boss = type_vs_boss[item.first];
 
-            JsonObject* obj = item.second.get_object();
-            if (obj == nullptr){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected an object: " + item.first, std::move(path));
-            }
+            JsonObject& obj = item.second.get_object_throw(path).get_object_throw("hash_table", path);
 
             for (const auto& type : TYPE_ENUM_TO_SLUG){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }
-                double value;
-                if (!obj->read_float(value, type.second)){
-                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected a float: " + type.second, std::move(path));
-                }
-                boss[type.first] = value;
+                boss[type.first] = obj.get_double_throw(type.second, path);
             }
         }
     }

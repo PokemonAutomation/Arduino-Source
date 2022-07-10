@@ -38,15 +38,11 @@ bool scan_col(const ConstImageRef& image, size_t col, const std::function<bool(Q
     return true;
 }
 
-QImage trim_image_alpha(const QImage& image){
-    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid image format.");
-    }
-
-    int rs = 0;
-    int re = image.height();
-    int cs = 0;
-    int ce = image.width();
+ConstImageRef trim_image_alpha_ref(const ConstImageRef& image){
+    size_t rs = 0;
+    size_t re = image.height();
+    size_t cs = 0;
+    size_t ce = image.width();
     auto filter = [](QRgb pixel){
         return qAlpha(pixel) != 0;
     };
@@ -54,7 +50,10 @@ QImage trim_image_alpha(const QImage& image){
     while (re > rs && scan_row(image, re - 1, filter)) re--;
     while (cs < ce && scan_col(image, cs    , filter)) cs++;
     while (ce > cs && scan_col(image, ce - 1, filter)) ce--;
-    return image.copy(cs, rs, ce - cs, re - rs);
+    return image.sub_image(cs, rs, ce - cs, re - rs);;
+}
+QImage trim_image_alpha(const ConstImageRef& image){
+    return trim_image_alpha_ref(image).to_qimage();
 }
 QImage trim_image_pixel_filter(const QImage& image, const std::function<bool(QRgb)>& filter){
     if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){

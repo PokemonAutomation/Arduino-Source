@@ -20,16 +20,13 @@ namespace Pokemon{
 
 NameSelectWidget::NameSelectWidget(
     QWidget& parent,
-    const std::map<std::string, QIcon>& icons,
+    const SpriteDatabase& icons,
     const std::vector<std::string>& slugs,
     const std::string& current_slug,
     const std::map<std::string, std::pair<std::string, QIcon>>* extra_names,
     const std::vector<std::string>* extra_name_list,
     const std::map<std::string, std::string>* extra_display_name_to_slug
-)
-    : NoWheelComboBox(&parent)
-    , m_extra_display_name_to_slug(extra_display_name_to_slug)
-{
+){
     this->setEditable(true);
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
@@ -38,7 +35,6 @@ NameSelectWidget::NameSelectWidget(
 
 //    WallClock time0 = current_time();
 
-#if 1
     //  A more optimized version.
     QStringList list;
     for (const std::string& slug : slugs){
@@ -58,11 +54,11 @@ NameSelectWidget::NameSelectWidget(
     for (size_t index = 0; index < slugs.size(); index++){
         const std::string& slug = slugs[index];
 
-        auto iter = icons.find(slug);
-        if (iter == icons.end()){
+        const SpriteDatabase::Sprite* sprite = icons.get_nothrow(slug);
+        if (sprite == nullptr){
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            this->setItemIcon((int)index, iter->second);
+            this->setItemIcon((int)index, sprite->icon);
         }
 
         if (slug == current_slug){
@@ -84,34 +80,16 @@ NameSelectWidget::NameSelectWidget(
             }
         }
     }
-#else
-    for (size_t index = 0; index < slugs.size(); index++){
-        const std::string& slug = slugs[index];
-
-        auto iter = icons.find(slug);
-        if (iter == icons.end()){
-            this->addItem(
-                get_pokemon_name(slug).display_name()
-            );
-            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
-        }else{
-            this->addItem(
-                iter->second,
-                get_pokemon_name(slug).display_name()
-            );
-        }
-
-        if (slug == current_slug){
-            this->setCurrentIndex((int)index);
-        }
-    }
-#endif
 
 //    WallClock time3 = current_time();
 //    cout << std::chrono::duration_cast<std::chrono::milliseconds>(time3 - time0).count() / 1000. << endl;
 
     update_size_cache();
 }
+
+
+
+
 std::string NameSelectWidget::slug() const{
     std::string current_text = currentText().toStdString();
     if (m_extra_display_name_to_slug){

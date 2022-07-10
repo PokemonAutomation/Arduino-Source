@@ -154,7 +154,7 @@ void BossActionWidget::redraw_table(){
 
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
-        const QIcon& icon = get_pokemon_sprite(sprite_slug).icon();
+        const QIcon& icon = ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon;
         const std::string& display_name = get_pokemon_name(name_slug).display_name();
         QTableWidgetItem* icon_item = new QTableWidgetItem(icon, QString::fromStdString(display_name));
 //        icon_item->setIcon(icon);

@@ -16,7 +16,7 @@
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 #include "PokemonLA_TradeCountTable.h"
 
 namespace PokemonAutomation{
@@ -137,7 +137,7 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     m_table->horizontalHeader()->setFont(font);
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    const std::map<std::string, QIcon>& ICONS = ALL_POKEMON_ICONS();
+    const SpriteDatabase& ICONS = ALL_POKEMON_SPRITES();
 
     size_t rows = m_value.m_list.size();
     m_table->setRowCount((int)rows);
@@ -147,9 +147,9 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
         const std::string& display_name = Pokemon::get_pokemon_name(entry.first).display_name();
         QTableWidgetItem* icon_item = new QTableWidgetItem(QString::fromStdString(display_name));
 
-        auto iter = ICONS.find(entry.first);
-        if (iter != ICONS.end()){
-            icon_item->setIcon(iter->second);
+        const SpriteDatabase::Sprite* sprite = ICONS.get_nothrow(entry.first);
+        if (sprite != nullptr){
+            icon_item->setIcon(sprite->icon);
         }
 
         m_table->setItem(c, 0, icon_item);

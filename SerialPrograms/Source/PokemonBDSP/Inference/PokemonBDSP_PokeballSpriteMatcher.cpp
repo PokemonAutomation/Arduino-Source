@@ -17,8 +17,8 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
     : CroppedImageDictionaryMatcher({1, 128})
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 {
-    for (const auto& item : PokemonSwSh::all_pokeball_sprites()){
-        add(item.first, item.second.sprite());
+    for (const auto& item : PokemonSwSh::ALL_POKEBALL_SPRITES()){
+        add(item.first, item.second.sprite.to_qimage());
     }
 }
 

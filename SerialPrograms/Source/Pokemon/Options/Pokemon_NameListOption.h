@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Resources/SpriteDatabase.h"
 
 class QIcon;
 
@@ -27,15 +28,18 @@ struct ExtraNames{
 
 class PokemonNameListFactory : public EditableTableFactory{
 public:
-    PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
-        const ExtraNames* extra_names = nullptr);
+    PokemonNameListFactory(
+        const SpriteDatabase& icons,
+        std::vector<std::string> slug_list,
+        const ExtraNames* extra_names = nullptr
+    );
 
     virtual QStringList make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() const override;
 
 private:
     friend class PokemonNameListRow;
-    const std::map<std::string, QIcon>& m_icons;
+    const SpriteDatabase& m_icons;
     std::vector<std::string> m_slug_list;
     const ExtraNames* m_extra_names = nullptr;
 };
@@ -51,8 +55,12 @@ public:
     //   appear in `icons`, its icon will be missing on the UI.
     // extra_names: optional non-pokemon items to choose on the UI. Those extra items will appear after all the available
     //   pokemon on the UI. Example usage of `extra_names`: choose MMO along with other outbreak pokemon in LA.
-    PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list,
-        const ExtraNames* extra_names = nullptr);
+    PokemonNameList(
+        QString label,
+        const SpriteDatabase& icons,
+        std::vector<std::string> slug_list,
+        const ExtraNames* extra_names = nullptr
+    );
 
     const std::string& operator[](size_t index) const;
 };

@@ -219,7 +219,7 @@ void send_message(
     bool should_ping,
     const std::vector<QString>& tags,
     const QString& message,
-    JsonArray embeds,
+    const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
 ){
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
@@ -292,7 +292,7 @@ void send_message(
 
         JsonObject jsonContent;
         jsonContent["content"] = str.toStdString();
-        jsonContent["embeds"] = std::move(embeds);
+        jsonContent["embeds"] = embeds.clone();
 
 //        cout << QJsonDocument(jsonContent).toJson().data() << endl;
 

@@ -15,7 +15,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
@@ -90,7 +90,7 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , DESIRED_SLUGS(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
-        ALL_POKEMON_ICONS(),
+        ALL_POKEMON_SPRITES(),
         HISUI_OUTBREAK_SLUGS(),
         &MMO_NAMES()
     )
