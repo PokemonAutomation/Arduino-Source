@@ -18,10 +18,9 @@ JsonValue::~JsonValue(){
     clear();
 }
 JsonValue::JsonValue(JsonValue&& x)
-//    : m_type(x.m_type)
-//    , m_node(x.m_node)
+    : m_type(x.m_type)
+    , u(x.u)
 {
-    memcpy(this, &x, sizeof(JsonValue));
     x.m_type = JsonType::EMPTY;
 }
 void JsonValue::operator=(JsonValue&& x){
@@ -29,9 +28,8 @@ void JsonValue::operator=(JsonValue&& x){
         return;
     }
     clear();
-    memcpy(this, &x, sizeof(JsonValue));
-//    m_type = x.m_type;
-//    m_node = x.m_node;
+    m_type = x.m_type;
+    u = x.u;
     x.m_type = JsonType::EMPTY;
 }
 JsonValue::JsonValue(const JsonValue& x)
@@ -41,22 +39,22 @@ JsonValue::JsonValue(const JsonValue& x)
     case JsonType::EMPTY:
         break;
     case JsonType::BOOLEAN:
-        m_bool = x.m_bool;
+        u.m_bool = x.u.m_bool;
         break;
     case JsonType::INTEGER:
-        m_integer = x.m_integer;
+        u.m_integer = x.u.m_integer;
         break;
     case JsonType::FLOAT:
-        m_float = x.m_float;
+        u.m_float = x.u.m_float;
         break;
     case JsonType::STRING:
-        m_string = new std::string(*x.m_string);
+        u.m_string = new std::string(*x.u.m_string);
         break;
     case JsonType::ARRAY:
-        m_array = new JsonArray(*x.m_array);
+        u.m_array = new JsonArray(*x.u.m_array);
         break;
     case JsonType::OBJECT:
-        m_object = new JsonObject(*x.m_object);
+        u.m_object = new JsonObject(*x.u.m_object);
         break;
     }
 }
@@ -73,13 +71,13 @@ JsonValue JsonValue::clone() const{
 void JsonValue::clear(){
     switch (m_type){
     case JsonType::STRING:
-        delete m_string;
+        delete u.m_string;
         break;
     case JsonType::ARRAY:
-        delete m_array;
+        delete u.m_array;
         break;
     case JsonType::OBJECT:
-        delete m_object;
+        delete u.m_object;
         break;
     default:;
     }
@@ -88,67 +86,74 @@ void JsonValue::clear(){
 
 JsonValue::JsonValue(bool x)
     : m_type(JsonType::BOOLEAN)
-    , m_bool(x)
-{}
+{
+    u.m_bool = x;
+}
 JsonValue::JsonValue(int64_t x)
     : m_type(JsonType::INTEGER)
-    , m_integer(x)
-{}
+{
+    u.m_integer = x;
+}
 JsonValue::JsonValue(double x)
     : m_type(JsonType::FLOAT)
-    , m_float(x)
-{}
+{
+    u.m_float = x;
+}
 JsonValue::JsonValue(const char* x)
     : m_type(JsonType::STRING)
-    , m_string(new std::string(x))
-{}
+{
+    u.m_string = new std::string(x);
+}
 JsonValue::JsonValue(std::string x)
     : m_type(JsonType::STRING)
-    , m_string(new std::string(std::move(x)))
-{}
+{
+    u.m_string = new std::string(std::move(x));
+}
 JsonValue::JsonValue(JsonArray&& x)
     : m_type(JsonType::ARRAY)
-    , m_array(new JsonArray(std::move(x)))
-{}
+{
+    u.m_array = new JsonArray(std::move(x));
+}
 JsonValue::JsonValue(JsonObject&& x)
     : m_type(JsonType::OBJECT)
-    , m_object(new JsonObject(std::move(x)))
-{}
+{
+    u.m_object = new JsonObject(std::move(x));
+}
 bool JsonValue::read_boolean(bool& value) const{
     if (m_type == JsonType::BOOLEAN){
-        value = m_bool;
+        value = u.m_bool;
         return true;
     }
     return false;
 }
 bool JsonValue::read_integer(int64_t& value) const{
     if (m_type == JsonType::INTEGER){
-        value = m_integer;
+        value = u.m_integer;
         return true;
     }
     return false;
 }
 bool JsonValue::read_integer(uint64_t& value) const{
     if (m_type == JsonType::INTEGER){
-        value = m_integer;
+        value = u.m_integer;
         return true;
     }
     return false;
 }
 bool JsonValue::read_float(double& value) const{
     if (m_type == JsonType::INTEGER){
-        value = (double)m_integer;
+        value = (double)u.m_integer;
         return true;
     }
     if (m_type == JsonType::FLOAT){
-        value = m_float;
+        value = u.m_float;
         return true;
     }
     return false;
 }
 bool JsonValue::read_string(std::string& value) const{
     if (m_type == JsonType::STRING){
-        value = *m_string;
+        value = *u.m_string;
         return true;
     }
     return false;
@@ -157,25 +162,25 @@ const std::string* JsonValue::get_string() const{
     if (m_type != JsonType::STRING){
         return nullptr;
     }
-    return m_string;
+    return u.m_string;
 }
 std::string* JsonValue::get_string(){
     if (m_type != JsonType::STRING){
         return nullptr;
     }
-    return m_string;
+    return u.m_string;
 }
 const JsonArray* JsonValue::get_array() const{
-    return m_type == JsonType::ARRAY ? m_array : nullptr;
+    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
 }
 JsonArray* JsonValue::get_array(){
-    return m_type == JsonType::ARRAY ? m_array : nullptr;
+    return m_type == JsonType::ARRAY ? u.m_array : nullptr;
 }
 const JsonObject* JsonValue::get_object() const{
-    return m_type == JsonType::OBJECT ? m_object : nullptr;
+    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
 }
 JsonObject* JsonValue::get_object(){
-    return m_type == JsonType::OBJECT ? m_object : nullptr;
+    return m_type == JsonType::OBJECT ? u.m_object : nullptr;
 }
 
 

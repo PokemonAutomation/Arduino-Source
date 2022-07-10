@@ -118,7 +118,7 @@ private:
         std::string* m_string;
         JsonArray* m_array;
         JsonObject* m_object;
-    };
+    } u;
 };
 
 JsonValue parse_json(const std::string& str);
