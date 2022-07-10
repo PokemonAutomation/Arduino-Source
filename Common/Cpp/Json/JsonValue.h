@@ -76,14 +76,20 @@ public:
     bool is_array   () const{ return m_type == JsonType::ARRAY; }
     bool is_object  () const{ return m_type == JsonType::OBJECT; }
 
+    //  Convert to the specified type. If the type doesn't match, return the default.
+    bool        to_boolean  (bool default_value = false) const;
+    int64_t     to_integer  (int64_t default_value = 0) const;
+    double      to_double   (double default_value = 0) const;
+    std::string to_string   (const char* default_value = "") const;
+
     //  Attempt to read this value as a specific type.
     //  If the type matches, the value is assigned to "value" and returns true.
     //  Otherwise returns false and "value" remains unchanged.
-    bool read_boolean(bool& value) const;
-    bool read_integer(int64_t& value) const;
-    bool read_integer(uint64_t& value) const;
-    bool read_float(double& value) const;
-    bool read_string(std::string& value) const;
+    bool read_boolean   (bool& value) const;
+    bool read_integer   (int64_t& value) const;
+    bool read_integer   (uint64_t& value) const;
+    bool read_float     (double& value) const;
+    bool read_string    (std::string& value) const;
 
     //  Same as the above, but will saturate the value to the specific min/max.
     template <typename Type>

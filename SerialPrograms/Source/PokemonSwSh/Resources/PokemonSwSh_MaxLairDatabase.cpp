@@ -7,11 +7,15 @@
 #include <algorithm>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
+
+#include "Common/Qt/QtJsonTools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -119,65 +123,109 @@ PokemonType parse_type_slug(const std::string& slug){
     return iter->second;
 }
 
-MaxLairMove parse_move(const QJsonObject& obj){
+MaxLairMove parse_move(const JsonObject& obj){
     MaxLairMove move;
-    move.slug = obj["move"].toString().toStdString();
-    move.category = parse_category_slug(obj["category"].toString().toStdString());
-    move.type = parse_type_slug(obj["type"].toString().toStdString());
-    move.base_power = obj["base_power"].toInt();
-    move.accuracy = obj["accuracy"].toDouble();
-    move.PP = obj["PP"].toInt();
-    move.spread = obj["spread"].toBool();
-    move.correction_factor = obj["correction_factor"].toDouble();
-    move.effective_power = obj["effective_power"].toDouble();
+    move.slug = obj.to_string("move");
+    move.category = parse_category_slug(obj.to_string("category"));
+    move.type = parse_type_slug(obj.to_string("type"));
+    move.base_power = obj.to_integer("base_power");
+    move.accuracy = obj.to_double("accuracy");
+    move.PP = obj.to_integer("PP");
+    move.spread = obj.to_boolean("spread");
+    move.correction_factor = obj.to_double("correction_factor");
+    move.effective_power = obj.to_double("effective_power");
     return move;
 }
 
 
 std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& path){
-    QString qpath = RESOURCE_PATH() + QString::fromStdString(path);
-    QJsonObject json = read_json_file(qpath).object();
+    std::string filepath = RESOURCE_PATH().toStdString() + path;
+    JsonValue json = load_json_file(filepath);
+    JsonObject* root = json.get_object();
+    if (root == nullptr){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
+    }
 
     std::map<std::string, MaxLairMon> database;
 
-    for (auto iter = json.begin(); iter != json.end(); ++iter){
-        std::string slug = iter.key().toStdString();
-        QJsonObject obj = iter.value().toObject();
+    for (auto& item : *root){
+        const std::string& slug = item.first;
+        if (slug.empty()){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected non-empty string for Pokemon slug.", std::move(path));
+        }
+
+        JsonObject* obj = item.second.get_object();
+        if (obj == nullptr){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "No data for Pokemon slug: " + slug, std::move(path));
+        }
+
         MaxLairMon& mon = database[slug];
         mon.species = slug;
         mon.type[0] = PokemonType::NONE;
         mon.type[1] = PokemonType::NONE;
         {
-            QJsonArray array = obj["type"].toArray();
-            if (array.size() >= 1){
-                mon.type[0] = parse_type_slug(array[0].toString().toStdString());
+            JsonArray* array = obj->get_array("type");
+            if (array == nullptr){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Missing type: " + slug, std::move(path));
             }
-            if (array.size() >= 2){
-                mon.type[1] = parse_type_slug(array[1].toString().toStdString());
+            if (array->size() >= 1){
+                std::string* str = (*array)[0].get_string();
+                if (str == nullptr){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected string for type: " + slug, std::move(path));
+                }
+                mon.type[0] = parse_type_slug(*str);
+            }
+            if (array->size() >= 2){
+                std::string* str = (*array)[1].get_string();
+                if (str == nullptr){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected string for type: " + slug, std::move(path));
+                }
+                mon.type[1] = parse_type_slug(*str);
             }
         }
-        mon.ability = obj["ability"].toString().toStdString();
         {
-            QJsonArray array = obj["base_stats"].toArray();
-            if (array.size() != 6){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements.", qpath.toStdString());
+            std::string* str = obj->get_string("ability");
+            if (str != nullptr){
+                mon.ability = *str;
+            }
+        }
+        {
+            JsonArray* array = obj->get_array("base_stats");
+            if (array == nullptr || array->size() != 6){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements: " + slug, std::move(path));
             }
             for (int c = 0; c < 6; c++){
-                mon.base_stats[c] = (uint8_t)array[c].toInt();
+                if (!(*array)[c].read_integer(mon.base_stats[c])){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "IVs should be integers: " + slug, std::move(path));
+                }
             }
         }
         {
-            QJsonArray array = obj["moves"].toArray();
-            int stop = std::min(5, (int)array.size());
-            for (int c = 0; c < stop; c++){
-                mon.moves[c] = parse_move(array[c].toObject());
+            JsonArray* array = obj->get_array("moves");
+            if (array == nullptr){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "No moves found: " + slug, std::move(path));
+            }
+            size_t stop = std::min<size_t>(5, array->size());
+            for (size_t c = 0; c < stop; c++){
+                JsonObject* move = (*array)[c].get_object();
+                if (move == nullptr){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected object for moves: " + slug, std::move(path));
+                }
+                mon.moves[c] = parse_move(*move);
             }
         }
         {
-            QJsonArray array = obj["max_moves"].toArray();
-            int stop = std::min(5, (int)array.size());
-            for (int c = 0; c < stop; c++){
-                mon.max_moves[c] = parse_move(array[c].toObject());
+            JsonArray* array = obj->get_array("max_moves");
+            if (array == nullptr){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "No max moves found: " + slug, std::move(path));
+            }
+            size_t stop = std::min<size_t>(5, array->size());
+            for (size_t c = 0; c < stop; c++){
+                JsonObject* move = (*array)[c].get_object();
+                if (move == nullptr){
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Expected object for max moves: " + slug, std::move(path));
+                }
+                mon.max_moves[c] = parse_move(*move);
             }
         }
     }

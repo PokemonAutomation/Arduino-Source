@@ -5,7 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -38,20 +39,29 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
     }
 }
 PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
-    QJsonArray array = read_json_file(RESOURCE_PATH() + json_file_slugs).array();
-    for (const auto& item : array){
-        QString slug = item.toString();
-        std::string slug_str = slug.toUtf8().data();
-        if (slug.size() <= 0){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Expected non-empty string for Pokemon slug.");
+    std::string path = RESOURCE_PATH().toStdString() + json_file_slugs.toStdString();
+    JsonValue json_slugs = load_json_file(path);
+    JsonArray* slugs = json_slugs.get_array();
+    if (slugs == nullptr){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load resource.", std::move(path));
+    }
+
+    for (auto& item : *slugs){
+        std::string* slug = item.get_string();
+        if (slug == nullptr || slug->empty()){
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                std::move(path)
+            );
         }
 
         using namespace NintendoSwitch::PokemonSwSh;
-        const PokemonNames& data = get_pokemon_name(slug_str);
-        const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug_str);
+        const PokemonNames& data = get_pokemon_name(*slug);
+        const PokemonSprite* sprites = get_pokemon_sprite_nothrow(*slug);
         if (sprites == nullptr){
             m_list.emplace_back(data.display_name(), QIcon());
-            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
+            global_logger_tagged().log("Missing sprite for: " + *slug, COLOR_RED);
         }else{
             m_list.emplace_back(
                 data.display_name(),

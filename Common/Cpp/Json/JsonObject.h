@@ -35,6 +35,12 @@ public:
     JsonValue& operator[](const std::string& key){ return m_data[key]; }
     JsonValue& operator[](     std::string&& key){ return m_data[std::move(key)]; }
 
+    //  Convert to the specified type. If the type doesn't match, return the default.
+    bool        to_boolean  (const std::string& key, bool default_value = false) const;
+    int64_t     to_integer  (const std::string& key, int64_t default_value = 0) const;
+    double      to_double   (const std::string& key, double default_value = 0) const;
+    std::string to_string   (const std::string& key, const char* default_value = "") const;
+
     //  Attempt to read this value at the specified key.
     //  If the key exists and the type matches, the value is assigned to "value" and returns true.
     //  Otherwise returns false and "value" remains unchanged.

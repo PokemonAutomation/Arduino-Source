@@ -24,6 +24,24 @@ JsonObject JsonObject::clone() const{
 }
 
 
+bool JsonObject::to_boolean(const std::string& key, bool default_value) const{
+    read_boolean(default_value, key);
+    return default_value;
+}
+int64_t JsonObject::to_integer(const std::string& key, int64_t default_value) const{
+    read_integer(default_value, key);
+    return default_value;
+}
+double JsonObject::to_double(const std::string& key, double default_value) const{
+    read_float(default_value, key);
+    return default_value;
+}
+std::string JsonObject::to_string(const std::string& key, const char* default_value) const{
+    const std::string* str = get_string(key);
+    return str == nullptr ? default_value : *str;
+}
+
+
 bool JsonObject::read_boolean(bool& value, const std::string& key) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){

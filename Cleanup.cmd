@@ -1,4 +1,6 @@
 
+rd /s /q "..\build-SerialPrograms*"
+
 ::cd %~dp0\ClientProject
 ::@call Cleanup.cmd
 

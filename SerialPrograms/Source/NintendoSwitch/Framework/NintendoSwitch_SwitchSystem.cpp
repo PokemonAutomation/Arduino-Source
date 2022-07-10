@@ -70,8 +70,8 @@ JsonValue SwitchSystemFactory::to_json() const{
     JsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
     root[JSON_SERIAL] = m_serial.to_json();
-    root[JSON_CAMERA] = m_serial.to_json();
-    root[JSON_AUDIO] = m_serial.to_json();
+    root[JSON_CAMERA] = m_camera.to_json();
+    root[JSON_AUDIO] = m_audio.to_json();
     return root;
 }
 
