@@ -7,7 +7,8 @@
 #include <deque>
 #include <fstream>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_PkmnLib_Types.h"
 #include "PokemonSwSh_PkmnLib_Moves.h"
@@ -103,33 +104,26 @@ private:
         std::map<uint32_t, const Move*>& ids,
         std::map<std::string, const Move*>& slugs
     ){
-        QString path = RESOURCE_PATH() + QString::fromStdString(filepath);
-        QJsonObject json = read_json_file(path).object();
-        if (json.empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Json is either empty or invalid.",
-                path.toStdString()
-            );
-        }
+        std::string path = RESOURCE_PATH().toStdString() + filepath;
+        JsonValue json = load_json_file(path);
+        JsonObject& root = json.get_object_throw(path);
 
-        for (auto iter = json.begin(); iter != json.end(); ++iter){
-            uint32_t move_id = iter.key().toUInt();
-            QJsonObject obj = iter.value().toObject();
-            std::string slug = json_get_string_throw(obj, "name").toStdString();
-
+        for (auto& item : root){
+            uint32_t move_id = std::atoi(item.first.c_str());
+            JsonObject& obj = item.second.get_object_throw(path);
+            std::string& slug = obj.get_string_throw("name", path);
             moves.emplace_back(
                 move_id,
-                json_get_string_throw(obj, "name").toStdString(),
-                get_type_from_string(json_get_string_throw(obj, "type").toStdString()),
-                get_move_category_from_string(json_get_string_throw(obj, "category").toStdString()),
-                (uint8_t)json_get_int_throw(obj, "base_power"),
-                json_get_double_throw(obj, "accuracy"),
-                json_get_int_throw(obj, "pp"),
-                json_get_string_throw(obj, "effect").toStdString(),
-                json_get_double_throw(obj, "probability"),
-                json_get_bool_throw(obj, "is_spread"),
-                json_get_double_throw(obj, "correction_factor")
+                obj.get_string_throw("name", path),
+                get_type_from_string(obj.get_string_throw("type", path)),
+                get_move_category_from_string(obj.get_string_throw("category")),
+                (uint8_t)obj.get_integer_throw("base_power"),
+                obj.get_double_throw("accuracy", path),
+                obj.get_integer_throw("pp", path),
+                obj.get_string_throw("effect", path),
+                obj.get_double_throw("probability", path),
+                obj.get_boolean_throw("is_spread", path),
+                obj.get_double_throw("correction_factor", path)
             );
             ids.emplace(move_id, &moves.back());
             slugs.emplace(std::move(slug), &moves.back());

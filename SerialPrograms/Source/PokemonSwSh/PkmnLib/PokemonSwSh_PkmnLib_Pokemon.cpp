@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_PkmnLib_Pokemon.h"
 
@@ -335,20 +337,14 @@ std::string Pokemon::dump() const{
 
 
 std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is_legendary){
-    QString path = RESOURCE_PATH() + QString::fromStdString(filepath);
-    QJsonObject json = read_json_file(path).object();
-    if (json.empty()){
-        throw FileException(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Json is either empty or invalid.",
-            path.toStdString()
-        );
-    }
+    std::string path = RESOURCE_PATH().toStdString() + filepath;
+    JsonValue json = load_json_file(path);
+    JsonObject& root = json.get_object_throw(path);
 
     std::map<std::string, Pokemon> map;
 
     uint8_t level;
-    int move_limit;
+    size_t move_limit;
     if (is_legendary){
         level = default_legendary_level;
         move_limit = 5;
@@ -357,64 +353,64 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
         move_limit = 4;
     }
 
-    for (auto iter = json.begin(); iter != json.end(); ++iter){
-        std::string slug = iter.key().toStdString();
-        QJsonObject obj = iter.value().toObject();
+    for (auto& item : root){
+        const std::string& slug = item.first;
+        JsonObject& obj = item.second.get_object_throw(path);
 
         Type type1 = Type::none;
         Type type2 = Type::none;
         {
-            QJsonArray array = json_get_array_throw(obj, "types");
+            JsonArray& array = obj.get_array_throw("types", path);
             if (array.size() < 1){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Must have at least one type: " + slug, path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Must have at least one type: " + slug, std::move(path));
             }
-            type1 = get_type_from_string(array[0].toString().toStdString());
+            type1 = get_type_from_string(array[0].get_string_throw(path));
             if (array.size() > 1){
-                type2 = get_type_from_string(array[1].toString().toStdString());
+                type2 = get_type_from_string(array[1].get_string_throw(path));
             }
         }
 
         uint32_t moves[5] = {0, 0, 0, 0, 0};
         {
-            QJsonArray array = json_get_array_throw(obj, "moves");
+            JsonArray& array = obj.get_array_throw("moves", path);
             if (array.size() > move_limit){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
-            for (int c = 0; c < array.size(); c++){
-                moves[c] = array[c].toInt();
+            for (size_t c = 0; c < array.size(); c++){
+                moves[c] = array[c].get_integer_throw(path);
             }
         }
 
         uint32_t max_moves[5] = {0, 0, 0, 0, 0};
         {
-            QJsonArray array = json_get_array_throw(obj, "max_moves");
+            JsonArray& array = obj.get_array_throw("max_moves", path);
             if (array.size() > move_limit){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
-            for (int c = 0; c < array.size(); c++){
-                max_moves[c] = array[c].toInt();
+            for (size_t c = 0; c < array.size(); c++){
+                max_moves[c] = array[c].get_integer_throw(path);
             }
         }
-        QJsonArray base_stats = json_get_array_throw(obj, "base_stats");
+        JsonArray& base_stats = obj.get_array_throw("base_stats", path);
         if (base_stats.size() != 6){
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Should be exactly 6 base stats: " + slug, path.toStdString());
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Should be exactly 6 base stats: " + slug, std::move(path));
         }
 
         map.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(slug),
             std::forward_as_tuple(
-                json_get_int_throw(obj, "id"),
+                obj.get_integer_throw("id", path),
                 slug,
-                json_get_string_throw(obj, "ability_id").toStdString(),
+                obj.get_string_throw("ability_id", path),
                 type1, type2,
                 level,
-                (uint8_t)base_stats[0].toInt(),
-                (uint8_t)base_stats[1].toInt(),
-                (uint8_t)base_stats[2].toInt(),
-                (uint8_t)base_stats[3].toInt(),
-                (uint8_t)base_stats[4].toInt(),
-                (uint8_t)base_stats[5].toInt(),
+                (uint8_t)base_stats[0].get_integer_throw(path),
+                (uint8_t)base_stats[1].get_integer_throw(path),
+                (uint8_t)base_stats[2].get_integer_throw(path),
+                (uint8_t)base_stats[3].get_integer_throw(path),
+                (uint8_t)base_stats[4].get_integer_throw(path),
+                (uint8_t)base_stats[5].get_integer_throw(path),
                 moves[0],
                 moves[1],
                 moves[2],

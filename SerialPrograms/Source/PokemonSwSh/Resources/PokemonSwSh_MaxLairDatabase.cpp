@@ -15,8 +15,6 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
 
-#include "Common/Qt/QtJsonTools.h"
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -34,29 +32,23 @@ struct MaxLairSlugsDatabase{
     }
 
     MaxLairSlugsDatabase(){
-        QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLairSlugMap.json");
-        QJsonObject json = read_json_file(path).object();
-        if (json.empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Json is either empty or invalid.",
-                path.toStdString()
-            );
-        }
+        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLairSlugMap.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& root = json.get_object_throw(path);
 
-        for (auto iter = json.begin(); iter != json.end(); ++iter){
-            std::string maxlair_slug = iter.key().toStdString();
-            QJsonObject obj = iter.value().toObject();
+        for (auto& item0 : root){
+            const std::string& maxlair_slug = item0.first;
+            JsonObject& obj = item0.second.get_object_throw(path);
             MaxLairSlugs slugs;
-            for (const auto& item : obj["OCR"].toArray()){
-                std::string slug = item.toString().toStdString();
+            for (auto& item1 : obj.get_array_throw("OCR", path)){
+                std::string& slug = item1.get_string_throw(path);
                 if (!slugs.name_slug.empty()){
-                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Multiple names specified for MaxLair slug.", path.toStdString());
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Multiple names specified for MaxLair slug.", std::move(path));
                 }
                 slugs.name_slug = std::move(slug);
             }
-            for (const auto& item : obj["Sprite"].toArray()){
-                std::string slug = item.toString().toStdString();
+            for (auto& item1 : obj.get_array_throw("Sprite", path)){
+                std::string& slug = item1.get_string_throw(path);
                 slugs.sprite_slugs.insert(std::move(slug));
             }
             m_slugs[maxlair_slug] = std::move(slugs);

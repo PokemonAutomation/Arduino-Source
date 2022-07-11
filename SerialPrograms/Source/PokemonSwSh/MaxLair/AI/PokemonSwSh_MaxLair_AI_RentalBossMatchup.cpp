@@ -6,7 +6,8 @@
 
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
@@ -40,20 +41,14 @@ struct MatchupDatabase{
 
 private:
     MatchupDatabase(){
-        QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLair/boss_matchup_LUT.json");
-        QJsonObject json = read_json_file(path).object();
-        if (json.empty()){
-            throw FileException(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Json is either empty or invalid.",
-                path.toStdString()
-            );
-        }
-        for (auto iter0 = json.begin(); iter0 != json.end(); ++iter0){
-            std::map<std::string, double>& sub = map[iter0.key().toStdString()];
-            QJsonObject obj = iter0.value().toObject();
-            for (auto iter1 = obj.begin(); iter1 != obj.end(); ++iter1){
-                sub[iter1.key().toStdString()] = iter1.value().toDouble();
+        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLair/boss_matchup_LUT.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& root = json.get_object_throw(path);
+        for (auto& item0 : root){
+            std::map<std::string, double>& sub = map[item0.first];
+            JsonObject& obj = item0.second.get_object_throw(path);
+            for (auto& item1 : obj){
+                sub[item1.first] = item1.second.get_double_throw(path);
             }
         }
     }
