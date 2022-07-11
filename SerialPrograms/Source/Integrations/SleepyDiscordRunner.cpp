@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <thread>
 #include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"

@@ -5,7 +5,6 @@
  */
 
 #include <QImage>
-#include "Common/Qt/QtJsonTools.h"
 #include "PokemonBDSP_IVCheckerReader.h"
 
 namespace PokemonAutomation{

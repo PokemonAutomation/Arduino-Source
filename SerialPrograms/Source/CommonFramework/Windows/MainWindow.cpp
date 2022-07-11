@@ -20,9 +20,6 @@
 #include "MainWindow.h"
 
 
-//#include <Windows.h>
-
-//#include <QJsonDocument>
 #include <iostream>
 using std::cout;
 using std::endl;

@@ -10,10 +10,9 @@
 #include "Panel.h"
 #include "PanelWidget.h"
 
-#include <QJsonDocument>
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

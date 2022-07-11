@@ -4,16 +4,15 @@
  *
  */
 
-#include <QJsonObject>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "PanelList.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>

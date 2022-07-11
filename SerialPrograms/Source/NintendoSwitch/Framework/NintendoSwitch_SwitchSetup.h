@@ -11,7 +11,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonObject>
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"

@@ -1,5 +1,5 @@
 #ifndef PokemonAutomation_SleepyPA_H
-    #define PokemonAutomation_SleepyPA_H
+#define PokemonAutomation_SleepyPA_H
 
 #include <stdint.h>
 #include "CommonFramework/PersistentSettings.h"

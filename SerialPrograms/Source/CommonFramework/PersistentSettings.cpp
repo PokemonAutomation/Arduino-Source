@@ -10,7 +10,6 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"

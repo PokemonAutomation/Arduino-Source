@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "NintendoSwitch_Panels.h"

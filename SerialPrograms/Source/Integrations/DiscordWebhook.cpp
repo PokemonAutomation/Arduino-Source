@@ -12,6 +12,7 @@
 #include <QNetworkAccessManager>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -293,8 +294,6 @@ void send_message(
         JsonObject jsonContent;
         jsonContent["content"] = str.toStdString();
         jsonContent["embeds"] = embeds.clone();
-
-//        cout << QJsonDocument(jsonContent).toJson().data() << endl;
 
         DiscordWebhookSender::instance().send_json(logger, url.url, jsonContent, file);
     }
