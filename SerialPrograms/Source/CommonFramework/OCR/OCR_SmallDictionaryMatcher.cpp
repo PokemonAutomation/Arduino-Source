@@ -5,7 +5,8 @@
  */
 
 #include <QtGlobal>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
@@ -18,18 +19,18 @@ namespace OCR{
 
 SmallDictionaryMatcher::SmallDictionaryMatcher(const QString& json_offset, bool first_only)
     : SmallDictionaryMatcher(
-        read_json_file(RESOURCE_PATH() + json_offset).object(),
+        load_json_file(RESOURCE_PATH().toStdString() + json_offset.toStdString()).get_object_throw(),
         first_only
     )
 {}
-SmallDictionaryMatcher::SmallDictionaryMatcher(const QJsonObject& json, bool first_only){
-    for (auto iter = json.begin(); iter != json.end(); ++iter){
-        Language language = language_code_to_enum(iter.key().toUtf8().data());
+SmallDictionaryMatcher::SmallDictionaryMatcher(const JsonObject& json, bool first_only){
+    for (const auto& item : json){
+        Language language = language_code_to_enum(item.first);
         const LanguageData& data = language_data(language);
         m_database.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(language),
-            std::forward_as_tuple(iter->toObject(), nullptr, data.random_match_chance, first_only)
+            std::forward_as_tuple(item.second.get_object_throw(), nullptr, data.random_match_chance, first_only)
         );
         m_languages += language;
     }
@@ -37,14 +38,11 @@ SmallDictionaryMatcher::SmallDictionaryMatcher(const QJsonObject& json, bool fir
 
 
 void SmallDictionaryMatcher::save(const QString& json_path) const{
-    QJsonObject root;
+    JsonObject root;
     for (const auto& item : m_database){
-        root.insert(
-            QString::fromStdString(language_data(item.first).code),
-            item.second.to_json()
-        );
+        root[language_data(item.first).code] = item.second.to_json();
     }
-    write_json_file(json_path, QJsonDocument(root));
+    root.dump(json_path.toStdString());
 }
 
 

@@ -4,8 +4,9 @@
  *
  */
 
-#include <QJsonArray>
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
 #include "OCR_DictionaryOCR.h"
@@ -20,29 +21,29 @@ namespace OCR{
 
 
 DictionaryOCR::DictionaryOCR(
-    const QJsonObject& json,
+    const JsonObject& json,
     const std::set<std::string>* subset,
     double random_match_chance,
     bool first_only
 )
     : m_random_match_chance(random_match_chance)
 {
-    for (auto it = json.begin(); it != json.end(); ++it){
-        std::string token = it.key().toUtf8().data();
+    for (const auto& item0 : json){
+        const std::string& token = item0.first;
         if (subset != nullptr && subset->find(token) == subset->end()){
             continue;
         }
         std::vector<QString>& candidates = m_database[token];
-        for (const auto& item : it.value().toArray()){
-            QString candidate = item.toString();
-            QString normalized = normalize(candidate);
+        for (const auto& item1 : item0.second.get_array_throw()){
+            const std::string& candidate = item1.get_string_throw();
+            QString normalized = normalize(QString::fromStdString(candidate));
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
-                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + it.key().toStdString());
+                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + token);
 //                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
             }
             set.insert(token);
-            candidates.emplace_back(std::move(candidate));
+            candidates.emplace_back(QString::fromStdString(candidate));
             if (first_only){
                 break;
             }
@@ -55,27 +56,32 @@ DictionaryOCR::DictionaryOCR(
 //    cout << "Tokens: " << m_database.size() << ", Match Candidates: " << m_candidate_to_token.size() << endl;
 }
 DictionaryOCR::DictionaryOCR(
-    const QString& json_path,
+    const std::string& json_path,
     const std::set<std::string>* subset,
     double random_match_chance,
     bool first_only
 )
-    : DictionaryOCR(read_json_file(json_path).object(), subset, random_match_chance, first_only)
+    : DictionaryOCR(
+        load_json_file(json_path).get_object_throw(json_path),
+        subset,
+        random_match_chance,
+        first_only
+    )
 {}
 
-QJsonObject DictionaryOCR::to_json() const{
-    QJsonObject obj;
+JsonObject DictionaryOCR::to_json() const{
+    JsonObject obj;
     for (const auto& item : m_database){
-        QJsonArray list;
+        JsonArray list;
         for (const QString& candidate : item.second){
-            list.append(candidate);
+            list.push_back(candidate.toStdString());
         }
-        obj.insert(QString::fromStdString(item.first), list);
+        obj[item.first] = std::move(list);
     }
     return obj;
 }
-void DictionaryOCR::save_json(const QString& json_path) const{
-    write_json_file(json_path, QJsonDocument(to_json()));
+void DictionaryOCR::save_json(const std::string& json_path) const{
+    to_json().dump(json_path);
 }
 
 

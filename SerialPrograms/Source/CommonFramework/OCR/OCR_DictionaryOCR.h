@@ -14,29 +14,28 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "OCR_StringMatchResult.h"
 
-class QJsonObject;
-
 namespace PokemonAutomation{
+    class JsonObject;
 namespace OCR{
 
 
 class DictionaryOCR{
 public:
     DictionaryOCR(
-        const QJsonObject& json,
+        const JsonObject& json,
         const std::set<std::string>* subset,
         double random_match_chance,
         bool first_only
     );
     DictionaryOCR(
-        const QString& json_path,
+        const std::string& json_path,
         const std::set<std::string>* subset,
         double random_match_chance,
         bool first_only
     );
 
-    QJsonObject to_json() const;
-    void save_json(const QString& json_path) const;
+    JsonObject to_json() const;
+    void save_json(const std::string& json_path) const;
 
     StringMatchResult match_substring(const QString& text, double log10p_spread = 0.50) const;
 

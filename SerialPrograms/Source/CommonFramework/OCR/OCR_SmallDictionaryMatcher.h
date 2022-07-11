@@ -9,16 +9,15 @@
 
 #include "OCR_DictionaryMatcher.h"
 
-class QJsonObject;
-
 namespace PokemonAutomation{
+    class JsonObject;
 namespace OCR{
 
 
 class SmallDictionaryMatcher : public DictionaryMatcher{
 public:
     SmallDictionaryMatcher(const QString& json_offset, bool first_only = false);
-    SmallDictionaryMatcher(const QJsonObject& json, bool first_only = false);
+    SmallDictionaryMatcher(const JsonObject& json, bool first_only = false);
 
     void save(const QString& json_path) const;
 };

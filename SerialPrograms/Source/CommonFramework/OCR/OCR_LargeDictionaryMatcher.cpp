@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
@@ -30,7 +29,7 @@ LargeDictionaryMatcher::LargeDictionaryMatcher(
             m_database.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(language),
-                std::forward_as_tuple(prefix + QString::fromStdString(code) + ".json", subset, data.random_match_chance, first_only)
+                std::forward_as_tuple(prefix.toStdString() + code + ".json", subset, data.random_match_chance, first_only)
             );
             m_languages += language;
         }catch (FileException&){}
@@ -38,7 +37,7 @@ LargeDictionaryMatcher::LargeDictionaryMatcher(
 }
 
 void LargeDictionaryMatcher::save(Language language, const QString& json_path) const{
-    dictionary(language).save_json(json_path);
+    dictionary(language).save_json(json_path.toStdString());
 }
 
 #if 0

@@ -6,7 +6,8 @@
 
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"
 
@@ -78,23 +79,24 @@ bool strip_leading_trailing_non_alphanumeric(QString& text){
 
 
 std::map<QChar, QString> make_substitution_map(){
-    QString path = RESOURCE_PATH() + "Tesseract/CharacterReductions.json";
-    QJsonObject obj = read_json_file(path).object();
+    std::string path = RESOURCE_PATH().toStdString() + "Tesseract/CharacterReductions.json";
+    JsonValue json = load_json_file(path);
+    JsonObject& obj = json.get_object_throw(path);
 
     std::map<QChar, QString> map;
-    for (auto item = obj.begin(); item != obj.end(); ++item){
-        QString target = item.key();
-        QString sources = item.value().toString();
-        for (QChar ch : sources){
+    for (auto& item : obj){
+        const std::string& target = item.first;
+        std::string& sources = item.second.get_string_throw(path);
+        for (QChar ch : QString::fromStdString(sources)){
             auto iter = map.find(ch);
             if (iter != map.end()){
                 throw FileException(
                     nullptr, PA_CURRENT_FUNCTION,
                     (QString("Duplicate character reduction: ") + ch).toStdString(),
-                    path.toStdString()
+                    std::move(path)
                 );
             }
-            map[ch] = target;
+            map[ch] = QString::fromStdString(target);
         }
     }
     return map;
