@@ -5,9 +5,9 @@
  */
 
 #include <QDir>
-#include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -68,7 +68,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
 }
 
 void GenerateNameOCRDataPokedex::read(
-    QJsonArray& output,
+    JsonArray& output,
     LoggerQt& logger,
     QImage image
 ) const{
@@ -77,9 +77,9 @@ void GenerateNameOCRDataPokedex::read(
         OCR::BLACK_OR_WHITE_TEXT_FILTERS()
     );
     if (result.results.empty()){
-        output.append("");
+        output.push_back("");
     }else{
-        output.append(QString::fromStdString(result.results.begin()->second.token));
+        output.push_back(result.results.begin()->second.token);
     }
 }
 
@@ -138,15 +138,15 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
     InferenceBoxScope box6(env.console, 0.75, 0.146 + 6 * 0.1115, 0.18, 0.059, COLOR_BLUE);
 
     std::vector<std::string> expected;
-    QJsonArray actual;
+    JsonArray actual;
 //    OCR::DictionaryOCR& dictionary = m_reader.dictionary(LANGUAGE);
 
     if (MODE == Mode::GENERATE_TRAINING_DATA){
-        QJsonArray array = read_json_file(
-            RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json"
-        ).array();
+        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-" + dex_name.toStdString() + ".json";
+        JsonValue json = load_json_file(path);
+        JsonArray& array = json.get_array_throw(path);
         for (const auto& item : array){
-            expected.emplace_back(item.toString().toUtf8().data());
+            expected.emplace_back(item.get_string_throw(path));
         }
     }
 
@@ -194,7 +194,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
     }
 
     if (MODE == Mode::READ_AND_SAVE){
-        write_json_file("PokedexReadData.json", QJsonDocument(actual));
+        actual.dump("PokedexReadData.json");
     }
 
 }

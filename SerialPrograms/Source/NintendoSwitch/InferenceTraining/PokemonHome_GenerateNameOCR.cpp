@@ -7,7 +7,9 @@
 #include <QDir>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -52,20 +54,14 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 
 
 void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    QString resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
-    QJsonArray array = read_json_file(resource_path).array();
+    std::string resource_path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-National.json";
+    JsonValue json = load_json_file(resource_path);
+    JsonArray& array = json.get_array_throw(resource_path);
 
     std::vector<std::string> slugs;
-    for (const auto& item : array){
-        QString slug = item.toString();
-        if (slug.size() <= 0){
-            throw FileException(
-                &env.logger(), PA_CURRENT_FUNCTION,
-                "Expected non-empty string for Pokemon slug.",
-                resource_path.toStdString()
-            );
-        }
-        slugs.emplace_back(slug.toUtf8().data());
+    for (auto& item : array){
+        std::string& slug = item.get_string_throw(resource_path);
+        slugs.emplace_back(std::move(slug));
     }
 
 

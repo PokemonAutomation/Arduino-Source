@@ -13,6 +13,7 @@
 
 
 namespace PokemonAutomation{
+    class JsonArray;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -38,7 +39,7 @@ public:
 
 private:
     void read(
-        QJsonArray& output,
+        JsonArray& output,
         LoggerQt& logger,
         QImage image
     ) const;

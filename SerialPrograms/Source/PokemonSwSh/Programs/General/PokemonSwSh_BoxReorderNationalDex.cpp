@@ -7,13 +7,13 @@
 #include <sstream>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
@@ -148,21 +148,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
 
     std::vector<std::string> current_order = read_all_pokemon(env.console, env.console, context, POKEMON_COUNT, LANGUAGE);
 
-    QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
-    QJsonArray array = read_json_file(path).array();
-
-    std::vector<std::string> slugs;
-    for (const auto& item : array) {
-        QString slug = item.toString();
-        if (slug.size() <= 0) {
-            throw FileException(
-                &env.console.logger(), PA_CURRENT_FUNCTION,
-                "Expected non-empty string for Pokemon slug.",
-                path.toStdString()
-            );
-        }
-        slugs.emplace_back(slug.toUtf8().data());
-    }
+    const std::vector<std::string>& slugs = Pokemon::NATIONAL_DEX_SLUGS();
     std::vector<std::string> sorted_order = current_order;
     std::sort(sorted_order.begin(), sorted_order.end(), [&](const std::string& str1, const std::string& str2){
         auto it1 = std::find(slugs.cbegin(), slugs.cend(), str1);

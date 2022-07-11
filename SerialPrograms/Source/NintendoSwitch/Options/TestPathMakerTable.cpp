@@ -8,7 +8,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Options/EditableTableWidget.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
@@ -356,45 +355,34 @@ public:
         button_layout->addWidget(dump_button);
 
         connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
-            QString path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json");
-            std::cout << "Load TestPath from " << path.toStdString() << std::endl;
-            if (path.size() > 0){
-                QJsonDocument doc = read_json_file(path);
-                if (!doc.isObject()){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", "Invalid option file: " + path + ", no Json object.");
-                    return;
-                }
-                QJsonObject root = doc.object();
-                auto it = root.find("TEST_PATH_MAKER_TABLE");
-                if (it == root.end()){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", "Invalid option file: " + path + ", no TEST_PATH_MAKER_TABLE.");
-                    return;
-                }
-                QJsonValue obj = json_get_value_nothrow(root, "TEST_PATH_MAKER_TABLE");
-                value.load_json(from_QJson(obj));
-                if (m_table_widget == nullptr){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
-                    return;
-                }
-                m_table_widget->update_ui();
+            std::string path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json").toStdString();
+            std::cout << "Load TestPath from " << path << std::endl;
+            if (path.empty()){
+                return;
             }
+            JsonValue json = load_json_file(path);
+            JsonObject& root = json.get_object_throw(path);
+            JsonValue& obj = root.get_value_throw("TEST_PATH_MAKER_TABLE", path);
+            value.load_json(obj);
+            if (m_table_widget == nullptr){
+                QMessageBox box;
+                box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
+                return;
+            }
+            m_table_widget->update_ui();
         });
 
         connect(save_button,  &QPushButton::clicked, this, [&value, this](bool){
-            auto path = QFileDialog::getSaveFileName(this, tr("Open option file"), ".", "*.json");
-            std::cout << "Save TestPath from " << path.toStdString() << std::endl;
+            std::string path = QFileDialog::getSaveFileName(this, tr("Open option file"), ".", "*.json").toStdString();
+            std::cout << "Save TestPath from " << path << std::endl;
             if (path.size() > 0){
                 try{
                     JsonObject root;
                     root["TEST_PATH_MAKER_TABLE"] = value.to_json();
-                    QJsonObject obj = to_QJson(std::move(root)).toObject();
-                    write_json_file(path, QJsonDocument(obj));
+                    root.dump(path);
                 }catch (FileException&){
                     QMessageBox box;
-                    box.critical(nullptr, "Error", "Failed to save to file: " + path);
+                    box.critical(nullptr, "Error", QString::fromStdString("Failed to save to file: " + path));
                     return;
                 }
             }
