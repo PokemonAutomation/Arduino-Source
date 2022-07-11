@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonValue>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "BooleanCheckBoxBaseOption.h"
 

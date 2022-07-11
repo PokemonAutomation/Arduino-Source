@@ -12,8 +12,6 @@
 #include <atomic>
 #include <QString>
 
-class QJsonValue;
-
 namespace PokemonAutomation{
 
 class JsonValue;

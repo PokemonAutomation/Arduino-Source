@@ -11,7 +11,6 @@
 #include <vector>
 #include <QString>
 
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{

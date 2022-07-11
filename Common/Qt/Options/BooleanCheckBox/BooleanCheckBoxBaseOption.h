@@ -12,7 +12,6 @@
 #include <atomic>
 #include <QString>
 
-class QJsonValue;
 class QCheckBox;
 
 namespace PokemonAutomation{

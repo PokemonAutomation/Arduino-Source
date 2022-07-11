@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonValue>
 #include <QWidget>
 #include <QLineEdit>
 #include <QCheckBox>

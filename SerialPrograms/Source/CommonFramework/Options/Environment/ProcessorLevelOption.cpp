@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonObject>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -52,7 +51,6 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
     if (obj == nullptr){
         return;
     }
-//    QJsonObject obj = json.toObject();
     std::string processor_string = get_processor_name();
     global_logger_tagged().log("Processor String: " + processor_string);
 

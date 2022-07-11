@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonValue>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"

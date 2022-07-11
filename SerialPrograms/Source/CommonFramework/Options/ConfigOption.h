@@ -8,7 +8,6 @@
 #define PokemonAutomation_ConfigOption_H
 
 class QString;
-class QJsonValue;
 class QWidget;
 
 namespace PokemonAutomation{

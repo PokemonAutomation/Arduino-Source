@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonObject>
 #include <QLabel>
 #include <QPushButton>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
