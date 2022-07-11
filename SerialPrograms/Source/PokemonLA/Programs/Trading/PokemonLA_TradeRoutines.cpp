@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -146,11 +147,11 @@ TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Langua
     , m_language(language)
     , m_box(overlay, 0.80, 0.155, 0.18, 0.05)
 {
-    QJsonArray json = read_json_file(
-        RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json"
-    ).array();
-    for (const auto& item : json){
-        m_slugs.insert(item.toString().toStdString());
+    std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-Hisui.json";
+    JsonValue json = load_json_file(path);
+    JsonArray& array = json.get_array_throw(path);
+    for (auto& item : array){
+        m_slugs.insert(std::move(item.get_string_throw(path)));
     }
 }
 

@@ -12,7 +12,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
@@ -27,13 +26,13 @@ namespace PokemonLA{
 
 
 std::map<std::string, int> make_research_catch_count_map(){
-    QJsonObject json = read_json_file(
-        RESOURCE_PATH() + "PokemonLA/ResearchMaxCatches.json"
-    ).object();
+    std::string path = RESOURCE_PATH().toStdString() + "PokemonLA/ResearchMaxCatches.json";
+    JsonValue json = load_json_file(path);
+    JsonObject& root = json.get_object_throw(path);
 
     std::map<std::string, int> map;
-    for (auto iter = json.begin(); iter != json.end(); ++iter){
-        map.emplace(iter.key().toStdString(), iter.value().toInt());
+    for (auto& item : root){
+        map.emplace(item.first, item.second.get_integer_throw(path));
     }
 
     return map;

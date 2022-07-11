@@ -14,6 +14,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/Resources/SpriteDatabase.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
@@ -21,7 +22,6 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/Globals.h"
@@ -279,36 +279,12 @@ FeatureVector compute_feature(const ConstImageRef& input_image){
     return result;
 }
 
-void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, QImage& sprite)> visit_sprit){
-    const char* sprite_path = "PokemonLA/MMOSprites.png";
-    const char* json_path = "PokemonLA/MMOSprites.json";
-    QImage sprites = open_image(RESOURCE_PATH() + sprite_path);
-    QJsonObject json = read_json_file(
-        RESOURCE_PATH() + json_path
-    ).object();
-
-    int width = json.find("spriteWidth")->toInt();
-    int height = json.find("spriteHeight")->toInt();
-    if (width <= 0){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", (RESOURCE_PATH() + json_path).toStdString());
-    }
-    if (height <= 0){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", (RESOURCE_PATH() + json_path).toStdString());
-    }
-
-    QJsonObject locations = json.find("spriteLocations")->toObject();
-    for (auto iter = locations.begin(); iter != locations.end(); ++iter){
+void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const QImage& sprite)> visit_sprit){
+    static const SpriteDatabase database("PokemonLA/MMOSprites.png", "PokemonLA/MMOSprites.json");
+    for (const auto& item : database){
         // cout << "sprite " << count << endl;
-
-        std::string slug = iter.key().toStdString();
-        QJsonObject obj = iter.value().toObject();
-        int y = obj.find("top")->toInt();
-        int x = obj.find("left")->toInt();
-        QImage sprite = sprites.copy(x, y, width, height);
-
-        sprite = sprite.scaled(50, 50);
-
-        visit_sprit(slug, sprite);
+        const std::string& slug = item.first;
+        visit_sprit(slug, item.second.sprite.scaled_to_qimage(50, 50));
     }
 }
 
@@ -327,7 +303,7 @@ MMOSpriteMatchingData build_MMO_sprite_matching_data(){
 
     std::map<std::string, FeatureVector> features;
 
-    load_and_visit_MMO_sprite([&](const std::string& slug, QImage& sprite){
+    load_and_visit_MMO_sprite([&](const std::string& slug, const QImage& sprite){
         color_matcher.add(slug, sprite);
         QImage sprite_gradient = compute_image_gradient(sprite);
         gradient_matcher.add(slug, sprite_gradient);
