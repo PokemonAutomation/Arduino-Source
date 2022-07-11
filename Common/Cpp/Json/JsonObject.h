@@ -45,6 +45,8 @@ public:
           JsonArray&    get_array_throw     (const std::string& key, const std::string& filename = std::string());
     const JsonObject&   get_object_throw    (const std::string& key, const std::string& filename = std::string()) const;
           JsonObject&   get_object_throw    (const std::string& key, const std::string& filename = std::string());
+    const JsonValue&    get_value_throw     (const std::string& key, const std::string& filename = std::string()) const;
+          JsonValue&    get_value_throw     (const std::string& key, const std::string& filename = std::string());
 
     //  Get a pointer to the value at the specified key.
     //  If the key exists and the type matches, returns the pointer.

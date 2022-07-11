@@ -93,6 +93,20 @@ JsonObject& JsonObject::get_object_throw(const std::string& key, const std::stri
     }
     return iter->second.get_object_throw(filename);
 }
+const JsonValue& JsonObject::get_value_throw(const std::string& key, const std::string& filename) const{
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second;
+}
+JsonValue& JsonObject::get_value_throw(const std::string& key, const std::string& filename){
+    auto iter = m_data.find(key);
+    if (iter == m_data.end()){
+        throw JsonParseException(filename, key);
+    }
+    return iter->second;
+}
 
 
 
