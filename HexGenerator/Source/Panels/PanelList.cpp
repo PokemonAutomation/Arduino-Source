@@ -9,7 +9,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "UI/MainWindow.h"
 #include "JsonSettings.h"

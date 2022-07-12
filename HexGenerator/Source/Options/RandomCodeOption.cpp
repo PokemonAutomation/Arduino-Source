@@ -9,7 +9,6 @@
 #include <QIntValidator>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCodeOption.h"
 

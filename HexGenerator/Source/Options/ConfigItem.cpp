@@ -7,7 +7,6 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "ConfigItem.h"
 

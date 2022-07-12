@@ -49,7 +49,6 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
-    ../Common/Qt/QtJsonTools.cpp \
     Source/Main.cpp \
     Source/Options/BooleanCheckBoxOption.cpp \
     Source/Options/ConfigItem.cpp \
@@ -105,7 +104,6 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
-    ../Common/Qt/QtJsonTools.h \
     Source/Options/BooleanCheckBoxOption.h \
     Source/Options/ConfigItem.h \
     Source/Options/Divider.h \

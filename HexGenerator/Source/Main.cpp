@@ -5,7 +5,6 @@
 #include <QApplication>
 #include <QDir>
 #include <QMessageBox>
-#include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "UI/MainWindow.h"
 

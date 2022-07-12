@@ -12,7 +12,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"
 #include "FossilTableOption.h"

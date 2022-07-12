@@ -10,7 +10,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "SwitchDateOption.h"
 

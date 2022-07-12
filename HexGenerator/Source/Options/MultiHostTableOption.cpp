@@ -15,7 +15,6 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"

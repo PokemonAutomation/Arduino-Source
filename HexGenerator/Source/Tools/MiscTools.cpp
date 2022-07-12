@@ -5,7 +5,6 @@
  */
 
 #include <QString>
-#include "Common/Qt/QtJsonTools.h"
 #include "Tools.h"
 
 namespace PokemonAutomation{
