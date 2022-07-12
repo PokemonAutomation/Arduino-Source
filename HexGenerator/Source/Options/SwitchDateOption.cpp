@@ -4,12 +4,11 @@
  *
  */
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QDateEdit>
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
@@ -19,24 +18,24 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-const QString SwitchDate::OPTION_TYPE = "SwitchDate";
+const std::string SwitchDate::OPTION_TYPE = "SwitchDate";
 
 
 int SwitchDate_init = register_option(
     SwitchDate::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new SwitchDate(obj)
         );
     }
 );
 
-SwitchDate::SwitchDate(const QJsonObject& obj)
+SwitchDate::SwitchDate(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , SwitchDateBaseOption(SingleStatementOption::m_label, QDate(2000, 1, 1))
+    , SwitchDateBaseOption(QString::fromStdString(SingleStatementOption::m_label), QDate(2000, 1, 1))
 {
-    load_default(from_QJson(json_get_value_throw(obj, JSON_DEFAULT)));
-    load_current(from_QJson(json_get_value_throw(obj, JSON_CURRENT)));
+    load_default(obj.get_value_throw(JSON_DEFAULT));
+    load_current(obj.get_value_throw(JSON_CURRENT));
 }
 QString SwitchDate::check_validity() const{
     return SwitchDateBaseOption::check_validity();
@@ -44,15 +43,15 @@ QString SwitchDate::check_validity() const{
 void SwitchDate::restore_defaults(){
     SwitchDateBaseOption::restore_defaults();
 }
-QJsonObject SwitchDate::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, to_QJson(write_default()));
-    root.insert(JSON_CURRENT, to_QJson(write_current()));
+JsonObject SwitchDate::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
+    root[JSON_DEFAULT] = write_default();
+    root[JSON_CURRENT] = write_current();
     return root;
 }
 std::string SwitchDate::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = {";
     str += std::to_string(m_current.year());
     str += ", ";

@@ -8,7 +8,6 @@
 #define PokemonAutomation_SingleStatementOption_H
 
 #include <memory>
-#include <QJsonValue>
 #include <QWidget>
 #include "ConfigItem.h"
 
@@ -17,17 +16,17 @@ namespace PokemonAutomation{
 
 class SingleStatementOption : public ConfigItem{
 public:
-    static const QString JSON_DECLARATION;
-    static const QString JSON_DEFAULT;
-    static const QString JSON_CURRENT;
+    static const std::string JSON_DECLARATION;
+    static const std::string JSON_DEFAULT;
+    static const std::string JSON_CURRENT;
 
 public:
-    SingleStatementOption(const QJsonObject& obj);
+    SingleStatementOption(const JsonObject& obj);
 
-    virtual QJsonObject to_json() const;
+    virtual JsonObject to_json() const;
 
 protected:
-    QString m_declaration;
+    std::string m_declaration;
 };
 
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonArray>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTableWidget>
@@ -14,6 +13,7 @@
 #include <QScrollBar>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
@@ -29,11 +29,11 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const QString MultiHostTable::OPTION_TYPE = "MultiHostTable";
+const std::string MultiHostTable::OPTION_TYPE = "MultiHostTable";
 
 int MultiHostTable_init = register_option(
     MultiHostTable::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new MultiHostTable(obj)
         );
@@ -41,13 +41,13 @@ int MultiHostTable_init = register_option(
 );
 
 
-MultiHostTable::MultiHostTable(const QJsonObject& obj)
+MultiHostTable::MultiHostTable(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_factory(false)
-    , m_table(SingleStatementOption::m_label, m_factory)
+    , m_table(QString::fromStdString(SingleStatementOption::m_label), m_factory)
 {
-    m_table.load_default(from_QJson(json_get_array_throw(obj, JSON_DEFAULT)));
-    m_table.load_current(from_QJson(json_get_array_throw(obj, JSON_CURRENT)));
+    m_table.load_default(obj.get_value_throw(JSON_DEFAULT));
+    m_table.load_current(obj.get_value_throw(JSON_CURRENT));
 }
 QString MultiHostTable::check_validity() const{
     return m_table.check_validity();
@@ -55,15 +55,15 @@ QString MultiHostTable::check_validity() const{
 void MultiHostTable::restore_defaults(){
     m_table.restore_defaults();
 }
-QJsonObject MultiHostTable::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, to_QJson(m_table.write_default()));
-    root.insert(JSON_CURRENT, to_QJson(m_table.write_current()));
+JsonObject MultiHostTable::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
+    root[JSON_DEFAULT] = m_table.write_default();
+    root[JSON_CURRENT] = m_table.write_current();
     return root;
 }
 std::string MultiHostTable::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = {\r\n";
     for (size_t c = 0; c < m_table.size(); c++){
         const MultiHostSlot& item = static_cast<const MultiHostSlot&>(m_table[c]);

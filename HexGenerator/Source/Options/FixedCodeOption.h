@@ -14,17 +14,17 @@ namespace PokemonAutomation{
 
 class FixedCode : public SingleStatementOption{
 public:
-    static const QString OPTION_TYPE;
-    static const QString JSON_DIGITS;
+    static const std::string OPTION_TYPE;
+    static const std::string JSON_DIGITS;
 
 public:
-    FixedCode(const QJsonObject& obj);
+    FixedCode(const JsonObject& obj);
 
-    virtual const QString& type() const override{ return OPTION_TYPE; }
+    virtual const std::string& type() const override{ return OPTION_TYPE; }
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual QJsonObject to_json() const override;
+    virtual JsonObject to_json() const override;
     virtual std::string to_cpp() const override;
 
     virtual QWidget* make_ui(QWidget& parent) override;
@@ -32,19 +32,19 @@ public:
 private:
     friend class FixedCodeUI;
     size_t m_digits;
-    QString m_default;
-    QString m_current;
+    std::string m_default;
+    std::string m_current;
 };
 
 
 
 class FixedCodeUI : public QWidget{
 public:
-    FixedCodeUI(QWidget& parent, FixedCode& value, const QString& label);
+    FixedCodeUI(QWidget& parent, FixedCode& value, const std::string& label);
     ~FixedCodeUI();
 
 private:
-    QString sanitized_code(const QString& text);
+    std::string sanitized_code(const std::string& text);
 
 private:
     FixedCode& m_value;

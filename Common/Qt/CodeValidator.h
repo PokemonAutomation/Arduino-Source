@@ -7,13 +7,13 @@
 #ifndef PokemonAutomation_CodeValidator_H
 #define PokemonAutomation_CodeValidator_H
 
-#include <QString>
+#include <string>
 
 namespace PokemonAutomation{
 
 
-bool validate_code(size_t digits, const QString& code);
-QString sanitize_code(size_t digits, const QString& code);
+bool validate_code(size_t digits, const std::string& code);
+std::string sanitize_code(size_t digits, const std::string& code);
 
 
 }

@@ -10,12 +10,11 @@
 
 namespace PokemonAutomation{
 
-const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";
+const std::string STRING_POKEMON = (QString("Pok") + QChar(0xe9) + "mon").toStdString();
 
 
 
 
-//QJsonObject json_get_object(const QJsonObject& obj, const QString& key);
 
 
 

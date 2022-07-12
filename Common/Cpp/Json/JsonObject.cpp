@@ -170,6 +170,11 @@ JsonValue* JsonObject::get_value(const std::string& key){
 }
 
 
+
+#if 0
+
+//  Read with defaults.
+
 bool JsonObject::to_boolean(const std::string& key, bool default_value) const{
     read_boolean(default_value, key);
     return default_value;
@@ -186,7 +191,11 @@ std::string JsonObject::to_string(const std::string& key, const char* default_va
     const std::string* str = get_string(key);
     return str == nullptr ? default_value : *str;
 }
+#endif
 
+
+
+//  Conditional read.
 
 bool JsonObject::read_boolean(bool& value, const std::string& key) const{
     auto iter = m_data.find(key);

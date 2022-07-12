@@ -13,13 +13,11 @@
 #include <map>
 #include <QApplication>
 #include <QDate>
-#include <QJsonObject>
-#include <QJsonDocument>
 
 namespace PokemonAutomation{
 
 
-extern const QString STRING_POKEMON;
+extern const std::string STRING_POKEMON;
 
 
 
@@ -30,10 +28,10 @@ bool valid_switch_date(const QDate& date);
 //  Build the .hex
 int build_hexfile(
     const std::string& board,
-    const QString& category,
-    const QString& program_name,
-    const QString& hex_file,
-    const QString& log_file
+    const std::string& category,
+    const std::string& program_name,
+    const std::string& hex_file,
+    const std::string& log_file
 );
 
 

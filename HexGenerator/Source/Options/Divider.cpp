@@ -4,7 +4,6 @@
  *
  */
 
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
@@ -14,12 +13,12 @@
 namespace PokemonAutomation{
 
 
-const QString Divider::OPTION_TYPE = "Divider";
-const QString Divider::JSON_TEXT = "Text";
+const std::string Divider::OPTION_TYPE = "Divider";
+const std::string Divider::JSON_TEXT = "Text";
 
 int Divider_init = register_option(
     Divider::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new Divider(obj)
         );
@@ -27,7 +26,7 @@ int Divider_init = register_option(
 );
 
 
-Divider::Divider(const QJsonObject& obj)
+Divider::Divider(const JsonObject& obj)
     : ConfigItem(obj)
 {}
 QWidget* Divider::make_ui(QWidget& parent){
@@ -35,7 +34,7 @@ QWidget* Divider::make_ui(QWidget& parent){
 }
 
 
-DividerUI::DividerUI(QWidget& parent, const QString& label)
+DividerUI::DividerUI(QWidget& parent, const std::string& label)
     : QWidget(&parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -44,7 +43,7 @@ DividerUI::DividerUI(QWidget& parent, const QString& label)
     layout->addWidget(frame);
     frame->setFrameShape(QFrame::HLine);
 
-    QLabel* text = new QLabel(label, this);
+    QLabel* text = new QLabel(QString::fromStdString(label), this);
     layout->addWidget(text);
     text->setWordWrap(true);
 }

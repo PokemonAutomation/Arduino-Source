@@ -13,19 +13,21 @@
 
 namespace PokemonAutomation{
 
+class JsonValue;
+
 class PanelList : public QListWidget{
 public:
-    PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json);
+    PanelList(QWidget& parent, MainWindow& window, const JsonValue& json);
 
-    const QString& display_name() const{ return m_display_name; }
+    const std::string& display_name() const{ return m_display_name; }
 
 public slots:
     void row_selected(QListWidgetItem* item);
 
 private:
     MainWindow& m_window;
-    QString m_display_name;
-    std::map<QString, std::unique_ptr<RightPanel>> m_map;
+    std::string m_display_name;
+    std::map<std::string, std::unique_ptr<RightPanel>> m_map;
 };
 
 

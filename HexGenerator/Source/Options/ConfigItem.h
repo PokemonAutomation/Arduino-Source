@@ -8,29 +8,30 @@
 #define PokemonAutomation_ConfigItem_H
 
 #include <memory>
-#include <QJsonValue>
 #include <QWidget>
 
 namespace PokemonAutomation{
 
+class JsonObject;
+
 
 class ConfigItem{
 public:
-    static const QString JSON_TYPE;
-    static const QString JSON_LABEL;
+    static const std::string JSON_TYPE;
+    static const std::string JSON_LABEL;
 
 public:
-    ConfigItem(const QJsonObject& obj);
+    ConfigItem(const JsonObject& obj);
     virtual ~ConfigItem() = default;
 
-    virtual const QString& type() const = 0;
+    virtual const std::string& type() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual QString check_validity() const{ return QString(); }
 
     virtual void restore_defaults(){}
 
-    virtual QJsonObject to_json() const;
+    virtual JsonObject to_json() const;
     virtual std::string to_cpp() const{ return ""; }
 
     virtual QWidget* make_ui(QWidget& parent) = 0;
@@ -39,15 +40,15 @@ public:
 
 
 protected:
-    QString m_label;
+    std::string m_label;
 };
 
 
 
-std::unique_ptr<ConfigItem> parse_option(const QJsonObject& obj);
+std::unique_ptr<ConfigItem> parse_option(const JsonObject& obj);
 
-using OptionMaker = std::unique_ptr<ConfigItem> (*)(const QJsonObject& obj);
-int register_option(const QString& name, OptionMaker fp);
+using OptionMaker = std::unique_ptr<ConfigItem> (*)(const JsonObject& obj);
+int register_option(const std::string& name, OptionMaker fp);
 
 
 }

@@ -16,25 +16,25 @@ namespace PokemonAutomation{
 
 class EnumDropdown : public SingleStatementOption{
 public:
-    static const QString OPTION_TYPE;
-    static const QString JSON_OPTIONS;
+    static const std::string OPTION_TYPE;
+    static const std::string JSON_OPTIONS;
 
 public:
-    EnumDropdown(const QString& declaration, const QString& label, size_t default_value);
-    EnumDropdown(const QJsonObject& obj);
+    EnumDropdown(const std::string& declaration, const std::string& label, size_t default_value);
+    EnumDropdown(const JsonObject& obj);
 
-    virtual const QString& type() const override{ return OPTION_TYPE; }
+    virtual const std::string& type() const override{ return OPTION_TYPE; }
     virtual void restore_defaults() override;
 
-    virtual QJsonObject to_json() const override;
+    virtual JsonObject to_json() const override;
     virtual std::string to_cpp() const override;
 
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
     friend class EnumDropdownUI;
-    std::vector<std::pair<QString, QString>> m_options;
-    std::map<QString, size_t> m_map;
+    std::vector<std::pair<std::string, std::string>> m_options;
+    std::map<std::string, size_t> m_map;
     size_t m_default;
     size_t m_current;
 };
@@ -43,7 +43,7 @@ private:
 
 class EnumDropdownUI : public QWidget{
 public:
-    EnumDropdownUI(QWidget& parent, EnumDropdown& value, const QString& label);
+    EnumDropdownUI(QWidget& parent, EnumDropdown& value, const std::string& label);
     ~EnumDropdownUI();
 private:
     EnumDropdown& m_value;

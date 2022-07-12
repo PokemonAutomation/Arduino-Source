@@ -9,14 +9,14 @@
 namespace PokemonAutomation{
 
 
-extern const QString VERSION;
-extern const QString DISCORD;
-extern const QString GITHUB_REPO;
+extern const std::string VERSION;
+extern const std::string DISCORD;
+extern const std::string GITHUB_REPO;
 
-extern const QString SETTINGS_NAME;
-extern const QString CONFIG_FOLDER_NAME;
-extern const QString SOURCE_FOLDER_NAME;
-extern const QString LOG_FOLDER_NAME;
+extern const std::string SETTINGS_NAME;
+extern const std::string CONFIG_FOLDER_NAME;
+extern const std::string SOURCE_FOLDER_NAME;
+extern const std::string LOG_FOLDER_NAME;
 
 
 class PersistentSettings{
@@ -28,7 +28,7 @@ private:
     void determine_paths();
 
 public:
-    QString path;
+    std::string path;
     size_t board_index = 0;
 
 };

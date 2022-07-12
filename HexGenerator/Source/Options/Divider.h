@@ -15,13 +15,13 @@ namespace PokemonAutomation{
 
 class Divider : public ConfigItem{
 public:
-    static const QString OPTION_TYPE;
-    static const QString JSON_TEXT;
+    static const std::string OPTION_TYPE;
+    static const std::string JSON_TEXT;
 
 public:
-    Divider(const QJsonObject& obj);
+    Divider(const JsonObject& obj);
 
-    virtual const QString& type() const override{ return OPTION_TYPE; }
+    virtual const std::string& type() const override{ return OPTION_TYPE; }
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
@@ -32,7 +32,7 @@ private:
 
 class DividerUI : public QWidget{
 public:
-    DividerUI(QWidget& parent, const QString& label);
+    DividerUI(QWidget& parent, const std::string& label);
     ~DividerUI();
 };
 

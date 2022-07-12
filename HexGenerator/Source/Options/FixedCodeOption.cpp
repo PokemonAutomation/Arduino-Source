@@ -4,11 +4,11 @@
  *
  */
 
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
@@ -16,12 +16,12 @@
 namespace PokemonAutomation{
 
 
-const QString FixedCode::OPTION_TYPE = "FixedCode";
-const QString FixedCode::JSON_DIGITS = "03-Digits";
+const std::string FixedCode::OPTION_TYPE = "FixedCode";
+const std::string FixedCode::JSON_DIGITS = "03-Digits";
 
 int FixedCode_init = register_option(
     FixedCode::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new FixedCode(obj)
         );
@@ -29,11 +29,11 @@ int FixedCode_init = register_option(
 );
 
 
-FixedCode::FixedCode(const QJsonObject& obj)
+FixedCode::FixedCode(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , m_digits(json_get_int_throw(obj, JSON_DIGITS))
-    , m_default(json_get_string_throw(obj, JSON_DEFAULT))
-    , m_current(json_get_string_throw(obj, JSON_CURRENT))
+    , m_digits(obj.get_integer_throw(JSON_DIGITS))
+    , m_default(obj.get_string_throw(JSON_DEFAULT))
+    , m_current(obj.get_string_throw(JSON_CURRENT))
 {
     if (!validate_code(m_digits, m_default)){
         throw ParseException("Invalid code.");
@@ -48,18 +48,18 @@ void FixedCode::restore_defaults(){
 QString FixedCode::check_validity() const{
     return validate_code(m_digits, m_current) ? QString() : "Code is invalid.";
 }
-QJsonObject FixedCode::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DIGITS, (int)m_digits);
-    root.insert(JSON_DEFAULT, m_default);
-    root.insert(JSON_CURRENT, m_current);
+JsonObject FixedCode::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
+    root[JSON_DIGITS] = m_digits;
+    root[JSON_DEFAULT] = m_default;
+    root[JSON_CURRENT] = m_current;
     return root;
 }
 std::string FixedCode::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = \"";
-    str += m_current.toUtf8().data();
+    str += m_current;
     str += "\";\r\n";
     return str;
 }
@@ -69,39 +69,39 @@ QWidget* FixedCode::make_ui(QWidget& parent){
 
 
 
-QString FixedCodeUI::sanitized_code(const QString& text){
-    QString message;
+std::string FixedCodeUI::sanitized_code(const std::string& text){
+    std::string message;
     try{
         message = "Code: " + sanitize_code(m_value.m_digits, text);
     }catch (const ParseException& e){
-        message = "<font color=\"red\">" + QString::fromStdString(e.message()) + "</font>";
+        message = "<font color=\"red\">" + e.message() + "</font>";
     }
     return message;
 }
 
-FixedCodeUI::FixedCodeUI(QWidget& parent, FixedCode& value, const QString& label)
+FixedCodeUI::FixedCodeUI(QWidget& parent, FixedCode& value, const std::string& label)
     : QWidget(&parent)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    QLabel* text = new QLabel(label, this);
+    QLabel* text = new QLabel(QString::fromStdString(label), this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
 
     QVBoxLayout* right = new QVBoxLayout();
     layout->addLayout(right, 1);
 
-    QLineEdit* box = new QLineEdit(m_value.m_current, this);
+    QLineEdit* box = new QLineEdit(QString::fromStdString(m_value.m_current), this);
     right->addWidget(box);
-    QLabel* under_text = new QLabel(sanitized_code(m_value.m_current), this);
+    QLabel* under_text = new QLabel(QString::fromStdString(sanitized_code(m_value.m_current)), this);
     right->addWidget(under_text);
     under_text->setWordWrap(true);
 
     connect(
         box, &QLineEdit::textChanged,
         this, [=](const QString& text){
-            m_value.m_current = text;
-            under_text->setText(sanitized_code(text));
+            m_value.m_current = text.toStdString();
+            under_text->setText(QString::fromStdString(sanitized_code(m_value.m_current)));
         }
     );
 }

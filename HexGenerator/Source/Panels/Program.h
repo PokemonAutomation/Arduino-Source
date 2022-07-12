@@ -9,40 +9,41 @@
 
 #include <thread>
 #include <QObject>
-#include <QJsonDocument>
-#include <QJsonArray>
 #include <QPushButton>
 #include "UI/BoardList.h"
 #include "RightPanel.h"
 
 namespace PokemonAutomation{
 
+class JsonArray;
+class JsonObject;
+
 
 class Program : public RightPanel{
 public:
-    static const QString JSON_PROGRAM_NAME;
-    static const QString JSON_DOCUMENTATION;
-    static const QString JSON_DESCRIPTION;
-    static const QString JSON_PARAMETERS;
+    static const std::string JSON_PROGRAM_NAME;
+    static const std::string JSON_DOCUMENTATION;
+    static const std::string JSON_DESCRIPTION;
+    static const std::string JSON_PARAMETERS;
 
-    static const QString BUILD_BUTTON_NORMAL;
-    static const QString BUILD_BUTTON_BUSY;
+    static const std::string BUILD_BUTTON_NORMAL;
+    static const std::string BUILD_BUTTON_BUSY;
 
 public:
-    Program(QString category, QString name, QString description, QString doc_link);
-    Program(QString category, const QJsonObject& obj);
+    Program(std::string category, std::string name, std::string description, std::string doc_link);
+    Program(std::string category, const JsonObject& obj);
     ~Program();
 
-    const QString& description() const{ return m_description; }
+    const std::string& description() const{ return m_description; }
 
     virtual QString check_validity() const{ return QString(); }
     virtual void restore_defaults(){}
 
-    QJsonDocument to_json() const;
+    JsonObject to_json() const;
     std::string to_cfile() const;
 
-    QString save_json() const;
-    QString save_cfile() const;
+    std::string save_json() const;
+    std::string save_cfile() const;
 
     void save_and_build(const std::string& board);
 
@@ -50,12 +51,11 @@ public:
 
 protected:
     virtual QWidget* make_options_body(QWidget& parent);
-    virtual QJsonArray parameters_json() const{ return QJsonArray(); }
+    virtual JsonArray parameters_json() const;
     virtual std::string parameters_cpp() const{ return ""; }
-    virtual void from_json(const QJsonDocument&){}
 
 private:
-    QString m_description;
+    std::string m_description;
     QPushButton* m_build_button;
     std::thread m_builder;
 };

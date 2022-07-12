@@ -4,11 +4,12 @@
  *
  */
 
-#include <QJsonDocument>
 #include <QFile>
 #include <QLabel>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "PanelList.h"
@@ -23,33 +24,28 @@ namespace PokemonAutomation{
 PanelLists::PanelLists(QWidget& parent, MainWindow& window)
     : QTabWidget(&parent)
 {
-    QString path = settings.path + CONFIG_FOLDER_NAME + "/Categories.json";
+    std::string path = settings.path + CONFIG_FOLDER_NAME + "/Categories.json";
 
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly)){
-        QMessageBox box;
-        box.critical(nullptr, "Error", "Unable to open program list: " + path);
-        return;
-    }
-
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    if (!doc.isArray()){
-        QMessageBox box;
-        box.critical(nullptr, "Error", "Invalid program list: " + path);
-        return;
-    }
-
-    for (const auto& item : doc.array()){
-        try{
-            PanelList* tab = new PanelList(*this, window, item);
-            addTab(tab, tab->display_name());
-            if (tab->count() == 0){
-                setTabEnabled(this->count() - 1, false);
+    JsonValue json;
+    try{
+        json = load_json_file(path);
+        for (const auto& item : json.get_array_throw(path)){
+            try{
+                PanelList* tab = new PanelList(*this, window, item);
+                addTab(tab, QString::fromStdString(tab->display_name()));
+                if (tab->count() == 0){
+                    setTabEnabled(this->count() - 1, false);
+                }
+            }catch (Exception&){
+                continue;
             }
-        }catch (Exception&){
-            continue;
         }
+    }catch (ParseException&){
+        QMessageBox box;
+        box.critical(nullptr, "Error", "Unable to open program list: " + QString::fromStdString(path));
+        return;
     }
+
 
 
 

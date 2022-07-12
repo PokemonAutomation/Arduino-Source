@@ -8,6 +8,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "JsonSettings.h"
@@ -15,17 +17,15 @@
 namespace PokemonAutomation{
 
 
-Settings_JsonFile::Settings_JsonFile(QString category, const QString& filepath)
-    : Settings_JsonFile(std::move(category), read_json_file(filepath).object())
+Settings_JsonFile::Settings_JsonFile(std::string category, const std::string& filepath)
+    : Settings_JsonFile(std::move(category), load_json_file(filepath).get_object_throw(filepath))
 {}
-Settings_JsonFile::Settings_JsonFile(QString category, const QJsonObject& obj)
+Settings_JsonFile::Settings_JsonFile(std::string category, const JsonObject& obj)
     : ConfigSet(std::move(category), obj)
 {
-    for (const auto item : json_get_array_throw(obj, JSON_OPTIONS)){
-        if (!item.isObject()){
-            throw ParseException("Config Error - Expected and object.");
-        }
-        m_options.emplace_back(parse_option(item.toObject()));
+    for (const auto& item : obj.get_array_throw(JSON_OPTIONS)){
+        const JsonObject& obj = item.get_object_throw();
+        m_options.emplace_back(parse_option(obj));
     }
 }
 
@@ -44,10 +44,10 @@ void Settings_JsonFile::restore_defaults(){
     }
 }
 
-QJsonArray Settings_JsonFile::options_json() const{
-    QJsonArray params;
+JsonArray Settings_JsonFile::options_json() const{
+    JsonArray params;
     for (const auto& item : m_options){
-        params += item->to_json();
+        params.push_back(item->to_json());
     }
     return params;
 }

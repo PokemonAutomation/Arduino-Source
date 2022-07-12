@@ -17,16 +17,16 @@ namespace PokemonAutomation{
 
 int build_hexfile(
     const std::string& board,
-    const QString& category,
-    const QString& program_name,
-    const QString& hex_file,
-    const QString& log_file
+    const std::string& category,
+    const std::string& program_name,
+    const std::string& hex_file,
+    const std::string& log_file
 ){
-    QFile file(hex_file);
+    QFile file(QString::fromStdString(hex_file));
     file.remove();
 
     using PokemonAutomation::utf8_to_wstr;
-    QString module;
+    std::string module;
     for (auto ch : settings.path + CONFIG_FOLDER_NAME + "/BuildWindows.cmd"){
         module += ch == '/' ? '\\' : ch;
     }
@@ -37,12 +37,12 @@ int build_hexfile(
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
-    QString command = "\"" + module + "\"";
-    command += QString(" ") + board.c_str();
-    command += QString(" ") + category;
-    command += QString(" ") + program_name;
+    std::string command = "\"" + module + "\"";
+    command += " " + board;
+    command += " " + category;
+    command += " " + program_name;
     command += " > \"" + log_file + "\" 2>&1";
-    std::wstring wpath = utf8_to_wstr(command.toUtf8().data());
+    std::wstring wpath = utf8_to_wstr(command);
     bool ret = CreateProcessW(
         nullptr,
         &wpath[0],
@@ -84,17 +84,17 @@ namespace PokemonAutomation{
 
 int build_hexfile(
     const std::string& board,
-    const QString& category,
-    const QString& program_name,
-    const QString& hex_file,
-    const QString& log_file
+    const std::string& category,
+    const std::string& program_name,
+    const std::string& hex_file,
+    const std::string& log_file
 ){
-    QString module_dir = settings.path + SOURCE_FOLDER_NAME + "/" + category;
-    QString module = "../Scripts/BuildOneUnix.sh ";
-    QString command =  module + board.c_str() + " " + program_name + " gui > " + log_file + " 2>&1";
+    std::string module_dir = settings.path + SOURCE_FOLDER_NAME + "/" + category;
+    std::string module = "../Scripts/BuildOneUnix.sh ";
+    std::string command = module + board + " " + program_name + " gui > " + log_file + " 2>&1";
 
     // Since most macs will have the avr tools installed in /usr/local/bin, add it to the path now
-    QString path = "/usr/local/bin:";
+    std::string path = "/usr/local/bin:";
     path.append(getenv("PATH"));
     setenv("PATH", path.toUtf8(), 1);
 
@@ -106,10 +106,10 @@ int build_hexfile(
     getcwd(cwd, sizeof(cwd));
 
     // Move to our Device Source directory
-    int cd_mod_dir = chdir(module_dir.toUtf8().data());
+    int cd_mod_dir = chdir(module_dir.c_str());
     if (cd_mod_dir !=0) {
         char msg[50];
-        sprintf(msg, "chdir() to %s failed with code %d", module_dir.toUtf8().data(), cd_mod_dir);
+        sprintf(msg, "chdir() to %s failed with code %d", module_dir.c_str() cd_mod_dir);
         std::cout << msg;
         run_on_main_thread([=]{
             QMessageBox box;
@@ -118,12 +118,12 @@ int build_hexfile(
         return 1;
     }
 
-    FILE* pipe = popen(command.toUtf8().data(), "r");
+    FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
-        std::cout << "Failed to create process with command " + command.toStdString();
+        std::cout << "Failed to create process with command " + command;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", "Failed to create process for " + module);
+            box.critical(nullptr, "Error", QString::fromStdString("Failed to create process for " + module));
         });
         return 1;
     };

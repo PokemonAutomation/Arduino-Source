@@ -5,25 +5,25 @@
  */
 
 #include <map>
-#include <QJsonObject>
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 
-const QString SingleStatementOption::JSON_DECLARATION  = "02-Declaration";
-const QString SingleStatementOption::JSON_DEFAULT      = "98-Default";
-const QString SingleStatementOption::JSON_CURRENT      = "99-Current";
+const std::string SingleStatementOption::JSON_DECLARATION  = "02-Declaration";
+const std::string SingleStatementOption::JSON_DEFAULT      = "98-Default";
+const std::string SingleStatementOption::JSON_CURRENT      = "99-Current";
 
-SingleStatementOption::SingleStatementOption(const QJsonObject& obj)
+SingleStatementOption::SingleStatementOption(const JsonObject& obj)
     : ConfigItem(obj)
-    , m_declaration(json_get_string_throw(obj, JSON_DECLARATION))
+    , m_declaration(obj.get_string_throw(JSON_DECLARATION))
 {}
 
-QJsonObject SingleStatementOption::to_json() const{
-    QJsonObject root = ConfigItem::to_json();
-    root.insert(JSON_DECLARATION, m_declaration);
+JsonObject SingleStatementOption::to_json() const{
+    JsonObject root = ConfigItem::to_json();
+    root[JSON_DECLARATION] = m_declaration;
     return root;
 }
 

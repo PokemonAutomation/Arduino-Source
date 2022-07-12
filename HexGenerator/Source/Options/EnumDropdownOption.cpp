@@ -5,12 +5,13 @@
  */
 
 #include <vector>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "EnumDropdownOption.h"
@@ -18,13 +19,13 @@
 namespace PokemonAutomation{
 
 
-const QString EnumDropdown::OPTION_TYPE = "EnumDropdown";
-const QString EnumDropdown::JSON_OPTIONS = "03-Options";
+const std::string EnumDropdown::OPTION_TYPE = "EnumDropdown";
+const std::string EnumDropdown::JSON_OPTIONS = "03-Options";
 
 
 int EnumDropdown_init = register_option(
     EnumDropdown::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new EnumDropdown(obj)
         );
@@ -32,24 +33,18 @@ int EnumDropdown_init = register_option(
 );
 
 
-EnumDropdown::EnumDropdown(const QJsonObject& obj)
+EnumDropdown::EnumDropdown(const JsonObject& obj)
     : SingleStatementOption(obj)
 {
-    QJsonArray options = json_get_array_throw(obj, JSON_OPTIONS);
-    for (const auto option : options){
-        if (!option.isArray()){
-            throw ParseException("Config Error - Expected Array: " + JSON_OPTIONS.toStdString());
-        }
-        QJsonArray pair = option.toArray();
+    const JsonArray& options = obj.get_array_throw(JSON_OPTIONS);
+    for (const auto& option : options){
+        const JsonArray& pair = option.get_array_throw();
         if (pair.size() != 2){
-            throw ParseException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS.toStdString());
-        }
-        if (!pair[0].isString() || !pair[1].isString()){
-            throw ParseException("Config Error - Enum pairs should be strings: " + JSON_OPTIONS.toStdString());
+            throw ParseException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS);
         }
         m_options.emplace_back(
-            pair[0].toString(),
-            pair[1].toString()
+            pair[0].get_string_throw(),
+            pair[1].get_string_throw()
         );
     }
     for (size_t c = 0; c < m_options.size(); c++){
@@ -58,14 +53,14 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
         }
     }
     {
-        auto iter = m_map.find(json_get_string_throw(obj, JSON_DEFAULT));
+        auto iter = m_map.find(obj.get_string_throw(JSON_DEFAULT));
         if (iter == m_map.end()){
             throw ParseException("Config Error - Unrecognized token.");
         }
         m_default = iter->second;
     }
     {
-        auto iter = m_map.find(json_get_string_throw(obj, JSON_CURRENT));
+        auto iter = m_map.find(obj.get_string_throw(JSON_CURRENT));
         if (iter == m_map.end()){
             throw ParseException("Config Error - Unrecognized token.");
         }
@@ -76,27 +71,27 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
 void EnumDropdown::restore_defaults(){
     m_current = m_default;
 }
-QJsonObject EnumDropdown::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
+JsonObject EnumDropdown::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
     {
-        QJsonArray options;
+        JsonArray options;
         for (const auto& option : m_options){
-            QJsonArray pair;
-            pair += option.first;
-            pair += option.second;
-            options += std::move(pair);
+            JsonArray pair;
+            pair.push_back(option.first);
+            pair.push_back(option.second);
+            options.push_back(std::move(pair));
         }
-        root.insert(JSON_OPTIONS, std::move(options));
+        root[JSON_OPTIONS] = std::move(options);
     }
-    root.insert(JSON_DEFAULT, m_options[m_default].first);
-    root.insert(JSON_CURRENT, m_options[m_current].first);
+    root[JSON_DEFAULT] = m_options[m_default].first;
+    root[JSON_CURRENT] = m_options[m_current].first;
     return root;
 }
 std::string EnumDropdown::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = ";
-    str += m_options[m_current].first.toUtf8().data();
+    str += m_options[m_current].first;
     str += ";\r\n";
     return str;
 }
@@ -105,18 +100,18 @@ QWidget* EnumDropdown::make_ui(QWidget& parent){
 }
 
 
-EnumDropdownUI::EnumDropdownUI(QWidget& parent, EnumDropdown& value, const QString& label)
+EnumDropdownUI::EnumDropdownUI(QWidget& parent, EnumDropdown& value, const std::string& label)
     : QWidget(&parent)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    QLabel* text = new QLabel(label, this);
+    QLabel* text = new QLabel(QString::fromStdString(label), this);
     layout->addWidget(text);
     text->setWordWrap(true);
     QComboBox* box = new QComboBox(this);
     layout->addWidget(box);
     for (const auto& item : m_value.m_options){
-        box->addItem(item.second);
+        box->addItem(QString::fromStdString(item.second));
     }
     box->setCurrentIndex(m_value.m_current);
     connect(

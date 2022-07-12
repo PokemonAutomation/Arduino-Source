@@ -8,8 +8,9 @@
 #define PokemonAutomation_Compiler_H
 
 //#include <stddef.h>
-
+#ifdef __cplusplus
 namespace PokemonAutomation{
+#endif
 
 
 #define PA_ALIGNMENT    64
@@ -53,5 +54,7 @@ namespace PokemonAutomation{
 
 
 
+#ifdef __cplusplus
 }
+#endif
 #endif

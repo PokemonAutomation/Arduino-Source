@@ -10,8 +10,8 @@
 namespace PokemonAutomation{
 
 
-bool validate_code(size_t digits, const QString& code){
-    if (code.isEmpty()){
+bool validate_code(size_t digits, const std::string& code){
+    if (code.empty()){
         return true;
     }
     size_t c = 0;
@@ -33,24 +33,24 @@ bool validate_code(size_t digits, const QString& code){
     return c == digits;
 }
 
-QString sanitize_code(size_t digits, const QString& code){
-    QString ret;
+std::string sanitize_code(size_t digits, const std::string& code){
+    std::string ret;
     size_t c = 0;
     for (const auto& ch : code){
         if (ch == ' ' || ch == '-'){
             continue;
         }
         if (ch < '0' || ch > '9'){
-            throw ParseException(std::string("Invalid code digit: ") + QString(ch).toStdString());
+            throw ParseException(std::string("Invalid code digit: ") + ch);
         }
         c++;
         if (c > digits){
-            throw ParseException(std::string("Code is too long: ") + code.toStdString());
+            throw ParseException(std::string("Code is too long: ") + code);
         }
         ret += ch;
     }
     if (c < digits){
-        throw ParseException(std::string("Code is too short: ") + code.toStdString());
+        throw ParseException(std::string("Code is too short: ") + code);
     }
     return ret;
 }

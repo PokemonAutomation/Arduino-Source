@@ -11,16 +11,18 @@
 
 namespace PokemonAutomation{
 
+class JsonArray;
+
 
 class Settings_JsonFile : public ConfigSet{
 public:
-    Settings_JsonFile(QString category, const QString& filepath);
-    Settings_JsonFile(QString category, const QJsonObject& obj);
+    Settings_JsonFile(std::string category, const std::string& filepath);
+    Settings_JsonFile(std::string category, const JsonObject& obj);
 
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual QJsonArray options_json() const override;
+    virtual JsonArray options_json() const override;
     virtual std::string options_cpp() const override;
 
     virtual QWidget* make_options_body(QWidget& parent) override;

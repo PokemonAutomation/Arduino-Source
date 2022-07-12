@@ -7,6 +7,8 @@
 #include <QFile>
 #include <QTextStream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "UI/MainWindow.h"
@@ -20,40 +22,28 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json)
+PanelList::PanelList(QWidget& parent, MainWindow& window, const JsonValue& json)
     : QListWidget(&parent)
     , m_window(window)
 {
-    if (!json.isObject()){
-        throw ParseException("Expected an object.");
-    }
-    const QJsonObject& category = json.toObject();
+    const JsonObject& category = json.get_object_throw();
 
-    QString category_name;
-    if (!json_get_string(category_name, category, "Name")){
-        throw ParseException("Expected string field: Name");
-    }
-
-    if (!json_get_string(m_display_name, category, "Display")){
-        throw ParseException("Expected string field: Display");
-    }
+    const std::string& category_name = category.get_string_throw("Name");
+    m_display_name = category.get_string_throw("Display");
 
     //  Populate Settings
 //    std::vector<QString> settings_list;
     bool first = true;
-    for (const auto& item : json_get_array_nothrow(category, "Settings")){
-        if (!item.isString()){
-            throw ParseException("Expected string field: Settings");
-        }
-        QString setting = item.toString();
+    for (const auto& item : category.get_array_throw("Settings")){
+        const std::string& setting = item.get_string_throw();
 //        settings.emplace_back(setting.toString());
 //        m_list.emplace_back();
 //        cout << setting.toUtf8().data() << endl;
         try{
-            QString path = settings.path + CONFIG_FOLDER_NAME + "/" + category_name + "/" + setting + ".json";
+            std::string path = settings.path + CONFIG_FOLDER_NAME + "/" + category_name + "/" + setting + ".json";
             std::unique_ptr<RightPanel> config(new Settings_JsonFile(category_name, path));
 //            m_list.emplace_back(std::move(config));
-            const QString& name = config->name();
+            const std::string& name = config->name();
             if (!m_map.emplace(name, std::move(config)).second){
                 throw ParseException("Duplicate: Program name");
             }
@@ -65,28 +55,28 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
                 list_item->setFont(font);
                 first = false;
             }
-            addItem(name);
+            addItem(QString::fromStdString(name));
         }catch (const Exception& e){
             cout << "Error: " << e.message() << endl;
         }
     }
 
     //  Populate Programs
-    QString path = settings.path + SOURCE_FOLDER_NAME + "/" + category_name + "/ProgramList.txt";
-    QFile file(path);
+    std::string path = settings.path + SOURCE_FOLDER_NAME + "/" + category_name + "/ProgramList.txt";
+    QFile file(QString::fromStdString(path));
     if (file.open(QFile::ReadOnly)){
-        cout << "File = " << path.toUtf8().data() << endl;
+        cout << "File = " << path << endl;
         QTextStream stream(&file);
         while (!stream.atEnd()){
-            QString line = stream.readLine();
-            if (line.isEmpty()){
+            std::string line = stream.readLine().toStdString();
+            if (line.empty()){
                 continue;
             }
-            cout << "Open: " << line.toUtf8().data() << endl;
+            cout << "Open: " << line << endl;
 
             //  Divider
             if (line[0] == '-'){
-                addItem(line);
+                addItem(QString::fromStdString(line));
                 QListWidgetItem* list_item = this->item(this->count() - 1);
                 QFont font = list_item->font();
                 font.setBold(true);
@@ -96,14 +86,14 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
 
             //  Program
             try{
-                QString path = settings.path + CONFIG_FOLDER_NAME + "/" + category_name + "/" + line + ".json";
+                std::string path = settings.path + CONFIG_FOLDER_NAME + "/" + category_name + "/" + line + ".json";
                 std::unique_ptr<RightPanel> config(new Program_JsonFile(category_name, path));
 //                m_list.emplace_back(std::move(config));
-                const QString& name = config->name();
+                const std::string& name = config->name();
                 if (!m_map.emplace(name, std::move(config)).second){
                     throw ParseException("Duplicate: Program name");
                 }
-                addItem(name);
+                addItem(QString::fromStdString(name));
             }catch (const Exception& e){
                 cout << "Error: " << e.message() << endl;
             }
@@ -116,7 +106,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
 }
 
 void PanelList::row_selected(QListWidgetItem* item){
-    auto iter = m_map.find(item->text());
+    auto iter = m_map.find(item->text().toStdString());
     if (iter == m_map.end()){
 //        std::cout << item->text().toUtf8().data() << std::endl;
 //        PA_THROW_StringException("Invalid program name: " + item->text());

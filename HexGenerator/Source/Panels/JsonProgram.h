@@ -14,13 +14,13 @@ namespace PokemonAutomation{
 
 class Program_JsonFile : public Program{
 public:
-    Program_JsonFile(QString category, const QString& filepath);
-    Program_JsonFile(QString category, const QJsonObject& obj);
+    Program_JsonFile(std::string category, const std::string& filepath);
+    Program_JsonFile(std::string category, const JsonObject& obj);
 
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual QJsonArray parameters_json() const override;
+    virtual JsonArray parameters_json() const override;
     virtual std::string parameters_cpp() const override;
 
     virtual QWidget* make_options_body(QWidget& parent) override;

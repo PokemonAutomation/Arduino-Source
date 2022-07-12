@@ -4,12 +4,12 @@
  *
  */
 
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QDoubleValidator>
 #include <QLineEdit>
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
@@ -18,30 +18,30 @@
 namespace PokemonAutomation{
 
 
-const QString FloatingPoint::OPTION_TYPE = "FloatingPoint";
-const QString FloatingPoint::JSON_MIN_VALUE = "03-MinValue";
-const QString FloatingPoint::JSON_MAX_VALUE = "04-MaxValue";
+const std::string FloatingPoint::OPTION_TYPE = "FloatingPoint";
+const std::string FloatingPoint::JSON_MIN_VALUE = "03-MinValue";
+const std::string FloatingPoint::JSON_MAX_VALUE = "04-MaxValue";
 
 
 int FloatingPoint_init = register_option(
     FloatingPoint::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new FloatingPoint(obj)
         );
     }
 );
 
-FloatingPoint::FloatingPoint(const QJsonObject& obj)
+FloatingPoint::FloatingPoint(const JsonObject& obj)
     : SingleStatementOption(obj)
     , FloatingPointBaseOption(
-        SingleStatementOption::m_label,
-        json_get_double_throw(obj, JSON_MIN_VALUE),
-        json_get_double_throw(obj, JSON_MAX_VALUE),
-        json_get_double_throw(obj, JSON_DEFAULT)
+        QString::fromStdString(SingleStatementOption::m_label),
+        obj.get_double_throw(JSON_MIN_VALUE),
+        obj.get_double_throw(JSON_MAX_VALUE),
+        obj.get_double_throw(JSON_DEFAULT)
     )
 {
-    m_current = json_get_double_throw(obj, JSON_CURRENT);
+    m_current = obj.get_double_throw(JSON_CURRENT);
 }
 QString FloatingPoint::check_validity() const{
     return FloatingPointBaseOption::check_validity();
@@ -49,17 +49,17 @@ QString FloatingPoint::check_validity() const{
 void FloatingPoint::restore_defaults(){
     FloatingPointBaseOption::restore_defaults();
 }
-QJsonObject FloatingPoint::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_MIN_VALUE, QJsonValue(m_min_value));
-    root.insert(JSON_MAX_VALUE, QJsonValue(m_max_value));
-    root.insert(JSON_DEFAULT, to_QJson(write_default()));
-    root.insert(JSON_CURRENT, to_QJson(write_current()));
+JsonObject FloatingPoint::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
+    root[JSON_MIN_VALUE] = m_min_value;
+    root[JSON_MAX_VALUE] = m_max_value;
+    root[JSON_DEFAULT] = write_default();
+    root[JSON_CURRENT] = write_current();
     return root;
 }
 std::string FloatingPoint::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = ";
     str += std::to_string(m_current);
     str += ";\r\n";

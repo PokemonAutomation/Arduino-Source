@@ -54,7 +54,7 @@ RaidCodeOption::RaidCodeOption(size_t random_digits, QString code_string)
 {}
 QString RaidCodeOption::check_validity() const{
     if (m_random_digits == 0){
-        return validate_code(m_digits, m_code)
+        return validate_code(m_digits, m_code.toStdString())
             ? QString()
             : "Code is invalid.";
     }else{
@@ -71,9 +71,9 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
         return false;
     }
     if (m_random_digits == 0){
-        QString qstr = sanitize_code(8, m_code);
+        std::string qstr = sanitize_code(8, m_code.toStdString());
         for (int c = 0; c < 8; c++){
-            code[c] = qstr[c].unicode() - '0';
+            code[c] = qstr[c] - '0';
         }
         return true;
     }
@@ -207,13 +207,13 @@ QString RandomCodeWidget::sanitized_code(const QString& text) const{
     if (text.isEmpty()){
         return "<font color=\"blue\">No Raid Code</font>";
     }
-    QString message;
+    std::string message;
     try{
-        message = "Fixed Raid Code: " + sanitize_code(m_value.m_current.total_digits(), text);
+        message = "Fixed Raid Code: " + sanitize_code(m_value.m_current.total_digits(), text.toStdString());
     }catch (const ParseException& e){
-        message = "<font color=\"red\">" + QString::fromStdString(e.message()) + "</font>";
+        message = "<font color=\"red\">" + e.message() + "</font>";
     }
-    return message;
+    return QString::fromStdString(message);
 }
 QString RandomCodeWidget::random_code_string() const{
     QString str;

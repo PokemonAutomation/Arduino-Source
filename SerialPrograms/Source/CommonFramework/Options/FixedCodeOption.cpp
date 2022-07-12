@@ -75,9 +75,9 @@ JsonValue FixedCodeOption::to_json() const{
 
 void FixedCodeOption::to_str(uint8_t* code) const{
     SpinLockGuard lg(m_lock);
-    QString qstr = sanitize_code(8, m_current);
+    std::string qstr = sanitize_code(8, m_current.toStdString());
     for (int c = 0; c < 8; c++){
-        code[c] = qstr[c].unicode() - '0';
+        code[c] = qstr[c] - '0';
     }
 }
 
@@ -86,7 +86,7 @@ QString FixedCodeOption::check_validity() const{
     return check_validity(m_current);
 }
 QString FixedCodeOption::check_validity(const QString& x) const{
-    return validate_code(m_digits, x) ? QString() : "Code is invalid.";
+    return validate_code(m_digits, x.toStdString()) ? QString() : "Code is invalid.";
 }
 void FixedCodeOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
@@ -99,13 +99,13 @@ ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
 
 
 QString FixedCodeWidget::sanitized_code(const QString& text) const{
-    QString message;
+    std::string message;
     try{
-        message = "Code: " + sanitize_code(m_value.m_digits, text);
+        message = "Code: " + sanitize_code(m_value.m_digits, text.toStdString());
     }catch (const ParseException& e){
-        message = "<font color=\"red\">" + QString::fromStdString(e.message()) + "</font>";
+        message = "<font color=\"red\">" + e.message() + "</font>";
     }
-    return message;
+    return QString::fromStdString(message);
 }
 FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     : QWidget(&parent)

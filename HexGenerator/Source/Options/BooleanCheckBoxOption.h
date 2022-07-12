@@ -16,15 +16,15 @@ namespace PokemonAutomation{
 
 class BooleanCheckBox : public SingleStatementOption, private BooleanCheckBoxBaseOption{
 public:
-    static const QString OPTION_TYPE;
+    static const std::string OPTION_TYPE;
 
 public:
-    BooleanCheckBox(const QJsonObject& obj);
+    BooleanCheckBox(const JsonObject& obj);
 
-    virtual const QString& type() const override{ return OPTION_TYPE; }
+    virtual const std::string& type() const override{ return OPTION_TYPE; }
     virtual void restore_defaults() override;
 
-    virtual QJsonObject to_json() const override;
+    virtual JsonObject to_json() const override;
     virtual std::string to_cpp() const override;
 
     virtual QWidget* make_ui(QWidget& parent) override;

@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     settings.load();
 
-    if (!QDir(settings.path + CONFIG_FOLDER_NAME).exists()){
+    if (!QDir(QString::fromStdString(settings.path + CONFIG_FOLDER_NAME)).exists()){
         QMessageBox box;
         box.critical(
             nullptr, "Error",
@@ -42,10 +42,12 @@ int main(int argc, char *argv[])
             QMessageBox box;
             box.critical(
                 nullptr, "Error",
-                "Unicode characters found in the path name. Please move the folder to a place with only English characters.\r\n"
-                "GNU Make does not work with filepaths containing non-ASCII characters.\r\n"
-                "\r\n"
-                "Path: " + settings.path
+                QString::fromStdString(
+                    "Unicode characters found in the path name. Please move the folder to a place with only English characters.\r\n"
+                    "GNU Make does not work with filepaths containing non-ASCII characters.\r\n"
+                    "\r\n"
+                    "Path: " + settings.path
+                )
             );
             break;
         }

@@ -4,10 +4,10 @@
  *
  */
 
-#include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
@@ -16,11 +16,11 @@
 namespace PokemonAutomation{
 
 
-const QString BooleanCheckBox::OPTION_TYPE = "BooleanCheckBox";
+const std::string BooleanCheckBox::OPTION_TYPE = "BooleanCheckBox";
 
 int BooleanCheckBox_init = register_option(
     BooleanCheckBox::OPTION_TYPE,
-        [](const QJsonObject& obj){
+        [](const JsonObject& obj){
         return std::unique_ptr<ConfigItem>(
             new BooleanCheckBox(obj)
         );
@@ -28,25 +28,25 @@ int BooleanCheckBox_init = register_option(
 );
 
 
-BooleanCheckBox::BooleanCheckBox(const QJsonObject& obj)
+BooleanCheckBox::BooleanCheckBox(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , BooleanCheckBoxBaseOption(SingleStatementOption::m_label, false)
+    , BooleanCheckBoxBaseOption(QString::fromStdString(SingleStatementOption::m_label), false)
 {
-    load_default(from_QJson(json_get_value_throw(obj, JSON_DEFAULT)));
-    load_current(from_QJson(json_get_value_throw(obj, JSON_CURRENT)));
+    load_default(obj.get_value_throw(JSON_DEFAULT));
+    load_current(obj.get_value_throw(JSON_CURRENT));
 }
 void BooleanCheckBox::restore_defaults(){
     BooleanCheckBoxBaseOption::restore_defaults();
 }
-QJsonObject BooleanCheckBox::to_json() const{
-    QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, to_QJson(write_default()));
-    root.insert(JSON_CURRENT, to_QJson(write_current()));
+JsonObject BooleanCheckBox::to_json() const{
+    JsonObject root = SingleStatementOption::to_json();
+    root[JSON_DEFAULT] = write_default();
+    root[JSON_CURRENT] = write_current();
     return root;
 }
 std::string BooleanCheckBox::to_cpp() const{
     std::string str;
-    str += m_declaration.toUtf8().data();
+    str += m_declaration;
     str += " = ";
     str += *this ? "true" : "false";
     str += ";\r\n";
