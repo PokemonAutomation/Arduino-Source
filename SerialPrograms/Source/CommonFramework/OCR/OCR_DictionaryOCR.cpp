@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
 #include "OCR_DictionaryOCR.h"
@@ -33,17 +34,17 @@ DictionaryOCR::DictionaryOCR(
         if (subset != nullptr && subset->find(token) == subset->end()){
             continue;
         }
-        std::vector<QString>& candidates = m_database[token];
+        std::vector<std::string>& candidates = m_database[token];
         for (const auto& item1 : item0.second.get_array_throw()){
             const std::string& candidate = item1.get_string_throw();
-            QString normalized = normalize(QString::fromStdString(candidate));
+            std::u32string normalized = normalize_utf32(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
                 global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + token);
 //                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
             }
             set.insert(token);
-            candidates.emplace_back(QString::fromStdString(candidate));
+            candidates.emplace_back(candidate);
             if (first_only){
                 break;
             }
@@ -73,8 +74,8 @@ JsonObject DictionaryOCR::to_json() const{
     JsonObject obj;
     for (const auto& item : m_database){
         JsonArray list;
-        for (const QString& candidate : item.second){
-            list.push_back(candidate.toStdString());
+        for (const std::string& candidate : item.second){
+            list.push_back(candidate);
         }
         obj[item.first] = std::move(list);
     }
@@ -87,7 +88,7 @@ void DictionaryOCR::save_json(const std::string& json_path) const{
 
 
 StringMatchResult DictionaryOCR::match_substring(
-    const QString& text,
+    const std::string& text,
     double log10p_spread
 ) const{
     return OCR::match_substring(
@@ -95,8 +96,8 @@ StringMatchResult DictionaryOCR::match_substring(
         text, log10p_spread
     );
 }
-void DictionaryOCR::add_candidate(std::string token, const QString& candidate){
-    if (candidate.isEmpty() || (candidate.size() == 1 && candidate[0].unicode() < 128)){
+void DictionaryOCR::add_candidate(std::string token, const std::u32string& candidate){
+    if (candidate.size() < 2){
         return;
     }
 
@@ -105,7 +106,7 @@ void DictionaryOCR::add_candidate(std::string token, const QString& candidate){
     auto iter = m_candidate_to_token.find(candidate);
     if (iter == m_candidate_to_token.end()){
         //  New candidate. Add it to both maps.
-        m_database[token].emplace_back(candidate);
+        m_database[token].emplace_back(to_utf8(candidate));
         m_candidate_to_token[candidate].insert(std::move(token));
         return;
     }
@@ -114,7 +115,7 @@ void DictionaryOCR::add_candidate(std::string token, const QString& candidate){
     std::set<std::string>& tokens = iter->second;
     if (tokens.find(token) == tokens.end()){
         //  Add to database only if it isn't already there.
-        m_database[token].emplace_back(candidate);
+        m_database[token].emplace_back(to_utf8(candidate));
     }
 
     tokens.insert(std::move(token));

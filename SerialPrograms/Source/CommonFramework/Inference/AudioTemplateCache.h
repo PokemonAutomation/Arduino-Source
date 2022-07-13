@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_AudioTemplateCache_H
 #define PokemonAutomation_CommonFramework_AudioTemplateCache_H
 
+#include <string>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-
-class QString;
 
 namespace PokemonAutomation{
 
@@ -28,10 +27,10 @@ public:
     // RESOURCE_PATH/PokemonLA/ShinySound-48000.wav if it exists. If not, it will load
     // RESOURCE_PATH/PokemonLA/ShinySound-48000.mp3 instead.
     // Won't throw if cannot read or parse the template file. Return nullptr in this case.
-    const AudioTemplate* get_nothrow(const QString& path, size_t sample_rate);
+    const AudioTemplate* get_nothrow(const std::string& path, size_t sample_rate);
     // See comment of AudioTemplateCache::get_nothrow().
     // Throw a FileException if cannot read or parse the template file.
-    const AudioTemplate& get_throw(const QString& path, size_t sample_rate);
+    const AudioTemplate& get_throw(const std::string& path, size_t sample_rate);
 
     static AudioTemplateCache& instance();
 
@@ -39,12 +38,12 @@ private:
     ~AudioTemplateCache();
     AudioTemplateCache();
 
-    const AudioTemplate* get_nothrow_internal(const QString& full_path_no_ext, size_t sample_rate);
+    const AudioTemplate* get_nothrow_internal(const std::string& full_path_no_ext, size_t sample_rate);
 
 
 private:
     SpinLock m_lock;
-    std::map<QString, AudioTemplate> m_cache;
+    std::map<std::string, AudioTemplate> m_cache;
 };
 
 

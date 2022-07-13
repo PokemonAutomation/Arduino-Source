@@ -14,11 +14,11 @@ namespace OCR{
 
 
 int read_number(LoggerQt& logger, const QImage& image){
-    QString ocr_text = OCR::ocr_read(Language::English, image);
-    QString normalized;
+    std::string ocr_text = OCR::ocr_read(Language::English, image);
+    std::string normalized;
     bool has_digit = false;
-    for (QChar ch : ocr_text){
-        if (ch.isDigit()){
+    for (char ch : ocr_text){
+        if ('0' <= ch && ch <= '9'){
             normalized += ch;
             has_digit = true;
         }
@@ -28,15 +28,15 @@ int read_number(LoggerQt& logger, const QImage& image){
         return -1;
     }
 
-    int number = normalized.toInt();
+    int number = std::atoi(normalized.c_str());
 
-    QString str;
-    for (QChar ch : ocr_text){
+    std::string str;
+    for (char ch : ocr_text){
         if (ch != '\r' && ch != '\n'){
             str += ch;
         }
     }
-    logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> " + QString::number(number));
+    logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
 
     return number;
 }

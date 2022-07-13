@@ -64,7 +64,7 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     );
     connect(
         &env, &ProgramEnvironment::set_status,
-        this, [=](QString status){
+        this, [=](std::string status){
             this->status_update(std::move(status));
         }
     );

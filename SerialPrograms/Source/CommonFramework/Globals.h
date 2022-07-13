@@ -8,7 +8,7 @@
 #define PokemonAutomation_Globals_H
 
 #include <chrono>
-#include <QString>
+#include <string>
 
 namespace PokemonAutomation{
 
@@ -22,8 +22,8 @@ extern const std::string PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
-const QString& RESOURCE_PATH();
-const QString& TRAINING_PATH();
+const std::string& RESOURCE_PATH();
+const std::string& TRAINING_PATH();
 
 
 enum class ProgramState{

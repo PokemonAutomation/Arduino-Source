@@ -8,6 +8,7 @@
 #define PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 
 #include <memory>
+#include <string>
 #include <deque>
 #include <set>
 #include <list>
@@ -19,8 +20,6 @@
 #include "Spectrograph.h"
 #include "AudioFeed.h"
 #include "AudioSelector.h"
-
-class QString;
 
 namespace PokemonAutomation{
 
@@ -54,7 +53,7 @@ public:
         LoggerQt& logger,
         const AudioDeviceInfo& inputInfo,
         AudioFormat inputFormat,
-        const QString& inputAbsoluteFilepath,
+        const std::string& inputAbsoluteFilepath,
         const AudioDeviceInfo& outputInfo,
         float outputVolume
     );

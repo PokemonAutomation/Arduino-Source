@@ -35,7 +35,7 @@ BerryNameDatabase::BerryNameDatabase()
 {
     // Load a list of berry slugs in the desired order:
     // ["cheri-berry", "chesto-berry", ... ]
-    std::string path_slugs = RESOURCE_PATH().toStdString() + "Pokemon/ItemListBerries.json";
+    std::string path_slugs = RESOURCE_PATH() + "Pokemon/ItemListBerries.json";
     JsonValue json_slugs = load_json_file(path_slugs);
     JsonArray& slugs = json_slugs.get_array_throw(path_slugs);
 
@@ -48,7 +48,7 @@ BerryNameDatabase::BerryNameDatabase()
     //      },
     //      ....
     // }
-    std::string path_disp = RESOURCE_PATH().toStdString() + "Pokemon/ItemNameDisplay.json";
+    std::string path_disp = RESOURCE_PATH() + "Pokemon/ItemNameDisplay.json";
     JsonValue json_disp = load_json_file(path_disp);
     JsonObject& item_disp = json_disp.get_object_throw(path_disp);
 

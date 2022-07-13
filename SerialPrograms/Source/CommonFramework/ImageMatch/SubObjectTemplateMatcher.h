@@ -71,7 +71,7 @@ protected:
     bool check_area_ratio(double candidate_area_ratio) const;
 
 protected:
-    QString m_path;
+    std::string m_path;
     QImage m_object;
     Color m_background_replacement;
 

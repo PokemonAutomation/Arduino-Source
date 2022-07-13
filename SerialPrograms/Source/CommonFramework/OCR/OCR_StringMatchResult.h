@@ -19,13 +19,13 @@ namespace OCR{
 
 
 struct StringMatchData{
-    QString original_text;
-    QString normalized_text;
+    std::string original_text;
+    std::u32string normalized_text;
 
-    QString target;
+    std::u32string target;
     std::string token;
 
-    QString to_qstr() const;
+    std::string to_str() const;
 };
 
 struct StringMatchResult{
@@ -36,7 +36,7 @@ struct StringMatchResult{
         exact_match = false;
         results.clear();
     }
-    void log(LoggerQt& logger, double max_log10p, const QString& extra = QString()) const;
+    void log(LoggerQt& logger, double max_log10p, const std::string& extra = std::string()) const;
 
     void add(double log10p, StringMatchData data);
     void clear_beyond_spread(double log10p_spread);

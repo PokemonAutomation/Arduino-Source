@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
     : m_backing_image(open_image(RESOURCE_PATH() + sprite_path))
 {
-    std::string path = RESOURCE_PATH().toStdString() + json_path;
+    std::string path = RESOURCE_PATH() + json_path;
     JsonValue json = load_json_file(path);
     JsonObject& root = json.get_object_throw(path);
 

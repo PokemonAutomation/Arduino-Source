@@ -15,6 +15,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "DiscordWebhook.h"
@@ -230,7 +231,7 @@ void send_message(
 
     std::set<std::string> tag_set;
     for (const std::string& tag : tags){
-        tag_set.insert(QString::fromStdString(tag).toLower().toStdString());
+        tag_set.insert(to_lower(tag));
     }
 
     for (size_t c = 0; c < settings.webhooks.urls.size(); c++){
@@ -250,7 +251,7 @@ void send_message(
         bool send = false;
         for (const std::string& tag : url.tags){
 //            cout << "find tag: " << tag.toStdString() << endl;
-            auto iter = tag_set.find(QString::fromStdString(tag).toLower().toStdString());
+            auto iter = tag_set.find(to_lower(tag));
             if (iter != tag_set.end()){
 //                cout << "found" << endl;
                 send = true;

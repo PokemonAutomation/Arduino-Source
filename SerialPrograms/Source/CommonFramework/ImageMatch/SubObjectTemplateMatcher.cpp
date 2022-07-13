@@ -20,7 +20,7 @@ namespace ImageMatch{
 
 SubObjectTemplateMatcher::SubObjectTemplateMatcher(const char* path, double max_rmsd)
     : m_path(RESOURCE_PATH() + path)
-    , m_object(m_path)
+    , m_object(QString::fromStdString(m_path))
     , m_max_rmsd(max_rmsd)
     , m_matcher(m_object)
     , m_subobject_area_ratio(0)

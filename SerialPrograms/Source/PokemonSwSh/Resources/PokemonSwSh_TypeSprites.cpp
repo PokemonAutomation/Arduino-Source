@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -53,13 +54,13 @@ struct TypeSpriteDatabase{
 TypeSprite::TypeSprite(const std::string& slug)
     : m_slug(slug)
 {
-    QString path = RESOURCE_PATH() + "PokemonSwSh/Types/" + QString::fromStdString(slug) + ".png";
-    m_sprite = QImage(path);
+    std::string path = RESOURCE_PATH() + "PokemonSwSh/Types/" + slug + ".png";
+    m_sprite = open_image(path);
     if (m_sprite.isNull()){
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
             "Unable to open file.",
-            path.toStdString()
+            path
         );
     }
     if (m_sprite.format() != QImage::Format_RGB32 && m_sprite.format() != QImage::Format_ARGB32){

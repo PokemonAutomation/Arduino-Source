@@ -73,7 +73,7 @@ void RunnableComputerProgramWidget::run_program(){
     }catch (ProgramFinishedException&){
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
-        emit signal_error(QString::fromStdString(e.to_str()));
+        emit signal_error(e.to_str());
     }catch (...){
         std::lock_guard<std::mutex> lg(m_lock);
         emit signal_error("Unknown error.");

@@ -66,7 +66,7 @@ public:
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
                 "Failed to find exactly 2 objects in resource.",
-                m_path.toStdString()
+                m_path
             );
         }
 

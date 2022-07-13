@@ -69,12 +69,12 @@ public:
     const char* try_next_interrupt();
 
 signals:
-    void on_not_connected(QString error);
+    void on_not_connected(std::string error);
     void on_connecting();
-    void on_ready(QString description);
-    void on_stopped(QString error);
+    void on_ready(std::string description);
+    void on_stopped(std::string error);
 
-    void uptime_status(QString status);
+    void uptime_status(std::string status);
 
 private:
     const char* check_accepting_commands();

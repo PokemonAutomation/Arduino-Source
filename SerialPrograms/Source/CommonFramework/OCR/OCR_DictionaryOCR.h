@@ -37,21 +37,21 @@ public:
     JsonObject to_json() const;
     void save_json(const std::string& json_path) const;
 
-    StringMatchResult match_substring(const QString& text, double log10p_spread = 0.50) const;
+    StringMatchResult match_substring(const std::string& text, double log10p_spread = 0.50) const;
 
 
 public:
     //  This function is thread-safe with itself, but not with any other
     //  function in this class.
 
-    void add_candidate(std::string token, const QString& candidate);
+    void add_candidate(std::string token, const std::u32string& candidate);
 
 
 private:
     SpinLock m_lock;
     double m_random_match_chance;
-    std::map<std::string, std::vector<QString>> m_database;
-    std::map<QString, std::set<std::string>> m_candidate_to_token;
+    std::map<std::string, std::vector<std::string>> m_database;
+    std::map<std::u32string, std::set<std::string>> m_candidate_to_token;
 };
 
 

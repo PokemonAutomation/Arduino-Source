@@ -78,7 +78,7 @@ protected:
     void update_historical_stats();
 
     virtual void update_ui_after_program_state_change();
-    void status_update(QString status);
+    void status_update(std::string status);
 
     virtual void run_program() = 0;
 
@@ -86,10 +86,10 @@ protected:
 
 signals:    //  Protected Signals
     void signal_cancel();
-    void signal_error(QString message);
+    void signal_error(std::string message);
     void signal_reset();
 
-    void async_set_status(QString status);
+    void async_set_status(std::string status);
 
 
 protected:

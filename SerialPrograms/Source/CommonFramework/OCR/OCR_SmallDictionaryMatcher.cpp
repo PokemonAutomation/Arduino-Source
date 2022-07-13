@@ -17,9 +17,9 @@ namespace OCR{
 
 
 
-SmallDictionaryMatcher::SmallDictionaryMatcher(const QString& json_offset, bool first_only)
+SmallDictionaryMatcher::SmallDictionaryMatcher(const std::string& json_offset, bool first_only)
     : SmallDictionaryMatcher(
-        load_json_file(RESOURCE_PATH().toStdString() + json_offset.toStdString()).get_object_throw(),
+        load_json_file(RESOURCE_PATH() + json_offset).get_object_throw(),
         first_only
     )
 {}
@@ -37,12 +37,12 @@ SmallDictionaryMatcher::SmallDictionaryMatcher(const JsonObject& json, bool firs
 }
 
 
-void SmallDictionaryMatcher::save(const QString& json_path) const{
+void SmallDictionaryMatcher::save(const std::string& json_path) const{
     JsonObject root;
     for (const auto& item : m_database){
         root[language_data(item.first).code] = item.second.to_json();
     }
-    root.dump(json_path.toStdString());
+    root.dump(json_path);
 }
 
 

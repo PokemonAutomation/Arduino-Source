@@ -41,7 +41,7 @@ struct MatchupDatabase{
 
 private:
     MatchupDatabase(){
-        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLair/boss_matchup_LUT.json";
+        std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLair/boss_matchup_LUT.json";
         JsonValue json = load_json_file(path);
         JsonObject& root = json.get_object_throw(path);
         for (auto& item0 : root){

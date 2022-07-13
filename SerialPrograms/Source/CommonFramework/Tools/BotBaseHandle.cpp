@@ -183,7 +183,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
             "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
             "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
         );
-        emit on_not_connected(QString::fromStdString(html_color_text("Cannot connect to Prolific controller.", COLOR_RED)));
+        emit on_not_connected(html_color_text("Cannot connect to Prolific controller.", COLOR_RED));
         m_logger.log("Unable to connect due to Prolific controller.");
         return;
     }
@@ -201,7 +201,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
         m_state.store(State::CONNECTING, std::memory_order_release);
         emit on_connecting();
     }else{
-        emit on_not_connected(QString::fromStdString(html_color_text("Unable to open port.", COLOR_RED)));
+        emit on_not_connected(html_color_text("Unable to open port.", COLOR_RED));
 //        m_logger.log(error, Color());
         return;
     }
@@ -264,7 +264,7 @@ void BotBaseHandle::thread_body(){
         }
         if (!error.empty()){
             m_botbase->stop();
-            emit on_stopped(QString::fromStdString(html_color_text(error, COLOR_RED)));
+            emit on_stopped(html_color_text(error, COLOR_RED));
             return;
         }
     }
@@ -286,10 +286,10 @@ void BotBaseHandle::thread_body(){
         if (error.empty()){
             m_state.store(State::READY, std::memory_order_release);
             std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(version) + ")";
-            emit on_ready(QString::fromStdString(html_color_text(text, theme_friendly_darkblue())));
+            emit on_ready(html_color_text(text, theme_friendly_darkblue()));
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            emit on_stopped(QString::fromStdString(html_color_text(error, COLOR_RED)));
+            emit on_stopped(html_color_text(error, COLOR_RED));
             m_botbase->stop();
             return;
         }
@@ -308,7 +308,7 @@ void BotBaseHandle::thread_body(){
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
                 std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                emit uptime_status(QString::fromStdString(html_color_text(text, COLOR_RED)));
+                emit uptime_status(html_color_text(text, COLOR_RED));
 //                m_logger.log("Connection issue detected. Turning on all logging...");
 //                settings.log_everything.store(true, std::memory_order_release);
             }
@@ -343,9 +343,9 @@ void BotBaseHandle::thread_body(){
         }
         if (error.empty()){
             std::string text = "Up Time: " + str;
-            emit uptime_status(QString::fromStdString(html_color_text(text, theme_friendly_darkblue())));
+            emit uptime_status(html_color_text(text, theme_friendly_darkblue()));
         }else{
-            emit uptime_status(QString::fromStdString(html_color_text(error, COLOR_RED)));
+            emit uptime_status(html_color_text(error, COLOR_RED));
             error.clear();
             std::lock_guard<std::mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_acquire);

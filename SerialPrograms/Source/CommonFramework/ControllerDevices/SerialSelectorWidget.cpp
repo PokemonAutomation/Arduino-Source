@@ -73,11 +73,11 @@ SerialSelectorWidget::SerialSelectorWidget(
     );
     connect(
         &m_connection, &BotBaseHandle::on_not_connected,
-        this, [=](QString error){
+        this, [=](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"red\">Not Connected</font>");
             }else{
-                m_serial_program->setText(error);
+                m_serial_program->setText(QString::fromStdString(error));
             }
             m_serial_uptime->hide();
         }
@@ -91,25 +91,25 @@ SerialSelectorWidget::SerialSelectorWidget(
     );
     connect(
         &m_connection, &BotBaseHandle::on_ready,
-        this, [=](QString description){
-            m_serial_program->setText(description);
-            on_ready(true);
+        this, [=](std::string description){
+            m_serial_program->setText(QString::fromStdString(description));
+            emit on_ready(true);
         }
     );
     connect(
         &m_connection, &BotBaseHandle::on_stopped,
-        this, [=](QString error){
+        this, [=](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"orange\">Stopping...</font>");
             }else{
-                m_serial_program->setText(error);
+                m_serial_program->setText(QString::fromStdString(error));
             }
         }
     );
     connect(
         &m_connection, &BotBaseHandle::uptime_status,
-        this, [=](QString status){
-            m_serial_uptime->setText(status);
+        this, [=](std::string status){
+            m_serial_uptime->setText(QString::fromStdString(status));
             m_serial_uptime->show();
         }
     );

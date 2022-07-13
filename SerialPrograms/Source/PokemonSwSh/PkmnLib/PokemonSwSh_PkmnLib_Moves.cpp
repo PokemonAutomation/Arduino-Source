@@ -104,7 +104,7 @@ private:
         std::map<uint32_t, const Move*>& ids,
         std::map<std::string, const Move*>& slugs
     ){
-        std::string path = RESOURCE_PATH().toStdString() + filepath;
+        std::string path = RESOURCE_PATH() + filepath;
         JsonValue json = load_json_file(path);
         JsonObject& root = json.get_object_throw(path);
 
@@ -119,7 +119,7 @@ private:
                 get_move_category_from_string(obj.get_string_throw("category")),
                 (uint8_t)obj.get_integer_throw("base_power"),
                 obj.get_double_throw("accuracy", path),
-                obj.get_integer_throw("pp", path),
+                (uint8_t)obj.get_integer_throw("pp", path),
                 obj.get_string_throw("effect", path),
                 obj.get_double_throw("probability", path),
                 obj.get_boolean_throw("is_spread", path),

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -244,10 +245,10 @@ int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
     }
 
 
-    QString ocr_text = OCR::ocr_read(Language::English, processed);
+    std::string ocr_text = OCR::ocr_read(Language::English, processed);
 
-    ocr_text = OCR::run_character_reductions(ocr_text);
-    int8_t pp = parse_pp(ocr_text.toStdString());
+    ocr_text = to_utf8(OCR::run_character_reductions(to_utf32(ocr_text)));
+    int8_t pp = parse_pp(ocr_text);
 
     QString str;
     str += "OCR Result: \"";

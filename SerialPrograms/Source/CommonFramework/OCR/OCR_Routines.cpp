@@ -36,7 +36,7 @@ StringMatchResult multifiltered_OCR(
     StringMatchResult ret;
 //    int c = 0;
     for (const auto& filtered : filtered_images){
-        QString text = ocr_read(language, filtered.first);
+        std::string text = ocr_read(language, filtered.first);
 //        cout << text.toStdString() << endl;
 //        filtered.first.save("test" + QString::number(c++) + ".png");
 

@@ -24,7 +24,7 @@ struct PokemonSlugDatabase{
         return data;
     }
     PokemonSlugDatabase(){
-        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-National.json";
+        std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
         JsonValue json = load_json_file(path);
         JsonArray& slugs = json.get_array_throw(path);
 

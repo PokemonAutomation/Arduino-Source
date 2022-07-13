@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSelectorWidget_H
 #define PokemonAutomation_AudioPipeline_AudioSelectorWidget_H
 
+#include <string>
 #include <vector>
 #include <atomic>
 #include <mutex>
 #include <QWidget>
 #include <QSlider>
-#include <QString>
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioSelector.h"
 
@@ -81,7 +81,7 @@ private:
     
     QPushButton* m_reset_button = nullptr;
     QPushButton* m_load_file_button = nullptr;
-    QString m_absoluteFilepath;
+    std::string m_absoluteFilepath;
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 

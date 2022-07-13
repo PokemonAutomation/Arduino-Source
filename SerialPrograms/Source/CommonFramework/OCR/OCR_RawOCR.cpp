@@ -25,11 +25,11 @@ namespace OCR{
 
 
 bool language_available(Language language){
-    QString path = RESOURCE_PATH();
+    std::string path = RESOURCE_PATH();
     path += "Tesseract/";
-    path += QString::fromStdString(language_data(language).code);
+    path += language_data(language).code;
     path += ".traineddata";
-    QFile file(path);
+    QFile file(QString::fromStdString(path));
     return file.exists();
 }
 
@@ -40,11 +40,11 @@ public:
     TesseractPool(Language language)
         : m_language_code(language_data(language).code)
         , m_training_data_path(
-            QDir::current().relativeFilePath(RESOURCE_PATH() + "Tesseract/").toStdString()
+            QDir::current().relativeFilePath(QString::fromStdString(RESOURCE_PATH() + "Tesseract/")).toStdString()
         )
     {}
 
-    QString run(const ConstImageRef& image){
+    std::string run(const ConstImageRef& image){
         TesseractAPI* instance;
         do{
             {
@@ -113,8 +113,8 @@ public:
         }
 
         return str.c_str() == nullptr
-            ? QString()
-            : QString::fromUtf8(str.c_str());
+            ? std::string()
+            : str.c_str();
     }
 
 #ifdef __APPLE__
@@ -150,7 +150,7 @@ SpinLock ocr_pool_lock;
 std::map<Language, TesseractPool> ocr_pool;
 
 
-QString ocr_read(Language language, const ConstImageRef& image){
+std::string ocr_read(Language language, const ConstImageRef& image){
 //    static size_t c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
 

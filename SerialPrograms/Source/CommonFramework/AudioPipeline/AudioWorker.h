@@ -56,7 +56,7 @@ public:
         LoggerQt& logger,
         const AudioDeviceInfo& inputInfo,
         AudioFormat inputFormat,
-        const QString& inputAbsoluteFilepath,
+        const std::string& inputAbsoluteFilepath,
         const AudioDeviceInfo& outputInfo,
         float outputVolume
     );
@@ -86,7 +86,7 @@ private:
     LoggerQt& m_logger;
     AudioDeviceInfo m_inputInfo;
     AudioFormat m_inputFormat;
-    QString m_inputAbsoluteFilepath;
+    std::string m_inputAbsoluteFilepath;
     AudioDeviceInfo m_outputInfo;
 
     AudioIODevice* m_audioIODevice = nullptr;

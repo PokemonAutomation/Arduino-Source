@@ -53,7 +53,7 @@ Pokemon::ExtraNames load_mmo_names(){
         "Icelands MMO"
     };
 
-    QString mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
+    std::string mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
     QImage mmo_sprite = open_image(mmo_symbol_path);
     QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite));
 

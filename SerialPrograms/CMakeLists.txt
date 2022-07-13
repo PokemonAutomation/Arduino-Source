@@ -173,6 +173,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
+    ../Common/Qt/StringToolsQt.cpp
+    ../Common/Qt/StringToolsQt.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h

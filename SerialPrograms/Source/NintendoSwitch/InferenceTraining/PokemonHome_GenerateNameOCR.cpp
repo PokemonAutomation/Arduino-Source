@@ -54,7 +54,7 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 
 
 void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    std::string resource_path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-National.json";
+    std::string resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     JsonValue json = load_json_file(resource_path);
     JsonArray& array = json.get_array_throw(resource_path);
 

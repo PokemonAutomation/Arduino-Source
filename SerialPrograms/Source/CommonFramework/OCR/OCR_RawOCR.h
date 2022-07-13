@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_OCR_RawOCR_H
 #define PokemonAutomation_OCR_RawOCR_H
 
+#include <string>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
 
@@ -16,7 +17,7 @@ namespace OCR{
 
 bool language_available(Language language);
 
-QString ocr_read(Language language, const ConstImageRef& image);
+std::string ocr_read(Language language, const ConstImageRef& image);
 
 
 

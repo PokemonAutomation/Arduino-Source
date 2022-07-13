@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
@@ -23,7 +24,7 @@ using namespace Kernels::Waterfill;
 
 
 const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
-    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonSwSh/BattleArrow.png"));
+    static ImageMatch::ExactImageMatcher matcher(open_image(RESOURCE_PATH() + "PokemonSwSh/BattleArrow.png"));
     return matcher;
 }
 

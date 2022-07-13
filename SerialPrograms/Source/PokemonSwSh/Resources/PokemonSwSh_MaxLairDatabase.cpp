@@ -32,7 +32,7 @@ struct MaxLairSlugsDatabase{
     }
 
     MaxLairSlugsDatabase(){
-        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLairSlugMap.json";
+        std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLairSlugMap.json";
         JsonValue json = load_json_file(path);
         JsonObject& root = json.get_object_throw(path);
 
@@ -131,7 +131,7 @@ MaxLairMove parse_move(JsonObject&& obj, const std::string& path){
 
 
 std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& path){
-    std::string filepath = RESOURCE_PATH().toStdString() + path;
+    std::string filepath = RESOURCE_PATH() + path;
     JsonValue json = load_json_file(filepath);
     JsonObject& root = json.get_object_throw(filepath);
 

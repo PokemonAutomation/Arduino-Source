@@ -58,7 +58,7 @@ public:
 
 signals:
     //  Called internally. You can connect to this.
-    void set_status(QString status);
+    void set_status(std::string status);
 
 
 private:

@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioFileLoader_H
 #define PokemonAutomation_AudioPipeline_AudioFileLoader_H
 
+#include <string>
+#include <tuple>
 #include <QObject>
-#include <QString>
 #include <QAudioFormat>
 #include <QFile>
 #include <QThread>
-#include <tuple>
 
 class QAudioBuffer;
 class QAudioDecoder;
@@ -44,7 +44,7 @@ class AudioFileLoader: public QObject{
     Q_OBJECT
 
 public:
-    AudioFileLoader(QObject* parent, const QString& filename, const QAudioFormat& audioFormat);
+    AudioFileLoader(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat);
     virtual ~AudioFileLoader();
 
     // Start loading and decoding audio samples.
@@ -89,7 +89,7 @@ private:
     void sendBufferFromWavFileOnTimer();
 
 private:
-    QString m_filename;
+    std::string m_filename;
 
     QAudioFormat m_audioFormat;
 
@@ -127,7 +127,7 @@ class AudioDecoderWorker: public QObject{
 Q_OBJECT
 
 public:
-    AudioDecoderWorker(QObject* parent, const QString& filename, const QAudioFormat& audioFormat, std::vector<char>& decodedBuffer);
+    AudioDecoderWorker(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat, std::vector<char>& decodedBuffer);
     virtual ~AudioDecoderWorker();
 
     void start();
@@ -151,7 +151,7 @@ private:
 
 private:
 
-    QString m_filename;
+    std::string m_filename;
     QAudioFormat m_audioFormat;
 
     QAudioDecoder* m_audioDecoder = nullptr;

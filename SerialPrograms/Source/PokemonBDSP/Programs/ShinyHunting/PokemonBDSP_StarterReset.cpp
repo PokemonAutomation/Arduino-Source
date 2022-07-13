@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -101,7 +102,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.current_stats<Stats>();
 
-    QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
+    QImage briefcase = open_image(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_B, 5, 5);

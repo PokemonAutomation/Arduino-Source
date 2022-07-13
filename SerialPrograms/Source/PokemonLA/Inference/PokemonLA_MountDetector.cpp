@@ -69,7 +69,7 @@ public:
 #if 1
 
 QImage make_MountMatcher2Image(const char* path){
-    QString qpath = RESOURCE_PATH() + path;
+    std::string qpath = RESOURCE_PATH() + path;
     QImage image = open_image(qpath);
 
     if (image.format() != QImage::Format_ARGB32){

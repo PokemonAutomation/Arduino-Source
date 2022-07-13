@@ -36,7 +36,7 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
     }
 }
 PokemonNameSelectData::PokemonNameSelectData(const std::string& json_file_slugs){
-    std::string path = RESOURCE_PATH().toStdString() + json_file_slugs;
+    std::string path = RESOURCE_PATH() + json_file_slugs;
     JsonValue json_slugs = load_json_file(path);
     JsonArray& slugs = json_slugs.get_array_throw(path);
 

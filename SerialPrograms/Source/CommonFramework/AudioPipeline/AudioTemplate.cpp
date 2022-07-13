@@ -29,7 +29,7 @@ AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
 {}
 
 
-AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate){
+AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
     QAudioFormat outputAudioFormat;
     outputAudioFormat.setChannelCount(1);
 #if QT_VERSION_MAJOR == 5
@@ -78,7 +78,7 @@ AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate){
     }
 
     std::cout << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies << 
-        " frequenices from " << filename.toStdString() << std::endl;
+        " frequenices from " << filename << std::endl;
 
     return audio_template;
 }

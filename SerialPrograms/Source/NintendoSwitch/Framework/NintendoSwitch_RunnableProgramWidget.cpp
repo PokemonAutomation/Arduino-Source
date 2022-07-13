@@ -183,7 +183,7 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (ProgramFinishedException&){
         m_logger.log("Program finished early!", COLOR_BLUE);
         std::string stats = stats_to_bar(m_logger, m_historical_stats.get(), m_current_stats.get());
-        status_update(QString::fromStdString(stats));
+        status_update(stats);
         send_program_finished_notification(
             m_logger, instance.NOTIFICATION_PROGRAM_FINISH,
             program_info,
@@ -198,7 +198,7 @@ void RunnableSwitchProgramWidget::run_program(){
         if (message.empty()){
             message = e.name();
         }
-        emit signal_error(QString::fromStdString(message));
+        emit signal_error(message);
         send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(

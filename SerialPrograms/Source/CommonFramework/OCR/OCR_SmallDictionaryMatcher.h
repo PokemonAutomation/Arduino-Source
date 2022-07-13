@@ -16,10 +16,10 @@ namespace OCR{
 
 class SmallDictionaryMatcher : public DictionaryMatcher{
 public:
-    SmallDictionaryMatcher(const QString& json_offset, bool first_only = false);
+    SmallDictionaryMatcher(const std::string& json_offset, bool first_only = false);
     SmallDictionaryMatcher(const JsonObject& json, bool first_only = false);
 
-    void save(const QString& json_path) const;
+    void save(const std::string& json_path) const;
 };
 
 

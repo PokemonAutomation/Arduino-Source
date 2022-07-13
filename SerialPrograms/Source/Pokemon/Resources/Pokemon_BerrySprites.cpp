@@ -29,7 +29,7 @@ struct BerrySpriteDatabase{
     BerrySpriteDatabase()
         : m_sprites(open_image(RESOURCE_PATH() + "Pokemon/BerrySprites.png"))
     {
-        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/BerrySprites.json";
+        std::string path = RESOURCE_PATH() + "Pokemon/BerrySprites.json";
         JsonValue json = load_json_file(path);
         JsonObject& root = json.get_object_throw(path);
 

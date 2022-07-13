@@ -50,20 +50,20 @@ std::string extract_name(const QString& filename){
 
 TrainingSession::TrainingSession(
     LoggerQt& logger, CancellableScope& scope,
-    const QString& training_data_directory
+    const std::string& training_data_directory
 )
     : m_logger(logger)
     , m_scope(scope)
     , m_directory(TRAINING_PATH() + training_data_directory)
     , m_total_samples(0)
 {
-    if (!m_directory.isEmpty() && m_directory.back() != '/' && m_directory.back() != '\\'){
+    if (!m_directory.empty() && m_directory.back() != '/' && m_directory.back() != '\\'){
         m_directory += "/";
     }
 
     logger.log("Parsing training data in: " + m_directory);
 
-    QDirIterator iter(m_directory, QDir::AllDirs);
+    QDirIterator iter(QString::fromStdString(m_directory), QDir::AllDirs);
     while (iter.hasNext()){
         iter.next();
         QString sample_directory = iter.fileName() + "/";
@@ -71,14 +71,14 @@ TrainingSession::TrainingSession(
             Language language = (Language)c;
             const std::string& code = language_data(language).code;
             QString folder = sample_directory + QString::fromStdString(code) + "/";
-            QDirIterator iter1(m_directory + folder, QStringList() << "*.png", QDir::Files);
+            QDirIterator iter1(QString::fromStdString(m_directory) + folder, QStringList() << "*.png", QDir::Files);
             while (iter1.hasNext()){
                 iter1.next();
 //                QString file = iter.next();
                 m_samples[language].emplace_back(
                     TrainingSample{
                         OCR::extract_name(iter1.fileName()),
-                        folder + iter1.fileName()
+                        (folder + iter1.fileName()).toStdString()
                     }
                 );
                 m_total_samples++;
@@ -97,8 +97,8 @@ TrainingSession::TrainingSession(
 
 
 void TrainingSession::generate_small_dictionary(
-    const QString& ocr_json_file,
-    const QString& output_json_file,
+    const std::string& ocr_json_file,
+    const std::string& output_json_file,
     bool incremental,
     size_t threads,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -123,7 +123,7 @@ void TrainingSession::generate_small_dictionary(
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
-                QImage image(m_directory + sample.filepath);
+                QImage image(QString::fromStdString(m_directory + sample.filepath));
                 if (image.isNull()){
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
@@ -179,8 +179,8 @@ void TrainingSession::generate_small_dictionary(
 }
 
 void TrainingSession::generate_large_dictionary(
-    const QString& ocr_json_directory,
-    const QString& output_prefix,
+    const std::string& ocr_json_directory,
+    const std::string& output_prefix,
     bool incremental,
     size_t threads,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -205,7 +205,7 @@ void TrainingSession::generate_large_dictionary(
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
-                QImage image(m_directory + sample.filepath);
+                QImage image(QString::fromStdString(m_directory + sample.filepath));
                 if (image.isNull()){
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
@@ -250,7 +250,7 @@ void TrainingSession::generate_large_dictionary(
         }
         task_runner.wait_for_everything();
 
-        QString json = output_prefix + QString::fromStdString(language_info.code) + ".json";
+        std::string json = output_prefix + language_info.code + ".json";
         trained.save(language.first, json);
         m_scope.throw_if_cancelled();
     }

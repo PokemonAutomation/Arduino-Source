@@ -8,8 +8,8 @@
 #define PokemonAutomation_AudioPipeline_AudioTemplate_H
 
 #include <cstddef>
+#include <string>
 #include <vector>
-#include <QString>
 #include "Common/Cpp/AlignedVector.h"
 
 namespace PokemonAutomation{
@@ -48,7 +48,7 @@ private:
 
 // Load AudioTemplate from disk. Accept .wav format on any OS.
 // Loading .mp3 format however is dependent on Qt's platform-dependent backend.
-AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate = 48000);
+AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate = 48000);
 
 
 

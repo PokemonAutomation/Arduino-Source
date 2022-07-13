@@ -337,7 +337,7 @@ std::string Pokemon::dump() const{
 
 
 std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is_legendary){
-    std::string path = RESOURCE_PATH().toStdString() + filepath;
+    std::string path = RESOURCE_PATH() + filepath;
     JsonValue json = load_json_file(path);
     JsonObject& root = json.get_object_throw(path);
 
@@ -377,7 +377,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
             for (size_t c = 0; c < array.size(); c++){
-                moves[c] = array[c].get_integer_throw(path);
+                moves[c] = (uint32_t)array[c].get_integer_throw(path);
             }
         }
 
@@ -388,7 +388,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
             for (size_t c = 0; c < array.size(); c++){
-                max_moves[c] = array[c].get_integer_throw(path);
+                max_moves[c] = (uint32_t)array[c].get_integer_throw(path);
             }
         }
         JsonArray& base_stats = obj.get_array_throw("base_stats", path);
@@ -400,7 +400,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
             std::piecewise_construct,
             std::forward_as_tuple(slug),
             std::forward_as_tuple(
-                obj.get_integer_throw("id", path),
+                (uint16_t)obj.get_integer_throw("id", path),
                 slug,
                 obj.get_string_throw("ability_id", path),
                 type1, type2,

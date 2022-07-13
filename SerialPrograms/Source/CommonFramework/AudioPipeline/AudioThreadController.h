@@ -9,12 +9,11 @@
 
 #include <vector>
 #include <chrono>
+#include <string>
 #include <QObject>
 #include <QThread>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
-
-class QString;
 
 namespace PokemonAutomation{
 
@@ -44,7 +43,7 @@ public:
         AudioDisplayWidget* parent,
         const AudioDeviceInfo& inputInfo,
         AudioFormat inputFormat,
-        const QString& inputAbsoluteFilepath,
+        const std::string& inputAbsoluteFilepath,
         const AudioDeviceInfo& outputInfo,
         float outputVolume
     );

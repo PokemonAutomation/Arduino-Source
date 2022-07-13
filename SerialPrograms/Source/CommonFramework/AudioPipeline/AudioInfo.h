@@ -12,7 +12,6 @@
 #include <QtConfig>
 #include "Common/Cpp/Pimpl.h"
 
-class QString;
 class QAudioFormat;
 
 #if QT_VERSION_MAJOR == 5
@@ -72,7 +71,7 @@ public:
 
     operator bool() const;
 
-    const QString& display_name() const;
+    const std::string& display_name() const;
     const std::string& device_name() const;
 
     const std::vector<AudioFormat>& supported_formats() const;

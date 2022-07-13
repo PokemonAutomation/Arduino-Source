@@ -28,7 +28,7 @@ struct PokemonNameDatabase{
 const std::string PokemonNameDatabase::NULL_SLUG;
 
 PokemonNameDatabase::PokemonNameDatabase(){
-    std::string path = RESOURCE_PATH().toStdString() + "Pokemon/PokemonNameDisplay.json";
+    std::string path = RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json";
     JsonValue json = load_json_file(path);
     JsonObject& displays = json.get_object_throw(path);
 
@@ -103,7 +103,7 @@ const std::string& parse_pokemon_name_nothrow(const std::string& display_name){
 }
 
 std::vector<std::string> load_pokemon_slug_json_list(const char* json_path){
-    std::string path = RESOURCE_PATH().toStdString() + json_path;
+    std::string path = RESOURCE_PATH() + json_path;
     JsonValue json = load_json_file(path);
     JsonArray& array = json.get_array_throw();
 

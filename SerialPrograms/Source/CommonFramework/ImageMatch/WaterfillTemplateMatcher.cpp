@@ -27,7 +27,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     Color min_color, Color max_color,
     size_t min_area
 ){
-    QString qpath = RESOURCE_PATH() + path;
+    std::string qpath = RESOURCE_PATH() + path;
     QImage reference = open_image(qpath);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
@@ -36,7 +36,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
             "Failed to find any objects in resource.",
-            qpath.toStdString()
+            qpath
         );
     }
 

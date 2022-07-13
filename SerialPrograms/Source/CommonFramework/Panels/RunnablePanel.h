@@ -21,9 +21,9 @@ class RunnableProgramDescriptor : public PanelDescriptor{
 public:
     RunnableProgramDescriptor(
         std::string identifier,
-        QString display_name,
-        QString doc_link,
-        QString description
+        std::string display_name,
+        std::string doc_link,
+        std::string description
     );
 };
 #endif

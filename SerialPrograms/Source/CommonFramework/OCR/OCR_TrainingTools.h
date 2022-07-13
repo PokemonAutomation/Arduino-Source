@@ -22,7 +22,7 @@ namespace OCR{
 
 struct TrainingSample{
     std::string token;
-    QString filepath;
+    std::string filepath;
 };
 
 
@@ -33,12 +33,12 @@ class TrainingSession{
 public:
     TrainingSession(
         LoggerQt& logger, CancellableScope& scope,
-        const QString& training_data_directory
+        const std::string& training_data_directory
     );
 
     void generate_small_dictionary(
-        const QString& ocr_json_file,
-        const QString& output_json_file,
+        const std::string& ocr_json_file,
+        const std::string& output_json_file,
         bool incremental,
         size_t threads,
         const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -46,8 +46,8 @@ public:
         double min_text_ratio = 0.01, double max_text_ratio = 0.50
     );
     void generate_large_dictionary(
-        const QString& ocr_json_directory,
-        const QString& output_prefix,
+        const std::string& ocr_json_directory,
+        const std::string& output_prefix,
         bool incremental,
         size_t threads,
         const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -58,7 +58,7 @@ public:
 private:
     LoggerQt& m_logger;
     CancellableScope& m_scope;
-    QString m_directory;
+    std::string m_directory;
     size_t m_total_samples;
     std::map<Language, std::vector<TrainingSample>> m_samples;
 };

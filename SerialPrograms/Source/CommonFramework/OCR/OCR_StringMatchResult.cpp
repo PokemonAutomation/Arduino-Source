@@ -4,31 +4,33 @@
  *
  */
 
+#include <sstream>
+#include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{
 namespace OCR{
 
 
-QString StringMatchData::to_qstr() const{
-    QString str;
+std::string StringMatchData::to_str() const{
+    std::string str;
 
     str += "\"";
-    for (QChar ch : original_text){
+    for (char ch : original_text){
         if (ch != '\r' && ch != '\n'){
             str += ch;
         }
     }
     str += "\" -> ";
-    str += "\"" + normalized_text + "\" -> ";
+    str += "\"" + to_utf8(normalized_text) + "\" -> ";
 
-    str += "(" + target + "): ";
-    str += "(" + QString::fromStdString(token) + ")";
+    str += "(" + to_utf8(target) + "): ";
+    str += "(" + token + ")";
     return str;
 }
 
-void StringMatchResult::log(LoggerQt& logger, double max_log10p, const QString& extra) const{
-    QString str = "String Match Result: ";
+void StringMatchResult::log(LoggerQt& logger, double max_log10p, const std::string& extra) const{
+    std::string str = "String Match Result: ";
 
 #if 0
     if (!expected_token.empty()){
@@ -50,29 +52,33 @@ void StringMatchResult::log(LoggerQt& logger, double max_log10p, const QString& 
 
         if (results.size() == 1){
             auto iter = results.begin();
-            str += iter->second.to_qstr();
+            str += iter->second.to_str();
             str += " (log10p = ";
-            str += QString::number(iter->first);
+            std::stringstream ss;
+            ss << iter->first;
+            str += ss.str();
             str += ")";
         }else{
             str += "Multiple Candidates =>\n";
             size_t printed = 0;
             for (const auto& item : results){
                 if (printed == 10){
-                    str += "    (" + QString::number(results.size() - 10) + " more...)\n";
+                    str += "    (" + std::to_string(results.size() - 10) + " more...)\n";
                     break;
                 }
                 str += "    ";
-                str += QString::number(item.first);
+                std::stringstream ss;
+                ss << item.first;
+                str += ss.str();
                 str += " : ";
-                str += item.second.to_qstr();
+                str += item.second.to_str();
                 str += "\n";
                 printed++;
             }
         }
     }
 
-    if (!extra.isEmpty()){
+    if (!extra.empty()){
         str += " ===> ";
         str += extra;
     }

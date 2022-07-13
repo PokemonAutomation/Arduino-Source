@@ -114,7 +114,7 @@ AudioStreamFormat get_stream_format(QAudioFormat& native_format){
 //  Return a list of our formats that are supported by this device.
 //  "preferred_index" is set to the index of the list that is preferred by the device.
 //  If no preferred format matches our formats, -1 is returned.
-std::vector<AudioFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const QString& display_name){
+std::vector<AudioFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const std::string& display_name){
     QAudioFormat preferred_format = info.preferredFormat();
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
@@ -177,7 +177,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
-                if (display_name.contains("MiraBox")){
+                if (QString::fromStdString(display_name).contains("MiraBox")){
                     preferred_index += 2;
                 }else{
                     preferred_index += 1;
@@ -238,7 +238,7 @@ std::vector<AudioFormat> supported_output_formats(int& preferred_index, const Na
 
 struct AudioDeviceInfo::Data{
     std::string device_name;    //  For serialization
-    QString display_name;
+    std::string display_name;
 
     std::vector<AudioFormat> supported_formats;
     int preferred_format_index;
@@ -276,8 +276,8 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        QString name = device.deviceName();
-        data.device_name = name.toStdString();
+        std::string name = device.deviceName().toStdString();
+        data.device_name = name;
         data.display_name = std::move(name);
         data.info = std::move(device);
 
@@ -289,7 +289,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         Data& data = list.back().m_body;
 
         data.device_name = device.id().data();
-        data.display_name = device.description();
+        data.display_name = device.description().toStdString();
         data.info = std::move(device);
 
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
@@ -301,7 +301,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     }
 
     //  Get map of best devices.
-    std::map<QString, size_t> best_devices;
+    std::map<std::string, size_t> best_devices;
     for (const AudioDeviceInfo& device : list){
         size_t& best_score = best_devices[device.display_name()];
         size_t current_score = device.supported_formats().size();
@@ -349,8 +349,8 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        QString name = device.deviceName();
-        data.device_name = name.toStdString();
+        std::string name = device.deviceName().toStdString();
+        data.device_name = name;
         data.display_name = std::move(name);
         data.info = std::move(device);
 
@@ -362,7 +362,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         Data& data = list.back().m_body;
 
         data.device_name = device.id().data();
-        data.display_name = device.description();
+        data.display_name = device.description().toStdString();
         data.info = std::move(device);
 
         data.supported_formats = supported_output_formats(data.preferred_format_index, data.info);
@@ -370,7 +370,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
 #endif
 
     //  Get map of greatest format counts.
-    std::map<QString, size_t> most_formats;
+    std::map<std::string, size_t> most_formats;
     for (AudioDeviceInfo& device : list){
         size_t& count = most_formats[device.display_name()];
         count = std::max(count, device.supported_formats().size());
@@ -415,7 +415,7 @@ AudioDeviceInfo::AudioDeviceInfo(const std::string& device_name){
 AudioDeviceInfo::operator bool() const{
     return !m_body->device_name.empty();
 }
-const QString& AudioDeviceInfo::display_name() const{
+const std::string& AudioDeviceInfo::display_name() const{
     return m_body->display_name;
 }
 const std::string& AudioDeviceInfo::device_name() const{

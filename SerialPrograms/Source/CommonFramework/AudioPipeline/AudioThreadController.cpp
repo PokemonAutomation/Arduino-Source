@@ -26,7 +26,7 @@ AudioThreadController::AudioThreadController(
     AudioDisplayWidget* parent,
     const AudioDeviceInfo& inputInfo,
     AudioFormat inputFormat,
-    const QString& inputAbsoluteFilepath,
+    const std::string& inputAbsoluteFilepath,
     const AudioDeviceInfo& outputInfo,
     float outputVolume
 ){

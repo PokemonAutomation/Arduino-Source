@@ -27,7 +27,7 @@ public:
 
     StringMatchResult match_substring(
         Language language,
-        const QString& text, double log10p_spread = 0.50
+        const std::string& text, double log10p_spread = 0.50
     ) const;
 
     OCR::StringMatchResult match_substring_from_image_multifiltered(
@@ -44,7 +44,7 @@ public:
     //  These functions are thread-safe with themselves, but not with any other
     //  functions in this class.
     DictionaryOCR& dictionary(Language language);
-    void add_candidate(Language language, std::string token, const QString& candidate);
+    void add_candidate(Language language, std::string token, const std::u32string& candidate);
 
 
 protected:

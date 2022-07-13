@@ -142,7 +142,7 @@ void searchAlphaRoarFromAudioDump(){
         const auto& path = fileList[fileIdx];
         std::ostringstream os;
         os << "File " << fileIdx << "/" << fileList.size() << " " << path << " ";
-        AudioTemplate audio = loadAudioTemplate(QString(path.c_str()));
+        AudioTemplate audio = loadAudioTemplate(path);
         if (audio.numWindows() == 0){
             os << "Fail" << std::endl;
             fout << os.str();

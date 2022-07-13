@@ -74,7 +74,7 @@ AsyncDispatcher& ProgramEnvironment::inference_dispatcher(){
 
 void ProgramEnvironment::update_stats(const std::string& override_current){
     std::string str = stats_to_bar(m_logger, m_historical_stats, m_current_stats, override_current);
-    emit set_status(QString::fromStdString(str));
+    emit set_status(str);
 }
 
 

@@ -187,7 +187,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
     // XXX for now we assume the audio in the command line test is always 48000.
     //     in future we can read sample rate from filename
     size_t sample_rate = 48000;
-    AudioTemplate audio_stream = loadAudioTemplate(QString::fromStdString(test_path), sample_rate);
+    AudioTemplate audio_stream = loadAudioTemplate(test_path, sample_rate);
     std::vector<AudioSpectrum> spectrums;
     for(size_t i = 0; i < audio_stream.numWindows(); i++){
         // AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m);

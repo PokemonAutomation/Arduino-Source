@@ -26,7 +26,7 @@ const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 
 
-QString get_resource_path(){
+std::string get_resource_path(){
     //  Find the resource directory.
     QString path = QCoreApplication::applicationDirPath();
     for (size_t c = 0; c < 5; c++){
@@ -34,13 +34,13 @@ QString get_resource_path(){
         QFile file(try_path);
 //        cout << path.toUtf8().data() << endl;
         if (file.exists()){
-            return try_path;
+            return try_path.toStdString();
         }
         path += "/..";
     }
-    return QCoreApplication::applicationDirPath() + "/../Resources/";
+    return (QCoreApplication::applicationDirPath() + "/../Resources/").toStdString();
 }
-QString get_training_path(){
+std::string get_training_path(){
     //  Find the resource directory.
     QString path = QCoreApplication::applicationDirPath();
     for (size_t c = 0; c < 5; c++){
@@ -48,20 +48,20 @@ QString get_training_path(){
         QFile file(try_path);
 //        cout << path.toUtf8().data() << endl;
         if (file.exists()){
-            return try_path;
+            return try_path.toStdString();
         }
         path += "/..";
     }
-    return QCoreApplication::applicationDirPath() + "/../TrainingData/";
+    return (QCoreApplication::applicationDirPath() + "/../TrainingData/").toStdString();
 }
 
 
-const QString& RESOURCE_PATH(){
-    static QString path = get_resource_path();
+const std::string& RESOURCE_PATH(){
+    static std::string path = get_resource_path();
     return path;
 }
-const QString& TRAINING_PATH(){
-    static QString path = get_training_path();
+const std::string& TRAINING_PATH(){
+    static std::string path = get_training_path();
     return path;
 }
 

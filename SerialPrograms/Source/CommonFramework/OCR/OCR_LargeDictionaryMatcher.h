@@ -16,12 +16,12 @@ namespace OCR{
 class LargeDictionaryMatcher : public DictionaryMatcher{
 public:
     LargeDictionaryMatcher(
-        const QString& json_file_prefix,
+        const std::string& json_file_prefix,
         const std::set<std::string>* subset,    //  Only include tokens in this set.
         bool first_only
     );
 
-    void save(Language language, const QString& json_path) const;
+    void save(Language language, const std::string& json_path) const;
 //    void update(Language language) const;
 
 

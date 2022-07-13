@@ -224,8 +224,8 @@ AudioSelectorWidget::AudioSelectorWidget(
         });
 
         connect(m_load_file_button,  &QPushButton::clicked, this, [=](bool){
-            m_absoluteFilepath = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3");
-            std::cout << "Select file " << m_absoluteFilepath.toStdString() << std::endl;
+            m_absoluteFilepath = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3").toStdString();
+            std::cout << "Select file " << m_absoluteFilepath << std::endl;
             if (m_absoluteFilepath.size() > 0){
                 if (m_audio_input_box->currentIndex() != 0) {
                     m_audio_input_box->setCurrentIndex(0);
@@ -277,7 +277,7 @@ void AudioSelectorWidget::refresh(){
         size_t index = 0;
         for (size_t c = 0; c < list.size(); c++){
             const AudioDeviceInfo& audio = list[c];
-            box->addItem(list[c].display_name());
+            box->addItem(QString::fromStdString(list[c].display_name()));
 
             if (current_device == audio){
                 index = c + 1;
@@ -319,7 +319,7 @@ void AudioSelectorWidget::refresh(){
 }
 
 void AudioSelectorWidget::reset_audio(){
-    m_logger.log("reset audio: " + m_absoluteFilepath.toStdString());
+    m_logger.log("reset audio: " + m_absoluteFilepath);
     std::lock_guard<std::mutex> lg(m_audio_lock);
     m_display.close_audio();
 

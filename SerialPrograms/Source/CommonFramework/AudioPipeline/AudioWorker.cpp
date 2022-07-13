@@ -52,7 +52,7 @@ AudioWorker::AudioWorker(
     LoggerQt& logger,
     const AudioDeviceInfo& inputInfo,
     AudioFormat inputFormat,
-    const QString& inputAbsoluteFilepath,
+    const std::string& inputAbsoluteFilepath,
     const AudioDeviceInfo& outputInfo,
     float outputVolume
 )

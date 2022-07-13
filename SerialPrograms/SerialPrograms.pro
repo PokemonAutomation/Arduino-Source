@@ -113,6 +113,7 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
+    ../Common/Qt/StringToolsQt.cpp \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
     Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp \
     Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp \
@@ -790,6 +791,7 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
+    ../Common/Qt/StringToolsQt.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \

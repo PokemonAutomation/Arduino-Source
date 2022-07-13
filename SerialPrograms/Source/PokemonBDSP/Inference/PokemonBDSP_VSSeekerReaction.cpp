@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -24,7 +25,7 @@ using namespace Kernels::Waterfill;
 
 
 const QImage& VS_SEEKER_REACTION_BUBBLE(){
-    static QImage image(RESOURCE_PATH() + "PokemonBDSP/VSSeekerReactBuble-WhiteFill.png");
+    static QImage image = open_image(RESOURCE_PATH() + "PokemonBDSP/VSSeekerReactBuble-WhiteFill.png");
     return image;
 }
 

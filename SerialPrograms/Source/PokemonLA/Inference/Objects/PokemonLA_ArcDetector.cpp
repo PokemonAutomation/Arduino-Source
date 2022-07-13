@@ -39,7 +39,7 @@ public:
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
                 "Failed to find exactly one object in resource.",
-                m_path.toStdString()
+                m_path
             );
         }
         set_subobject(objects[0]);

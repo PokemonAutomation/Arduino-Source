@@ -28,7 +28,7 @@ namespace PokemonLA{
 
 
 std::map<std::string, int> make_research_catch_count_map(){
-    std::string path = RESOURCE_PATH().toStdString() + "PokemonLA/ResearchMaxCatches.json";
+    std::string path = RESOURCE_PATH() + "PokemonLA/ResearchMaxCatches.json";
     JsonValue json = load_json_file(path);
     JsonObject& root = json.get_object_throw(path);
 

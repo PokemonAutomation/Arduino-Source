@@ -30,7 +30,7 @@ DictionaryOCR& DictionaryMatcher::dictionary(Language language){
 
 StringMatchResult DictionaryMatcher::match_substring(
     Language language,
-    const QString& text,
+    const std::string& text,
     double log10p_spread
 ) const{
     return dictionary(language).match_substring(text, log10p_spread);
@@ -56,7 +56,7 @@ OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifilter
     return ret;
 }
 
-void DictionaryMatcher::add_candidate(Language language, std::string token, const QString& candidate){
+void DictionaryMatcher::add_candidate(Language language, std::string token, const std::u32string& candidate){
     dictionary(language).add_candidate(std::move(token), candidate);
 }
 

@@ -143,7 +143,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
 //    OCR::DictionaryOCR& dictionary = m_reader.dictionary(LANGUAGE);
 
     if (MODE == Mode::GENERATE_TRAINING_DATA){
-        std::string path = RESOURCE_PATH().toStdString() + "Pokemon/Pokedex/Pokedex-" + dex_name.toStdString() + ".json";
+        std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name.toStdString() + ".json";
         JsonValue json = load_json_file(path);
         JsonArray& array = json.get_array_throw(path);
         for (const auto& item : array){

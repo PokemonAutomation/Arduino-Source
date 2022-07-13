@@ -4,13 +4,7 @@
  *
  */
 
-
-#include "AudioFileLoader.h"
-#include "AudioFormatUtils.h"
-#include "WavFile.h"
-
 #include <iostream>
-
 #include <QUrl>
 #include <QString>
 #include <QAudioBuffer>
@@ -18,13 +12,19 @@
 #include <QAudioFormat>
 #include <QTimer>
 #include <QEventLoop>
+#include "Common/Qt/StringToolsQt.h"
+#include "AudioFileLoader.h"
+#include "AudioFormatUtils.h"
+#include "WavFile.h"
+
+
 
 // #define DEBUG_AUDIO_DECODER_WORKER
 
 
 namespace PokemonAutomation{
 
-AudioFileLoader::AudioFileLoader(QObject* parent, const QString& filename, const QAudioFormat& audioFormat):
+AudioFileLoader::AudioFileLoader(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat):
     QObject(parent), m_filename(filename), m_audioFormat(audioFormat) {}
 
 AudioFileLoader::~AudioFileLoader(){
@@ -51,7 +51,7 @@ bool AudioFileLoader::start(){
 
     m_frames_per_timeout = m_audioFormat.sampleRate() * m_timer_interval_ms / 1000;
 
-    if (m_filename.toLower().endsWith(".wav")){
+    if (has_extension(m_filename, "wav")){
         // Use WavFile to load unencoded samples:
         if (!initWavFile()){
             return false;
@@ -97,7 +97,7 @@ void AudioFileLoader::buildTimer(){
 }
 
 std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
-    if (m_filename.toLower().endsWith(".wav")){
+    if (has_extension(m_filename, "wav")){
         // Use WavFile to load unencoded samples:
         if (!initWavFile()){
             return std::make_tuple<const char*, size_t>(nullptr, 0);
@@ -139,10 +139,10 @@ std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
 }
 
 bool AudioFileLoader::initWavFile(){
-    std::cout << "Initialize WavFile on " << m_filename.toStdString() << std::endl;
+    std::cout << "Initialize WavFile on " << m_filename << std::endl;
     m_wavFile = new WavFile(this);
-    if (m_wavFile->open(m_filename) == false){
-        std::cout << "Error: WavFile cannot open file " << m_filename.toStdString() << std::endl;
+    if (m_wavFile->open(QString::fromStdString(m_filename)) == false){
+        std::cout << "Error: WavFile cannot open file " << m_filename << std::endl;
         return false;
     }
 
@@ -266,7 +266,7 @@ std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
 
 AudioDecoderWorker::AudioDecoderWorker(
     QObject* parent,
-    const QString& filename,
+    const std::string& filename,
     const QAudioFormat& audioFormat,
     std::vector<char>& decodedBuffer
 ):
@@ -276,12 +276,14 @@ AudioDecoderWorker::AudioDecoderWorker(
 void AudioDecoderWorker::start(){
     m_audioDecoder = new QAudioDecoder(this);
 
+#if 0
     connect(
         m_audioDecoder, &QAudioDecoder::bufferAvailableChanged,
         this, [](bool available){
             std::cout << "QAudioDecoder::bufferAvailableChanged(): " << available << std::endl;
         }
     );
+#endif
 
 #if QT_VERSION_MAJOR == 5
     connect(
@@ -320,9 +322,9 @@ void AudioDecoderWorker::start(){
 
     // m_audioDecoder->setSourceDevice(&m_file);
 #if QT_VERSION_MAJOR == 5
-    m_audioDecoder->setSourceFilename(m_filename);
+    m_audioDecoder->setSourceFilename(QString::fromStdString(m_filename));
 #elif QT_VERSION_MAJOR == 6
-    m_audioDecoder->setSource(QUrl::fromLocalFile(m_filename));
+    m_audioDecoder->setSource(QUrl::fromLocalFile(QString::fromStdString(m_filename)));
 #endif
 
     m_audioDecoder->start();
@@ -387,7 +389,7 @@ void AudioDecoderWorker::handleAudioDecoderError(){
             errorStr = "UnownError";
         }
 
-        std::cout << "QAudioDecoder error when loading file: " << m_filename.toStdString() << ", " <<
+        std::cout << "QAudioDecoder error when loading file: " << m_filename << ", " <<
             errorStr << ": " << m_audioDecoder->errorString().toStdString() << std::endl;
 
         emit errored();

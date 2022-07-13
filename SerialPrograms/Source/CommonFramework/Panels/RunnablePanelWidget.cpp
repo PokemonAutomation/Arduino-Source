@@ -238,9 +238,9 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     );
     connect(
         this, &RunnablePanelWidget::signal_error,
-        this, [](QString message){
+        this, [](std::string message){
             QMessageBox box;
-            box.critical(nullptr, "Error", message);
+            box.critical(nullptr, "Error", QString::fromStdString(message));
         }
     );
     connect(
@@ -313,7 +313,7 @@ void RunnablePanelWidget::load_historical_stats(){
             list.aggregate(*stats);
         }
         stats_str = stats->to_str();
-        emit async_set_status(QString::fromStdString(stats_str));
+        emit async_set_status(stats_str);
 //        m_status_bar->setText(QString::fromStdString(stats->to_str()));
 //        m_status_bar->setVisible(true);
     }
@@ -394,12 +394,12 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
 }
 
 
-void RunnablePanelWidget::status_update(QString status){
-    if (status.size() <= 0){
+void RunnablePanelWidget::status_update(std::string status){
+    if (status.empty()){
         m_status_bar->setVisible(false);
-        m_status_bar->setText(status);
+        m_status_bar->setText("");
     }else{
-        m_status_bar->setText(status);
+        m_status_bar->setText(QString::fromStdString(status));
         m_status_bar->setVisible(true);
     }
 }

@@ -9,6 +9,7 @@
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -501,7 +502,7 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
 
         std::set<std::string> tag_set;
         for (const std::string& tag : tags){
-            tag_set.insert(QString::fromStdString(tag).toLower().toStdString());
+            tag_set.insert(to_lower(tag));
         }
 
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
@@ -517,7 +518,7 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
 
             bool send = false;
             for (const std::string& tag : channel.tags){
-                auto iter = tag_set.find(QString::fromStdString(tag).toLower().toStdString());
+                auto iter = tag_set.find(to_lower(tag));
                 if (iter != tag_set.end()){
                     channel_vector.emplace_back(channels.operator[](i).channel_id);
                     send = true;

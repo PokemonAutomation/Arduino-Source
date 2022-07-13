@@ -26,7 +26,7 @@ ButtonDiagram::ButtonDiagram(QWidget& parent)
 {
     setWindowTitle("Controller Keyboard Mapping");
 
-    m_image = QPixmap(RESOURCE_PATH() + "/NintendoSwitch/ButtonLayout.jpg");
+    m_image = QPixmap(QString::fromStdString(RESOURCE_PATH() + "/NintendoSwitch/ButtonLayout.jpg"));
 
     m_image_label = new QLabel(this);
     setCentralWidget(m_image_label);

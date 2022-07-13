@@ -31,7 +31,7 @@ struct PathMatchDatabase{
 
 private:
     PathMatchDatabase(){
-        std::string path = RESOURCE_PATH().toStdString() + "PokemonSwSh/MaxLair/path_tree.json";
+        std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLair/path_tree.json";
         JsonValue json = load_json_file(path);
         JsonObject& root = json.get_object_throw(path);
 
