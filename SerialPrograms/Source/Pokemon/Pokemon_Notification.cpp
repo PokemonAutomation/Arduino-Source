@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

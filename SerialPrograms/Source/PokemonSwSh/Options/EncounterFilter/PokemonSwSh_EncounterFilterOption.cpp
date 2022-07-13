@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSwSh_EncounterFilterWidget.h"
@@ -30,7 +31,7 @@ EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool rare_stars)
 {}
 QStringList EncounterFilterOptionFactory::make_header() const{
     QStringList list;
-    list << "Action" << STRING_POKEBALL << QString::fromStdString(STRING_POKEMON) << "Shininess";
+    list << "Action" << QString::fromStdString(STRING_POKEBALL) << QString::fromStdString(STRING_POKEMON) << "Shininess";
     return list;
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const{

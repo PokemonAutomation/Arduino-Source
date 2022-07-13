@@ -5,11 +5,13 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 

@@ -5,11 +5,13 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_SynchronizedSpinning.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+    using namespace Pokemon;
 
 
 SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()

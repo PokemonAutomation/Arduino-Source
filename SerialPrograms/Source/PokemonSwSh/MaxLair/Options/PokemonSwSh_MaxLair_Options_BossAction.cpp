@@ -12,6 +12,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
@@ -138,7 +139,7 @@ void BossActionWidget::redraw_table(){
     m_table->setColumnCount(3);
 
     QStringList header;
-    header << QString::fromStdString(STRING_POKEMON) << "Action" << STRING_POKEBALL;
+    header << QString::fromStdString(STRING_POKEMON) << "Action" << QString::fromStdString(STRING_POKEBALL);
     m_table->setHorizontalHeaderLabels(header);
     QFont font;
     font.setBold(true);

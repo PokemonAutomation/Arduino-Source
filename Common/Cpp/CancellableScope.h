@@ -22,7 +22,7 @@
 #ifndef PokemonAutomation_CancellableScope_H
 #define PokemonAutomation_CancellableScope_H
 
-#if 0
+#if 1
 #include <exception>
 #else
 namespace std{

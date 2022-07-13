@@ -9,6 +9,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
@@ -23,6 +24,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()

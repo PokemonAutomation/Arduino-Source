@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -22,6 +23,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+    using namespace Pokemon;
+
+
 
 namespace{
     constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
@@ -81,11 +85,11 @@ namespace{
         QImage screen = console.video().snapshot();
         ConstImageRef frame = extract_box_reference(screen, box);
 
-        OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
             console, language, frame,
             OCR::BLACK_TEXT_FILTERS()
         );
-        result.log(console, Pokemon::PokemonNameReader::MAX_LOG10P);
+        result.log(console, PokemonNameReader::MAX_LOG10P);
 //        assert(result.results.size() == 1);
         if (result.results.size() != 1){
             return "";
@@ -121,7 +125,7 @@ BoxReorderNationalDex::BoxReorderNationalDex(const BoxReorderNationalDex_Descrip
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for " + STRING_POKEMON + " to be identified correctly.",
-        Pokemon::PokemonNameReader::instance().languages(), true
+        PokemonNameReader::instance().languages(), true
     )
     , POKEMON_COUNT(
         "<b>Number of " + STRING_POKEMON + " to order:</b>",
@@ -148,7 +152,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
 
     std::vector<std::string> current_order = read_all_pokemon(env.console, env.console, context, POKEMON_COUNT, LANGUAGE);
 
-    const std::vector<std::string>& slugs = Pokemon::NATIONAL_DEX_SLUGS();
+    const std::vector<std::string>& slugs = NATIONAL_DEX_SLUGS();
     std::vector<std::string> sorted_order = current_order;
     std::sort(sorted_order.begin(), sorted_order.end(), [&](const std::string& str1, const std::string& str2){
         auto it1 = std::find(slugs.cbegin(), slugs.cend(), str1);

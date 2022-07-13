@@ -10,12 +10,14 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_Catchability.h"
 
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+    using namespace Pokemon;
 
 
 

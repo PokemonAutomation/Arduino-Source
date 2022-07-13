@@ -11,6 +11,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "CommonFramework/Options/EnumDropdownWidget.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_BattlePokemonActionTable.h"
 
@@ -22,6 +23,7 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 const std::string MoveStyle_NAMES[] = {

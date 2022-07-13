@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_TradeRoutines.h"
 #include "PokemonLA_SelfBoxTrade.h"
@@ -16,6 +17,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 

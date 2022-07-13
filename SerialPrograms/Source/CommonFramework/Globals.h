@@ -21,10 +21,6 @@ extern const std::string PROJECT_GITHUB_URL;
 extern const std::string PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
-extern const QString STRING_POKEBALL;
-extern const std::string STRING_POKEMON;
-extern const std::string STRING_POKEDEX;
-extern const std::string STRING_POKEJOB;
 
 const QString& RESOURCE_PATH();
 const QString& TRAINING_PATH();

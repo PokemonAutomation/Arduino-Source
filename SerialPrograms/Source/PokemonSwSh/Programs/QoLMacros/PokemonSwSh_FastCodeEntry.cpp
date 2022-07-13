@@ -7,11 +7,13 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_FastCodeEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+    using namespace Pokemon;
 
 
 FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()

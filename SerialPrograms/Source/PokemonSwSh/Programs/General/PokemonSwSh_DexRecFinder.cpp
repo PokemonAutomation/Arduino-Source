@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Options/Pokemon_NameSelectWidget.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"

@@ -5,12 +5,14 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
 #include "PokemonLA_FlagNavigationTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()

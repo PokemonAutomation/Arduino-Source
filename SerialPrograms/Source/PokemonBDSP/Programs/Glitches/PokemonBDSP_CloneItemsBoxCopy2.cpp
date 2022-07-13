@@ -10,6 +10,7 @@
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -20,6 +21,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
+    using namespace Pokemon;
 
 
 CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()

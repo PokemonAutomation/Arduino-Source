@@ -7,6 +7,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_EggFetcher.h"
@@ -14,6 +15,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
+    using namespace Pokemon;
 
 
 EggFetcher_Descriptor::EggFetcher_Descriptor()

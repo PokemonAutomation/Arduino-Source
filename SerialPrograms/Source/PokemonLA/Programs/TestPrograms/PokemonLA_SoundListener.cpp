@@ -19,6 +19,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h"
@@ -31,6 +32,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
+
+
 
 SoundListener_Descriptor::SoundListener_Descriptor()
     : RunnableSwitchProgramDescriptor(

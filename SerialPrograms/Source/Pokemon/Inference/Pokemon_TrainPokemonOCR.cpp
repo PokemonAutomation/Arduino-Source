@@ -8,6 +8,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon_NameReader.h"
 #include "Pokemon_TrainPokemonOCR.h"
 

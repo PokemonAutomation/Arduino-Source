@@ -15,6 +15,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/SleepyDiscordRunner.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "ProgramNotifications.h"
 
 #ifdef PA_OFFICIAL
@@ -26,6 +27,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+    using namespace Pokemon;
 
 
 void send_program_notification(
@@ -61,8 +63,8 @@ void send_program_notification(
         {
             JsonObject field;
             field["name"] = PreloadSettings::instance().DEVELOPER_MODE
-                ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
-                : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
+                ? Pokemon::STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
+                : Pokemon::STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
             std::string text = info.program_name;
             if (info.start_time != WallClock::min()){
                 text += "\nUp Time: ";

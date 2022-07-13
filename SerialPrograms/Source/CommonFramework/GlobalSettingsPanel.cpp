@@ -13,6 +13,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Windows/DpiScaler.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -79,7 +80,7 @@ GlobalSettings& GlobalSettings::instance(){
 GlobalSettings::GlobalSettings()
     : SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
-        "Send error reports to the " + STRING_POKEMON + " Automation server to help them resolve issues and improve the program.",
+        "Send error reports to the " + Pokemon::STRING_POKEMON + " Automation server to help them resolve issues and improve the program.",
         false
     )
     , STATS_FILE(

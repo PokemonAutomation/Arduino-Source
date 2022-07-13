@@ -7,6 +7,7 @@
 #include "ClientSource/Connection/BotBase.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h"
@@ -16,6 +17,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+    using namespace Pokemon;
 
 
 OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()

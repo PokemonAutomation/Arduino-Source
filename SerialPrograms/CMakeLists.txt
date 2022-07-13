@@ -745,6 +745,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_Notification.h
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp
     Source/Pokemon/Pokemon_ShinySparkleSet.h
+    Source/Pokemon/Pokemon_Strings.cpp
+    Source/Pokemon/Pokemon_Strings.h
     Source/Pokemon/Pokemon_Types.cpp
     Source/Pokemon/Pokemon_Types.h
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp

@@ -113,7 +113,6 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
-    ../Common/Qt/QtJsonTools.cpp \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
     Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp \
     Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp \
@@ -371,6 +370,7 @@ SOURCES += \
     Source/Pokemon/Pokemon_IVChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
+    Source/Pokemon/Pokemon_Strings.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
@@ -790,7 +790,6 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
-    ../Common/Qt/QtJsonTools.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
@@ -1097,6 +1096,7 @@ HEADERS += \
     Source/Pokemon/Pokemon_IVChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_ShinySparkleSet.h \
+    Source/Pokemon/Pokemon_Strings.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \

@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const std::string PROGRAM_VERSION_BASE = "v0.16.3";
+const std::string PROGRAM_VERSION_BASE = "v0.16.4";
 
 #ifdef PA_OFFICIAL
 const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE;
@@ -24,11 +24,6 @@ const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_GITHUB = "github.com/PokemonAutomation";
 const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
-
-const QString STRING_POKEBALL = QString("Pok") + QChar(0xe9) + " Ball";
-const std::string STRING_POKEMON = (QString("Pok") + QChar(0xe9) + "mon").toStdString();
-const std::string STRING_POKEDEX = (QString("Pok") + QChar(0xe9) + "dex").toStdString();
-const std::string STRING_POKEJOB = (QString("Pok") + QChar(0xe9) + " Job").toStdString();
 
 
 QString get_resource_path(){

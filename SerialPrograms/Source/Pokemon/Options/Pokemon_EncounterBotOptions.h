@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 
 namespace PokemonAutomation{

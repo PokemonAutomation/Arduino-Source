@@ -4,6 +4,7 @@
  *
  */
 
+#include <string.h>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_EncounterStats.h"

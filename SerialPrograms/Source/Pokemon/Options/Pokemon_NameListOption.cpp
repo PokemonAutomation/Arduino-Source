@@ -7,6 +7,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon_NameSelectWidget.h"
 #include "Pokemon_NameListOption.h"
 

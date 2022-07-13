@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

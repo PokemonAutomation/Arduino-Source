@@ -9,6 +9,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Options/Pokemon_BallSelectWidget.h"
@@ -239,7 +240,7 @@ EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool allow_autocatch)
 QStringList EncounterFilterOptionFactory::make_header() const{
     QStringList list;
     if (m_allow_autocatch){
-        list << "Action" << STRING_POKEBALL << QString::fromStdString(STRING_POKEMON) << "Shininess";
+        list << "Action" << QString::fromStdString(STRING_POKEBALL) << QString::fromStdString(STRING_POKEMON) << "Shininess";
     }else{
         list << "Action" << QString::fromStdString(STRING_POKEMON) << "Shininess";
     }
