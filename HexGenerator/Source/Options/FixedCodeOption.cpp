@@ -44,8 +44,8 @@ FixedCode::FixedCode(const JsonObject& obj)
 void FixedCode::restore_defaults(){
     m_current = m_default;
 }
-QString FixedCode::check_validity() const{
-    return validate_code(m_digits, m_current) ? QString() : "Code is invalid.";
+std::string FixedCode::check_validity() const{
+    return validate_code(m_digits, m_current) ? std::string() : "Code is invalid.";
 }
 JsonObject FixedCode::to_json() const{
     JsonObject root = SingleStatementOption::to_json();

@@ -43,12 +43,12 @@ int MultiHostTable_init = register_option(
 MultiHostTable::MultiHostTable(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_factory(false)
-    , m_table(QString::fromStdString(SingleStatementOption::m_label), m_factory)
+    , m_table(SingleStatementOption::m_label, m_factory)
 {
     m_table.load_default(obj.get_value_throw(JSON_DEFAULT));
     m_table.load_current(obj.get_value_throw(JSON_CURRENT));
 }
-QString MultiHostTable::check_validity() const{
+std::string MultiHostTable::check_validity() const{
     return m_table.check_validity();
 }
 void MultiHostTable::restore_defaults(){
@@ -75,7 +75,7 @@ std::string MultiHostTable::to_cpp() const{
         str += std::string("        .accept_FRs       = ") + (item.accept_FRs ? "true" : "false") + ",\r\n";
         str += std::string("        .move_slot        = ") + std::to_string(item.move_slot) + ",\r\n";
         str += std::string("        .dynamax          = ") + (item.dynamax ? "true" : "false") + ",\r\n";
-        str += std::string("        .post_raid_delay  = ") + item.post_raid_delay.toUtf8().data() + ",\r\n";
+        str += std::string("        .post_raid_delay  = ") + item.post_raid_delay + ",\r\n";
         str += "    },\r\n";
     }
     str += "    {},\r\n";

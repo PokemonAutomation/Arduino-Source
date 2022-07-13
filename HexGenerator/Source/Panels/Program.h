@@ -36,7 +36,7 @@ public:
 
     const std::string& description() const{ return m_description; }
 
-    virtual QString check_validity() const{ return QString(); }
+    virtual std::string check_validity() const{ return std::string(); }
     virtual void restore_defaults(){}
 
     JsonObject to_json() const;

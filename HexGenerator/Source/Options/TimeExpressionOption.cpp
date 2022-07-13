@@ -37,16 +37,16 @@ int TimeExpression_init = register_option(
 TimeExpression::TimeExpression(const JsonObject& obj)
     : SingleStatementOption(obj)
     , TimeExpressionBaseOption<uint32_t>(
-        QString::fromStdString(SingleStatementOption::m_label),
+        SingleStatementOption::m_label,
         obj.get_integer_throw(JSON_MIN_VALUE),
         obj.get_integer_throw(JSON_MAX_VALUE),
-        QString::fromStdString(obj.get_string_throw(JSON_DEFAULT))
+        obj.get_string_throw(JSON_DEFAULT)
     )
 {
     load_current(obj.get_string_throw(JSON_CURRENT));
 }
 
-QString TimeExpression::check_validity() const{
+std::string TimeExpression::check_validity() const{
     return TimeExpressionBaseOption<uint32_t>::check_validity();
 }
 void TimeExpression::restore_defaults(){

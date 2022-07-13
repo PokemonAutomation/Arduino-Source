@@ -27,7 +27,7 @@ public:
     virtual const std::string& type() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
-    virtual QString check_validity() const{ return QString(); }
+    virtual std::string check_validity() const{ return std::string(); }
 
     virtual void restore_defaults(){}
 

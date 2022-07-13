@@ -34,7 +34,7 @@ int SimpleInteger_init = register_option(
 SimpleInteger::SimpleInteger(const JsonObject& obj)
     : SingleStatementOption(obj)
     , SimpleIntegerBaseOption<uint32_t>(
-        QString::fromStdString(SingleStatementOption::m_label),
+        SingleStatementOption::m_label,
         obj.get_integer_throw(JSON_MIN_VALUE),
         obj.get_integer_throw(JSON_MAX_VALUE),
         obj.get_integer_throw(JSON_DEFAULT)
@@ -42,7 +42,7 @@ SimpleInteger::SimpleInteger(const JsonObject& obj)
 {
     m_current = obj.get_integer_throw(JSON_CURRENT);
 }
-QString SimpleInteger::check_validity() const{
+std::string SimpleInteger::check_validity() const{
     return SimpleIntegerBaseOption<uint32_t>::check_validity();
 }
 void SimpleInteger::restore_defaults(){

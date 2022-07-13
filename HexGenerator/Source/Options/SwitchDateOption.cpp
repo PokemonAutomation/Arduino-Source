@@ -31,12 +31,12 @@ int SwitchDate_init = register_option(
 
 SwitchDate::SwitchDate(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , SwitchDateBaseOption(QString::fromStdString(SingleStatementOption::m_label), QDate(2000, 1, 1))
+    , SwitchDateBaseOption(SingleStatementOption::m_label, QDate(2000, 1, 1))
 {
     load_default(obj.get_value_throw(JSON_DEFAULT));
     load_current(obj.get_value_throw(JSON_CURRENT));
 }
-QString SwitchDate::check_validity() const{
+std::string SwitchDate::check_validity() const{
     return SwitchDateBaseOption::check_validity();
 }
 void SwitchDate::restore_defaults(){

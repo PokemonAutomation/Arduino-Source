@@ -127,10 +127,10 @@ private:
 
 void Program::save_and_build(const std::string& board){
 //        cout << "asdf" << endl;
-    QString error = check_validity();
-    if (!error.isEmpty()){
+    std::string error = check_validity();
+    if (!error.empty()){
         QMessageBox box;
-        box.critical(nullptr, "Error", error);
+        box.critical(nullptr, "Error", QString::fromStdString(error));
         return;
     }
 //    if (!QDir(settings.config_path).exists()){

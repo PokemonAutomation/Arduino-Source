@@ -34,7 +34,7 @@ int FloatingPoint_init = register_option(
 FloatingPoint::FloatingPoint(const JsonObject& obj)
     : SingleStatementOption(obj)
     , FloatingPointBaseOption(
-        QString::fromStdString(SingleStatementOption::m_label),
+        SingleStatementOption::m_label,
         obj.get_double_throw(JSON_MIN_VALUE),
         obj.get_double_throw(JSON_MAX_VALUE),
         obj.get_double_throw(JSON_DEFAULT)
@@ -42,7 +42,7 @@ FloatingPoint::FloatingPoint(const JsonObject& obj)
 {
     m_current = obj.get_double_throw(JSON_CURRENT);
 }
-QString FloatingPoint::check_validity() const{
+std::string FloatingPoint::check_validity() const{
     return FloatingPointBaseOption::check_validity();
 }
 void FloatingPoint::restore_defaults(){

@@ -36,12 +36,12 @@ int FossilTable_init = register_option(
 
 FossilTable::FossilTable(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , m_table(QString::fromStdString(SingleStatementOption::m_label), m_factory)
+    , m_table(SingleStatementOption::m_label, m_factory)
 {
     m_table.load_default(obj.get_value_throw(JSON_DEFAULT));
     m_table.load_current(obj.get_value_throw(JSON_CURRENT));
 }
-QString FossilTable::check_validity() const{
+std::string FossilTable::check_validity() const{
     return m_table.check_validity();
 }
 void FossilTable::restore_defaults(){

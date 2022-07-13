@@ -61,15 +61,15 @@ void RandomCode::restore_defaults(){
     m_current_random = m_default_random;
     m_current_code = m_default_code;
 }
-QString RandomCode::check_validity() const{
+std::string RandomCode::check_validity() const{
     if (m_current_random == 0){
         return validate_code(m_digits, m_current_code)
-            ? QString()
+            ? std::string()
             : "Code is invalid.";
     }else{
         return m_current_random <= m_digits
-            ? QString()
-            : "Random digits cannot be greater than " + QString::number(m_digits) + ".";
+            ? std::string()
+            : "Random digits cannot be greater than " + std::to_string(m_digits) + ".";
     }
 }
 JsonObject RandomCode::to_json() const{

@@ -28,7 +28,7 @@ public:
     RandomCode(const JsonObject& obj);
 
     virtual const std::string& type() const override{ return OPTION_TYPE; }
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual JsonObject to_json() const override;

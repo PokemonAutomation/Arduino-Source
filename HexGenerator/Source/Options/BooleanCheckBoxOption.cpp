@@ -29,7 +29,7 @@ int BooleanCheckBox_init = register_option(
 
 BooleanCheckBox::BooleanCheckBox(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , BooleanCheckBoxBaseOption(QString::fromStdString(SingleStatementOption::m_label), false)
+    , BooleanCheckBoxBaseOption(SingleStatementOption::m_label, false)
 {
     load_default(obj.get_value_throw(JSON_DEFAULT));
     load_current(obj.get_value_throw(JSON_CURRENT));

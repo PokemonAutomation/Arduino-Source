@@ -17,7 +17,7 @@ public:
     Program_JsonFile(std::string category, const std::string& filepath);
     Program_JsonFile(std::string category, const JsonObject& obj);
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual JsonArray parameters_json() const override;
