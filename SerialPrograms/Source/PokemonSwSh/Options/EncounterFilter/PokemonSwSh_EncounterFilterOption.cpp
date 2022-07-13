@@ -30,7 +30,7 @@ EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool rare_stars)
 {}
 QStringList EncounterFilterOptionFactory::make_header() const{
     QStringList list;
-    list << "Action" << STRING_POKEBALL << STRING_POKEMON << "Shininess";
+    list << "Action" << STRING_POKEBALL << QString::fromStdString(STRING_POKEMON) << "Shininess";
     return list;
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const{

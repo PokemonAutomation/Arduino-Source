@@ -59,8 +59,8 @@ enum class ShinyDetectedAction{
 class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption(
-        QString label, QString description,
-        QString default_delay_ticks,
+        std::string label, std::string description,
+        std::string default_delay_ticks,
         ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
     );
 

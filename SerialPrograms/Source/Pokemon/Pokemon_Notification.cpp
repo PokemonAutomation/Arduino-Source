@@ -28,31 +28,31 @@ Color shiny_color(ShinyType shiny_type){
         return Color();
     }
 }
-QString shiny_symbol(ShinyType shiny_type){
+std::string shiny_symbol(ShinyType shiny_type){
     switch (shiny_type){
     case ShinyType::MAYBE_SHINY:
         return ":question:";
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
-        return QChar(0x2728);
+        return QString(QChar(0x2728)).toStdString();
     case ShinyType::SQUARE_SHINY:
-        return QChar(0x2733);   //  Green square asterisk
+        return QString(QChar(0x2733)).toStdString();    //  Green square asterisk
     default:
         return "";
     }
 }
-QString pokemon_to_string(const EncounterResult& pokemon){
-    QString str;
+std::string pokemon_to_string(const EncounterResult& pokemon){
+    std::string str;
 
-    QString symbol = shiny_symbol(pokemon.shininess);
-    if (!symbol.isEmpty()){
+    std::string symbol = shiny_symbol(pokemon.shininess);
+    if (!symbol.empty()){
         str += symbol + " ";
     }
 
     if (pokemon.slug_candidates.empty()){
         str = "Unable to detect.";
     }else if (pokemon.slug_candidates.size() == 1){
-        str += QString::fromStdString(get_pokemon_name(*pokemon.slug_candidates.begin()).display_name());
+        str += get_pokemon_name(*pokemon.slug_candidates.begin()).display_name();
     }else{
         str += "Ambiguous: ";
         bool first1 = true;
@@ -61,7 +61,7 @@ QString pokemon_to_string(const EncounterResult& pokemon){
                 str += ", ";
             }
             first1 = false;
-            str += QString::fromStdString(get_pokemon_name(slug).display_name());
+            str += get_pokemon_name(slug).display_name();
         }
     }
     return str;
@@ -82,7 +82,7 @@ void send_encounter_notification(
     ShinyType max_shiny_type = ShinyType::UNKNOWN;
     size_t shiny_count = 0;
 
-    QString names;
+    std::string names;
 
     bool first = true;
     for (const EncounterResult& result : results){
@@ -100,9 +100,9 @@ void send_encounter_notification(
     Color color = shiny_color(max_shiny_type);
     bool has_shiny = is_likely_shiny(max_shiny_type) || shiny_detected;
 
-    QString shinies;
+    std::string shinies;
     if (results.size() == 1){
-        QString symbol = shiny_symbol(results[0].shininess);
+        std::string symbol = shiny_symbol(results[0].shininess);
         switch (results[0].shininess){
         case ShinyType::UNKNOWN:
             shinies = "Unknown";
@@ -114,17 +114,17 @@ void send_encounter_notification(
             shinies = "Maybe Shiny";
             break;
         case ShinyType::UNKNOWN_SHINY:
-            shinies = symbol + QString(" Shiny ") + symbol;
+            shinies = symbol + std::string(" Shiny ") + symbol;
             break;
         case ShinyType::STAR_SHINY:
-            shinies = symbol + QString(" Star Shiny ") + symbol;
+            shinies = symbol + std::string(" Star Shiny ") + symbol;
             break;
         case ShinyType::SQUARE_SHINY:
-            shinies = symbol + QString(" Square Shiny ") + symbol;
+            shinies = symbol + std::string(" Square Shiny ") + symbol;
             break;
         }
     }else if (!results.empty()){
-        QString symbol = shiny_symbol(max_shiny_type);
+        std::string symbol = shiny_symbol(max_shiny_type);
         switch (shiny_count){
         case 0:
             if (shiny_detected){
@@ -138,38 +138,40 @@ void send_encounter_notification(
             shinies = symbol + " Found Shiny! " + symbol;
             break;
         default:
-            shinies += symbol + QString(" Multiple Shinies! ") + symbol;
+            shinies += symbol + std::string(" Multiple Shinies! ") + symbol;
             break;
         }
     }
 
-    std::vector<std::pair<QString, QString>> embeds;
-    if (enable_names && !names.isEmpty()){
+    std::vector<std::pair<std::string, std::string>> embeds;
+    if (enable_names && !names.empty()){
         embeds.emplace_back("Species", std::move(names));
     }
-    if (!shinies.isEmpty()){
+    if (!shinies.empty()){
         if (!std::isnan(alpha)){
-            shinies += "\n(Detection Alpha = " + QString::number(alpha) + ")";
+            std::stringstream ss;
+            ss << "\n(Detection Alpha = " << alpha << ")";
+            shinies += ss.str();
         }
         embeds.emplace_back("Shininess", std::move(shinies));
     }
     {
-        QString session_stats_str;
+        std::string session_stats_str;
         if (env.current_stats()){
-            session_stats_str += QString::fromStdString(env.current_stats()->to_str());
+            session_stats_str += env.current_stats()->to_str();
         }
         if (frequencies && !frequencies->empty()){
-            if (!session_stats_str.isEmpty()){
+            if (!session_stats_str.empty()){
                 session_stats_str += "\n";
             }
             session_stats_str += frequencies->dump_sorted_map("");
         }
-        if (!session_stats_str.isEmpty()){
+        if (!session_stats_str.empty()){
             embeds.emplace_back("Session Stats", std::move(session_stats_str));
         }
     }
     if (env.historical_stats()){
-        embeds.emplace_back("Historical Stats", QString::fromStdString(env.historical_stats()->to_str()));
+        embeds.emplace_back("Historical Stats", env.historical_stats()->to_str());
     }
 
     if (has_shiny){
@@ -204,14 +206,14 @@ void send_catch_notification(
 ){
     Color color = success ? COLOR_GREEN : COLOR_ORANGE;
 
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
 
     if (pokemon_slugs){
-        QString str;
+        std::string str;
         if (pokemon_slugs->empty()){
             str = "None - Unable to detect.";
         }else if (pokemon_slugs->size() == 1){
-            str += QString::fromStdString(get_pokemon_name(*pokemon_slugs->begin()).display_name());
+            str += get_pokemon_name(*pokemon_slugs->begin()).display_name();
         }else{
             str += "Ambiguous: ";
             bool first = true;
@@ -220,7 +222,7 @@ void send_catch_notification(
                     str += ", ";
                 }
                 first = false;
-                str += QString::fromStdString(get_pokemon_name(slug).display_name());
+                str += get_pokemon_name(slug).display_name();
             }
         }
         embeds.emplace_back("Species", std::move(str));
@@ -237,7 +239,7 @@ void send_catch_notification(
             str += get_pokeball_name(ball_slug).display_name();
         }
         if (!str.empty()){
-            embeds.emplace_back("Balls Used", QString::fromStdString(str));
+            embeds.emplace_back("Balls Used", str);
         }
     }
 

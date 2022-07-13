@@ -4,6 +4,7 @@
  *
  */
 
+#include <exception>
 #include <set>
 #include <atomic>
 #include <mutex>

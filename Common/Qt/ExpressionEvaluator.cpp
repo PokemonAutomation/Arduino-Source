@@ -136,7 +136,7 @@ int32_t parse_expression(
         char ch = *str;
 //        cout << "ch = " << ch << endl;
         if (is_digit(ch)){
-            num.emplace_back(0, parse_integer(str));
+            num.emplace_back('\0', parse_integer(str));
             continue;
         }
         if (is_symbol(ch)){
@@ -145,7 +145,7 @@ int32_t parse_expression(
             if (iter == variables.end()){
                 throw ParseException("Undefined symbol: " + symbol);
             }
-            num.emplace_back(0, iter->second);
+            num.emplace_back('\0', iter->second);
             continue;
         }
         if (ch == '+' || ch == '-' || ch == '*'){
@@ -279,8 +279,8 @@ const std::map<std::string, int64_t>& SYMBOLS(){
 }
 
 
-uint32_t parse_ticks_ui32(const QString& expression){
-    int32_t x = parse_expression(SYMBOLS(), expression.toUtf8().toStdString());
+uint32_t parse_ticks_ui32(const std::string& expression){
+    int32_t x = parse_expression(SYMBOLS(), expression);
     if (x < 0){
         throw ParseException("Value cannot be negative.");
     }
@@ -288,8 +288,8 @@ uint32_t parse_ticks_ui32(const QString& expression){
 }
 
 
-int32_t parse_ticks_i32(const QString& expression){
-    int32_t x = parse_expression(SYMBOLS(), expression.toUtf8().toStdString());
+int32_t parse_ticks_i32(const std::string& expression){
+    int32_t x = parse_expression(SYMBOLS(), expression);
     return x;
 }
 

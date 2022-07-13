@@ -30,7 +30,7 @@ namespace PokemonAutomation{
 class ResolutionOption : public GroupOption{
 public:
     ResolutionOption(
-        QString label, QString description,
+        std::string label, std::string description,
         int default_width, int default_height
     );
 

@@ -20,7 +20,7 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(value.label(), this);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     m_box = new QLineEdit(QString::number(m_value, 'f', 2), this);
@@ -34,7 +34,7 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
             bool ok;
             double current = text.toDouble(&ok);
             QPalette palette;
-            if (ok && m_value.set(current).isEmpty()){
+            if (ok && m_value.set(current).empty()){
                 palette.setColor(QPalette::Text, Qt::black);
             }else{
                 palette.setColor(QPalette::Text, Qt::red);

@@ -19,17 +19,17 @@ public:
     static const std::string JSON_PROGRAM_PANEL;
 
 public:
-    PanelList(QTabWidget& parent, QString label, PanelHolder& holder);
+    PanelList(QTabWidget& parent, std::string label, PanelHolder& holder);
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
     size_t items() const{ return m_panels.size(); }
 
-    void set_panel(const QString& panel_name);
+    void set_panel(const std::string& panel_name);
 
 protected:
-    void add_divider(QString label);
+    void add_divider(std::string label);
 
-    void handle_panel_clicked(const QString text);
+    void handle_panel_clicked(const std::string& text);
 
     template <typename Descriptor, typename Instance, class... Args>
     void add_settings(Args&&... args){
@@ -49,11 +49,11 @@ protected:
     void finish_panel_setup();
 
 protected:
-    QString m_label;
+    std::string m_label;
     PanelHolder& m_panel_holder;
-    std::vector<std::pair<QString, std::unique_ptr<PanelDescriptor>>> m_panels;
+    std::vector<std::pair<std::string, std::unique_ptr<PanelDescriptor>>> m_panels;
 private:
-    std::map<QString, const PanelDescriptor*> m_panel_map;
+    std::map<std::string, const PanelDescriptor*> m_panel_map;
 };
 
 

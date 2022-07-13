@@ -45,7 +45,7 @@ public:
 
     virtual std::unique_ptr<StatsTracker> make_stats() const;
 
-    virtual QString check_validity() const;
+    virtual std::string check_validity() const;
     virtual void restore_defaults();
     virtual void reset_state();
 

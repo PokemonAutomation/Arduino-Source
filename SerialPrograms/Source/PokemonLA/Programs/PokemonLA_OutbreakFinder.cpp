@@ -387,7 +387,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         COLOR_GREEN,
         env.program_info(),
         "Found Outbreak",
-        {{"Session Stats", QString::fromStdString(stats.to_str())}},
+        {{"Session Stats", stats.to_str()}},
         env.console.video().snapshot()
     );
 

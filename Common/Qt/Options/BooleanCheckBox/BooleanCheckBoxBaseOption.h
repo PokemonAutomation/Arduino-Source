@@ -10,7 +10,7 @@
 #define PokemonAutomation_BooleanCheckBoxBaseOption_H
 
 #include <atomic>
-#include <QString>
+#include <string>
 
 class QCheckBox;
 
@@ -22,11 +22,11 @@ class JsonValue;
 class BooleanCheckBoxBaseOption{
 public:
     BooleanCheckBoxBaseOption(
-        QString label,
+        std::string label,
         bool default_value
     );
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
 
     operator bool() const{ return m_current.load(std::memory_order_relaxed); }
     bool get() const{ return m_current.load(std::memory_order_relaxed); }
@@ -40,7 +40,7 @@ public:
     void restore_defaults();
 
 private:
-    const QString m_label;
+    const std::string m_label;
     bool m_default;
     std::atomic<bool> m_current;
 };

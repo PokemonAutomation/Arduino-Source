@@ -8,8 +8,9 @@
 #define PokemonAutomation_EditableTableBaseOption_H
 
 #include <memory>
+#include <string>
 #include <vector>
-#include <QString>
+#include <QStringList>
 
 class QWidget;
 
@@ -27,7 +28,7 @@ public:
 
     virtual std::unique_ptr<EditableTableRow> clone() const = 0;
 
-    virtual QString check_validity() const{ return QString(); }
+    virtual std::string check_validity() const{ return std::string(); }
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) = 0;
 
 private:
@@ -46,7 +47,7 @@ public:
 class EditableTableBaseOption{
 public:
     EditableTableBaseOption(
-        QString label, const EditableTableFactory& factory,
+        std::string label, const EditableTableFactory& factory,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 
@@ -58,7 +59,7 @@ public:
     size_t size() const{ return m_current.size(); }
     const EditableTableRow& operator[](size_t index) const;
 
-    QString check_validity() const;
+    std::string check_validity() const;
     void restore_defaults();
 
 public:
@@ -71,7 +72,7 @@ private:
 
 private:
     friend class EditableTableBaseWidget;
-    QString m_label;
+    std::string m_label;
     const EditableTableFactory& m_factory;
     std::vector<std::unique_ptr<EditableTableRow>> m_default;
     std::vector<std::unique_ptr<EditableTableRow>> m_current;

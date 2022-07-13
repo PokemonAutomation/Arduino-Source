@@ -41,7 +41,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210(const MoneyFarmerRoute210_Descriptor& d
     , START_LOCATION(
         "<b>Start Location:</b>",
         {
-            "Start in front of the Celestic Town " + UTF8_STRING_POKEMON + " center.",
+            "Start in front of the Celestic Town " + STRING_POKEMON + " center.",
             "Start in the lowermost row of the platform the Ace Trainer pair in Route 210 os on.",
         },
         0
@@ -49,7 +49,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210(const MoneyFarmerRoute210_Descriptor& d
     , HEALING_METHOD(
         "<b> Healing method:</b>",
         {
-            "Use the Hearthome City " + UTF8_STRING_POKEMON + " center.",
+            "Use the Hearthome City " + STRING_POKEMON + " center.",
             "Use Global Room. (Disable WiFi if you want to keep playing an old version of the game.)"
         },
         0

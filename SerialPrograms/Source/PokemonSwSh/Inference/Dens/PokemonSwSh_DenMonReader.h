@@ -63,7 +63,7 @@ protected:
 
 class DenMonSelectOption : private DenMonSelectData, public StringSelectOption{
 public:
-    DenMonSelectOption(QString label);
+    DenMonSelectOption(std::string label);
 
     std::string slug() const;
 

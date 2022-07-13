@@ -16,7 +16,7 @@ namespace Pokemon{
 
 class IVCheckerFilterOption : public EnumDropdownOption{
 public:
-    IVCheckerFilterOption(QString label, size_t default_index = 0);
+    IVCheckerFilterOption(std::string label, size_t default_index = 0);
 
     operator IVCheckerFilter() const;
 

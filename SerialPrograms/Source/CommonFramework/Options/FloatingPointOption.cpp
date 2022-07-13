@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 
 FloatingPointOption::FloatingPointOption(
-    QString label,
+    std::string label,
     double default_value,
     double min_value,
     double max_value
@@ -28,7 +28,7 @@ JsonValue FloatingPointOption::to_json() const{
     return this->write_current();
 }
 
-QString FloatingPointOption::check_validity() const{
+std::string FloatingPointOption::check_validity() const{
     return FloatingPointBaseOption::check_validity();
 }
 void FloatingPointOption::restore_defaults(){

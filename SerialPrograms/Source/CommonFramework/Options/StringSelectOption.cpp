@@ -39,7 +39,7 @@ private:
 
 
 StringSelectOption::StringSelectOption(
-    QString label,
+    std::string label,
     const std::vector<std::string>& cases,
     const std::string& default_case
 )
@@ -66,7 +66,7 @@ StringSelectOption::StringSelectOption(
     m_current.store(m_default, std::memory_order_relaxed);
 }
 StringSelectOption::StringSelectOption(
-    QString label,
+    std::string label,
     std::vector<std::pair<std::string, QIcon>> cases,
     const std::string& default_case
 )
@@ -123,7 +123,7 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(m_value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(m_value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     m_box = new NoWheelComboBox(&parent);

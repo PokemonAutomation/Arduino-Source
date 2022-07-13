@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <QString>
 
 namespace PokemonAutomation{
 
@@ -30,7 +29,7 @@ enum class Language{
 
 struct LanguageData{
     std::string code;
-    QString name;
+    std::string name;
     double random_match_chance;
 };
 

@@ -25,7 +25,7 @@ public:
     size_t size() const;
     const MultiHostSlot& operator[](size_t index) const;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;

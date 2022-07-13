@@ -187,7 +187,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         });
 
         if (!recv_ok){
-            throw UserSetupError(recv, "Receiving Switch has not selected a " + STRING_POKEMON.toStdString() + ".");
+            throw UserSetupError(recv, "Receiving Switch has not selected a " + STRING_POKEMON + ".");
         }
 
         //  Perform trade.

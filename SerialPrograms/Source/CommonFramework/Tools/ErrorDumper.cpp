@@ -14,22 +14,22 @@ namespace PokemonAutomation{
 
 
 
-QString dump_image(
+std::string dump_image(
     LoggerQt& logger,
-    const ProgramInfo& program_info, const QString& label,
+    const ProgramInfo& program_info, const std::string& label,
     const QImage& image
 ){
     static std::mutex lock;
     std::lock_guard<std::mutex> lg(lock);
 
     QDir().mkdir("ErrorDumps");
-    QString name = "ErrorDumps/";
-    name += QString::fromStdString(now_to_filestring());
+    std::string name = "ErrorDumps/";
+    name += now_to_filestring();
     name += "-";
     name += label;
     name += ".png";
     logger.log("Saving failed inference image to: " + name, COLOR_RED);
-    image.save(name);
+    image.save(QString::fromStdString(name));
     send_program_telemetry(
         logger, true, COLOR_RED,
         program_info,

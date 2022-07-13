@@ -11,7 +11,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-AutoHostNotificationOption::AutoHostNotificationOption(QString label, bool max_lair)
+AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool max_lair)
     : GroupOption(std::move(label), true, false)
     , DESCRIPTION(
         "<b>Description:</b>", "",

@@ -239,9 +239,9 @@ EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool allow_autocatch)
 QStringList EncounterFilterOptionFactory::make_header() const{
     QStringList list;
     if (m_allow_autocatch){
-        list << "Action" << STRING_POKEBALL << STRING_POKEMON << "Shininess";
+        list << "Action" << STRING_POKEBALL << QString::fromStdString(STRING_POKEMON) << "Shininess";
     }else{
-        list << "Action" << STRING_POKEMON << "Shininess";
+        list << "Action" << QString::fromStdString(STRING_POKEMON) << "Shininess";
     }
     return list;
 }

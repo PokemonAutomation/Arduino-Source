@@ -19,7 +19,7 @@ SimpleIntegerBaseWidget<Type>::SimpleIntegerBaseWidget(QWidget& parent, SimpleIn
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(m_value.label(), this);
+    QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     m_box = new QLineEdit(QString::number(m_value), this);
@@ -33,7 +33,7 @@ SimpleIntegerBaseWidget<Type>::SimpleIntegerBaseWidget(QWidget& parent, SimpleIn
             bool ok;
             Type current = (Type)text.toLong(&ok);
             QPalette palette;
-            if (ok && m_value.set(current).isEmpty()){
+            if (ok && m_value.set(current).empty()){
                 palette.setColor(QPalette::Text, Qt::black);
             }else{
                 palette.setColor(QPalette::Text, Qt::red);

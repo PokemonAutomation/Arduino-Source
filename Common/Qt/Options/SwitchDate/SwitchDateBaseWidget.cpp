@@ -18,7 +18,7 @@ SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(value.label(), this);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 

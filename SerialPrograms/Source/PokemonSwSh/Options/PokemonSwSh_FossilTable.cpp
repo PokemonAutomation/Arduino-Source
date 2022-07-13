@@ -49,7 +49,7 @@ const FossilGame& FossilTableOption::operator[](size_t index) const{
     return static_cast<const FossilGame&>(m_table[index]);
 }
 
-QString FossilTableOption::check_validity() const{
+std::string FossilTableOption::check_validity() const{
     return m_table.check_validity();
 }
 void FossilTableOption::restore_defaults(){

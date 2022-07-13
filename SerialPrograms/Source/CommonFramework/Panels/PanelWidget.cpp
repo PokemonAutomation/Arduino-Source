@@ -32,21 +32,21 @@ CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
     QVBoxLayout* vbox = new QVBoxLayout(body);
     vbox->setContentsMargins(0, 0, 0, 0);
 
-    QString name_text = "<b>Name:</b> " + m_instance.descriptor().display_name();
+    std::string name_text = "<b>Name:</b> " + m_instance.descriptor().display_name();
     if (m_instance.descriptor().doc_link().size() > 0){
-        QString path = ONLINE_DOC_URL + m_instance.descriptor().doc_link();
+        std::string path = ONLINE_DOC_URL + m_instance.descriptor().doc_link();
         name_text += " (" + make_text_url(path, "online documentation") + ")";
     }
-    QLabel* name = new QLabel(name_text, description_box);
+    QLabel* name = new QLabel(QString::fromStdString(name_text), description_box);
     name->setWordWrap(true);
     name->setTextFormat(Qt::RichText);
     name->setTextInteractionFlags(Qt::TextBrowserInteraction);
     name->setOpenExternalLinks(true);
     vbox->addWidget(name);
 
-    QString description = "<b>Description:</b> ";
+    std::string description = "<b>Description:</b> ";
     description += m_instance.descriptor().description();
-    QLabel* text = new QLabel(description, description_box);
+    QLabel* text = new QLabel(QString::fromStdString(description), description_box);
     text->setWordWrap(true);
     vbox->addWidget(text);
 

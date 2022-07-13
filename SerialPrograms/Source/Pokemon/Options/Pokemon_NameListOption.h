@@ -56,7 +56,7 @@ public:
     // extra_names: optional non-pokemon items to choose on the UI. Those extra items will appear after all the available
     //   pokemon on the UI. Example usage of `extra_names`: choose MMO along with other outbreak pokemon in LA.
     PokemonNameList(
-        QString label,
+        std::string label,
         const SpriteDatabase& icons,
         std::vector<std::string> slug_list,
         const ExtraNames* extra_names = nullptr

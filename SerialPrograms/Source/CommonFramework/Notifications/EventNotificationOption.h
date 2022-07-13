@@ -20,16 +20,16 @@ struct EventNotificationSettings{
     bool enabled = true;
     bool ping = false;
     ImageAttachmentMode screenshot = ImageAttachmentMode::NO_SCREENSHOT;
-    std::vector<QString> tags;
+    std::vector<std::string> tags;
     std::chrono::seconds rate_limit = std::chrono::seconds(0);
 
     void load_json(bool enable_screenshot, const JsonValue& json);
     JsonValue to_json(bool enable_screenshot) const;
 
 
-    static QString sanitize_tag(const QString& token);
-    static QString tags_to_str(const std::vector<QString>& tags);
-    static std::vector<QString> parse_tags(const QString& str);
+    static std::string sanitize_tag(const std::string& token);
+    static std::string tags_to_str(const std::vector<std::string>& tags);
+    static std::vector<std::string> parse_tags(const std::string& str);
 };
 
 
@@ -38,28 +38,28 @@ class EventNotificationOption{
 public:
     EventNotificationOption();
     EventNotificationOption(
-        QString label,
+        std::string label,
         bool enabled, bool ping,
         std::chrono::seconds rate_limit
     );
     EventNotificationOption(
-        QString label,
+        std::string label,
         bool enabled, bool ping,
-        std::vector<QString> tags = {"Notifs"},
+        std::vector<std::string> tags = {"Notifs"},
         std::chrono::seconds rate_limit = std::chrono::seconds(0)
     );
     EventNotificationOption(
-        QString label,
+        std::string label,
         bool enabled, bool ping,
         ImageAttachmentMode screenshot,
-        std::vector<QString> tags = {"Notifs"},
+        std::vector<std::string> tags = {"Notifs"},
         std::chrono::seconds rate_limit = std::chrono::seconds(0)
     );
 
-    const QString&      label       () const{ return m_label; }
-    bool                ping        () const{ return m_current.ping; }
-    ImageAttachmentMode screenshot  () const{ return m_current.screenshot; }
-    const std::vector<QString>& tags() const{ return m_current.tags; }
+    const std::string&      label       () const{ return m_label; }
+    bool                ping            () const{ return m_current.ping; }
+    ImageAttachmentMode screenshot      () const{ return m_current.screenshot; }
+    const std::vector<std::string>& tags() const{ return m_current.tags; }
 
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
@@ -73,7 +73,7 @@ private:
     friend class EventNotificationsTable;
     friend class EventNotificationsTableWidget;
 
-    QString m_label;
+    std::string m_label;
     bool screenshot_supported;
     EventNotificationSettings m_default;
     EventNotificationSettings m_current;

@@ -38,28 +38,28 @@ public:
     PanelDescriptor(
         Color color,
         std::string identifier,
-        QString category, QString display_name,
-        QString doc_link,
-        QString description
+        std::string category, std::string display_name,
+        std::string doc_link,
+        std::string description
     );
     virtual ~PanelDescriptor() = default;
 
     Color color() const{ return m_color; }
     const std::string& identifier() const{ return m_identifier; }
-    const QString& category() const{ return m_category; }
-    const QString& display_name() const{ return m_display_name; }
-    const QString& doc_link() const{ return m_doc_link; }
-    const QString& description() const{ return m_description; }
+    const std::string& category() const{ return m_category; }
+    const std::string& display_name() const{ return m_display_name; }
+    const std::string& doc_link() const{ return m_doc_link; }
+    const std::string& description() const{ return m_description; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const = 0;
 
 private:
     const Color m_color;
     const std::string m_identifier;
-    const QString m_category;
-    const QString m_display_name;
-    const QString m_doc_link;
-    const QString m_description;
+    const std::string m_category;
+    const std::string m_display_name;
+    const std::string m_doc_link;
+    const std::string m_description;
 };
 
 template <typename Descriptor, typename Instance>

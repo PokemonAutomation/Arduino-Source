@@ -95,7 +95,7 @@ std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
 QStringList BattlePokemonActionTableFactory::make_header() const{
     QStringList list;
     list << "Move 1 Style" << "Move 2 Style" << "Move 3 Style" << "Move 4 Style" << 
-        "Switch " + STRING_POKEMON << "Num Turns to Switch" << 
+        "Switch " + QString::fromStdString(STRING_POKEMON) << "Num Turns to Switch" <<
         "Limit Move Attempts" << "Max Move Attempts";
     return list;
 }
@@ -298,10 +298,10 @@ std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
 
 std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent){
     const std::string PokemonIndex_NAMES[] = {
-        "First " + UTF8_STRING_POKEMON,
-        "Second " + UTF8_STRING_POKEMON,
-        "Third " + UTF8_STRING_POKEMON,
-        "Fourth " + UTF8_STRING_POKEMON,
+        "First " + STRING_POKEMON,
+        "Second " + STRING_POKEMON,
+        "Third " + STRING_POKEMON,
+        "Fourth " + STRING_POKEMON,
     };
 
     std::vector<QWidget*> widgets;

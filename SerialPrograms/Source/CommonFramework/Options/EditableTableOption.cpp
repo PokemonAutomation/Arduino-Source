@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 EditableTableOption::EditableTableOption(
-    QString label, const EditableTableFactory& factory,
+    std::string label, const EditableTableFactory& factory,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : EditableTableBaseOption(std::move(label), factory, std::move(default_value))
@@ -30,7 +30,7 @@ JsonValue EditableTableOption::to_json() const{
     return EditableTableBaseOption::write_current();
 }
 
-QString EditableTableOption::check_validity() const{
+std::string EditableTableOption::check_validity() const{
     return EditableTableBaseOption::check_validity();
 }
 void EditableTableOption::restore_defaults(){

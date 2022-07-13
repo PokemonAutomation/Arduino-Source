@@ -69,7 +69,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     if (result.results.empty()){
         dump_image(
             m_console, m_env.program_info(),
-            QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code),
+            "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
             screen
         );
     }else{

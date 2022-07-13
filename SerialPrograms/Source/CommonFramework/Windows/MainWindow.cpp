@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget* parent)
 //    statusbar = new QStatusBar(this);
 //    statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(statusbar);
-    setWindowTitle(STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")");
+    setWindowTitle(QString::fromStdString(STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")"));
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
 
@@ -63,8 +63,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 
     QGroupBox* support_box = new QGroupBox(
-        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")",
-//        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (x64)",
+        QString::fromStdString(STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
     left_layout->addWidget(support_box);
@@ -80,7 +79,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText(make_text_url(ONLINE_DOC_URL, "Online Documentation"));
+        github->setText(QString::fromStdString(make_text_url(ONLINE_DOC_URL, "Online Documentation")));
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
@@ -88,7 +87,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* discord = new QLabel(support_box);
         links->addWidget(discord);
-        discord->setText(make_text_url(DISCORD_LINK_URL, DISCORD_LINK));
+        discord->setText(QString::fromStdString(make_text_url(DISCORD_LINK_URL, DISCORD_LINK)));
         discord->setTextFormat(Qt::RichText);
         discord->setTextInteractionFlags(Qt::TextBrowserInteraction);
         discord->setOpenExternalLinks(true);
@@ -96,7 +95,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText(make_text_url(PROJECT_GITHUB_URL, PROJECT_GITHUB));
+        github->setText(QString::fromStdString(make_text_url(PROJECT_GITHUB_URL, PROJECT_GITHUB)));
 //        github->setText("<a href=\"" + GITHUB_REPO + "\">GitHub Repository</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -105,7 +104,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* about = new QLabel(support_box);
         links->addWidget(about);
-        about->setText(make_text_url(PROJECT_GITHUB_URL, "About this Program"));
+        about->setText(QString::fromStdString(make_text_url(PROJECT_GITHUB_URL, "About this Program")));
         about->setTextFormat(Qt::RichText);
         connect(
             about, &QLabel::linkActivated,
@@ -114,12 +113,14 @@ MainWindow::MainWindow(QWidget* parent)
                 box.information(
                     nullptr,
                     "About",
-                    STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
-                    "Copyright: 2020 - 2021<br>" +
-                    "<br>"
-                    "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"
-                    "<br>"
-                    "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
+                    QString::fromStdString(
+                        STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
+                        "Copyright: 2020 - 2021<br>" +
+                        "<br>"
+                        "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"
+                        "<br>"
+                        "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
+                    )
                 );
             }
         );

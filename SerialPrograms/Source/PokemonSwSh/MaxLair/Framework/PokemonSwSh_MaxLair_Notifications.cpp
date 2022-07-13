@@ -32,35 +32,35 @@ void send_status_notification(
     MultiSwitchProgramEnvironment& env,
     AdventureRuntime& runtime
 ){
-    QString status_str = "Status:\n";
-    std::vector<std::pair<QString, QString>> embeds;
+    std::string status_str = "Status:\n";
+    std::vector<std::pair<std::string, std::string>> embeds;
     {
-        QString str = QString::fromStdString(pokemon_name(runtime.last_boss, "N/A"));
+        std::string str = pokemon_name(runtime.last_boss, "N/A");
         status_str += "Last Boss: " + str + "\n";
         embeds.emplace_back("Last Boss", std::move(str));
     }
     {
-        QString str = QString::fromStdString(runtime.path_stats.to_str());
+        std::string str = runtime.path_stats.to_str();
         status_str += "Current Path: " + str + "\n";
         embeds.emplace_back("Current Path", std::move(str));
     }
     {
-        QString str = QString::fromStdString(runtime.session_stats.to_str());
+        std::string str = runtime.session_stats.to_str();
         status_str += "Session Stats: " + str + "\n";
         embeds.emplace_back("Session Stats", std::move(str));
     }
     for (size_t c = 0; c < env.consoles.size(); c++){
         const ConsoleRuntime& stats = runtime.consoles[c];
-        QString label = "Console " + QString::number(c);
+        std::string label = "Console " + std::to_string(c);
         std::string str;
         str += "Ore: " + stats.ore.to_str();
         str += " - Normal Balls: " + stats.normal_balls.to_str();
         str += " - Boss Balls: " + stats.boss_balls.to_str();
-        status_str += label + " - " + QString::fromStdString(str) + "\n";
-        embeds.emplace_back(std::move(label), QString::fromStdString(str));
+        status_str += label + " - " + str + "\n";
+        embeds.emplace_back(std::move(label), str);
     }
     if (GlobalSettings::instance().ALL_STATS){
-        QString str = QString::fromStdString(env.historical_stats_str());
+        std::string str = env.historical_stats_str();
         status_str += "Historical Stats: " + str + "\n";
         embeds.emplace_back("Historical Stats", std::move(str));
     }
@@ -88,16 +88,18 @@ void send_raid_notification(
 
     QImage screen = console.video().snapshot();
 
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
 
-    QString description = settings.DESCRIPTION;
-    if (!description.isEmpty()){
-        embeds.emplace_back("Description", description);
+    {
+        std::string description = settings.DESCRIPTION;
+        if (!description.empty()){
+            embeds.emplace_back("Description", std::move(description));
+        }
     }
 
     embeds.emplace_back(
         "Current " + STRING_POKEMON,
-        QString::fromStdString(pokemon_name(slug, "Unable to detect."))
+        pokemon_name(slug, "Unable to detect.")
     );
 
     {
@@ -114,15 +116,15 @@ void send_raid_notification(
         }else{
             code_str += "None";
         }
-        embeds.emplace_back("Raid Code", QString::fromStdString(code_str));
+        embeds.emplace_back("Raid Code", std::move(code_str));
     }
 
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path", QString::fromStdString(path_stats.to_str()));
+        embeds.emplace_back("Current Path", path_stats.to_str());
     }
-    embeds.emplace_back("Session Stats", QString::fromStdString(session_stats.to_str()));
+    embeds.emplace_back("Session Stats", session_stats.to_str());
     if (GlobalSettings::instance().ALL_STATS){
-        QString str = QString::fromStdString(env.historical_stats_str());
+        std::string str = env.historical_stats_str();
         embeds.emplace_back("Historical Stats", std::move(str));
     }
 
@@ -147,24 +149,24 @@ void send_shiny_notification(
     const Stats& session_stats,
     const QImage& image
 ){
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
     embeds.emplace_back(
         "Adventure Result",
         shinies == 1
-            ? "Shiny on console " + QString::number(console_index) + "!"
-            : QString::number(shinies) + " shinies on console " + QString::number(console_index) + "!"
+            ? "Shiny on console " + std::to_string(console_index) + "!"
+            : std::to_string(shinies) + " shinies on console " + std::to_string(console_index) + "!"
     );
     if (slugs){
-        QString str;
+        std::string str;
         if (slugs->empty()){
             str = "None - Unable to detect.";
         }else if (slugs->size() == 1){
 //                str += get_pokemon_name(*slugs->begin()).display_name();
             const PokemonNames* names = get_pokemon_name_nothrow(*slugs->begin());
             if (names){
-                str += QString::fromStdString(names->display_name());
+                str += names->display_name();
             }else{
-                str += QString::fromStdString(*slugs->begin());
+                str += *slugs->begin();
             }
         }else{
             str += "Ambiguous: ";
@@ -177,20 +179,20 @@ void send_shiny_notification(
 //                    str += get_pokemon_name(slug).display_name();
                 const PokemonNames* names = get_pokemon_name_nothrow(slug);
                 if (names){
-                    str += QString::fromStdString(names->display_name());
+                    str += names->display_name();
                 }else{
-                    str += QString::fromStdString(slug);
+                    str += slug;
                 }
             }
         }
         embeds.emplace_back(STRING_POKEMON, std::move(str));
     }
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path", QString::fromStdString(path_stats.to_str()));
+        embeds.emplace_back("Current Path", path_stats.to_str());
     }
-    embeds.emplace_back("Session Stats", QString::fromStdString(session_stats.to_str()));
+    embeds.emplace_back("Session Stats", session_stats.to_str());
     if (GlobalSettings::instance().ALL_STATS){
-        QString str = QString::fromStdString(env.historical_stats_str());
+        std::string str = env.historical_stats_str();
         embeds.emplace_back("Historical Stats", std::move(str));
     }
 

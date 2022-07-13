@@ -31,7 +31,7 @@ class HostingSettings : public GroupOption{
 public:
     HostingSettings();
     using GroupOption::check_validity;
-    QString check_validity(size_t consoles) const;
+    std::string check_validity(size_t consoles) const;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

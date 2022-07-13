@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 class AutoHostNotificationOption : public GroupOption{
 public:
-    AutoHostNotificationOption(QString label, bool max_lair);
+    AutoHostNotificationOption(std::string label, bool max_lair);
 
     TextEditOption DESCRIPTION;
     BooleanCheckBoxOption SHOW_STATS;

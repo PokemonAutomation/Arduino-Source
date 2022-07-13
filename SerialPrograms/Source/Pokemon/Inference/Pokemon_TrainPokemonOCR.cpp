@@ -54,7 +54,7 @@ TrainPokemonOCR::TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor)
 
 
 void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
-    OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
+    OCR::TrainingSession session(env.logger(), scope, QString::fromStdString(DIRECTORY));
     session.generate_large_dictionary(
         "Pokemon/PokemonNameOCR/",
         "PokemonOCR-",

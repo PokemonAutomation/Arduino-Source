@@ -36,7 +36,7 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
 
 class MaxLairBossFinder_ConsoleOptions : public ConsoleSpecificOptions{
 public:
-    MaxLairBossFinder_ConsoleOptions(QString label, const LanguageSet& languages)
+    MaxLairBossFinder_ConsoleOptions(std::string label, const LanguageSet& languages)
         : ConsoleSpecificOptions(std::move(label), languages)
         , normal_ball("<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".", "poke-ball")
     {
@@ -48,7 +48,7 @@ public:
 
 class MaxLairBossFinder_ConsoleFactory : public ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(QString label, const LanguageSet& languages) const override{
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const override{
         return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairBossFinder_ConsoleOptions(std::move(label), languages));
     }
 };
@@ -79,20 +79,20 @@ MaxLairBossFinder::MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descrip
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-QString MaxLairBossFinder::check_validity() const{
-    QString error = RunnablePanelInstance::check_validity();
-    if (!error.isEmpty()){
+std::string MaxLairBossFinder::check_validity() const{
+    std::string error = RunnablePanelInstance::check_validity();
+    if (!error.empty()){
         return error;
     }
     error = CONSOLES.HOST.check_validity(system_count());
-    if (!error.isEmpty()){
+    if (!error.empty()){
         return error;
     }
     error = HOSTING.check_validity(system_count());
-    if (!error.isEmpty()){
+    if (!error.empty()){
         return error;
     }
-    return QString();
+    return std::string();
 }
 void MaxLairBossFinder::update_active_consoles(){
     size_t consoles = system_count();

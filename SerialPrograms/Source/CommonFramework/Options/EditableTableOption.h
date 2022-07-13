@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 class EditableTableOption : public ConfigOption, public EditableTableBaseOption{
 public:
     EditableTableOption(
-        QString label, const EditableTableFactory& factory,
+        std::string label, const EditableTableFactory& factory,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 
@@ -27,7 +27,7 @@ public:
     using ConfigOption::load_json;
     using ConfigOption::to_json;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override final;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;

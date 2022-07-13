@@ -11,6 +11,7 @@
 #include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
+//    class BotBaseContext;
 namespace NintendoSwitch{
 
 

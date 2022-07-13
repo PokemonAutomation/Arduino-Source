@@ -26,7 +26,7 @@ ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
         "PokemonBDSP:ActivateMenuGlitch112",
         STRING_POKEMON + " BDSP", "Activate Menu Glitch (1.1.2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-Poketch.md",
-        QString("Activate the menu glitch using the Pok") + QChar(0xe9) + "tch. "
+        "Activate the menu glitch using the Pok" + QString(QChar(0xe9)).toStdString() + "tch. "
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
@@ -133,7 +133,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "Unable to leave " + STRING_POKEMON.toStdString() + " center.");
+            throw OperationFailedException(console, "Unable to leave " + STRING_POKEMON + " center.");
         }
         console.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
     }

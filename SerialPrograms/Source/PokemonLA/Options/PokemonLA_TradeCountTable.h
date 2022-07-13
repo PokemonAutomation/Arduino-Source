@@ -36,7 +36,7 @@ public:
 private:
     friend class TradeCountTableWidget;
 
-    QString m_label;
+    std::string m_label;
     std::vector<std::pair<std::string, int>> m_list;
 };
 

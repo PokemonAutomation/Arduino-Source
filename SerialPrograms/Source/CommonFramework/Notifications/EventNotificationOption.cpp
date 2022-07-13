@@ -14,19 +14,19 @@ namespace PokemonAutomation{
 
 
 
-QString EventNotificationSettings::sanitize_tag(const QString& token){
-    QString str;
-    for (QChar ch : token){
-        if (ch.unicode() < 32) continue;
+std::string EventNotificationSettings::sanitize_tag(const std::string& token){
+    std::string str;
+    for (unsigned char ch : token){
+        if (ch < 32) continue;
         if (ch == ' ') continue;
         str += ch;
     }
     return str;
 }
-QString EventNotificationSettings::tags_to_str(const std::vector<QString>& tags){
-    QString text;
+std::string EventNotificationSettings::tags_to_str(const std::vector<std::string>& tags){
+    std::string text;
     bool first = true;
-    for (const QString& tag : tags){
+    for (const std::string& tag : tags){
         if (!first){
             text += ", ";
         }
@@ -35,12 +35,13 @@ QString EventNotificationSettings::tags_to_str(const std::vector<QString>& tags)
     }
     return text;
 }
-std::vector<QString> EventNotificationSettings::parse_tags(const QString& str){
-    std::vector<QString> tags;
-    for (QString token : str.split(",")){
-        token = sanitize_tag(token);
-        if (!token.isEmpty()){
-            tags.emplace_back(std::move(token));
+std::vector<std::string> EventNotificationSettings::parse_tags(const std::string& str){
+    std::vector<std::string> tags;
+    for (QString token : QString::fromStdString(str).split(",")){
+        std::string cstr = token.toStdString();
+        cstr = sanitize_tag(cstr);
+        if (!cstr.empty()){
+            tags.emplace_back(std::move(cstr));
         }
     }
     return tags;
@@ -69,7 +70,7 @@ void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValu
         for (const auto& tag : *array){
             const std::string* token = tag.get_string();
             if (token){
-                tags.emplace_back(QString::fromStdString(*token));
+                tags.emplace_back(*token);
             }
         }
     }
@@ -87,9 +88,9 @@ JsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
         obj["Screenshot"] = screenshot_option.to_json();
     }
     JsonArray array;
-    for (const QString& tag : tags){
+    for (const std::string& tag : tags){
 //        cout << tag.toStdString() << endl;
-        array.push_back(tag.toStdString());
+        array.push_back(tag);
     }
     obj["Tags"] = std::move(array);
     obj["RateLimitSeconds"] = rate_limit.count();
@@ -109,7 +110,7 @@ EventNotificationOption::EventNotificationOption()
     reset_rate_limit();
 }
 EventNotificationOption::EventNotificationOption(
-    QString label,
+    std::string label,
     bool enabled, bool ping,
     std::chrono::seconds rate_limit
 )
@@ -122,9 +123,9 @@ EventNotificationOption::EventNotificationOption(
     reset_rate_limit();
 }
 EventNotificationOption::EventNotificationOption(
-    QString label,
+    std::string label,
     bool enabled, bool ping,
-    std::vector<QString> tags,
+    std::vector<std::string> tags,
     std::chrono::seconds rate_limit
 )
     : m_label(std::move(label))
@@ -136,10 +137,10 @@ EventNotificationOption::EventNotificationOption(
     reset_rate_limit();
 }
 EventNotificationOption::EventNotificationOption(
-    QString label,
+    std::string label,
     bool enabled, bool ping,
     ImageAttachmentMode screenshot,
-    std::vector<QString> tags,
+    std::vector<std::string> tags,
     std::chrono::seconds rate_limit
 )
     : m_label(std::move(label))

@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 class FloatingPointOption : public ConfigOption, private FloatingPointBaseOption{
 public:
     FloatingPointOption(
-        QString label,
+        std::string label,
         double default_value,
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()
@@ -33,7 +33,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;

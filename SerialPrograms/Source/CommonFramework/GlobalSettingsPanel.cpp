@@ -30,7 +30,7 @@ const std::set<std::string> TOKENS{
 
 
 ResolutionOption::ResolutionOption(
-    QString label, QString description,
+    std::string label, std::string description,
     int default_width, int default_height
 )
     : GroupOption(std::move(label))

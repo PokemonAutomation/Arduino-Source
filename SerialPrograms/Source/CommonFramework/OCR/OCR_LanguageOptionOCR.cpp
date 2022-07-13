@@ -45,7 +45,7 @@ private:
 
 
 
-LanguageOCR::LanguageOCR(QString label, const LanguageSet& languages, bool required)
+LanguageOCR::LanguageOCR(std::string label, const LanguageSet& languages, bool required)
     : m_label(std::move(label))
     , m_default(0)
     , m_current(0)
@@ -100,8 +100,8 @@ JsonValue LanguageOCR::to_json() const{
     return language_data(m_case_list[m_current].first).code;
 }
 
-QString LanguageOCR::check_validity() const{
-    return m_case_list[m_current].second ? QString() : "Language data is not available.";
+std::string LanguageOCR::check_validity() const{
+    return m_case_list[m_current].second ? std::string() : "Language data is not available.";
 }
 void LanguageOCR::restore_defaults(){
     m_current = m_default;
@@ -120,7 +120,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(m_value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(m_value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
@@ -129,7 +129,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     m_box = new NoWheelComboBox(&parent);
 
     for (const auto& item : m_value.m_case_list){
-        m_box->addItem(language_data(item.first).name);
+        m_box->addItem(QString::fromStdString(language_data(item.first).name));
         auto* model = qobject_cast<QStandardItemModel*>(m_box->model());
         if (model == nullptr){
             continue;
@@ -183,8 +183,10 @@ void LanguageOCRWidget::update_status(){
         m_status->setVisible(false);
     }else{
         m_status->setText(
-            "<font color=\"red\">No text recognition data found for " + data.name + ".</font>\n" +
-            "<a href=\"" + PROJECT_GITHUB_URL + "Packages/blob/master/SerialPrograms/Resources/Tesseract/\">Download from here.</a>"
+            QString::fromStdString(
+                "<font color=\"red\">No text recognition data found for " + data.name + ".</font>\n" +
+                "<a href=\"" + PROJECT_GITHUB_URL + "Packages/blob/master/SerialPrograms/Resources/Tesseract/\">Download from here.</a>"
+            )
         );
         m_status->setVisible(true);
     }

@@ -153,8 +153,8 @@ void DiscordWebhookSender::internal_send_json(const QUrl& url, const QByteArray&
     process_reply(reply.get());
 }
 
-void DiscordWebhookSender::internal_send_file(const QUrl& url, const QString& filename){
-    QFile file(filename);
+void DiscordWebhookSender::internal_send_file(const QUrl& url, const std::string& filename){
+    QFile file(QString::fromStdString(filename));
     if (!file.open(QIODevice::ReadOnly)){
         m_logger.log("File doesn't exist: " + filename, COLOR_RED);
         return;
@@ -180,8 +180,8 @@ void DiscordWebhookSender::internal_send_file(const QUrl& url, const QString& fi
     process_reply(reply.get());
 }
 
-void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename){
-    QFile file(filepath);
+void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename){
+    QFile file(QString::fromStdString(filepath));
     if (!file.open(QIODevice::ReadOnly)){
         m_logger.log("File doesn't exist: " + filepath, COLOR_RED);
         return;
@@ -192,7 +192,7 @@ void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByt
     QHttpPart imagePart;
     imagePart.setHeader(
         QNetworkRequest::ContentDispositionHeader,
-        QVariant("application/octet-stream; name=file0; filename=" + filename)
+        QVariant("application/octet-stream; name=file0; filename=" + QString::fromStdString(filename))
     );
     imagePart.setBodyDevice(&file);
 
@@ -218,8 +218,8 @@ void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByt
 void send_message(
     LoggerQt& logger,
     bool should_ping,
-    const std::vector<QString>& tags,
-    const QString& message,
+    const std::vector<std::string>& tags,
+    const std::string& message,
     const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
 ){
@@ -228,9 +228,9 @@ void send_message(
         return;
     }
 
-    std::set<QString> tag_set;
-    for (const QString& tag : tags){
-        tag_set.insert(tag.toLower());
+    std::set<std::string> tag_set;
+    for (const std::string& tag : tags){
+        tag_set.insert(QString::fromStdString(tag).toLower().toStdString());
     }
 
     for (size_t c = 0; c < settings.webhooks.urls.size(); c++){
@@ -238,7 +238,7 @@ void send_message(
         if (!url.enabled){
             continue;
         }
-        if (url.url.isEmpty()){
+        if (url.url.empty()){
             continue;
         }
 //        cout << url.url.toStdString() << " : tags = " << url.tags.size() << endl;
@@ -248,9 +248,9 @@ void send_message(
 
         //  See if a tag matches.
         bool send = false;
-        for (const QString& tag : url.tags){
+        for (const std::string& tag : url.tags){
 //            cout << "find tag: " << tag.toStdString() << endl;
-            auto iter = tag_set.find(tag.toLower());
+            auto iter = tag_set.find(QString::fromStdString(tag).toLower().toStdString());
             if (iter != tag_set.end()){
 //                cout << "found" << endl;
                 send = true;
@@ -262,40 +262,40 @@ void send_message(
         }
 
         //  Sanitize user ID.
-        if (settings.message.user_id.get().toULongLong() == 0){
+        if (std::atoll(settings.message.user_id.get().c_str()) == 0){
             should_ping = false;
         }
 
         //  Message
-        QString str;
+        std::string str;
         if (should_ping && url.ping){
-            str += "<@" + settings.message.user_id + ">";
+            str += "<@" + (std::string)settings.message.user_id + ">";
         }
 
-        const QString& discord_message = settings.message.message;
-        if (!discord_message.isEmpty()){
-            if (!str.isEmpty()){
+        const std::string& discord_message = settings.message.message;
+        if (!discord_message.empty()){
+            if (!str.empty()){
                 str += " ";
             }
-            for (QChar ch : discord_message){
+            for (char ch : discord_message){
                 if (ch != '@'){
                     str += ch;
                 }
             }
 //            str += discord_message;
         }
-        if (!message.isEmpty()){
-            if (!str.isEmpty()){
+        if (!message.empty()){
+            if (!str.empty()){
                 str += " ";
             }
             str += message;
         }
 
         JsonObject jsonContent;
-        jsonContent["content"] = str.toStdString();
+        jsonContent["content"] = str;
         jsonContent["embeds"] = embeds.clone();
 
-        DiscordWebhookSender::instance().send_json(logger, url.url, jsonContent, file);
+        DiscordWebhookSender::instance().send_json(logger, QString::fromStdString(url.url), jsonContent, file);
     }
 }
 

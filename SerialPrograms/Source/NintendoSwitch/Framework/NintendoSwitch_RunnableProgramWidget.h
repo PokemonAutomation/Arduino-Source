@@ -37,7 +37,7 @@ protected:
     virtual QWidget* make_actions(QWidget& parent) override;
 
 protected:
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
 
     virtual void update_ui_after_program_state_change() override;
 

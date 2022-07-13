@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 
 BooleanCheckBoxBaseOption::BooleanCheckBoxBaseOption(
-    QString label,
+    std::string label,
     bool default_value
 )
     : m_label(std::move(label))

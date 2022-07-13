@@ -39,27 +39,27 @@ bool operator<(const PokemonEncounterSet& x, const PokemonEncounterSet& y){
         ++iter1;
     }
 }
-QString PokemonEncounterSet::dump() const{
+std::string PokemonEncounterSet::dump() const{
     if (m_set.empty()){
         return "None - Unable to detect";
     }
     if (m_set.size() == 1){
-        return QString::fromStdString(get_pokemon_name(*m_set.begin()).display_name());
+        return get_pokemon_name(*m_set.begin()).display_name();
     }
     if (m_set.size() <= 5){
-        QString str = "Ambiguous (";
+        std::string str = "Ambiguous (";
         bool first = true;
         for (const std::string& slug : m_set){
             if (!first){
                 str += ", ";
             }
             first = false;
-            str += QString::fromStdString(get_pokemon_name(slug).display_name());
+            str += get_pokemon_name(slug).display_name();
         }
         str += ")";
         return str;
     }
-    return "Ambiguous (" + QString::number(m_set.size()) + " candidates)";
+    return "Ambiguous (" + std::to_string(m_set.size()) + " candidates)";
 }
 
 
@@ -76,11 +76,11 @@ EncounterFrequencies::to_sorted_map() const{
     }
     return ret;
 }
-QString EncounterFrequencies::dump_sorted_map(const std::string& header) const{
+std::string EncounterFrequencies::dump_sorted_map(const std::string& header) const{
     MapType map = to_sorted_map();
-    QString str = QString::fromStdString(header);
+    std::string str = header;
     for (const auto& item : map){
-        str += QString::fromStdString(tostr_u_commas(item.first));
+        str += tostr_u_commas(item.first);
         str += " : ";
         str += item.second->dump();
         str += "\n";

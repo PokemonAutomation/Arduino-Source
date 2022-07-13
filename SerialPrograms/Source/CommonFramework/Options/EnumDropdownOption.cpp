@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 EnumDropdownOption::EnumDropdownOption(
-    QString label,
+    std::string label,
     std::initializer_list<Option> cases,
     size_t default_index
 )
@@ -74,7 +74,7 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(m_value.label(), this);
+    QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     m_box = new NoWheelComboBox(&parent);

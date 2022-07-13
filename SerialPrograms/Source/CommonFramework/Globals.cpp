@@ -10,28 +10,25 @@
 
 namespace PokemonAutomation{
 
-const QString PROGRAM_VERSION_BASE = "v0.16.3";
+const std::string PROGRAM_VERSION_BASE = "v0.16.3";
 
 #ifdef PA_OFFICIAL
-const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE;
+const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE;
 #else
-const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE + "u";
+const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "u";
 #endif
-const std::string UTF8_PROGRAM_VERSION = PROGRAM_VERSION.toStdString();
 
-const QString DISCORD_LINK = "discord.gg/PokemonAutomation";
-const QString DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";
-const QString ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
-const QString PROJECT_GITHUB = "github.com/PokemonAutomation";
-const QString PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
-const QString PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
+const std::string DISCORD_LINK = "discord.gg/PokemonAutomation";
+const std::string DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";
+const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
+const std::string PROJECT_GITHUB = "github.com/PokemonAutomation";
+const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
+const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 
 const QString STRING_POKEBALL = QString("Pok") + QChar(0xe9) + " Ball";
-const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";
-const QString STRING_POKEDEX = QString("Pok") + QChar(0xe9) + "dex";
-const QString STRING_POKEJOB = QString("Pok") + QChar(0xe9) + " Job";
-
-const std::string UTF8_STRING_POKEMON = STRING_POKEMON.toStdString();
+const std::string STRING_POKEMON = (QString("Pok") + QChar(0xe9) + "mon").toStdString();
+const std::string STRING_POKEDEX = (QString("Pok") + QChar(0xe9) + "dex").toStdString();
+const std::string STRING_POKEJOB = (QString("Pok") + QChar(0xe9) + " Job").toStdString();
 
 
 QString get_resource_path(){

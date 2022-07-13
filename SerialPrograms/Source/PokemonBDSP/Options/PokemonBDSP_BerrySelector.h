@@ -38,7 +38,7 @@ public:
 
 class BerrySelectorOption : public ConfigOption{
 public:
-    BerrySelectorOption(QString label);
+    BerrySelectorOption(std::string label);
 
     // Whether berry_slug is among the selected berries.
     bool find_berry(const std::string& berry_slug) const;

@@ -117,7 +117,9 @@ void CommandRow::update_ui(){
 //        m_reset_button->setEnabled(stopped);
         if (!stopped){
             m_status->setText(
-                html_color_text("Not Active. Keyboard commands are disabled while a program is running.", COLOR_PURPLE)
+                QString::fromStdString(
+                    html_color_text("Not Active. Keyboard commands are disabled while a program is running.", COLOR_PURPLE)
+                )
             );
             return;
         }
@@ -127,20 +129,28 @@ void CommandRow::update_ui(){
     if (state == BotBaseHandle::State::READY){
         if (!m_botbase.accepting_commands()){
             m_status->setText(
-                html_color_text("Not Active. The program on the device doesn't accept commands.", COLOR_RED)
+                QString::fromStdString(
+                    html_color_text("Not Active. The program on the device doesn't accept commands.", COLOR_RED)
+                )
             );
         }else if (!m_last_known_focus){
             m_status->setText(
-                html_color_text("Not Active. Click on the video to activate keyboard commands.", COLOR_PURPLE)
+                QString::fromStdString(
+                    html_color_text("Not Active. Click on the video to activate keyboard commands.", COLOR_PURPLE)
+                )
             );
         }else{
             m_status->setText(
-                html_color_text("Keyboard Control Active! Use the keyboard to enter commands.", COLOR_DARKGREEN)
+                QString::fromStdString(
+                    html_color_text("Keyboard Control Active! Use the keyboard to enter commands.", COLOR_DARKGREEN)
+                )
             );
         }
     }else{
         m_status->setText(
-            html_color_text("Not Active. The connection is not ready.", COLOR_RED)
+            QString::fromStdString(
+                html_color_text("Not Active. The connection is not ready.", COLOR_RED)
+            )
         );
     }
 }

@@ -5,13 +5,13 @@
  */
 
 #include <stdint.h>
-#include <QString>
+#include <string>
 
 namespace PokemonAutomation{
 
-uint32_t parse_ticks_ui32(const QString& expression);
+uint32_t parse_ticks_ui32(const std::string& expression);
 
-int32_t parse_ticks_i32(const QString& expression);
+int32_t parse_ticks_i32(const std::string& expression);
 
 
 }

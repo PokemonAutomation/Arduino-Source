@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 class SwitchDateOption : public ConfigOption, private SwitchDateBaseOption{
 public:
     SwitchDateOption(
-        QString label,
+        std::string label,
         QDate default_value
     );
 
@@ -31,7 +31,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;

@@ -226,7 +226,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(
                 m_console,
-                "Your " + STRING_POKEMON.toStdString() + " fainted after " + std::to_string(results.balls_used) + " balls."
+                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls."
             );
         case CatchResult::OUT_OF_BALLS:
             throw OperationFailedException(
@@ -236,12 +236,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::CANNOT_THROW_BALL:
             throw OperationFailedException(
                 m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON.toStdString() + " semi-invulnerable?"
+                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?"
             );
         case CatchResult::TIMEOUT:
             throw OperationFailedException(
                 m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON.toStdString() + " faint?"
+                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?"
             );
         }
         send_catch_notification(
@@ -271,7 +271,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(
                 m_console,
-                "Your " + STRING_POKEMON.toStdString() + " fainted after " + std::to_string(results.balls_used) + " balls."
+                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls."
             );
         case CatchResult::OUT_OF_BALLS:
             throw OperationFailedException(
@@ -281,12 +281,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::CANNOT_THROW_BALL:
             throw OperationFailedException(
                 m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON.toStdString() + " semi-invulnerable?"
+                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?"
             );
         case CatchResult::TIMEOUT:
             throw OperationFailedException(
                 m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON.toStdString() + " faint?"
+                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?"
             );
         }
         send_catch_notification(

@@ -28,7 +28,7 @@ class CaughtScreenActionOption : public EnumDropdownOption{
 public:
     CaughtScreenActionOption(
         bool take_non_shiny, bool reset_if_high_winrate,
-        QString label, CaughtScreenAction default_action
+        std::string label, CaughtScreenAction default_action
     );
     operator CaughtScreenAction() const{ return (CaughtScreenAction)(size_t)*this;}
 };
@@ -53,7 +53,7 @@ public:
 
 class ConsoleSpecificOptions : public GroupOption{
 public:
-    ConsoleSpecificOptions(QString label, const LanguageSet& languages);
+    ConsoleSpecificOptions(std::string label, const LanguageSet& languages);
 
     virtual void set_host(bool is_host);
 
@@ -63,7 +63,7 @@ public:
 };
 class ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(QString label, const LanguageSet& languages) const = 0;
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const = 0;
 };
 
 

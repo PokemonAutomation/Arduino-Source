@@ -21,7 +21,7 @@ enum class ImageAttachmentMode{
 
 class ScreenshotOption : public EnumDropdownOption{
 public:
-    ScreenshotOption(QString label)
+    ScreenshotOption(std::string label)
         : EnumDropdownOption(
             std::move(label),
             {

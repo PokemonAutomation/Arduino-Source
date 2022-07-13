@@ -30,7 +30,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    QString check_validity() const override;
+    std::string check_validity() const override;
     virtual void restore_defaults() override;
     virtual void reset_state() override;
 

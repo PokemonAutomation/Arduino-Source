@@ -123,7 +123,7 @@ DenMonSelectData::DenMonSelectData(){
         m_list.emplace_back(item.first, item.second.icon);
     }
 }
-DenMonSelectOption::DenMonSelectOption(QString label)
+DenMonSelectOption::DenMonSelectOption(std::string label)
     : StringSelectOption(std::move(label), cases(), "")
 {}
 std::string DenMonSelectOption::slug() const{

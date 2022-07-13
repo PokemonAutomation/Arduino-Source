@@ -42,14 +42,14 @@ JsonValue BatchOption::to_json() const{
     return obj;
 }
 
-QString BatchOption::check_validity() const{
+std::string BatchOption::check_validity() const{
     for (const auto& item : m_options){
-        QString error = item.first->check_validity();
-        if (!error.isEmpty()){
+        std::string error = item.first->check_validity();
+        if (!error.empty()){
             return error;
         }
     }
-    return QString();
+    return std::string();
 }
 void BatchOption::restore_defaults(){
     for (const auto& item : m_options){

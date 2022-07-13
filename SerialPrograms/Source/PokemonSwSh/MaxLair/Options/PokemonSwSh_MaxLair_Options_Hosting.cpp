@@ -55,11 +55,11 @@ HostingSettings::HostingSettings()
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-QString HostingSettings::check_validity(size_t consoles) const{
+std::string HostingSettings::check_validity(size_t consoles) const{
     if (consoles != 1 && !RAID_CODE.code_enabled()){
         return "You must use a code when running with multiple Switches.";
     }
-    return QString();
+    return std::string();
 }
 ConfigWidget* HostingSettings::make_ui(QWidget& parent){
     return new HostingSettingsUI(parent, *this);

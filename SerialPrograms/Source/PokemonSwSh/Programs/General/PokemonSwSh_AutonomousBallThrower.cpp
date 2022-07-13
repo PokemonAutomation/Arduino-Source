@@ -161,12 +161,12 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         if (pokemon_caught){
             send_program_status_notification(
                 env, NOTIFICATION_CATCH_SUCCESS,
-                "Threw " + QString::number(result.balls_used) + " ball(s) and caught it."
+                "Threw " + std::to_string(result.balls_used) + " ball(s) and caught it."
             );
         }else{
             send_program_status_notification(
                 env, NOTIFICATION_CATCH_FAILED,
-                "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it."
+                "Threw " + std::to_string(result.balls_used) + " ball(s) and did not catch it."
             );
         }
 

@@ -60,14 +60,14 @@ void send_raid_notification(
         return;
     }
 
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
 
-    QString description = settings.DESCRIPTION;
-    if (!description.isEmpty()){
+    std::string description = settings.DESCRIPTION;
+    if (!description.empty()){
         embeds.emplace_back("Description", description);
     }
 
-    QString slugs;
+    std::string slugs;
 
     if (!screenshot.isNull()){
         if (results.type == DenMonReadResults::NOT_DETECTED){
@@ -75,7 +75,7 @@ void send_raid_notification(
         }else if (results.slugs.results.empty()){
             slugs += "Unable to detect.";
         }else if (results.slugs.results.size() == 1){
-            slugs += QString::fromStdString(results.slugs.results.begin()->second);
+            slugs += results.slugs.results.begin()->second;
         }else{
             slugs += "Ambiguous: ";
             size_t c = 0;
@@ -83,7 +83,7 @@ void send_raid_notification(
                 if (c > 0){
                     slugs += ", ";
                 }
-                slugs += QString::fromStdString(item.second);
+                slugs += item.second;
                 c++;
                 if (c >= 5){
                     break;
@@ -91,7 +91,7 @@ void send_raid_notification(
             }
             if (c < results.slugs.results.size()){
                 slugs += ", (";
-                slugs += QString::number(results.slugs.results.size() - c);
+                slugs += std::to_string(results.slugs.results.size() - c);
                 slugs += " more...)";
             }
         }
@@ -112,17 +112,17 @@ void send_raid_notification(
         }else{
             code_str += "None";
         }
-        embeds.emplace_back("Raid Code", QString::fromStdString(code_str));
+        embeds.emplace_back("Raid Code", code_str);
     }
 
 //    if (!screenshot.isNull()){
-        embeds.emplace_back("Session Stats", QString::fromStdString(stats_tracker.to_str()));
+        embeds.emplace_back("Session Stats", stats_tracker.to_str());
 //    }
 
     if (GlobalSettings::instance().ALL_STATS){
         const StatsTracker* historical_stats = env.historical_stats();
         if (historical_stats){
-            embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+            embeds.emplace_back("Historical Stats", historical_stats->to_str());
         }
     }
 

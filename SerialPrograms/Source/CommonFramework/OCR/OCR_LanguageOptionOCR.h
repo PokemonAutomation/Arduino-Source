@@ -17,7 +17,7 @@ namespace OCR{
 
 class LanguageOCR : public ConfigOption{
 public:
-    LanguageOCR(QString label, const LanguageSet& languages, bool required = true);
+    LanguageOCR(std::string label, const LanguageSet& languages, bool required = true);
 
 //    explicit operator bool() const{ return m_case_list[m_current].first != Language::None && m_case_list[m_current].second; }
 //    operator size_t() const{ return m_current; }
@@ -26,7 +26,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
@@ -34,7 +34,7 @@ public:
 private:
     friend class LanguageOCRWidget;
 
-    QString m_label;
+    std::string m_label;
 
     std::vector<std::pair<Language, bool>> m_case_list;
     std::map<Language, size_t> m_case_map;

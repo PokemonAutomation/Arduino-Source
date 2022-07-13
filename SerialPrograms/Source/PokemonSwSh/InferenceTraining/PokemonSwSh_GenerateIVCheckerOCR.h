@@ -22,7 +22,7 @@ public:
     static const std::string TOKENS[];
 
 public:
-    IVCheckerOptionOCR(QString label, size_t default_index = 0)
+    IVCheckerOptionOCR(std::string label, size_t default_index = 0)
         : EnumDropdownOption(
             std::move(label),
             {

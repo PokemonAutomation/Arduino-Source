@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <sstream>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "FloatingPointBaseOption.h"
 
@@ -12,7 +13,7 @@ namespace PokemonAutomation{
 
 
 FloatingPointBaseOption::FloatingPointBaseOption(
-    QString label,
+    std::string label,
     double min_value,
     double max_value,
     double default_value
@@ -24,9 +25,9 @@ FloatingPointBaseOption::FloatingPointBaseOption(
     , m_current(default_value)
 {}
 
-QString FloatingPointBaseOption::set(double x){
-    QString err = check_validity(x);
-    if (err.isEmpty()){
+std::string FloatingPointBaseOption::set(double x){
+    std::string err = check_validity(x);
+    if (err.empty()){
         m_current.store(x, std::memory_order_relaxed);
     }
     return err;
@@ -60,20 +61,24 @@ JsonValue FloatingPointBaseOption::write_current() const{
     return m_current.load(std::memory_order_relaxed);
 }
 
-QString FloatingPointBaseOption::check_validity() const{
+std::string FloatingPointBaseOption::check_validity() const{
     return check_validity(m_current.load(std::memory_order_relaxed));
 }
-QString FloatingPointBaseOption::check_validity(double x) const{
+std::string FloatingPointBaseOption::check_validity(double x) const{
     if (x < m_min_value){
-        return "Value too small: min = " + QString::number(m_min_value) + ", value = " + QString::number(x);
+        std::stringstream ss;
+        ss << "Value too small: min = " << m_min_value << ", value = " << x;
+        return ss.str();
     }
     if (x > m_max_value){
-        return "Value too large: max = " + QString::number(m_max_value) + ", value = " + QString::number(x);
+        std::stringstream ss;
+        ss << "Value too large: max = " << m_max_value << ", value = " << x;
+        return ss.str();
     }
     if (std::isnan(x)){
         return "Value is NaN";
     }
-    return QString();
+    return std::string();
 }
 
 

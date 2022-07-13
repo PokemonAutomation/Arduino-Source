@@ -17,7 +17,7 @@ namespace PokemonBDSP{
 
 class ShortcutDirection : public EnumDropdownOption{
 public:
-    ShortcutDirection(QString label, bool required = true);
+    ShortcutDirection(std::string label, bool required = true);
 
     void run(BotBaseContext& context, uint16_t delay);
 

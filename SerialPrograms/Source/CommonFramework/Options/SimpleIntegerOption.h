@@ -24,7 +24,7 @@ template <typename Type>
 class SimpleIntegerOption : public ConfigOption, private SimpleIntegerBaseOption<Type>{
 public:
     SimpleIntegerOption(
-        QString label,
+        std::string label,
         Type default_value,
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
@@ -38,7 +38,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;

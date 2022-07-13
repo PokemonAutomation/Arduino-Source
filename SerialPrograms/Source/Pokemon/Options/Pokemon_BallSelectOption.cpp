@@ -34,7 +34,7 @@ PokemonBallSelectData::PokemonBallSelectData(const std::vector<std::string>& slu
 
 
 PokemonBallSelect::PokemonBallSelect(
-    QString label, const std::string& default_slug
+    std::string label, const std::string& default_slug
 )
     : PokemonBallSelectData(POKEBALL_SLUGS())
     , StringSelectOption(

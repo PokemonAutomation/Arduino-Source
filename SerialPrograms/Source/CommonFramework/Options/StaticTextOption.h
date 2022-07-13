@@ -16,9 +16,9 @@ namespace PokemonAutomation{
 
 class StaticTextOption : public ConfigOption{
 public:
-    StaticTextOption(QString label);
+    StaticTextOption(std::string label);
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -27,14 +27,14 @@ public:
 
 private:
     friend class StaticTextWidget;
-    QString m_label;
+    std::string m_label;
 };
 
 
 
 class SectionDividerOption : public ConfigOption{
 public:
-    SectionDividerOption(QString label);
+    SectionDividerOption(std::string label);
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
@@ -42,7 +42,7 @@ public:
 
 private:
     friend class SectionDividerWidget;
-    QString m_label;
+    std::string m_label;
 };
 
 

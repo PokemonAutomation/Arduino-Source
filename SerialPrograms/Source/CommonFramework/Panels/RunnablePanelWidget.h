@@ -71,7 +71,7 @@ protected:
 //    void redraw_options();
 
 protected:
-    virtual QString check_validity() const;
+    virtual std::string check_validity() const;
     virtual void restore_defaults();
 
     void load_historical_stats();

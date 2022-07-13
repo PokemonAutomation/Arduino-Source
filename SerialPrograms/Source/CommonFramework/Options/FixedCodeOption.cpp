@@ -23,7 +23,7 @@ public:
     virtual void update_ui() override;
 
 private:
-    QString sanitized_code(const QString& text) const;
+    std::string sanitized_code(const std::string& text) const;
 
 private:
     FixedCodeOption& m_value;
@@ -34,9 +34,9 @@ private:
 
 
 FixedCodeOption::FixedCodeOption(
-    QString label,
+    std::string label,
     size_t digits,
-    QString default_value
+    std::string default_value
 )
     : m_label(std::move(label))
     , m_digits(digits)
@@ -44,17 +44,17 @@ FixedCodeOption::FixedCodeOption(
     , m_current(std::move(default_value))
 {}
 
-FixedCodeOption::operator const QString&() const{
+FixedCodeOption::operator const std::string&() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-const QString& FixedCodeOption::get() const{
+const std::string& FixedCodeOption::get() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-QString FixedCodeOption::set(QString x){
-    QString error = check_validity(x);
-    if (error.isEmpty()){
+std::string FixedCodeOption::set(std::string x){
+    std::string error = check_validity(x);
+    if (error.empty()){
         m_current = std::move(x);
     }
     return error;
@@ -66,27 +66,27 @@ void FixedCodeOption::load_json(const JsonValue& json){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = QString::fromStdString(*str);
+    m_current = *str;
 }
 JsonValue FixedCodeOption::to_json() const{
     SpinLockGuard lg(m_lock);
-    return m_current.toStdString();
+    return m_current;
 }
 
 void FixedCodeOption::to_str(uint8_t* code) const{
     SpinLockGuard lg(m_lock);
-    std::string qstr = sanitize_code(8, m_current.toStdString());
+    std::string qstr = sanitize_code(8, m_current);
     for (int c = 0; c < 8; c++){
         code[c] = qstr[c] - '0';
     }
 }
 
-QString FixedCodeOption::check_validity() const{
+std::string FixedCodeOption::check_validity() const{
     SpinLockGuard lg(m_lock);
     return check_validity(m_current);
 }
-QString FixedCodeOption::check_validity(const QString& x) const{
-    return validate_code(m_digits, x.toStdString()) ? QString() : "Code is invalid.";
+std::string FixedCodeOption::check_validity(const std::string& x) const{
+    return validate_code(m_digits, x) ? std::string() : "Code is invalid.";
 }
 void FixedCodeOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
@@ -98,14 +98,14 @@ ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
 }
 
 
-QString FixedCodeWidget::sanitized_code(const QString& text) const{
+std::string FixedCodeWidget::sanitized_code(const std::string& text) const{
     std::string message;
     try{
-        message = "Code: " + sanitize_code(m_value.m_digits, text.toStdString());
+        message = "Code: " + sanitize_code(m_value.m_digits, text);
     }catch (const ParseException& e){
         message = "<font color=\"red\">" + e.message() + "</font>";
     }
-    return QString::fromStdString(message);
+    return message;
 }
 FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     : QWidget(&parent)
@@ -114,33 +114,34 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
     QVBoxLayout* right = new QVBoxLayout();
     layout->addLayout(right, 1);
 
-    QString current = m_value.get();
-    m_box = new QLineEdit(current, this);
+    std::string current = m_value.get();
+    m_box = new QLineEdit(QString::fromStdString(current), this);
     right->addWidget(m_box);
-    QLabel* under_text = new QLabel(sanitized_code(current), this);
+    QLabel* under_text = new QLabel(QString::fromStdString(sanitized_code(current)), this);
     under_text->setWordWrap(true);
     right->addWidget(under_text);
 
     connect(
         m_box, &QLineEdit::textChanged,
         this, [=](const QString& text){
-            m_value.set(text);
-            under_text->setText(sanitized_code(text));
+            std::string str = text.toStdString();
+            m_value.set(str);
+            under_text->setText(QString::fromStdString(sanitized_code(str)));
         }
     );
     connect(
         m_box, &QLineEdit::editingFinished,
         m_box, [=](){
-            QString current = m_value.get();
-            m_box->setText(current);
-            under_text->setText(sanitized_code(current));
+            std::string current = m_value.get();
+            m_box->setText(QString::fromStdString(current));
+            under_text->setText(QString::fromStdString(sanitized_code(current)));
         }
     );
 }
@@ -149,7 +150,7 @@ void FixedCodeWidget::restore_defaults(){
     update_ui();
 }
 void FixedCodeWidget::update_ui(){
-    m_box->setText(m_value);
+    m_box->setText(QString::fromStdString(m_value));
 }
 
 

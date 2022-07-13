@@ -9,7 +9,6 @@
 #ifndef PokemonAutomation_GroupOption_H
 #define PokemonAutomation_GroupOption_H
 
-#include <QString>
 #include "BatchOption.h"
 
 namespace PokemonAutomation{
@@ -18,12 +17,12 @@ namespace PokemonAutomation{
 class GroupOption : public BatchOption{
 public:
     GroupOption(
-        QString label,
+        std::string label,
         bool toggleable = false,
         bool enabled = true
     );
 
-    const QString label() const{ return m_label; }
+    const std::string label() const{ return m_label; }
     bool enabled() const;
 
     virtual void load_json(const JsonValue& json) override;
@@ -39,7 +38,7 @@ public:
 
 private:
     friend class GroupWidget;
-    const QString m_label;
+    const std::string m_label;
     const bool m_toggleable;
     const bool m_default_enabled;
     std::atomic<bool> m_enabled;

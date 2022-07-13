@@ -33,7 +33,7 @@ public:
 private:
     friend class EventNotificationsTableWidget;
     std::vector<EventNotificationOption*> m_options;
-    std::map<QString, EventNotificationOption*> m_name_map;
+    std::map<std::string, EventNotificationOption*> m_name_map;
 };
 
 class EventNotificationsTableWidget : public QWidget, public ConfigWidget{

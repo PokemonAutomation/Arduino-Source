@@ -10,7 +10,7 @@
 #define PokemonAutomation_SimpleIntegerBaseOption_H
 
 #include <atomic>
-#include <QString>
+#include <string>
 
 namespace PokemonAutomation{
 
@@ -21,20 +21,20 @@ template <typename Type>
 class SimpleIntegerBaseOption{
 public:
     SimpleIntegerBaseOption(
-        QString label,
+        std::string label,
         Type min_value,
         Type max_value,
         Type default_value
     );
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
 
     operator Type() const{ return m_current.load(std::memory_order_relaxed); }
     Type get() const{ return m_current.load(std::memory_order_relaxed); }
-    QString set(Type x);
+    std::string set(Type x);
 
-    QString check_validity() const;
-    QString check_validity(Type x) const;
+    std::string check_validity() const;
+    std::string check_validity(Type x) const;
     void restore_defaults();
 
     void load_default(const JsonValue& json);
@@ -44,7 +44,7 @@ public:
 
 
 protected:
-    const QString m_label;
+    const std::string m_label;
     const Type m_min_value;
     const Type m_max_value;
     Type m_default;

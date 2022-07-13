@@ -10,8 +10,8 @@
 namespace PokemonAutomation{
 
 
-QString ConfigOption::check_validity() const{
-    return QString();
+std::string ConfigOption::check_validity() const{
+    return std::string();
 }
 
 

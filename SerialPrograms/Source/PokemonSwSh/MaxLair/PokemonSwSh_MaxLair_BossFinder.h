@@ -33,7 +33,7 @@ class MaxLairBossFinder : public MultiSwitchProgramInstance{
 public:
     MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descriptor);
 
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
     virtual void update_active_consoles() override;
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;

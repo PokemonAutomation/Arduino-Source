@@ -173,9 +173,8 @@ CatchResults basic_catcher(
     console.log("Attempting to catch with: " + ball_slug);
 
     CatchResults results = throw_balls(console, context, language, ball_slug);
-    const QString s = (results.balls_used <= 1 ? "" : "s");
-    const QString pokeball_str = QString::number(results.balls_used) + " " +
-        QString(ball_slug.c_str()) + s;
+    const std::string s = (results.balls_used <= 1 ? "" : "s");
+    const std::string pokeball_str = std::to_string(results.balls_used) + " " + ball_slug + s;
 
     switch (results.result){
     case CatchResult::OUT_OF_BALLS:
@@ -228,8 +227,10 @@ CatchResults basic_catcher(
         switch (ret){
         case 0:
             if (results.result == CatchResult::POKEMON_FAINTED){
-                console.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted after " +
-                    pokeball_str, COLOR_RED);
+                console.log(
+                    "BasicCatcher: The wild " + STRING_POKEMON + " fainted after " +
+                    pokeball_str, COLOR_RED
+                );
             }
             console.log("BasicCatcher: Battle finished!", COLOR_BLUE);
             pbf_wait(context, TICKS_PER_SECOND);

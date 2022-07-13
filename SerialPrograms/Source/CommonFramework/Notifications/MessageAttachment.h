@@ -37,11 +37,11 @@ class PendingFileSend{
 public:
     ~PendingFileSend();
 
-    PendingFileSend(const QString& file, bool keep_file);
+    PendingFileSend(const std::string& file, bool keep_file);
     PendingFileSend(LoggerQt& logger, const ImageAttachment& image);
 
-    const QString& filename() const{ return m_filename; }
-    const QString& filepath() const{ return m_filepath; }
+    const std::string& filename() const{ return m_filename; }
+    const std::string& filepath() const{ return m_filepath; }
     bool keep_file() const{ return m_keep_file; }
 
     //  Work around bug in Sleepy that destroys file before it's not needed anymore.
@@ -51,8 +51,8 @@ private:
     bool m_keep_file;
     std::atomic<bool> m_extend_lifetime;
 //    QFile m_file;
-    QString m_filename;
-    QString m_filepath;
+    std::string m_filename;
+    std::string m_filepath;
 };
 
 

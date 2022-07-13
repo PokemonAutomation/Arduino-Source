@@ -14,9 +14,9 @@ namespace PokemonAutomation{
 
 StringOption::StringOption(
     bool is_password,
-    QString label,
-    QString default_value,
-    QString placeholder_text
+    std::string label,
+    std::string default_value,
+    std::string placeholder_text
 )
     : StringBaseOption(
         is_password,

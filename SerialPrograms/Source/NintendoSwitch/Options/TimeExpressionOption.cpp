@@ -33,12 +33,12 @@ public:
 
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
-    QString label,
-    QString default_value,
+    std::string label,
+    std::string default_value,
     Type min_value,
     Type max_value
 )
-    : TimeExpressionBaseOption<Type>(std::move(label), min_value, max_value, default_value)
+    : TimeExpressionBaseOption<Type>(std::move(label), min_value, max_value, std::move(default_value))
 {}
 
 template <typename Type>
@@ -51,7 +51,7 @@ JsonValue TimeExpressionOption<Type>::to_json() const{
 }
 
 template <typename Type>
-QString TimeExpressionOption<Type>::check_validity() const{
+std::string TimeExpressionOption<Type>::check_validity() const{
     return TimeExpressionBaseOption<Type>::check_validity();
 }
 template <typename Type>

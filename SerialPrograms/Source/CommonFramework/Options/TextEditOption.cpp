@@ -33,9 +33,9 @@ private:
 
 
 TextEditOption::TextEditOption(
-    QString label,
-    QString default_value,
-    QString placeholder_text
+    std::string label,
+    std::string default_value,
+    std::string placeholder_text
 )
     : m_label(std::move(label))
     , m_default(std::move(default_value))
@@ -43,11 +43,11 @@ TextEditOption::TextEditOption(
     , m_current(m_default)
 {}
 
-TextEditOption::operator const QString&() const{
+TextEditOption::operator const std::string&() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-void TextEditOption::set(QString x){
+void TextEditOption::set(std::string x){
     SpinLockGuard lg(m_lock);
     m_current = std::move(x);
 }
@@ -59,11 +59,11 @@ void TextEditOption::load_json(const JsonValue& json){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = QString::fromStdString(*str);
+    m_current = *str;
 }
 JsonValue TextEditOption::to_json() const{
     SpinLockGuard lg(m_lock);
-    return m_current.toStdString();
+    return m_current;
 }
 void TextEditOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
@@ -86,7 +86,7 @@ public:
     {
         this->setAcceptRichText(false);
         this->setFocusPolicy(Qt::StrongFocus);
-        this->setPlaceholderText(parent.m_value.placeholder_text());
+        this->setPlaceholderText(QString::fromStdString(parent.m_value.placeholder_text()));
 
 //        QPalette palette = this->palette();
 //        palette.setColor(QPalette::Text, "blue");
@@ -108,7 +108,7 @@ public:
     }
 
     void update_backing(){
-        m_parent.m_value.set(this->toPlainText());
+        m_parent.m_value.set(this->toPlainText().toStdString());
     }
 
     virtual void focusOutEvent(QFocusEvent* event) override{
@@ -133,15 +133,15 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* label = new QLabel(value.label(), this);
+    QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
     label->setWordWrap(true);
     layout->addWidget(label);
     m_box = new Box(*this);
-    m_box->setText(value);
+    m_box->setText(QString::fromStdString(value));
     layout->addWidget(m_box);
 }
 void TextEditWidget::update_ui(){
-    m_box->setText(m_value);
+    m_box->setText(QString::fromStdString(m_value));
 }
 void TextEditWidget::restore_defaults(){
     m_value.restore_defaults();

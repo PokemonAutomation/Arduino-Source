@@ -73,7 +73,7 @@ PokemonNameListFactory::PokemonNameListFactory(
 
 QStringList PokemonNameListFactory::make_header() const{
     QStringList list;
-    list << STRING_POKEMON;
+    list << QString::fromStdString(STRING_POKEMON);
     return list;
 }
 std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
@@ -84,7 +84,7 @@ std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
 
 
 PokemonNameList::PokemonNameList(
-    QString label,
+    std::string label,
     const SpriteDatabase& icons,
     std::vector<std::string> slug_list,
     const ExtraNames* extra_names

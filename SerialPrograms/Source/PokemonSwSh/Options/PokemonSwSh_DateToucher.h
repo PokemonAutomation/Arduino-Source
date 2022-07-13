@@ -42,7 +42,7 @@ public:
     virtual JsonValue to_json() const override;
 
     //  Returns error message if invalid. Otherwise returns empty string.
-    virtual QString check_validity() const override;
+    virtual std::string check_validity() const override;
 
     virtual void restore_defaults() override;
     virtual void reset_state() override final;

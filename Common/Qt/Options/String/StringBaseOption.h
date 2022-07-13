@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_StringBaseOption_H
 #define PokemonAutomation_StringBaseOption_H
 
-#include <QString>
+#include <string>
 #include "Common/Cpp/SpinLock.h"
 
 namespace PokemonAutomation{
@@ -21,18 +21,18 @@ class StringBaseOption{
 public:
     StringBaseOption(
         bool is_password,
-        QString label,
-        QString default_value,
-        QString placeholder_text
+        std::string label,
+        std::string default_value,
+        std::string placeholder_text
     );
 
-    const QString& label() const{ return m_label; }
-    const QString& placeholder_text() const{ return m_placeholder_text; }
+    const std::string& label() const{ return m_label; }
+    const std::string& placeholder_text() const{ return m_placeholder_text; }
     bool is_password() const{ return m_is_password; }
 
-    operator QString() const;
-    QString get() const;
-    void set(QString x);
+    operator std::string() const;
+    std::string get() const;
+    void set(std::string x);
 
     void restore_defaults();
 
@@ -42,13 +42,13 @@ public:
     JsonValue write_current() const;
 
 private:
-    const QString m_label;
-    QString m_default;
-    QString m_placeholder_text;
+    const std::string m_label;
+    std::string m_default;
+    std::string m_placeholder_text;
     bool m_is_password;
 
     mutable SpinLock m_lock;
-    QString m_current;
+    std::string m_current;
 };
 
 

@@ -29,7 +29,7 @@ public:
 
 
 SwitchDateOption::SwitchDateOption(
-    QString label,
+    std::string label,
     QDate default_value
 )
     : SwitchDateBaseOption(std::move(label), default_value)
@@ -41,7 +41,7 @@ JsonValue SwitchDateOption::to_json() const{
     return this->write_current();
 }
 
-QString SwitchDateOption::check_validity() const{
+std::string SwitchDateOption::check_validity() const{
     return SwitchDateBaseOption::check_validity();
 }
 void SwitchDateOption::restore_defaults(){

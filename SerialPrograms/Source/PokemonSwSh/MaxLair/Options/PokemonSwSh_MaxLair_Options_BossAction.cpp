@@ -138,7 +138,7 @@ void BossActionWidget::redraw_table(){
     m_table->setColumnCount(3);
 
     QStringList header;
-    header << STRING_POKEMON << "Action" << STRING_POKEBALL;
+    header << QString::fromStdString(STRING_POKEMON) << "Action" << STRING_POKEBALL;
     m_table->setHorizontalHeaderLabels(header);
     QFont font;
     font.setBold(true);

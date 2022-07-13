@@ -48,7 +48,7 @@ const MultiHostSlot& MultiHostTableOption::operator[](size_t index) const{
     return static_cast<const MultiHostSlot&>(m_table[index]);
 }
 
-QString MultiHostTableOption::check_validity() const{
+std::string MultiHostTableOption::check_validity() const{
     return m_table.check_validity();
 }
 void MultiHostTableOption::restore_defaults(){

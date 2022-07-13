@@ -18,12 +18,12 @@ StringBaseWidget::StringBaseWidget(QWidget& parent, StringBaseOption& value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(value.label(), this);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
-    m_line_edit = new QLineEdit(m_value.get());
-    m_line_edit->setPlaceholderText(value.placeholder_text());
+    m_line_edit = new QLineEdit(QString::fromStdString(m_value.get()));
+    m_line_edit->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
     layout->addWidget(m_line_edit, 1);
 
     if (m_value.is_password()){
@@ -33,7 +33,7 @@ StringBaseWidget::StringBaseWidget(QWidget& parent, StringBaseOption& value)
     connect(
         m_line_edit, &QLineEdit::editingFinished,
         this, [=](){
-            m_value.set(m_line_edit->text());
+            m_value.set(m_line_edit->text().toStdString());
         }
     );
 }
@@ -42,7 +42,7 @@ void StringBaseWidget::restore_defaults(){
     update_ui();
 }
 void StringBaseWidget::update_ui(){
-    m_line_edit->setText(m_value.get());
+    m_line_edit->setText(QString::fromStdString(m_value.get()));
 }
 
 

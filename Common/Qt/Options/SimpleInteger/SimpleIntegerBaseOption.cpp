@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 
 template <typename Type>
 SimpleIntegerBaseOption<Type>::SimpleIntegerBaseOption(
-    QString label,
+    std::string label,
     Type min_value,
     Type max_value,
     Type default_value
@@ -25,23 +25,23 @@ SimpleIntegerBaseOption<Type>::SimpleIntegerBaseOption(
 {}
 
 template <typename Type>
-QString SimpleIntegerBaseOption<Type>::set(Type x){
-    QString err = check_validity(x);
-    if (err.isEmpty()){
+std::string SimpleIntegerBaseOption<Type>::set(Type x){
+    std::string err = check_validity(x);
+    if (err.empty()){
         m_current.store(x, std::memory_order_relaxed);
     }
     return err;
 }
 
 template <typename Type>
-QString SimpleIntegerBaseOption<Type>::check_validity(Type x) const{
+std::string SimpleIntegerBaseOption<Type>::check_validity(Type x) const{
     if (x < m_min_value){
-        return "Value too small: min = " + QString::number(m_min_value) + ", value = " + QString::number(x);
+        return "Value too small: min = " + std::to_string(m_min_value) + ", value = " + std::to_string(x);
     }
     if (x > m_max_value){
-        return "Value too large: max = " + QString::number(m_max_value) + ", value = " + QString::number(x);
+        return "Value too large: max = " + std::to_string(m_max_value) + ", value = " + std::to_string(x);
     }
-    return QString();
+    return std::string();
 }
 template <typename Type>
 void SimpleIntegerBaseOption<Type>::restore_defaults(){
@@ -70,7 +70,7 @@ JsonValue SimpleIntegerBaseOption<Type>::write_current() const{
 }
 
 template <typename Type>
-QString SimpleIntegerBaseOption<Type>::check_validity() const{
+std::string SimpleIntegerBaseOption<Type>::check_validity() const{
     Type current = m_current.load(std::memory_order_relaxed);
     return check_validity(current);
 }

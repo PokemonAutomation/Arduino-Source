@@ -31,12 +31,12 @@ HostingSwitch::HostingSwitch()
         0
     )
 {}
-QString HostingSwitch::check_validity(size_t consoles) const{
+std::string HostingSwitch::check_validity(size_t consoles) const{
     if (*this >= consoles){
-        return "Host Switch cannot be larger than " + QString::number(consoles - 1) +
-        " since you only have " + QString::number(consoles) + " Switch(es) enabled.";
+        return "Host Switch cannot be larger than " + std::to_string(consoles - 1) +
+        " since you only have " + std::to_string(consoles) + " Switch(es) enabled.";
     }
-    return QString();
+    return std::string();
 }
 
 BossSlot::BossSlot()

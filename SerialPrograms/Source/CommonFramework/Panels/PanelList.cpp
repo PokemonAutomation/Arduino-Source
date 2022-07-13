@@ -18,12 +18,12 @@ namespace PokemonAutomation{
 
 const std::string PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
-PanelList::PanelList(QTabWidget& parent, QString label, PanelHolder& holder)
+PanelList::PanelList(QTabWidget& parent, std::string label, PanelHolder& holder)
     : QListWidget(&parent)
     , m_label(label)
     , m_panel_holder(holder)
 {}
-void PanelList::add_divider(QString label){
+void PanelList::add_divider(std::string label){
     m_panels.emplace_back(std::move(label), nullptr);
 }
 void PanelList::finish_panel_setup(){
@@ -31,7 +31,7 @@ void PanelList::finish_panel_setup(){
     for (const auto& item : m_panels){
         //  Label/divider
         if (item.second == nullptr){
-            addItem(item.first);
+            addItem(QString::fromStdString(item.first));
             QListWidgetItem* list_item = this->item(this->count() - 1);
             QFont font = list_item->font();
             font.setBold(true);
@@ -41,29 +41,29 @@ void PanelList::finish_panel_setup(){
         }
 
         //  Program
-        const QString& display_name = item.second->display_name();
+        const std::string& display_name = item.second->display_name();
         if (!m_panel_map.emplace(display_name, item.second.get()).second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate program name: " + display_name.toStdString());
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate program name: " + display_name);
         }
 
-        addItem(display_name);
+        addItem(QString::fromStdString(display_name));
         QListWidgetItem* list_item = this->item(this->count() - 1);
         Color color = item.second->color();
         if (color){
             QColor qcolor = QColor((uint32_t)color);
             list_item->setForeground(qcolor);
         }
-        list_item->setToolTip(item.second->description());
+        list_item->setToolTip(QString::fromStdString(item.second->description()));
     }
     connect(
         this, &QListWidget::itemClicked,
         this, [=](QListWidgetItem* item){
-            handle_panel_clicked(item->text());
+            handle_panel_clicked(item->text().toStdString());
         }
     );
 }
 
-void PanelList::handle_panel_clicked(const QString text){
+void PanelList::handle_panel_clicked(const std::string& text){
     auto iter = m_panel_map.find(text);
     if (iter == m_panel_map.end()){
         PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = "";
@@ -78,7 +78,7 @@ void PanelList::handle_panel_clicked(const QString text){
         panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
         m_panel_holder.load_panel(std::move(panel));
 
-        PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = iter->first.toStdString();
+        PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = iter->first;
     }catch (const Exception& error){
         QMessageBox box;
         box.critical(
@@ -89,8 +89,8 @@ void PanelList::handle_panel_clicked(const QString text){
     }
 }
 
-void PanelList::set_panel(const QString& panel_name){
-    const auto panels = findItems(panel_name, Qt::MatchExactly);
+void PanelList::set_panel(const std::string& panel_name){
+    const auto panels = findItems(QString::fromStdString(panel_name), Qt::MatchExactly);
     if (panels.size() > 0){
         setCurrentItem(panels[0]);
     }

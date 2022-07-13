@@ -35,8 +35,8 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
         }
     }
 }
-PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
-    std::string path = RESOURCE_PATH().toStdString() + json_file_slugs.toStdString();
+PokemonNameSelectData::PokemonNameSelectData(const std::string& json_file_slugs){
+    std::string path = RESOURCE_PATH().toStdString() + json_file_slugs;
     JsonValue json_slugs = load_json_file(path);
     JsonArray& slugs = json_slugs.get_array_throw(path);
 
@@ -58,7 +58,7 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
 
 
 PokemonNameSelect::PokemonNameSelect(
-    QString label,
+    std::string label,
     const std::vector<std::string>& slugs,
     const std::string& default_slug
 )
@@ -70,8 +70,8 @@ PokemonNameSelect::PokemonNameSelect(
     )
 {}
 PokemonNameSelect::PokemonNameSelect(
-    QString label,
-    const QString& json_file_slugs,
+    std::string label,
+    const std::string& json_file_slugs,
     const std::string& default_slug
 )
     : PokemonNameSelectData(json_file_slugs)

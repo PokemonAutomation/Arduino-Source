@@ -32,7 +32,7 @@ public:
 
 
 
-StaticTextOption::StaticTextOption(QString label)
+StaticTextOption::StaticTextOption(std::string label)
     : m_label(std::move(label))
 {}
 void StaticTextOption::load_json(const JsonValue&){
@@ -46,7 +46,7 @@ ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
 
 
 
-SectionDividerOption::SectionDividerOption(QString label)
+SectionDividerOption::SectionDividerOption(std::string label)
     : m_label(std::move(label))
 {}
 void SectionDividerOption::load_json(const JsonValue&){
@@ -69,7 +69,7 @@ StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel* text = new QLabel(value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -89,7 +89,7 @@ SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption
     layout->addWidget(frame);
     frame->setFrameShape(QFrame::HLine);
 
-    QLabel* text = new QLabel(value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);

@@ -21,12 +21,12 @@ namespace PokemonAutomation{
 class StringSelectOption : public ConfigOption{
 public:
     StringSelectOption(
-        QString label,
+        std::string label,
         const std::vector<std::string>& cases,
         const std::string& default_case
     );
     StringSelectOption(
-        QString label,
+        std::string label,
         std::vector<std::pair<std::string, QIcon>> cases,
         const std::string& default_case
     );
@@ -43,7 +43,7 @@ public:
 
 private:
     friend class StringSelectWidget;
-    const QString m_label;
+    const std::string m_label;
     std::vector<std::pair<std::string, QIcon>> m_case_list;
     std::map<std::string, size_t> m_case_map;
     size_t m_default;

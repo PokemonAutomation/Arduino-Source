@@ -160,8 +160,8 @@ private:
                 m_queue.pop_front();
             }
 
-            if (item.file != nullptr && !item.file->filepath().isEmpty()) {
-                std::string filepath = item.file->filepath().toStdString();
+            if (item.file != nullptr && !item.file->filepath().empty()) {
+                std::string filepath = item.file->filepath();
                 sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], &filepath[0]);
             }
             else sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], nullptr);
@@ -204,7 +204,7 @@ public:
         if (m_sleepy_client != nullptr) {
             if (file){
 //                cout << "Sending: " << file->filepath().toStdString() << endl;
-                m_active_list.emplace(file->filepath().toStdString(), file);
+                m_active_list.emplace(file->filepath(), file);
             }
             SleepyDiscordSender::instance().send(embed, channels, messages, std::move(file));
         }else{
@@ -309,7 +309,7 @@ public:
 
 private:
     void send_response(SleepyRequest request, char* channel, std::string message, std::shared_ptr<PendingFileSend> file = nullptr){
-        std::string filename = file == nullptr ? "" : file->filepath().toStdString();
+        std::string filename = file == nullptr ? "" : file->filepath();
         if ((int)request <= 11) {
             program_response(request, channel, &message[0], &filename[0]);
         }else{
@@ -367,7 +367,7 @@ private:
             message = "Captured image from console ID " + std::to_string(id) + ".";
         }
 
-        std::shared_ptr<PendingFileSend> file(new PendingFileSend(QString::fromStdString(filepath), true));
+        std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
         send_response(SleepyRequest::ScreenshotPng, channel, message, std::move(file));
     }
     void run_ScreenshotJpg(char* channel, uint64_t id){
@@ -380,7 +380,7 @@ private:
             message = "Captured image from console ID " + std::to_string(id) + ".";
         }
 
-        std::shared_ptr<PendingFileSend> file(new PendingFileSend(QString::fromStdString(filepath), true));
+        std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
         send_response(SleepyRequest::ScreenshotJpg, channel, message, std::move(file));
     }
     void run_start(char* channel, uint64_t id){
@@ -491,7 +491,7 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
     }
 }
 
-void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file) {
+void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags, const std::string& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file) {
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
 //        //  TODO: Once file cleanup works, remove this.
@@ -499,15 +499,15 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
 //            file->extend_lifetime();
 //        }
 
-        std::set<QString> tag_set;
-        for (const QString& tag : tags){
-            tag_set.insert(tag.toLower());
+        std::set<std::string> tag_set;
+        for (const std::string& tag : tags){
+            tag_set.insert(QString::fromStdString(tag).toLower().toStdString());
         }
 
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
         DiscordIntegrationTable& channels = settings.integration.channels;
-        std::vector<QString> channel_vector;
-        std::vector<QString> message_vector;
+        std::vector<std::string> channel_vector;
+        std::vector<std::string> message_vector;
 
         for (size_t i = 0; i < channels.size(); i++){
             Integration::DiscordIntegrationChannel channel = channels.operator[](i);
@@ -516,8 +516,8 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
             }
 
             bool send = false;
-            for (const QString& tag : channel.tags){
-                auto iter = tag_set.find(tag.toLower());
+            for (const std::string& tag : channel.tags){
+                auto iter = tag_set.find(QString::fromStdString(tag).toLower().toStdString());
                 if (iter != tag_set.end()){
                     channel_vector.emplace_back(channels.operator[](i).channel_id);
                     send = true;
@@ -529,30 +529,30 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
                 continue;
             }
 
-            if (settings.message.user_id.get().toULongLong() == 0){
+            if (std::atoll(settings.message.user_id.get().c_str()) == 0){
                 should_ping = false;
             }
 
-            QString str = "";
+            std::string str = "";
             if (should_ping && channel.ping){
-                str += "<@" + settings.message.user_id + ">";
+                str += "<@" + (std::string)settings.message.user_id + ">";
             }
 
-            const QString& discord_message = settings.message.message;
-            if (!discord_message.isEmpty()){
-                if (!str.isEmpty()){
+            const std::string& discord_message = settings.message.message;
+            if (!discord_message.empty()){
+                if (!str.empty()){
                     str += " ";
                 }
 
-                for (QChar ch : discord_message){
+                for (char ch : discord_message){
                     if (ch != '@'){
                         str += ch;
                     }
                 }
             }
 
-            if (!message.isEmpty()){
-                if (!str.isEmpty()){
+            if (!message.empty()){
+                if (!str.empty()){
                     str += " ";
                 }
                 str += message;
@@ -567,9 +567,9 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
         std::string chanStr;
         std::string messages;
         for (size_t i = 0; i < channel_vector.size(); i++){
-            chanStr += channel_vector[i].toStdString();
+            chanStr += channel_vector[i];
             chanStr += (i + 1 == channel_vector.size() ? "" : ",");
-            messages += message_vector[i].toStdString();
+            messages += message_vector[i];
             messages += (i + 1 == channel_vector.size() ? "" : "|");
         }
 
@@ -588,25 +588,27 @@ bool initialize_sleepy_settings() {
         return false;
     }
 
+    //  TODO: REMOVE QString
+
     bool suffix = settings.integration.use_suffix;
     std::string param_string;
-    param_string += settings.integration.token.get().replace(" ", "").toStdString() + "|";
-    param_string += settings.integration.command_prefix.get().toStdString() + "|";
-    param_string += settings.integration.owner.get().replace(" ", "").toStdString() + "|";
-    param_string += settings.integration.game_status.get().toStdString() + "|";
-    param_string += settings.integration.hello_message.get().replace("@", "").toStdString() + "|";
-    param_string += PROGRAM_VERSION.toStdString() + "|";
-    param_string += PROJECT_SOURCE_URL.toStdString();
+    param_string += QString::fromStdString(settings.integration.token.get()).replace(" ", "").toStdString() + "|";
+    param_string += settings.integration.command_prefix.get() + "|";
+    param_string += QString::fromStdString(settings.integration.owner.get()).replace(" ", "").toStdString() + "|";
+    param_string += settings.integration.game_status.get() + "|";
+    param_string += QString::fromStdString(settings.integration.hello_message.get()).replace("@", "").toStdString() + "|";
+    param_string += PROGRAM_VERSION + "|";
+    param_string += PROJECT_SOURCE_URL;
 
-    std::string sudo = settings.integration.sudo.get().replace(" ", "").toStdString();
+    std::string sudo = QString::fromStdString(settings.integration.sudo.get()).replace(" ", "").toStdString();
 
 //    std::string w_channels = settings.integration.channels_whitelist.get().replace(" ", "").toStdString();
     std::string w_channels;
-    for (const QString& channel_id : settings.integration.channels.command_channels()){
+    for (const std::string& channel_id : settings.integration.channels.command_channels()){
         if (!w_channels.empty()){
             w_channels += ",";
         }
-        w_channels += channel_id.toStdString();
+        w_channels += channel_id;
     }
 
     m_sleepy_client = std::unique_ptr<SleepyDiscordClient>(new SleepyDiscordClient());
@@ -615,21 +617,24 @@ bool initialize_sleepy_settings() {
 }
 
 bool check_if_empty(const DiscordSettingsOption& settings) {
+
+    //  TODO: REMOVE QString
+
     if (!settings.integration.enabled()){
         return false;
     }
-    if (settings.integration.token.get().isEmpty()) {
+    if (settings.integration.token.get().empty()) {
         return false;
     }
-    else if (settings.integration.token.get().contains(",")) {
+    else if (QString::fromStdString(settings.integration.token.get()).contains(",")) {
         sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
     }
-    else if (settings.integration.owner.get().contains(",")) {
+    else if (QString::fromStdString(settings.integration.owner.get()).contains(",")) {
         sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
     }
-    else if (settings.integration.command_prefix.get().isEmpty()) {
+    else if (settings.integration.command_prefix.get().empty()) {
         sleepy_logger().log("Please enter a Discord command prefix. Stopping...", COLOR_RED);
         return false;
     }

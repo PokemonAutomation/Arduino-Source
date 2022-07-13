@@ -26,7 +26,7 @@ public:
 
 class ThreadPriorityOption : public EnumDropdownOption{
 public:
-    ThreadPriorityOption(QString label, int default_priority);
+    ThreadPriorityOption(std::string label, int default_priority);
     void set_on_this_thread() const;
     void set_on_qthread(QThread& thread) const;
 };

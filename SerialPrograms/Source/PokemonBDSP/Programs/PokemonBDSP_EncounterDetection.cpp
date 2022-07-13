@@ -127,7 +127,7 @@ std::set<std::string> StandardEncounterDetection::read_name(const QImage& screen
     if (result.results.empty()){
         dump_image(
             m_console, ProgramInfo(),
-            QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code),
+            "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
             screen
         );
     }else{
@@ -226,8 +226,8 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
         run_overrides(action_right, overrides, m_pokemon_right, m_shininess_right);
     }
 
-    std::string str_left = "Left " + UTF8_STRING_POKEMON + ": " + action_left.to_str();
-    std::string str_right = "Right " + UTF8_STRING_POKEMON + ": " + action_right.to_str();
+    std::string str_left = "Left " + STRING_POKEMON + ": " + action_left.to_str();
+    std::string str_right = "Right " + STRING_POKEMON + ": " + action_right.to_str();
     m_console.log(str_left);
     m_console.log(str_right);
 

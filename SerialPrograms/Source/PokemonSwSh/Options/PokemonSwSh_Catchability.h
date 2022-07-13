@@ -31,7 +31,7 @@ public:
 
 private:
     friend class CatchabilitySelectorWidget;
-    QString m_label;
+    std::string m_label;
     const Catchability m_default;
     Catchability m_current;
 };

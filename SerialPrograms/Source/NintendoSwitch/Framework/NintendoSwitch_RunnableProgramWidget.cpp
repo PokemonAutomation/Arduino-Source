@@ -116,13 +116,13 @@ QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
 }
 
 
-QString RunnableSwitchProgramWidget::check_validity() const{
-    QString error = RunnablePanelWidget::check_validity();
-    if (!error.isEmpty()){
+std::string RunnableSwitchProgramWidget::check_validity() const{
+    std::string error = RunnablePanelWidget::check_validity();
+    if (!error.empty()){
         return error;
     }
     return m_setup && m_setup->serial_ok()
-        ? QString()
+        ? std::string()
         : "Switch setup is not ready.";
 }
 void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
@@ -194,11 +194,11 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
         m_logger.log("Program stopped with an exception!", COLOR_RED);
-        QString message = QString::fromStdString(e.message());
-        if (message.isEmpty()){
+        std::string message = e.message();
+        if (message.empty()){
             message = e.name();
         }
-        emit signal_error(message);
+        emit signal_error(QString::fromStdString(message));
         send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(

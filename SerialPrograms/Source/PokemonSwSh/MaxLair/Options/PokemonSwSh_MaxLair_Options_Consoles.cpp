@@ -18,14 +18,14 @@ namespace MaxLairInternal{
 
 CaughtScreenActionOption::CaughtScreenActionOption(
     bool take_non_shiny, bool reset_if_high_winrate,
-    QString label, CaughtScreenAction default_action
+    std::string label, CaughtScreenAction default_action
 )
     : EnumDropdownOption(
         std::move(label),
         {
             "Stop Program",
             take_non_shiny
-                ? "Continue Running. (Take any shiny non-boss " + UTF8_STRING_POKEMON + " along the way.)"
+                ? "Continue Running. (Take any shiny non-boss " + STRING_POKEMON + " along the way.)"
                 : "Continue Running",
             !reset_if_high_winrate
                 ? "Reset Game"
@@ -57,7 +57,7 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
         default_shiny_boss
     )
     , description(
-        QString("Choosing \"Reset Game\" has the effect of preserving your balls at the cost of paying ore. (10 ore per reset after enough resets) "
+        std::string("Choosing \"Reset Game\" has the effect of preserving your balls at the cost of paying ore. (10 ore per reset after enough resets) "
         "Therefore, you should start with plenty of ore to avoid running out.") +
         (
             host_tooltip
@@ -77,7 +77,7 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
 
 
 
-ConsoleSpecificOptions::ConsoleSpecificOptions(QString label, const LanguageSet& languages)
+ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const LanguageSet& languages)
     : GroupOption(std::move(label))
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
     , language("<b>Game Language:</b>", languages, true)

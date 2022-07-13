@@ -27,7 +27,7 @@ class HostingSwitch : public EnumDropdownOption{
 public:
     HostingSwitch();
     using EnumDropdownOption::check_validity;
-    QString check_validity(size_t consoles) const;
+    std::string check_validity(size_t consoles) const;
 };
 
 class BossSlot : public EnumDropdownOption{

@@ -60,10 +60,10 @@ bool RunnablePanelWidget::start(){
         break;
     case ProgramState::STOPPED:{
         m_logger.log("Received Start Request");
-        QString error = check_validity();
-        if (!error.isEmpty()){
+        std::string error = check_validity();
+        if (!error.empty()){
             QMessageBox box;
-            box.critical(nullptr, "Error", error);
+            box.critical(nullptr, "Error", QString::fromStdString(error));
             ret = false;
             break;
         }
@@ -293,7 +293,7 @@ void RunnablePanelWidget::redraw_options(){
 #endif
 
 
-QString RunnablePanelWidget::check_validity() const{
+std::string RunnablePanelWidget::check_validity() const{
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
     return instance.check_validity();
 }
@@ -306,7 +306,7 @@ void RunnablePanelWidget::load_historical_stats(){
     std::string stats_str;
     if (stats){
         StatSet set;
-        set.open_from_file(GlobalSettings::instance().STATS_FILE);
+        set.open_from_file(QString::fromStdString(GlobalSettings::instance().STATS_FILE));
         const std::string& identifier = instance.descriptor().identifier();
         StatList& list = set[identifier];
         if (list.size() != 0){
@@ -331,7 +331,7 @@ void RunnablePanelWidget::update_historical_stats(){
         }
         m_logger.log("Saving historical stats...");
         ok = StatSet::update_file(
-            GlobalSettings::instance().STATS_FILE,
+            QString::fromStdString(GlobalSettings::instance().STATS_FILE),
             m_instance.descriptor().identifier(),
             *m_current_stats
         );

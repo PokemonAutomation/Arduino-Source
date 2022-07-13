@@ -27,8 +27,8 @@ public:
     virtual void update_ui() override;
 
 private:
-    QString sanitized_code(const QString& text) const;
-    QString random_code_string() const;
+    std::string sanitized_code(const std::string& text) const;
+    std::string random_code_string() const;
     void update_labels();
 
 private:
@@ -47,20 +47,20 @@ RaidCodeOption::RaidCodeOption()
     , m_random_digits(0)
     , m_code("1280 0000")
 {}
-RaidCodeOption::RaidCodeOption(size_t random_digits, QString code_string)
+RaidCodeOption::RaidCodeOption(size_t random_digits, std::string code_string)
     : m_digits(8)
     , m_random_digits(random_digits)
     , m_code(std::move(code_string))
 {}
-QString RaidCodeOption::check_validity() const{
+std::string RaidCodeOption::check_validity() const{
     if (m_random_digits == 0){
-        return validate_code(m_digits, m_code.toStdString())
-            ? QString()
+        return validate_code(m_digits, m_code)
+            ? std::string()
             : "Code is invalid.";
     }else{
         return m_random_digits <= m_digits
-            ? QString()
-            : "Random digits cannot be greater than " + QString::number(m_digits) + ".";
+            ? std::string()
+            : "Random digits cannot be greater than " + std::to_string(m_digits) + ".";
     }
 }
 bool RaidCodeOption::code_enabled() const{
@@ -71,7 +71,7 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
         return false;
     }
     if (m_random_digits == 0){
-        std::string qstr = sanitize_code(8, m_code.toStdString());
+        std::string qstr = sanitize_code(8, m_code);
         for (int c = 0; c < 8; c++){
             code[c] = qstr[c] - '0';
         }
@@ -97,7 +97,7 @@ RandomCodeOption::RandomCodeOption()
         "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits."
     )
 {}
-RandomCodeOption::RandomCodeOption(QString label, size_t random_digits, QString code_string)
+RandomCodeOption::RandomCodeOption(std::string label, size_t random_digits, std::string code_string)
     : m_label(std::move(label))
     , m_default(random_digits, std::move(code_string))
     , m_current(m_default)
@@ -111,13 +111,13 @@ void RandomCodeOption::load_json(const JsonValue& json){
 
     std::string code;
     if (obj->read_string(code, "RaidCode")){
-        m_current.m_code = QString::fromStdString(code);
+        m_current.m_code = code;
     }
 }
 JsonValue RandomCodeOption::to_json() const{
     JsonObject obj;
     obj["RandomDigits"] = m_current.m_random_digits;
-    obj["RaidCode"] = m_current.m_code.toStdString();
+    obj["RaidCode"] = m_current.m_code;
     return obj;
 }
 
@@ -129,7 +129,7 @@ bool RandomCodeOption::get_code(uint8_t* code) const{
     return m_current.get_code(code);
 }
 
-QString RandomCodeOption::check_validity() const{
+std::string RandomCodeOption::check_validity() const{
     return m_current.check_validity();
 }
 void RandomCodeOption::restore_defaults(){
@@ -148,7 +148,7 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(value.m_label, this);
+    QLabel* text = new QLabel(QString::fromStdString(value.m_label), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
@@ -172,10 +172,10 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
         m_label_code = new QLabel("Raid Code: ", this);
         box_row->addWidget(m_label_code, 1);
 
-        m_box_code = new QLineEdit(m_value.m_current.code_string(), this);
+        m_box_code = new QLineEdit(QString::fromStdString(m_value.m_current.code_string()), this);
         box_row->addWidget(m_box_code, 1);
     }
-    m_under_text = new QLabel(sanitized_code(m_value.m_current.code_string()), this);
+    m_under_text = new QLabel(QString::fromStdString(sanitized_code(m_value.m_current.code_string())), this);
     right->addWidget(m_under_text);
     update_labels();
 
@@ -198,25 +198,25 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
     connect(
         m_box_code, &QLineEdit::textChanged,
         this, [=](const QString& text){
-            m_value.m_current.m_code = text;
+            m_value.m_current.m_code = text.toStdString();
             update_labels();
         }
     );
 }
-QString RandomCodeWidget::sanitized_code(const QString& text) const{
-    if (text.isEmpty()){
+std::string RandomCodeWidget::sanitized_code(const std::string& text) const{
+    if (text.empty()){
         return "<font color=\"blue\">No Raid Code</font>";
     }
     std::string message;
     try{
-        message = "Fixed Raid Code: " + sanitize_code(m_value.m_current.total_digits(), text.toStdString());
+        message = "Fixed Raid Code: " + sanitize_code(m_value.m_current.total_digits(), text);
     }catch (const ParseException& e){
         message = "<font color=\"red\">" + e.message() + "</font>";
     }
-    return QString::fromStdString(message);
+    return message;
 }
-QString RandomCodeWidget::random_code_string() const{
-    QString str;
+std::string RandomCodeWidget::random_code_string() const{
+    std::string str;
     char ch = 'A' - 1;
     size_t c = 0;
     for (; c < m_value.m_current.random_digits(); c++){
@@ -233,12 +233,12 @@ void RandomCodeWidget::update_labels(){
 //        m_label_code->setText("Raid Code: ");
 //        m_code_row->setEnabled(true);
         m_box_code->setEnabled(true);
-        m_under_text->setText(sanitized_code(m_value.m_current.code_string()));
+        m_under_text->setText(QString::fromStdString(sanitized_code(m_value.m_current.code_string())));
     }else{
 //        m_label_code->setText("RNG Seed: ");
 //        m_code_row->setEnabled(false);
         m_box_code->setEnabled(false);
-        m_under_text->setText("Random Code: " + random_code_string());
+        m_under_text->setText(QString::fromStdString("Random Code: " + random_code_string()));
     }
 }
 void RandomCodeWidget::restore_defaults(){
@@ -247,7 +247,7 @@ void RandomCodeWidget::restore_defaults(){
 }
 void RandomCodeWidget::update_ui(){
     m_box_random->setText(QString::number(m_value.m_current.random_digits()));
-    m_box_code->setText(m_value.m_current.code_string());
+    m_box_code->setText(QString::fromStdString(m_value.m_current.code_string()));
 }
 
 

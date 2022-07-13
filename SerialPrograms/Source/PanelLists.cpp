@@ -59,12 +59,12 @@ void ProgramTabs::load_persistent_panel(){
     }
     str = PERSISTENT_SETTINGS().panels.get_string(PanelList::JSON_PROGRAM_PANEL);
     if (str != nullptr){
-        m_lists[currentIndex()]->set_panel(QString::fromStdString(*str));
+        m_lists[currentIndex()]->set_panel(*str);
     }
 }
 
 void ProgramTabs::add(PanelList* list){
-    addTab(list, list->label());
+    addTab(list, QString::fromStdString(list->label()));
     if (list->items() == 0){
         setTabEnabled((int)m_lists.size(), false);
     }

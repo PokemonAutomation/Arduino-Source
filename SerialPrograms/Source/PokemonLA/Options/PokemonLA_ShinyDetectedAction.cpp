@@ -36,8 +36,8 @@ ShinyRequiresAudioText::ShinyRequiresAudioText()
 
 
 ShinyDetectedActionOption::ShinyDetectedActionOption(
-    QString label, QString description,
-    QString default_delay_ticks,
+    std::string label, std::string description,
+    std::string default_delay_ticks,
     ShinyDetectedAction default_action
 )
     : GroupOption(std::move(label))
@@ -61,7 +61,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     )
     , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
-    if (!DESCRIPTION.label().isEmpty()){
+    if (!DESCRIPTION.label().empty()){
         PA_ADD_OPTION(DESCRIPTION);
     }
     PA_ADD_OPTION(ACTION);
@@ -98,21 +98,21 @@ bool on_shiny_callback(
 
     console.log("Ignoring shiny per user settings...", COLOR_RED);
 
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
 
     std::stringstream ss;
     ss << "Error Coefficient: ";
     ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";
-    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
+    embeds.emplace_back("Detection Results", ss.str());
 
     const StatsTracker* current_stats = env.current_stats();
     if (current_stats){
-        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+        embeds.emplace_back("Session Stats", current_stats->to_str());
     }
     const StatsTracker* historical_stats = env.historical_stats();
     if (historical_stats){
-        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+        embeds.emplace_back("Historical Stats", historical_stats->to_str());
     }
     send_program_notification(
         console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
@@ -128,21 +128,21 @@ void on_shiny_sound(
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
 
     std::stringstream ss;
     ss << "Error Coefficient: ";
     ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";
-    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
+    embeds.emplace_back("Detection Results", ss.str());
 
     const StatsTracker* current_stats = env.current_stats();
     if (current_stats){
-        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+        embeds.emplace_back("Session Stats", current_stats->to_str());
     }
     const StatsTracker* historical_stats = env.historical_stats();
     if (historical_stats){
-        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+        embeds.emplace_back("Historical Stats", historical_stats->to_str());
     }
 
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
@@ -172,14 +172,14 @@ void on_match_found(
     const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options, bool stop_program
 ){
-    std::vector<std::pair<QString, QString>> embeds;
+    std::vector<std::pair<std::string, std::string>> embeds;
     const StatsTracker* current_stats = env.current_stats();
     if (current_stats){
-        embeds.emplace_back("Session Stats", QString::fromStdString(current_stats->to_str()));
+        embeds.emplace_back("Session Stats", current_stats->to_str());
     }
     const StatsTracker* historical_stats = env.historical_stats();
     if (historical_stats){
-        embeds.emplace_back("Historical Stats", QString::fromStdString(historical_stats->to_str()));
+        embeds.emplace_back("Historical Stats", historical_stats->to_str());
     }
 
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);

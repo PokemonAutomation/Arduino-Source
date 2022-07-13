@@ -10,7 +10,7 @@
 #define PokemonAutomation_FloatingPointBaseOption_H
 
 #include <atomic>
-#include <QString>
+#include <string>
 
 namespace PokemonAutomation{
 
@@ -20,22 +20,22 @@ class JsonValue;
 class FloatingPointBaseOption{
 public:
     FloatingPointBaseOption(
-        QString label,
+        std::string label,
         double min_value,
         double max_value,
         double default_value
     );
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
     double min_value() const{ return m_min_value; }
     double max_value() const{ return m_max_value; }
 
     operator double() const{ return m_current.load(std::memory_order_relaxed); }
     double get() const{ return m_current.load(std::memory_order_relaxed); }
-    QString set(double x);
+    std::string set(double x);
 
-    QString check_validity() const;
-    QString check_validity(double x) const;
+    std::string check_validity() const;
+    std::string check_validity(double x) const;
     void restore_defaults();
 
     void load_default(const JsonValue& json);
@@ -44,7 +44,7 @@ public:
     JsonValue write_current() const;
 
 protected:
-    const QString m_label;
+    const std::string m_label;
     const double m_min_value;
     const double m_max_value;
     double m_default;

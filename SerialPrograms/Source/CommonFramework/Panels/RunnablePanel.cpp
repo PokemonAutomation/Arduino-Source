@@ -40,7 +40,7 @@ JsonValue RunnablePanelInstance::to_json() const{
     return m_options.to_json();
 }
 
-QString RunnablePanelInstance::check_validity() const{
+std::string RunnablePanelInstance::check_validity() const{
     return m_options.check_validity();
 }
 void RunnablePanelInstance::restore_defaults(){

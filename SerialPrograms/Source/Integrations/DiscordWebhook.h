@@ -58,8 +58,8 @@ private:
 
     void process_reply(QNetworkReply* reply);
     void internal_send_json(const QUrl& url, const QByteArray& data);
-    void internal_send_file(const QUrl& url, const QString& filename);
-    void internal_send_image_embed(const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename);
+    void internal_send_file(const QUrl& url, const std::string& filename);
+    void internal_send_image_embed(const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename);
 
 
 private:
@@ -78,8 +78,8 @@ private:
 void send_message(
     LoggerQt& logger,
     bool should_ping,
-    const std::vector<QString>& tags,
-    const QString& message,
+    const std::vector<std::string>& tags,
+    const std::string& message,
     const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
 );

@@ -58,7 +58,7 @@ public:
     bool accept_FRs         = true;
     uint8_t move_slot       = 0;
     bool dynamax            = true;
-    QString post_raid_delay = "0 * TICKS_PER_SECOND";
+    std::string post_raid_delay = "0 * TICKS_PER_SECOND";
 };
 class MultiHostSlotOptionFactory : public EditableTableFactory{
 public:

@@ -59,7 +59,7 @@ std::vector<std::string> make_thread_priority_list(){
     }
     return ret;
 }
-ThreadPriorityOption::ThreadPriorityOption(QString label, int default_priority)
+ThreadPriorityOption::ThreadPriorityOption(std::string label, int default_priority)
     : EnumDropdownOption(
         std::move(label),
         make_thread_priority_list(),

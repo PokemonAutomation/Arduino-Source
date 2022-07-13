@@ -24,7 +24,7 @@ protected:
 
 class PokemonBallSelect : private PokemonBallSelectData, public StringSelectOption{
 public:
-    PokemonBallSelect(QString label, const std::string& default_slug = "");
+    PokemonBallSelect(std::string label, const std::string& default_slug = "");
 
     const std::string& slug() const;
 

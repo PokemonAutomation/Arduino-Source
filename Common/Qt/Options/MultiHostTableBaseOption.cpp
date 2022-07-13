@@ -56,7 +56,7 @@ void MultiHostSlot::load_json(const JsonValue& json){
 
     std::string str;
     if (obj->read_string(str, MultiHostSlot::JSON_POST_RAID_DELAY)){
-        post_raid_delay = QString::fromStdString(str);
+        post_raid_delay = str;
     }
 }
 JsonValue MultiHostSlot::to_json() const{
@@ -70,7 +70,7 @@ JsonValue MultiHostSlot::to_json() const{
     obj[JSON_USE_RAID_CODE] = use_raid_code;
     obj[JSON_MOVE_SLOT] = move_slot;
     obj[JSON_DYNAMAX] = dynamax;
-    obj[JSON_POST_RAID_DELAY] = post_raid_delay.toStdString();
+    obj[JSON_POST_RAID_DELAY] = post_raid_delay;
     return obj;
 }
 std::unique_ptr<EditableTableRow> MultiHostSlot::clone() const{
@@ -245,7 +245,7 @@ QWidget* MultiHostSlot::make_dynamax_box(QWidget& parent){
 }
 QWidget* MultiHostSlot::make_delay_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(post_raid_delay);
+    box->setText(QString::fromStdString(post_raid_delay));
 //    box->setMaxLength(3);
 //    box->setMaximumWidth(50);
     box->setAlignment(Qt::AlignHCenter);
@@ -253,7 +253,7 @@ QWidget* MultiHostSlot::make_delay_box(QWidget& parent){
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&](const QString& text){
-            post_raid_delay = text;
+            post_raid_delay = text.toStdString();
 //            QSize size = box->document()->size().toSize();
 //            box->setFixedWidth(size);
         }

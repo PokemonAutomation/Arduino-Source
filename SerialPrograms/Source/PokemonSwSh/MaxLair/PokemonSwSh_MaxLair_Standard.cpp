@@ -42,7 +42,7 @@ MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
 class MaxLairStandard_ConsoleOptions : public ConsoleSpecificOptions{
 public:
     MaxLairStandard_ConsoleOptions(
-        QString label,
+        std::string label,
         const LanguageSet& languages
     )
         : ConsoleSpecificOptions(std::move(label), languages)
@@ -61,7 +61,7 @@ public:
 };
 class MaxLairStandard_ConsoleFactory : public ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(QString label, const LanguageSet& languages) const override{
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const override{
         return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairStandard_ConsoleOptions(std::move(label), languages));
     }
 };
@@ -93,20 +93,20 @@ MaxLairStandard::MaxLairStandard(const MaxLairStandard_Descriptor& descriptor)
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-QString MaxLairStandard::check_validity() const{
-    QString error = RunnablePanelInstance::check_validity();
-    if (!error.isEmpty()){
+std::string MaxLairStandard::check_validity() const{
+    std::string error = RunnablePanelInstance::check_validity();
+    if (!error.empty()){
         return error;
     }
     error = CONSOLES.HOST.check_validity(system_count());
-    if (!error.isEmpty()){
+    if (!error.empty()){
         return error;
     }
     error = HOSTING.check_validity(system_count());
-    if (!error.isEmpty()){
+    if (!error.empty()){
         return error;
     }
-    return QString();
+    return std::string();
 }
 void MaxLairStandard::update_active_consoles(){
     size_t consoles = system_count();

@@ -95,10 +95,10 @@ Color theme_friendly_darkblue(){
     return COLOR_DARK_BLUE;
 }
 #endif
-QString html_color_text(const QString& text, Color color){
+std::string html_color_text(const std::string& text, Color color){
     const char HEX[] = "0123456789abcdef";
     uint32_t rgb = (uint32_t)color;
-    QString str;
+    std::string str;
     str += HEX[(rgb >> 20) & 15];
     str += HEX[(rgb >> 16) & 15];
     str += HEX[(rgb >> 12) & 15];
@@ -107,7 +107,7 @@ QString html_color_text(const QString& text, Color color){
     str += HEX[(rgb >>  0) & 15];
     return "<font color=#" + str + ">" + text + "</font>";
 }
-QString make_text_url(const QString& url, const QString& text){
+std::string make_text_url(const std::string& url, const std::string& text){
 #if 0
     switch (current_theme){
     case 0:

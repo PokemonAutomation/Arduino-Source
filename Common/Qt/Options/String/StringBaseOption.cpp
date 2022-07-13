@@ -12,9 +12,9 @@ namespace PokemonAutomation{
 
 StringBaseOption::StringBaseOption(
     bool is_password,
-    QString label,
-    QString default_value,
-    QString placeholder_text
+    std::string label,
+    std::string default_value,
+    std::string placeholder_text
 )
     : m_label(std::move(label))
     , m_default(std::move(default_value))
@@ -22,15 +22,15 @@ StringBaseOption::StringBaseOption(
     , m_is_password(is_password)
     , m_current(m_default)
 {}
-StringBaseOption::operator QString() const{
+StringBaseOption::operator std::string() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-QString StringBaseOption::get() const{
+std::string StringBaseOption::get() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-void StringBaseOption::set(QString x){
+void StringBaseOption::set(std::string x){
     SpinLockGuard lg(m_lock);
     m_current = std::move(x);
 }
@@ -46,7 +46,7 @@ void StringBaseOption::load_default(const JsonValue& json){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_default = QString::fromStdString(*str);
+    m_default = *str;
 }
 void StringBaseOption::load_current(const JsonValue& json){
     const std::string* str = json.get_string();
@@ -54,15 +54,15 @@ void StringBaseOption::load_current(const JsonValue& json){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = QString::fromStdString(*str);
+    m_current = *str;
 }
 JsonValue StringBaseOption::write_default() const{
     SpinLockGuard lg(m_lock);
-    return m_default.toStdString();
+    return m_default;
 }
 JsonValue StringBaseOption::write_current() const{
     SpinLockGuard lg(m_lock);
-    return m_current.toStdString();
+    return m_current;
 }
 
     

@@ -33,7 +33,7 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
     {
         std::string str;
         if (obj->read_string(str, "Label")){
-            label = QString::fromStdString(str);
+            label = str;
         }
     }
     obj->read_boolean(ping, "Ping");
@@ -45,8 +45,8 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
             if (str == nullptr){
                 continue;
             }
-            QString token = EventNotificationSettings::sanitize_tag(QString::fromStdString(*str));
-            if (!token.isEmpty()){
+            std::string token = EventNotificationSettings::sanitize_tag(*str);
+            if (!token.empty()){
                 tags.emplace_back(std::move(token));
             }
         }
@@ -54,21 +54,21 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
     {
         std::string str;
         if (obj->read_string(str, "URL")){
-            url = QString::fromStdString(str);
+            url = str;
         }
     }
 }
 JsonValue DiscordWebhookUrl::to_json() const{
     JsonObject obj;
     obj["Enabled"] = enabled;
-    obj["Label"] = label.toStdString();
+    obj["Label"] = label;
     obj["Ping"] = ping;
     JsonArray array;
-    for (const QString& tag : tags){
-        array.push_back(tag.toStdString());
+    for (const std::string& tag : tags){
+        array.push_back(tag);
     }
     obj["Tags"] = std::move(array);
-    obj["URL"] = url.toStdString();
+    obj["URL"] = url;
     return obj;
 }
 std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
@@ -101,12 +101,12 @@ QWidget* DiscordWebhookUrl::make_enabled_box(QWidget& parent){
 }
 QWidget* DiscordWebhookUrl::make_label_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(label);
+    box->setText(QString::fromStdString(label));
     box->setPlaceholderText("My test server");
     box->connect(
         box, &QLineEdit::textChanged,
         box, [=](const QString& line){
-            label = line;
+            label = line.toStdString();
         }
     );
     return box;
@@ -129,25 +129,25 @@ QWidget* DiscordWebhookUrl::make_ping_box(QWidget& parent){
 }
 QWidget* DiscordWebhookUrl::make_tags_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(EventNotificationSettings::tags_to_str(tags));
+    box->setText(QString::fromStdString(EventNotificationSettings::tags_to_str(tags)));
 //    box->setAlignment(Qt::AlignHCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&](const QString& text){
-            tags = EventNotificationSettings::parse_tags(text);
+            tags = EventNotificationSettings::parse_tags(text.toStdString());
         }
     );
     return box;
 }
 QWidget* DiscordWebhookUrl::make_url_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(url);
+    box->setText(QString::fromStdString(url));
     box->setPlaceholderText("https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     box->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [=](const QString& line){
-            url = line;
+            url = line.toStdString();
         }
     );
     return box;

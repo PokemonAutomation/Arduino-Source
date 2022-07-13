@@ -25,8 +25,8 @@ private:
 
 
 Color theme_friendly_darkblue();
-QString html_color_text(const QString& text, Color color);
-QString make_text_url(const QString& url, const QString& text);
+std::string html_color_text(const std::string& text, Color color);
+std::string make_text_url(const std::string& url, const std::string& text);
 
 
 

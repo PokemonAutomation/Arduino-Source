@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_TimeExpressionBaseOption_H
 #define PokemonAutomation_TimeExpressionBaseOption_H
 
-#include <QString>
+#include <string>
 #include "Common/Cpp/SpinLock.h"
 
 class JsonValue;
@@ -22,20 +22,20 @@ template <typename Type>
 class TimeExpressionBaseOption{
 public:
     TimeExpressionBaseOption(
-        QString label,
+        std::string label,
         Type min_value,
         Type max_value,
-        QString default_value
+        std::string default_value
     );
 
-    const QString& label() const{ return m_label; }
+    const std::string& label() const{ return m_label; }
 
     operator Type() const;
     Type get() const;
-    QString set(QString text);
+    std::string set(std::string text);
 
-    QString text() const;
-    QString time_string() const;
+    std::string text() const;
+    std::string time_string() const;
 
     void load_default(const JsonValue& json);
     void load_current(const JsonValue& json);
@@ -45,22 +45,22 @@ public:
     Type min() const{ return m_min_value; }
     Type max() const{ return m_max_value; }
 
-    QString check_validity() const;
+    std::string check_validity() const;
     void restore_defaults();
 
 private:
-    QString process(const QString& text, Type& value) const;
+    std::string process(const std::string& text, Type& value) const;
 
 private:
-    const QString m_label;
+    const std::string m_label;
     const Type m_min_value;
     const Type m_max_value;
-    QString m_default;
+    std::string m_default;
 
     mutable SpinLock m_lock;
-    QString m_current;
+    std::string m_current;
     Type m_value;
-    QString m_error;
+    std::string m_error;
 };
 
 

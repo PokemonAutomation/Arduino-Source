@@ -22,7 +22,14 @@
 #ifndef PokemonAutomation_CancellableScope_H
 #define PokemonAutomation_CancellableScope_H
 
+#if 0
 #include <exception>
+#else
+namespace std{
+    class exception_ptr;
+}
+#endif
+
 #include "Pimpl.h"
 #include "Time.h"
 #include "LifetimeSanitizer.h"

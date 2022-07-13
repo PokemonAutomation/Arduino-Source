@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
-    QString label,
+    std::string label,
     Type default_value,
     Type min_value,
     Type max_value
@@ -31,7 +31,7 @@ JsonValue SimpleIntegerOption<Type>::to_json() const{
 }
 
 template <typename Type>
-QString SimpleIntegerOption<Type>::check_validity() const{
+std::string SimpleIntegerOption<Type>::check_validity() const{
     return SimpleIntegerBaseOption<Type>::check_validity();
 }
 template <typename Type>

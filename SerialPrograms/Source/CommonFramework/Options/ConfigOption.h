@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_ConfigOption_H
 #define PokemonAutomation_ConfigOption_H
 
-class QString;
+#include <string>
+
 class QWidget;
 
 namespace PokemonAutomation{
@@ -36,7 +37,7 @@ public:
     virtual JsonValue to_json() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
-    virtual QString check_validity() const;
+    virtual std::string check_validity() const;
 
     virtual void restore_defaults(){};
 

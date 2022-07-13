@@ -30,12 +30,7 @@ void DiscordIntegrationChannel::load_json(const JsonValue& json){
         return;
     }
     obj->read_boolean(enabled, "Enabled");
-    {
-        std::string str;
-        if (obj->read_string(str, "Label")){
-            label = QString::fromStdString(str);
-        }
-    }
+    obj->read_string(label, "Label");
     obj->read_boolean(ping, "Label");
     const JsonArray* array = obj->get_array("Tags");
     if (array != nullptr){
@@ -45,32 +40,27 @@ void DiscordIntegrationChannel::load_json(const JsonValue& json){
             if (str == nullptr){
                 continue;
             }
-            QString token = EventNotificationSettings::sanitize_tag(QString::fromStdString(*str));
-            if (!token.isEmpty()){
+            std::string token = EventNotificationSettings::sanitize_tag(*str);
+            if (!token.empty()){
                 tags.emplace_back(std::move(token));
             }
         }
     }
     obj->read_boolean(allow_commands, "Commands");
-    {
-        std::string str;
-        if (obj->read_string(str, "Channel")){
-            channel_id = QString::fromStdString(str);
-        }
-    }
+    obj->read_string(channel_id, "Channel");
 }
 JsonValue DiscordIntegrationChannel::to_json() const{
     JsonObject obj;
     obj["Enabled"] = enabled;
-    obj["Label"] = label.toStdString();
+    obj["Label"] = label;
     obj["Ping"] = ping;
     JsonArray array;
-    for (const QString& tag : tags){
-        array.push_back(tag.toStdString());
+    for (const std::string& tag : tags){
+        array.push_back(tag);
     }
     obj["Tags"] = std::move(array);
     obj["Commands"] = allow_commands;
-    obj["Channel"] = channel_id.toStdString();
+    obj["Channel"] = channel_id;
     return obj;
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
@@ -105,12 +95,12 @@ QWidget* DiscordIntegrationChannel::make_enabled_box(QWidget& parent){
 }
 QWidget* DiscordIntegrationChannel::make_label_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(label);
+    box->setText(QString::fromStdString(label));
     box->setPlaceholderText("My test server");
     box->connect(
         box, &QLineEdit::textChanged,
         box, [=](const QString& line){
-            label = line;
+            label = line.toStdString();
         }
     );
     return box;
@@ -133,12 +123,12 @@ QWidget* DiscordIntegrationChannel::make_ping_box(QWidget& parent){
 }
 QWidget* DiscordIntegrationChannel::make_tags_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(EventNotificationSettings::tags_to_str(tags));
+    box->setText(QString::fromStdString(EventNotificationSettings::tags_to_str(tags)));
 //    box->setAlignment(Qt::AlignHCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&](const QString& text){
-            tags = EventNotificationSettings::parse_tags(text);
+            tags = EventNotificationSettings::parse_tags(text.toStdString());
         }
     );
     return box;
@@ -162,12 +152,12 @@ QWidget* DiscordIntegrationChannel::make_commands_box(QWidget& parent){
 
 QWidget* DiscordIntegrationChannel::make_channel_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(channel_id);
+    box->setText(QString::fromStdString(channel_id));
     box->setPlaceholderText("123456789012345678");
     box->connect(
         box, &QLineEdit::textChanged,
         box, [=](const QString& line){
-            channel_id = line;
+            channel_id = line.toStdString();
         }
     );
     return box;
@@ -210,8 +200,8 @@ const DiscordIntegrationChannel& DiscordIntegrationTable::operator[](size_t inde
     return static_cast<const DiscordIntegrationChannel&>(EditableTableOption::operator[](index));
 }
 
-std::vector<QString> DiscordIntegrationTable::command_channels() const{
-    std::vector<QString> ret;
+std::vector<std::string> DiscordIntegrationTable::command_channels() const{
+    std::vector<std::string> ret;
     for (size_t c = 0; c < size(); c++){
         const DiscordIntegrationChannel& channel = (*this)[c];
         if (channel.enabled && channel.allow_commands){

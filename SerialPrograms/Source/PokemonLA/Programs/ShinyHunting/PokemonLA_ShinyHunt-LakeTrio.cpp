@@ -100,7 +100,7 @@ std::set<std::string> read_name(
     if (result.results.empty()){
         dump_image(
             logger, ProgramInfo(),
-            QString::fromStdString("NameOCR-" + language_data(language).code),
+            "NameOCR-" + language_data(language).code,
             screen
         );
     }else{
@@ -165,7 +165,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 stats.add_error();
                 dump_image(
                     env.logger(), ProgramInfo(),
-                    QString::fromStdString("NoEncounter"),
+                    "NoEncounter",
                     screen
                 );
                 send_program_recoverable_error_notification(

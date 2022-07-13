@@ -26,7 +26,7 @@ ImageAttachment::ImageAttachment(
 
 
 PendingFileSend::~PendingFileSend(){
-    if (m_filepath.isEmpty()){
+    if (m_filepath.empty()){
         return;
     }
     if (m_keep_file){
@@ -37,16 +37,16 @@ PendingFileSend::~PendingFileSend(){
         return;
     }
 
-    QFile file(m_filepath);
+    QFile file(QString::fromStdString(m_filepath));
     file.remove();
 }
-PendingFileSend::PendingFileSend(const QString& file, bool keep_file)
+PendingFileSend::PendingFileSend(const std::string& file, bool keep_file)
     : m_keep_file(keep_file)
     , m_extend_lifetime(false)
     , m_filepath(file)
 {
-    QFileInfo info(file);
-    m_filename = info.fileName();
+    QFileInfo info(QString::fromStdString(file));
+    m_filename = info.fileName().toStdString();
 }
 PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
     : m_keep_file(image.keep_file)
@@ -60,7 +60,7 @@ PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
         return;
     }
 
-    QString format;
+    std::string format;
     switch (image.mode){
     case ImageAttachmentMode::NO_SCREENSHOT:
         break;
@@ -72,7 +72,7 @@ PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
         break;
     }
 
-    m_filename = QString::fromStdString(now_to_filestring()) + format;
+    m_filename = now_to_filestring() + format;
 
     if (image.keep_file){
         m_filepath = m_filename;
@@ -82,7 +82,7 @@ PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
         m_filepath = "TempImages/" + m_filename;
     }
 
-    if (image.image.save(m_filepath)){
+    if (image.image.save(QString::fromStdString(m_filepath))){
         logger.log("Saved image to: " + m_filepath, COLOR_BLUE);
     }else{
         logger.log("Unable to save screenshot to: " + m_filepath, COLOR_RED);

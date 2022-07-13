@@ -32,10 +32,10 @@ private:
 
 public:
     bool enabled;
-    QString label;
+    std::string label;
     bool ping;
-    std::vector<QString> tags;
-    QString url;
+    std::vector<std::string> tags;
+    std::string url;
 };
 
 class DiscordWebhookUrlsFactory : public EditableTableFactory{

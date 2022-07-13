@@ -56,7 +56,7 @@ JsonArray json_write_date(const QDate& date){
 
 
 SwitchDateBaseOption::SwitchDateBaseOption(
-    QString label,
+    std::string label,
     QDate default_value
 )
     : m_label(std::move(label))
@@ -72,21 +72,21 @@ QDate SwitchDateBaseOption::get() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
-QString SwitchDateBaseOption::set(QDate x){
-    QString err = check_validity(x);
-    if (err.isEmpty()){
+std::string SwitchDateBaseOption::set(QDate x){
+    std::string err = check_validity(x);
+    if (err.empty()){
         SpinLockGuard lg(m_lock);
         m_current = x;
     }
     return err;
 }
 
-QString SwitchDateBaseOption::check_validity() const{
+std::string SwitchDateBaseOption::check_validity() const{
     SpinLockGuard lg(m_lock);
     return check_validity(m_current);
 }
-QString SwitchDateBaseOption::check_validity(QDate x) const{
-    return valid_switch_date(x) ? QString() : "Invalid Switch date.";
+std::string SwitchDateBaseOption::check_validity(QDate x) const{
+    return valid_switch_date(x) ? std::string() : "Invalid Switch date.";
 }
 void SwitchDateBaseOption::restore_defaults(){
     SpinLockGuard lg(m_lock);

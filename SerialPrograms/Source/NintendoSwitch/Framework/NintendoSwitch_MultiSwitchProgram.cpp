@@ -54,9 +54,9 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
 
 MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string identifier,
-    QString category, QString display_name,
-    QString doc_link,
-    QString description,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
     FeedbackType feedback, bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level,
     size_t min_switches,

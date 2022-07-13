@@ -32,11 +32,11 @@ private:
 
 public:
     bool enabled;
-    QString label;
+    std::string label;
     bool ping;
-    std::vector<QString> tags;
+    std::vector<std::string> tags;
     bool allow_commands;
-    QString channel_id;
+    std::string channel_id;
 };
 
 class DiscordIntegrationTableFactory : public EditableTableFactory{
@@ -55,7 +55,7 @@ public:
     size_t size() const;
     const DiscordIntegrationChannel& operator[](size_t index) const;
 
-    std::vector<QString> command_channels() const;
+    std::vector<std::string> command_channels() const;
 };
 
 

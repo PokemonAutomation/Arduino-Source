@@ -40,7 +40,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& d
     , START_LOCATION(
         "<b>Start Location:</b>",
         {
-            "Start in front of the Hearthome City " + UTF8_STRING_POKEMON + " center.",
+            "Start in front of the Hearthome City " + STRING_POKEMON + " center.",
             "Start in the row above the rich couple in Route 212.",
         },
         0
@@ -48,7 +48,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& d
     , HEALING_METHOD(
         "<b> Healing method:</b>",
         {
-            "Use the Hearthome City " + UTF8_STRING_POKEMON + " center.",
+            "Use the Hearthome City " + STRING_POKEMON + " center.",
             "Use Global Room. (Disable WiFi if you want to keep playing an old version of the game.)"
         },
         0

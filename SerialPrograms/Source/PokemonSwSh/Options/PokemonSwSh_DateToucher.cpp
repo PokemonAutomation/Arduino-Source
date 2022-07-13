@@ -41,7 +41,7 @@ void TouchDateIntervalOption::load_json(const JsonValue& json){
 JsonValue TouchDateIntervalOption::to_json() const{
     return m_hours.to_json();
 }
-QString TouchDateIntervalOption::check_validity() const{
+std::string TouchDateIntervalOption::check_validity() const{
     return m_hours.check_validity();
 }
 void TouchDateIntervalOption::restore_defaults(){

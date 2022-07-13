@@ -220,10 +220,15 @@ void determine_shiny_status(
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
         dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.best_screenshot);
+        std::stringstream ss;
+        ss << "Low alpha shiny (alpha = "
+           << alpha_wild_overall
+           << ").\nPlease report this image to the "
+           << STRING_POKEMON
+           << " Automation server.";
         send_program_recoverable_error_notification(
             env, settings,
-            "Low alpha shiny (alpha = " + QString::number(alpha_wild_overall) +
-            ").\nPlease report this image to the " + STRING_POKEMON + " Automation server.",
+            ss.str(),
             wild_result.best_screenshot
         );
     }

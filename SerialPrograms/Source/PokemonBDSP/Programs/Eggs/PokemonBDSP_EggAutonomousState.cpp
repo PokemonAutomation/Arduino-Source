@@ -146,7 +146,7 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
     QImage screen = m_console.video().snapshot();
     dump_image(
         m_console, m_env.program_info(),
-        QString::fromStdString(name),
+        name,
         screen
     );
     send_program_recoverable_error_notification(

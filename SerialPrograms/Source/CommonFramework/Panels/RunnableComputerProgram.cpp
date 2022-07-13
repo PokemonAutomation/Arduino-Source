@@ -12,9 +12,9 @@ namespace PokemonAutomation{
 
 RunnableComputerProgramDescriptor::RunnableComputerProgramDescriptor(
     std::string identifier,
-    QString category, QString display_name,
-    QString doc_link,
-    QString description
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description
 )
     : RunnablePanelDescriptor(
         COLOR_DARKCYAN,

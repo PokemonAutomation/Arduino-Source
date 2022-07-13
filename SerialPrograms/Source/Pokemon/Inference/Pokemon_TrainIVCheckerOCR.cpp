@@ -55,7 +55,7 @@ TrainIVCheckerOCR::TrainIVCheckerOCR(const TrainIVCheckerOCR_Descriptor& descrip
 
 
 void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope){
-    OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
+    OCR::TrainingSession session(env.logger(), scope, QString::fromStdString(DIRECTORY));
     session.generate_small_dictionary(
         "Pokemon/IVCheckerOCR.json",
         "IVCheckerOCR.json",

@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 
 EditableTableBaseOption::EditableTableBaseOption(
-    QString label, const EditableTableFactory& factory,
+    std::string label, const EditableTableFactory& factory,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : m_label(std::move(label))
@@ -61,14 +61,14 @@ const EditableTableRow& EditableTableBaseOption::operator[](size_t index) const{
     return *m_current[index];
 }
 
-QString EditableTableBaseOption::check_validity() const{
+std::string EditableTableBaseOption::check_validity() const{
     for (const std::unique_ptr<EditableTableRow>& item : m_current){
-        QString error = item->check_validity();
-        if (!error.isEmpty()){
+        std::string error = item->check_validity();
+        if (!error.empty()){
             return error;
         }
     }
-    return QString();
+    return std::string();
 }
 void EditableTableBaseOption::restore_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> tmp;

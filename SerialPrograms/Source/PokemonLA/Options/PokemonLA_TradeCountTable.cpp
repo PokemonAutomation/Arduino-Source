@@ -120,7 +120,7 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     , m_table(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    QLabel* label = new QLabel(m_value.m_label, this);
+    QLabel* label = new QLabel(QString::fromStdString(m_value.m_label), this);
     label->setWordWrap(true);
     layout->addWidget(label);
 
@@ -129,7 +129,7 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     m_table->setColumnCount(3);
 
     QStringList header;
-    header << STRING_POKEMON << "Trades" << "Default";
+    header << QString::fromStdString(STRING_POKEMON) << "Trades" << "Default";
     m_table->setHorizontalHeaderLabels(header);
     QFont font;
     font.setBold(true);

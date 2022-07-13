@@ -34,10 +34,7 @@ EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOp
     for (EventNotificationOption* option : m_options){
         auto iter = m_name_map.find(option->label());
         if (iter != m_name_map.end()){
-            throw InternalProgramError(
-                nullptr, PA_CURRENT_FUNCTION,
-                "Duplicate Key: " + option->label().toStdString()
-            );
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Key: " + option->label());
         }
         m_name_map.emplace(option->label(), option);
     }
@@ -46,7 +43,7 @@ void EventNotificationsTable::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     ScreenshotOption screenshot_option("");
     for (EventNotificationOption* option : m_options){
-        auto iter = obj->find(option->label().toStdString());
+        auto iter = obj->find(option->label());
         if (iter == obj->end()){
             continue;
         }
@@ -56,7 +53,7 @@ void EventNotificationsTable::load_json(const JsonValue& json){
 JsonValue EventNotificationsTable::to_json() const{
     JsonObject obj;
     for (EventNotificationOption* option : m_options){
-        obj[option->label().toStdString()] = option->to_json();
+        obj[option->label()] = option->to_json();
     }
     return obj;
 }
@@ -121,7 +118,7 @@ void EventNotificationsTableWidget::redraw_table(){
     for (int c = 0; c < stop; c++){
         EventNotificationOption& entry = *m_value.m_options[c];
         m_table->setCellWidget(c, 0, make_enabled_box(entry));
-        m_table->setCellWidget(c, 1, new QLabel(" " + entry.label() + " ", this));
+        m_table->setCellWidget(c, 1, new QLabel(QString::fromStdString(" " + entry.label() + " "), this));
         m_table->setCellWidget(c, 2, make_ping_box(entry));
         m_table->setCellWidget(c, 3, make_screenshot_box(entry));
         m_table->setCellWidget(c, 4, make_tags_box(entry));
@@ -185,12 +182,12 @@ QWidget* EventNotificationsTableWidget::make_screenshot_box(EventNotificationOpt
 }
 QWidget* EventNotificationsTableWidget::make_tags_box(EventNotificationOption& entry){
     QLineEdit* box = new QLineEdit(this);
-    box->setText(EventNotificationSettings::tags_to_str(entry.m_current.tags));
+    box->setText(QString::fromStdString(EventNotificationSettings::tags_to_str(entry.m_current.tags)));
 //    box->setAlignment(Qt::AlignCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&](const QString& text){
-            entry.m_current.tags = EventNotificationSettings::parse_tags(text);
+            entry.m_current.tags = EventNotificationSettings::parse_tags(text.toStdString());
         }
     );
     return box;

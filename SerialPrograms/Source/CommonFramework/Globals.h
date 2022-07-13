@@ -12,22 +12,19 @@
 
 namespace PokemonAutomation{
 
-extern const QString PROGRAM_VERSION;
-extern const QString DISCORD_LINK;
-extern const QString DISCORD_LINK_URL;
-extern const QString ONLINE_DOC_URL;
-extern const QString PROJECT_GITHUB;
-extern const QString PROJECT_GITHUB_URL;
-extern const QString PROJECT_SOURCE_URL;
+extern const std::string PROGRAM_VERSION;
+extern const std::string DISCORD_LINK;
+extern const std::string DISCORD_LINK_URL;
+extern const std::string ONLINE_DOC_URL;
+extern const std::string PROJECT_GITHUB;
+extern const std::string PROJECT_GITHUB_URL;
+extern const std::string PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 extern const QString STRING_POKEBALL;
-extern const QString STRING_POKEMON;
-extern const QString STRING_POKEDEX;
-extern const QString STRING_POKEJOB;
-
-extern const std::string UTF8_PROGRAM_VERSION;
-extern const std::string UTF8_STRING_POKEMON;
+extern const std::string STRING_POKEMON;
+extern const std::string STRING_POKEDEX;
+extern const std::string STRING_POKEJOB;
 
 const QString& RESOURCE_PATH();
 const QString& TRAINING_PATH();

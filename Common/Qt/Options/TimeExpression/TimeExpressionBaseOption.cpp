@@ -17,10 +17,10 @@ namespace NintendoSwitch{
 
 template <typename Type>
 TimeExpressionBaseOption<Type>::TimeExpressionBaseOption(
-    QString label,
+    std::string label,
     Type min_value,
     Type max_value,
-    QString default_value
+    std::string default_value
 )
     : m_label(std::move(label))
     , m_min_value(min_value)
@@ -42,10 +42,10 @@ Type TimeExpressionBaseOption<Type>::get() const{
     return m_value;
 }
 template <typename Type>
-QString TimeExpressionBaseOption<Type>::set(QString text){
+std::string TimeExpressionBaseOption<Type>::set(std::string text){
     Type value = 0;
-    QString error = process(text, value);
-    if (error.isEmpty()){
+    std::string error = process(text, value);
+    if (error.empty()){
         SpinLockGuard lg(m_lock);
         m_current = std::move(text);
         m_value = value;
@@ -55,17 +55,17 @@ QString TimeExpressionBaseOption<Type>::set(QString text){
 }
 
 template <typename Type>
-QString TimeExpressionBaseOption<Type>::text() const{
+std::string TimeExpressionBaseOption<Type>::text() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 template <typename Type>
-QString TimeExpressionBaseOption<Type>::time_string() const{
+std::string TimeExpressionBaseOption<Type>::time_string() const{
     SpinLockGuard lg(m_lock);
-    if (!m_error.isEmpty()){
+    if (!m_error.empty()){
         return "<font color=\"red\">" + m_error + "</font>";
     }
-    return QString::fromStdString(NintendoSwitch::ticks_to_time(m_value));
+    return NintendoSwitch::ticks_to_time(m_value);
 }
 
 template <typename Type>
@@ -74,7 +74,7 @@ void TimeExpressionBaseOption<Type>::load_default(const JsonValue& json){
     if (str == nullptr){
         return;
     }
-    m_default = QString::fromStdString(*str);
+    m_default = *str;
     m_error = process(m_current, m_value);
 }
 template <typename Type>
@@ -84,21 +84,21 @@ void TimeExpressionBaseOption<Type>::load_current(const JsonValue& json){
         return;
     }
     SpinLockGuard lg(m_lock);
-    m_current = QString::fromStdString(*str);
+    m_current = *str;
     m_error = process(m_current, m_value);
 }
 template <typename Type>
 JsonValue TimeExpressionBaseOption<Type>::write_default() const{
-    return m_default.toStdString();
+    return m_default;
 }
 template <typename Type>
 JsonValue TimeExpressionBaseOption<Type>::write_current() const{
     SpinLockGuard lg(m_lock);
-    return m_current.toStdString();
+    return m_current;
 }
 
 template <typename Type>
-QString TimeExpressionBaseOption<Type>::check_validity() const{
+std::string TimeExpressionBaseOption<Type>::check_validity() const{
     SpinLockGuard lg(m_lock);
     return m_error;
 }
@@ -111,15 +111,15 @@ void TimeExpressionBaseOption<Type>::restore_defaults(){
 
 
 template <typename Type>
-QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value) const{
-    if (text.isEmpty() || text.isNull()){
+std::string TimeExpressionBaseOption<Type>::process(const std::string& text, Type& value) const{
+    if (text.empty()){
         return "Expression is empty.";
     }
     int32_t parsed;
     try{
         parsed = parse_ticks_i32(text);
     }catch (const ParseException& str){
-        return QString::fromStdString(str.message());
+        return str.message();
     }
     // std::cout << "value = " << parsed << " " << m_min_value << " " << m_max_value << std::endl;
 
@@ -130,7 +130,7 @@ QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value
         return "Overflow: Number is too large.";
     }
     value = (Type)parsed;
-    return QString();
+    return std::string();
 }
 
 

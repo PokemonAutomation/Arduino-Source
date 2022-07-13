@@ -7,13 +7,11 @@
 #ifndef PokemonAutomation_AbstractBotBase_H
 #define PokemonAutomation_AbstractBotBase_H
 
-#include <atomic>
-#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
-
+class Logger;
 struct BotBaseMessage;
 class BotBaseRequest;
 

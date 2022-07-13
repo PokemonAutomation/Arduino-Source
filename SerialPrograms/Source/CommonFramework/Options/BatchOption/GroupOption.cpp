@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 GroupOption::GroupOption(
-    QString label,
+    std::string label,
     bool toggleable,
     bool enabled
 )
@@ -68,7 +68,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
-    m_group_box = new QGroupBox(value.m_label, this);
+    m_group_box = new QGroupBox(QString::fromStdString(value.m_label), this);
     m_group_box->setCheckable(value.m_toggleable);
     m_group_box->setChecked(value.enabled());
     layout->addWidget(m_group_box);

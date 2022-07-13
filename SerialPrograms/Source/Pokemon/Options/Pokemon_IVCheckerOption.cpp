@@ -12,7 +12,7 @@ namespace Pokemon{
 
 
 
-IVCheckerFilterOption::IVCheckerFilterOption(QString label, size_t default_index)
+IVCheckerFilterOption::IVCheckerFilterOption(std::string label, size_t default_index)
     : EnumDropdownOption(
         std::move(label),
         IVCheckerFilter_NAMES,
