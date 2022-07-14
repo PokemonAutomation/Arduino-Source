@@ -49,7 +49,7 @@ int register_message_converters_switch_digit_entry(){
     register_message_converter(
         PABB_MSG_COMMAND_ENTER_DIGITS,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "enter_digits() - ";
             if (body.size() != sizeof(pabb_enter_digits)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_enter_digits*)body.c_str();

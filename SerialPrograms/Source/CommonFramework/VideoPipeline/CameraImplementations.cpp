@@ -72,7 +72,7 @@ std::vector<CameraInfo> get_all_cameras(){
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.get_all_cameras();
 }
-QString get_camera_name(const CameraInfo& info){
+std::string get_camera_name(const CameraInfo& info){
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.get_camera_name(info);
 }

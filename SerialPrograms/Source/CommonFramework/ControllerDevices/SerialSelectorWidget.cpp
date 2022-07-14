@@ -171,7 +171,7 @@ void SerialSelectorWidget::stop(){
 }
 void SerialSelectorWidget::reset(){
     stop();
-    on_ready(false);
+    emit on_ready(false);
     refresh();
     m_connection.reset(m_value.m_port);
 }

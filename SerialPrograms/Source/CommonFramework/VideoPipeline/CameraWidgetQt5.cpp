@@ -26,7 +26,7 @@ namespace CameraQt5QCameraViewfinder{
 std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     return qt5_get_all_cameras();
 }
-QString CameraBackend::get_camera_name(const CameraInfo& info) const{
+std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
     return qt5_get_camera_name(info);
 }
 PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(

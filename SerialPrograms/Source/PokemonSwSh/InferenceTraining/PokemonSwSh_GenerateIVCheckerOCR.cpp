@@ -67,10 +67,10 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor
 void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     IVCheckerReaderScope reader(env.console, LANGUAGE);
 
-    QString path = "IVCheckerOCR/";
-    path += QString::fromStdString(language_data(LANGUAGE).code);
+    std::string path = "IVCheckerOCR/";
+    path += language_data(LANGUAGE).code;
 
-    QDir dir(path);
+    QDir dir(QString::fromStdString(path));
     if (!dir.exists()){
         dir.mkpath(".");
     }
@@ -78,13 +78,13 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseC
 
     std::vector<QImage> images = reader.dump_images(env.console.video().snapshot());
 
-    QString now = QString::fromStdString(now_to_filestring());
-    images[0].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[HP]) + "-" + now + "a.png");
-    images[1].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[ATTACK]) + "-" + now + "b.png");
-    images[2].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[DEFENSE]) + "-" + now + "c.png");
-    images[3].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPATK]) + "-" + now + "d.png");
-    images[4].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPDEF]) + "-" + now + "e.png");
-    images[5].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPEED]) + "-" + now + "f.png");
+    std::string now = now_to_filestring();
+    images[0].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[HP] + "-" + now + "a.png"));
+    images[1].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[ATTACK] + "-" + now + "b.png"));
+    images[2].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[DEFENSE] + "-" + now + "c.png"));
+    images[3].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPATK] + "-" + now + "d.png"));
+    images[4].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPDEF] + "-" + now + "e.png"));
+    images[5].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPEED] + "-" + now + "f.png"));
 
 }
 

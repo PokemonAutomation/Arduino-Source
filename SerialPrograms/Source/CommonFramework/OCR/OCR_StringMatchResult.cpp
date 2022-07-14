@@ -4,7 +4,7 @@
  *
  */
 
-#include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringMatchResult.h"
 
@@ -53,11 +53,7 @@ void StringMatchResult::log(LoggerQt& logger, double max_log10p, const std::stri
         if (results.size() == 1){
             auto iter = results.begin();
             str += iter->second.to_str();
-            str += " (log10p = ";
-            std::stringstream ss;
-            ss << iter->first;
-            str += ss.str();
-            str += ")";
+            str += " (log10p = " + tostr_default(iter->first) +")";
         }else{
             str += "Multiple Candidates =>\n";
             size_t printed = 0;
@@ -66,13 +62,7 @@ void StringMatchResult::log(LoggerQt& logger, double max_log10p, const std::stri
                     str += "    (" + std::to_string(results.size() - 10) + " more...)\n";
                     break;
                 }
-                str += "    ";
-                std::stringstream ss;
-                ss << item.first;
-                str += ss.str();
-                str += " : ";
-                str += item.second.to_str();
-                str += "\n";
+                str += "    " + tostr_default(item.first) + " : " + item.second.to_str() + "\n";
                 printed++;
             }
         }

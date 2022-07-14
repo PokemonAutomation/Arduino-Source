@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <QString>
 #include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
 

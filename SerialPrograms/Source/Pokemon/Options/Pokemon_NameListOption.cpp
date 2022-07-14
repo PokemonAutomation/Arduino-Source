@@ -72,10 +72,10 @@ PokemonNameListFactory::PokemonNameListFactory(
     , m_extra_names(extra_names)
 {}
 
-QStringList PokemonNameListFactory::make_header() const{
-    QStringList list;
-    list << QString::fromStdString(STRING_POKEMON);
-    return list;
+std::vector<std::string> PokemonNameListFactory::make_header() const{
+    return std::vector<std::string>{
+        STRING_POKEMON,
+    };
 }
 std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new PokemonNameListRow(*this));

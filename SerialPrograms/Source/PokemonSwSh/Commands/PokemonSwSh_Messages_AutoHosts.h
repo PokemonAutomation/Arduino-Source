@@ -35,7 +35,7 @@ public:
     }
 #if 0
     virtual std::string to_str() const override{
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "connect_to_internet() - ";
         ss << "seqnum = " << (uint64_t)params.seqnum;
         ss << ", open_ycomm_delay = " << params.open_ycomm_delay;

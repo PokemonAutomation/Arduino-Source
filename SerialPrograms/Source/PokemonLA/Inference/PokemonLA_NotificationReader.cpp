@@ -97,56 +97,6 @@ Notification NotificationReader::detect(const QImage& screen) const{
         return Notification::NOTHING;
     }
 
-
-#if 0
-    const double max_log10p = -8.0;
-
-
-//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-
-    OCR::StringMatchResult results;
-    bool good = false;
-
-    std::vector<uint32_t> filters{
-        0xff808080,
-        0xffa0a0a0,
-    };
-    for (uint32_t filter : filters){
-        Kernels::filter_rgb32_range(
-            image.data(), image.bytes_per_row(), image.width(), image.height(),
-            (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), filter, 0xffffffff, 0xff000000, false
-        );
-
-        QString text = OCR::ocr_read(m_language, image_ocr);
-        results = NotificationOCR::instance().match_substring(m_language, text, 4.0);
-
-        results.clear_beyond_log10p(-2.0);
-        results.log(m_logger, max_log10p);
-
-        //  No reads at all.
-        if (results.results.empty()){
-            continue;
-        }
-
-        //  Ambiguous.
-        if (results.results.size() > 1){
-            m_logger.log("Ambiguous read result.", COLOR_RED);
-            continue;
-        }
-
-        //  Result found!
-        if (results.results.begin()->first < max_log10p){
-            good = true;
-            break;
-        }
-    }
-
-    if (!good){
-        return Notification::NOTHING;
-    }
-#endif
-
 //    cout << results.results.begin()->second.token << endl;
 
     static std::map<std::string, Notification> MAP{

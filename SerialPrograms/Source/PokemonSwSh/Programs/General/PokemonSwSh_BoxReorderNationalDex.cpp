@@ -46,7 +46,7 @@ namespace{
         auto [from_box, from_row, from_column] = get_location(from);
         auto [to_box, to_row, to_column] = get_location(to);
 
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Moving from location index " << from << "(" << from_box << "/" << from_row << "/" << from_column << ")";
         ss << " to location index " << to << "(" << to_box << "/" << to_row << "/" << to_column << ")";
         logger.log(ss.str());
@@ -170,7 +170,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
         uint16_t unsorted_location = it - current_order.begin();
         uint16_t sorted_location = index;
 
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Swapping " << current_order[unsorted_location] << " at location index " << unsorted_location << " and " << current_order[sorted_location] << " at location index " << sorted_location;
         env.console.log(ss.str());
         current_location = move_to_location(env.console, context, current_location, unsorted_location);

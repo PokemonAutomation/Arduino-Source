@@ -34,14 +34,14 @@ std::string current_time_to_str(){
 //    tm utc_tm = *gmtime(&tt);
     tm local_tm = *localtime(&tt);
 
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << local_tm.tm_year + 1900 << '-';
-    ss << to_string_padded(2, local_tm.tm_mon + 1) << '-';
-    ss << to_string_padded(2, local_tm.tm_mday) << ' ';
-    ss << to_string_padded(2, local_tm.tm_hour) << ':';
-    ss << to_string_padded(2, local_tm.tm_min) << ':';
-    ss << to_string_padded(2, local_tm.tm_sec) << '.';
-    ss << to_string_padded(6, micros);
+    ss << tostr_padded(2, local_tm.tm_mon + 1) << '-';
+    ss << tostr_padded(2, local_tm.tm_mday) << ' ';
+    ss << tostr_padded(2, local_tm.tm_hour) << ':';
+    ss << tostr_padded(2, local_tm.tm_min) << ':';
+    ss << tostr_padded(2, local_tm.tm_sec) << '.';
+    ss << tostr_padded(6, micros);
 
     return ss.str();
 }
@@ -51,7 +51,7 @@ std::string current_time_to_str(){
 
 std::mutex logging_lock;
 
-void log(const std::stringstream& ss){
+void log(const std::ostringstream& ss){
     log(ss.str());
 }
 void log(const std::string& msg){

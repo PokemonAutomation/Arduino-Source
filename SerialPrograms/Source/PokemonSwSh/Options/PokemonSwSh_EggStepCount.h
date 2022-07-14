@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -32,7 +31,7 @@ public:
 
 private:
     friend class EggStepCountWidget;
-    QString m_label;
+    std::string m_label;
     const size_t m_default;
     size_t m_current;
 };

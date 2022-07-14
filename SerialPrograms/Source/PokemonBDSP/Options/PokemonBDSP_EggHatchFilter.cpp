@@ -196,10 +196,18 @@ QWidget* EggHatchFilterRow::make_gender_box(QWidget& parent){
 }
 
 
-QStringList EggHatchFilterOptionFactory::make_header() const{
-    QStringList list;
-    list << "Action" << "Shininess" << "HP" << "Attack" << "Defense" << "Sp. Attack" << "Sp. Defense" << "Speed" << "Gender";
-    return list;
+std::vector<std::string> EggHatchFilterOptionFactory::make_header() const{
+    return std::vector<std::string>{
+        "Action",
+        "Shininess",
+        "HP",
+        "Attack",
+        "Defense",
+        "Sp. Attack",
+        "Sp. Defense",
+        "Speed",
+        "Gender",
+    };
 }
 std::unique_ptr<EditableTableRow> EggHatchFilterOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new EggHatchFilterRow());

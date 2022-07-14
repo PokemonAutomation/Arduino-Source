@@ -51,7 +51,7 @@ public:
 private:
     friend class BossActionWidget;
 
-    QString m_label;
+    std::string m_label;
     std::vector<BossFilter> m_list;
 };
 

@@ -306,7 +306,7 @@ void RunnablePanelWidget::load_historical_stats(){
     std::string stats_str;
     if (stats){
         StatSet set;
-        set.open_from_file(QString::fromStdString(GlobalSettings::instance().STATS_FILE));
+        set.open_from_file(GlobalSettings::instance().STATS_FILE);
         const std::string& identifier = instance.descriptor().identifier();
         StatList& list = set[identifier];
         if (list.size() != 0){
@@ -331,7 +331,7 @@ void RunnablePanelWidget::update_historical_stats(){
         }
         m_logger.log("Saving historical stats...");
         ok = StatSet::update_file(
-            QString::fromStdString(GlobalSettings::instance().STATS_FILE),
+            GlobalSettings::instance().STATS_FILE,
             m_instance.descriptor().identifier(),
             *m_current_stats
         );

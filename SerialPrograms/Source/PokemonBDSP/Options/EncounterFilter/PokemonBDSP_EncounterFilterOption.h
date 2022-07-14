@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterFilterOption_H
 #define PokemonAutomation_PokemonBDSP_EncounterFilterOption_H
 
+#include <atomic>
 #include "PokemonBDSP_EncounterFilterOverride.h"
 
 namespace PokemonAutomation{
@@ -30,8 +31,6 @@ public:
 
 private:
     friend class EncounterFilterWidget;
-
-    QString m_label;
 
     const bool m_enable_overrides;
     const bool m_allow_autocatch;

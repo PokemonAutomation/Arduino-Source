@@ -393,10 +393,11 @@ QWidget* CustomPathTableRow::make_action_box(QWidget& parent, PathAction& action
 
 
 
-QStringList CustomPathTableTableFactory::make_header() const{
-    QStringList list;
-    list << "Action" << "Parameters";
-    return list;
+std::vector<std::string> CustomPathTableTableFactory::make_header() const{
+    return std::vector<std::string>{
+        "Action",
+        "Parameters",
+    };
 }
 
 std::unique_ptr<EditableTableRow> CustomPathTableTableFactory::make_row() const{

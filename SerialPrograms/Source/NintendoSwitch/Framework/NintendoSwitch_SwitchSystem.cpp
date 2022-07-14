@@ -28,7 +28,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     , m_console_id(console_id)
     , m_logger_tag("Console " + std::to_string(console_id))
 //    , m_settings_visible(true)
-    , m_serial("<b>Serial Port:</b>", min_pabotbase)
+    , m_serial(min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
     , m_audio()
 {}

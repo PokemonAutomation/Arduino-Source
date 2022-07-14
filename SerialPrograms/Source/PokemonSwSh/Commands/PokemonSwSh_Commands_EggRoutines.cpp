@@ -45,7 +45,7 @@ int register_message_converters_eggs(){
     register_message_converter(
         PABB_MSG_COMMAND_EGG_FETCHER_LOOP,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "eggfetcher_loop() - ";
             if (body.size() != sizeof(pabb_eggfetcher_loop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_eggfetcher_loop*)body.c_str();
@@ -56,7 +56,7 @@ int register_message_converters_eggs(){
     register_message_converter(
         PABB_MSG_COMMAND_MOVE_WHILE_MASHING_B,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "move_while_mashing_B() - ";
             if (body.size() != sizeof(pabb_move_while_mashing_B)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_move_while_mashing_B*)body.c_str();
@@ -68,7 +68,7 @@ int register_message_converters_eggs(){
     register_message_converter(
         PABB_MSG_COMMAND_SPIN_AND_MASH_A,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "spin_and_mash_A() - ";
             if (body.size() != sizeof(pabb_spin_and_mash_A)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_spin_and_mash_A*)body.c_str();
@@ -80,7 +80,7 @@ int register_message_converters_eggs(){
     register_message_converter(
         PABB_MSG_COMMAND_TRAVEL_TO_SPIN_LOCATION,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "travel_to_spin_location() - ";
             if (body.size() != sizeof(pabb_travel_to_spin_location)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_travel_to_spin_location*)body.c_str();
@@ -91,7 +91,7 @@ int register_message_converters_eggs(){
     register_message_converter(
         PABB_MSG_COMMAND_TRAVEL_BACK_TO_LADY,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "travel_back_to_lady() - ";
             if (body.size() != sizeof(pabb_travel_back_to_lady)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_travel_back_to_lady*)body.c_str();

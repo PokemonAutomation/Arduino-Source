@@ -4,8 +4,8 @@
  *
  */
 
-#include <sstream>
 #include <QImage>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -52,19 +52,19 @@ ShinySparkleSetBDSP ShinySparkleSetBDSP::extract_subbox(const ImagePixelBox& sub
     return ret;
 }
 std::string ShinySparkleSetBDSP::to_str() const{
-    std::stringstream ss;
+    std::string str;
     if (m_alpha_overall < 3.0){
-        return "";
+        return str;
     }
-    ss << "SparkleDetector";
+    str += "SparkleDetector";
     if (!balls.empty()){
-        ss << " - Balls: " << balls.size();
+        str += " - Balls: " + std::to_string(balls.size());
     }
     if (!stars.empty()){
-        ss << " - Stars: " << stars.size();
+        str += " - Stars: " + std::to_string(stars.size());
     }
-    ss << " - (alpha = " << m_alpha_overall << ")";
-    return ss.str();
+    str += " - (alpha = " + tostr_default(m_alpha_overall) + ")";
+    return str;
 }
 void ShinySparkleSetBDSP::draw_boxes(
     VideoOverlaySet& overlays,

@@ -8,7 +8,6 @@
 #define PokemonAutomation_FriendCodeList_H
 
 #include <vector>
-#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -17,12 +16,12 @@ namespace NintendoSwitch{
 
 class FriendCodeListOption : public ConfigOption{
 public:
-    FriendCodeListOption(QString label, std::vector<QString> default_lines);
+    FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    static std::vector<uint8_t> parse(const QString& line);
-    const std::vector<QString>& lines() const{ return m_lines; }
+    static std::vector<uint8_t> parse(const std::string& line);
+    const std::vector<std::string>& lines() const{ return m_lines; }
 
     std::vector<std::string> list() const;
 
@@ -32,9 +31,9 @@ public:
 
 private:
     friend class FriendCodeListWidget;
-    QString m_label;
-    std::vector<QString> m_default;
-    std::vector<QString> m_lines;
+    std::string m_label;
+    std::vector<std::string> m_default;
+    std::vector<std::string> m_lines;
 };
 
 

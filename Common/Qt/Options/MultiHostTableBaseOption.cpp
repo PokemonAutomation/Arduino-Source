@@ -265,14 +265,33 @@ QWidget* MultiHostSlot::make_delay_box(QWidget& parent){
 MultiHostSlotOptionFactory::MultiHostSlotOptionFactory(bool raid_code_option)
     : m_raid_code_option(raid_code_option)
 {}
-QStringList MultiHostSlotOptionFactory::make_header() const{
-    QStringList list;
-    list << "Game" << "User" << "Skips" << "Backup Save" << "Always Catchable";
+std::vector<std::string> MultiHostSlotOptionFactory::make_header() const{
     if (m_raid_code_option){
-        list << "Use Raid Code";
+        return std::vector<std::string>{
+            "Game",
+            "User",
+            "Skips",
+            "Backup Save",
+            "Always Catchable",
+            "Use Raid Code",
+            "Accept FRs",
+            "1st Move",
+            "Dynamax",
+            "Post Raid Delay",
+        };
+    }else{
+        return std::vector<std::string>{
+            "Game",
+            "User",
+            "Skips",
+            "Backup Save",
+            "Always Catchable",
+            "Accept FRs",
+            "1st Move",
+            "Dynamax",
+            "Post Raid Delay",
+        };
     }
-    list << "Accept FRs" << "1st Move" << "Dynamax" << "Post Raid Delay";
-    return list;
 }
 std::unique_ptr<EditableTableRow> MultiHostSlotOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new MultiHostSlot(m_raid_code_option));

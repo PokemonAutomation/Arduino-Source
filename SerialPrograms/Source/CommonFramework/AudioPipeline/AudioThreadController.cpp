@@ -4,19 +4,16 @@
  *
  */
 
+#include <iostream>
+#include <QIODevice>
+#include <QThread>
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioConstants.h"
 #include "AudioDisplayWidget.h"
 #include "AudioInfo.h"
 #include "AudioWorker.h"
 #include "AudioThreadController.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/LoggerQt.h"
-
-#include <QIODevice>
-#include <QThread>
-#include <QString>
-
-#include <iostream>
 
 namespace PokemonAutomation{
 

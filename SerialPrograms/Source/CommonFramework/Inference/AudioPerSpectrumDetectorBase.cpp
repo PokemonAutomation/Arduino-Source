@@ -4,10 +4,9 @@
  *
  */
 
-#include <QString>
-#include <sstream>
 #include <cfloat>
-
+#include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
@@ -52,12 +51,10 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
 }
 
 void AudioPerSpectrumDetectorBase::log_results(){
-    std::stringstream ss;
-    ss << m_lowest_error;
     if (m_last_timestamp != WallClock::min()){
-        m_console.log(m_audio_name + " detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
+        m_console.log(m_audio_name + " detected! Error Coefficient = " + tostr_default(m_lowest_error), COLOR_BLUE);
     }else{
-        m_console.log(m_audio_name + " not detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
+        m_console.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
 }
 

@@ -28,7 +28,7 @@ int register_message_converters_pokemon_misc(){
     register_message_converter(
         PABB_MSG_COMMAND_MASH_A,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "mash_A() - ";
             if (body.size() != sizeof(pabb_mashA)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_mashA*)body.c_str();
@@ -40,7 +40,7 @@ int register_message_converters_pokemon_misc(){
     register_message_converter(
         PABB_MSG_COMMAND_IOA_BACKOUT,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "IoA_backout() - ";
             if (body.size() != sizeof(pabb_IoA_backout)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_IoA_backout*)body.c_str();

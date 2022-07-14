@@ -63,7 +63,7 @@ signals:
 
 private:
     void refresh();
-    static QString aspect_ratio(const QSize& size);
+    static std::string aspect_ratio(const QSize& size);
 
 private:
     LoggerQt& m_logger;

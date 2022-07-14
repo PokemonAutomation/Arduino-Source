@@ -9,7 +9,6 @@
 
 #include <string>
 #include <set>
-#include <QString>
 #include "PokemonSwSh_TypeMatchup.h"
 
 namespace PokemonAutomation{

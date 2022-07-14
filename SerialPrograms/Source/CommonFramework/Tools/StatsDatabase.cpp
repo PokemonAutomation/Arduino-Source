@@ -130,14 +130,14 @@ std::string StatSet::to_str() const{
     return str;
 }
 
-void StatSet::save_to_file(const QString& filepath){
-    QFile file(filepath);
+void StatSet::save_to_file(const std::string& filepath){
+    QFile file(QString::fromStdString(filepath));
     file.open(QIODevice::WriteOnly);
     std::string data = to_str();
     file.write(data.c_str(), data.size());
 }
-void StatSet::open_from_file(const QString& filepath){
-    QFile file(filepath);
+void StatSet::open_from_file(const std::string& filepath){
+    QFile file(QString::fromStdString(filepath));
     if (!file.open(QIODevice::ReadOnly)){
         return;
     }
@@ -147,11 +147,11 @@ void StatSet::open_from_file(const QString& filepath){
 }
 
 bool StatSet::update_file(
-    const QString& filepath,
+    const std::string& filepath,
     const std::string& identifier,
     StatsTracker& tracker
 ){
-    QFile file(filepath);
+    QFile file(QString::fromStdString(filepath));
     while (!file.open(QIODevice::ReadWrite)){
         return false;
     }

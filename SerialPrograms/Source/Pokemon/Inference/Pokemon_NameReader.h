@@ -26,14 +26,6 @@ public:
 public:
     static const PokemonNameReader& instance();
 
-#if 0
-    OCR::StringMatchResult read_substring(
-        LoggerQt& logger,
-        Language language,
-        const ConstImageRef& image
-    ) const;
-#endif
-
     OCR::StringMatchResult read_substring(
         LoggerQt& logger,
         Language language,

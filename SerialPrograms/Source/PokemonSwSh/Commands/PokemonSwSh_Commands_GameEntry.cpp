@@ -162,7 +162,7 @@ int register_message_converters_pokemon_game_entry(){
     register_message_converter(
         PABB_MSG_COMMAND_FAST_RESET_GAME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "fast_reset_game() - ";
             if (body.size() != sizeof(pabb_fast_reset_game)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_fast_reset_game*)body.c_str();
@@ -177,7 +177,7 @@ int register_message_converters_pokemon_game_entry(){
     register_message_converter(
         PABB_MSG_COMMAND_SETTINGS_TO_ENTER_GAME_DEN_LOBBY,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "settings_to_enter_game_den_lobby() - ";
             if (body.size() != sizeof(pabb_settings_to_enter_game_den_lobby)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_settings_to_enter_game_den_lobby*)body.c_str();
@@ -192,7 +192,7 @@ int register_message_converters_pokemon_game_entry(){
     register_message_converter(
         PABB_MSG_COMMAND_ENTER_GAME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "start_game_from_home() - ";
             if (body.size() != sizeof(pabb_enter_game)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_enter_game*)body.c_str();

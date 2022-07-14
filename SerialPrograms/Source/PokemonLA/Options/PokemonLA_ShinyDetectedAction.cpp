@@ -84,7 +84,7 @@ bool on_shiny_callback(
     float error_coefficient
 ){
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
         console.log(ss.str(), COLOR_BLUE);
 
@@ -100,10 +100,8 @@ bool on_shiny_callback(
 
     std::vector<std::pair<std::string, std::string>> embeds;
 
-    std::stringstream ss;
-    ss << "Error Coefficient: ";
-    ss << error_coefficient;
-    ss << "\n(Shiny may not be visible on the screen.)";
+    std::ostringstream ss;
+    ss << "Error Coefficient: " << error_coefficient << "\n(Shiny may not be visible on the screen.)";
     embeds.emplace_back("Detection Results", ss.str());
 
     const StatsTracker* current_stats = env.current_stats();
@@ -130,7 +128,7 @@ void on_shiny_sound(
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
 
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << "Error Coefficient: ";
     ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";

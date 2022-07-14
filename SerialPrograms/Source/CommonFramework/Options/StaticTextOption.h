@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_StaticTextOption_H
 #define PokemonAutomation_StaticTextOption_H
 
-#include <QString>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{

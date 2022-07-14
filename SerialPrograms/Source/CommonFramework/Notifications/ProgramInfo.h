@@ -8,7 +8,6 @@
 #define PokemonAutomation_ProgramInfo_H
 
 #include <string>
-#include <QString>
 #include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QString>
 #include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"

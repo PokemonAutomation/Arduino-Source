@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
@@ -134,12 +135,12 @@ void OverworldTargetTracker::populate_targets(
 bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>::iterator target){
 #if 1
     m_logger.log(
-        QString("Best Target: ") +
+        std::string("Best Target: ") +
         (target->second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
         " at [" +
-        QString::number(target->second.delta_x) + " , " +
-        QString::number(-target->second.delta_y) + "], alpha = " +
-        QString::number(target->first),
+        tostr_default(target->second.delta_x) + " , " +
+        tostr_default(-target->second.delta_y) + "], alpha = " +
+        tostr_default(target->first),
         COLOR_ORANGE
     );
 #endif

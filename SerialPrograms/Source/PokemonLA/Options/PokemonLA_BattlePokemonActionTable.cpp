@@ -94,12 +94,18 @@ std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
 
 
 
-QStringList BattlePokemonActionTableFactory::make_header() const{
-    QStringList list;
-    list << "Move 1 Style" << "Move 2 Style" << "Move 3 Style" << "Move 4 Style" << 
-        "Switch " + QString::fromStdString(STRING_POKEMON) << "Num Turns to Switch" <<
-        "Limit Move Attempts" << "Max Move Attempts";
-    return list;
+std::vector<std::string> BattlePokemonActionTableFactory::make_header() const{
+    return std::vector<std::string>{
+        "Move 1 Style",
+        "Move 2 Style",
+        "Move 3 Style",
+        "Move 4 Style",
+        "Switch ",
+        STRING_POKEMON,
+        "Num Turns to Switch",
+        "Limit Move Attempts",
+        "Max Move Attempts",
+    };
 }
 
 std::unique_ptr<EditableTableRow> BattlePokemonActionTableFactory::make_row() const{
@@ -208,10 +214,10 @@ std::vector<QWidget*> OneMoveBattlePokemonActionRow::make_widgets(QWidget& paren
 
 
 
-QStringList OneMoveBattlePokemonActionTableFactory::make_header() const{
-    QStringList list;
-    list << "Move Style";
-    return list;
+std::vector<std::string> OneMoveBattlePokemonActionTableFactory::make_header() const{
+    return std::vector<std::string>{
+        "Move Style",
+    };
 }
 
 std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionTableFactory::make_row() const{
@@ -314,10 +320,13 @@ std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent){
     return widgets;
 }
 
-QStringList MoveGrinderActionTableFactory::make_header() const{
-    QStringList list;
-    list << "Pokemon index" << "Move index" << "Move Style" << "Move Attempts";
-    return list;
+std::vector<std::string> MoveGrinderActionTableFactory::make_header() const{
+    return std::vector<std::string>{
+        "Pokemon index",
+        "Move index",
+        "Move Style",
+        "Move Attempts",
+    };
 }
 
 std::unique_ptr<EditableTableRow> MoveGrinderActionTableFactory::make_row() const{

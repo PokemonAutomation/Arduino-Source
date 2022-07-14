@@ -18,6 +18,8 @@ const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE;
 const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "u";
 #endif
 
+const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";
+
 const std::string DISCORD_LINK = "discord.gg/PokemonAutomation";
 const std::string DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";
 const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";

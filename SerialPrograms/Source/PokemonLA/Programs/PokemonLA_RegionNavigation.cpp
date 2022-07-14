@@ -330,7 +330,7 @@ void goto_camp_from_overworld(
                 {{detector}}
             );
             if (ret < 0){
-                dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
+//                dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
                 console.log("Map not detected after 5 seconds.", COLOR_RED);
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
                 context.wait_for_all_requests();
@@ -381,8 +381,10 @@ void goto_camp_from_overworld(
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
-void goto_any_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-                                  const TravelLocation& location){
+void goto_any_camp_from_overworld(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    const TravelLocation& location
+){
 
     auto start = current_time();
     std::chrono::seconds grace_period(0);
@@ -410,7 +412,7 @@ void goto_any_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& consol
                 {{detector}}
             );
             if (ret < 0){
-                dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
+//                dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
                 throw OperationFailedException(console, "Map not detected after 5 seconds.");
             }
             console.log("Found map!");

@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
@@ -249,12 +250,12 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         }
         if (target.first > MAX_TARGET_ALPHA){
             console.log(
-                QString("Target too Weak: ") +
+                std::string("Target too Weak: ") +
                 (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
                 " at [" +
-                QString::number(target.second.delta_x) + " , " +
-                QString::number(-target.second.delta_y) + "], alpha = " +
-                QString::number(target.first),
+                tostr_default(target.second.delta_x) + " , " +
+                tostr_default(-target.second.delta_y) + "], alpha = " +
+                tostr_default(target.first),
                 COLOR_ORANGE
             );
             continue;
@@ -273,12 +274,12 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 ) const{
     InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
     console.log(
-        QString("Best Target: ") +
+        std::string("Best Target: ") +
         (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
         " at [" +
-        QString::number(target.second.delta_x) + " , " +
-        QString::number(-target.second.delta_y) + "], alpha = " +
-        QString::number(target.first),
+        tostr_default(target.second.delta_x) + " , " +
+        tostr_default(-target.second.delta_y) + "], alpha = " +
+        tostr_default(target.first),
         COLOR_PURPLE
     );
 
@@ -288,8 +289,8 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         (double)trajectory.joystick_x - 128
     ) * 57.295779513082320877;
     console.log(
-        "Trajectory: Distance = " + QString::number(trajectory.distance_in_ticks) +
-        ", Direction = " + QString::number(-angle) + " degrees"
+        "Trajectory: Distance = " + std::to_string(trajectory.distance_in_ticks) +
+        ", Direction = " + tostr_default(-angle) + " degrees"
     );
 
     int duration = trajectory.distance_in_ticks + 16;

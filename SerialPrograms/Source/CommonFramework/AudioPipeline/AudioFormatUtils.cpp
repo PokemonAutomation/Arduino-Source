@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 #if QT_VERSION_MAJOR == 5
 
 std::string dumpAudioFormat(const QAudioFormat& format){
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << "Audio format: sample type ";
     switch(format.sampleType()){
         case QAudioFormat::SampleType::Float:
@@ -137,7 +137,7 @@ std::string dumpAudioFormat(const QAudioFormat& format){
         default:
             channelConfigStr = "Non Mono or Stereo";
     }
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << "sample format " << sampleFormatStr << 
         ", bytes per sample " << format.bytesPerSample() << 
         ", channel config " << channelConfigStr <<

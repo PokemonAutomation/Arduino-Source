@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "FloatingPointBaseOption.h"
 
@@ -66,14 +67,12 @@ std::string FloatingPointBaseOption::check_validity() const{
 }
 std::string FloatingPointBaseOption::check_validity(double x) const{
     if (x < m_min_value){
-        std::stringstream ss;
-        ss << "Value too small: min = " << m_min_value << ", value = " << x;
-        return ss.str();
+        std::ostringstream ss;
+        return "Value too small: min = " + tostr_default(m_min_value) + ", value = " + tostr_default(x);
     }
     if (x > m_max_value){
-        std::stringstream ss;
-        ss << "Value too large: max = " << m_max_value << ", value = " << x;
-        return ss.str();
+        std::ostringstream ss;
+        return "Value too large: max = " + tostr_default(m_max_value) + ", value = " + tostr_default(x);
     }
     if (std::isnan(x)){
         return "Value is NaN";

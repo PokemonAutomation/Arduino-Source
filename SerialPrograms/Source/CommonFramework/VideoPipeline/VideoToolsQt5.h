@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 
 std::vector<CameraInfo> qt5_get_all_cameras();
-QString qt5_get_camera_name(const CameraInfo& info);
+std::string qt5_get_camera_name(const CameraInfo& info);
 
 
 

@@ -120,9 +120,9 @@ MaxLairMove parse_move(JsonObject&& obj, const std::string& path){
     move.slug               = obj.get_string_throw("move", path);
     move.category           = parse_category_slug(obj.get_string_throw("category", path));
     move.type               = parse_type_slug(obj.get_string_throw("type", path));
-    move.base_power         = obj.get_integer_throw("base_power", path);
+    move.base_power         = (uint8_t)obj.get_integer_throw("base_power", path);
     move.accuracy           = obj.get_double_throw("accuracy", path);
-    move.PP                 = obj.get_integer_throw("PP", path);
+    move.PP                 = (uint8_t)obj.get_integer_throw("PP", path);
     move.spread             = obj.get_boolean_throw("spread", path);
     move.correction_factor  = obj.get_double_throw("correction_factor", path);
     move.effective_power    = obj.get_double_throw("effective_power", path);
@@ -166,7 +166,7 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements: " + slug, std::move(path));
             }
             for (int c = 0; c < 6; c++){
-                mon.base_stats[c] = array[c].get_integer_throw(filepath);
+                mon.base_stats[c] = (uint8_t)array[c].get_integer_throw(filepath);
             }
         }
         {

@@ -21,7 +21,7 @@ class FileWindowLoggerWindow;
 
 class FileWindowLogger : public LoggerQt{
 public:
-    FileWindowLogger(const QString& path);
+    FileWindowLogger(const std::string& path);
 
     void operator+=(FileWindowLoggerWindow& widget);
     void operator-=(FileWindowLoggerWindow& widget);
@@ -31,7 +31,6 @@ public:
     virtual void log(const QString& msg, Color color = Color()) override;
 
 private:
-
     static std::string normalize_newlines(const std::string& msg);
     static std::string to_file_str(const std::string& msg);
     static QString to_window_str(const std::string& msg, Color color);

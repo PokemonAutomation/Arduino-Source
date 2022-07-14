@@ -15,7 +15,6 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/SleepyDiscordRunner.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "ProgramNotifications.h"
 
 #ifdef PA_OFFICIAL
@@ -27,7 +26,6 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-    using namespace Pokemon;
 
 
 void send_program_notification(
@@ -63,8 +61,8 @@ void send_program_notification(
         {
             JsonObject field;
             field["name"] = PreloadSettings::instance().DEVELOPER_MODE
-                ? Pokemon::STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
-                : Pokemon::STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
+                ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
+                : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")";
             std::string text = info.program_name;
             if (info.start_time != WallClock::min()){
                 text += "\nUp Time: ";
@@ -152,8 +150,8 @@ void send_program_telemetry(
         {
             JsonObject field;
             field["name"] = PreloadSettings::instance().DEVELOPER_MODE
-                ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
-                : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
+                ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
+                : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")";
             field["value"] = info.program_name.empty() ? "(unknown)" : info.program_name;
             fields.push_back(std::move(field));
         }
@@ -179,19 +177,17 @@ void send_program_telemetry(
 //    jsonContent["content"] = "asdf";
     jsonContent["embeds"] = std::move(embeds);
 
-    QString url = QString::fromStdString(
-        is_error
+    std::string url = is_error
             ? flip(ERROR_REPORTING_URL, sizeof(ERROR_REPORTING_URL))
-            : flip(TELEMETRY_URL, sizeof(TELEMETRY_URL))
-    );
+            : flip(TELEMETRY_URL, sizeof(TELEMETRY_URL));
 
     using namespace Integration::DiscordWebhook;
 
     DiscordWebhookSender& sender = DiscordWebhookSender::instance();
     if (hasFile){
-        sender.send_json(logger, url, jsonContent, pending);
+        sender.send_json(logger, QString::fromStdString(url), jsonContent, pending);
     }else{
-        sender.send_json(logger, url, jsonContent, nullptr);
+        sender.send_json(logger, QString::fromStdString(url), jsonContent, nullptr);
     }
 #endif
 }

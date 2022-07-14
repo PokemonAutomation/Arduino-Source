@@ -63,7 +63,7 @@ public:
 class MultiHostSlotOptionFactory : public EditableTableFactory{
 public:
     MultiHostSlotOptionFactory(bool raid_code_option);
-    virtual QStringList make_header() const override;
+    virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() const override;
 private:
     bool m_raid_code_option;

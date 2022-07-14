@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -97,9 +98,9 @@ ShinyType determine_shiny_status(
     double best_square = sparkles.best_square();
 
     logger.log(
-        "ShinyDetector: Overall Alpha = " + QString::number(alpha) +
-        ", Star Alpha = " + QString::number(best_star) +
-        ", Square Alpha = " + QString::number(best_square),
+        "ShinyDetector: Overall Alpha = " + tostr_default(alpha) +
+        ", Star Alpha = " + tostr_default(best_star) +
+        ", Square Alpha = " + tostr_default(best_square),
         COLOR_PURPLE
     );
 

@@ -33,7 +33,7 @@ private:
 
 
 
-FriendCodeListOption::FriendCodeListOption(QString label, std::vector<QString> default_lines)
+FriendCodeListOption::FriendCodeListOption(std::string label, std::vector<std::string> default_lines)
     : m_label(std::move(label))
     , m_default(std::move(default_lines))
     , m_lines(m_default)
@@ -50,13 +50,13 @@ void FriendCodeListOption::load_json(const JsonValue& json){
         if (str == nullptr || str->empty()){
             continue;
         }
-        m_lines.emplace_back(QString::fromStdString(*str));
+        m_lines.emplace_back(*str);
     }
 }
 JsonValue FriendCodeListOption::to_json() const{
     JsonArray list;
-    for (const QString& line : m_lines){
-        list.push_back(line.toStdString());
+    for (const std::string& line : m_lines){
+        list.push_back(line);
     }
     return list;
 }
@@ -69,11 +69,11 @@ ConfigWidget* FriendCodeListOption::make_ui(QWidget& parent){
 
 
 
-std::vector<uint8_t> FriendCodeListOption::parse(const QString& line){
+std::vector<uint8_t> FriendCodeListOption::parse(const std::string& line){
     std::vector<uint8_t> code;
-    for (QChar ch : line){
+    for (char ch : line){
         if ('0' <= ch && ch <= '9'){
-            code.emplace_back((uint8_t)ch.unicode());
+            code.emplace_back(ch);
         }
     }
     return code;
@@ -111,9 +111,9 @@ public:
 
     void redraw(){
         this->clear();
-        for (const QString& line : m_parent.m_value.m_lines){
+        for (const std::string& line : m_parent.m_value.m_lines){
             if (FriendCodeListOption::parse(line).size() == 12){
-                this->append(line);
+                this->append(QString::fromStdString(line));
             }else{
 //                this->append("<font color=\"red\">" + line + "</font>");
             }
@@ -121,9 +121,9 @@ public:
     }
     void update_backing(){
         m_parent.m_value.m_lines.clear();
-        QString body = this->toPlainText();
-        QString line;
-        for (QChar ch : body){
+        std::string body = this->toPlainText().toStdString();
+        std::string line;
+        for (char ch : body){
             if (ch == '\n'){
                 m_parent.m_value.m_lines.emplace_back(std::move(line));
                 line.clear();
@@ -153,7 +153,7 @@ FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    QLabel* label = new QLabel(value.m_label, this);
+    QLabel* label = new QLabel(QString::fromStdString(value.m_label), this);
     label->setWordWrap(true);
     layout->addWidget(label);
     m_box = new Box(*this);

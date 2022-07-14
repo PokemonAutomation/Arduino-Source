@@ -9,7 +9,6 @@
 
 #include <deque>
 #include <map>
-#include <QString>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"

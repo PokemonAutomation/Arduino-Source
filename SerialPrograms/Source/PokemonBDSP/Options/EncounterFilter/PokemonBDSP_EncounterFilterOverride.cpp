@@ -237,14 +237,21 @@ QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
 EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool allow_autocatch)
     : m_allow_autocatch(allow_autocatch)
 {}
-QStringList EncounterFilterOptionFactory::make_header() const{
-    QStringList list;
+std::vector<std::string> EncounterFilterOptionFactory::make_header() const{
     if (m_allow_autocatch){
-        list << "Action" << QString::fromStdString(STRING_POKEBALL) << QString::fromStdString(STRING_POKEMON) << "Shininess";
+        return std::vector<std::string>{
+            "Action",
+            STRING_POKEBALL,
+            STRING_POKEMON,
+            "Shininess",
+        };
     }else{
-        list << "Action" << QString::fromStdString(STRING_POKEMON) << "Shininess";
+        return std::vector<std::string>{
+            "Action",
+            STRING_POKEMON,
+            "Shininess",
+        };
     }
-    return list;
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(m_allow_autocatch));

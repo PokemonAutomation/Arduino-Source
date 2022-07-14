@@ -67,7 +67,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_HOME_TO_DATE_TIME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "home_to_date_time() - ";
             if (body.size() != sizeof(pabb_home_to_date_time)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_home_to_date_time*)body.c_str();
@@ -80,7 +80,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "neutral_date_skip() - ";
             if (body.size() != sizeof(pabb_neutral_date_skip)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_neutral_date_skip*)body.c_str();
@@ -91,7 +91,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "roll_date_forward_1() - ";
             if (body.size() != sizeof(pabb_roll_date_forward_1)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_roll_date_forward_1*)body.c_str();
@@ -103,7 +103,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_ROLL_DATE_BACKWARD_N,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "roll_date_backward_N() - ";
             if (body.size() != sizeof(pabb_roll_date_backward_N)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_roll_date_backward_N*)body.c_str();
@@ -116,7 +116,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_HOME_ROLL_DATE_ENTER_GAME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "home_roll_date_enter_game() - ";
             if (body.size() != sizeof(pabb_home_roll_date_enter_game)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_home_roll_date_enter_game*)body.c_str();
@@ -128,7 +128,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "home_roll_date_enter_game_autorollback() - ";
             if (body.size() != sizeof(pabb_touch_date_from_home)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_touch_date_from_home*)body.c_str();
@@ -139,7 +139,7 @@ int register_message_converters_pokemon_date_spam(){
     register_message_converter(
         PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "rollback_hours_from_home() - ";
             if (body.size() != sizeof(pabb_rollback_hours_from_home)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_rollback_hours_from_home*)body.c_str();

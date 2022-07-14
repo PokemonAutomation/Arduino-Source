@@ -348,7 +348,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
             target_sprites.size() << endl;
         return 1;
     }
-    
+
     static int count = 0;
     QImage output_sprite = sprite_image;
     QImage output_quest = question_mark_image;

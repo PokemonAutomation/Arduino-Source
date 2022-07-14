@@ -73,7 +73,7 @@ public:
 class EncounterFilterOptionFactory : public EditableTableFactory{
 public:
     EncounterFilterOptionFactory(bool allow_autocatch);
-    virtual QStringList make_header() const override;
+    virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() const override;
 private:
     bool m_allow_autocatch;

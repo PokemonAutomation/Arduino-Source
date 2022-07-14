@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 class EncounterFilterOptionFactory : public EditableTableFactory{
 public:
     EncounterFilterOptionFactory(bool rare_stars);
-    virtual QStringList make_header() const override;
+    virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() const override;
 private:
     bool m_rare_stars;
@@ -29,10 +29,13 @@ private:
 EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool rare_stars)
     : m_rare_stars(rare_stars)
 {}
-QStringList EncounterFilterOptionFactory::make_header() const{
-    QStringList list;
-    list << "Action" << QString::fromStdString(STRING_POKEBALL) << QString::fromStdString(STRING_POKEMON) << "Shininess";
-    return list;
+std::vector<std::string> EncounterFilterOptionFactory::make_header() const{
+    return std::vector<std::string>{
+        "Action",
+        STRING_POKEBALL,
+        STRING_POKEMON,
+        "Shininess",
+    };
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(m_rare_stars));
@@ -48,8 +51,7 @@ const EncounterFilterOptionFactory ENCOUNTER_FILTER_RARE(true);
 EncounterFilterOption::~EncounterFilterOption(){
 }
 EncounterFilterOption::EncounterFilterOption(bool rare_stars, bool enable_overrides)
-    : m_label("<b>Encounter Filter:</b>")
-    , m_rare_stars(rare_stars)
+    : m_rare_stars(rare_stars)
     , m_enable_overrides(enable_overrides)
     , m_shiny_filter_default(ShinyFilter::ANY_SHINY)
     , m_shiny_filter_current(m_shiny_filter_default)

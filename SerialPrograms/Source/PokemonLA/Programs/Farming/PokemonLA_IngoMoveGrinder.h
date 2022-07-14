@@ -42,8 +42,8 @@ private:
     void go_to_next_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     size_t get_next_move_to_switch_to() const;
     size_t get_next_pokemon_to_switch_to() const;
-    QString debug_current_info() const;
-    QString debug_move_attempts_info() const;
+    std::string debug_current_info() const;
+    std::string debug_move_attempts_info() const;
     class Stats;
 
     EnumDropdownOption OPPONENT;

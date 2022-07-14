@@ -250,15 +250,15 @@ int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
     ocr_text = to_utf8(OCR::run_character_reductions(to_utf32(ocr_text)));
     int8_t pp = parse_pp(ocr_text);
 
-    QString str;
+    std::string str;
     str += "OCR Result: \"";
-    for (QChar ch : ocr_text){
+    for (char ch : ocr_text){
         if (ch != '\r' && ch != '\n'){
             str += ch;
         }
     }
     str += "\" -> (";
-    str += pp < 0 ? "? PP)" : QString::number((int)pp) + " PP)";
+    str += pp < 0 ? "? PP)" : std::to_string((int)pp) + " PP)";
     logger.log(str, pp < 0 ? COLOR_RED : COLOR_BLUE);
 
     return pp;

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_StatsDatabase_H
 #define PokemonAutomation_StatsDatabase_H
 
-#include <QString>
 #include "StatsTracking.h"
 
 namespace PokemonAutomation{
@@ -54,11 +53,11 @@ public:
 
     std::string to_str() const;
 
-    void save_to_file(const QString& filepath);
-    void open_from_file(const QString& filepath);
+    void save_to_file(const std::string& filepath);
+    void open_from_file(const std::string& filepath);
 
     static bool update_file(
-        const QString& filepath,
+        const std::string& filepath,
         const std::string& identifier,
         StatsTracker& tracker
     );

@@ -20,8 +20,8 @@ namespace OCR{
 
 
 
-std::string extract_name(const QString& filename){
-    std::string name = filename.toUtf8().data();
+std::string extract_name(const std::string& filename){
+    std::string name = filename;
     while (!name.empty()){
         char ch = name.back();
         name.pop_back();
@@ -77,7 +77,7 @@ TrainingSession::TrainingSession(
 //                QString file = iter.next();
                 m_samples[language].emplace_back(
                     TrainingSample{
-                        OCR::extract_name(iter1.fileName()),
+                        OCR::extract_name(iter1.fileName().toStdString()),
                         (folder + iter1.fileName()).toStdString()
                     }
                 );

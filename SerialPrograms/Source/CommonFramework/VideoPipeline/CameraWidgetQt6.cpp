@@ -31,11 +31,11 @@ std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     }
     return ret;
 }
-QString CameraBackend::get_camera_name(const CameraInfo& info) const{
+std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
-            return camera.description();
+            return camera.description().toStdString();
         }
     }
     std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;

@@ -13,13 +13,13 @@ namespace PokemonAutomation{
 
 
 LoggerQt& global_logger_raw(){
-    static FileWindowLogger logger(QCoreApplication::applicationName() + ".log");
+    static FileWindowLogger logger((QCoreApplication::applicationName() + ".log").toStdString());
     return logger;
 }
 
 
-FileWindowLogger::FileWindowLogger(const QString& path)
-    : m_file(path)
+FileWindowLogger::FileWindowLogger(const std::string& path)
+    : m_file(QString::fromStdString(path))
 {
     bool exists = m_file.exists();
     m_file.open(QIODevice::WriteOnly | QIODevice::Append);

@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -150,9 +149,7 @@ void send_encounter_notification(
     }
     if (!shinies.empty()){
         if (!std::isnan(alpha)){
-            std::stringstream ss;
-            ss << "\n(Detection Alpha = " << alpha << ")";
-            shinies += ss.str();
+            shinies += "\n(Detection Alpha = " + tostr_default(alpha) + ")";
         }
         embeds.emplace_back("Shininess", std::move(shinies));
     }

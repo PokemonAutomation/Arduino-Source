@@ -103,9 +103,9 @@ SwitchSystemWidget::SwitchSystemWidget(
                 if (image.isNull()){
                     return;
                 }
-                QString filename = QString::fromStdString("screenshot-" + now_to_filestring() + ".png");
+                std::string filename = "screenshot-" + now_to_filestring() + ".png";
                 m_logger.log("Saving screenshot to: " + filename, COLOR_PURPLE);
-                image.save(filename);
+                image.save(QString::fromStdString(filename));
             });
         }
     );

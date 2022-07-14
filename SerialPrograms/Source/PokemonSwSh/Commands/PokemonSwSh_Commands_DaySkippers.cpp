@@ -61,7 +61,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_INIT_VIEW,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_init_view() - ";
             if (body.size() != sizeof(pabb_skipper_init_view)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_init_view*)body.c_str();
@@ -72,7 +72,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_AUTO_RECOVERY,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_auto_recovery() - ";
             if (body.size() != sizeof(pabb_skipper_auto_recovery)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_auto_recovery*)body.c_str();
@@ -83,7 +83,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_FULL,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_rollback_year_full() - ";
             if (body.size() != sizeof(pabb_skipper_rollback_year_full)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_rollback_year_full*)body.c_str();
@@ -95,7 +95,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_SYNC,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_rollback_year_sync() - ";
             if (body.size() != sizeof(pabb_skipper_rollback_year_sync)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_rollback_year_sync*)body.c_str();
@@ -106,7 +106,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_INCREMENT_DAY,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_increment_day() - ";
             if (body.size() != sizeof(pabb_skipper_increment_day)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_increment_day*)body.c_str();
@@ -118,7 +118,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_INCREMENT_MONTH,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_increment_month() - ";
             if (body.size() != sizeof(pabb_skipper_increment_month)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_increment_month*)body.c_str();
@@ -130,7 +130,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_increment_all() - ";
             if (body.size() != sizeof(pabb_skipper_increment_all)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_increment_all*)body.c_str();
@@ -141,7 +141,7 @@ int register_message_converters_pokemon_skippers(){
     register_message_converter(
         PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL_ROLLBACK,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "skipper_increment_all_rollback() - ";
             if (body.size() != sizeof(pabb_skipper_increment_all_rollback)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_skipper_increment_all_rollback*)body.c_str();

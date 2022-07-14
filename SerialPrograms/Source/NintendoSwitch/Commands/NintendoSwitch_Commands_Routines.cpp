@@ -27,7 +27,7 @@ int register_message_converters_routines(){
     register_message_converter(
         PABB_MSG_COMMAND_CLOSE_GAME,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "close_game() - ";
             if (body.size() != sizeof(pabb_close_game)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_close_game*)body.c_str();

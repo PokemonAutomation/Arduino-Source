@@ -34,7 +34,10 @@ EditableTableBaseWidget::EditableTableBaseWidget(QWidget& parent, EditableTableB
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
 
-    QStringList header = m_value.m_factory.make_header();
+    QStringList header;
+    for (const std::string& name : m_value.m_factory.make_header()){
+        header << QString::fromStdString(name);
+    }
     header << "" << "";
     m_table->setColumnCount(header.size());
     m_table->setHorizontalHeaderLabels(header);

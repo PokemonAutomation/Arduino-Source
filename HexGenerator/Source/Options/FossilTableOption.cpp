@@ -64,7 +64,7 @@ std::string FossilTable::to_cpp() const{
         str += ", ";
         str += std::to_string(item.user_slot);
         str += ", ";
-        str += FossilGame::FOSSIL_LIST[item.fossil].toUtf8().data();
+        str += FossilGame::FOSSIL_LIST[item.fossil];
         str += ", ";
         str += std::to_string(item.revives);
         str += "},\r\n";

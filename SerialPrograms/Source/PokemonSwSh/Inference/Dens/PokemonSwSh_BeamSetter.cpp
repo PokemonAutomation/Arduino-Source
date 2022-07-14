@@ -158,13 +158,13 @@ BeamSetter::Detection BeamSetter::run(
             }
         }
 
-        QString str = "BeamReader: column = " + QString::number(best_index);
+        std::string str = "BeamReader: column = " + tostr_default(best_index);
 
-        str += ", stddev = " + QString::number(best_stddev);
-        str += ", brightness = " + QString::number(best_brightness);
-        str += ", euclidean = " + QString::number(best_euclidean);
-        str += ", delta = " + QString::number(best_delta);
-        str += ", sigma = " + QString::number(best_sigma);
+        str += ", stddev = " + tostr_default(best_stddev);
+        str += ", brightness = " + tostr_default(best_brightness);
+        str += ", euclidean = " + tostr_default(best_euclidean);
+        str += ", delta = " + tostr_default(best_delta);
+        str += ", sigma = " + tostr_default(best_sigma);
 
         if (purple){
             m_console.log(str, COLOR_BLUE);

@@ -34,7 +34,7 @@ public:
         const ExtraNames* extra_names = nullptr
     );
 
-    virtual QStringList make_header() const override;
+    virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() const override;
 
 private:

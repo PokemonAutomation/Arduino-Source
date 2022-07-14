@@ -10,7 +10,6 @@
 #include <string>
 #include <set>
 #include <chrono>
-#include <QString>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"

@@ -10,7 +10,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <QStringList>
 
 class QWidget;
 
@@ -38,7 +37,7 @@ private:
 
 class EditableTableFactory{
 public:
-    virtual QStringList make_header() const = 0;
+    virtual std::vector<std::string> make_header() const = 0;
     virtual std::unique_ptr<EditableTableRow> make_row() const = 0;
 };
 

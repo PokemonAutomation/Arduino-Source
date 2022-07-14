@@ -66,7 +66,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 
     InferenceBoxScope box(env.console, 0.705, 0.815, 0.219, 0.055);
-    QString language_code = QString::fromStdString(language_data(LANGUAGE).code);
+    std::string language_code = language_data(LANGUAGE).code;
 
     for (const std::string& slug : slugs){
         context.wait_for_all_requests();
@@ -74,20 +74,20 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         QImage screen = env.console.video().snapshot();
         ImageRef image = extract_box_reference(screen, box);
 
-        QString path = "PokemonNameOCR/";
+        std::string path = "PokemonNameOCR/";
         path += language_code;
         path += "/";
 
-        QDir dir(path);
+        QDir dir(QString::fromStdString(path));
         if (!dir.exists()){
             dir.mkpath(".");
         }
 
-        path += QString::fromStdString(slug);
+        path += slug;
         path += "-";
-        path += QString::fromStdString(now_to_filestring());
+        path += now_to_filestring();
         path += ".png";
-        image.save(path);
+        image.save(QString::fromStdString(path));
 
         pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
 

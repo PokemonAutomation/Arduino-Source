@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-const QString PathAction_NAMES[] = {
+const std::string PathAction_NAMES[] = {
     "No Action",
     "Left Joystick",
     "Right Joystick",
@@ -38,7 +38,7 @@ const QString PathAction_NAMES[] = {
     "Wait"
 };
 
-const std::map<QString, PathAction> PathAction_MAP{
+const std::map<std::string, PathAction> PathAction_MAP{
     {PathAction_NAMES[0], PathAction::NO_ACTION},
     {PathAction_NAMES[1], PathAction::LEFT_JOYSTICK},
     {PathAction_NAMES[2], PathAction::RIGHT_JOYSTICK},
@@ -69,7 +69,7 @@ void TestPathMakerTableRow::load_json(const JsonValue& json){
     {
         const std::string* str = obj->get_string("Action");
         if (str != nullptr){
-            const auto iter = PathAction_MAP.find(QString::fromStdString(*str));
+            const auto iter = PathAction_MAP.find(*str);
             if (iter != PathAction_MAP.end()){
                 action = iter->second;
             }
@@ -110,7 +110,7 @@ void TestPathMakerTableRow::load_json(const JsonValue& json){
 
 JsonValue TestPathMakerTableRow::to_json() const{
     JsonObject obj;
-    obj["Action"] = PathAction_NAMES[(size_t)action].toStdString();
+    obj["Action"] = PathAction_NAMES[(size_t)action];
     switch(action){
     case PathAction::B:
     case PathAction::A:
@@ -276,7 +276,7 @@ std::vector<QWidget*> TestPathMakerTableRow::make_widgets(QWidget& parent){
 QWidget* TestPathMakerTableRow::make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget){
     QComboBox* box = new NoWheelComboBox(&parent);
     for(size_t i = 0; i < PathAction_MAP.size(); i++){
-        box->addItem(PathAction_NAMES[i]);
+        box->addItem(QString::fromStdString(PathAction_NAMES[i]));
     }
     box->setCurrentIndex((int)action);
     box->connect(
@@ -292,10 +292,11 @@ QWidget* TestPathMakerTableRow::make_action_box(QWidget& parent, PathAction& act
     return box;
 }
 
-QStringList TestPathMakerTableFactory::make_header() const{
-    QStringList list;
-    list << "Action" << "Parameters";
-    return list;
+std::vector<std::string> TestPathMakerTableFactory::make_header() const{
+    return std::vector<std::string>{
+        "Action",
+        "Parameters",
+    };
 }
 
 std::unique_ptr<EditableTableRow> TestPathMakerTableFactory::make_row() const{

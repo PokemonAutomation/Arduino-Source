@@ -40,28 +40,6 @@ void TaggedLogger::log(const QString& msg, Color color){
 
 
 
-
-std::string combine_string(const char* a, const char* b){
-    std::string str(a);
-    str += ": ";
-    str += b;
-    return str;
-}
-std::string combine_string(const char* a, const std::string& b){
-    std::string str(a);
-    str += ": ";
-    str += b;
-    return str;
-}
-QString combine_string(const char* a, const QString& b){
-    QString str(a);
-    str += ": ";
-    str += b;
-    return str;
-}
-
-
-
 class CommandLineLogger : public LoggerQt{
 public:
     CommandLineLogger(LoggerQt& logger)

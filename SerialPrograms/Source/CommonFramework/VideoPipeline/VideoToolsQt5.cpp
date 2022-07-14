@@ -7,9 +7,9 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 5
 
-#include <sstream>
 #include <QCameraInfo>
 #include <QCoreApplication>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "VideoToolsQt5.h"
@@ -31,9 +31,9 @@ std::vector<CameraInfo> qt5_get_all_cameras(){
     return ret;
 }
 
-QString qt5_get_camera_name(const CameraInfo& info){
+std::string qt5_get_camera_name(const CameraInfo& info){
     QCameraInfo qinfo(info.device_name().c_str());
-    return qinfo.description();
+    return qinfo.description().toStdString();
 }
 
 
@@ -90,65 +90,65 @@ bool determine_frame_orientation(
     Logger& logger, const QImage& reference, const QImage& image,
     bool& flip_vertical
 ){
-    std::stringstream ss;
-    ss << "Attempting to determine frame orientation... ";
+    std::string str;
+    str += "Attempting to determine frame orientation... ";
 
     if (reference.isNull()){
-        ss << "Image is null.";
-        logger.log(ss.str(), COLOR_RED);
+        str += "Image is null.";
+        logger.log(str, COLOR_RED);
         return false;
     }
     if (image.isNull()){
-        ss << "Frame is null.";
-        logger.log(ss.str(), COLOR_RED);
+        str += "Frame is null.";
+        logger.log(str, COLOR_RED);
         return false;
     }
 
     ImageStats ref_stats = image_stats(reference);
     double ref_stddev = ref_stats.stddev.sum();
     if (ref_stddev < 10){
-        ss << "Image has too little detail. (rmsd = " << ref_stddev << ")";
-        logger.log(ss.str(), COLOR_RED);
+        str += "Image has too little detail. (rmsd = " + tostr_default(ref_stddev) + ")";
+        logger.log(str, COLOR_RED);
         return false;
     }
     ImageStats img_stats = image_stats(image);
     double img_stddev = img_stats.stddev.sum();
     if (img_stddev < 10){
-        ss << "Frame has too little detail. (rmsd = " << img_stddev << ")";
-        logger.log(ss.str(), COLOR_RED);
+        str += "Frame has too little detail. (rmsd = " + tostr_default(img_stddev) + ")";
+        logger.log(str, COLOR_RED);
         return false;
     }
 
     double stddev_inv = (ref_stddev + img_stddev) * 0.5;
-    ss << "\n";
-    ss << "    Stddev = " << stddev_inv << "\n";
+    str += "\n";
+    str += "    Stddev = " + tostr_default(stddev_inv) + "\n";
 
     stddev_inv = 1 / stddev_inv;
 
     double identity         = stddev_inv * ImageMatch::pixel_RMSD(reference, image);
     double flipped_vertical = stddev_inv * ImageMatch::pixel_RMSD(reference, image.mirrored(false, true));
-    ss << "    Identity = " << identity << "\n";
-    ss << "    Flipped Vertical = " << flipped_vertical << "\n";
+    str += "    Identity = " + tostr_default(identity) + "\n";
+    str += "    Flipped Vertical = " + tostr_default(flipped_vertical) + "\n";
 
-    ss << "    Orientation: ";
+    str += "    Orientation: ";
     bool ok = false;
     do{
         if (identity < 0.05 && identity * 10 < flipped_vertical){
             flip_vertical = false;
             ok = true;
-            ss << "Identity";
+            str += "Identity";
             break;
         }
         if (flipped_vertical < 0.05 && flipped_vertical * 10 < identity){
             flip_vertical = true;
             ok = true;
-            ss << "Flipped Vertical";
+            str += "Flipped Vertical";
             break;
         }
-        ss << "Unknown";
+        str += "Unknown";
     }while (false);
 
-    logger.log(ss.str(), ok ? COLOR_BLUE : COLOR_RED);
+    logger.log(str, ok ? COLOR_BLUE : COLOR_RED);
 
     return ok;
 }

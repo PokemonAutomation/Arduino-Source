@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -195,11 +196,11 @@ void determine_shiny_status(
         }
     }
     env.log(
-        "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
+        "ShinyDetector: Wild Alpha = " + tostr_default(alpha_wild_overall) +
         (wild_shiny_sound_detected ? " (shiny sound detected)" : "") +
-        ", Left Alpha = " + QString::number(alpha_wild_left) +
-        ", Right Alpha = " + QString::number(alpha_wild_right) +
-        ", Your Alpha = " + QString::number(alpha_own) + 
+        ", Left Alpha = " + tostr_default(alpha_wild_left) +
+        ", Right Alpha = " + tostr_default(alpha_wild_right) +
+        ", Your Alpha = " + tostr_default(alpha_own) +
         (own_shiny_sound_detected ? " (shiny sound detected)" : ""),
         COLOR_PURPLE
     );
@@ -221,15 +222,13 @@ void determine_shiny_status(
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
         dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.best_screenshot);
-        std::stringstream ss;
-        ss << "Low alpha shiny (alpha = "
-           << alpha_wild_overall
-           << ").\nPlease report this image to the "
-           << STRING_POKEMON
-           << " Automation server.";
+        std::string str;
+        str += "Low alpha shiny (alpha = ";
+        str += tostr_default(alpha_wild_overall);
+        str += ").\nPlease report this image to the " + PROGRAM_NAME + " server.";
         send_program_recoverable_error_notification(
             env, settings,
-            ss.str(),
+            str,
             wild_result.best_screenshot
         );
     }

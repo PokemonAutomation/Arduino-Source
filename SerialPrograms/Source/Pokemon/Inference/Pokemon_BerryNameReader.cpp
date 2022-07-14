@@ -21,20 +21,6 @@ BerryNameReader::BerryNameReader()
     : SmallDictionaryMatcher("Pokemon/BerryNameOCR.json")
 {}
 
-#if 0
-OCR::StringMatchResult BerryNameReader::read_substring(
-    LoggerQt& logger,
-    Language language,
-    const ConstImageRef& image
-) const{
-    QString text = OCR::ocr_read(language, image);
-    OCR::StringMatchResult ret = match_substring(language, text);
-    ret.log(logger, MAX_LOG10P);
-    ret.clear_beyond_log10p(MAX_LOG10P);
-    return ret;
-}
-#endif
-
 OCR::StringMatchResult BerryNameReader::read_substring(
     LoggerQt& logger,
     Language language,

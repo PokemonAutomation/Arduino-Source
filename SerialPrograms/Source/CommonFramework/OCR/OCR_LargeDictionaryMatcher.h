@@ -22,11 +22,8 @@ public:
     );
 
     void save(Language language, const std::string& json_path) const;
-//    void update(Language language) const;
-
 
 private:
-//    QString m_prefix;
 };
 
 

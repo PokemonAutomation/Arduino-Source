@@ -70,7 +70,7 @@ int register_message_converters_pokemon_autohosting(){
     register_message_converter(
         PABB_MSG_COMMAND_CONNECT_TO_INTERNET,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "connect_to_internet() - ";
             if (body.size() != sizeof(pabb_connect_to_internet)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_connect_to_internet*)body.c_str();
@@ -83,7 +83,7 @@ int register_message_converters_pokemon_autohosting(){
     register_message_converter(
         PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "home_to_add_friends() - ";
             if (body.size() != sizeof(pabb_home_to_add_friends)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_home_to_add_friends*)body.c_str();

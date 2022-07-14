@@ -8,7 +8,6 @@
 #define PokemonAutomation_Panel_H
 
 #include <memory>
-#include <QString>
 #include "Common/Compiler.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 

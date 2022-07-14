@@ -12,7 +12,6 @@
 #ifndef PokemonAutomation_EditableTableOptionEnumTableCell_H
 #define PokemonAutomation_EditableTableOptionEnumTableCell_H
 
-#include <QString>
 #include "Common/Qt/NoWheelComboBox.h"
 
 namespace PokemonAutomation{

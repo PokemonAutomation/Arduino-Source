@@ -14,7 +14,6 @@
 #include <QVector>
 #include <QIODevice>
 #include <QAudioFormat>
-#include <QString>
 #include <QAudio>
 #include "Common/Compiler.h"
 #include "Common/Cpp/AlignedVector.h"

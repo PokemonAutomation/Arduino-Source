@@ -155,10 +155,14 @@ QWidget* DiscordWebhookUrl::make_url_box(QWidget& parent){
 
 
 
-QStringList DiscordWebhookUrlsFactory::make_header() const{
-    QStringList list;
-    list << "Enabled" << "Description" << "Allow Pings" << "Tags" << "Webhook URL";
-    return list;
+std::vector<std::string> DiscordWebhookUrlsFactory::make_header() const{
+    return std::vector<std::string>{
+        "Enabled",
+        "Description",
+        "Allow Pings",
+        "Tags",
+        "Webhook URL",
+    };
 }
 std::unique_ptr<EditableTableRow> DiscordWebhookUrlsFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new DiscordWebhookUrl());

@@ -13,8 +13,10 @@
 
 namespace PokemonAutomation{
 
-std::string to_string_padded(size_t digits, uint64_t x);
+std::string tostr_padded(size_t digits, uint64_t x);
 std::string tostr_u_commas(int64_t x);
+
+std::string tostr_default(double x);
 std::string tostr_fixed(double x, int precision);
 
 std::string now_to_filestring();

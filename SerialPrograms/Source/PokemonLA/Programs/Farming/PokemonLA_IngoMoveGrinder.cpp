@@ -400,22 +400,20 @@ size_t IngoMoveGrinder::get_next_pokemon_to_switch_to() const
     return 4;
 }
 
-QString IngoMoveGrinder::debug_current_info() const
+std::string IngoMoveGrinder::debug_current_info() const
 {
-    return "(cur_pokemon : " + QString::number(cur_pokemon) + ", cur_move : " + QString::number(cur_move) + ")";
+    return "(cur_pokemon : " + std::to_string(cur_pokemon) + ", cur_move : " + std::to_string(cur_move) + ")";
 }
 
-QString IngoMoveGrinder::debug_move_attempts_info() const
+std::string IngoMoveGrinder::debug_move_attempts_info() const
 {
-    QString debug = "\n";
-    for (size_t i = 0; i < 4; ++i)
-    {
-        for (size_t j = 0; j < 4; ++j)
-        {
+    std::string debug = "\n";
+    for (size_t i = 0; i < 4; ++i){
+        for (size_t j = 0; j < 4; ++j){
             Move move = POKEMON_ACTIONS.get_move(i, j);
             if (move.attempts != 0)
             {
-                debug += "(pokemon : " + QString::number(i) + ", move : " + QString::number(j) + " did " + QString::number(move_issued[i][j]) + " out of " + QString::number(move.attempts) + ")\n";
+                debug += "(pokemon : " + std::to_string(i) + ", move : " + std::to_string(j) + " did " + std::to_string(move_issued[i][j]) + " out of " + std::to_string(move.attempts) + ")\n";
             }
         }
     }

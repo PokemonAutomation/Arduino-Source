@@ -34,7 +34,7 @@ void ShinySparkleSetSwSh::clear(){
 }
 
 std::string ShinySparkleSetSwSh::to_str() const{
-    std::stringstream ss;
+    std::ostringstream ss;
     if (m_alpha_overall < 1.0){
         return "";
     }

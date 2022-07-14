@@ -24,13 +24,13 @@ const std::string FossilGame::JSON_USER_SLOT    = "user_slot";
 const std::string FossilGame::JSON_FOSSIL       = "fossil";
 const std::string FossilGame::JSON_REVIVES      = "revives";
 
-const std::vector<QString> FossilGame::FOSSIL_LIST{
+const std::vector<std::string> FossilGame::FOSSIL_LIST{
     "Dracozolt",
     "Arctozolt",
     "Dracovish",
     "Arctovish",
 };
-const std::map<QString, int> FOSSIL_MAP{
+const std::map<std::string, int> FOSSIL_MAP{
     {"Dracozolt", 0},
     {"Arctozolt", 1},
     {"Dracovish", 2},
@@ -52,7 +52,7 @@ void FossilGame::load_json(const JsonValue& json){
 
     const std::string* str = obj->get_string(JSON_FOSSIL);
     if (str != nullptr){
-        auto iter = FOSSIL_MAP.find(QString::fromStdString(*str));
+        auto iter = FOSSIL_MAP.find(*str);
         if (iter != FOSSIL_MAP.end()){
             fossil = (Fossil)iter->second;
         }
@@ -64,7 +64,7 @@ JsonValue FossilGame::to_json() const{
     JsonObject obj;
     obj[JSON_GAME_SLOT] = game_slot;
     obj[JSON_USER_SLOT] = user_slot;
-    obj[JSON_FOSSIL] = FOSSIL_LIST[fossil].toStdString();
+    obj[JSON_FOSSIL] = FOSSIL_LIST[fossil];
     obj[JSON_REVIVES] = revives;
     return obj;
 }
@@ -113,10 +113,10 @@ QWidget* FossilGame::make_user_slot_box(QWidget& parent){
 }
 QWidget* FossilGame::make_fossil_slot_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(FOSSIL_LIST[0]);
-    box->addItem(FOSSIL_LIST[1]);
-    box->addItem(FOSSIL_LIST[2]);
-    box->addItem(FOSSIL_LIST[3]);
+    box->addItem(QString::fromStdString(FOSSIL_LIST[0]));
+    box->addItem(QString::fromStdString(FOSSIL_LIST[1]));
+    box->addItem(QString::fromStdString(FOSSIL_LIST[2]));
+    box->addItem(QString::fromStdString(FOSSIL_LIST[3]));
     box->setCurrentIndex(fossil);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -151,10 +151,13 @@ QWidget* FossilGame::make_revives_slot_box(QWidget& parent){
 }
 
 
-QStringList FossilGameOptionFactory::make_header() const{
-    QStringList list;
-    list << "Game" << "User" << "Fossil" << "Revives";
-    return list;
+std::vector<std::string> FossilGameOptionFactory::make_header() const{
+    return std::vector<std::string>{
+        "Game",
+        "User",
+        "Fossil",
+        "Revives"
+    };
 }
 std::unique_ptr<EditableTableRow> FossilGameOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new FossilGame());

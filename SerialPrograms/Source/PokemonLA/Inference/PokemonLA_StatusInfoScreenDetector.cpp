@@ -5,7 +5,6 @@
  */
 
 #include <QImage>
-#include <QString>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonLA_StatusInfoScreenDetector.h"

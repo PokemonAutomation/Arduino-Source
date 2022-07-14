@@ -20,8 +20,7 @@ namespace PokemonBDSP{
 
 
 EncounterFilterOption::EncounterFilterOption(bool enable_overrides, bool allow_autocatch)
-    : m_label("<b>Encounter Filter:</b>")
-    , m_enable_overrides(enable_overrides)
+    : m_enable_overrides(enable_overrides)
     , m_allow_autocatch(allow_autocatch)
     , m_shiny_filter_default(ShinyFilter::SHINY)
     , m_shiny_filter_current(m_shiny_filter_default)

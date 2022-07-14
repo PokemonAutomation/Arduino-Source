@@ -9,7 +9,6 @@
 #ifndef PokemonAutomation_FixedCode_H
 #define PokemonAutomation_FixedCode_H
 
-#include <QString>
 #include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 

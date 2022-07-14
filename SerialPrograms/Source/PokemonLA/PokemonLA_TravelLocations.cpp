@@ -5,7 +5,6 @@
  */
 
 #include <map>
-#include <QString>
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"

@@ -315,7 +315,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
         && m_flag_distance >= 0
         && m_last_flag_print + std::chrono::seconds(1) <= timestamp
     ){
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Flag: Distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
            << ", x = " << m_flag_x << ", y = " << m_flag_y << std::endl;
         m_console.log(ss.str(), COLOR_PURPLE);

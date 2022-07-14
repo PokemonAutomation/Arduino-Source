@@ -14,7 +14,8 @@
 namespace PokemonAutomation{
 
 
-std::string to_string_padded(size_t digits, uint64_t x){
+
+std::string tostr_padded(size_t digits, uint64_t x){
     std::string str = std::to_string(x);
     if (digits < str.size()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Number is too big to convert to fixed length string.");
@@ -47,6 +48,11 @@ std::string tostr_u_commas(int64_t x){
     }
 
     return out;
+}
+std::string tostr_default(double x){
+    std::ostringstream ss;
+    ss << x;
+    return ss.str();
 }
 std::string tostr_fixed(double x, int precision){
     std::ostringstream out;
@@ -84,12 +90,12 @@ std::string now_to_filestring(){
 
     std::stringstream ss;
     ss << local_tm.tm_year + 1900;
-    ss << to_string_padded(2, local_tm.tm_mon + 1);
-    ss << to_string_padded(2, local_tm.tm_mday) << '-';
-    ss << to_string_padded(2, local_tm.tm_hour);
-    ss << to_string_padded(2, local_tm.tm_min);
-    ss << to_string_padded(2, local_tm.tm_sec);
-    ss << to_string_padded(6, micros);
+    ss << tostr_padded(2, local_tm.tm_mon + 1);
+    ss << tostr_padded(2, local_tm.tm_mday) << '-';
+    ss << tostr_padded(2, local_tm.tm_hour);
+    ss << tostr_padded(2, local_tm.tm_min);
+    ss << tostr_padded(2, local_tm.tm_sec);
+    ss << tostr_padded(6, micros);
 
     return ss.str();
 }

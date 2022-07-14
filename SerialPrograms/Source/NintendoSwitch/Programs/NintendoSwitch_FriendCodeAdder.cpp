@@ -68,7 +68,7 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     grip_menu_connect_go_home(context);
 
     bool first = true;
-    for (const QString& line : FRIEND_CODES.lines()){
+    for (const std::string& line : FRIEND_CODES.lines()){
         std::vector<uint8_t> code = FriendCodeListOption::parse(line);
         if (code.size() != 12){
             continue;

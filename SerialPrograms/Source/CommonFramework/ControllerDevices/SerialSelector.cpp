@@ -14,22 +14,9 @@ namespace PokemonAutomation{
 
 
 SerialSelector::~SerialSelector(){}
-SerialSelector::SerialSelector(
-    QString label,
-    PABotBaseLevel minimum_pabotbase
-)
-    : m_label(std::move(label))
-    , m_minimum_pabotbase(minimum_pabotbase)
+SerialSelector::SerialSelector(PABotBaseLevel minimum_pabotbase)
+    : m_minimum_pabotbase(minimum_pabotbase)
 {}
-SerialSelector::SerialSelector(
-    QString label,
-    PABotBaseLevel minimum_pabotbase,
-    const JsonValue& json
-)
-    : SerialSelector(std::move(label), minimum_pabotbase)
-{
-    load_json(json);
-}
 void SerialSelector::load_json(const JsonValue& json){
     const std::string* name = json.get_string();
     if (name == nullptr || name->empty()){

@@ -33,8 +33,6 @@ public:
 private:
     friend class EncounterFilterWidget;
 
-    QString m_label;
-
     const bool m_rare_stars;
     const bool m_enable_overrides;
 

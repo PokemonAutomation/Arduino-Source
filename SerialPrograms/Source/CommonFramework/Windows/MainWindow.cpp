@@ -15,7 +15,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "PanelLists.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
@@ -46,7 +45,7 @@ MainWindow::MainWindow(QWidget* parent)
 //    statusbar = new QStatusBar(this);
 //    statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(statusbar);
-    setWindowTitle(QString::fromStdString(Pokemon::STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")"));
+    setWindowTitle(QString::fromStdString(PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")"));
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
 
@@ -64,7 +63,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 
     QGroupBox* support_box = new QGroupBox(
-        QString::fromStdString(Pokemon::STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
+        QString::fromStdString(PROGRAM_NAME + " " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
     left_layout->addWidget(support_box);
@@ -115,10 +114,10 @@ MainWindow::MainWindow(QWidget* parent)
                     nullptr,
                     "About",
                     QString::fromStdString(
-                        Pokemon::STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
+                        PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
                         "Copyright: 2020 - 2021<br>" +
                         "<br>"
-                        "Made by the " + Pokemon::STRING_POKEMON + " Automation Discord Server.<br>"
+                        "Made by the " + PROGRAM_NAME + " Discord Server.<br>"
                         "<br>"
                         "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
                     )

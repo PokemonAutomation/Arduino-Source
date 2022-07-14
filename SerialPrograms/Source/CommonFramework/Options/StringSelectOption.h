@@ -11,7 +11,6 @@
 
 #include <vector>
 #include <map>
-#include <QString>
 #include <QIcon>
 #include "ConfigOption.h"
 

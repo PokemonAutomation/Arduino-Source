@@ -105,7 +105,7 @@ void CameraSelectorWidget::refresh(){
     size_t index = 0;
     for (size_t c = 0; c < m_cameras.size(); c++){
         const CameraInfo& camera = m_cameras[c];
-        m_camera_box->addItem(get_camera_name(camera));
+        m_camera_box->addItem(QString::fromStdString(get_camera_name(camera)));
 
         if (current_camera == camera){
             index = c + 1;
@@ -118,7 +118,7 @@ void CameraSelectorWidget::refresh(){
         m_camera_box->setCurrentIndex(0);
     }
 }
-QString CameraSelectorWidget::aspect_ratio(const QSize& size){
+std::string CameraSelectorWidget::aspect_ratio(const QSize& size){
     int w = size.width();
     int h = size.height();
     if (w <= 0 || h <= 0){
@@ -141,7 +141,7 @@ QString CameraSelectorWidget::aspect_ratio(const QSize& size){
     h = size.height();
     w /= gcd;
     h /= gcd;
-    return "(" + QString::number(w) + ":" + QString::number(h) + ")";
+    return "(" + std::to_string(w) + ":" + std::to_string(h) + ")";
 }
 
 
@@ -167,7 +167,9 @@ void CameraSelectorWidget::reset_video(){
     for (int c = 0; c < (int)m_resolutions.size(); c++){
         const QSize& size = m_resolutions[c];
         m_resolution_box->addItem(
-            QString::number(size.width()) + " x " + QString::number(size.height()) + " " + aspect_ratio(size)
+            QString::fromStdString(
+                std::to_string(size.width()) + " x " + std::to_string(size.height()) + " " + aspect_ratio(size)
+            )
         );
         if (size == m_value.m_current_resolution){
             resolution_match = true;

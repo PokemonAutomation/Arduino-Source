@@ -97,7 +97,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_PBF_WAIT,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_wait() - ";
             if (body.size() != sizeof(pabb_pbf_wait)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_wait*)body.c_str();
@@ -109,7 +109,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_PBF_PRESS_BUTTON,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_press_button() - ";
             if (body.size() != sizeof(pabb_pbf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_press_button*)body.c_str();
@@ -123,7 +123,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_PBF_PRESS_DPAD,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_press_dpad() - ";
             if (body.size() != sizeof(pabb_pbf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_press_dpad*)body.c_str();
@@ -137,7 +137,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_L,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_move_left_joystick() - ";
             if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
@@ -152,7 +152,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_R,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_move_right_joystick() - ";
             if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
@@ -167,7 +167,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_COMMAND_MASH_BUTTON,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "pbf_mash_button() - ";
             if (body.size() != sizeof(pabb_pbf_mash_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_mash_button*)body.c_str();
@@ -180,7 +180,7 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_CONTROLLER_STATE,
         [](const std::string& body){
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << "controller_state() - ";
             if (body.size() != sizeof(pabb_controller_state)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_controller_state*)body.c_str();

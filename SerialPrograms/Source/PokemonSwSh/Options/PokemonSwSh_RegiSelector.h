@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiSelector_H
 #define PokemonAutomation_PokemonSwSh_RegiSelector_H
 
-#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -39,7 +38,7 @@ public:
 
 private:
     friend class RegiSelectorWidget;
-    QString m_label;
+    std::string m_label;
     const RegiGolem m_default;
     RegiGolem m_current;
 };

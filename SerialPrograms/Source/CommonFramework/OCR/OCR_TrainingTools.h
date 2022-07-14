@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <QString>
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -66,7 +65,7 @@ private:
 
 
 
-std::string extract_name(const QString& filename);
+std::string extract_name(const std::string& filename);
 
 
 }

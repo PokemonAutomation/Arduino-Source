@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <QUrl>
-#include <QString>
 #include <QAudioBuffer>
 #include <QAudioDecoder>
 #include <QAudioFormat>

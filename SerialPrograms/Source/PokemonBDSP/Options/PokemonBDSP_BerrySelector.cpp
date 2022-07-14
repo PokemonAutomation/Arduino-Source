@@ -5,7 +5,6 @@
  */
 
 #include <QComboBox>
-#include <QString>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -57,10 +56,10 @@ QWidget* BerrySelectorRow::make_berry_box(QWidget& parent){
 }
 
 
-QStringList BerrySelectorOptionFactory::make_header() const{
-    QStringList list;
-    list << "Berry";
-    return list;
+std::vector<std::string> BerrySelectorOptionFactory::make_header() const{
+    return std::vector<std::string>{
+        "Berry",
+    };
 }
 std::unique_ptr<EditableTableRow> BerrySelectorOptionFactory::make_row() const{
     return std::unique_ptr<EditableTableRow>(new BerrySelectorRow());

@@ -8,6 +8,7 @@
  */
 
 #include <QImage>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "PokemonSwSh_RaidLobbyReader.h"
@@ -39,7 +40,7 @@ RaidLobbyState RaidLobbyReader::read(const QImage& screen){
         return RaidLobbyState();
     }
 
-    QString str;
+    std::string str;
 
     FloatPixel average0 = image_average(extract_box_reference(screen, m_checkbox0));
     FloatPixel average1 = image_average(extract_box_reference(screen, m_checkbox1));
@@ -49,20 +50,20 @@ RaidLobbyState RaidLobbyReader::read(const QImage& screen){
     double distance2 = euclidean_distance(average0, average2);
     double distance3 = euclidean_distance(average0, average3);
     str += "Ready = {";
-    str += QString::number(0) + ", ";
-    str += QString::number(distance1) + ", ";
-    str += QString::number(distance2) + ", ";
-    str += QString::number(distance3) + "}";
+    str += tostr_default(0) + ", ";
+    str += tostr_default(distance1) + ", ";
+    str += tostr_default(distance2) + ", ";
+    str += tostr_default(distance3) + "}";
 
     double stddev0 = image_stddev(extract_box_reference(screen, m_spritebox0)).sum();
     double stddev1 = image_stddev(extract_box_reference(screen, m_spritebox1)).sum();
     double stddev2 = image_stddev(extract_box_reference(screen, m_spritebox2)).sum();
     double stddev3 = image_stddev(extract_box_reference(screen, m_spritebox3)).sum();
     str += ", Sprites = {";
-    str += QString::number(stddev0) + ", ";
-    str += QString::number(stddev1) + ", ";
-    str += QString::number(stddev2) + ", ";
-    str += QString::number(stddev3) + "}";
+    str += tostr_default(stddev0) + ", ";
+    str += tostr_default(stddev1) + ", ";
+    str += tostr_default(stddev2) + ", ";
+    str += tostr_default(stddev3) + "}";
 
     m_logger.log("RaidLobbyReader(): " + str, COLOR_PURPLE);
 

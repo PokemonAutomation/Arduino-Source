@@ -13,6 +13,8 @@
 namespace PokemonAutomation{
 
 extern const std::string PROGRAM_VERSION;
+extern const std::string PROGRAM_NAME;
+
 extern const std::string DISCORD_LINK;
 extern const std::string DISCORD_LINK_URL;
 extern const std::string ONLINE_DOC_URL;

@@ -4,10 +4,12 @@
  *
  */
 
+#include <sstream>
 #include <QString>
 #include "StringToolsQt.h"
 
 namespace PokemonAutomation{
+
 
 
 std::u32string to_utf32(const std::string& str){

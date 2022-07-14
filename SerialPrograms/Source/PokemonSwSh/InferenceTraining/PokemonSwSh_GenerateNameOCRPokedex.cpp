@@ -93,27 +93,27 @@ void GenerateNameOCRDataPokedex::dump_images(
         return;
     }
 
-    QString path = "PokemonNameOCR/";
-    path += QString::fromStdString(language_data(LANGUAGE).code);
+    std::string path = "PokemonNameOCR/";
+    path += language_data(LANGUAGE).code;
 
-    QDir dir(path);
+    QDir dir(QString::fromStdString(path));
     if (!dir.exists()){
         dir.mkpath(".");
     }
 
     path += "/";
-    path += QString::fromStdString(expected[index]);
+    path += expected[index];
     path += "-";
-    path += QString::fromStdString(now_to_filestring());
+    path += now_to_filestring();
     path += ".png";
-    image.save(path);
+    image.save(QString::fromStdString(path));
 
 //    OCR::make_OCR_filter(image).apply(image);
 }
 
 void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    QString dex_name;
+    std::string dex_name;
     size_t dex_size = 0;
     switch (POKEDEX){
     case 0:
@@ -143,7 +143,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
 //    OCR::DictionaryOCR& dictionary = m_reader.dictionary(LANGUAGE);
 
     if (MODE == Mode::GENERATE_TRAINING_DATA){
-        std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name.toStdString() + ".json";
+        std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json";
         JsonValue json = load_json_file(path);
         JsonArray& array = json.get_array_throw(path);
         for (const auto& item : array){

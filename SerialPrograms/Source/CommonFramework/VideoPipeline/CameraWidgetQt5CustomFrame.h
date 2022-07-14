@@ -35,7 +35,7 @@ namespace CameraQt5CustomFrame{
 class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
     virtual std::vector<CameraInfo> get_all_cameras() const override;
-    virtual QString get_camera_name(const CameraInfo& info) const override;
+    virtual std::string get_camera_name(const CameraInfo& info) const override;
     virtual VideoWidget* make_video_widget(
         QWidget& parent,
         LoggerQt& logger,
