@@ -468,6 +468,35 @@ void goto_any_camp_from_overworld(
 }
 
 
+void goto_Mai_from_camp(
+    Logger& logger, BotBaseContext& context, Camp camp
+){
+    switch (camp){
+    case Camp::FIELDLANDS_FIELDLANDS:
+        // 80 - 128, time - 400
+        pbf_move_left_joystick(context, 85, 255, 300, 0);
+        return;
+    case Camp::MIRELANDS_MIRELANDS:
+        pbf_move_left_joystick(context, 0, 120, 310, 0);
+        return;
+    case Camp::COASTLANDS_BEACHSIDE:
+        // 255, 150 -170, 600 too long
+        pbf_move_left_joystick(context, 255, 165, 550, 0);
+        return;
+    case Camp::HIGHLANDS_HIGHLANDS:
+        // 255, 150 - 170
+        pbf_move_left_joystick(context, 255, 165, 360, 0);
+        return;
+    case Camp::ICELANDS_SNOWFIELDS:
+        pbf_move_left_joystick(context, 255, 124, 250, 0);
+        return;
+    default:
+        throw InternalProgramError(
+            &logger, PA_CURRENT_FUNCTION,
+            "Unknown Camp when going to Mai: " + std::to_string((int)camp)
+        );
+    }
+}
 
 void goto_professor(Logger& logger, BotBaseContext& context, const TravelLocation& location){
 

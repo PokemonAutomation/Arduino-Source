@@ -20,6 +20,7 @@
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
+#include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
@@ -275,6 +276,12 @@ int test_pokemonLA_MapZoomLevelReader(const QImage& image, int target){
     return 0;
 }
 
+int test_pokemonLA_MapMissionTabReader(const QImage& image, bool target){
+    bool result = is_map_mission_tab_raised(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 void test_pokemonLA_BerryTreeDetector(const QImage& image){
     BerryTreeDetector detector;
 
@@ -308,6 +315,33 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     const QFileInfo fileinfo(full_path);
     const QString filename = fileinfo.fileName();
     const QDir parent_dir = fileinfo.dir();
+
+    std::string base_name = fileinfo.baseName().toStdString();
+
+    const std::vector<std::string> filename_words = parse_words(base_name);
+    MapRegion region = MapRegion::NONE;
+    for(const std::string& word : filename_words){
+        if (word == "Fieldlands"){
+            region = MapRegion::FIELDLANDS;
+            break;
+        } else if (word == "Mirelands"){
+            region = MapRegion::MIRELANDS;
+            break;
+        } else if (word == "Coastlands"){
+            region = MapRegion::COASTLANDS;
+            break;
+        } else if (word == "Highlands"){
+            region = MapRegion::HIGHLANDS;
+            break;
+        } else if (word == "Icelands"){
+            region = MapRegion::ICELANDS;
+            break;
+        }
+    }
+    if (region == MapRegion::NONE){
+        cout << "Error: filename should contain a region name (e.g. \"Fieldlands\")." << endl;
+        return 1;
+    } 
 
     const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
     const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
@@ -381,7 +415,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "--------------------------------------------------------------------" << endl;
         cout << i << ": Target slug: " << target_sprites[i] << endl;
 
-        auto result = match_sprite_on_map(sprite_image, new_boxes[i]);
+        auto result = match_sprite_on_map(sprite_image, new_boxes[i], region);
         if (result.slug == target_sprites[i]){
             success_count++;
             cout << "Match SUCCESS" << endl;
@@ -392,6 +426,9 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
 
     if (success_count == target_sprites.size()){
         cout << "ALL SUCCESS" << endl;
+    }else{
+        cout << "FAILURE: " << success_count << "/" << target_sprites.size() << endl;
+        return 1;
     }
     count++;
     

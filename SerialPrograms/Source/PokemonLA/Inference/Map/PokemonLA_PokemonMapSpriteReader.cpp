@@ -9,8 +9,12 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#include <QImage>
-
+#include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -26,6 +30,7 @@
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/Globals.h"
 
+#include <set>
 #include <map>
 #include <vector>
 #include <string>
@@ -51,20 +56,26 @@ using ImageMatch::ExactImageDictionaryMatcher;
 // defined locally stored data for matching MMO sprites
 struct MMOSpriteMatchingData {
     ExactImageDictionaryMatcher color_matcher;
+    ExactImageDictionaryMatcher color_matcher_hsv;
     ExactImageDictionaryMatcher gradient_matcher;
     // sprite slug -> features
     std::map<std::string, FeatureVector> features;
 
     MMOSpriteMatchingData(
         ExactImageDictionaryMatcher c_matcher,
+        ExactImageDictionaryMatcher c_matcher_hsv,
         ExactImageDictionaryMatcher g_matcher,
         std::map<std::string, FeatureVector> f
     )
         : color_matcher(std::move(c_matcher))
+        , color_matcher_hsv(std::move(c_matcher_hsv))
         , gradient_matcher(std::move(g_matcher))
         , features(f) {}
 };
 
+inline bool is_transparent(uint32_t g){
+    return (g >> 24) < 128;
+}
 
 
 FeatureType feature_distance(const FeatureVector& a, const FeatureVector& b){
@@ -149,29 +160,147 @@ void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(in
     }
 }
 
-// QImage smooth_image(const ConstImageRef& image){
-//     QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
-//     result.fill(QColor(0,0,0,0));
-//     ImageRef result_ref(result);
+QImage smooth_image(const ConstImageRef& image){
+    // static int count = 0;
+    // {
+    //     image.save("./test_smooth_before_" + QString::number(count) + ".png");
+    // }
 
-//     const float filter[5] = {0.062, 0.244, 0.388, 0.244, 0.062};
+    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
+    result.fill(QColor(0,0,0,0));
+    ImageRef result_ref(result);
 
-//     for(int y = 0; y < image.height(); y++){
-//         for(int x = 0; x < image.width(); x++){
-//             float sum = 0;
-//             int num_pixels = 0;
-//             for(int i = 0; i < 5; i++){
-//                 int sx = x + i - 2;
-//                 if (sx < 0 || sx >= image.width()){
-//                     continue;
-//                 }
-//                 // transparent
-//                 // sum += filter[i] * image.pixel[]
-//             }
-//         }
-//     }
-//     return result;
-// }
+    const float filter[5] = {0.062f, 0.244f, 0.388f, 0.244f, 0.062f};
+
+    int image_width = (int)image.width();
+    int image_height = (int)image.height();
+    for(int y = 0; y < image_height; y++){
+        for(int x = 0; x < image_width; x++){
+            float sum[3] = {0,0,0};
+            float weights = 0.0;
+            for(int i = 0; i < 5; i++){
+                int sx = x + i - 2;
+                if (sx < 0 || sx >= image_width){
+                    continue;
+                }
+            
+                uint32_t p = image.pixel(sx, y);
+                if (is_transparent(p)){
+                    continue;
+                }
+
+                weights += filter[i];
+
+                for(int ch = 0; ch < 3; ch++){
+                    int shift = 16 - ch * 8;
+                    int c = (uint32_t(0xff) & p >> shift);
+                    sum[ch] += filter[i] * c;
+                }
+            }
+            if (weights == 0){
+                continue;
+            }
+
+            char c[3];
+            for(int ch = 0; ch < 3; ch++){
+                sum[ch] /= weights;
+                int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
+                c[ch] = v;
+            }
+            result_ref.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
+        }
+    }
+
+    QImage result2((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
+    result2.fill(QColor(0,0,0,0));
+    ImageRef result_ref2(result2);
+
+    for(int y = 0; y < image_height; y++){
+        for(int x = 0; x < image_width; x++){
+            float sum[3] = {0,0,0};
+            float weights = 0.0;
+            for(int i = 0; i < 5; i++){
+                int sy = y + i - 2;
+                
+                if (sy < 0 || sy >= image_height){
+                    continue;
+                }
+
+                uint32_t p = result.pixel(x, sy);
+                if (is_transparent(p)){
+                    continue;
+                }
+
+                weights += filter[i];
+
+                for(int ch = 0; ch < 3; ch++){
+                    int shift = 16 - ch * 8;
+                    int c = (uint32_t(0xff) & (p >> shift));
+                    sum[ch] += filter[i] * c;
+                }
+            }
+            if (weights == 0){
+                continue;
+            }
+
+            char c[3];
+            for(int ch = 0; ch < 3; ch++){
+                sum[ch] /= weights;
+                int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
+                c[ch] = v;
+            }
+            result_ref2.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
+        }
+    }
+
+    // {
+    //     result_ref.save("./test_smooth_middle_" + QString::number(count) + ".png");
+    //     result_ref2.save("./test_smooth_after_" + QString::number(count) + ".png");
+    //     count++;
+    // }
+    // exit(0);
+
+    return result2;
+}
+
+QImage convert_to_hsv(const ConstImageRef& image){
+    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
+    result.fill(QColor(0,0,0,0));
+    ImageRef result_ref(result);
+
+    for(int y = 0; y < (int)image.height(); y++){
+        for(int x = 0; x < (int)image.width(); x++){
+            uint32_t p = image.pixel(x, y);
+            if (is_transparent(p)){
+                continue;
+            }
+
+            int r = (uint32_t(0xff) & (p >> 16));
+            int g = (uint32_t(0xff) & (p >> 8));
+            int b = (uint32_t(0xff) & p);
+
+            int M = std::max(std::max(r, g), b);
+            int m = std::min(std::min(r, g), b);
+
+            int S = 0;
+            if (M > 0){
+                S = std::min(std::max(255 - (m*255 + M/2)/M, 0), 255);
+            }
+
+            double cosH = std::sqrt(r*r + g*g + b*b - r*g - r*b - g*b) * (r - 0.5*g - 0.5*b);
+            double Hf = std::acos(std::min(std::max(cosH, -1.0), 1.0)) * (180 / M_PI);
+            if (b > g){
+                Hf = 360 - Hf;
+            }
+            // Convert Hf range from [0, 360) to [0, 256)
+            int H = std::max(int(Hf * 256.0 / 360.0 + 0.5) % 256, 0);
+
+            result_ref.pixel(x, y) = combine_rgb(H, S, M);
+        }
+    }
+
+    return result;
+}
 
 
 QImage compute_image_gradient(const ConstImageRef& image){
@@ -300,19 +429,24 @@ MMOSpriteMatchingData build_MMO_sprite_matching_data(){
     // stddev_weight.stddev_coefficient = 0.1;
     gradient_stddev_weight.offset = 1.0;
     ExactImageDictionaryMatcher gradient_matcher(gradient_stddev_weight);
+    ExactImageDictionaryMatcher color_matcher_hsv(color_stddev_weight);
 
     std::map<std::string, FeatureVector> features;
 
     load_and_visit_MMO_sprite([&](const std::string& slug, const QImage& sprite){
         color_matcher.add(slug, sprite);
-        QImage sprite_gradient = compute_image_gradient(sprite);
+        QImage sprite_hsv = convert_to_hsv(sprite);
+        color_matcher_hsv.add(slug, sprite_hsv);
+        QImage smoothed_sprite = smooth_image(sprite);
+        QImage sprite_gradient = compute_image_gradient(smoothed_sprite);
         gradient_matcher.add(slug, sprite_gradient);
 
-        features.emplace(slug, compute_feature(sprite));
+        features.emplace(slug, compute_feature(smoothed_sprite));
     });
 
     return MMOSpriteMatchingData(
         std::move(color_matcher),
+        std::move(color_matcher_hsv),
         std::move(gradient_matcher),
         std::move(features)
     );
@@ -325,11 +459,33 @@ const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
 }
 
 
-std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image){
+std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image, MapRegion region){
     const FeatureVector& image_feature = compute_feature(image);
 
-
     const std::map<std::string, FeatureVector>& features = MMO_SPRITE_MATCHING_DATA().features;
+
+    const std::array<std::vector<std::string>, 5>& region_available_sprites = MMO_FIRST_WAVE_REGION_SPRITE_SLUGS();
+    int region_index = 0;
+    switch(region){
+    case MapRegion::FIELDLANDS:
+        region_index = 0;
+        break;
+    case MapRegion::MIRELANDS:
+        region_index = 1;
+        break;
+    case MapRegion::COASTLANDS:
+        region_index = 2;
+        break;
+    case MapRegion::HIGHLANDS:
+        region_index = 3;
+        break;
+    case MapRegion::ICELANDS:
+        region_index = 4;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid region.");
+        return {};
+    }
 
     // cout << "input image feature: " << feature_to_str(image_feature) << endl;
 
@@ -338,9 +494,13 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstI
 
     std::multimap<double, std::string> result;
 
-    for(const auto& p : features){
-        const std::string& slug = p.first;
-        const FeatureVector& feature = p.second;
+    for(const auto& slug : region_available_sprites[region_index]){
+        auto it = features.find(slug);
+        if (it == features.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Inconsistent sprite slug definitions in resource: " + slug);
+        }
+
+        const FeatureVector& feature = it->second;
         const FeatureType dist = feature_distance(image_feature, feature);
         result.emplace(dist, slug);
     }
@@ -354,7 +514,9 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstI
 
 // For a sprite on the screenshot, create gradient image of it
 QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
-    QImage result = compute_image_gradient(image);
+
+    QImage result = smooth_image(image);
+    result = compute_image_gradient(result);
     ImageRef result_ref(result);
     
     int width = (int)image.width();
@@ -407,10 +569,6 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
         float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
         pixel_score /= 255;
         return pixel_score;
-    };
-
-    auto is_transparent = [](uint32_t g){
-        return (g >> 24) < 128;
     };
 
 
@@ -585,17 +743,71 @@ float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_templat
     return score;
 }
 
+float compute_hsv_dist2(uint32_t template_color, uint32_t color){
+    int t_h = (uint32_t(0xff) & (template_color >> 16));
+    int t_s = (uint32_t(0xff) & (template_color >> 8));
+    int t_v = (uint32_t(0xff) & template_color);
+
+    int h = (uint32_t(0xff) & (color >> 16));
+    int s = (uint32_t(0xff) & (color >> 8));
+    int v = (uint32_t(0xff) & color);
+
+    int h_dif = std::abs(t_h - h);
+    if (h_dif > 255 - h_dif){
+        h_dif = 256 - h_dif;
+    }
+
+    return h_dif * h_dif + (t_s - s) * (t_s - s) + 0.5 * (t_v - v) * (t_v - v);
+}
+
+float compute_MMO_sprite_hsv_distance(const ConstImageRef& image_template, const ConstImageRef& query_image){
+    int tempt_width = (int)image_template.width();
+    int tempt_height = (int)image_template.height();
+
+    // cout << tempt_width << " " << tempt_height << " " << query_image.width() << " " << query_image.height() << endl;
+    float score = 0.0;
+    int num_pixels = 0;
+    for(int y = 0; y < (int)query_image.height(); y++){
+        for(int x = 0; x < (int)query_image.width(); x++){
+            uint32_t p = query_image.pixel(x, y);
+            if (is_transparent(p)){
+                // cout << "Skip query pixel " << x << " " << y << endl;
+                continue;
+            }
+            int mx = x;
+            int my = y;
+            if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
+                continue;
+            }
+
+            uint32_t t_p = image_template.pixel(mx, my);
+            if (is_transparent(t_p)){
+                // cout << "Skip template pixel " << x << " " << y << endl;
+                continue;
+            }
+
+            num_pixels++;
+
+            float pixel_score = compute_hsv_dist2(t_p, p);
+            score += pixel_score;
+        }
+    }
+
+    score = std::sqrt(score / num_pixels);
+    // cout << "score " << score << " " << num_pixels << endl;
+    // exit(0);
+    return score;
+}
 
 
-
-
-MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box){
+MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box, MapRegion region){
     const static auto& sprite_matching_data = MMO_SPRITE_MATCHING_DATA();
     const ExactImageDictionaryMatcher& color_matcher = sprite_matching_data.color_matcher;
+    const ExactImageDictionaryMatcher& color_matcher_hsv = sprite_matching_data.color_matcher_hsv;
     const ExactImageDictionaryMatcher& gradient_matcher = sprite_matching_data.gradient_matcher;
 
     // configs for the algorithm:
-    const size_t num_feature_candidates = 20;
+    const size_t num_feature_candidates = 10;
     const double color_difference_threshold = 10.0;
     const double gradient_confidence_threshold = 2.0;
     const double color_to_gradient_confidence_scale = 2.0;
@@ -605,7 +817,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
 
     // This map has the match score for all sprites.
     // This map must be not empty for subsequent computation.
-    const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box));
+    const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box), region);
     
     for(const auto& p : feature_map){
         result.candidates.push_back(p.second);
@@ -629,10 +841,25 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
 
     cout << "Color matching..." << endl;
     {
-        auto color_match_results = color_matcher.subset_match(result.candidates, screen,
-            pixelbox_to_floatbox(screen, box), 1, 10);
-    
-        result.color_match_results = std::move(color_match_results.results);
+        // auto color_match_results = color_matcher.subset_match(result.candidates, screen,
+        //     pixelbox_to_floatbox(screen, box), 1, 10);
+        // result.color_match_results = std::move(color_match_results.results);
+        ImagePixelBox expanded_box(box.min_x - 2, box.min_y - 2, box.max_x + 2, box.max_y + 2);
+        QImage sprite_hsv = convert_to_hsv(extract_box_reference(screen, expanded_box));
+        for(const auto& slug: result.candidates){
+            const QImage candidate_template = color_matcher_hsv.image_template(slug);
+            float score = FLT_MAX;
+            for(int ox = -2; ox <= 2; ox++){
+                for(int oy = -2; oy <= 2; oy++){
+                    ImagePixelBox shifted_box(ox+2, oy+2, box.width(), box.height());
+                    float match_score = compute_MMO_sprite_hsv_distance(candidate_template, 
+                        extract_box_reference(sprite_hsv, shifted_box));
+                    score = std::min(match_score, score);
+                }
+            }
+
+            result.color_match_results.emplace(score, slug);
+        }
     }
 
 
@@ -675,7 +902,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
     cout << "Top color score: " << result.color_score << " diff to second: " << result.color_lead << endl;
 
     if (result.color_lead >= color_difference_threshold){
-        cout << "Color difference large enough. Good match." << endl;
+        cout << "Color difference large enough. Good match: " << result.slug << endl;
         result.second_slug = color_second->second;
         return result;
     }
@@ -721,7 +948,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
     cout << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead << endl;
 
     if (result.gradient_lead >= gradient_confidence_threshold){
-        cout << "Gradient difference large enough. Good match." << endl;
+        cout << "Gradient difference large enough. Good match: " << result.slug << endl;
         return result;
     }
 
@@ -744,7 +971,7 @@ MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const Imag
         }
     }
     else{
-        cout << "Low confidence match." << endl;
+        cout << "Low confidence match: " << result.slug << endl;
     }
 
     return result;

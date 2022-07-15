@@ -13,8 +13,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+// All pokemon sprites in LA
 const SpriteDatabase& ALL_POKEMON_SPRITES();
 
+// All icons of pokemon sprites in MMO
+const SpriteDatabase& ALL_MMO_SPRITES();
 
 }
 }

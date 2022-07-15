@@ -21,6 +21,8 @@ public:
     const std::string& display_name() const{ return m_display_name; }
     const std::string& display_name(Language language) const;
 
+public:
+    const static std::string NULL_SLUG;
 private:
     friend struct PokemonNameDatabase;
 
