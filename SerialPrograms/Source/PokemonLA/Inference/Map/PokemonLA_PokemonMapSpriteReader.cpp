@@ -166,14 +166,14 @@ QImage smooth_image(const ConstImageRef& image){
     //     image.save("./test_smooth_before_" + QString::number(count) + ".png");
     // }
 
-    QImage result(image.width(), image.height(), QImage::Format::Format_ARGB32);
+    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
     result.fill(QColor(0,0,0,0));
     ImageRef result_ref(result);
 
-    const float filter[5] = {0.062, 0.244, 0.388, 0.244, 0.062};
+    const float filter[5] = {0.062f, 0.244f, 0.388f, 0.244f, 0.062f};
 
-    int image_width = image.width();
-    int image_height = image.height();
+    int image_width = (int)image.width();
+    int image_height = (int)image.height();
     for(int y = 0; y < image_height; y++){
         for(int x = 0; x < image_width; x++){
             float sum[3] = {0,0,0};
@@ -211,7 +211,7 @@ QImage smooth_image(const ConstImageRef& image){
         }
     }
 
-    QImage result2(image.width(), image.height(), QImage::Format::Format_ARGB32);
+    QImage result2((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
     result2.fill(QColor(0,0,0,0));
     ImageRef result_ref2(result2);
 

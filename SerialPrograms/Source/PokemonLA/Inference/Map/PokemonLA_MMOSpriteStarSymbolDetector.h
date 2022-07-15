@@ -31,7 +31,7 @@ public:
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
     // Not thread safe: must call after inference session ends.
-    bool is_star(int index) const { return m_is_star[index]; }
+    bool is_star(size_t index) const { return m_is_star[index]; }
 
 private:
     const std::vector<ImagePixelBox>& m_boxes;
