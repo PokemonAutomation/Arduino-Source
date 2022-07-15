@@ -274,7 +274,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 #if QT_VERSION_MAJOR == 5
     for (NativeAudioInfo& device : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)){
         list.emplace_back();
-        Data& data = list.back().m_body;
+        Data& data = *list.back().m_body;
 
         std::string name = device.deviceName().toStdString();
         data.device_name = name;
@@ -286,7 +286,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioInputs()){
         list.emplace_back();
-        Data& data = list.back().m_body;
+        Data& data = *list.back().m_body;
 
         data.device_name = device.id().data();
         data.display_name = device.description().toStdString();
@@ -347,7 +347,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
 #if QT_VERSION_MAJOR == 5
     for (NativeAudioInfo& device : QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)){
         list.emplace_back();
-        Data& data = list.back().m_body;
+        Data& data = *list.back().m_body;
 
         std::string name = device.deviceName().toStdString();
         data.device_name = name;
@@ -359,7 +359,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioOutputs()){
         list.emplace_back();
-        Data& data = list.back().m_body;
+        Data& data = *list.back().m_body;
 
         data.device_name = device.id().data();
         data.display_name = device.description().toStdString();
@@ -395,7 +395,9 @@ void AudioDeviceInfo::operator=(const AudioDeviceInfo& x){
     m_body = x.m_body;
 }
 
-AudioDeviceInfo::AudioDeviceInfo(){}
+AudioDeviceInfo::AudioDeviceInfo()
+    : m_body(CONSTRUCT_TOKEN)
+{}
 
 AudioDeviceInfo::AudioDeviceInfo(const std::string& device_name){
     for (AudioDeviceInfo& info : all_input_devices()){
@@ -410,10 +412,11 @@ AudioDeviceInfo::AudioDeviceInfo(const std::string& device_name){
             return;
         }
     }
+    m_body.reset();
 }
 
 AudioDeviceInfo::operator bool() const{
-    return !m_body->device_name.empty();
+    return m_body && !m_body->device_name.empty();
 }
 const std::string& AudioDeviceInfo::display_name() const{
     return m_body->display_name;

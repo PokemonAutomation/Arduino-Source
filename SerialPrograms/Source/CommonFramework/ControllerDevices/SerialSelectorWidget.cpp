@@ -25,7 +25,7 @@ SerialSelectorWidget::SerialSelectorWidget(
     : QWidget(&parent)
     , m_value(value)
     , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
-    , m_connection(m_logger, value.m_port, value.m_minimum_pabotbase)
+    , m_connection(m_logger, *value.m_port, value.m_minimum_pabotbase)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);
     serial_row->setContentsMargins(0, 0, 0, 0);
@@ -58,7 +58,7 @@ SerialSelectorWidget::SerialSelectorWidget(
     connect(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            QSerialPortInfo& current_port = m_value.m_port;
+            QSerialPortInfo& current_port = *m_value.m_port;
             if (index <= 0 || (size_t)index > m_ports.size()){
                 current_port = QSerialPortInfo();
             }else{
@@ -136,7 +136,7 @@ void SerialSelectorWidget::refresh(){
         m_ports.emplace_back(std::move(port));
     }
 
-    QSerialPortInfo& current_port = m_value.m_port;
+    QSerialPortInfo& current_port = *m_value.m_port;
 
     size_t index = 0;
     for (size_t c = 0; c < m_ports.size(); c++){
@@ -173,7 +173,7 @@ void SerialSelectorWidget::reset(){
     stop();
     emit on_ready(false);
     refresh();
-    m_connection.reset(m_value.m_port);
+    m_connection.reset(*m_value.m_port);
 }
 
 

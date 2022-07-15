@@ -26,7 +26,7 @@ AlignedVector<Object>::~AlignedVector(){
     m_capacity = 0;
 }
 template <typename Object>
-AlignedVector<Object>::AlignedVector(AlignedVector&& x)
+AlignedVector<Object>::AlignedVector(AlignedVector&& x) noexcept
     : m_ptr(x.m_ptr)
     , m_size(x.m_size)
     , m_capacity(x.m_capacity)
@@ -36,7 +36,7 @@ AlignedVector<Object>::AlignedVector(AlignedVector&& x)
     x.m_capacity = 0;
 }
 template <typename Object>
-void AlignedVector<Object>::operator=(AlignedVector&& x){
+void AlignedVector<Object>::operator=(AlignedVector&& x) noexcept{
     clear();
     aligned_free(m_ptr);
     m_ptr = x.m_ptr;

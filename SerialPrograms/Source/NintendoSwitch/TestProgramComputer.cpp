@@ -72,6 +72,8 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/ImageTypes/RGB32Image.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 
 
 
@@ -117,6 +119,10 @@ using namespace Kernels;
 
 
 
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
@@ -124,6 +130,30 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+    ImageRGB32 image0("Avermedia-Qt5.png");
+    ImageRGB32 image1(std::move(image0));
+
+    image1.sub_image(100, 100, 100, 100).save("test.png");
+
+
+
+#if 0
+//    QImage image("20220714-114859147833-connect_to_internet_with_inference.png");
+//    QImage image("MyPin-Qt6.png");
+
+    YCommMenuDetector detector(true);
+    cout << detector.detect(QImage("MiraBox-Qt5.png")) << endl;
+    cout << detector.detect(QImage("MiraBox-Qt5.png")) << endl;
+    cout << detector.detect(QImage("MyPin-Qt5.png")) << endl;
+    cout << detector.detect(QImage("MyPin-Qt6.png")) << endl;
+    cout << detector.detect(QImage("NoBrand-Qt6.png")) << endl;
+    cout << detector.detect(QImage("ShadowCast-Qt6.png")) << endl;
+    #endif
+
+
+
+#if 0
     GlobalState state;
     state.boss = "dialga";
     state.players[0].pokemon = "cradily";
@@ -135,6 +165,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
     select_move(env.logger(), state, 1);
+#endif
 
 #if 0
     using namespace nlohmann;

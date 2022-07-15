@@ -53,9 +53,9 @@ ImageRef ImageRef::sub_image(size_t min_x, size_t min_y, size_t width, size_t he
         width, height
     );
 }
-void ImageRef::save(const QString& path) const{
+void ImageRef::save(const std::string& path) const{
     QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
-    tmp.save(path);
+    tmp.save(QString::fromStdString(path));
 }
 QImage ImageRef::to_qimage() const{
     QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
@@ -113,9 +113,9 @@ ConstImageRef ConstImageRef::sub_image(size_t min_x, size_t min_y, size_t width,
         width, height
     );
 }
-void ConstImageRef::save(const QString& path) const{
+void ConstImageRef::save(const std::string& path) const{
     QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
-    tmp.save(path);
+    tmp.save(QString::fromStdString(path));
 }
 QImage ConstImageRef::to_qimage() const{
     QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);

@@ -147,11 +147,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    QImage image("screenshot-20220706-164542803531.png");
+
+
+
+#if 0
+    QImage image("MiraBox-Qt5.png");
 
     BattleMenuDetector detector(BattleType::STARTER);
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 //    GreyDialogDetector detector;

@@ -271,6 +271,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTypes/BinaryImage.h
     Source/CommonFramework/ImageTypes/ImageReference.cpp
     Source/CommonFramework/ImageTypes/ImageReference.h
+    Source/CommonFramework/ImageTypes/Planar32ImageView.cpp
+    Source/CommonFramework/ImageTypes/Planar32ImageView.h
+    Source/CommonFramework/ImageTypes/RGB32Image.cpp
+    Source/CommonFramework/ImageTypes/RGB32Image.h
+    Source/CommonFramework/ImageTypes/RGB32ImageView.cpp
+    Source/CommonFramework/ImageTypes/RGB32ImageView.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
     Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp

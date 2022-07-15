@@ -87,7 +87,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         path += "-";
         path += now_to_filestring();
         path += ".png";
-        image.save(QString::fromStdString(path));
+        image.save(path);
 
         pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
 

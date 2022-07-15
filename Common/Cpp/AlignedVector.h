@@ -16,8 +16,8 @@ template <typename Object>
 class AlignedVector{
 public:
     ~AlignedVector();
-    AlignedVector(AlignedVector&& x);
-    void operator=(AlignedVector&& x);
+    AlignedVector(AlignedVector&& x) noexcept;
+    void operator=(AlignedVector&& x) noexcept;
     AlignedVector(const AlignedVector&);
     void operator=(const AlignedVector&);
 
@@ -26,6 +26,7 @@ public:
     AlignedVector(size_t items);
 
 public:
+    size_t empty() const{ return m_size == 0; }
     size_t size() const{ return m_size; }
     size_t capacity() const{ return m_capacity; }
 

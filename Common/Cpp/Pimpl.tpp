@@ -37,9 +37,24 @@ void Pimpl<Type>::operator=(const Pimpl& x){
 
 template <typename Type>
 template <class... Args>
-Pimpl<Type>::Pimpl(Args&&... args)
+Pimpl<Type>::Pimpl(PimplConstruct, Args&&... args)
     : m_ptr(new Type(std::forward<Args>(args)...))
 {}
+
+
+template <typename Type>
+void Pimpl<Type>::clear(){
+    delete m_ptr;
+    m_ptr = nullptr;
+}
+
+template <typename Type>
+template <class... Args>
+void Pimpl<Type>::reset(Args&&... args){
+    Type* ptr = new Type(std::forward<Args>(args)...);
+    delete m_ptr;
+    m_ptr = ptr;
+}
 
 
 

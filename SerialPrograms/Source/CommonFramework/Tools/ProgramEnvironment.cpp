@@ -58,7 +58,7 @@ ProgramEnvironment::ProgramEnvironment(
     : m_logger(logger)
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)
-    , m_data(program_info)
+    , m_data(CONSTRUCT_TOKEN, program_info)
 {}
 
 const ProgramInfo& ProgramEnvironment::program_info() const{

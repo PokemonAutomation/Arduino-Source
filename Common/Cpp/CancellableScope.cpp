@@ -32,7 +32,9 @@ struct CancellableData{
 
 
 
-Cancellable::Cancellable(){}
+Cancellable::Cancellable()
+    : m_impl(CONSTRUCT_TOKEN)
+{}
 Cancellable::~Cancellable(){
     detach();
 }
@@ -46,7 +48,7 @@ bool Cancellable::cancelled() const noexcept{
 }
 bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     m_sanitizer.check_usage();
-    CancellableData& data(m_impl);
+    CancellableData& data(*m_impl);
     SpinLockGuard lg(data.lock);
     if (exception && !data.exception){
         data.exception = std::move(exception);
@@ -58,7 +60,7 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
 }
 void Cancellable::throw_if_cancelled() const{
     m_sanitizer.check_usage();
-    const CancellableData& data(m_impl);
+    const CancellableData& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return;
     }
@@ -71,7 +73,7 @@ void Cancellable::throw_if_cancelled() const{
 }
 bool Cancellable::throw_if_cancelled_with_exception() const{
     m_sanitizer.check_usage();
-    const CancellableData& data(m_impl);
+    const CancellableData& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return false;
     }
@@ -106,7 +108,9 @@ struct CancellableScopeData{
 
 
 
-CancellableScope::CancellableScope(){}
+CancellableScope::CancellableScope()
+    : m_impl(CONSTRUCT_TOKEN)
+{}
 CancellableScope::~CancellableScope(){
     detach();
 }
@@ -114,7 +118,7 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(exception)){
         return true;
     }
-    CancellableScopeData& data(m_impl);
+    CancellableScopeData& data(*m_impl);
     std::lock_guard lg(data.lock);
     for (Cancellable* child : data.children){
         child->cancel(exception);
@@ -130,7 +134,7 @@ void CancellableScope::wait_for(std::chrono::milliseconds duration){
 void CancellableScope::wait_until(WallClock stop){
     m_sanitizer.check_usage();
     throw_if_cancelled();
-    CancellableScopeData& data(m_impl);
+    CancellableScopeData& data(*m_impl);
     {
         std::unique_lock<std::mutex> lg(data.lock);
         data.cv.wait_until(
@@ -145,7 +149,7 @@ void CancellableScope::wait_until(WallClock stop){
 void CancellableScope::wait_until_cancel(){
     m_sanitizer.check_usage();
     throw_if_cancelled();
-    CancellableScopeData& data(m_impl);
+    CancellableScopeData& data(*m_impl);
     {
         std::unique_lock<std::mutex> lg(data.lock);
         data.cv.wait(
@@ -159,14 +163,14 @@ void CancellableScope::wait_until_cancel(){
 }
 void CancellableScope::operator+=(Cancellable& cancellable){
     m_sanitizer.check_usage();
-    CancellableScopeData& data(m_impl);
+    CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);
     throw_if_cancelled();
     data.children.insert(&cancellable);
 }
 void CancellableScope::operator-=(Cancellable& cancellable){
     m_sanitizer.check_usage();
-    CancellableScopeData& data(m_impl);
+    CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);
     data.children.erase(&cancellable);
 }

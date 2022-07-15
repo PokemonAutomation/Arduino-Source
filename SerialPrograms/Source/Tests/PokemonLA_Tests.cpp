@@ -367,7 +367,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         std::ostringstream os;
         os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
         std::string sprite_filename = os.str();
-        extract_box_reference(sprite_image, new_box).save(QString::fromStdString(sprite_filename));
+        extract_box_reference(sprite_image, new_box).save(sprite_filename);
     }
     output_quest.save("test_MMO_question_mark_detection_" + QString::number(count) + ".png");
     output_sprite.save("test_sprite_detection_" + QString::number(count) + ".png");
