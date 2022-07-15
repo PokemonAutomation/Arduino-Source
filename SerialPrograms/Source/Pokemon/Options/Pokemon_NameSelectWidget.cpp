@@ -67,6 +67,12 @@ NameSelectWidget::NameSelectWidget(
     }
     this->addItems(list);
 
+    // Inititalize the widget to at least select sth.
+    if (slugs.size() > 0){
+        this->setCurrentIndex(0);
+    }
+
+    // Set the widget to select the pokemon `current_slug`.
     for (size_t index = 0; index < slugs.size(); index++){
         const std::string& slug = slugs[index];
 

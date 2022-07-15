@@ -53,6 +53,10 @@ public:
                 m_slug = box->slug();
             }
         );
+        // When a PokemonNameListRow is constructed, `m_slug` is empty. It needs to be assigned the first slug in the pokemon
+        // name list, since the NameSelectWidget by default selects the first pokemon.
+        // So here we assign box->slug() back to `m_slug`.
+        m_slug = box->slug();
         return {box};
     }
 
