@@ -40,7 +40,7 @@ bool YCommMenuDetector::detect(const QImage& screen){
 
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << top.average << top.stddev << endl;
-    if (!is_solid(top, {0.167835, 0.134728, 0.697437}, 0.2)){
+    if (!is_solid(top, {0.0819777, 0.124031, 0.793991}, 0.2)){
         return false;
     }
 
