@@ -82,14 +82,14 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/FixedLimitVector.tpp
-    ../Common/Cpp/Json/JsonTools.cpp
-    ../Common/Cpp/Json/JsonTools.h
-    ../Common/Cpp/Json/JsonValue.cpp
-    ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/Json/JsonArray.cpp
     ../Common/Cpp/Json/JsonArray.h
     ../Common/Cpp/Json/JsonObject.cpp
     ../Common/Cpp/Json/JsonObject.h
+    ../Common/Cpp/Json/JsonTools.cpp
+    ../Common/Cpp/Json/JsonTools.h
+    ../Common/Cpp/Json/JsonValue.cpp
+    ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/PanicDump.cpp
@@ -505,12 +505,12 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_Default.cpp
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
-    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
-    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h
@@ -1064,10 +1064,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
-    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
-    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
+    Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
@@ -1431,6 +1431,8 @@ file(GLOB MAIN_SOURCES
     Source/Tests/CommandLineTests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
+    Source/Tests/PokemonSwSh_Tests.cpp
+    Source/Tests/PokemonSwSh_Tests.h
     Source/Tests/TestMap.cpp
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp

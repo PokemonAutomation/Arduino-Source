@@ -706,6 +706,7 @@ SOURCES += \
     Source/PokemonSwSh/ShinyHuntTracker.cpp \
     Source/Tests/CommandLineTests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
     Source/Tests/TestUtils.cpp
 
@@ -1441,6 +1442,7 @@ HEADERS += \
     Source/PokemonSwSh/ShinyHuntTracker.h \
     Source/Tests/CommandLineTests.h \
     Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
     Source/Tests/TestUtils.h
 

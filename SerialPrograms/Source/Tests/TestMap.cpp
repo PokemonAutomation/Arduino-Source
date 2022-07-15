@@ -7,6 +7,7 @@
 
 #include "Common/Cpp/AlignedVector.tpp"
 #include "PokemonLA_Tests.h"
+#include "PokemonSwSh_Tests.h"
 #include "TestMap.h"
 #include "TestUtils.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -207,6 +208,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
 
 const std::map<std::string, TestFunction> TEST_MAP = {
+    {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
     {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
     {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
     {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},
