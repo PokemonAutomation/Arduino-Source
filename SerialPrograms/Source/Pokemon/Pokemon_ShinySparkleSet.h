@@ -26,10 +26,10 @@ public:
 
     virtual std::string to_str() const = 0;
 
-    virtual void read_from_image(const ConstImageRef& image) = 0;
+    virtual void read_from_image(const ImageViewRGB32& image) = 0;
     virtual void draw_boxes(
         VideoOverlaySet& overlays,
-        const QImage& frame,
+        const ImageViewRGB32& frame,
         const ImageFloatBox& inference_box
     ) const = 0;
 

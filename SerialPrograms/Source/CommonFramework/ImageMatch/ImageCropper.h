@@ -10,7 +10,7 @@
 #include <functional>
 #include <QImage>
 #include "CommonFramework/ImageTypes/ImageReference.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{

@@ -8,7 +8,7 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"

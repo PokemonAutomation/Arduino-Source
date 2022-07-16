@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-std::vector<ImagePixelBox> find_seeker_bubbles(const QImage& image);
+std::vector<ImagePixelBox> find_seeker_bubbles(const ImageViewRGB32& image);
 
 
 

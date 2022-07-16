@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"

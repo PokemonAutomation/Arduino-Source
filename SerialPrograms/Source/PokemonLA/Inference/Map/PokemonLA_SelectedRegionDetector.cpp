@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"

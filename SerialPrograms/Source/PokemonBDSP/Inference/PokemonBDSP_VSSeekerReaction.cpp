@@ -53,7 +53,7 @@ bool is_seeker_bubble(const ImageViewRGB32& image, const WaterfillObject& object
     return rmsd <= 80;
 }
 
-std::vector<ImagePixelBox> find_seeker_bubbles(const ConstImageRef& image){
+std::vector<ImagePixelBox> find_seeker_bubbles(const ImageViewRGB32& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400);
     std::vector<ImagePixelBox> ret;

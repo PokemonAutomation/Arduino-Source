@@ -68,7 +68,7 @@ std::string ShinySparkleSetBDSP::to_str() const{
 }
 void ShinySparkleSetBDSP::draw_boxes(
     VideoOverlaySet& overlays,
-    const QImage& frame,
+    const ImageViewRGB32& frame,
     const ImageFloatBox& inference_box
 ) const{
     for (const ImagePixelBox& box : balls){
@@ -104,7 +104,7 @@ ShinySparkleSetBDSP find_sparkles(WaterfillSession& session){
     }
     return sparkles;
 }
-void ShinySparkleSetBDSP::read_from_image(const ConstImageRef& image){
+void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
     clear();
     if (!image){
         return;

@@ -10,7 +10,7 @@
 #include <map>
 #include <QIcon>
 #include <QImage>
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 

@@ -9,7 +9,7 @@
 
 #include <string>
 #include "Common/Cpp/Pimpl.h"
-#include "RGB32ImageView.h"
+#include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 

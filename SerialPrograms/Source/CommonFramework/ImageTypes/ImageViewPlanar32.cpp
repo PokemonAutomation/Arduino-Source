@@ -5,7 +5,7 @@
  */
 
 #include <algorithm>
-#include "Planar32ImageView.h"
+#include "ImageViewPlanar32.h"
 
 namespace PokemonAutomation{
 

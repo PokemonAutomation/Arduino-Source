@@ -11,7 +11,7 @@
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageDiff.h"
 
 #include <iostream>

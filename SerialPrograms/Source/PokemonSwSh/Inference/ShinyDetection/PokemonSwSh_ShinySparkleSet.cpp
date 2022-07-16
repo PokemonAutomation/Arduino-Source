@@ -56,7 +56,7 @@ std::string ShinySparkleSetSwSh::to_str() const{
 }
 void ShinySparkleSetSwSh::draw_boxes(
     VideoOverlaySet& overlays,
-    const QImage& frame,
+    const ImageViewRGB32& frame,
     const ImageFloatBox& inference_box
 ) const{
     for (const ImagePixelBox& box : balls){
@@ -111,7 +111,7 @@ ShinySparkleSetSwSh find_sparkles(WaterfillSession& session){
     }
     return sparkles;
 }
-void ShinySparkleSetSwSh::read_from_image(const ConstImageRef& image){
+void ShinySparkleSetSwSh::read_from_image(const ImageViewRGB32& image){
     clear();
     if (!image){
         return;

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ColorClustering_H
 #define PokemonAutomation_CommonFramework_ColorClustering_H
 
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "FloatPixel.h"
 
 namespace PokemonAutomation{

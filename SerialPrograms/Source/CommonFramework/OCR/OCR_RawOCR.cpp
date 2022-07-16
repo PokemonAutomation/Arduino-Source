@@ -11,7 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "TesseractPA.h"
 #include "OCR_RawOCR.h"
 

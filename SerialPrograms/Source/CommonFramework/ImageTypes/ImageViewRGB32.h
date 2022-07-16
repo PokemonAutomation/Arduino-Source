@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_RGB32ImageView_H
 
 #include <string>
-#include "Planar32ImageView.h"
+#include "ImageViewPlanar32.h"
 
 class QImage;
 

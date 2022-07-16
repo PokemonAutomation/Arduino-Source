@@ -7,8 +7,8 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "ImageReference.h"
-#include "RGB32Image.h"
-#include "RGB32ImageView.h"
+#include "ImageRGB32.h"
+#include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 

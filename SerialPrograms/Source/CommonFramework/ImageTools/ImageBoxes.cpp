@@ -9,7 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageBoxes.h"
 
 #include <iostream>
@@ -209,7 +209,7 @@ QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, 
 
 
 ImageFloatBox translate_to_parent(
-    const ConstImageRef& original_image,
+    const ImageViewRGB32& original_image,
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 ){

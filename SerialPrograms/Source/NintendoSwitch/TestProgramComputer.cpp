@@ -72,7 +72,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/ImageTypes/RGB32Image.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 
 

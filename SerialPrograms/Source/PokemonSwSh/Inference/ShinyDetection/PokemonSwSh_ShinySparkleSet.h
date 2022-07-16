@@ -32,11 +32,11 @@ public:
     double alpha_square() const{ return m_alpha_square; }
 
     virtual std::string to_str() const override;
-    virtual void read_from_image(const ConstImageRef& image) override;
+    virtual void read_from_image(const ImageViewRGB32& image) override;
 
     virtual void draw_boxes(
         VideoOverlaySet& overlays,
-        const QImage& frame,
+        const ImageViewRGB32& frame,
         const ImageFloatBox& inference_box
     ) const override;
 

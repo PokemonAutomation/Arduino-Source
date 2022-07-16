@@ -120,7 +120,7 @@ QImage extract_box_copy(const QImage& image, const ImageFloatBox& box, int offse
 //  This is used for translating detection box within inference boxes back to
 //  the parent so it can be displayed in a VideoOverlay.
 ImageFloatBox translate_to_parent(
-    const ConstImageRef& original_image,
+    const ImageViewRGB32& original_image,
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 );

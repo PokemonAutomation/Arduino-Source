@@ -7,7 +7,7 @@
 #include <mutex>
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ErrorDumper.h"
 

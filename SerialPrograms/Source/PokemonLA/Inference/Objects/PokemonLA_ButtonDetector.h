@@ -10,7 +10,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"

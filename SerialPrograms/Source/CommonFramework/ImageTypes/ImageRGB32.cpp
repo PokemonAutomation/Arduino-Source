@@ -9,8 +9,8 @@
 #include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.tpp"
-#include "RGB32Image.h"
-#include "RGB32ImageView.h"
+#include "ImageRGB32.h"
+#include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 

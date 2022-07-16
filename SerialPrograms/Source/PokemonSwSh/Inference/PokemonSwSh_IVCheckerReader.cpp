@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/ImageTypes/RGB32ImageView.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonSwSh_IVCheckerReader.h"
 
 namespace PokemonAutomation{
