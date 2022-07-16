@@ -120,8 +120,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
         TradeNameReader name_reader0(env.consoles[0], env.consoles[0], LANGUAGE_LEFT);
         TradeNameReader name_reader1(env.consoles[1], env.consoles[1], LANGUAGE_RIGHT);
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-            ConstImageRef image0 = extract_box_reference(console.video().snapshot(), box0);
-            ImageStats stats = image_stats(image0);
+            ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool is_ok = is_white(stats);
             if (!is_ok){
                 console.log("Skipping empty slot.", COLOR_ORANGE);
