@@ -13,41 +13,43 @@
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
 class QImage;
 
 namespace PokemonAutomation{
 
+class ImageViewRGB32;
 
 
 PackedBinaryMatrix2 compress_rgb32_to_binary_min(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     uint8_t min_red,
     uint8_t min_green,
     uint8_t min_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_max(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     uint8_t max_red,
     uint8_t max_green,
     uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     uint32_t mins, uint32_t maxs
 );
 
@@ -58,7 +60,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
 //  Pixels Within filter color ranges are marked as 1 in the corresponding binary matrices,
 //  while those output of range are 0.
 std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters
 );
 
@@ -66,7 +68,7 @@ std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
 
 //  Run multiple filters and OR them all together. (experimental)
 PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters
 );
 

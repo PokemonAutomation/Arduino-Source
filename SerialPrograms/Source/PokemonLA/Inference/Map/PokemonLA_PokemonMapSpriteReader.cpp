@@ -13,6 +13,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageTools/ImageStats.h"

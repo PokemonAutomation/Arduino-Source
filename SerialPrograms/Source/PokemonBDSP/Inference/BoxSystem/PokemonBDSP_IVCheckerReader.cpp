@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "PokemonBDSP_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -24,7 +25,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 
 
 IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box){
-    ConstImageRef image = extract_box_reference(frame, box);
+    ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
         logger, m_language, image,
         OCR::BLACK_TEXT_FILTERS()

@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageCropper.h"
 #include "ImageDiff.h"
 #include "CroppedImageDictionaryMatcher.h"
@@ -41,7 +42,7 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, QImage image){
 
 
 ImageMatchResult CroppedImageDictionaryMatcher::match(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     double alpha_spread
 ) const{
     ImageMatchResult results;
@@ -49,7 +50,7 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         return results;
     }
 
-    QImage processed = image.to_qimage();
+    QImage processed = image.to_QImage_owning();
     QRgb background = crop_image(processed);
 //    image.save("test.png");
 //    cout << FloatPixel(background) << endl;

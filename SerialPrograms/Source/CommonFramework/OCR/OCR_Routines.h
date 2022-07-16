@@ -9,9 +9,9 @@
 
 #include <vector>
 #include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace OCR{
 
 struct StringMatchResult;
@@ -31,7 +31,7 @@ struct TextColorRange{
 
 
 StringMatchResult multifiltered_OCR(
-    Language language, const DictionaryMatcher& dictionary, const ConstImageRef& image,
+    Language language, const DictionaryMatcher& dictionary, const ImageViewRGB32& image,
     const std::vector<TextColorRange>& text_color_ranges,
     double log10p_spread,
     double min_text_ratio = 0.01, double max_text_ratio = 0.50

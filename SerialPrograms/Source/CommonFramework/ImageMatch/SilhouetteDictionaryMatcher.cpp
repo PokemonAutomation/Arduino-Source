@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageCropper.h"
 #include "ImageDiff.h"
 #include "SilhouetteDictionaryMatcher.h"

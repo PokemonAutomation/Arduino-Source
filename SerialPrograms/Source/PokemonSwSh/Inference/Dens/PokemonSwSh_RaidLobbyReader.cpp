@@ -9,6 +9,7 @@
 
 #include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "PokemonSwSh_RaidLobbyReader.h"

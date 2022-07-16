@@ -7,6 +7,7 @@
 #include <set>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -132,7 +133,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
 
         ImageFloatBox dialog_box(0.218, 0.835, 0.657, 0.12);
-        ConstImageRef dialog_image = extract_box_reference(screen, dialog_box);
+        ImageViewRGB32 dialog_image = extract_box_reference(screen, dialog_box);
         const auto result = Pokemon::BerryNameReader::instance().read_substring(
             env.console, LANGUAGE, dialog_image,
             OCR::BLACK_TEXT_FILTERS()

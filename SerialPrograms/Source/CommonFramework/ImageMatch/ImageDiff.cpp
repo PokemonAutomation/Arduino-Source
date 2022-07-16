@@ -11,6 +11,7 @@
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageDiff.h"
 
 #include <iostream>
@@ -21,7 +22,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-FloatPixel pixel_average(const ConstImageRef& image, const ConstImageRef& alpha_mask){
+FloatPixel pixel_average(const ImageViewRGB32& image, const ImageViewRGB32& alpha_mask){
     if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
@@ -52,7 +53,7 @@ void scale_brightness(const ImageRef& image, const FloatPixel& multiplier){
 
 
 
-double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image){
+double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image){
     if (!image){
 //        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
         return 765; //  Max possible deviation.
@@ -70,7 +71,7 @@ double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image){
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }
-double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image, QRgb background){
+double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, QRgb background){
     if (!image){
 //        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
         return 765; //  Max possible deviation.
@@ -89,7 +90,7 @@ double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image, QR
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }
-double pixel_RMSD_masked(const ConstImageRef& reference, const ConstImageRef& image){
+double pixel_RMSD_masked(const ImageViewRGB32& reference, const ImageViewRGB32& image){
     if (!image){
 //        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
         return 765; //  Max possible deviation.

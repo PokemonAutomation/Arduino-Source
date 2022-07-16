@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ColorClustering_H
 #define PokemonAutomation_CommonFramework_ColorClustering_H
 
-#include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "FloatPixel.h"
 
 namespace PokemonAutomation{
@@ -33,13 +33,13 @@ private:
 };
 
 double cluster_fit_2(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     QRgb color0, PixelEuclideanStatAccumulator& cluster0,
     QRgb color1, PixelEuclideanStatAccumulator& cluster1
 );
 
 bool cluster_fit_2(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     QRgb color0, double ratio0,
     QRgb color1, double ratio1,
     double ratio_threshold = 0.2,

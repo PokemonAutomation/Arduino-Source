@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -84,7 +85,7 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot());
+        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot().frame);
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",

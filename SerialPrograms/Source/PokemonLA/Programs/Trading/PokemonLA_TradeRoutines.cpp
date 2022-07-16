@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -156,7 +157,7 @@ TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Langua
 }
 
 std::string TradeNameReader::read(const QImage& screen) const{
-    ConstImageRef image = extract_box_reference(screen, m_box);
+    ImageViewRGB32 image = extract_box_reference(screen, m_box);
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
         m_logger, m_language, image,
         OCR::WHITE_TEXT_FILTERS()

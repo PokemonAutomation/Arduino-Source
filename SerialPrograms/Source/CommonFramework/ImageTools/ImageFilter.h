@@ -15,7 +15,10 @@ class QImage;
 
 namespace PokemonAutomation{
 
+
 class ConstImageRef;
+class ImageViewRGB32;
+
 
 //  If `invert` is false, replace the color outside of the range [mins, maxs] with the color `replace_with`.
 //  If `invert` is true, replace the color range [mins, maxs] with `replace_with`.
@@ -33,7 +36,7 @@ struct FilterRgb32Range{
     bool invert;
 };
 std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<FilterRgb32Range>& filters
 );
 
@@ -56,7 +59,7 @@ struct BlackWhiteRgb32Range{
     bool in_range_black;
 };
 std::vector<std::pair<QImage, size_t>> to_blackwhite_rgb32_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<BlackWhiteRgb32Range>& filters
 );
 

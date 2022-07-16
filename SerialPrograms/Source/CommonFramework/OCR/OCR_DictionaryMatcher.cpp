@@ -39,7 +39,7 @@ StringMatchResult DictionaryMatcher::match_substring(
 OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifiltered(
     LoggerQt* logger,
     Language language,
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double max_log10p, double log10p_spread,
     double min_text_ratio, double max_text_ratio

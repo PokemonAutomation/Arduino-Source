@@ -6,9 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -472,7 +473,7 @@ std::set<std::string> OutbreakFinder::read_MMOs(
     DialogueYellowArrowDetector yellow_arrow_detector(env.logger(), env.console.overlay(), true);
     int ret = wait_until(env.console, context, std::chrono::seconds(10), {{yellow_arrow_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot());
+        dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot().frame);
         throw OperationFailedException(env.console, "Dialog box not detected when waiting for MMO map.");
     }
 
@@ -481,7 +482,7 @@ std::set<std::string> OutbreakFinder::read_MMOs(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "MapNotDetected", env.console.video().snapshot());
+        dump_image(env.console.logger(), env.program_info(), "MapNotDetected", env.console.video().snapshot().frame);
         throw OperationFailedException(env.console, "Map not detected after talking to Mai.");
     }
     env.console.log("Found revealed map thanks to Munchlax!");

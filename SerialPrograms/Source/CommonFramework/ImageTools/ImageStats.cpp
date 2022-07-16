@@ -7,6 +7,7 @@
 #include <cmath>
 #include <QImage>
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageBoxes.h"
 #include "ImageStats.h"
 
@@ -18,7 +19,7 @@ namespace PokemonAutomation{
 
 
 
-FloatPixel image_average(const ConstImageRef& image){
+FloatPixel image_average(const ImageViewRGB32& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
@@ -30,7 +31,7 @@ FloatPixel image_average(const ConstImageRef& image){
 
     return sum / sums.count;
 }
-FloatPixel image_stddev(const ConstImageRef& image){
+FloatPixel image_stddev(const ImageViewRGB32& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
@@ -49,7 +50,7 @@ FloatPixel image_stddev(const ConstImageRef& image){
         std::sqrt(variance.b)
     );
 }
-ImageStats image_stats(const ConstImageRef& image){
+ImageStats image_stats(const ImageViewRGB32& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
@@ -78,7 +79,7 @@ ImageStats image_stats(const ConstImageRef& image){
 
 
 
-ImageStats image_border_stats(const ConstImageRef& image){
+ImageStats image_border_stats(const ImageViewRGB32& image){
     size_t w = image.width();
     size_t h = image.height();
     if (w * h <= 1){

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -113,7 +114,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot().frame);
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
@@ -183,7 +184,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot().frame);
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 

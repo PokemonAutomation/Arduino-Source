@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_SolidColorTest_H
 
 #include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageStats.h"
 #include "ImageBoxes.h"
 

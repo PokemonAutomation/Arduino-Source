@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -114,7 +115,7 @@ void from_professor_return_to_jubilife(
             pbf_mash_button(context, BUTTON_B, 20);
             break;
         default:
-            dump_image(env.logger(), env.program_info(), "ReturnToJubilife", console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "ReturnToJubilife", console.video().snapshot().frame);
             throw OperationFailedException(console, "Did not detect option to return to Jubilife.");
         }
     }
@@ -133,7 +134,7 @@ void mash_A_to_enter_sub_area(
         {{black_screen0}}
     );
     if (ret < 0){
-        dump_image(env.logger(), env.program_info(), "LoadSubArea", console.video().snapshot());
+        dump_image(env.logger(), env.program_info(), "LoadSubArea", console.video().snapshot().frame);
         throw OperationFailedException(console, "Failed to load into sub area after 7 seconds.");
     }
 
@@ -169,7 +170,7 @@ void mash_A_to_change_region(
         }
     );
     if (ret < 0){
-        dump_image(console.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "LoadRegion", console.video().snapshot().frame);
         throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
     console.log("Loaded into map...");
@@ -198,7 +199,7 @@ void goto_camp_from_jubilife(
             {{detector}}
         );
         if (ret < 0){
-            dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
+            dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot().frame);
             throw OperationFailedException(console, "Map not detected after 10 x A presses.");
         }
         console.log("Found map!");
@@ -218,7 +219,7 @@ void goto_camp_from_jubilife(
         context.wait_for_all_requests();
     }
     if (current_region != location.region){
-        dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot().frame);
         throw OperationFailedException(console, std::string("Unable to find: ") + location.label);
     }
 
@@ -246,7 +247,7 @@ void goto_camp_from_jubilife(
             {{detector}}
         );
         if (ret < 0){
-            dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot().frame);
             throw OperationFailedException(console, "Map not detected after 5 seconds.");
         }
         console.log("Found map!");
@@ -284,7 +285,7 @@ void goto_camp_from_jubilife(
         {{black_screen}}
     );
     if (ret < 0){
-        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot().frame);
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at sub-camp...");
@@ -316,7 +317,7 @@ void goto_camp_from_overworld(
         }
 
         if (current_time() - start > std::chrono::seconds(60)){
-            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
+            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot().frame);
             throw OperationFailedException(console, "Unable to escape from being attacked.");
         }
 
@@ -374,7 +375,7 @@ void goto_camp_from_overworld(
         {{black_screen}}
     );
     if (ret < 0){
-        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot().frame);
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");
@@ -398,7 +399,7 @@ void goto_any_camp_from_overworld(
         }
 
         if (current_time() - start > std::chrono::seconds(60)){
-            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
+            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot().frame);
             throw OperationFailedException(console, "Unable to escape from being attacked.");
         }
 
@@ -459,7 +460,7 @@ void goto_any_camp_from_overworld(
         {{black_screen}}
     );
     if (ret < 0){
-        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot().frame);
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");

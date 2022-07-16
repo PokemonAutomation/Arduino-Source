@@ -8,6 +8,7 @@
 #include <vector>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "ImageDiff.h"
 #include "ExactImageDictionaryMatcher.h"
@@ -28,7 +29,7 @@ namespace ImageMatch{
 //   e.g. tolerance of 1 means translating the candidate images around so that it can match
 //   the template with at most 1 pixel off on the template image. 
 std::vector<QImage> make_image_set(
-    const ConstImageRef& screen,
+    const ImageViewRGB32& screen,
     const ImageFloatBox& box,
     const QSize& dimensions,
     size_t tolerance
@@ -50,7 +51,7 @@ std::vector<QImage> make_image_set(
 //            }
 
             ret.emplace_back(
-                extract_box_reference(screen, box, x * scale, y * scale).scaled_to_qimage(dimensions.width(), dimensions.height())
+                extract_box_reference(screen, box, x * scale, y * scale).scaled_to_QImage(dimensions.width(), dimensions.height())
             );
 //            cout << "make_image_set(): image = " << ret.back().width() << " x " << ret.back().height() << endl;
 //            if (x == 0 && y == 0){
@@ -126,7 +127,7 @@ double ExactImageDictionaryMatcher::compare(
 }
 
 ImageMatchResult ExactImageDictionaryMatcher::match(
-    const ConstImageRef& image, const ImageFloatBox& box,
+    const ImageViewRGB32& image, const ImageFloatBox& box,
     size_t tolerance,
     double alpha_spread
 ) const{
@@ -151,7 +152,7 @@ ImageMatchResult ExactImageDictionaryMatcher::match(
 
 ImageMatchResult ExactImageDictionaryMatcher::subset_match(
     const std::vector<std::string>& subset,
-    const ConstImageRef& image, const ImageFloatBox& box,
+    const ImageViewRGB32& image, const ImageFloatBox& box,
     size_t tolerance,
     double alpha_spread
 ) const{

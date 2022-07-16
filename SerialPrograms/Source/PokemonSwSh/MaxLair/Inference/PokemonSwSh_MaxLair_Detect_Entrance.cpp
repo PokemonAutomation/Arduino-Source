@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -39,9 +40,9 @@ bool EntranceDetector::detect(const QImage& screen){
 
     QImage copy;
 
-    ConstImageRef image = extract_box_reference(screen, m_box0);
+    ImageViewRGB32 image = extract_box_reference(screen, m_box0);
     if (image.width() != (size_t)m_entrance_screen.width() || image.height() != (size_t)m_entrance_screen.height()){
-        copy = image.scaled_to_qimage(m_entrance_screen.width(), m_entrance_screen.height());
+        copy = image.scaled_to_QImage(m_entrance_screen.width(), m_entrance_screen.height());
         image = copy;
     }
 

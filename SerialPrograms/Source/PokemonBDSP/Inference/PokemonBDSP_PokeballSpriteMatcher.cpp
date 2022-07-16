@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonBDSP_PokeballSpriteMatcher.h"

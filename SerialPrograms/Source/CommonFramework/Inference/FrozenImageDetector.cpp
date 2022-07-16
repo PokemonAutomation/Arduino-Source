@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "FrozenImageDetector.h"

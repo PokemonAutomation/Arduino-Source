@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_CommonFramework_ImageStats_H
 #define PokemonAutomation_CommonFramework_ImageStats_H
 
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "FloatPixel.h"
 
-class QImage;
-
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 
 
 struct ImageStats{
@@ -25,12 +23,12 @@ struct ImageStats{
 
 
 //  Pixels with alpha < 128 are ignored.
-FloatPixel image_average(const ConstImageRef& image);
-FloatPixel image_stddev(const ConstImageRef& image);
-ImageStats image_stats(const ConstImageRef& image);
+FloatPixel image_average(const ImageViewRGB32& image);
+FloatPixel image_stddev(const ImageViewRGB32& image);
+ImageStats image_stats(const ImageViewRGB32& image);
 
 
-ImageStats image_border_stats(const ConstImageRef& image);
+ImageStats image_border_stats(const ImageViewRGB32& image);
 
 
 

@@ -6,6 +6,7 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -60,7 +61,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     m_context.wait_for(m_read_name_delay);
 
     QImage screen = m_console.video().snapshot();
-    ConstImageRef frame = extract_box_reference(screen, box);
+    ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         m_console, m_language, frame,

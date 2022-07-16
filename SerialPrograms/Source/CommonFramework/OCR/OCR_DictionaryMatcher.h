@@ -14,6 +14,7 @@
 #include "OCR_DictionaryOCR.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace OCR{
 
 
@@ -33,7 +34,7 @@ public:
     OCR::StringMatchResult match_substring_from_image_multifiltered(
         LoggerQt* logger,
         Language language,
-        const ConstImageRef& image,
+        const ImageViewRGB32& image,
         const std::vector<OCR::TextColorRange>& text_color_ranges,
         double max_log10p, double log10p_spread = 0.5,
         double min_text_ratio = 0.01, double max_text_ratio = 0.50

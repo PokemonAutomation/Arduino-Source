@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -49,7 +50,7 @@ StateMachineAction mash_A_to_entrance(
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
         runtime.session_stats.add_error();
-        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
+        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot().frame);
         return StateMachineAction::RESET_RECOVER;
     }
     return StateMachineAction::KEEP_GOING;

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -57,7 +58,7 @@ bool openedgame_to_ingame(
     ok &= openedgame_to_gamemenu(console, context, load_game_timeout);
     ok &= gamemenu_to_ingame(console, context, mash_duration, enter_game_timeout);
     if (!ok){
-        dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot().frame);
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);

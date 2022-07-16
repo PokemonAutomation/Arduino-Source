@@ -9,6 +9,7 @@
 #include "Common/Cpp/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "OCR_SmallDictionaryMatcher.h"

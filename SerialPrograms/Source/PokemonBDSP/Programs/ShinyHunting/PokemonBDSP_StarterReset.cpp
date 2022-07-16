@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -145,7 +146,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             env.log("Timed out waiting for briefcase.", COLOR_RED);
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.logger(), env.program_info(), "Briefcase", env.console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "Briefcase", env.console.video().snapshot().frame);
             continue;
         }
 
@@ -206,7 +207,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (result_own.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.logger(), env.program_info(), "UnknownShinyDetection", env.console.video().snapshot());
+            dump_image(env.logger(), env.program_info(), "UnknownShinyDetection", env.console.video().snapshot().frame);
         }else{
             consecutive_failures = 0;
         }

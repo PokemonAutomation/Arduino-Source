@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -144,7 +145,7 @@ void DexRecFinder::read_line(
     const std::set<std::string>& desired,
     const std::set<std::string>& exclusions
 ){
-    ConstImageRef image = extract_box_reference(frame, box);
+    ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         logger, language, image,
         OCR::BLACK_TEXT_FILTERS()

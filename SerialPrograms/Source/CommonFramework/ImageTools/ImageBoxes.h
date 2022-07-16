@@ -13,6 +13,8 @@
 class QImage;
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
+    class ImageRGB32;
 namespace Kernels{
 namespace Waterfill{
     class WaterfillObject;
@@ -91,6 +93,8 @@ struct ImageFloatBox{
 //  Given an image, extract the request box from it.
 
 //  Return a reference to the sub-region of the image.
+ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box);
+ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box);
 ConstImageRef extract_box_reference(const ConstImageRef& image, const ImagePixelBox& box);
 ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box);
 ConstImageRef extract_box_reference(const QImage& image, const ImagePixelBox& box);
@@ -99,6 +103,7 @@ ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box);
 ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box);
 ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
 ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
+ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, int offset_x, int offset_y);
 ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 //  Deep copy the sub-region.

@@ -12,6 +12,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace ImageMatch{
 
 
@@ -29,26 +30,26 @@ public:
     // the input image, then compute their RMSD (root mean square deviation).
     // The part of the image template where alpha is 0 is not used to compare with the corresponding
     // part in the input image.
-    double rmsd(const ConstImageRef& image) const;
+    double rmsd(const ImageViewRGB32& image) const;
     // Resize image to match the shape of the image template, scale the template brightness to match
     // the input image, then compute their RMSD (root mean square deviation).
     // The part of the image template where alpha is 0 is replace with `background` color when comparing
     // against the corresponding part in the input image.
-    double rmsd(const ConstImageRef& image, QRgb background) const;
+    double rmsd(const ImageViewRGB32& image, QRgb background) const;
     // Resize image to match the shape of the image template, scale the template brightness to match
     // the input image, then compute their RMSD (root mean square deviation).
     // Alpha channels from both the template and the input image are considered when computing RMSD.
     // If only one of the two has alpha==255 on one pixel, that the deviation on that pixel is the max pixel
     // distance.
     // If both two images have alpha==0 on one pixel, that pixel is ignored.
-    double rmsd_masked(const ConstImageRef& image) const;
+    double rmsd_masked(const ImageViewRGB32& image) const;
 
     const QImage& image_template() const { return m_image; }
 
 private:
     // scale stored image template according to the brightness of `image`, assign
     // the scaled template to `reference`.
-    void process_images(QImage& reference, const ConstImageRef& image) const;
+    void process_images(QImage& reference, const ImageViewRGB32& image) const;
 
 public:
     QImage m_image;
@@ -77,11 +78,11 @@ public:
     WeightedExactImageMatcher(QImage image_template, const InverseStddevWeight& weight);
 
     // Like ExactImageMatcher::rmsd(image) but scale based on template stddev.
-    double diff(const ConstImageRef& image) const;
+    double diff(const ImageViewRGB32& image) const;
     // Like ExactImageMatcher::rmsd(image, background) but scale based on template stddev.
-    double diff(const ConstImageRef& image, QRgb background) const;
+    double diff(const ImageViewRGB32& image, QRgb background) const;
     // Like ExactImageMatcher::rmsd_masked(image) but scale based on template stddev.
-    double diff_masked(const ConstImageRef& image) const;
+    double diff_masked(const ImageViewRGB32& image) const;
 
 public:
     double m_multiplier;

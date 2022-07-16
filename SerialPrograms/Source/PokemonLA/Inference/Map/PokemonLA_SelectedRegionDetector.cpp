@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -48,10 +49,10 @@ public:
         }
 
         for (RegionState& region : m_regions){
-            ConstImageRef current = extract_box_reference(frame, region.box);
+            ImageViewRGB32 current = extract_box_reference(frame, region.box);
 
             if (current.width() != (size_t)region.start.width() || current.height() != (size_t)region.start.height()){
-                region.start = current.to_qimage();
+                region.start = current.to_QImage_owning();
                 continue;
             }
 

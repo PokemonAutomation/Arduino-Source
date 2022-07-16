@@ -15,6 +15,7 @@
 #include "ExactImageMatcher.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
     struct ImageFloatBox;
 namespace ImageMatch{
 
@@ -45,7 +46,7 @@ public:
     // The brightness of the input image and the stddev of the template is compensated during
     // matching. 
     ImageMatchResult match(
-        const ConstImageRef& image, const ImageFloatBox& box,
+        const ImageViewRGB32& image, const ImageFloatBox& box,
         size_t tolerance,
         double alpha_spread
     ) const;
@@ -54,7 +55,7 @@ public:
     // See match() for deatils on how the matching is done against a template.
     ImageMatchResult subset_match(
         const std::vector<std::string>& subset,
-        const ConstImageRef& image, const ImageFloatBox& box,
+        const ImageViewRGB32& image, const ImageFloatBox& box,
         size_t tolerance,
         double alpha_spread
     ) const;

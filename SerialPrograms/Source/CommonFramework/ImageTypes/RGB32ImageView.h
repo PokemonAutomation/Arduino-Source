@@ -15,12 +15,19 @@ class QImage;
 namespace PokemonAutomation{
 
 
+class ConstImageRef;
+class ImageRef;
+
+
 class ImageRGB32;
 
 
 class ImageViewRGB32 : public ImageViewPlanar32{
 public:
     using ImageViewPlanar32::ImageViewPlanar32;
+
+    ImageViewRGB32(const ConstImageRef& image);
+    ImageViewRGB32(const ImageRef& image);
 
 public:
     using ImageViewPlanar32::operator bool;

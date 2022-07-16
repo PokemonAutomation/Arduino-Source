@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
@@ -15,7 +16,7 @@ namespace OCR{
 
 
 StringMatchResult multifiltered_OCR(
-    Language language, const DictionaryMatcher& dictionary, const ConstImageRef& image,
+    Language language, const DictionaryMatcher& dictionary, const ImageViewRGB32& image,
     const std::vector<TextColorRange>& text_color_ranges,
     double log10p_spread,
     double min_text_ratio, double max_text_ratio

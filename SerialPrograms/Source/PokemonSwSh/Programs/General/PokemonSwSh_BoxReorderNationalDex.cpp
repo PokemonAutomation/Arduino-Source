@@ -8,6 +8,7 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
@@ -83,7 +84,7 @@ namespace{
         context.wait_for(k_wait_after_read);
 
         QImage screen = console.video().snapshot();
-        ConstImageRef frame = extract_box_reference(screen, box);
+        ImageViewRGB32 frame = extract_box_reference(screen, box);
 
         OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
             console, language, frame,

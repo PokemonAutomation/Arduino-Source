@@ -5,6 +5,7 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -145,7 +146,7 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::RESET_RECOVER;
     default:
         console.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
-        dump_image(console, MODULE_NAME, "ProgramHang", console.video().snapshot());
+        dump_image(console, MODULE_NAME, "ProgramHang", console.video().snapshot().frame);
         global_state.mark_as_dead(console_index);
         return StateMachineAction::RESET_RECOVER;
     }

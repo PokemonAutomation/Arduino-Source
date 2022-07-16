@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_UnderAttackDetector.h"

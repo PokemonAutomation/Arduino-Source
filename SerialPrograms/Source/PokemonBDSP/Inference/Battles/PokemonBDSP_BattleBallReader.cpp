@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
@@ -63,7 +64,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 
     OCR::StringMatchResult name_result;
     {
-        ConstImageRef cropped = extract_box_reference(screen, m_box_name);
+        ImageViewRGB32 cropped = extract_box_reference(screen, m_box_name);
         name_result = m_name_reader.read_substring(
             m_console, m_language, cropped,
             {

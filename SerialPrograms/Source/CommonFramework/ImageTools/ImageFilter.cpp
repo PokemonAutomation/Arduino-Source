@@ -8,6 +8,7 @@
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageFilter.h"
 
 namespace PokemonAutomation{
@@ -24,7 +25,7 @@ size_t filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color rep
     );
 }
 std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<FilterRgb32Range>& filters
 ){
     std::vector<std::pair<QImage, size_t>> ret(filters.size());
@@ -62,7 +63,7 @@ size_t to_blackwhite_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, bo
     );
 }
 std::vector<std::pair<QImage, size_t>> to_blackwhite_rgb32_range(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<BlackWhiteRgb32Range>& filters
 ){
     std::vector<std::pair<QImage, size_t>> ret(filters.size());
