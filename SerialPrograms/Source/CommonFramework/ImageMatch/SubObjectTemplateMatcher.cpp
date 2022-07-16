@@ -42,14 +42,14 @@ ImagePixelBox SubObjectTemplateMatcher::object_from_subobject(const ImagePixelBo
 
 double SubObjectTemplateMatcher::rmsd(
     ImagePixelBox& object_box,
-    const ConstImageRef& image, const ImagePixelBox& subobject_in_image
+    const ImageViewRGB32& image, const ImagePixelBox& subobject_in_image
 ) const{
     object_box = object_from_subobject(subobject_in_image);
 //    cout << object_box.min_x << ", "
 //         << object_box.min_y << ", "
 //         << object_box.max_x << ", "
 //         << object_box.max_y << endl;
-    ConstImageRef object = extract_box_reference(image, object_box);
+    ImageViewRGB32 object = extract_box_reference(image, object_box);
 //    QImage object = extract_box(image, object_box);
 
 //    object.save("test.png");
@@ -64,11 +64,11 @@ double SubObjectTemplateMatcher::rmsd(
 }
 double SubObjectTemplateMatcher::rmsd_with_background_replace(
     ImagePixelBox& object_box,
-    const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
+    const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
     const ImagePixelBox& subobject_in_image
 ) const{
     object_box = object_from_subobject(subobject_in_image);
-    QImage object = extract_box_reference(image, object_box).to_qimage();
+    QImage object = extract_box_reference(image, object_box).to_QImage_owning();
     if (object.isNull() || !check_image(object)){
         return 99999.;
     }
@@ -115,7 +115,7 @@ bool SubObjectTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
 
 bool SubObjectTemplateMatcher::matches(
     ImagePixelBox& object_box,
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const WaterfillObject& subobject_in_image
 ) const{
     if (!check_aspect_ratio(subobject_in_image.width(), subobject_in_image.height())){
@@ -141,7 +141,7 @@ bool SubObjectTemplateMatcher::matches(
 }
 bool SubObjectTemplateMatcher::matches_with_background_replace(
     ImagePixelBox& object_box,
-    const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
+    const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
     const WaterfillObject& subobject_in_image
 ) const{
     if (!check_aspect_ratio(subobject_in_image.width(), subobject_in_image.height())){

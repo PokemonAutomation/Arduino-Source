@@ -54,7 +54,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     m_area_ratio = best->area_ratio();
 }
 
-double WaterfillTemplateMatcher::rmsd(const ConstImageRef& object) const{
+double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& object) const{
     if (!object || !check_image(object)){
         return 99999.;
     }
@@ -79,7 +79,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     // cout << "template area ratio " << m_area_ratio << " candidate " << candidate_area_ratio << " area error = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
-double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
         // cout << "bad aspect ratio" << endl;
         return 99999.;
@@ -103,7 +103,7 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_im
 
     return rmsd;
 }
-double WaterfillTemplateMatcher::rmsd_original(const ConstImageRef& original_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
         // cout << "bad aspect ratio" << endl;
         // double expected_aspect_ratio = (double)m_object.width() / m_object.height();

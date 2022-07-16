@@ -25,7 +25,7 @@ class StartBattleDetector : public VisualInferenceCallback{
 public:
     StartBattleDetector(VideoOverlay& overlay);
 
-    bool detect(const QImage& frame);
+    bool detect(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
@@ -41,7 +41,7 @@ public:
     StartBattleMenuOverlapDetector(VideoOverlay& overlay);
 
     bool detected() const{ return m_battle_detected.load(std::memory_order_acquire); }
-    bool detect(const QImage& frame);
+    bool detect(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;

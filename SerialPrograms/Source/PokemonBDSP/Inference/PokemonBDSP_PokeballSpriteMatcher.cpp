@@ -19,7 +19,7 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 {
     for (const auto& item : PokemonSwSh::ALL_POKEBALL_SPRITES()){
-        add(item.first, item.second.sprite.to_qimage());
+        add(item.first, item.second.sprite.to_QImage_owning());
     }
 }
 

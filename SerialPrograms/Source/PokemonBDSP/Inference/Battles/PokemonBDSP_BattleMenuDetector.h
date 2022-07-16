@@ -31,10 +31,10 @@ public:
     BattleMenuDetector(BattleType battle_type, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const QImage& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
-    bool is_battle_button(const QImage& screen) const;
+    bool is_battle_button(const ImageViewRGB32& screen) const;
 
 private:
     Color m_color;

@@ -69,7 +69,7 @@ ArcDetector::ArcDetector()
         }
     )
 {}
-void ArcDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
+void ArcDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
     ImagePixelBox object_box;
     if (ArcMatcher::left().matches(object_box, image, object)){
         m_left.emplace_back(object_box);

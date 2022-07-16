@@ -103,7 +103,7 @@ FlagDetector::FlagDetector()
         }
     )
 {}
-void FlagDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
+void FlagDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
     if (object.area < 50){
         return;
     }

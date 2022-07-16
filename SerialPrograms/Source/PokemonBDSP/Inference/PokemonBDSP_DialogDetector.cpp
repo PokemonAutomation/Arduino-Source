@@ -33,7 +33,7 @@ void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_right_white);
     items.add(m_color, m_right);
 }
-bool ShortDialogDetector::detect(const QImage& screen) const{
+bool ShortDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
     if (!is_white(left_white)){
         return false;
@@ -87,7 +87,7 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left);
     items.add(m_color, m_right);
 }
-bool BattleDialogDetector::detect(const QImage& screen) const{
+bool BattleDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
     if (!is_white(left_white)){
         return false;

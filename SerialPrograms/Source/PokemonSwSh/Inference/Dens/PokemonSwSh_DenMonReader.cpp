@@ -45,7 +45,7 @@ public:
 DenSpriteMatcher make_DEN_SPRITE_MATCHER(){
     DenSpriteMatcher matcher;
     for (const auto& item : ALL_POKEMON_SILHOUETTES()){
-        matcher.add(item.first, item.second.sprite.to_qimage());
+        matcher.add(item.first, item.second.sprite.to_QImage_owning());
     }
     return matcher;
 }

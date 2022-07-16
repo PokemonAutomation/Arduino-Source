@@ -7,6 +7,7 @@
 #include <QtGlobal>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -73,7 +74,7 @@ void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
 
     context.wait_for(std::chrono::milliseconds(500));
     ShortDialogDetector dialog;
-    while (dialog.detect(console.video().snapshot())){
+    while (dialog.detect(console.video().snapshot().frame)){
         console.log("Overshot mashing. Backing out.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_B, 20, 105);
         context.wait_for_all_requests();

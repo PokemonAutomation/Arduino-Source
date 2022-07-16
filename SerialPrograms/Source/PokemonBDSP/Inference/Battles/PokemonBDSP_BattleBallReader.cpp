@@ -51,7 +51,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 
     ImageMatch::ImageMatchResult sprite_result;
     {
-        ConstImageRef image = extract_box_reference(screen, m_box_sprite);
+        ImageViewRGB32 image = extract_box_reference(screen, m_box_sprite);
         sprite_result = m_matcher.match(image, ALPHA_SPREAD);
         sprite_result.log(m_console, 0.50);
         if (!sprite_result.results.empty() && sprite_result.results.begin()->first > MAX_ALPHA){

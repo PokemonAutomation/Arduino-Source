@@ -48,7 +48,7 @@ public:
     const std::vector<ImagePixelBox>& detections() const{ return m_detections; }
     void clear(){ m_detections.clear(); }
 
-    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) = 0;
+    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) = 0;
     virtual void finish(){}
 
 protected:

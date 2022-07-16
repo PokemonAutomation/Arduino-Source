@@ -25,7 +25,7 @@ PokemonSpriteMatcherExact::PokemonSpriteMatcherExact(const std::set<std::string>
     for (const auto& item : ALL_POKEMON_SPRITES()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
-            add(item.first, item.second.sprite.to_qimage());
+            add(item.first, item.second.sprite.to_QImage_owning());
         }
     }
 }
@@ -35,10 +35,10 @@ PokemonLeftSpriteMatcherExact::PokemonLeftSpriteMatcherExact(const std::set<std:
     for (const auto& item : ALL_POKEMON_SPRITES()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
-            const QImage& sprite = item.second.sprite.to_qimage();
-            int width = sprite.width();
-            int height = sprite.height();
-            add(item.first, sprite.copy(0, 0, width/2, height));
+            const ImageViewRGB32& sprite = item.second.sprite;
+            size_t width = sprite.width();
+            size_t height = sprite.height();
+            add(item.first, sprite.sub_image(0, 0, width/2, height).to_QImage_owning());
         }
     }
 }
@@ -55,7 +55,7 @@ PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::str
     for (const auto& item : ALL_POKEMON_SPRITES()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
-            add(item.first, item.second.sprite.to_qimage());
+            add(item.first, item.second.sprite.to_QImage_owning());
         }
     }
 }

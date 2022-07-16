@@ -13,7 +13,7 @@ namespace OCR{
 
 
 
-int read_number(LoggerQt& logger, const QImage& image){
+int read_number(LoggerQt& logger, const ImageViewRGB32& image){
     std::string ocr_text = OCR::ocr_read(Language::English, image);
     std::string normalized;
     bool has_digit = false;

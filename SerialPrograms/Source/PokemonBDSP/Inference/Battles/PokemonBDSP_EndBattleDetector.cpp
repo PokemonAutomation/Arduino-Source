@@ -35,8 +35,8 @@ void EndBattleWatcher::make_overlays(VideoOverlaySet& items) const{
 bool EndBattleWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return battle_is_over(frame);
 }
-bool EndBattleWatcher::battle_is_over(const QImage& frame){
-    ConstImageRef image = extract_box_reference(frame, m_box);
+bool EndBattleWatcher::battle_is_over(const ImageViewRGB32& frame){
+    ImageViewRGB32 image = extract_box_reference(frame, m_box);
     ImageStats stats = image_stats(image);
     if (is_black(stats)){
         m_has_been_black = true;

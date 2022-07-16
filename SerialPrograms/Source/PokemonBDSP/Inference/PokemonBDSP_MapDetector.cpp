@@ -31,7 +31,7 @@ void MapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box1);
     items.add(m_color, m_box2);
 }
-bool MapDetector::detect(const QImage& screen) const{
+bool MapDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
 //    cout << "m_box0: " << stats0.average << stats0.stddev << endl;
     if (!is_solid(stats0, {0.0668203, 0.4447, 0.488479})){

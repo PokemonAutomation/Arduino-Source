@@ -43,7 +43,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_menu_bag);
     items.add(m_color, m_menu_run);
 }
-bool BattleMenuDetector::is_battle_button(const QImage& screen) const{
+bool BattleMenuDetector::is_battle_button(const ImageViewRGB32& screen) const{
     ImageStats stats = image_stats(extract_box_reference(screen, m_menu_battle));
 //    cout << stats.average << stats.stddev << endl;
     double stddev = stats.stddev.sum();
@@ -57,7 +57,7 @@ bool BattleMenuDetector::is_battle_button(const QImage& screen) const{
     }
     return true;
 }
-bool BattleMenuDetector::detect(const QImage& screen) const{
+bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     {
         bool left0 = is_white(extract_box_reference(screen, m_left0_status));
         bool left1 = is_white(extract_box_reference(screen, m_left1_status));

@@ -35,7 +35,7 @@ class DialogueEllipseTracker : public WhiteObjectDetector{
 public:
     DialogueEllipseTracker();
 
-    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
+    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) override;
     virtual void finish() override;
 };
 

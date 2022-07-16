@@ -14,6 +14,7 @@
 #include "ExactImageMatcher.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace ImageMatch{
 
 
@@ -24,7 +25,7 @@ public:
 
     void add(const std::string& slug, QImage image);
 
-    ImageMatchResult match(const ConstImageRef& image, double alpha_spread) const;
+    ImageMatchResult match(const ImageViewRGB32& image, double alpha_spread) const;
 
 
 protected:

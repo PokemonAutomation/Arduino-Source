@@ -414,7 +414,7 @@ void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const
     for (const auto& item : database){
         // cout << "sprite " << count << endl;
         const std::string& slug = item.first;
-        visit_sprit(slug, item.second.sprite.scaled_to_qimage(50, 50));
+        visit_sprit(slug, item.second.sprite.scaled_to_QImage(50, 50));
     }
 }
 

@@ -4,8 +4,7 @@
  *
  */
 
-#include "PokemonLA_PokedexTasksReader.h"
-
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
@@ -13,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLA_PokedexTasksReader.h"
 
 #include <array>
 #include <fstream>

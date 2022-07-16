@@ -41,7 +41,7 @@ public:
         set_subobject(objects[0]);
     }
 
-    virtual bool check_image(const ConstImageRef& image) const override{
+    virtual bool check_image(const ImageViewRGB32& image) const override{
         return image_stddev(image).sum() > 100;
     };
 
@@ -56,7 +56,7 @@ public:
 BubbleDetector::BubbleDetector()
     : WhiteObjectDetector(COLOR_GREEN, {Color(0xffb0b0b0)})
 {}
-void BubbleDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
+void BubbleDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
     if (object.area < 200){
         return;
     }

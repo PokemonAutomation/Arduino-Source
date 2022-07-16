@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"

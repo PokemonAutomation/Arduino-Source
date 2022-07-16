@@ -10,6 +10,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -40,7 +41,7 @@ public:
     static const ButtonMatcher& ArrowLeft();
     static const ButtonMatcher& ArrowRight();
 
-    virtual bool check_image(const ConstImageRef& image) const override{
+    virtual bool check_image(const ImageViewRGB32& image) const override{
         return image.width() >= m_min_width && image.height() >= m_min_height;
     };
 
@@ -56,7 +57,7 @@ class ButtonTracker : public WhiteObjectDetector{
 public:
     ButtonTracker(ButtonType type);
 
-    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
+    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) override;
     virtual void finish() override;
 
 private:

@@ -29,7 +29,7 @@ void BoxShinyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_background);
 }
 
-bool BoxShinyDetector::is_panel(const QImage& screen) const{
+bool BoxShinyDetector::is_panel(const ImageViewRGB32& screen) const{
     ImageStats background = image_stats(extract_box_reference(screen, m_background));
 //    cout << background.average << background.stddev << endl;
     if (!is_white(background)){
@@ -37,7 +37,7 @@ bool BoxShinyDetector::is_panel(const QImage& screen) const{
     }
     return true;
 }
-bool BoxShinyDetector::detect(const QImage& screen) const{
+bool BoxShinyDetector::detect(const ImageViewRGB32& screen) const{
     if (!is_panel(screen)){
         return false;
     }

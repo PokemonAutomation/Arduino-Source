@@ -29,7 +29,7 @@ const QImage& VS_SEEKER_REACTION_BUBBLE(){
     return image;
 }
 
-bool is_seeker_bubble(const ConstImageRef& image, const WaterfillObject& object){
+bool is_seeker_bubble(const ImageViewRGB32& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -40,7 +40,7 @@ bool is_seeker_bubble(const ConstImageRef& image, const WaterfillObject& object)
     }
 
     const QImage& exclamation_mark = VS_SEEKER_REACTION_BUBBLE();
-    QImage scaled = extract_box_reference(image, object).scaled_to_qimage(exclamation_mark.width(), exclamation_mark.height());
+    QImage scaled = extract_box_reference(image, object).scaled_to_QImage(exclamation_mark.width(), exclamation_mark.height());
 #if 0
     QImage scaled = image.copy(
         (pxint_t)object.min_x, (pxint_t)object.min_y,

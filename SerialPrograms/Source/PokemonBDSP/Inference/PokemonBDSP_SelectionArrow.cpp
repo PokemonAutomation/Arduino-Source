@@ -32,7 +32,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
 }
 
 
-bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& object){
+bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > height){
@@ -47,7 +47,7 @@ bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& objec
 //        (int)object.min_x, (int)object.min_y,
 //        (int)width, (int)height
 //    );
-    ConstImageRef cropped = extract_box_reference(image, object);
+    ImageViewRGB32 cropped = extract_box_reference(image, object);
 
 //    static int c = 0;
 //    scaled.save("test-" + QString::number(c++) + ".png");
@@ -61,7 +61,7 @@ bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& objec
 }
 
 
-std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
+std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 200);
     std::vector<ImagePixelBox> ret;

@@ -41,7 +41,7 @@ DialogueEllipseTracker::DialogueEllipseTracker()
     )
 {}
 
-void DialogueEllipseTracker::process_object(const ConstImageRef& image, const WaterfillObject& object){
+void DialogueEllipseTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
     double rmsd = DialogueEllipseMatcher::instance().rmsd_original(image, object);
     if (rmsd < 80){
         m_detections.emplace_back(object);

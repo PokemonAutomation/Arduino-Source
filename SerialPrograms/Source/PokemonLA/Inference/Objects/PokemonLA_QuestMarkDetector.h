@@ -18,7 +18,7 @@ namespace PokemonLA{
 class QuestMarkDetector : public WhiteObjectDetector{
 public:
     QuestMarkDetector();
-    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
+    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) override;
 };
 
 

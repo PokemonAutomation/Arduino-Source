@@ -9,15 +9,15 @@
 
 #include <string>
 #include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace OCR{
 
 
 bool language_available(Language language);
 
-std::string ocr_read(Language language, const ConstImageRef& image);
+std::string ocr_read(Language language, const ImageViewRGB32& image);
 
 
 

@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh_BattleDialogTracker.h"
 

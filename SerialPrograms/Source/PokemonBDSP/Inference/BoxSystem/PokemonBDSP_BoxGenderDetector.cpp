@@ -79,7 +79,7 @@ const ImageMatch::ExactImageMatcher& MALE_ICON(){
 }
 #endif
 
-bool is_male(const ConstImageRef& image, const WaterfillObject& object){
+bool is_male(const ImageViewRGB32& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -93,7 +93,7 @@ bool is_male(const ConstImageRef& image, const WaterfillObject& object){
     ImagePixelBox obj;
     return GenderIcon::male().matches(obj, image, object);
 #else
-    ConstImageRef obj = extract_box_reference(image, object);
+    ImageViewRGB32 obj = extract_box_reference(image, object);
     static int c = 0;
     obj.save("blue-" + QString::number(c++) + ".png");
 //    image.save("image-" + QString::number(c++) + ".png");
@@ -105,7 +105,7 @@ bool is_male(const ConstImageRef& image, const WaterfillObject& object){
 #endif
 }
 
-bool is_female(const ConstImageRef& image, const WaterfillObject& object){
+bool is_female(const ImageViewRGB32& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -119,7 +119,7 @@ bool is_female(const ConstImageRef& image, const WaterfillObject& object){
     ImagePixelBox obj;
     return GenderIcon::female().matches(obj, image, object);
 #else
-    ConstImageRef obj = extract_box_reference(image, object);
+    ImageViewRGB32 obj = extract_box_reference(image, object);
     static int c = 0;
     obj.save("red-" + QString::number(c++) + ".png");
 //    image.save("image-" + QString::number(c++) + ".png");
@@ -135,7 +135,7 @@ bool is_female(const ConstImageRef& image, const WaterfillObject& object){
 EggHatchGenderFilter read_gender_from_box(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame)
 {
     InferenceBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
-    ConstImageRef name_and_gender = extract_box_reference(frame, gender_box);
+    ImageViewRGB32 name_and_gender = extract_box_reference(frame, gender_box);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(name_and_gender, 0xff7f7f7f, 0xffffffff);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);

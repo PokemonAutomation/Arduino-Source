@@ -24,7 +24,7 @@ const double BattleBallReader::ALPHA_SPREAD = 0.02;
 ImageMatch::ExactImageDictionaryMatcher make_BALL_SPRITE_MATCHER(){
     ImageMatch::ExactImageDictionaryMatcher matcher({1, 128});
     for (const auto& item : ALL_POKEBALL_SPRITES()){
-        matcher.add(item.first, item.second.sprite.to_qimage());
+        matcher.add(item.first, item.second.sprite.to_QImage_owning());
     }
     return matcher;
 }

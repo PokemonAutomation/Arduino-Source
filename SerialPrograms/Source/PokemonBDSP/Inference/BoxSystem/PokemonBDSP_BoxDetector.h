@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_BoxDetector_H
 #define PokemonAutomation_PokemonBDSP_BoxDetector_H
 
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -20,7 +22,7 @@ public:
     BoxDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const QImage& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
     Color m_color;

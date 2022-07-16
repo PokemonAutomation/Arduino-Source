@@ -33,7 +33,7 @@ void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     items.add(m_color, m_row);
 }
-bool BoxDetector::detect(const QImage& screen) const{
+bool BoxDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.average << left.stddev << endl;
     if (!is_solid(left, {0.274119, 0.355324, 0.370557})){

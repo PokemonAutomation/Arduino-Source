@@ -38,7 +38,7 @@ void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
 
 
 ImageMatchResult SilhouetteDictionaryMatcher::match(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     double alpha_spread
 ) const{
     ImageMatchResult results;
@@ -46,7 +46,7 @@ ImageMatchResult SilhouetteDictionaryMatcher::match(
         return results;
     }
 
-    QImage processed = image.to_qimage();
+    QImage processed = image.to_QImage_owning();
 
     crop_image(processed);
     set_alpha_channels(processed);

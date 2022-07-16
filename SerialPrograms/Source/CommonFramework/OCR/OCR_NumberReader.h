@@ -7,15 +7,15 @@
 #ifndef PokemonAutomation_OCR_NumberReader_H
 #define PokemonAutomation_OCR_NumberReader_H
 
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace OCR{
 
 
 //  Returns -1 if no number is found.
-int read_number(LoggerQt& logger, const QImage& image);
+int read_number(LoggerQt& logger, const ImageViewRGB32& image);
 
 
 }

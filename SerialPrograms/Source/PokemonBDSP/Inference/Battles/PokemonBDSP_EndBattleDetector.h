@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_EndBattleDetector_H
 #define PokemonAutomation_PokemonBDSP_EndBattleDetector_H
 
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -27,7 +29,7 @@ public:
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
-    bool battle_is_over(const QImage& frame);
+    bool battle_is_over(const ImageViewRGB32& frame);
 
 private:
     Color m_color;

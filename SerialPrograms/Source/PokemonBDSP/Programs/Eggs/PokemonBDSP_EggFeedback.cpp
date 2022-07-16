@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
@@ -30,7 +31,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
     do{
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
-        if (dialog.detect(console.video().snapshot())){
+        if (dialog.detect(console.video().snapshot().frame)){
             break;
         }
 

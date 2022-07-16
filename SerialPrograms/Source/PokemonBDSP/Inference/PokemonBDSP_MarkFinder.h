@@ -11,14 +11,16 @@
 #include <deque>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
+    class VideoOverlay;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image);
+std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image);
 
 
 
@@ -42,10 +44,7 @@ class MarkDetector : public MarkTracker{
 public:
     using MarkTracker::MarkTracker;
 
-    virtual bool process_frame(
-        const QImage& frame,
-        WallClock timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 };
 
 

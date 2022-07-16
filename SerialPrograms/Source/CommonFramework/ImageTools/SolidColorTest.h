@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_CommonFramework_SolidColorTest_H
 #define PokemonAutomation_CommonFramework_SolidColorTest_H
 
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "ImageStats.h"
 #include "ImageBoxes.h"
@@ -47,14 +46,14 @@ bool is_solid(
 
 
 inline bool is_white(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     double min_rgb_sum = 500,
     double max_stddev_sum = 10
 ){
     return is_white(image_stats(image), min_rgb_sum, max_stddev_sum);
 }
 inline bool is_black(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     double max_rgb_sum = 100,
     double max_stddev_sum = 10
 ){
@@ -63,7 +62,7 @@ inline bool is_black(
     return is_black(stats, max_rgb_sum, max_stddev_sum);
 }
 inline bool is_grey(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     double min_rgb_sum, double max_rgb_sum,
     double max_stddev_sum = 10
 ){
@@ -72,7 +71,7 @@ inline bool is_grey(
 
 // expected_color_ratio: ratio of color channels to match, e.g. if a color is (127, 127, 254), it's color ratio is (0.25, 0.25, 0.5)
 inline bool is_solid(
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const FloatPixel& expected_color_ratio,
     double max_euclidean_distance = 0.15,
     double max_stddev_sum = 10

@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "TesseractPA.h"
 #include "OCR_RawOCR.h"
 
@@ -44,7 +45,7 @@ public:
         )
     {}
 
-    std::string run(const ConstImageRef& image){
+    std::string run(const ImageViewRGB32& image){
         TesseractAPI* instance;
         do{
             {
@@ -150,7 +151,7 @@ SpinLock ocr_pool_lock;
 std::map<Language, TesseractPool> ocr_pool;
 
 
-std::string ocr_read(Language language, const ConstImageRef& image){
+std::string ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
 

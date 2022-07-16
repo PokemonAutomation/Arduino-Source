@@ -10,6 +10,7 @@
 #include <QCameraInfo>
 #include <QCoreApplication>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "VideoToolsQt5.h"

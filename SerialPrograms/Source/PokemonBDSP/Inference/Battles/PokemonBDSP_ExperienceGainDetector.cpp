@@ -36,7 +36,7 @@ void ExperienceGainDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left_column);
     items.add(m_color, m_lower_left_region);
 }
-bool ExperienceGainDetector::detect(const QImage& screen) const{
+bool ExperienceGainDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_dialog.detect(screen)){
 //        cout << "ExperienceGainDetector: No dialogue detected, return" << endl;
         return false;

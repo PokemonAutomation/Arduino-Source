@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"

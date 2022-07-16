@@ -7,17 +7,16 @@
 #ifndef PokemonAutomation_CommonFramework_VisualDetector_H
 #define PokemonAutomation_CommonFramework_VisualDetector_H
 
-class QImage;
-
 namespace PokemonAutomation{
 
+class ImageViewRGB32;
 class VideoOverlaySet;
 
 
 class StaticScreenDetector{
 public:
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
-    virtual bool detect(const QImage& screen) const = 0;
+    virtual bool detect(const ImageViewRGB32& screen) const = 0;
 };
 
 

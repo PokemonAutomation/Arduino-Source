@@ -24,10 +24,10 @@ public:
         Color color = COLOR_RED
     );
 
-    double rmsd(const QImage& frame) const;
+    double rmsd(const ImageViewRGB32& frame) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const QImage& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
     QImage m_reference_image;

@@ -44,7 +44,7 @@ void ExperienceGainDetector::make_overlays(VideoOverlaySet& items) const{
         items.add(m_color, item.second);
     }
 }
-bool ExperienceGainDetector::detect(const QImage& screen) const{
+bool ExperienceGainDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_dialog.detect(screen)){
         return false;
     }

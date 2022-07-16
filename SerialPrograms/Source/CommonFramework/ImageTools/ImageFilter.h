@@ -15,8 +15,6 @@ class QImage;
 
 namespace PokemonAutomation{
 
-
-class ConstImageRef;
 class ImageViewRGB32;
 
 

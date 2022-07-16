@@ -40,7 +40,7 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
         int x = (int)obj.get_integer_throw("left", path);
 
 //        QImage sprite = sprites.copy(x, y, width, height);
-        ConstImageRef sprite = extract_box_reference(m_backing_image, ImagePixelBox(x, y, x + width, y + height));
+        ImageViewRGB32 sprite = extract_box_reference(m_backing_image, ImagePixelBox(x, y, x + width, y + height));
         QPixmap pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(sprite));
         m_database.emplace(slug, Sprite{sprite, pixmap});
     }

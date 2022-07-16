@@ -35,12 +35,12 @@ ImageMatchDetector::ImageMatchDetector(
     m_reference_image = extract_box_copy(m_reference_image, m_box);
 }
 
-double ImageMatchDetector::rmsd(const QImage& frame) const{
-    if (frame.isNull()){
+double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
+    if (!frame){
         return 1000;
     }
-    ConstImageRef image = extract_box_reference(frame, m_box);
-    QImage scaled = image.scaled_to_qimage(m_reference_image.width(), m_reference_image.height());
+    ImageViewRGB32 image = extract_box_reference(frame, m_box);
+    QImage scaled = image.scaled_to_QImage(m_reference_image.width(), m_reference_image.height());
 
 #if 0
     if (image.width() != (size_t)scaled.width() || image.height() != (size_t)scaled.height()){
@@ -68,7 +68,7 @@ double ImageMatchDetector::rmsd(const QImage& frame) const{
 void ImageMatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool ImageMatchDetector::detect(const QImage& screen) const{
+bool ImageMatchDetector::detect(const ImageViewRGB32& screen) const{
     return rmsd(screen) <= m_max_rmsd;
 }
 

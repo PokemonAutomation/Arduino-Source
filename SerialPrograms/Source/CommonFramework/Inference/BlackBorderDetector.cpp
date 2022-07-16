@@ -32,7 +32,7 @@ void BlackBorderDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right);
 //        items.add(COLOR_RED, m_body);
 }
-bool BlackBorderDetector::detect(const QImage& screen) const{
+bool BlackBorderDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << "top = " << top.average << top.stddev << endl;
 //    extract_box(screen, m_top).save("top.png");

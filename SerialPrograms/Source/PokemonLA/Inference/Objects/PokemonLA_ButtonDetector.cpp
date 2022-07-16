@@ -121,7 +121,7 @@ ButtonTracker::ButtonTracker(ButtonType type)
     , m_matcher(getButtonMatcher(type))
 {}
 
-void ButtonTracker::process_object(const ConstImageRef& image, const WaterfillObject& object){
+void ButtonTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    extract_box(image, object).save("test-" + QString::number(c++) + ".png");

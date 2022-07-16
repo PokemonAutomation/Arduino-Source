@@ -10,7 +10,7 @@
 #include <map>
 #include <QIcon>
 #include <QImage>
-#include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/RGB32ImageView.h"
 
 namespace PokemonAutomation{
 
@@ -38,7 +38,7 @@ public:
 
 public:
     struct Sprite{
-        ConstImageRef sprite;
+        ImageViewRGB32 sprite;
         QIcon icon;
     };
     const Sprite& get_throw(const std::string& slug) const;
