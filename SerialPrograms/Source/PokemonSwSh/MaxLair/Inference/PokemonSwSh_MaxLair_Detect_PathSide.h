@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSide_H
 
 #include <stdint.h>
-#include "CommonFramework/ImageTypes/ImageReference.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,7 +17,7 @@ namespace MaxLairInternal{
 
 
 
-int8_t read_side(const ConstImageRef& image);
+int8_t read_side(const ImageViewRGB32& image);
 
 
 }

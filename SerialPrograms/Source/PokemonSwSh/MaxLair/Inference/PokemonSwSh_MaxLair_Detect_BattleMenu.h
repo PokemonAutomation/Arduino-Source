@@ -62,15 +62,15 @@ public:
         LoggerQt& logger, CancellableScope& scope,
         VideoFeed& feed
     ) const;
-    std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const;
+    std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const ImageViewRGB32& screen) const;
 
-    std::string read_own_mon(LoggerQt& logger, const QImage& screen) const;
+    std::string read_own_mon(LoggerQt& logger, const ImageViewRGB32& screen) const;
 
-    double read_opponent_hp(LoggerQt& logger, const QImage& screen) const;
-    double read_own_hp(LoggerQt& logger, const QImage& screen) const;
-    void read_hp(LoggerQt& logger, const QImage& screen, Health health[4], size_t player_index);
-    void read_own_pp(LoggerQt& logger, const QImage& screen, int8_t pp[4]) const;
-    bool can_dmax(const QImage& screen) const;
+    double read_opponent_hp(LoggerQt& logger, const ImageViewRGB32& screen) const;
+    double read_own_hp(LoggerQt& logger, const ImageViewRGB32& screen) const;
+    void read_hp(LoggerQt& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index);
+    void read_own_pp(LoggerQt& logger, const ImageViewRGB32& screen, int8_t pp[4]) const;
+    bool can_dmax(const ImageViewRGB32& screen) const;
 
 private:
     Language m_language;

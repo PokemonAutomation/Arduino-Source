@@ -27,14 +27,14 @@ void FishingMissDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
     items.add(COLOR_RED, m_miss_box);
 }
-bool FishingMissDetector::detect(const QImage& frame){
-    ConstImageRef miss_image = extract_box_reference(frame, m_miss_box);
+bool FishingMissDetector::detect(const ImageViewRGB32& frame){
+    ImageViewRGB32 miss_image = extract_box_reference(frame, m_miss_box);
     ImageStats miss_stats = image_stats(miss_image);
     if (!is_white(miss_stats)){
         return false;
     }
 
-    ConstImageRef hook_image = extract_box_reference(frame, m_hook_box);
+    ImageViewRGB32 hook_image = extract_box_reference(frame, m_hook_box);
     if (image_stddev(hook_image).sum() < 50){
         return false;
     }
@@ -54,7 +54,7 @@ void FishingHookDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
 }
 bool FishingHookDetector::process_frame(const QImage& frame, WallClock timestamp){
-    ConstImageRef hook_image = extract_box_reference(frame, m_hook_box);
+    ImageViewRGB32 hook_image = extract_box_reference(frame, m_hook_box);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);
     for (const ImagePixelBox& mark : exclamation_marks){

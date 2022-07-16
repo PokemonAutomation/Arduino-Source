@@ -7,6 +7,7 @@
 #include <cmath>
 #include <map>
 #include <QImage>
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonLA_FlagTracker.h"
 
 #include <iostream>

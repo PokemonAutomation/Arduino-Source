@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_MountChange.h"
@@ -60,7 +61,7 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        MountState current = mount_detector.detect(console.video().snapshot().frame);
         if (mount == current){
             return;
         }
@@ -112,7 +113,7 @@ void dismount(ConsoleHandle& console, BotBaseContext& context){
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        MountState current = mount_detector.detect(console.video().snapshot().frame);
         switch (current){
         case MountState::WYRDEER_OFF:
         case MountState::URSALUNA_OFF:

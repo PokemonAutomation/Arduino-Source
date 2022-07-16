@@ -99,7 +99,7 @@ struct WaterfillTemplateDetectionDebugParams{
 };
 
 bool detect_template_by_single_pass_waterfill(
-    const PokemonAutomation::ConstImageRef &image,
+    const ImageViewRGB32 &image,
     const ImageMatch::WaterfillTemplateMatcher &matcher,
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
     const std::pair<size_t, size_t> &area_thresholds,
@@ -112,7 +112,7 @@ bool detect_template_by_single_pass_waterfill(
     static int debug_count = 0;
     std::unique_ptr<QImage> debug_image;
     if (debug_params){
-        debug_image = std::make_unique<QImage>(image.to_qimage());
+        debug_image = std::make_unique<QImage>(image.to_QImage_owning());
         draw_matrix_on_image(matrix, debug_params->filter_color, *debug_image, 0, 0);
     }
 
@@ -156,7 +156,7 @@ bool detect_template_by_single_pass_waterfill(
 }
 
 
-bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image){
+bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &image){
 
     std::unique_ptr<WaterfillTemplateDetectionDebugParams> debug_params = nullptr;
 
@@ -209,7 +209,7 @@ void MMOQuestionMarkDetector::make_overlays(VideoOverlaySet& items) const{
     }
 }
 
-std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImage& frame){
+std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const ImageViewRGB32& frame){
     std::array<bool, 5> detected{false};
     for(size_t i = 0; i < hisui_map_boxes.size(); i++){
         auto cropped_frame = extract_box_reference(frame, hisui_map_boxes[i]);
@@ -230,13 +230,13 @@ std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const QImag
     return detected;
 }
 
-std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(const QImage& frame){
+std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(const ImageViewRGB32& frame){
     ImageFloatBox map_view{0.261, 0.060, 0.481, 0.842};
     size_t map_min_x = (size_t)(frame.width() * map_view.x + 0.5);
     size_t map_min_y = (size_t)(frame.height() * map_view.y + 0.5);
     size_t map_width = (size_t)(frame.width() * map_view.width + 0.5);
     size_t map_height = (size_t)(frame.height() * map_view.height + 0.5);
-    ConstImageRef map_image(ConstImageRef(frame).sub_image(map_min_x, map_min_y, map_width, map_height));
+    ImageViewRGB32 map_image(frame.sub_image(map_min_x, map_min_y, map_width, map_height));
 
     std::unique_ptr<WaterfillTemplateDetectionDebugParams> debug_params = nullptr;
 

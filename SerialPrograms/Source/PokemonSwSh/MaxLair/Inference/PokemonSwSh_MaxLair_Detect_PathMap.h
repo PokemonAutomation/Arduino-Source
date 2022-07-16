@@ -25,7 +25,7 @@ using namespace Pokemon;
 
 bool read_type_array(
     ConsoleHandle& console,
-    const ConstImageRef& screen,
+    const ImageViewRGB32& screen,
     const ImageFloatBox& box,
     std::deque<InferenceBoxScope>& hits,
     size_t count,

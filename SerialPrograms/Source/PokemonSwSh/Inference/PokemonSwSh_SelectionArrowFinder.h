@@ -20,7 +20,7 @@ class SelectionArrowFinder : public VisualInferenceCallback{
 public:
     SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box);
 
-    bool detect(const QImage& screen);
+    bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
@@ -45,7 +45,7 @@ public:
     int8_t get_slot();
 
     //  These are not thread safe.
-    int8_t detect(const QImage& screen);
+    int8_t detect(const ImageViewRGB32& screen);
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 

@@ -32,7 +32,7 @@ public:
 public:
     SummaryShinySymbolDetector(LoggerQt& logger, VideoOverlay& overlay);
 
-    Detection detect(const QImage& screen);
+    Detection detect(const ImageViewRGB32& screen);
     Detection wait_for_detection(
         CancellableScope& scope, VideoFeed& feed,
         std::chrono::seconds timeout = std::chrono::seconds(10)

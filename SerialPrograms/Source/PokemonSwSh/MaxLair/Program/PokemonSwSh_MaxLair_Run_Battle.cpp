@@ -65,7 +65,7 @@ bool read_battle_menu(
         pbf_press_dpad(context, DPAD_UP, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
-        mon = reader.read_opponent_in_summary(console, console.video().snapshot());
+        mon = reader.read_opponent_in_summary(console, console.video().snapshot().frame);
         pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
         state.opponent = std::move(mon);
 

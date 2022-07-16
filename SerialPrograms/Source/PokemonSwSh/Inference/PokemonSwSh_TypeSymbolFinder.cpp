@@ -51,7 +51,7 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const ConstImageRef& image){
+std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
     size_t width = image.width();
     size_t height = image.height();
     if (width * height < 100){
@@ -111,7 +111,7 @@ std::pair<double, PokemonType> match_type_symbol(const ConstImageRef& image){
 
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     PackedBinaryMatrix2& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
@@ -161,7 +161,7 @@ void find_symbol_candidates(
 
     //  Identify objects.
     for (const auto& item : objmap){
-        ConstImageRef img = extract_box_reference(image, item.second);
+        ImageViewRGB32 img = extract_box_reference(image, item.second);
         std::pair<double, PokemonType> result = match_type_symbol(img);
         if (result.second != PokemonType::NONE){
             const WaterfillObject& obj = item.second;
@@ -181,7 +181,7 @@ void find_symbol_candidates(
 
 
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
-    const ConstImageRef& image, double max_area_ratio
+    const ImageViewRGB32& image, double max_area_ratio
 ){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
@@ -242,9 +242,9 @@ void test_find_symbols(
     CancellableScope& scope,
     VideoOverlay& overlay,
     const ImageFloatBox& box,
-    const QImage& screen, double max_area_ratio
+    const ImageViewRGB32& screen, double max_area_ratio
 ){
-    ConstImageRef image = extract_box_reference(screen, box);
+    ImageViewRGB32 image = extract_box_reference(screen, box);
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, max_area_ratio);
 

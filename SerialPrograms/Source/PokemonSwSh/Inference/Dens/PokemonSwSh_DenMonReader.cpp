@@ -104,7 +104,7 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
     }while (false);
 
 
-    ConstImageRef processed = extract_box_reference(screen, m_sprite);
+    ImageViewRGB32 processed = extract_box_reference(screen, m_sprite);
 //    processed.save("processed.png");
 //    processed = ImageMatch::black_filter_to_alpha(processed);
     results.slugs = m_matcher.match(processed, ALPHA_SPREAD);

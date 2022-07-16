@@ -8,15 +8,12 @@
 #ifndef PokemonAutomation_PokemonLA_PokemonMapSpriteReader_H
 #define PokemonAutomation_PokemonLA_PokemonMapSpriteReader_H
 
-
+#include <map>
+#include <vector>
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
-#include <map>
-#include <vector>
-
-class QImage;
 struct ImagePixelBox;
 
 namespace PokemonAutomation{
@@ -49,7 +46,7 @@ struct MapSpriteMatchResult{
     std::string second_slug;
 };
 
-MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box, MapRegion region);
+MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region);
 
 
 }

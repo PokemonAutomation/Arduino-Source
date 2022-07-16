@@ -26,7 +26,7 @@ SummaryShinySymbolDetector::SummaryShinySymbolDetector(LoggerQt& logger, VideoOv
     , m_symbol_box(overlay, 0.08, 0.53, 0.02, 0.05)
 {}
 
-SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const QImage& screen){
+SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const ImageViewRGB32& screen){
     {
         ImageStats stats = image_stats(extract_box_reference(screen, m_state1_box));
         if (!is_black(stats)){
@@ -40,7 +40,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const Q
         }
     }
 
-    ConstImageRef symbol = extract_box_reference(screen, m_symbol_box);
+    ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
     if (cluster_fit_2(
         symbol,
         qRgb(255, 255, 255), 0.84,
@@ -72,7 +72,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
     while (true){
         scope.throw_if_cancelled();
 
-        Detection detection = detect(feed.snapshot());
+        Detection detection = detect(feed.snapshot().frame);
         if (detection == last_detection){
             confirmations++;
         }else{

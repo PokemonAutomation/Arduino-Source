@@ -39,7 +39,7 @@ bool OverworldDetector::process_frame(const QImage& frame, WallClock timestamp){
 
 
 
-bool is_pokemon_selection(VideoOverlay& overlay, const ConstImageRef& frame){
+bool is_pokemon_selection(VideoOverlay& overlay, const ImageViewRGB32& frame){
 #if 1
     using namespace Kernels::Waterfill;
 

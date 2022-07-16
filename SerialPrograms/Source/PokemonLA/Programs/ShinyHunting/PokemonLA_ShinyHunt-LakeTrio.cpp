@@ -90,7 +90,7 @@ std::set<std::string> read_name(
     }
 
 
-    ConstImageRef image = extract_box_reference(screen, box);
+    ImageViewRGB32 image = extract_box_reference(screen, box);
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
         logger, language, image,
         OCR::WHITE_TEXT_FILTERS()

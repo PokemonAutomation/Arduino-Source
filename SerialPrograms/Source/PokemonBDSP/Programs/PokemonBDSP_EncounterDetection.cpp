@@ -116,7 +116,7 @@ bool StandardEncounterDetection::has_shiny() const{
 }
 
 std::set<std::string> StandardEncounterDetection::read_name(const QImage& screen, const ImageFloatBox& box){
-    ConstImageRef image = extract_box_reference(screen, box);
+    ImageViewRGB32 image = extract_box_reference(screen, box);
 
     std::set<std::string> ret;
 

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_RGB32Image_H
-#define PokemonAutomation_CommonFramework_RGB32Image_H
+#ifndef PokemonAutomation_CommonFramework_ImageRGB32_H
+#define PokemonAutomation_CommonFramework_ImageRGB32_H
 
 #include <string>
 #include "Common/Cpp/Pimpl.h"

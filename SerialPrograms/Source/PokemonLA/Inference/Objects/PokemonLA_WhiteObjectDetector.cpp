@@ -26,7 +26,7 @@ using namespace Kernels::Waterfill;
 
 void find_overworld_white_objects(
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
-    const ConstImageRef& image
+    const ImageViewRGB32& image
 ){
     std::set<Color> threshold_set;
     for (const auto& item : detectors){

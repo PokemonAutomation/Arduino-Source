@@ -61,7 +61,7 @@ public:
 
 
 
-std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
+std::vector<ImagePixelBox> find_shiny_symbols(const ImageViewRGB32& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         128, 255,

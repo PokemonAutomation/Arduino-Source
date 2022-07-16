@@ -106,7 +106,7 @@ std::string feature_to_str(const FeatureVector& a){
     return os.str();
 }
 
-void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(int x, int y, int sum_x[3], int sum_y[3])> proces_gradient){
+void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(int x, int y, int sum_x[3], int sum_y[3])> proces_gradient){
     const int width = (int)image.width();
     const int height = (int)image.height();
     // Kernel for computing gradient along x axis
@@ -161,7 +161,7 @@ void run_Sobel_gradient_filter(const ConstImageRef& image, std::function<void(in
     }
 }
 
-QImage smooth_image(const ConstImageRef& image){
+QImage smooth_image(const ImageViewRGB32& image){
     // static int count = 0;
     // {
     //     image.save("./test_smooth_before_" + QString::number(count) + ".png");
@@ -264,7 +264,7 @@ QImage smooth_image(const ConstImageRef& image){
     return result2;
 }
 
-QImage convert_to_hsv(const ConstImageRef& image){
+QImage convert_to_hsv(const ImageViewRGB32& image){
     QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
     result.fill(QColor(0,0,0,0));
     ImageRef result_ref(result);
@@ -304,7 +304,7 @@ QImage convert_to_hsv(const ConstImageRef& image){
 }
 
 
-QImage compute_image_gradient(const ConstImageRef& image){
+QImage compute_image_gradient(const ImageViewRGB32& image){
     QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
     result.fill(QColor(0,0,0,0));
     ImageRef result_ref(result);
@@ -322,7 +322,7 @@ QImage compute_image_gradient(const ConstImageRef& image){
     return result;
 }
 
-FeatureVector compute_gradient_histogram(const ConstImageRef& image){
+FeatureVector compute_gradient_histogram(const ImageViewRGB32& image){
     const int num_angle_divisions = 8;
     double division_angle = 2. * M_PI / num_angle_divisions;
     double inverse_division_angle = 1.0 / division_angle;
@@ -365,8 +365,8 @@ FeatureVector compute_gradient_histogram(const ConstImageRef& image){
 
 } // end anonymous namespace
 
-FeatureVector compute_feature(const ConstImageRef& input_image){
-    QImage image = input_image.to_qimage().convertToFormat(QImage::Format::Format_ARGB32);
+FeatureVector compute_feature(const ImageViewRGB32& input_image){
+    QImage image = input_image.to_QImage_owning().convertToFormat(QImage::Format::Format_ARGB32);
     ImageRef image_ref(image);
     int width = image.width();
     int height = image.height();
@@ -460,7 +460,7 @@ const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
 }
 
 
-std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstImageRef& image, MapRegion region){
+std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageViewRGB32& image, MapRegion region){
     const FeatureVector& image_feature = compute_feature(image);
 
     const std::map<std::string, FeatureVector>& features = MMO_SPRITE_MATCHING_DATA().features;
@@ -514,7 +514,7 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ConstI
 
 
 // For a sprite on the screenshot, create gradient image of it
-QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
+QImage compute_MMO_sprite_gradient(const ImageViewRGB32& image){
 
     QImage result = smooth_image(image);
     result = compute_image_gradient(result);
@@ -548,7 +548,7 @@ QImage compute_MMO_sprite_gradient(const ConstImageRef& image){
 
 
 
-float compute_MMO_sprite_gradient_distance(const ConstImageRef& gradient_template, const ConstImageRef& gradient){
+float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_template, const ImageViewRGB32& gradient){
     int tempt_width = (int)gradient_template.width();
     int tempt_height = (int)gradient_template.height();
 
@@ -761,7 +761,7 @@ float compute_hsv_dist2(uint32_t template_color, uint32_t color){
     return h_dif * h_dif + (t_s - s) * (t_s - s) + 0.5 * (t_v - v) * (t_v - v);
 }
 
-float compute_MMO_sprite_hsv_distance(const ConstImageRef& image_template, const ConstImageRef& query_image){
+float compute_MMO_sprite_hsv_distance(const ImageViewRGB32& image_template, const ImageViewRGB32& query_image){
     int tempt_width = (int)image_template.width();
     int tempt_height = (int)image_template.height();
 
@@ -801,7 +801,7 @@ float compute_MMO_sprite_hsv_distance(const ConstImageRef& image_template, const
 }
 
 
-MapSpriteMatchResult match_sprite_on_map(const ConstImageRef& screen, const ImagePixelBox& box, MapRegion region){
+MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region){
     const static auto& sprite_matching_data = MMO_SPRITE_MATCHING_DATA();
     const ExactImageDictionaryMatcher& color_matcher = sprite_matching_data.color_matcher;
     const ExactImageDictionaryMatcher& color_matcher_hsv = sprite_matching_data.color_matcher_hsv;

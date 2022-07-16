@@ -110,8 +110,8 @@ BeamSetter::Detection BeamSetter::run(
         for (size_t c = 0; c < m_boxes.size(); c++){
             FloatStatAccumulator stats = trackers[c].accumulate_all();
 
-            ConstImageRef previous_box = extract_box_reference(last_screenshot, m_boxes[c]);
-            ConstImageRef current_box = extract_box_reference(current_screenshot, m_boxes[c]);
+            ImageViewRGB32 previous_box = extract_box_reference(last_screenshot, m_boxes[c]);
+            ImageViewRGB32 current_box = extract_box_reference(current_screenshot, m_boxes[c]);
 
             FloatPixel current_average = image_average(current_box);
             double delta = ImageMatch::pixel_RMSD(current_box, previous_box);

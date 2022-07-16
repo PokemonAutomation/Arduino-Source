@@ -24,11 +24,11 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-float get_orientation_on_map(const QImage& screen, bool avoid_lava_area){
+float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area){
     // The map region of the entire screen
     const ImageFloatBox box(0.271, 0.059, 0.458, 0.833);
 
-    const ConstImageRef region = extract_box_reference(screen, box);
+    const ImageViewRGB32 region = extract_box_reference(screen, box);
 
     // Find the red pixels that form the red arrow
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_multirange(region,
@@ -40,7 +40,7 @@ float get_orientation_on_map(const QImage& screen, bool avoid_lava_area){
         {combine_rgb(120, 0, 0), combine_rgb(255, 100, 100)},
     });
 
-    QImage output = region.to_qimage();
+    QImage output = region.to_QImage_owning();
 
     std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
     session->set_source(matrix);

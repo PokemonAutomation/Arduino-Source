@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_RGB32ImageView_H
-#define PokemonAutomation_CommonFramework_RGB32ImageView_H
+#ifndef PokemonAutomation_CommonFramework_ImageViewRGB32_H
+#define PokemonAutomation_CommonFramework_ImageViewRGB32_H
 
 #include <string>
 #include "ImageViewPlanar32.h"

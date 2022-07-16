@@ -152,7 +152,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
 }
 
 bool OverworldTargetTracker::process_frame(const QImage& frame, WallClock timestamp){
-    ConstImageRef image = extract_box_reference(frame, m_search_area);
+    ImageViewRGB32 image = extract_box_reference(frame, m_search_area);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);
     std::vector<ImagePixelBox> question_marks = find_question_marks(image);

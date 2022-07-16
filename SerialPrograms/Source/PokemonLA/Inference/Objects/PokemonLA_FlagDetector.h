@@ -28,7 +28,7 @@ private:
 
 
 
-int read_flag_distance(const QImage& screen, double flag_x, double flag_y);
+int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_y);
 
 
 

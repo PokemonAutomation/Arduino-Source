@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 
 //  Find all type symbols inside the image.
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
-    const ConstImageRef& image, double max_area_ratio
+    const ImageViewRGB32& image, double max_area_ratio
 );
 
 
@@ -29,7 +29,7 @@ void test_find_symbols(
     ProgramEnvironment& env,
     VideoOverlay& overlay,
     const ImageFloatBox& box,
-    const ConstImageRef& screen, double max_area_ratio = 0.20
+    const ImageViewRGB32& screen, double max_area_ratio = 0.20
 );
 
 

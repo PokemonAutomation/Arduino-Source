@@ -48,7 +48,7 @@ public:
     MountDetector(MountDetectorLogging logging = MountDetectorLogging::NONE);
 
     void make_overlays(VideoOverlaySet& items) const;
-    MountState detect(const QImage& screen) const;
+    MountState detect(const ImageViewRGB32& screen) const;
 
 private:
     ImageFloatBox m_box;

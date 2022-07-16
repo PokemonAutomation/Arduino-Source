@@ -8,15 +8,12 @@
 #ifndef PokemonAutomation_PokemonLA_MMOQuestionMarkDetector_H
 #define PokemonAutomation_PokemonLA_MMOQuestionMarkDetector_H
 
+#include <array>
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-
-#include <array>
-
-class QImage;
 
 namespace PokemonAutomation{
 
@@ -38,16 +35,16 @@ public:
     // Return an array of bool, each bool is whether MMO appears on one of the 
     // wild region. The order of the bool is the same order as the game progession:
     // Fieldlands, Mirelands, Coastlands, Highlands, Icelands.
-    std::array<bool, 5> detect_MMO_on_hisui_map(const QImage& frame);
+    std::array<bool, 5> detect_MMO_on_hisui_map(const ImageViewRGB32& frame);
 
-    std::vector<ImagePixelBox> detect_MMOs_on_region_map(const QImage& frame);
+    std::vector<ImagePixelBox> detect_MMOs_on_region_map(const ImageViewRGB32& frame);
 
 private:
     LoggerQt& m_logger;
 };
 
 // Detect the presense of MM question mark on an image
-bool detect_MMO_question_mark(const PokemonAutomation::ConstImageRef &image);
+bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &image);
 
 
 // Show output of `MMOQuestionMarkDetector::detect_MMO_on_hisui_map()` to video overlay.

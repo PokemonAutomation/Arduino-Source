@@ -29,7 +29,7 @@ private:
 
 
 //  Only works at full health.
-bool is_pokemon_selection(VideoOverlay& overlay, const ConstImageRef& frame);
+bool is_pokemon_selection(VideoOverlay& overlay, const ImageViewRGB32& frame);
 
 
 }

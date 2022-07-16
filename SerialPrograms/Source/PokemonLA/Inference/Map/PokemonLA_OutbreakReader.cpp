@@ -35,7 +35,7 @@ OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
         return result;
     }
 
-    ConstImageRef image = extract_box_reference(screen, m_text_box);
+    ImageViewRGB32 image = extract_box_reference(screen, m_text_box);
     result = Pokemon::PokemonNameReader::instance().read_substring(
         m_logger, m_language, image,
         OCR::WHITE_TEXT_FILTERS()

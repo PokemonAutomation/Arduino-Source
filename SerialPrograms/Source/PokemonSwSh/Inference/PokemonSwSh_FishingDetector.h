@@ -26,7 +26,7 @@ class FishingMissDetector : public VisualInferenceCallback{
 public:
     FishingMissDetector();
 
-    bool detect(const QImage& frame);
+    bool detect(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;

@@ -272,7 +272,7 @@ bool is_arrow_pointed_corner(
 }
 
 
-bool is_arrow(const ConstImageRef& image, const WaterfillObject& object){
+bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     double area_ratio = object.area_ratio();
     if (area_ratio < 0.35 || area_ratio > 0.55){
         return false;
@@ -282,7 +282,7 @@ bool is_arrow(const ConstImageRef& image, const WaterfillObject& object){
         return false;
     }
 
-    QImage cropped = extract_box_reference(image, object).to_qimage();
+    QImage cropped = extract_box_reference(image, object).to_QImage_owning();
 
 //    QImage cropped = cropped0;
     PackedBinaryMatrix2 matrix = object.packed_matrix();
@@ -325,7 +325,7 @@ bool is_arrow(const ConstImageRef& image, const WaterfillObject& object){
 
 
 
-int8_t read_side(WaterfillSession& session, const ConstImageRef& image, uint8_t pixel_threshold){
+int8_t read_side(WaterfillSession& session, const ImageViewRGB32& image, uint8_t pixel_threshold){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(
         image, pixel_threshold, pixel_threshold, pixel_threshold
     );
@@ -355,7 +355,7 @@ int8_t read_side(WaterfillSession& session, const ConstImageRef& image, uint8_t 
         : 1;
 }
 
-int8_t read_side(const ConstImageRef& image){
+int8_t read_side(const ImageViewRGB32& image){
     auto session = make_WaterfillSession();
     int8_t ret;
     if ((ret = read_side(*session, image, 160)) != -1) return ret;

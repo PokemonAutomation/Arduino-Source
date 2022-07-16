@@ -23,7 +23,7 @@ namespace PokemonLA{
 // Detect the star symbols on MMO sprite on the map
 class MMOSpriteStarSymbolDetector : public VisualInferenceCallback{
 public:
-    MMOSpriteStarSymbolDetector(const ConstImageRef& frame, const std::vector<ImagePixelBox>& star_boxes);
+    MMOSpriteStarSymbolDetector(const ImageViewRGB32& frame, const std::vector<ImagePixelBox>& star_boxes);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -41,7 +41,7 @@ private:
     size_t m_num_frames = 0;
     size_t m_frame_width = 0;
     size_t m_frame_height = 0;
-    std::vector<ConstImageRef> m_initial_images;
+    std::vector<ImageViewRGB32> m_initial_images;
 
 };
 

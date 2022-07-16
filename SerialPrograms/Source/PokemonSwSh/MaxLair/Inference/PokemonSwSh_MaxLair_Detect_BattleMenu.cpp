@@ -239,7 +239,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     QImage screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
-        ConstImageRef image = extract_box_reference(screen, m_opponent_name);
+        ImageViewRGB32 image = extract_box_reference(screen, m_opponent_name);
         result = read_pokemon_name(logger, m_language, image);
         if (!result.empty()){
             return result;
@@ -250,11 +250,11 @@ std::set<std::string> BattleMenuReader::read_opponent(
     dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
     return result;
 }
-std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const{
-    ConstImageRef name = extract_box_reference(screen, m_summary_opponent_name);
+std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const ImageViewRGB32& screen) const{
+    ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
     std::set<std::string> slugs = read_pokemon_name(logger, m_language, name);
 
-    ConstImageRef types = extract_box_reference(screen, m_summary_opponent_types);
+    ImageViewRGB32 types = extract_box_reference(screen, m_summary_opponent_types);
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
 //    for (const auto& item : candidates){
 //        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
@@ -315,7 +315,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logge
 
     return slugs;
 }
-std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const QImage& screen) const{
+std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const ImageViewRGB32& screen) const{
     return read_pokemon_name_sprite(
         logger,
         screen,
@@ -325,8 +325,8 @@ std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const QImage& scree
     );
 }
 
-double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const QImage& screen) const{
-    ConstImageRef image = extract_box_reference(screen, m_opponent_hp);
+double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const ImageViewRGB32& screen) const{
+    ImageViewRGB32 image = extract_box_reference(screen, m_opponent_hp);
 //    image.save("test.png");
 
 //    ImageStats stats = image_stats(image);
@@ -342,8 +342,8 @@ double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const QImage& screen
 #endif
     return read_hp_bar(logger, image);
 }
-double BattleMenuReader::read_own_hp(LoggerQt& logger, const QImage& screen) const{
-    ConstImageRef image = extract_box_reference(screen, m_own_hp);
+double BattleMenuReader::read_own_hp(LoggerQt& logger, const ImageViewRGB32& screen) const{
+    ImageViewRGB32 image = extract_box_reference(screen, m_own_hp);
 //    image.save("test.png");
 #if 0
     double hp = read_hp_bar(image);
@@ -357,7 +357,7 @@ double BattleMenuReader::read_own_hp(LoggerQt& logger, const QImage& screen) con
 #endif
     return read_hp_bar(logger, image);
 }
-void BattleMenuReader::read_hp(LoggerQt& logger, const QImage& screen, Health health[4], size_t player_index){
+void BattleMenuReader::read_hp(LoggerQt& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index){
     Health tmp_hp[4];
     tmp_hp[0] = {read_own_hp(logger, screen), false};
     tmp_hp[1] = read_in_battle_hp_box(logger, extract_box_reference(screen, m_sprite0), extract_box_reference(screen, m_hp0));
@@ -373,7 +373,7 @@ void BattleMenuReader::read_hp(LoggerQt& logger, const QImage& screen, Health he
         dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
     }
 }
-void BattleMenuReader::read_own_pp(LoggerQt& logger, const QImage& screen, int8_t pp[4]) const{
+void BattleMenuReader::read_own_pp(LoggerQt& logger, const ImageViewRGB32& screen, int8_t pp[4]) const{
     pp[0] = read_pp_text(logger, extract_box_reference(screen, m_pp0));
     pp[1] = read_pp_text(logger, extract_box_reference(screen, m_pp1));
     pp[2] = read_pp_text(logger, extract_box_reference(screen, m_pp2));
@@ -393,52 +393,52 @@ void BattleMenuReader::read_own_pp(LoggerQt& logger, const QImage& screen, int8_
 }
 
 
-bool dmax_circle_ready(QImage image){
-    pxint_t w = image.width();
-    pxint_t h = image.height();
+bool dmax_circle_ready(const ImageViewRGB32& image){
+    size_t w = image.width();
+    size_t h = image.height();
     if (w * h <= 1){
         return false;
     }
 
     w = 200;
     h = 200;
-    image = image.scaled(w, h);
-    if (image_stats(image).stddev.sum() < 75){
+    QImage processed = image.scaled_to_QImage(w, h);
+    if (image_stats(processed).stddev.sum() < 75){
         return false;
     }
-//    cout << image_stats(image).stddev.sum() << endl;
+//    cout << image_stats(processed).stddev.sum() << endl;
 
 
     size_t total = 0;
     FloatPixel sum;
     FloatPixel sqr_sum;
-    for (int r = 0; r < h; r++){
-        for (int c = 0; c < w; c++){
-            int dy = r - 100;
-            int dx = c - 100;
+    for (size_t r = 0; r < h; r++){
+        for (size_t c = 0; c < w; c++){
+            int dy = (int)r - 100;
+            int dx = (int)c - 100;
             if (dy < -60){
-//                image.setPixelColor(c, r, COLOR_BLUE);
+//                processed.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (-25 < dy && dy < 55){
-//                image.setPixelColor(c, r, COLOR_BLUE);
+//                processed.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (dx*dx + dy*dy < 72*72){
-//                image.setPixelColor(c, r, COLOR_BLUE);
+//                processed.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (dx*dx + dy*dy > 80*80){
-//                image.setPixelColor(c, r, COLOR_BLUE);
+//                processed.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
-            FloatPixel p(image.pixel(c, r));
+            FloatPixel p(processed.pixel((int)c, (int)r));
             total++;
             sum += p;
             sqr_sum += p * p;
         }
     }
-//    image.save("test.png");
+//    processed.save("test.png");
 
 //    size_t total = (size_t)w * (size_t)h;
     FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
@@ -458,10 +458,10 @@ bool dmax_circle_ready(QImage image){
     }
     return is_solid(stats, {0.684591, 0.000481775, 0.314928}, 0.15, 50);
 
-//    ImageStats stats = image_stats(image);
+//    ImageStats stats = image_stats(processed);
 }
-bool BattleMenuReader::can_dmax(const QImage& screen) const{
-    return dmax_circle_ready(extract_box_copy(screen, m_dmax));
+bool BattleMenuReader::can_dmax(const ImageViewRGB32& screen) const{
+    return dmax_circle_ready(extract_box_reference(screen, m_dmax));
 }
 
 

@@ -205,7 +205,7 @@ std::vector<std::pair<int, DigitMatcher>> make_digit_matchers(){
 }
 
 
-std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObject& object){
+std::pair<double, int> read_digit(const ImageViewRGB32& image, const WaterfillObject& object){
     static const std::vector<std::pair<int, DigitMatcher>> MATCHERS = make_digit_matchers();
     double best_rmsd = 99999;
     int best_digit = -1;
@@ -226,9 +226,9 @@ std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObj
 
 
 
-int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
+int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_y){
     ImageFloatBox box(flag_x - 0.025, flag_y - 0.055, 0.045, 0.025);
-    ConstImageRef image = extract_box_reference(screen, box);
+    ImageViewRGB32 image = extract_box_reference(screen, box);
 //    image.save("test.png");
 
     size_t width = image.width();

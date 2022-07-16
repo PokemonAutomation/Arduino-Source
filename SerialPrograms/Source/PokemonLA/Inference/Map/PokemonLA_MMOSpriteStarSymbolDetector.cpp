@@ -21,14 +21,14 @@ namespace PokemonLA{
 
 
 
-MMOSpriteStarSymbolDetector::MMOSpriteStarSymbolDetector(const ConstImageRef& frame, const std::vector<ImagePixelBox>& star_boxes)
+MMOSpriteStarSymbolDetector::MMOSpriteStarSymbolDetector(const ImageViewRGB32& frame, const std::vector<ImagePixelBox>& star_boxes)
     : VisualInferenceCallback("MMOSpriteStarSymbolDetector")
     , m_boxes(star_boxes), m_is_star(star_boxes.size(), false), m_rmsd(star_boxes.size(), 0.0)
     , m_symbol_colors(star_boxes.size(), FloatPixel())
     , m_frame_width(frame.width()), m_frame_height(frame.height())
 {
     for(size_t i = 0; i < m_boxes.size(); i++){
-        ConstImageRef ref = extract_box_reference(frame, m_boxes[i]);
+        ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         m_initial_images.push_back(std::move(ref));
     }
 }
@@ -41,9 +41,9 @@ void MMOSpriteStarSymbolDetector::make_overlays(VideoOverlaySet& items) const{
 
 //  Return true if the inference session should stop.
 bool MMOSpriteStarSymbolDetector::process_frame(const QImage& frame, WallClock timestamp){
-    const ConstImageRef frame_ref(frame);
+    const ImageViewRGB32 frame_ref(frame);
     for(size_t i = 0; i < m_boxes.size(); i++){
-        ConstImageRef ref = extract_box_reference(frame, m_boxes[i]);
+        ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         double rmsd = ImageMatch::pixel_RMSD(m_initial_images[i], ref);
         m_rmsd[i] += rmsd;
 

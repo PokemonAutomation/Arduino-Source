@@ -40,7 +40,7 @@ NotificationOCR::NotificationOCR()
 OCR::StringMatchResult NotificationOCR::read_substring(
     LoggerQt& logger,
     Language language,
-    const ConstImageRef& image,
+    const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
 ) const{
@@ -65,8 +65,8 @@ NotificationReader::NotificationReader(LoggerQt& logger, Language language)
 void NotificationReader::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_ocr_box);
 }
-Notification NotificationReader::detect(const QImage& screen) const{
-    ConstImageRef image = extract_box_reference(screen, m_ocr_box);
+Notification NotificationReader::detect(const ImageViewRGB32& screen) const{
+    ImageViewRGB32 image = extract_box_reference(screen, m_ocr_box);
 
 
     //  Check if there anything that looks like text.

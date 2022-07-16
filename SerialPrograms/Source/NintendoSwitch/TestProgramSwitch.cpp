@@ -83,53 +83,6 @@ using namespace Kernels::Waterfill;
 
 
 
-class GreyDialogDetector : public VisualInferenceCallback{
-public:
-    GreyDialogDetector()
-        : VisualInferenceCallback("GreyDialogDetector")
-        , m_box0(0.180, 0.815, 0.015, 0.030)
-        , m_box1(0.785, 0.840, 0.030, 0.050)
-    {}
-
-    bool detect(const QImage& screen){
-        ConstImageRef box = extract_box_reference(screen, m_box0);
-        box.save("test.png");
-        for (size_t r = 0; r < box.height(); r++){
-            for (size_t c = 0; c < box.width(); c++){
-                cout << qRed(box.pixel(c, r)) << " ";
-            }
-            cout << endl;
-        }
-        ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
-        cout << stats0.average << stats0.stddev << endl;
-        if (!is_grey(stats0, 0, 200)){
-            return false;
-        }
-        ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
-        cout << stats1.average << stats1.stddev << endl;
-        if (!is_grey(stats1, 0, 200)){
-            return false;
-        }
-        return true;
-    }
-    virtual void make_overlays(VideoOverlaySet& items) const override{
-        items.add(COLOR_RED, m_box0);
-        items.add(COLOR_RED, m_box1);
-    }
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
-        return detect(frame);
-    }
-
-private:
-    ImageFloatBox m_box0;
-    ImageFloatBox m_box1;
-};
-
-
-
-
-
-
 
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;

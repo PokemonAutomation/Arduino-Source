@@ -198,7 +198,7 @@ std::set<std::string> OutbreakFinder::read_outbreaks(
 
     MMOQuestionMarkDetector question_mark_detector(env.logger());
     VideoOverlaySet mmo_overlay_set(env.console);
-    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot().frame);
     add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
@@ -208,7 +208,7 @@ std::set<std::string> OutbreakFinder::read_outbreaks(
         size_t current_wild_area_index = (int)current_region - 2;
         pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
         context.wait_for_all_requests();
-        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot().frame);
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
         if (new_mmo_read[current_wild_area_index]){
             add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);

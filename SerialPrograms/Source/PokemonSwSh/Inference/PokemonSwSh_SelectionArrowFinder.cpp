@@ -28,7 +28,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
     return matcher;
 }
 
-bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& object){
+bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     double area = (double)object.area_ratio();
     if (area < 0.4 || area > 0.5){
         return false;
@@ -36,7 +36,7 @@ bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& objec
 
 //    size_t width = object.width();
 //    size_t height = object.height();
-    QImage cropped = extract_box_reference(image, object).to_qimage();
+    QImage cropped = extract_box_reference(image, object).to_QImage_owning();
 
     filter_rgb32(
         object.packed_matrix(),
@@ -51,7 +51,7 @@ bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& objec
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 110;
 }
-std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
+std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
     auto session = make_WaterfillSession(matrix);
     auto finder = session->make_iterator(200);
@@ -76,7 +76,7 @@ SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFlo
 void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
-bool SelectionArrowFinder::detect(const QImage& screen){
+bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
     std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
 
     m_arrow_boxes.clear();
@@ -101,7 +101,7 @@ BattleMoveArrowFinder::BattleMoveArrowFinder(VideoOverlay& overlay)
 int8_t BattleMoveArrowFinder::get_slot(){
     return m_arrow_slot.load(std::memory_order_acquire);
 }
-int8_t BattleMoveArrowFinder::detect(const QImage& screen){
+int8_t BattleMoveArrowFinder::detect(const ImageViewRGB32& screen){
     SelectionArrowFinder::detect(screen);
 
     if (m_arrow_boxes.empty()){
