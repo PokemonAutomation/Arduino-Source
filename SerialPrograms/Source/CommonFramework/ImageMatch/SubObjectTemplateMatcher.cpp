@@ -45,11 +45,9 @@ double SubObjectTemplateMatcher::rmsd(
 //         << object_box.max_x << ", "
 //         << object_box.max_y << endl;
     ImageViewRGB32 object = extract_box_reference(image, object_box);
-//    QImage object = extract_box(image, object_box);
 
 //    object.save("test.png");
 
-//    QImage object = ref.to_qimage();
 
     if (!object || !check_image(object)){
         return 99999.;

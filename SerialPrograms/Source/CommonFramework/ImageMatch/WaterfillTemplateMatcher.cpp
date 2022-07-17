@@ -5,15 +5,14 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "WaterfillTemplateMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -27,8 +26,8 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     Color min_color, Color max_color,
     size_t min_area
 ){
-    std::string qpath = RESOURCE_PATH() + path;
-    QImage reference = open_image(qpath);
+    std::string full_path = RESOURCE_PATH() + path;
+    ImageRGB32 reference(full_path);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
@@ -36,7 +35,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
             "Failed to find any objects in resource.",
-            qpath
+            std::move(full_path)
         );
     }
 
@@ -47,8 +46,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         }
     }
 
-    QImage image_template = extract_box_copy(reference, *best);
-    m_matcher.reset(new ExactImageMatcher(std::move(image_template)));
+    m_matcher.reset(new ExactImageMatcher(extract_box_reference(reference, *best).copy()));
     m_area_ratio = best->area_ratio();
 }
 
