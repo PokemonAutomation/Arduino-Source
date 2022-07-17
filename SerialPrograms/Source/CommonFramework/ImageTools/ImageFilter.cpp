@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
@@ -16,11 +15,28 @@ namespace PokemonAutomation{
 
 
 
-size_t filter_rgb32_range(ImageRGB32& image, uint32_t mins, uint32_t maxs, Color replace_with, bool invert){
-    return Kernels::filter_rgb32_range(
+ImageRGB32 filter_rgb32_range(
+    const ImageViewRGB32& image,
+    uint32_t mins, uint32_t maxs, Color replace_with, bool invert
+){
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        image.data(), image.bytes_per_row(), mins, maxs, (uint32_t)replace_with, invert
+        ret.data(), ret.bytes_per_row(), mins, maxs, (uint32_t)replace_with, invert
     );
+    return ret;
+}
+ImageRGB32 filter_rgb32_range(
+    size_t& pixels_in_range,
+    const ImageViewRGB32& image,
+    uint32_t mins, uint32_t maxs, Color replace_with, bool invert
+){
+    ImageRGB32 ret(image.width(), image.height());
+    pixels_in_range = Kernels::filter_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(), mins, maxs, (uint32_t)replace_with, invert
+    );
+    return ret;
 }
 std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
     const ImageViewRGB32& image,

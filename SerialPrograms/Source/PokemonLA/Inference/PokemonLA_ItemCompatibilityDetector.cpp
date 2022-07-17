@@ -25,13 +25,14 @@ ItemCompatibility detect_item_compatibility(const QImage& screen){
     // The Compatible/Incompatible text region of the lead pokemon on the screen.
     const ImageFloatBox box(0.838, 0.1815, 0.090, 0.024);
 
-    ImageRGB32 region = extract_box_reference(screen, box).copy();
-
     // Replacing white background with zero-alpha color so that they won't be counted in
     // the following image_stats()
     // The white background is defined as the color between 0xffa0a0a0 and 0xffffffff.
     const bool replace_background = true;
-    filter_rgb32_range(region, 0xffa0a0a0, 0xffffffff, Color(0), replace_background);
+    ImageRGB32 region = filter_rgb32_range(
+        extract_box_reference(screen, box),
+        0xffa0a0a0, 0xffffffff, Color(0), replace_background
+    );
 
     ImageStats stats = image_stats(region);
     // std::cout << "Compability color " << stats.average.r << " " << stats.average.g << " " << stats.average.b << std::endl;
