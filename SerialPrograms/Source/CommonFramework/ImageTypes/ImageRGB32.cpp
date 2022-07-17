@@ -68,10 +68,20 @@ ImageRGB32::ImageRGB32(const std::string& filename){
 
 
 
-ImageRGB32::ImageRGB32(QImage image)
-    : ImageViewRGB32(image)
-    , m_data(CONSTRUCT_TOKEN, std::move(image))
-{}
+ImageRGB32::ImageRGB32(QImage image){
+    if (image.isNull()){
+        return;
+    }
+    QImage::Format format = image.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format.");
+    }
+    m_width = image.width();
+    m_height = image.height();
+    m_bytes_per_row = image.bytesPerLine();
+    m_ptr = (uint32_t*)image.bits();
+    m_data.reset(std::move(image));
+}
 
 
 

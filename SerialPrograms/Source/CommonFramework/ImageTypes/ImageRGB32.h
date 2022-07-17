@@ -34,11 +34,17 @@ public:
 
 public:
     using ImageViewRGB32::operator bool;
+
     using ImageViewRGB32::data;
+    uint32_t* data(){ return m_ptr; }
+
     using ImageViewRGB32::bytes_per_row;
     using ImageViewRGB32::width;
     using ImageViewRGB32::height;
+
     using ImageViewRGB32::pixel;
+    using ImageViewRGB32::get_pixel;
+
     using ImageViewRGB32::sub_image;
 
 

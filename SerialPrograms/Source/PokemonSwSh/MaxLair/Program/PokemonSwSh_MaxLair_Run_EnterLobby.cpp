@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -109,8 +110,10 @@ QImage enter_lobby(
             console.log("Need to pay ore.", COLOR_PURPLE);
 
             arrow_count = 0;
-            QImage image = extract_box_copy(screen, ore_quantity);
-            to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, true);
+            ImageRGB32 image = to_blackwhite_rgb32_range(
+                extract_box_reference(screen, ore_quantity),
+                0xff808080, 0xffffffff, true
+            );
             ore.update_with_ocr(console.logger(), image);
 
             if (ore.quantity < 20){

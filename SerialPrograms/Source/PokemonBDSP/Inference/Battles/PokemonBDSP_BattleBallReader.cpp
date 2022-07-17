@@ -108,8 +108,10 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 }
 
 uint16_t BattleBallReader::read_quantity(const QImage& screen) const{
-    QImage image = extract_box_copy(screen, m_box_quantity);
-    to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, true);
+    ImageRGB32 image = to_blackwhite_rgb32_range(
+        extract_box_reference(screen, m_box_quantity),
+        0xff808080, 0xffffffff, true
+    );
     return OCR::read_number(m_console, image);
 }
 

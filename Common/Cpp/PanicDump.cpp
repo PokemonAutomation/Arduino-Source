@@ -33,6 +33,9 @@ void panic_dump(const char* location, const char* message){
 
 
 void run_with_catch(const char* location, std::function<void()>&& lambda){
+#if 0
+    lambda();
+#else
     try{
         lambda();
     }catch (Exception&){
@@ -51,6 +54,7 @@ void run_with_catch(const char* location, std::function<void()>&& lambda){
         panic_dump(location, "Unknown Exception");
         throw;
     }
+#endif
 }
 
 

@@ -376,7 +376,7 @@ void MountDetector::make_overlays(VideoOverlaySet& items) const{
 
 
 struct MountDetectorFilteredImage{
-    QImage image;
+    ImageRGB32 image;
     PackedBinaryMatrix2 matrix;
 };
 
@@ -387,7 +387,7 @@ std::vector<MountDetectorFilteredImage> run_filters(const ImageViewRGB32& image,
     }
 
     std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(image, range);
-    std::vector<std::pair<QImage, size_t>> filtered = filter_rgb32_range(image, filters);
+    std::vector<std::pair<ImageRGB32, size_t>> filtered = filter_rgb32_range(image, filters);
 
     std::vector<MountDetectorFilteredImage> ret(range.size());
     for (size_t c = 0; c < range.size(); c++){

@@ -74,6 +74,13 @@ void RunnableComputerProgramWidget::run_program(){
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
         emit signal_error(e.to_str());
+    }catch (std::exception& e){
+        m_logger.log("Program stopped with an exception!", COLOR_RED);
+        std::string message = e.what();
+        if (message.empty()){
+            message = "Unknown std::exception.";
+        }
+        emit signal_error(message);
     }catch (...){
         std::lock_guard<std::mutex> lg(m_lock);
         emit signal_error("Unknown error.");

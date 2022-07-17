@@ -66,7 +66,7 @@ ImageViewRGB32::ImageViewRGB32(const QImage& image){
     m_width = image.width();
     m_height = image.height();
     m_bytes_per_row = image.bytesPerLine();
-    m_ptr = (uint32_t*)image.bits();
+    m_ptr = (uint32_t*)image.bits();    //  Intentionally casting away const. It won't be modified.
 }
 QImage ImageViewRGB32::to_QImage_ref() const{
     return QImage((const uchar*)m_ptr, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);

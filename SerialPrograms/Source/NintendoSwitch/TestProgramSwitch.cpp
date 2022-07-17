@@ -25,6 +25,7 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
 #include <QVideoFrame>
 
@@ -90,7 +91,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
     using namespace PokemonBDSP;
     using namespace PokemonLA;
 
@@ -102,7 +103,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-    read_map_zoom_level(feed.snapshot());
+    MaxLairInternal::PokemonSwapMenuReader reader(logger, overlay, Language::English);
+
+    int8_t pp[4];
+    reader.read_pp(QImage("screenshot-20220717-125742133117.png"), pp);
+
+
+
+//    read_map_zoom_level(feed.snapshot());
 
 
 

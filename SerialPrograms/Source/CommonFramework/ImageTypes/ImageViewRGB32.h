@@ -31,10 +31,12 @@ public:
 
 public:
     using ImageViewPlanar32::operator bool;
+
     using ImageViewPlanar32::data;
     using ImageViewPlanar32::bytes_per_row;
     using ImageViewPlanar32::width;
     using ImageViewPlanar32::height;
+
     using ImageViewPlanar32::pixel;
 
     ImageViewRGB32 sub_image(size_t min_x, size_t min_y, size_t width, size_t height) const{

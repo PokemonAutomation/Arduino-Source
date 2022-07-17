@@ -25,7 +25,7 @@ public:
 public:
     operator bool() const{ return m_ptr != nullptr; }
 
-    uint32_t*       data            () const{ return m_ptr; }
+    const uint32_t* data            () const{ return m_ptr; }
     size_t          bytes_per_row   () const{ return m_bytes_per_row; }
     size_t          width           () const{ return m_width; }
     size_t          height          () const{ return m_height; }

@@ -34,7 +34,7 @@ struct FilterRgb32Range{
     Color replace_with;
     bool invert;
 };
-std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
+std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
     const ImageViewRGB32& image,
     const std::vector<FilterRgb32Range>& filters
 );
@@ -46,7 +46,15 @@ std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
 //  Convert the image to black and white.
 //  Inside [mins, maxs] is white, otherwise it's black.
 //  Set "in_range_black" to true to invert the colors.
-size_t to_blackwhite_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, bool in_range_black);
+ImageRGB32 to_blackwhite_rgb32_range(
+    const ImageViewRGB32& image,
+    uint32_t mins, uint32_t maxs, bool in_range_black
+);
+ImageRGB32 to_blackwhite_rgb32_range(
+    size_t& pixels_in_range,
+    const ImageViewRGB32& image,
+    uint32_t mins, uint32_t maxs, bool in_range_black
+);
 
 
 
@@ -57,7 +65,7 @@ struct BlackWhiteRgb32Range{
     uint32_t maxs;
     bool in_range_black;
 };
-std::vector<std::pair<QImage, size_t>> to_blackwhite_rgb32_range(
+std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,
     const std::vector<BlackWhiteRgb32Range>& filters
 );

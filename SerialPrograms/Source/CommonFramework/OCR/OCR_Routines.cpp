@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
@@ -29,7 +29,7 @@ StringMatchResult multifiltered_OCR(
     for (const auto& range : text_color_ranges){
         bw_filters.emplace_back(BlackWhiteRgb32Range{range.mins, range.maxs, true});
     }
-    std::vector<std::pair<QImage, size_t>> filtered_images = to_blackwhite_rgb32_range(image, bw_filters);
+    std::vector<std::pair<ImageRGB32, size_t>> filtered_images = to_blackwhite_rgb32_range(image, bw_filters);
 
     double pixels_inv = 1. / (image.width() * image.height());
 

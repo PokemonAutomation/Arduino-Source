@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -225,22 +226,25 @@ int8_t read_pp_text(LoggerQt& logger, const ImageViewRGB32& image){
     if (image.width() == 0 || image.height() == 0){
         return -1;
     }
-    QImage reference = image.to_QImage_owning();
 
     std::vector<std::pair<uint32_t, uint32_t>> filters{
         {0xff000000, 0xff404040},
         {0xff808080, 0xffffffff},
     };
-    QImage processed;
+    bool ok = false;
+    ImageRGB32 processed;
+//    cout << "============" << endl;
     for (const auto& item : filters){
-        processed = reference;
-        size_t text_pixels = to_blackwhite_rgb32_range(processed, item.first, item.second, false);
+        size_t text_pixels;
+        processed = to_blackwhite_rgb32_range(text_pixels, image, item.first, item.second, false);
         double text_ratio = 1.0 - (double)text_pixels / (image.width() * image.height());
-        if (0.05 <= text_ratio && text_ratio <= 0.50){
+//        cout << "text_ratio = " << text_ratio << endl;
+        if (0.02 <= text_ratio && text_ratio <= 0.50){
+            ok = true;
             break;
         }
     }
-    if (processed.isNull()){
+    if (!ok){
         logger.log("OCR Result: Invalid text ratio.", COLOR_RED);
         return -1;
     }

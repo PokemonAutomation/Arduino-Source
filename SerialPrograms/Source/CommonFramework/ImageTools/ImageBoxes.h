@@ -99,6 +99,14 @@ ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
 ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
+//  Disable these as they tend to lead to dangling references.
+//ImageViewRGB32 extract_box_reference(ImageRGB32&& image, const ImagePixelBox& box) = delete;
+//ImageViewRGB32 extract_box_reference(ImageRGB32&& image, const ImageFloatBox& box) = delete;
+//ImageViewRGB32 extract_box_reference(QImage&& image, const ImagePixelBox& box) = delete;
+//ImageViewRGB32 extract_box_reference(QImage&& image, const ImageFloatBox& box) = delete;
+
+
+
 //  Deep copy the sub-region.
 QImage extract_box_copy(const QImage& image, const ImagePixelBox& box);
 QImage extract_box_copy(const QImage& image, const ImageFloatBox& box);

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
@@ -45,8 +45,7 @@ public:
         std::array<int, 9> tasks{};
         for (size_t i = 0; i < m_tasks_box.size(); ++i)
         {
-            QImage image = extract_box_copy(screen, m_tasks_box[i]);
-            to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, false);
+            ImageRGB32 image = to_blackwhite_rgb32_range(extract_box_reference(screen, m_tasks_box[i]), 0xff808080, 0xffffffff, false);
             tasks[i] = OCR::read_number(m_console, image);
         }
         return tasks;
