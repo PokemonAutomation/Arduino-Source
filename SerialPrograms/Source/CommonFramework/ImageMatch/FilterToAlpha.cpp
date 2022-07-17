@@ -4,52 +4,34 @@
  *
  */
 
-#include "Common/Cpp/SIMDDebuggers.h"
+#include "Common/Cpp/CpuId/CpuId.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "FilterToAlpha.h"
+
+#ifdef PA_ARCH_x86
+#include <smmintrin.h>
+#endif
 
 namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-QImage black_filter_to_alpha(const QImage& image, uint32_t max_rgb_sum){
-    QImage filtered = image.convertToFormat(QImage::Format_ARGB32);
 
-    int width = filtered.width();
-    int height = filtered.height();
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
-            QRgb pixel = filtered.pixel(c, r);
-            uint32_t sum = qRed(pixel) + qGreen(pixel) + qBlue(pixel);
-            pixel &= 0x00ffffff;
-            if (sum <= max_rgb_sum){
-                pixel |= 0xff000000;
-//                pixel = 0xff000000;
-            }else{
-//                pixel = 0x00ffffff;
-            }
-            filtered.setPixel(c, r, pixel);
-        }
-    }
+void set_alpha_black(ImageRGB32& image, uint32_t max_rgb_sum){
+    size_t words = image.bytes_per_row() / sizeof(uint32_t);
+    uint32_t* data = image.data();
 
-    return filtered;
-}
+    size_t width = image.width();
+    size_t height = image.height();
 
-
-void set_alpha_black(QImage& image, uint32_t max_rgb_sum){
-    image = image.convertToFormat(QImage::Format_ARGB32);
-
-    size_t words = image.bytesPerLine() / sizeof(uint32_t);
-    uint32_t* data = (uint32_t*)image.bits();
-
-    int width = image.width();
-    int height = image.height();
-
+#ifdef PA_ARCH_x86
     __m128i threshold = _mm_set1_epi32(max_rgb_sum);
+#endif
 
     uint32_t* row = data;
-    for (int r = 0; r < height; r++){
-        int c = 0;
-#if 1
+    for (size_t r = 0; r < height; r++){
+        size_t c = 0;
+#ifdef PA_ARCH_x86
         while (c + 3 < width){
             __m128i pixel = _mm_loadu_si128((__m128i*)(row + c));
 //            print8(pixel); cout << " ====> ";

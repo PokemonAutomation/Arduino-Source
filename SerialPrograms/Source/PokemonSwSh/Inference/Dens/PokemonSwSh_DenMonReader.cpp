@@ -29,18 +29,17 @@ public:
     DenSpriteMatcher& operator=(DenSpriteMatcher&&) = default;
 public:
     DenSpriteMatcher() = default;
-    virtual QRgb crop_image(QImage& image) const override{
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, QRgb& background) const override{
         QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
             image,
             [](QRgb pixel){
                 return qRed(pixel) + qGreen(pixel) + qBlue(pixel) < 100;
             }
         );
-        image = image.copy(rect);
-        return 0;
-    }
-    virtual void set_alpha_channels(QImage& image) const override{
-        ImageMatch::set_alpha_black(image);
+        background = 0;
+        ImageRGB32 ret = image.sub_image(rect.x(), rect.y(), rect.width(), rect.height()).copy();
+        ImageMatch::set_alpha_black(ret);
+        return ret;
     }
 };
 

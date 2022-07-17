@@ -19,8 +19,8 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
-    if (image.isNull()){
+void SilhouetteDictionaryMatcher::add(const std::string& slug, ImageRGB32 image){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Null image.");
     }
     auto iter = m_database.find(slug);
@@ -31,7 +31,7 @@ void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha(image))
+        std::forward_as_tuple(trim_image_alpha_ref(image).copy())
     );
 }
 
@@ -46,10 +46,8 @@ ImageMatchResult SilhouetteDictionaryMatcher::match(
         return results;
     }
 
-    QImage processed = image.to_QImage_owning();
-
-    crop_image(processed);
-    set_alpha_channels(processed);
+    QRgb background;
+    ImageRGB32 processed = process_image(image, background);
 
     for (const auto& item : m_database){
 //        if (item.first != "solosis"){

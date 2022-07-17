@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
 #define PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "ImageMatchResult.h"

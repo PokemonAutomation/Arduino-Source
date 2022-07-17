@@ -28,12 +28,12 @@ public:
 
     // Add an image template.
     // Do not allow one slug to have more than one template.
-    void add(const std::string& slug, QImage image_template);
+    void add(const std::string& slug, ImageRGB32 image_template);
 
-    QSize dimensions() const{ return m_dimensions; }
+//    QSize dimensions() const{ return m_dimensions; }
 
     // Scale image to match the size of the templates.
-    void scale_to_dimensions(QImage& image) const;
+//    void scale_to_dimensions(ImageRGB32& image) const;
 
     // Match the `box` area on `image` against the stored template dictionary.
     // `tolerance`: how much translation noise to tolerate. tolerance of 1 means to allow 1 pixel
@@ -68,7 +68,7 @@ public:
 private:
     static double compare(
         const WeightedExactImageMatcher& sprite,
-        const std::vector<QImage>& images
+        const std::vector<ImageRGB32>& images
     );
 
 
@@ -76,7 +76,9 @@ private:
     WeightedExactImageMatcher::InverseStddevWeight m_weight;
     // The size of the image templates.
     // Each template must have the same size.
-    QSize m_dimensions;
+//    QSize m_dimensions;
+    size_t m_width = 0;
+    size_t m_height = 0;
     std::map<std::string, WeightedExactImageMatcher> m_database;
 };
 
