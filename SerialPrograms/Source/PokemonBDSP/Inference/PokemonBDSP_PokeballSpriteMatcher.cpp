@@ -26,18 +26,18 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
 
 ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, QRgb& background) const{
     ImageStats border = image_border_stats(image);
-    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
+    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
-        [&](QRgb pixel){
-            double r = (double)qRed(pixel) - border.average.r;
-            double g = (double)qGreen(pixel) - border.average.g;
-            double b = (double)qBlue(pixel) - border.average.b;
+        [&](Color pixel){
+            double r = (double)pixel.r() - border.average.r;
+            double g = (double)pixel.g() - border.average.g;
+            double b = (double)pixel.b() - border.average.b;
             bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
             return stop;
         }
     );
     background = border.average.round();
-    return image.sub_image(rect.x(), rect.y(), rect.width(), rect.height()).copy();
+    return extract_box_reference(image, box).copy();
 }
 
 

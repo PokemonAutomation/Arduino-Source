@@ -64,17 +64,17 @@ ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& imag
     ImageStats border = image_border_stats(image);
 //    cout << border.average << border.stddev << endl;
 //    image.save("image1.png");
-    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
+    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
-        [&](QRgb pixel){
+        [&](Color pixel){
 //            if (qAlpha(pixel) == 0){
 //                return false;
 //            }
 //            FloatPixel p(pixel);
 //            cout << p << endl;
-            double r = (double)qRed(pixel) - border.average.r;
-            double g = (double)qGreen(pixel) - border.average.g;
-            double b = (double)qBlue(pixel) - border.average.b;
+            double r = (double)pixel.r() - border.average.r;
+            double g = (double)pixel.g() - border.average.g;
+            double b = (double)pixel.b() - border.average.b;
             bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
             if (stop){
 //                FloatPixel p(pixel);
@@ -85,7 +85,7 @@ ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& imag
     );
 
     background = border.average.round();
-    return image.sub_image(rect.x(), rect.y(), rect.width(), rect.height()).copy();
+    return extract_box_reference(image, box).copy();
 }
 
 
