@@ -66,7 +66,7 @@ Pokemon::ExtraNames load_mmo_names(){
 
     std::string mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
     QImage mmo_sprite = open_image(mmo_symbol_path);
-    QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite));
+    QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite).to_QImage_ref());
 
 
     for(size_t i = 0; i < 5; i++){

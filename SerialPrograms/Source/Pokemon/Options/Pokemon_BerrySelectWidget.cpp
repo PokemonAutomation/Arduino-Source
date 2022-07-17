@@ -29,13 +29,13 @@ BerrySelectWidget::BerrySelectWidget(
     for (size_t index = 0; index < slugs.size(); index++){
         const std::string& slug = slugs[index];
 
-        const BerrySprite* sprite = get_berry_sprite_nothrow(slug);
+        const SpriteDatabase::Sprite* sprite = ALL_BERRY_SPRITES().get_nothrow(slug);
         if (sprite == nullptr){
             this->addItem(QString::fromStdString(get_berry_name(slug).display_name()));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             this->addItem(
-                sprite->icon(),
+                sprite->icon,
                 QString::fromStdString(get_berry_name(slug).display_name())
             );
         }

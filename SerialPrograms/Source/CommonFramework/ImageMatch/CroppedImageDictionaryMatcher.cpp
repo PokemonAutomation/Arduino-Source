@@ -35,7 +35,7 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, const ImageView
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha_ref(image).copy(), m_weight)
+        std::forward_as_tuple(trim_image_alpha(image).copy(), m_weight)
     );
 }
 

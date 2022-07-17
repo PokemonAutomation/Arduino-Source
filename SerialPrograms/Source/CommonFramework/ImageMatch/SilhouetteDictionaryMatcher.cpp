@@ -31,7 +31,7 @@ void SilhouetteDictionaryMatcher::add(const std::string& slug, ImageRGB32 image)
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha_ref(image).copy())
+        std::forward_as_tuple(trim_image_alpha(image).copy())
     );
 }
 

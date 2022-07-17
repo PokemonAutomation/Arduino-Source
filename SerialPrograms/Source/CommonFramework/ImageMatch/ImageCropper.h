@@ -18,8 +18,7 @@ namespace ImageMatch{
 
 //  Shrink image so that it perfectly fits the object.
 //  The alpha channel is used to determine what is object vs. background.
-ImageViewRGB32 trim_image_alpha_ref(const ImageViewRGB32& image);
-QImage trim_image_alpha(const ImageViewRGB32& image);
+ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image);
 
 
 //  Shrink image so that it perfectly fits the object.
