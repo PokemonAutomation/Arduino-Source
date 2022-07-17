@@ -38,13 +38,11 @@ ImageRGB32 ImageViewRGB32::copy() const{
     }else{
         char* dst = (char*)ret.m_ptr;
         const char* src = (const char*)m_ptr;
-        size_t stop = m_height - 1;
-        for (size_t c = 0; c < stop; c++){
-            memcpy(dst, src, m_bytes_per_row);
+        for (size_t c = 0; c < m_height; c++){
+            memcpy(dst, src, m_width * sizeof(uint32_t));
             dst += ret.m_bytes_per_row;
             src += m_bytes_per_row;
         }
-        memcpy(dst, src, m_width * sizeof(uint32_t));
     }
     return ret;
 }
