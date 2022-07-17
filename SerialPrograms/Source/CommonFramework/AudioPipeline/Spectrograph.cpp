@@ -4,8 +4,8 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/AlignedVector.tpp"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Spectrograph.h"
 
 namespace PokemonAutomation{
@@ -31,10 +31,10 @@ void Spectrograph::push_spectrum(const uint32_t* spectrum){
         m_current_index = 0;
     }
 }
-QImage Spectrograph::to_image() const{
-    QImage image((int)m_frames, (int)m_buckets, QImage::Format_RGB32);
-    size_t bytes_per_line = image.bytesPerLine();
-    uint32_t* dst = (uint32_t*)image.bits();
+ImageRGB32 Spectrograph::to_image() const{
+    ImageRGB32 image(m_frames, m_buckets);
+    size_t bytes_per_line = image.bytes_per_row();
+    uint32_t* dst = image.data();
     const uint32_t* src = m_buffer.data();
 
     size_t frames = m_frames;

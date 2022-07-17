@@ -10,9 +10,9 @@
 #include <stdint.h>
 #include "Common/Cpp/AlignedVector.h"
 
-class QImage;
-
 namespace PokemonAutomation{
+
+class ImageRGB32;
 
 
 class Spectrograph{
@@ -22,7 +22,7 @@ public:
 
     void push_spectrum(const uint32_t* spectrum);
 
-    QImage to_image() const;
+    ImageRGB32 to_image() const;
 
 
 private:

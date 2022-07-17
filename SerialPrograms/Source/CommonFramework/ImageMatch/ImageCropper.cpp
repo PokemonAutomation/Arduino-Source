@@ -50,7 +50,7 @@ ImageViewRGB32 trim_image_alpha_ref(const ImageViewRGB32& image){
     while (re > rs && scan_row(image, re - 1, filter)) re--;
     while (cs < ce && scan_col(image, cs    , filter)) cs++;
     while (ce > cs && scan_col(image, ce - 1, filter)) ce--;
-    return image.sub_image(cs, rs, ce - cs, re - rs);;
+    return image.sub_image(cs, rs, ce - cs, re - rs);
 }
 QImage trim_image_alpha(const ImageViewRGB32& image){
     return trim_image_alpha_ref(image).to_QImage_owning();

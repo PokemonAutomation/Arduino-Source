@@ -24,6 +24,7 @@
 #include "AudioDisplayWidget.h"
 #include "AudioThreadController.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 
 #include <iostream>
@@ -295,32 +296,16 @@ void AudioDisplayWidget::render_spectrograph(){
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
 
-    QImage graph = m_spectrograph.to_image();
-
-#if 0
-    int width = (int)m_numFreqWindows;
-    int height = (int)m_numFreqVisBlocks;
-    QImage graph(width, height, QImage::Format_RGB32);
-    uint32_t* pixels = (uint32_t*)graph.bits();
-    size_t bytes_per_line = graph.bytesPerLine();
-    for (int c = 0; c < width; c++){
-        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows + c) % m_numFreqWindows;
-        const float* in = m_freqVisBlocks.data() + curWindow * m_numFreqVisBlocks;
-        uint32_t* out = pixels;
-        for (int r = 0; r < height; r++){
-            float value = in[r];
-            out[0] = jetColorMap(value);
-            out = (uint32_t*)((char*)out + bytes_per_line);
-        }
-        pixels++;
+    {
+        ImageRGB32 graph = m_spectrograph.to_image();
+        QImage graph_image = graph.to_QImage_ref();
+        graph_image = graph_image.scaled(
+            widgetWidth, widgetHeight,
+            Qt::IgnoreAspectRatio,
+            Qt::SmoothTransformation
+        );
+        painter.fillRect(rect(), graph_image);
     }
-#endif
-    graph = graph.scaled(
-        widgetWidth, widgetHeight,
-        Qt::IgnoreAspectRatio
-        , Qt::SmoothTransformation
-    );
-    painter.fillRect(rect(), graph);
 
     // Now render overlays:
 
