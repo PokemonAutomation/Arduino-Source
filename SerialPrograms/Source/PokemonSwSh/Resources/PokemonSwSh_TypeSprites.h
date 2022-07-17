@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_TypeSprites_H
 
 #include <memory>
-#include <QImage>
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSwSh_TypeMatchup.h"
@@ -21,7 +20,7 @@ namespace PokemonSwSh{
 class TypeSprite{
 public:
     const std::string& slug() const{ return m_slug; }
-    const QImage& sprite() const{ return m_sprite; }
+//    const ImageRGB32& sprite() const{ return m_sprite; }
 
     const ImageMatch::WeightedExactImageMatcher& matcher() const{ return *m_matcher; }
 
@@ -31,7 +30,6 @@ public:
 
 private:
     std::string m_slug;
-    QImage m_sprite;
 
     std::unique_ptr<ImageMatch::WeightedExactImageMatcher> m_matcher;
 };

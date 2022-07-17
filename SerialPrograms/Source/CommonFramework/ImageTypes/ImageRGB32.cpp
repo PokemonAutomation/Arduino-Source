@@ -60,6 +60,9 @@ ImageRGB32::ImageRGB32(const std::string& filename){
     if (image.isNull()){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open image.", filename);
     }
+    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
+        image = image.convertToFormat(QImage::Format_RGB32);
+    }
     *this = std::move(image);
 }
 
