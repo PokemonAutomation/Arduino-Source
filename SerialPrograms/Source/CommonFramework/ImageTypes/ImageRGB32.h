@@ -22,10 +22,8 @@ public:
     ImageRGB32& operator=(ImageRGB32&& x) noexcept;
 private:
     //  Disable these to prevent implicit copying.
-    ImageRGB32(const ImageRGB32& x);
-    ImageRGB32& operator=(const ImageRGB32& x);
-public:
-    ImageRGB32 clone() const{ return *this; }
+    ImageRGB32(const ImageRGB32& x) = delete;
+    void operator=(const ImageRGB32& x) = delete;
 
 
 public:

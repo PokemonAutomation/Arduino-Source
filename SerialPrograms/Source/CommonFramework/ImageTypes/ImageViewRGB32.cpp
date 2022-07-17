@@ -25,8 +25,34 @@ ImageViewRGB32::ImageViewRGB32(const ImageRef& image)
 
 
 
+ImageRGB32 ImageViewRGB32::copy() const{
+    if (m_ptr == nullptr){
+        return ImageRGB32();
+    }
+    ImageRGB32 ret(m_width, m_height);
+    if (ret.m_bytes_per_row == m_bytes_per_row){
+        memcpy(
+            ret.m_ptr, m_ptr,
+            (m_height - 1) * m_bytes_per_row + m_width * sizeof(uint32_t)
+        );
+    }else{
+        char* dst = (char*)ret.m_ptr;
+        const char* src = (const char*)m_ptr;
+        size_t stop = m_height - 1;
+        for (size_t c = 0; c < stop; c++){
+            memcpy(dst, src, m_bytes_per_row);
+            dst += ret.m_bytes_per_row;
+            src += m_bytes_per_row;
+        }
+        memcpy(dst, src, m_width * sizeof(uint32_t));
+    }
+    return ret;
+}
 void ImageViewRGB32::save(const std::string& path) const{
     to_QImage_ref().save(QString::fromStdString(path));
+}
+ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
+    return scaled_to_QImage(width, height);
 }
 
 

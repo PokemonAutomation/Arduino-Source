@@ -44,6 +44,7 @@ public:
 public:
     ImageRGB32 copy() const;
     void save(const std::string& path) const;
+    ImageRGB32 scale_to(size_t width, size_t height) const;
 
 public:
     ImageViewRGB32(const QImage& image);
