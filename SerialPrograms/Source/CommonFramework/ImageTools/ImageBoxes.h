@@ -95,16 +95,9 @@ struct ImageFloatBox{
 //  Return a reference to the sub-region of the image.
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box);
-//ConstImageRef extract_box_reference(const ConstImageRef& image, const ImagePixelBox& box);
-//ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box);
-//ConstImageRef extract_box_reference(const QImage& image, const ImagePixelBox& box);
-//ConstImageRef extract_box_reference(const QImage& image, const ImageFloatBox& box);
-//ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box);
-//ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box);
 ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
 ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, int offset_x, int offset_y);
-//ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 //  Deep copy the sub-region.
 QImage extract_box_copy(const QImage& image, const ImagePixelBox& box);
@@ -129,7 +122,7 @@ ImageFloatBox translate_to_parent(
 //  Given a ImagePixelBox within an image, get the ImageFloatBox for it.
 ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloatBox& float_box);
 ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixelBox& pixel_box);
-ImageFloatBox pixelbox_to_floatbox(const ConstImageRef& image, const ImagePixelBox& pixel_box);
+ImageFloatBox pixelbox_to_floatbox(const ImageViewRGB32& image, const ImagePixelBox& pixel_box);
 
 
 //  Given:

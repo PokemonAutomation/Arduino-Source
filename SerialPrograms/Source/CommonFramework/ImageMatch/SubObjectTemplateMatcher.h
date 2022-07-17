@@ -15,8 +15,6 @@
 #ifndef PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 #define PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 
-#include <QImage>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -73,7 +71,6 @@ protected:
 
 protected:
     std::string m_path;
-    QImage m_object;
     Color m_background_replacement;
 
     double m_max_rmsd;

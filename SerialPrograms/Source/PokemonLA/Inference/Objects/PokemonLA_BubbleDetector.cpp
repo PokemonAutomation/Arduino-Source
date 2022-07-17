@@ -25,7 +25,7 @@ public:
         : SubObjectTemplateMatcher("PokemonLA/Bubble-Template0.png", 40)
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
-            m_object,
+            m_matcher.image_template(),
             128, 255,
             128, 255,
             128, 255

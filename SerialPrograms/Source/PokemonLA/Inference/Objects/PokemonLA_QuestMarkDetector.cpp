@@ -24,7 +24,7 @@ public:
         : SubObjectTemplateMatcher("PokemonLA/QuestMark-Template1.png", 100)
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
-            m_object,
+            m_matcher.image_template(),
             128, 255,
             128, 255,
             128, 255

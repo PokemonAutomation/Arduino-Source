@@ -30,10 +30,10 @@ namespace ImageMatch{
 std::vector<ImageRGB32> make_image_set(
     const ImageViewRGB32& screen,
     const ImageFloatBox& box,
-    const QSize& dimensions,
+    size_t width, size_t height,
     size_t tolerance
 ){
-    double num_template_pixels = dimensions.width() * dimensions.height();
+    double num_template_pixels = width * height;
     double num_image_pixels = screen.width() * box.width * screen.height() * box.height;
 //    cout << std::sqrt(image / num_template_pixels) << endl;
     // scale: roughly the relative size between the input image and the template.
@@ -50,7 +50,7 @@ std::vector<ImageRGB32> make_image_set(
 //            }
 
             ret.emplace_back(
-                extract_box_reference(screen, box, x * scale, y * scale).scale_to(dimensions.width(), dimensions.height())
+                extract_box_reference(screen, box, x * scale, y * scale).scale_to(width, height)
             );
 //            cout << "make_image_set(): image = " << ret.back().width() << " x " << ret.back().height() << endl;
 //            if (x == 0 && y == 0){
@@ -137,7 +137,7 @@ ImageMatchResult ExactImageDictionaryMatcher::match(
     }
 
     // Translate the input image area a bit to careate matching candidates.
-    std::vector<ImageRGB32> image_set = make_image_set(image, box, QSize((int)m_width, (int)m_height), tolerance);
+    std::vector<ImageRGB32> image_set = make_image_set(image, box, m_width, m_height, tolerance);
     for (const auto& item : m_database){
 //        if (item.first != "linoone-galar"){
 //            continue;
@@ -162,7 +162,7 @@ ImageMatchResult ExactImageDictionaryMatcher::subset_match(
     }
 
     // Translate the input image area a bit to careate matching candidates.
-    std::vector<ImageRGB32> image_set = make_image_set(image, box, QSize((int)m_width, (int)m_height), tolerance);
+    std::vector<ImageRGB32> image_set = make_image_set(image, box,  m_width, m_height, tolerance);
     for (const auto& slug : subset){
         const auto& matcher = image_matcher(slug);
         double alpha = compare(matcher, image_set);

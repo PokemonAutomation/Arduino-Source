@@ -41,7 +41,7 @@ public:
         )
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
-            m_object, 0xff7f7f7f, 0xffffffff
+            m_matcher.image_template(), 0xff7f7f7f, 0xffffffff
         );
         std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 1){

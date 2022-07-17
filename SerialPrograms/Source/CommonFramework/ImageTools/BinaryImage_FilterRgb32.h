@@ -80,6 +80,12 @@ void filter_rgb32(
     Color replace_with,
     bool replace_if_zero    //  If false, replace if one.
 );
+void filter_rgb32(
+    const PackedBinaryMatrix2& matrix,
+    ImageRGB32& image,
+    Color replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+);
 
 
 

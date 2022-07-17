@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_CommonFramework_ImageDiff_H
 #define PokemonAutomation_CommonFramework_ImageDiff_H
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 

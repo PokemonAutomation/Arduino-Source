@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 
+#include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 

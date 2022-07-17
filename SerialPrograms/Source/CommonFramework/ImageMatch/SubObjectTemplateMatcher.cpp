@@ -20,15 +20,10 @@ namespace ImageMatch{
 
 SubObjectTemplateMatcher::SubObjectTemplateMatcher(const char* path, double max_rmsd)
     : m_path(RESOURCE_PATH() + path)
-    , m_object(QString::fromStdString(m_path))
     , m_max_rmsd(max_rmsd)
-    , m_matcher(m_object)
+    , m_matcher(m_path)
     , m_subobject_area_ratio(0)
-{
-    if (m_object.isNull()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, std::string("Unable to Open: ") + path);
-    }
-}
+{}
 
 SubObjectTemplateMatcher::SubObjectTemplateMatcher(const char* path, Color background_replacement, double max_rmsd)
     : SubObjectTemplateMatcher(path, max_rmsd)
@@ -68,8 +63,8 @@ double SubObjectTemplateMatcher::rmsd_with_background_replace(
     const ImagePixelBox& subobject_in_image
 ) const{
     object_box = object_from_subobject(subobject_in_image);
-    QImage object = extract_box_reference(image, object_box).to_QImage_owning();
-    if (object.isNull() || !check_image(object)){
+    ImageRGB32 object = extract_box_reference(image, object_box).copy();
+    if (!object || !check_image(object)){
         return 99999.;
     }
 
@@ -89,7 +84,7 @@ double SubObjectTemplateMatcher::rmsd_with_background_replace(
 
 void SubObjectTemplateMatcher::set_subobject(const WaterfillObject& subobject_in_object){
     m_subobject_in_object_p = subobject_in_object;
-    m_subobject_in_object_f = pixelbox_to_floatbox(m_object, m_subobject_in_object_p);
+    m_subobject_in_object_f = pixelbox_to_floatbox(m_matcher.image_template(), m_subobject_in_object_p);
     m_subobject_area_ratio = subobject_in_object.area_ratio();
 }
 bool SubObjectTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t candidate_height) const{

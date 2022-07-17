@@ -244,8 +244,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/ImageMatchOption.h
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp
     Source/CommonFramework/ImageMatch/ImageMatchResult.h
-    Source/CommonFramework/ImageMatch/ScaleBrightness.cpp
-    Source/CommonFramework/ImageMatch/ScaleBrightness.h
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp

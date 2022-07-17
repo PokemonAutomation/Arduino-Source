@@ -144,7 +144,6 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/ImageDiff.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchOption.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
-    Source/CommonFramework/ImageMatch/ScaleBrightness.cpp \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
@@ -838,7 +837,6 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/ImageDiff.h \
     Source/CommonFramework/ImageMatch/ImageMatchOption.h \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
-    Source/CommonFramework/ImageMatch/ScaleBrightness.h \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \

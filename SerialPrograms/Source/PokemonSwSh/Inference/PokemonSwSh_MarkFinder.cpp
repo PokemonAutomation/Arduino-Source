@@ -57,7 +57,7 @@ public:
         : SubObjectTemplateMatcher("PokemonSwSh/ExclamationMark1-Template.png", 80)
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
-            m_object,
+            m_matcher.image_template(),
             160, 255,
             0, 160,
             0, 192
