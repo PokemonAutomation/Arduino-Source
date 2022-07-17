@@ -23,8 +23,8 @@ namespace ImageMatch{
 CroppedImageDictionaryMatcher::CroppedImageDictionaryMatcher(const WeightedExactImageMatcher::InverseStddevWeight& weight)
     : m_weight(weight)
 {}
-void CroppedImageDictionaryMatcher::add(const std::string& slug, QImage image){
-    if (image.isNull()){
+void CroppedImageDictionaryMatcher::add(const std::string& slug, const ImageViewRGB32& image){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Null image.");
     }
     auto iter = m_database.find(slug);
@@ -35,7 +35,7 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, QImage image){
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha(image), m_weight)
+        std::forward_as_tuple(trim_image_alpha_ref(image).copy(), m_weight)
     );
 }
 
@@ -50,17 +50,10 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         return results;
     }
 
-    QImage processed = image.to_QImage_owning();
-    QRgb background = crop_image(processed);
-//    image.save("test.png");
-//    cout << FloatPixel(background) << endl;
-    set_alpha_channels(processed);
-
+    QRgb background;
+    ImageRGB32 processed = process_image(image, background);
 
     for (const auto& item : m_database){
-//        if (item.first != "solosis"){
-//            continue;
-//        }
         double alpha = item.second.diff(processed, background);
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);

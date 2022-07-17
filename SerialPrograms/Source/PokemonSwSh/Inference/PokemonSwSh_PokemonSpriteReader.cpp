@@ -55,12 +55,12 @@ PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::str
     for (const auto& item : ALL_POKEMON_SPRITES()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
-            add(item.first, item.second.sprite.to_QImage_owning());
+            add(item.first, item.second.sprite);
         }
     }
 }
 
-QRgb PokemonSpriteMatcherCropped::crop_image(QImage& image) const{
+ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& image, QRgb& background) const{
     ImageStats border = image_border_stats(image);
 //    cout << border.average << border.stddev << endl;
 //    image.save("image1.png");
@@ -83,31 +83,9 @@ QRgb PokemonSpriteMatcherCropped::crop_image(QImage& image) const{
             return stop;
         }
     );
-    image = image.copy(rect);
-//    image.save("image2.png");
-    return border.average.round();
-}
-void PokemonSpriteMatcherCropped::crop_sprite(QImage& image, QRgb background) const{
-//    FloatPixel p(background);
-//    cout << p << endl;
-//    image.save("test0.png");
-    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        image,
-        [&](QRgb pixel){
-            if (qAlpha(pixel) == 0){
-                return false;
-            }
-            double r = (double)qRed(pixel) - (double)qRed(background);
-            double g = (double)qGreen(pixel) - (double)qGreen(background);
-            double b = (double)qBlue(pixel) - (double)qBlue(background);
-            bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
-//            if (stop){
-//                cout << r << " " << g << " " << b << endl;
-//            }
-            return stop;
-        }
-    );
-    image = image.copy(rect);
+
+    background = border.average.round();
+    return image.sub_image(rect.x(), rect.y(), rect.width(), rect.height()).copy();
 }
 
 

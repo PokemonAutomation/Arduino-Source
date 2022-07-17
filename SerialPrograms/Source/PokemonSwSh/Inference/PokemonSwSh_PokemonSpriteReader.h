@@ -37,8 +37,7 @@ public:
     PokemonSpriteMatcherCropped(const std::set<std::string>* subset, double min_euclidean_distance = 100);
 
 private:
-    virtual QRgb crop_image(QImage& image) const override;
-    virtual void crop_sprite(QImage& image, QRgb background) const override;
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, QRgb& background) const override;
 
 private:
     double m_min_euclidean_distance_squared;

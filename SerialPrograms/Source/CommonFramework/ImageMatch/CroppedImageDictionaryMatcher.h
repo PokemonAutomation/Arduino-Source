@@ -14,7 +14,6 @@
 #include "ExactImageMatcher.h"
 
 namespace PokemonAutomation{
-    class ImageViewRGB32;
 namespace ImageMatch{
 
 
@@ -23,15 +22,13 @@ public:
     CroppedImageDictionaryMatcher(const WeightedExactImageMatcher::InverseStddevWeight& weight);
     virtual ~CroppedImageDictionaryMatcher() = default;
 
-    void add(const std::string& slug, QImage image);
+    void add(const std::string& slug, const ImageViewRGB32& image);
 
     ImageMatchResult match(const ImageViewRGB32& image, double alpha_spread) const;
 
 
 protected:
-    virtual QRgb crop_image(QImage& image) const{ return 0; }
-    virtual void crop_sprite(QImage& image, QRgb background) const{}
-    virtual void set_alpha_channels(QImage& image) const{}
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, QRgb& background) const = 0;
 
 
 private:

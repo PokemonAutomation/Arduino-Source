@@ -19,11 +19,12 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 {
     for (const auto& item : PokemonSwSh::ALL_POKEBALL_SPRITES()){
-        add(item.first, item.second.sprite.to_QImage_owning());
+        add(item.first, item.second.sprite);
     }
 }
 
-QRgb PokeballSpriteMatcher::crop_image(QImage& image) const{
+
+ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, QRgb& background) const{
     ImageStats border = image_border_stats(image);
     QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
@@ -35,24 +36,8 @@ QRgb PokeballSpriteMatcher::crop_image(QImage& image) const{
             return stop;
         }
     );
-    image = image.copy(rect);
-    return border.average.round();
-}
-void PokeballSpriteMatcher::crop_sprite(QImage& image, QRgb background) const{
-    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        image,
-        [&](QRgb pixel){
-            if (qAlpha(pixel) == 0){
-                return false;
-            }
-            double r = (double)qRed(pixel) - (double)qRed(background);
-            double g = (double)qGreen(pixel) - (double)qGreen(background);
-            double b = (double)qBlue(pixel) - (double)qBlue(background);
-            bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
-            return stop;
-        }
-    );
-    image = image.copy(rect);
+    background = border.average.round();
+    return image.sub_image(rect.x(), rect.y(), rect.width(), rect.height()).copy();
 }
 
 
