@@ -16,11 +16,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
-class QImage;
-
 namespace PokemonAutomation{
-
-class ImageViewRGB32;
 
 
 PackedBinaryMatrix2 compress_rgb32_to_binary_min(

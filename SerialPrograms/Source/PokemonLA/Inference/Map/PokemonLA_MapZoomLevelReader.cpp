@@ -6,14 +6,15 @@
 
 #include <cmath>
 #include <QImage>
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonLA_MapZoomLevelReader.h"
 
-#include <cmath>
 #include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,8 +33,9 @@ int read_map_zoom_level(const QImage& screen){
     float max_yellow = 0;
     int max_yellow_index = -1;
 
-    for(int i = 0; i < 3; i++){
-        QImage region = extract_box_copy(screen, boxes[i]);
+    for (int i = 0; i < 3; i++){
+        ImageRGB32 region = extract_box_reference(screen, boxes[i]).copy();
+
         // Replacing non-yellow color with zero-alpha color so that they won't be counted in
         // the following image_stats()
         const bool replace_background = true;

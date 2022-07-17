@@ -24,6 +24,7 @@
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 
 #include <QVideoFrame>
 
@@ -99,6 +100,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
+
+
+    read_map_zoom_level(feed.snapshot());
 
 
 

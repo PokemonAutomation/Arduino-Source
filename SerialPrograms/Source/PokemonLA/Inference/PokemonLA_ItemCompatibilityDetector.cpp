@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -25,7 +25,7 @@ ItemCompatibility detect_item_compatibility(const QImage& screen){
     // The Compatible/Incompatible text region of the lead pokemon on the screen.
     const ImageFloatBox box(0.838, 0.1815, 0.090, 0.024);
 
-    QImage region = extract_box_copy(screen, box);
+    ImageRGB32 region = extract_box_reference(screen, box).copy();
 
     // Replacing white background with zero-alpha color so that they won't be counted in
     // the following image_stats()
