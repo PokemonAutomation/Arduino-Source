@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_TypeSprites_H
 
 #include <memory>
+#include <QImage>
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSwSh_TypeMatchup.h"

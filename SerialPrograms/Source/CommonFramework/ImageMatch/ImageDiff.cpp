@@ -12,6 +12,7 @@
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageDiff.h"
 
 #include <iostream>
@@ -43,6 +44,13 @@ FloatPixel pixel_average(const ImageViewRGB32& image, const ImageViewRGB32& alph
 
 
 
+void scale_brightness(ImageRGB32& image, const FloatPixel& multiplier){
+    Kernels::scale_brightness(
+        image.width(), image.height(),
+        image.data(), image.bytes_per_row(),
+        (float)multiplier.r, (float)multiplier.g, (float)multiplier.b
+    );
+}
 void scale_brightness(const ImageRef& image, const FloatPixel& multiplier){
     Kernels::scale_brightness(
         image.width(), image.height(),

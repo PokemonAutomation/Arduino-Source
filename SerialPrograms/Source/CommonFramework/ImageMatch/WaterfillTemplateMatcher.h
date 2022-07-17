@@ -66,8 +66,6 @@ protected:
     bool check_area_ratio(double candidate_area_ratio) const;
 
 protected:
-    QImage m_object;
-
     double m_aspect_ratio_lower = 0.80;
     double m_aspect_ratio_upper = 1.25;
     double m_area_ratio_lower = 0.80;

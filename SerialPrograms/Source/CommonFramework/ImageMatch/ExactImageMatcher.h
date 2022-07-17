@@ -7,12 +7,11 @@
 #ifndef PokemonAutomation_ExactImageMatcher_H
 #define PokemonAutomation_ExactImageMatcher_H
 
-#include <QImage>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
-    class ImageViewRGB32;
 namespace ImageMatch{
 
 
@@ -21,8 +20,13 @@ namespace ImageMatch{
 //  match the input image. Alpha channels as used as masks in matching.
 //  No other treatment like tolerating translation or scaling based on stddevs, hence the name "Exact".
 class ExactImageMatcher{
+    ExactImageMatcher(ExactImageMatcher&&) = default;
+    ExactImageMatcher& operator=(ExactImageMatcher&&) = default;
+    ExactImageMatcher(const ExactImageMatcher&) = delete;
+    void operator=(const ExactImageMatcher&) = delete;
+
 public:
-    ExactImageMatcher(QImage image_template);
+    ExactImageMatcher(ImageRGB32 image_template);
     
     const ImageStats& stats() const{ return m_stats; }
 
@@ -44,15 +48,15 @@ public:
     // If both two images have alpha==0 on one pixel, that pixel is ignored.
     double rmsd_masked(const ImageViewRGB32& image) const;
 
-    const QImage& image_template() const { return m_image; }
+    ImageViewRGB32 image_template() const { return m_image; }
 
 private:
     // scale stored image template according to the brightness of `image`, assign
     // the scaled template to `reference`.
-    void process_images(QImage& reference, const ImageViewRGB32& image) const;
+    ImageRGB32 scale_template_brightness(const ImageViewRGB32& image) const;
 
-public:
-    QImage m_image;
+protected:
+    ImageRGB32 m_image;
     ImageStats m_stats;
 };
 
@@ -75,7 +79,7 @@ public:
         double offset;
     };
 
-    WeightedExactImageMatcher(QImage image_template, const InverseStddevWeight& weight);
+    WeightedExactImageMatcher(ImageRGB32 image_template, const InverseStddevWeight& weight);
 
     // Like ExactImageMatcher::rmsd(image) but scale based on template stddev.
     double diff(const ImageViewRGB32& image) const;

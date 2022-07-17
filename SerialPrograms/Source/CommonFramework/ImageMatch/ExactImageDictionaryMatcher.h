@@ -60,7 +60,7 @@ public:
         double alpha_spread
     ) const;
 
-    const QImage& image_template(const std::string& slug) const;
+    ImageViewRGB32 image_template(const std::string& slug) const;
 
     const WeightedExactImageMatcher& image_matcher(const std::string& slug) const;
 

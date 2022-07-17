@@ -485,7 +485,7 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageV
         break;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid region.");
-        return {};
+//        return {};
     }
 
     // cout << "input image feature: " << feature_to_str(image_feature) << endl;
@@ -848,13 +848,15 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
         ImagePixelBox expanded_box(box.min_x - 2, box.min_y - 2, box.max_x + 2, box.max_y + 2);
         QImage sprite_hsv = convert_to_hsv(extract_box_reference(screen, expanded_box));
         for(const auto& slug: result.candidates){
-            const QImage candidate_template = color_matcher_hsv.image_template(slug);
+            ImageViewRGB32 candidate_template = color_matcher_hsv.image_template(slug);
             float score = FLT_MAX;
             for(int ox = -2; ox <= 2; ox++){
                 for(int oy = -2; oy <= 2; oy++){
                     ImagePixelBox shifted_box(ox+2, oy+2, box.width(), box.height());
-                    float match_score = compute_MMO_sprite_hsv_distance(candidate_template, 
-                        extract_box_reference(sprite_hsv, shifted_box));
+                    float match_score = compute_MMO_sprite_hsv_distance(
+                        candidate_template,
+                        extract_box_reference(sprite_hsv, shifted_box)
+                    );
                     score = std::min(match_score, score);
                 }
             }
@@ -918,7 +920,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
 
     for(const auto& p : result.color_match_results){
         const auto& slug = p.second;
-        auto& template_gradient = gradient_matcher.image_template(slug);
+        ImageViewRGB32 template_gradient = gradient_matcher.image_template(slug);
         double score = compute_MMO_sprite_gradient_distance(template_gradient, gradient_image);
         result.gradient_match_results.emplace(score, slug);
     }

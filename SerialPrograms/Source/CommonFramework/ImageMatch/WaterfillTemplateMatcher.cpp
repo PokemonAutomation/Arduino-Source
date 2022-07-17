@@ -47,10 +47,8 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         }
     }
 
-    m_object = extract_box_copy(reference, *best);
-    // m_object.save("test.png");
-    // cout << "object width height " << m_object.width() << " " << m_object.height() << endl;
-    m_matcher.reset(new ExactImageMatcher(m_object));
+    QImage image_template = extract_box_copy(reference, *best);
+    m_matcher.reset(new ExactImageMatcher(std::move(image_template)));
     m_area_ratio = best->area_ratio();
 }
 
@@ -61,13 +59,10 @@ double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& object) const{
     return m_matcher->rmsd(object);
 }
 bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t candidate_height) const{
-    // double expected_aspect_ratio = (double)m_object.width() / m_object.height();
-    // double actual_aspect_ratio = (double)candidate_width / candidate_height;
-    // cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
-    // cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
+    ImageViewRGB32 image_template = m_matcher->image_template();
 
-    double error = (double)m_object.width() * candidate_height;
-    error /= (double)m_object.height() * candidate_width;
+    double error = (double)image_template.width() * candidate_height;
+    error /= (double)image_template.height() * candidate_width;
     // cout << "ratio = " << error << endl;
     return m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
 }

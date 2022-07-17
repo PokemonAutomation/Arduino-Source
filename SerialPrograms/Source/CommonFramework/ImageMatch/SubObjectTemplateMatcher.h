@@ -15,6 +15,7 @@
 #ifndef PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 #define PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 
+#include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"

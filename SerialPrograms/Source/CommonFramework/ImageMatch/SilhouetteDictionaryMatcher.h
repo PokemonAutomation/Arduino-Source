@@ -20,6 +20,12 @@ namespace ImageMatch{
 
 class SilhouetteDictionaryMatcher{
 public:
+    SilhouetteDictionaryMatcher(SilhouetteDictionaryMatcher&&) = default;
+    SilhouetteDictionaryMatcher& operator=(SilhouetteDictionaryMatcher&&) = default;
+    SilhouetteDictionaryMatcher(const SilhouetteDictionaryMatcher&) = delete;
+    void operator=(const SilhouetteDictionaryMatcher&) = delete;
+
+public:
     SilhouetteDictionaryMatcher() = default;
     virtual ~SilhouetteDictionaryMatcher() = default;
 

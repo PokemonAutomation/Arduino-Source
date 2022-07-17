@@ -13,6 +13,7 @@
 
 namespace PokemonAutomation{
     class ImageViewRGB32;
+    class ImageRGB32;
 namespace ImageMatch{
 
 
@@ -24,6 +25,7 @@ FloatPixel pixel_average(const ImageViewRGB32& image, const ImageViewRGB32& alph
 
 
 //  Multiply every pixel by "multiplier". Alpha channels are ignored.
+void scale_brightness(ImageRGB32& image, const FloatPixel& multiplier);
 void scale_brightness(const ImageRef& image, const FloatPixel& multiplier);
 
 

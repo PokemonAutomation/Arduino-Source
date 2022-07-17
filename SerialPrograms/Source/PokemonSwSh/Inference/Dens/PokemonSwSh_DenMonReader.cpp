@@ -25,6 +25,9 @@ namespace PokemonSwSh{
 
 class DenSpriteMatcher : public ImageMatch::SilhouetteDictionaryMatcher{
 public:
+    DenSpriteMatcher(DenSpriteMatcher&&) = default;
+    DenSpriteMatcher& operator=(DenSpriteMatcher&&) = default;
+public:
     DenSpriteMatcher() = default;
     virtual QRgb crop_image(QImage& image) const override{
         QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(

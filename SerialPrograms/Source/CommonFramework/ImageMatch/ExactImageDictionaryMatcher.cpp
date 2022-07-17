@@ -173,7 +173,7 @@ ImageMatchResult ExactImageDictionaryMatcher::subset_match(
     return results;
 }
 
-const QImage& ExactImageDictionaryMatcher::image_template(const std::string& slug) const{
+ImageViewRGB32 ExactImageDictionaryMatcher::image_template(const std::string& slug) const{
     auto it = m_database.find(slug);
     if (it == m_database.end()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown slug: " + slug);

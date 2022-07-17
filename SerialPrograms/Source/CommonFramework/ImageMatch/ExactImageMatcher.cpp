@@ -6,7 +6,6 @@
 
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageDiff.h"
 #include "ExactImageMatcher.h"
 
@@ -18,30 +17,28 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-ExactImageMatcher::ExactImageMatcher(QImage image)
+ExactImageMatcher::ExactImageMatcher(ImageRGB32 image)
     : m_image(std::move(image))
     , m_stats(image_stats(m_image))
 {
-    if (m_image.isNull()){
+    if (!m_image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is null.");
     }
 //    cout << m_stats.stddev.sum() << endl;
 }
 
-void ExactImageMatcher::process_images(QImage& reference, const ImageViewRGB32& image) const{
-//    cout << "ExactImageMatcher::process_images(): " << image.width() << " x " << image.height() << endl;
+ImageRGB32 ExactImageMatcher::scale_template_brightness(const ImageViewRGB32& image) const{
     FloatPixel image_brightness = pixel_average(image, m_image);
     FloatPixel scale = image_brightness / m_stats.average;
-
-//    cout << image_brightness << m_stats.average << scale << endl;
 
     if (std::isnan(scale.r)) scale.r = 1.0;
     if (std::isnan(scale.g)) scale.g = 1.0;
     if (std::isnan(scale.b)) scale.b = 1.0;
     scale.bound(0.8, 1.2);
 
-    reference = m_image;
-    scale_brightness(reference, scale);
+    ImageRGB32 ret = m_image.copy();
+    scale_brightness(ret, scale);
+    return ret;
 }
 
 
@@ -50,11 +47,12 @@ double ExactImageMatcher::rmsd(const ImageViewRGB32& image) const{
         return 1000.;
     }
 
+//    image.save("test.png");
+
 //    cout << "ExactImageMatcher::rmsd(): image = " << image.width() << " x " << image.height() << endl;
-    QImage scaled = image.scaled_to_QImage(m_image.width(), m_image.height());
+    ImageRGB32 scaled = image.scale_to(m_image.width(), m_image.height());
 //    cout << "ExactImageMatcher::rmsd(): scaled = " << scaled.width() << " x " << scaled.height() << endl;
-    QImage reference;
-    process_images(reference, scaled);
+    ImageRGB32 reference = scale_template_brightness(scaled);
 
 #if 0
     static int c = 0;
@@ -71,25 +69,23 @@ double ExactImageMatcher::rmsd(const ImageViewRGB32& image, QRgb background) con
     if (!image){
         return 1000.;
     }
-    QImage scaled = image.scaled_to_QImage(m_image.width(), m_image.height());
-    QImage reference;
-    process_images(reference, scaled);
+    ImageRGB32 scaled = image.scale_to(m_image.width(), m_image.height());
+    ImageRGB32 reference = scale_template_brightness(scaled);
     return pixel_RMSD(reference, scaled, background);
 }
 double ExactImageMatcher::rmsd_masked(const ImageViewRGB32& image) const{
     if (!image){
         return 1000.;
     }
-    QImage scaled = image.scaled_to_QImage(m_image.width(), m_image.height());
-    QImage reference;
-    process_images(reference, scaled);
+    ImageRGB32 scaled = image.scale_to(m_image.width(), m_image.height());
+    ImageRGB32 reference = scale_template_brightness(scaled);
     return pixel_RMSD_masked(reference, scaled);
 }
 
 
 
 
-WeightedExactImageMatcher::WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight)
+WeightedExactImageMatcher::WeightedExactImageMatcher(ImageRGB32 image, const InverseStddevWeight& weight)
     : ExactImageMatcher(std::move(image))
     , m_multiplier(1. / (m_stats.stddev.sum() * weight.stddev_coefficient + weight.offset))
 {}
