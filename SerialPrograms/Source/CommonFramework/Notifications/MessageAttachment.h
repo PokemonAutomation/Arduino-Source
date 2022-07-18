@@ -8,22 +8,21 @@
 #define PokemonAutomation_MessageAttachment_H
 
 #include <atomic>
-//#include <QFile>
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 
 namespace PokemonAutomation{
 
 
 struct ImageAttachment{
-    QImage image;
+    ImageRGB32 image;
     ImageAttachmentMode mode = ImageAttachmentMode::NO_SCREENSHOT;
     bool keep_file = false;
 
     ImageAttachment() = default;
     ImageAttachment(
-        QImage p_image,
+        ImageRGB32&& p_image,
         ImageAttachmentMode p_mode,
         bool p_keep_file = false
     );

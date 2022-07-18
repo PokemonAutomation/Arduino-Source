@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -21,26 +22,24 @@ namespace PokemonAutomation{
 
 
 ImageMatchDetector::ImageMatchDetector(
-    QImage reference_image, const ImageFloatBox& box,
+    const ImageViewRGB32& reference_image, const ImageFloatBox& box,
     double max_rmsd, bool scale_brightness,
     Color color
 )
-    : m_reference_image(std::move(reference_image))
+    : m_reference_image(extract_box_reference(reference_image, box).copy())
     , m_average_brightness(image_stats(m_reference_image).average)
     , m_max_rmsd(max_rmsd)
     , m_scale_brightness(scale_brightness)
     , m_color(color)
     , m_box(box)
-{
-    m_reference_image = extract_box_copy(m_reference_image, m_box);
-}
+{}
 
 double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
     if (!frame){
         return 1000;
     }
     ImageViewRGB32 image = extract_box_reference(frame, m_box);
-    QImage scaled = image.scaled_to_QImage(m_reference_image.width(), m_reference_image.height());
+    ImageRGB32 scaled = image.scale_to(m_reference_image.width(), m_reference_image.height());
 
 #if 0
     if (image.width() != (size_t)scaled.width() || image.height() != (size_t)scaled.height()){

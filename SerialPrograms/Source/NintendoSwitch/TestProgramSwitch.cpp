@@ -26,6 +26,8 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 
 #include <QVideoFrame>
 
@@ -102,12 +104,35 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    FrozenImageDetector detector(std::chrono::seconds(10), 20);
+    BotBaseContext context(scope, console.botbase());
+    int ret = wait_until(
+        console, context, std::chrono::seconds(600),
+        { detector }
+    );
+    cout << "ret = " << ret << endl;
 
+
+
+
+#if 0
+    InferenceBoxScope box0(env.consoles[0], {0.925, 0.100, 0.015, 0.030});
+
+    QImage image("screenshot-20220717-204925545835.png");
+    ImageViewRGB32 cropped = extract_box_reference(image, box0);
+    ImageStats stats = image_stats(cropped);
+    cout << stats.average << stats.stddev << endl;
+    cropped.save("test.png");
+#endif
+
+
+
+#if 0
     MaxLairInternal::PokemonSwapMenuReader reader(logger, overlay, Language::English);
 
     int8_t pp[4];
     reader.read_pp(QImage("screenshot-20220717-125742133117.png"), pp);
-
+#endif
 
 
 //    read_map_zoom_level(feed.snapshot());

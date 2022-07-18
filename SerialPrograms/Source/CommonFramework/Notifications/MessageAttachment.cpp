@@ -14,11 +14,11 @@ namespace PokemonAutomation{
 
 
 ImageAttachment::ImageAttachment(
-    QImage p_image,
+    ImageRGB32&& p_image,
     ImageAttachmentMode p_mode,
     bool p_keep_file
 )
-    : image(p_image)
+    : image(std::move(p_image))
     , mode(p_mode)
     , keep_file(p_keep_file)
 {}
@@ -55,7 +55,7 @@ PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
     if (image.mode == ImageAttachmentMode::NO_SCREENSHOT){
         return;
     }
-    if (image.image.isNull()){
+    if (!image.image){
         logger.log("Screenshot is null.", COLOR_ORANGE);
         return;
     }
@@ -82,7 +82,7 @@ PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
         m_filepath = "TempImages/" + m_filename;
     }
 
-    if (image.image.save(QString::fromStdString(m_filepath))){
+    if (image.image.save(m_filepath)){
         logger.log("Saved image to: " + m_filepath, COLOR_BLUE);
     }else{
         logger.log("Unable to save screenshot to: " + m_filepath, COLOR_RED);

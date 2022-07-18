@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_CommonFramework_FrozenImageDetector_H
 #define PokemonAutomation_CommonFramework_FrozenImageDetector_H
 
-#include <QImage>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -33,7 +33,7 @@ private:
     std::chrono::milliseconds m_timeout;
     double m_rmsd_threshold;
     WallClock m_timestamp;
-    QImage m_last_delta;
+    ImageRGB32 m_last_delta;
 };
 
 

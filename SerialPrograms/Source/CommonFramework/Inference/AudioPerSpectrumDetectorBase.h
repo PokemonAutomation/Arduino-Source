@@ -28,8 +28,6 @@
 #ifndef PokemonAutomation_CommonFramework_AudioPerSpectrumDetectorBase_H
 #define PokemonAutomation_CommonFramework_AudioPerSpectrumDetectorBase_H
 
-#include <QImage>
-
 #include <string>
 #include <functional>
 #include "Common/Cpp/AbstractLogger.h"

@@ -4,6 +4,7 @@
  *
  */
 
+#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -37,10 +38,10 @@ void FrozenImageDetector::make_overlays(VideoOverlaySet& set) const{
     set.add(m_color, m_box);
 }
 bool FrozenImageDetector::process_frame(const QImage& frame, WallClock timestamp){
-    QImage image = extract_box_copy(frame, m_box);
-    if (m_last_delta.size() != image.size()){
+    ImageRGB32 image = extract_box_reference(frame, m_box).copy();
+    if (m_last_delta.width() != image.width() || m_last_delta.height() != image.height()){
         m_timestamp = timestamp;
-        m_last_delta = image;
+        m_last_delta = std::move(image);
         return false;
     }
 
@@ -48,7 +49,7 @@ bool FrozenImageDetector::process_frame(const QImage& frame, WallClock timestamp
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd > m_rmsd_threshold){
         m_timestamp = timestamp;
-        m_last_delta = image;
+        m_last_delta = std::move(image);
         return false;
     }
 

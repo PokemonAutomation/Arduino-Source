@@ -46,8 +46,8 @@ ImageRGB32 ImageViewRGB32::copy() const{
     }
     return ret;
 }
-void ImageViewRGB32::save(const std::string& path) const{
-    to_QImage_ref().save(QString::fromStdString(path));
+bool ImageViewRGB32::save(const std::string& path) const{
+    return to_QImage_ref().save(QString::fromStdString(path));
 }
 ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
     return scaled_to_QImage(width, height);

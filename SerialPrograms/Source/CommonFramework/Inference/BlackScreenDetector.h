@@ -49,7 +49,7 @@ public:
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 };
 
 
@@ -62,10 +62,10 @@ public:
         double max_stddev_sum = 10
     );
 
-    bool black_is_over(const QImage& frame);
+    bool black_is_over(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     BlackScreenDetector m_detector;

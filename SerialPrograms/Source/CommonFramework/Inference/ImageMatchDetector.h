@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CommonFramework_ImageMatchDetector_H
 #define PokemonAutomation_CommonFramework_ImageMatchDetector_H
 
-#include <QImage>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/Inference/VisualDetector.h"
@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 class ImageMatchDetector : public StaticScreenDetector{
 public:
     ImageMatchDetector(
-        QImage reference_image, const ImageFloatBox& box,
+        const ImageViewRGB32& reference_image, const ImageFloatBox& box,
         double max_rmsd, bool scale_brightness = false,
         Color color = COLOR_RED
     );
@@ -30,7 +30,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
-    QImage m_reference_image;
+    ImageRGB32 m_reference_image;
     FloatPixel m_average_brightness;
 
     double m_max_rmsd;

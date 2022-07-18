@@ -8,15 +8,13 @@
  *
  */
 
-#include <QImage>
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "BlackScreenDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -52,7 +50,7 @@ BlackScreenWatcher::BlackScreenWatcher(
 void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
     BlackScreenDetector::make_overlays(items);
 }
-bool BlackScreenWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool BlackScreenWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -71,10 +69,10 @@ void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
 
-bool BlackScreenOverWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool BlackScreenOverWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return black_is_over(frame);
 }
-bool BlackScreenOverWatcher::black_is_over(const QImage& frame){
+bool BlackScreenOverWatcher::black_is_over(const ImageViewRGB32& frame){
     if (m_detector.detect(frame)){
         m_has_been_black = true;
         return false;

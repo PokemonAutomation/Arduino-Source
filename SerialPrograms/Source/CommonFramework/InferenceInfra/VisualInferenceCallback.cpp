@@ -4,36 +4,25 @@
  *
  */
 
-#include "CommonFramework/Tools/InterruptableCommands.h"
+#include <QImage>
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
 
-#if 0
-VisualInferenceCallbackWithCommandStop::VisualInferenceCallbackWithCommandStop()
-    : m_triggered(false)
-{}
-
-void VisualInferenceCallbackWithCommandStop::register_command_stop(InterruptableCommandSession& session){
-    m_command_stops.emplace_back(&session);
+bool VisualInferenceCallback::process_frame(const QImage& frame, WallClock timestamp){
+    return process_frame(std::make_shared<ImageRGB32>(frame), timestamp);
+}
+bool VisualInferenceCallback::process_frame(const std::shared_ptr<ImageRGB32>& frame, WallClock timestamp){
+    return process_frame(*frame, timestamp);
+}
+bool VisualInferenceCallback::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "You must override one of the two process_frame() functions.");
 }
 
 
-bool VisualInferenceCallbackWithCommandStop::process_frame(
-    const QImage& frame,
-    WallClock timestamp
-){
-    if (!on_frame(frame, timestamp)){
-        return false;
-    }
-    m_triggered.store(true, std::memory_order_release);
-    for (InterruptableCommandSession* command : m_command_stops){
-        command->stop();
-    }
-    return true;
-}
-#endif
 
 
 
