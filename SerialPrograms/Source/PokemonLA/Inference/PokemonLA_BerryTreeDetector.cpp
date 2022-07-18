@@ -5,25 +5,25 @@
  */
 
 #include <cmath>
+#include <algorithm>
+#include <sstream>
+#include <map>
 #include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 // #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
-#include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
 #include <iostream>
-#include <algorithm>
-#include <sstream>
-#include <map>
 using std::cout;
 using std::endl;
 

@@ -41,7 +41,6 @@ bool is_exclamation_mark(const ImageViewRGB32& image, const WaterfillObject& obj
         return false;
     }
 
-//    const QImage& exclamation_mark = EXCLAMATION_MARK();
     ImageViewRGB32 obj = extract_box_reference(image, object);
     double rmsd = EXCLAMATION_MARK().rmsd(obj);
 //    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
@@ -75,7 +74,7 @@ MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
 void MarkTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool MarkTracker::process_frame(const QImage& frame, WallClock){
+bool MarkTracker::process_frame(const ImageViewRGB32& frame, WallClock){
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box_reference(frame, m_box));
 //        cout << exclamation_marks.size() << endl;
 
@@ -86,7 +85,7 @@ bool MarkTracker::process_frame(const QImage& frame, WallClock){
     return false;
 }
 
-bool MarkDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool MarkDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     MarkTracker::process_frame(frame, timestamp);
     return !m_marks.empty();
 }

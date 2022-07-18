@@ -154,6 +154,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
+    Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp \
     Source/CommonFramework/ImageTypes/ImageReference.cpp \
@@ -315,7 +316,6 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -848,6 +848,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
+    Source/CommonFramework/ImageTools/WaterfillUtilities.h \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
     Source/CommonFramework/ImageTypes/ImageRGB32.h \
     Source/CommonFramework/ImageTypes/ImageReference.h \
@@ -1037,7 +1038,6 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \

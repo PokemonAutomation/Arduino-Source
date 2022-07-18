@@ -6,11 +6,11 @@
 
 #include <cmath>
 #include <QImage>
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
@@ -75,7 +75,7 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     // matrix2 stores pixels that are at the end points of the red marker.
     PackedBinaryMatrix2 matrix2 = remove_center_pixels(red_marker_obj, stop).first;
 
-    Kernels::Waterfill::draw_matrix_on_image(matrix2, combine_rgb(0, 0, 255), output, red_marker_obj.min_x, red_marker_obj.min_y);
+    draw_matrix_on_image(matrix2, combine_rgb(0, 0, 255), output, red_marker_obj.min_x, red_marker_obj.min_y);
 
     // Get those end point regions from matrix2 into marker_ends.
     // The object in marker_ends are in the local coordinate system of the red marker

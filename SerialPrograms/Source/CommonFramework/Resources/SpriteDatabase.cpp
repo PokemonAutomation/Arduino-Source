@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
-    : m_backing_image(open_image(RESOURCE_PATH() + sprite_path))
+    : m_backing_image(RESOURCE_PATH() + sprite_path)
 {
     std::string path = RESOURCE_PATH() + json_path;
     JsonValue json = load_json_file(path);
@@ -39,7 +39,6 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
         int y = (int)obj.get_integer_throw("top", path);
         int x = (int)obj.get_integer_throw("left", path);
 
-//        QImage sprite = sprites.copy(x, y, width, height);
         ImageViewRGB32 sprite = extract_box_reference(m_backing_image, ImagePixelBox(x, y, x + width, y + height));
         QPixmap pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(sprite).to_QImage_ref());
         m_database.emplace(slug, Sprite{sprite, pixmap});

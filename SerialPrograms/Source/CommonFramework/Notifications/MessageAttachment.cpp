@@ -14,11 +14,11 @@ namespace PokemonAutomation{
 
 
 ImageAttachment::ImageAttachment(
-    ImageRGB32&& p_image,
+    const ImageViewRGB32& p_image,
     ImageAttachmentMode p_mode,
     bool p_keep_file
 )
-    : image(std::move(p_image))
+    : image(p_image)
     , mode(p_mode)
     , keep_file(p_keep_file)
 {}

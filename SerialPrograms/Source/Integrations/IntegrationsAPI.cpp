@@ -4,9 +4,9 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Integrations/ProgramTracker.h"
 #include "IntegrationsAPI.h"
 
@@ -78,13 +78,13 @@ void pai_status(DllSafeString& description){
     description = str;
 }
 void pai_screenshot(DllSafeString& error, uint64_t console_id, const char* path){
-    QImage image;
+    ImageRGB32 image;
     std::string err = ProgramTracker::instance().grab_screenshot(console_id, image);
     if (!err.empty()){
         error = err;
         return;
     }
-    if (image.save(QString::fromStdString(path))){
+    if (image.save(path)){
         error = DllSafeString();
     }else{
         error = std::string("Failed to save image to: ") + path;

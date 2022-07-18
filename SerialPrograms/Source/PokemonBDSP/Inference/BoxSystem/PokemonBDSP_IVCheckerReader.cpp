@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonBDSP_IVCheckerReader.h"
 
@@ -24,7 +23,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
-IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box){
+IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const ImageViewRGB32& frame, const InferenceBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
         logger, m_language, image,
@@ -36,7 +35,7 @@ IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame,
     }
     return IVCheckerValue_string_to_enum(result.results.begin()->second.token);
 }
-IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame){
+IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const ImageViewRGB32& frame){
     IVCheckerReader::Results results;
     if (m_language != Language::None){
         results.hp      = read(logger, frame, m_box0);
@@ -49,14 +48,14 @@ IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const QIma
     return results;
 }
 
-std::vector<QImage> IVCheckerReaderScope::dump_images(const QImage& frame){
-    std::vector<QImage> images;
-    images.emplace_back(extract_box_copy(frame, m_box0));
-    images.emplace_back(extract_box_copy(frame, m_box1));
-    images.emplace_back(extract_box_copy(frame, m_box2));
-    images.emplace_back(extract_box_copy(frame, m_box3));
-    images.emplace_back(extract_box_copy(frame, m_box4));
-    images.emplace_back(extract_box_copy(frame, m_box5));
+std::vector<ImageViewRGB32> IVCheckerReaderScope::dump_images(const ImageViewRGB32& frame){
+    std::vector<ImageViewRGB32> images;
+    images.emplace_back(extract_box_reference(frame, m_box0));
+    images.emplace_back(extract_box_reference(frame, m_box1));
+    images.emplace_back(extract_box_reference(frame, m_box2));
+    images.emplace_back(extract_box_reference(frame, m_box3));
+    images.emplace_back(extract_box_reference(frame, m_box4));
+    images.emplace_back(extract_box_reference(frame, m_box5));
     return images;
 }
 

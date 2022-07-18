@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonBDSP_DialogDetector.h"
@@ -67,7 +66,7 @@ ShortDialogWatcher::ShortDialogWatcher(Color color)
 void ShortDialogWatcher::make_overlays(VideoOverlaySet& items) const{
     ShortDialogDetector::make_overlays(items);
 }
-bool ShortDialogWatcher::process_frame(const QImage& frame, WallClock){
+bool ShortDialogWatcher::process_frame(const ImageViewRGB32& frame, WallClock){
     return detect(frame);
 }
 
@@ -125,7 +124,7 @@ void ShortDialogPromptDetector::make_overlays(VideoOverlaySet& items) const{
     m_dialog.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool ShortDialogPromptDetector::process_frame(const QImage& screen, WallClock timestamp){
+bool ShortDialogPromptDetector::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
     return m_dialog.detect(screen) && m_arrow.process_frame(screen, timestamp);
 }
 

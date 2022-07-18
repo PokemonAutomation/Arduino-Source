@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -72,7 +71,7 @@ MenuWatcher::MenuWatcher(Color color)
 void MenuWatcher::make_overlays(VideoOverlaySet& items) const{
     MenuDetector::make_overlays(items);
 }
-bool MenuWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool MenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 

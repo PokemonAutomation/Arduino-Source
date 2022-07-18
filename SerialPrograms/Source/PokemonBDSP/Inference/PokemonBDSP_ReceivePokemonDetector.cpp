@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -29,7 +28,7 @@ void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box1);
 }
 
-bool ReceivePokemonDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool ReceivePokemonDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const ImageStats stats0 = image_stats(extract_box_reference(frame, m_box0));
     if (stats0.average.sum() < 100 || !is_solid(stats0, {0.22951, 0.340853, 0.429638}, 0.15, 20)){
         return m_received;

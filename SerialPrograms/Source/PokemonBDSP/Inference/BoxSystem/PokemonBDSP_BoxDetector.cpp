@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -66,7 +65,7 @@ BoxWatcher::BoxWatcher(Color color)
 void BoxWatcher::make_overlays(VideoOverlaySet& items) const{
     BoxDetector::make_overlays(items);
 }
-bool BoxWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool BoxWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 

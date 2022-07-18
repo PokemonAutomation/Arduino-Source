@@ -6,11 +6,11 @@
 
 #include <functional>
 #include <QImage>
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 

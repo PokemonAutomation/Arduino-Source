@@ -9,8 +9,7 @@
 
 #include <map>
 #include <QIcon>
-#include <QImage>
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 
@@ -61,7 +60,7 @@ public:
 
 private:
     std::map<std::string, Sprite> m_database;
-    QImage m_backing_image;
+    ImageRGB32 m_backing_image;
 };
 
 

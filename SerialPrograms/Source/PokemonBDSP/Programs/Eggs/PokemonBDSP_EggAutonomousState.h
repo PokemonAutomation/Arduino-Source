@@ -16,6 +16,7 @@
 #include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
 
 namespace PokemonAutomation{
+    class ImageRGB32;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -75,7 +76,7 @@ public:
 
 private:
     [[noreturn]] void process_error(const std::string& name, const char* message);
-    void process_shiny(QImage screen);
+    void process_shiny(const ImageViewRGB32& screen);
 
 private:
     ProgramEnvironment& m_env;

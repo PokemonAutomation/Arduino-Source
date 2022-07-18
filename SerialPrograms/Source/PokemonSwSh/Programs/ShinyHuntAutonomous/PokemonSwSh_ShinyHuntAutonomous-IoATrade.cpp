@@ -156,7 +156,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                env.console.video().snapshot()
+                env.console.video().snapshot().frame
             );
             if (VIDEO_ON_SHINY){
                 pbf_wait(context, 1 * TICKS_PER_SECOND);

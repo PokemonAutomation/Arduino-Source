@@ -71,7 +71,7 @@ public:
         items.add(m_color, m_box0);
         items.add(m_color, m_box1);
     }
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         ImageStats stats0 = image_stats(extract_box_reference(frame, m_box0));
         ImageStats stats1 = image_stats(extract_box_reference(frame, m_box1));
         if (!is_solid(stats0, {0.22951, 0.340853, 0.429638}, 0.15, 20)){
@@ -143,7 +143,7 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
     m_console.log(message, COLOR_RED);
-    QImage screen = m_console.video().snapshot();
+    ImageRGB32 screen = m_console.video().snapshot().frame;
     dump_image(
         m_console, m_env.program_info(),
         name,
@@ -153,12 +153,12 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
         m_env,
         m_notification_error,
         message,
-        std::move(screen)
+        screen
     );
     throw OperationFailedException(m_console, message);
 }
 
-void EggAutonomousState::process_shiny(QImage screen){
+void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){
 //    take_video(m_console);
     m_stats.m_shinies++;
     m_env.update_stats();
@@ -167,7 +167,7 @@ void EggAutonomousState::process_shiny(QImage screen){
         m_notification_noop,
         m_notification_shiny,
         false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-        std::move(screen)
+        screen
     );
 }
 
@@ -207,7 +207,7 @@ bool EggAutonomousState::process_party(){
     shiny_reader.make_overlays(set);
 
     //  Make sure the stats menu is up.
-    QImage screen = m_console.video().snapshot();
+    ImageRGB32 screen = m_console.video().snapshot().frame;
     if (!shiny_reader.is_panel(screen)){
         process_error("StatsPanel", "Stats panel not detected.");
     }
@@ -221,7 +221,7 @@ bool EggAutonomousState::process_party(){
             m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
 
-            screen = m_console.video().snapshot();
+            screen = m_console.video().snapshot().frame;
             if (!shiny_reader.is_panel(screen)){
                 process_error("StatsPanel", "Stats panel not detected.");
             }

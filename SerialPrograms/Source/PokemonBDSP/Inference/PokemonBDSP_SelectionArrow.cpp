@@ -89,7 +89,7 @@ SelectionArrowFinder::SelectionArrowFinder(
     , m_box(box)
 {}
 
-void SelectionArrowFinder::detect(const QImage& screen){
+void SelectionArrowFinder::detect(const ImageViewRGB32& screen){
     std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
 
     m_arrow_boxes.clear();
@@ -100,7 +100,7 @@ void SelectionArrowFinder::detect(const QImage& screen){
 void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool SelectionArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
+bool SelectionArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     detect(frame);
 //    cout << m_arrow_boxes.size() << endl;
 //    if (!m_arrow_boxes.empty()){

@@ -7,6 +7,7 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -24,8 +25,8 @@ using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
-const QImage& VS_SEEKER_REACTION_BUBBLE(){
-    static QImage image = open_image(RESOURCE_PATH() + "PokemonBDSP/VSSeekerReactBuble-WhiteFill.png");
+const ImageViewRGB32& VS_SEEKER_REACTION_BUBBLE(){
+    static ImageRGB32 image(RESOURCE_PATH() + "PokemonBDSP/VSSeekerReactBuble-WhiteFill.png");
     return image;
 }
 
@@ -39,15 +40,8 @@ bool is_seeker_bubble(const ImageViewRGB32& image, const WaterfillObject& object
         return false;
     }
 
-    const QImage& exclamation_mark = VS_SEEKER_REACTION_BUBBLE();
-    QImage scaled = extract_box_reference(image, object).scaled_to_QImage(exclamation_mark.width(), exclamation_mark.height());
-#if 0
-    QImage scaled = image.copy(
-        (pxint_t)object.min_x, (pxint_t)object.min_y,
-        (pxint_t)width, (pxint_t)height
-    );
-    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-#endif
+    const ImageViewRGB32& exclamation_mark = VS_SEEKER_REACTION_BUBBLE();
+    ImageRGB32 scaled = extract_box_reference(image, object).scale_to(exclamation_mark.width(), exclamation_mark.height());
     double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;
@@ -77,7 +71,7 @@ VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const Im
 void VSSeekerReactionTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool VSSeekerReactionTracker::process_frame(const QImage& frame, WallClock){
+bool VSSeekerReactionTracker::process_frame(const ImageViewRGB32& frame, WallClock){
     ImageViewRGB32 cropped = extract_box_reference(frame, m_box);
     m_dimensions = QSize((int)cropped.width(), (int)cropped.height());
     m_bubbles = find_seeker_bubbles(cropped);

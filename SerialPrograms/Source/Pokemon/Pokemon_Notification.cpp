@@ -76,7 +76,7 @@ void send_encounter_notification(
     bool enable_names, bool shiny_detected,
     const std::vector<EncounterResult>& results,
     double alpha,
-    QImage screenshot,
+    const ImageViewRGB32& screenshot,
     const EncounterFrequencies* frequencies
 ){
     ShinyType max_shiny_type = ShinyType::UNKNOWN;
@@ -178,7 +178,7 @@ void send_encounter_notification(
             color, env.program_info(),
             "Encounter Notification",
             embeds,
-            std::move(screenshot), true
+            screenshot, true
         );
     }else{
         send_program_notification(
@@ -186,7 +186,7 @@ void send_encounter_notification(
             color, env.program_info(),
             "Encounter Notification",
             embeds,
-            std::move(screenshot), false
+            screenshot, false
         );
     }
 }

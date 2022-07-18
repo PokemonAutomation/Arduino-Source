@@ -4,20 +4,20 @@
  *
  */
 
-
-#include "Common/Cpp/Color.h"
-#include "Kernels_Waterfill_Utilities.h"
 #include <map>
-
 #include <QImage>
 #include <QColor>
+#include "Common/Cpp/Color.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "WaterfillUtilities.h"
 
 namespace PokemonAutomation{
-namespace Kernels{
-namespace Waterfill{
 
 
-std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(const WaterfillObject& object, size_t num_pixels_to_remove){
+std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
+    const Kernels::Waterfill::WaterfillObject& object,
+    size_t num_pixels_to_remove
+){
     PackedBinaryMatrix2 matrix = object.packed_matrix();
     size_t width = matrix.width();
     size_t height = matrix.height();
@@ -63,7 +63,10 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(const WaterfillObjec
 }
 
 
-void draw_matrix_on_image(const PackedBinaryMatrix2& matrix, uint32_t color, QImage& image, size_t offset_x, size_t offset_y){
+void draw_matrix_on_image(
+    const PackedBinaryMatrix2& matrix,
+    uint32_t color, QImage& image, size_t offset_x, size_t offset_y
+){
     const Color c(color);
     const QColor q_color(c.r(), c.g(), c.b());
     for (size_t x = 0; x < matrix.width(); x++){
@@ -80,7 +83,10 @@ void draw_matrix_on_image(const PackedBinaryMatrix2& matrix, uint32_t color, QIm
 }
 
 
-void draw_object_on_image(const WaterfillObject& obj, const uint32_t& color, QImage& image, size_t offset_x, size_t offset_y){
+void draw_object_on_image(
+    const Kernels::Waterfill::WaterfillObject& obj,
+    const uint32_t& color, QImage& image, size_t offset_x, size_t offset_y
+){
     const Color c(color);
     const QColor q_color(c.r(), c.g(), c.b());
     for (size_t x = 0; x < obj.width(); x++){
@@ -98,6 +104,6 @@ void draw_object_on_image(const WaterfillObject& obj, const uint32_t& color, QIm
 }
 
 
-}
-}
+
+
 }

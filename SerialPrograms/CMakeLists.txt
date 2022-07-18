@@ -265,6 +265,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/SolidColorTest.cpp
     Source/CommonFramework/ImageTools/SolidColorTest.h
+    Source/CommonFramework/ImageTools/WaterfillUtilities.cpp
+    Source/CommonFramework/ImageTools/WaterfillUtilities.h
     Source/CommonFramework/ImageTypes/BinaryImage.cpp
     Source/CommonFramework/ImageTypes/BinaryImage.h
     Source/CommonFramework/ImageTypes/ImageReference.cpp
@@ -625,8 +627,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Utilities.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp

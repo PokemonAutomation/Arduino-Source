@@ -40,7 +40,7 @@ void send_encounter_notification(
     bool enable_names, bool shiny_detected,
     const std::vector<EncounterResult>& results,
     double alpha,   //  Set to std::nan("") to hide the field.
-    QImage screenshot = QImage(),
+    const ImageViewRGB32& screenshot = ImageViewRGB32(),
     const EncounterFrequencies* frequencies = nullptr
 );
 

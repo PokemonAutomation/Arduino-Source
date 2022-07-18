@@ -16,7 +16,10 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-EggHatchGenderFilter read_gender_from_box(LoggerQt& logger, VideoOverlay& overlay,const QImage& frame);
+EggHatchGenderFilter read_gender_from_box(
+    LoggerQt& logger, VideoOverlay& overlay,
+    const ImageViewRGB32& frame
+);
 
 
 

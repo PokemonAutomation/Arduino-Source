@@ -4,9 +4,8 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -21,9 +20,9 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
         return;
     }
 
-    QImage screen = console.video().snapshot();
+    ImageRGB32 screen = console.video().snapshot().frame;
 
-    if (screen.isNull()){
+    if (!screen){
         if (feedback == FeedbackType::REQUIRED){
             throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
         }

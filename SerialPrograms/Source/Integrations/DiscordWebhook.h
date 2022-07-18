@@ -10,7 +10,6 @@
 #include <deque>
 #include <condition_variable>
 #include <thread>
-#include <QImage>
 #include <QNetworkReply>
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"

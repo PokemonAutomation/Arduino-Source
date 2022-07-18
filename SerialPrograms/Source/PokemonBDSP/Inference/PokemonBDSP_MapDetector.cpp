@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -60,7 +59,7 @@ MapWatcher::MapWatcher(Color color)
 void MapWatcher::make_overlays(VideoOverlaySet& items) const{
     MapDetector::make_overlays(items);
 }
-bool MapWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool MapWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 

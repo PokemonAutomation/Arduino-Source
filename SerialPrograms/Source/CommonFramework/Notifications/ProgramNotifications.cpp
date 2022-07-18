@@ -113,7 +113,7 @@ void send_program_notification(
     const ProgramInfo& info,
     const std::string& title,
     const std::vector<std::pair<std::string, std::string>>& messages,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     if (!settings.ok_to_send_now(logger)){
         return;
@@ -124,7 +124,7 @@ void send_program_notification(
         settings.ping(), settings.tags(),
         info, title,
         messages,
-        ImageAttachment(std::move(image), settings.screenshot(), keep_file)
+        ImageAttachment(image, settings.screenshot(), keep_file)
     );
 }
 
@@ -209,7 +209,7 @@ void send_program_status_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
@@ -225,14 +225,14 @@ void send_program_status_notification(
         Color(), info,
         "Program Status",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 #endif
 void send_program_status_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -250,7 +250,7 @@ void send_program_status_notification(
         Color(), env.program_info(),
         "Program Status",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 void send_program_finished_notification(
@@ -259,7 +259,7 @@ void send_program_finished_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
@@ -275,13 +275,13 @@ void send_program_finished_notification(
         COLOR_GREEN, info,
         "Program Finished",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 void send_program_finished_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -299,13 +299,13 @@ void send_program_finished_notification(
         COLOR_GREEN, env.program_info(),
         "Program Finished",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 void send_program_recoverable_error_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -323,7 +323,7 @@ void send_program_recoverable_error_notification(
         COLOR_RED, env.program_info(),
         "Program Error (Recoverable)",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 void send_program_fatal_error_notification(
@@ -332,7 +332,7 @@ void send_program_fatal_error_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    ImageRGB32 image, bool keep_file
+    const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
@@ -348,7 +348,7 @@ void send_program_fatal_error_notification(
         COLOR_RED, info,
         "Program Stopped (Fatal Error)",
         messages,
-        std::move(image), keep_file
+        image, keep_file
     );
 }
 

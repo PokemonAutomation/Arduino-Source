@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
@@ -50,7 +51,7 @@ std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
     return info;
 }
 
-std::string ProgramTracker::grab_screenshot(uint64_t console_id, QImage& image){
+std::string ProgramTracker::grab_screenshot(uint64_t console_id, ImageRGB32& image){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
@@ -58,7 +59,7 @@ std::string ProgramTracker::grab_screenshot(uint64_t console_id, QImage& image){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    image = iter->second.first->video().snapshot();
+    image = iter->second.first->video().snapshot().frame;
     return "";
 }
 std::string ProgramTracker::reset_camera(uint64_t console_id){

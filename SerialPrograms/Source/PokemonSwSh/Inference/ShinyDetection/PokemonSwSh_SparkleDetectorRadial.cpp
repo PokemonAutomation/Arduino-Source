@@ -8,7 +8,7 @@
 #include <set>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Utilities.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 
 #include <iostream>
