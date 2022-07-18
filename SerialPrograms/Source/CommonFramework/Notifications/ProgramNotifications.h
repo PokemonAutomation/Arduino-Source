@@ -9,8 +9,8 @@
 
 #include <vector>
 #include <string>
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ProgramInfo.h"
 #include "MessageAttachment.h"
 #include "EventNotificationOption.h"
@@ -27,7 +27,7 @@ void send_program_notification(
     const ProgramInfo& info,
     const std::string& title,
     const std::vector<std::pair<std::string, std::string>>& messages,
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 
 void send_program_telemetry(
@@ -45,13 +45,13 @@ void send_program_status_notification(
     const std::string& message,
     const StatsTracker* current_stats = nullptr,
     const StatsTracker* historical_stats = nullptr,
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 #endif
 void send_program_status_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message = "",
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 
 void send_program_finished_notification(
@@ -60,18 +60,18 @@ void send_program_finished_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 void send_program_finished_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message = "",
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 
 void send_program_recoverable_error_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 
 void send_program_fatal_error_notification(
@@ -80,7 +80,7 @@ void send_program_fatal_error_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    QImage image = QImage(), bool keep_file = false
+    ImageRGB32 image = ImageRGB32(), bool keep_file = false
 );
 
 

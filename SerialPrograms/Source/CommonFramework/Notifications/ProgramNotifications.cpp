@@ -95,9 +95,16 @@ void send_program_notification(
         embed_sleepy = std::move(embed);
     }
 
-    Integration::DiscordWebhook::send_message(logger, should_ping, tags, "", std::move(embeds), hasFile ? file : nullptr);
+    Integration::DiscordWebhook::send_message(
+        logger, should_ping, tags, "",
+        std::move(embeds),
+        hasFile ? file : nullptr
+    );
 #ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::send_message_sleepy(should_ping, tags, "", embed_sleepy, hasFile ? file : nullptr);
+    Integration::SleepyDiscordRunner::send_message_sleepy(
+        should_ping, tags, "", embed_sleepy,
+        hasFile ? file : nullptr
+    );
 #endif
 }
 void send_program_notification(
@@ -106,7 +113,7 @@ void send_program_notification(
     const ProgramInfo& info,
     const std::string& title,
     const std::vector<std::pair<std::string, std::string>>& messages,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     if (!settings.ok_to_send_now(logger)){
         return;
@@ -202,7 +209,7 @@ void send_program_status_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
@@ -225,7 +232,7 @@ void send_program_status_notification(
 void send_program_status_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -252,7 +259,7 @@ void send_program_finished_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
@@ -274,7 +281,7 @@ void send_program_finished_notification(
 void send_program_finished_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -298,7 +305,7 @@ void send_program_finished_notification(
 void send_program_recoverable_error_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     const StatsTracker* current_stats = env.current_stats();
     const StatsTracker* historical_stats = env.historical_stats();
@@ -325,7 +332,7 @@ void send_program_fatal_error_notification(
     const std::string& message,
     const StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    QImage image, bool keep_file
+    ImageRGB32 image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},

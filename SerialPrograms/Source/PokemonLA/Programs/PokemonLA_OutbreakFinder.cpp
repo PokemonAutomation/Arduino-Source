@@ -682,7 +682,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.program_info(),
         "Found Outbreak",
         {{"Session Stats", stats.to_str()}},
-        env.console.video().snapshot()
+        env.console.video().snapshot().frame
     );
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

@@ -201,7 +201,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     send_program_finished_notification(
         env, NOTIFICATION_PURPLE_BEAM,
         "Found a purple beam!",
-        env.console.video().snapshot()
+        env.console.video().snapshot().frame
     );
     while (true){
         pbf_press_button(context, BUTTON_B, 20, 20);

@@ -31,8 +31,8 @@ public:
     );
 
 public:
-    std::string read_ball(const QImage& screen) const;
-    uint16_t read_quantity(const QImage& screen) const;
+    std::string read_ball(const ImageViewRGB32& screen) const;
+    uint16_t read_quantity(const ImageViewRGB32& screen) const;
 
 private:
     const ImageMatch::CroppedImageDictionaryMatcher& m_matcher;

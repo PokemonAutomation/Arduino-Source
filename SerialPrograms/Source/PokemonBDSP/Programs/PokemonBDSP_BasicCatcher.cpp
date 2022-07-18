@@ -69,7 +69,7 @@ int16_t move_to_ball(
         return 0;
     }
     if (ret == 0){
-        uint16_t quantity = reader.read_quantity(console.video().snapshot());
+        uint16_t quantity = reader.read_quantity(console.video().snapshot().frame);
         return quantity == 0 ? -1 : quantity;
     }
 
@@ -87,7 +87,7 @@ int16_t move_to_ball(
         console.log("BasicCatcher: Fast ball scrolling overshot by " +
             std::to_string(ret) + " slot(s).", COLOR_RED);
     }
-    uint16_t quantity = reader.read_quantity(console.video().snapshot());
+    uint16_t quantity = reader.read_quantity(console.video().snapshot().frame);
     return quantity == 0 ? -1 : quantity;
 }
 

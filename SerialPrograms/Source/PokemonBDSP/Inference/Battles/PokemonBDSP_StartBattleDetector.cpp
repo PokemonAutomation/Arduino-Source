@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -32,7 +31,7 @@ void StartBattleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_screen_box);
     m_dialog.make_overlays(items);
 }
-bool StartBattleDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool StartBattleDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -60,7 +59,7 @@ void StartBattleMenuOverlapDetector::make_overlays(VideoOverlaySet& items) const
     items.add(COLOR_RED, m_left);
     items.add(COLOR_RED, m_right);
 }
-bool StartBattleMenuOverlapDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool StartBattleMenuOverlapDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     if (detect(frame)){
         m_battle_detected.store(true, std::memory_order_release);
         return true;
