@@ -178,33 +178,36 @@ void mash_A_to_change_region(
 }
 
 
+void open_travel_map_from_jubilife(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+){
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    MapDetector detector;
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+            }
+        },
+        {{detector}}
+    );
+    if (ret < 0){
+        dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot().frame);
+        throw OperationFailedException(console, "Map not detected after 10 x A presses.");
+    }
+    console.log("Found map!");
+}
 
 
 void goto_camp_from_jubilife(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const TravelLocation& location
 ){
-    //  Open the map.
+    // Move backwards and talk to guard to open the map.
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
-    {
-        MapDetector detector;
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
-                for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
-                }
-            },
-            {{detector}}
-        );
-        if (ret < 0){
-            dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot().frame);
-            throw OperationFailedException(console, "Map not detected after 10 x A presses.");
-        }
-        console.log("Found map!");
-        context.wait_for(std::chrono::milliseconds(500));
-    }
+    open_travel_map_from_jubilife(env, console, context);
+    context.wait_for(std::chrono::milliseconds(500));
 
     DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;
 

@@ -32,7 +32,10 @@ const char* WILD_REGION_SHORT_NAMES[] = {
     "Icelands",
 };
 
-
+bool is_wild_land(MapRegion region){
+    return region == MapRegion::FIELDLANDS || region == MapRegion::MIRELANDS || region == MapRegion::COASTLANDS
+           || region == MapRegion::HIGHLANDS || region == MapRegion::ICELANDS;
+}
 
 }
 }

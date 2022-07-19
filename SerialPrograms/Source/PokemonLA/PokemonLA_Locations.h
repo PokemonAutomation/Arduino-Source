@@ -49,6 +49,9 @@ enum class Camp{
     ICELANDS_ICEPEAK,
 };
 
+// Return true if the region is fieldlands, mirelands, coastlands, highlands or icelands.
+bool is_wild_land(MapRegion region);
+
 
 
 

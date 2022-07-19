@@ -78,6 +78,12 @@ Pokemon::ExtraNames load_mmo_names(){
     return names;
 }
 
+// The name of each MMO event happening at each region. Their slugs are:
+// - "fieldlands-mmo"
+// - "mirelands-mmo"
+// - "coastlands-mmo"
+// - "highlands-mmo"
+// - "icelands-mmo"
 const Pokemon::ExtraNames& MMO_NAMES(){
     const static Pokemon::ExtraNames mmo_names = load_mmo_names();
     return mmo_names;
@@ -178,19 +184,15 @@ std::unique_ptr<StatsTracker> OutbreakFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-//  Returns true if program should stop. (match found)
-//  "current_region" is set to the location of the cursor.
-//  If "current_region" is set to "MapRegion::NONE", it means an inference error.
-std::set<std::string> OutbreakFinder::read_outbreaks(
+std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-    MapRegion& current_region,
-    const std::set<std::string>& desired
+    const std::set<std::string>& desired_events
 ){
     Stats& stats = env.current_stats<Stats>();
 
     MapRegion start_region = MapRegion::NONE;
 
-    current_region = detect_selected_region(env.console, context);
+    MapRegion current_region = detect_selected_region(env.console, context);
     if (current_region == MapRegion::NONE){
         env.console.log("Unable to detect selected region.", COLOR_RED);
         return std::set<std::string>();
@@ -225,8 +227,8 @@ std::set<std::string> OutbreakFinder::read_outbreaks(
     const auto& mmo_names = MMO_NAMES();
     for (int i = 0; i < 5; i++){
         if (mmo_appears[i]){
-            auto iter = desired.find(mmo_names.name_list[i]);
-            if (iter != desired.end()){
+            auto iter = desired_events.find(mmo_names.name_list[i]);
+            if (iter != desired_events.end()){
                 env.console.log("Found a match!", COLOR_BLUE);
                 found.insert(mmo_names.name_list[i]);
             }
@@ -262,8 +264,8 @@ std::set<std::string> OutbreakFinder::read_outbreaks(
                     stats.outbreaks++;
                 }
                 for (const auto& item : result.results){
-                    auto iter = desired.find(item.second.token);
-                    if (iter != desired.end()){
+                    auto iter = desired_events.find(item.second.token);
+                    if (iter != desired_events.end()){
                         env.console.log("Found a match!", COLOR_BLUE);
                         found.insert(item.second.token);
                     }
@@ -277,35 +279,51 @@ std::set<std::string> OutbreakFinder::read_outbreaks(
 
     stats.checks++;
 
-    if (found.size() > 0){
-        return found;
-    }
-
-    while (true){
-        if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
-            break;
-        }
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
-        context.wait_for_all_requests();
-
-        current_region = detect_selected_region(env.console, context);
-        if (current_region == MapRegion::NONE){
-            env.console.log("Unable to detect selected region.", COLOR_RED);
-            return std::set<std::string>();
-        }
-    }
-
-    return std::set<std::string>();
+    return found;
 }
 
 
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MapRegion region){
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    bool inside_travel_map
+){
     Stats& stats = env.current_stats<Stats>();
+
+    if (inside_travel_map == false){
+        // Move to guard to open map
+        open_travel_map_from_jubilife(env, env.console, context);
+        context.wait_for(std::chrono::milliseconds(500));
+    }
+
+    MapRegion current_region = MapRegion::NONE;
+    for (size_t c = 0; c < 10; c++){
+        current_region = detect_selected_region(env.console, context);
+        if (is_wild_land(current_region)){
+            break;
+        }
+
+        if (current_region == MapRegion::JUBILIFE){
+            // Move to fieldlands
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        }
+        else if (current_region == MapRegion::RETREAT){
+            // Move to icelands
+            pbf_press_dpad(context, DPAD_LEFT, 20, 40);
+        }
+        else{
+            // Cannot read current region. Try move to another region
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        }
+        context.wait_for_all_requests();
+    }
+    if (is_wild_land(current_region) == false){
+        dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot().frame);
+        throw OperationFailedException(env.console, std::string("Unable to find a wild land"));
+    }
 
     mash_A_to_change_region(env, env.console, context);
 
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
-    switch (region){
+    switch (current_region){
     case MapRegion::FIELDLANDS:
         camp = Camp::FIELDLANDS_FIELDLANDS;
         break;
@@ -355,7 +373,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
     mash_A_to_change_region(env, env.console, context);
 }
 
-std::set<std::string> OutbreakFinder::read_MMOs(
+std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const std::string& mmo_name,
     const std::set<std::string>& desired_MMOs,
@@ -503,7 +521,7 @@ std::set<std::string> OutbreakFinder::read_MMOs(
     QImage sprites_screen = env.console.video().snapshot();
     for (size_t i = 0; i < new_boxes.size(); i++){
         auto result = match_sprite_on_map(sprites_screen, new_boxes[i], region);
-        env.console.log("Found sprite " + result.slug);
+        env.console.log("Found MMO sprite " + result.slug);
         stats.mmo_pokemon++;
 
         sprites.push_back(result.slug);
@@ -552,49 +570,49 @@ bool OutbreakFinder::run_iteration(
     Stats& stats = env.current_stats<Stats>();
 
     //  Enter map.
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
-
-    MapDetector detector;
-    int ret = run_until(
-        env.console, context,
-        [](BotBaseContext& context){
-            for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
-            }
-        },
-        {{detector}}
-    );
-    if (ret < 0){
+    try{
+        open_travel_map_from_jubilife(env, env.console, context);
+    } catch(OperationFailedException& e)
+    {
         stats.errors++;
-        throw OperationFailedException(env.console, "Map not detected after 10 x A presses.");
+        throw e;
     }
-    env.console.log("Found map!");
     context.wait_for(std::chrono::milliseconds(500));
 
+    // found_hisui_map_events: desired pokemon names or MMO names
+    std::set<std::string> found_hisui_map_events;
+    found_hisui_map_events = read_travel_map_outbreaks(env, context, desired_hisui_map_events);
 
-    MapRegion current_region;
-    std::set<std::string> found_hisui_map_events = read_outbreaks(env, context, current_region, desired_hisui_map_events);
-    if (current_region == MapRegion::NONE){
-        stats.errors++;
-        throw OperationFailedException(env.console, "Unable to read map.");
-    }
-
+    bool inside_travel_map = true;
     if (found_hisui_map_events.size() > 0){
-
         // Check if we found any Massive Outbreak pokemon (including MMO symbol targets)
-        int num_outbreak_pokemon_found = 0;
-        for(const auto& found : found_hisui_map_events){
-            num_outbreak_pokemon_found += (desired_outbreaks.find(found) != desired_outbreaks.end());
-        }
-        if (num_outbreak_pokemon_found > 0){
-            stats.matches += num_outbreak_pokemon_found;
-            return true;
+        {
+            std::vector<std::string> desired_outbreaks_found;
+            for(const auto& found : found_hisui_map_events){
+                if (desired_outbreaks.find(found) != desired_outbreaks.end()){
+                    desired_outbreaks_found.push_back(found);
+                }
+            }
+            if (desired_outbreaks_found.size() > 0){
+                stats.matches += desired_outbreaks_found.size();
+                std::ostringstream os;
+                os << "Found following desired outbreak" << (desired_outbreaks_found.size() > 1 ? "s: " : ": ");
+                for(const auto& outbreak: desired_outbreaks_found){
+                    os << outbreak << ", ";
+                }
+                env.log(os.str());
+                return true;
+            }
+            else{
+                env.log("No desired outbreak.");
+            }
         }
 
         // What we found is MMO symbols for MMO pokemon.
         // Go into those regions to check MMO details.
-        
+
         // Cancel map view
+        inside_travel_map = false;
         pbf_press_button(context, BUTTON_B, 50, 50);
         // Leave the guard.
         pbf_move_left_joystick(context, 128, 0, 100, 50);
@@ -603,9 +621,15 @@ bool OutbreakFinder::run_iteration(
         save_game_from_overworld(env, env.console, context);
 
         for(const auto& mmo_name: found_hisui_map_events){
-            std::set<std::string> found_pokemon = read_MMOs(env, context, mmo_name, desired_MMOs, desired_star_MMOs);
+            std::set<std::string> found_pokemon = enter_region_and_read_MMO(env, context, mmo_name, desired_MMOs, desired_star_MMOs);
             if (found_pokemon.size() > 0){
                 stats.matches += found_pokemon.size();
+                std::ostringstream os;
+                os << "Found desired MMO pokemon (including desired MMO pokemon with star symbols): ";
+                for (const auto& pokemon : found_pokemon){
+                    os << pokemon << ", ";
+                }
+                env.log(os.str());
                 return true;
             }
 
@@ -620,7 +644,7 @@ bool OutbreakFinder::run_iteration(
 
     //  Go to region and return.
     env.log("Go to a random region and back to refresh outbreaks...");
-    goto_region_and_return(env, context, current_region);
+    goto_region_and_return(env, context, inside_travel_map);
 
     return false;
 }
@@ -633,8 +657,8 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);
     // return;
 
-
-    auto to_set = [&](const Pokemon::PokemonNameList& name_list){
+    // Convert PokemonNameList to a set of slug strings
+    auto to_set = [&](const Pokemon::PokemonNameList& name_list) -> std::set<std::string>{
         std::set<std::string> ret;
         for (size_t c = 0; c < name_list.size(); c++){
             ret.insert(name_list[c]);
@@ -643,33 +667,47 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     };
 
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
-    std::set<std::string> desired_MMOs = to_set(DESIRED_MMO_SLUGS);
-    std::set<std::string> desired_star_MMOs = to_set(DESIRED_STAR_MMO_SLUGS);
+    std::set<std::string> desired_MMO_pokemon = to_set(DESIRED_MMO_SLUGS);
+    std::set<std::string> desired_star_MMO_pokemon = to_set(DESIRED_STAR_MMO_SLUGS);
 
+    // desired_hisui_map_events: the slugs of travel map event. This includes
+    // - Massive Outbreak pokemon
+    // - Question mark MMO event at any region
     std::set<std::string> desired_hisui_map_events = desired_outbreaks;
+
+    // If the user sets MMO pokemon, then we should add the MMO map events that may spawn those MMO pokemon to
+    // `desired_hisui_map_events`.
+
+    // MMO_targets: MMO map event slug (e.g. "fieldlands-mmo") -> how many desired MMO pokemon can spawn on this map
     std::map<std::string, int> MMO_targets;
+    // Check if each MMO map event may spawn desired MMO pokemon:
     for(size_t i = 0; i < 5; i++){
         for(const std::string& sprite_slug: MMO_FIRST_WAVE_REGION_SPRITE_SLUGS()[i]){
-            if (desired_MMOs.find(sprite_slug) != desired_MMOs.end() || desired_star_MMOs.find(sprite_slug) != desired_star_MMOs.end()){
+            if (desired_MMO_pokemon.find(sprite_slug) != desired_MMO_pokemon.end()
+                || desired_star_MMO_pokemon.find(sprite_slug) != desired_star_MMO_pokemon.end()
+            ){
                 MMO_targets[MMO_NAMES().name_list[i]]++;
             }
         }
     }
 
     std::ostringstream os;
-    os << "User requires MMO pokemon. Need to visit ";
+    os << "User requires MMO pokemon. Need to visit (<map MMO name>, <how many desired MMO pokemon on the map>): ";
     for(const auto& p : MMO_targets){
-        os << "(" << p.first << " " << p.second << ") ";
+        os << "(" << p.first << ", " << p.second << ") ";
     }
     env.log(os.str());
 
+    // Add MMO map event targets (e.g. "fieldlands-mmo") derived from user selected MMO pokemon to 
+    // `desired_hisui_map_events`.
     for(const auto& p : MMO_targets){
         desired_hisui_map_events.insert(p.first);
     }
 
-
     while (true){
-        if (run_iteration(env, context, desired_hisui_map_events, desired_outbreaks, desired_MMOs, desired_star_MMOs)){
+        if (run_iteration(env, context, desired_hisui_map_events, desired_outbreaks, desired_MMO_pokemon, 
+            desired_star_MMO_pokemon))
+        {
             break;
         }
     }
