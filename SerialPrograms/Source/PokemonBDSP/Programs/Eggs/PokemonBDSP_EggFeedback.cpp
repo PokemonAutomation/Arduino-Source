@@ -58,8 +58,8 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
 
 
     //  Hatch the egg.
-    QImage overworld = console.video().snapshot();
-    overworld.save("test-0.png");
+    std::shared_ptr<const ImageRGB32> overworld = std::make_shared<const ImageRGB32>(console.video().snapshot().frame);
+//    overworld.save("test-0.png");
     {
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
@@ -135,7 +135,7 @@ void release(ConsoleHandle& console, BotBaseContext& context){
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){
         context.wait_for_all_requests();
-        QImage screen = console.video().snapshot();
+        ImageRGB32 screen = console.video().snapshot().frame;
         if (!detector.detect(screen)){
             return;
         }

@@ -42,7 +42,7 @@ void trade_current_pokemon(
     tracker.check_unrecoverable_error(console);
 
     context.wait_for_all_requests();
-    QImage box_image = console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> box_image = std::make_shared<const ImageRGB32>(console.video().snapshot());
     ImageMatchWatcher box_detector(box_image, {0.02, 0.15, 0.15, 0.80}, 50);
 
     {

@@ -103,7 +103,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.current_stats<Stats>();
 
-    QImage briefcase = open_image(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
+    std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_B, 5, 5);

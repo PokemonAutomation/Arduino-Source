@@ -121,14 +121,14 @@ bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemo
         {0.5985, 0.8185, 0.2500, 0.0320},
     };
 
-    QImage screen = console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> screen = std::make_shared<const ImageRGB32>(console.video().snapshot());
     ImageMatchDetector move_slot_detector(std::move(screen), move_slot_boxes[cur_move], 10.0);
 
     use_move_blindly(console, context, style, cur_pokemon, cur_move);
 
-    screen = console.video().snapshot();
+    screen = std::make_shared<const ImageRGB32>(console.video().snapshot());
 
-    const bool still_on_move_screen = move_slot_detector.detect(screen);
+    const bool still_on_move_screen = move_slot_detector.detect(*screen);
 
 #ifdef DEBUG_NO_PP
     if (still_on_move_screen == false){

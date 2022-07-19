@@ -5,7 +5,6 @@
  */
 
 #include <QtGlobal>
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

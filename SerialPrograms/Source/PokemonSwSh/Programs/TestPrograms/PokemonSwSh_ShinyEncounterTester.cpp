@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_ShinyEncounterTester.h"
 
@@ -41,11 +42,12 @@ ShinyEncounterTester::ShinyEncounterTester(const ShinyEncounterTester_Descriptor
 
 
 void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    detect_shiny_battle(
+    ShinyDetectionResult result = detect_shiny_battle(
         env.console, context,
         ENCOUNTER_TYPE == 0 ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,
         std::chrono::seconds(30)
     );
+    result.best_screenshot->save(now_to_filestring() + ".png");
 }
 
 

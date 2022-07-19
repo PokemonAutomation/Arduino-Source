@@ -34,8 +34,8 @@
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h"
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
-#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
-#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
+//#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
+//#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
 #include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
@@ -85,9 +85,9 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_divider("---- Glitches (v1.1.2) ----");
     add_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>();
 
-    add_divider("---- Glitches (v1.1.1) ----");
-    add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
-    add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
+//    add_divider("---- Glitches (v1.1.1) ----");
+//    add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
+//    add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");

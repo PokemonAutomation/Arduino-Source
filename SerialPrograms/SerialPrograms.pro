@@ -424,10 +424,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp \
@@ -1157,10 +1154,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h \

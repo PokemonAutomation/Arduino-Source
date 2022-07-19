@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 
-#include <functional>
-#include <QImage>
-#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 

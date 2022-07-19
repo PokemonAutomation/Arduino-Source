@@ -373,8 +373,6 @@ void EggAutonomousState::fetch_egg(){
         m_console.log("Found daycare man!");
     }
 
-//    QImage overworld = console.video().snapshot();
-
     {
         EggReceivedDetector received;
         run_until(
@@ -407,7 +405,7 @@ void EggAutonomousState::hatch_egg(){
     }
 
     //  Hatch the egg.
-    QImage overworld = m_console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> overworld = std::make_shared<const ImageRGB32>(m_console.video().snapshot());
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);

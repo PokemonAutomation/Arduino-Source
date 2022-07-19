@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 class ImageMatchDetector : public StaticScreenDetector{
 public:
     ImageMatchDetector(
-        const ImageViewRGB32& reference_image, const ImageFloatBox& box,
+        std::shared_ptr<const ImageRGB32> reference_image, const ImageFloatBox& box,
         double max_rmsd, bool scale_brightness = false,
         Color color = COLOR_RED
     );
@@ -30,7 +30,8 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
-    ImageRGB32 m_reference_image;
+    std::shared_ptr<const ImageRGB32> m_reference_image;
+    ImageViewRGB32 m_reference_image_cropped;
     FloatPixel m_average_brightness;
 
     double m_max_rmsd;
@@ -44,14 +45,14 @@ private:
 class ImageMatchWatcher : public ImageMatchDetector, public VisualInferenceCallback{
 public:
     ImageMatchWatcher(
-        QImage reference_image, const ImageFloatBox& box,
+        std::shared_ptr<const ImageRGB32> reference_image, const ImageFloatBox& box,
         double max_rmsd, bool scale_brightness = false,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(0),
         Color color = COLOR_RED
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     std::chrono::milliseconds m_hold_duration;

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"

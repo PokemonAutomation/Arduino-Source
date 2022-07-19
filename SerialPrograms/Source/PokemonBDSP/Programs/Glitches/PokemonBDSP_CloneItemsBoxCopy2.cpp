@@ -16,7 +16,6 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
-#include "PokemonBDSP_MenuOverlap.h"
 #include "PokemonBDSP_CloneItemsBoxCopy2.h"
 
 namespace PokemonAutomation{
@@ -101,8 +100,8 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     menu_to_box(context);
 
     context.wait_for_all_requests();
-    QImage expected = env.console.video().snapshot();
-    ImageMatchWatcher matcher(expected, {0.02, 0.25, 0.96, 0.73}, 20);
+    std::shared_ptr<const ImageRGB32> expected = std::make_shared<const ImageRGB32>(env.console.video().snapshot());
+    ImageMatchWatcher matcher(std::move(expected), {0.02, 0.25, 0.96, 0.73}, 20);
 
     for (uint16_t box = 0; box < BOXES; box++){
         env.update_stats();

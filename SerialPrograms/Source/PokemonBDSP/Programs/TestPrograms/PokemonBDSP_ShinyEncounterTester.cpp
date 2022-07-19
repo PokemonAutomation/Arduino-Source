@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP_ShinyEncounterTester.h"
 
@@ -61,6 +62,11 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
         std::chrono::seconds(30),
         USE_SOUND_DETECTION
     );
+    if (ENCOUNTER_TYPE == 0){
+        result_own.best_screenshot->save(now_to_filestring() + ".png");
+    }else{
+        result_wild.best_screenshot->save(now_to_filestring() + ".png");
+    }
 }
 
 

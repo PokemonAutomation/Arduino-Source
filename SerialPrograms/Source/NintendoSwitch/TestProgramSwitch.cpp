@@ -28,6 +28,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 
 #include <QVideoFrame>
 
@@ -94,8 +95,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace Pokemon;
     using namespace PokemonSwSh;
-    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+//    using namespace PokemonBDSP;
+//    using namespace PokemonLA;
 
     [[maybe_unused]] LoggerQt& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -104,6 +105,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    StandardBattleMenuDetector detector(false);
+
+    bool ret = detector.detect(ImageRGB32("screenshot-20220719-005748590044.png"));
+    cout << ret << endl;
+
+#if 0
     FrozenImageDetector detector(std::chrono::seconds(10), 20);
     BotBaseContext context(scope, console.botbase());
     int ret = wait_until(
@@ -111,7 +118,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         { detector }
     );
     cout << "ret = " << ret << endl;
-
+#endif
 
 
 

@@ -22,12 +22,13 @@ namespace PokemonAutomation{
 
 
 ImageMatchDetector::ImageMatchDetector(
-    const ImageViewRGB32& reference_image, const ImageFloatBox& box,
+    std::shared_ptr<const ImageRGB32> reference_image, const ImageFloatBox& box,
     double max_rmsd, bool scale_brightness,
     Color color
 )
-    : m_reference_image(extract_box_reference(reference_image, box).copy())
-    , m_average_brightness(image_stats(m_reference_image).average)
+    : m_reference_image(std::move(reference_image))
+    , m_reference_image_cropped(extract_box_reference(*m_reference_image, box))
+    , m_average_brightness(image_stats(m_reference_image_cropped).average)
     , m_max_rmsd(max_rmsd)
     , m_scale_brightness(scale_brightness)
     , m_color(color)
@@ -39,7 +40,7 @@ double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
         return 1000;
     }
     ImageViewRGB32 image = extract_box_reference(frame, m_box);
-    ImageRGB32 scaled = image.scale_to(m_reference_image.width(), m_reference_image.height());
+    ImageRGB32 scaled = image.scale_to(m_reference_image_cropped.width(), m_reference_image_cropped.height());
 
 #if 0
     if (image.width() != (size_t)scaled.width() || image.height() != (size_t)scaled.height()){
@@ -49,7 +50,7 @@ double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
 #endif
 
     if (m_scale_brightness){
-        FloatPixel image_brightness = ImageMatch::pixel_average(scaled, m_reference_image);
+        FloatPixel image_brightness = ImageMatch::pixel_average(scaled, m_reference_image_cropped);
         FloatPixel scale = m_average_brightness / image_brightness;
         if (std::isnan(scale.r)) scale.r = 1.0;
         if (std::isnan(scale.g)) scale.g = 1.0;
@@ -59,7 +60,7 @@ double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
     }
 
 //    cout << "asdf" << endl;
-    double ret = ImageMatch::pixel_RMSD(m_reference_image, scaled);
+    double ret = ImageMatch::pixel_RMSD(m_reference_image_cropped, scaled);
 //    cout << "rmsd = " << ret << endl;
     return ret;
 }
@@ -74,7 +75,7 @@ bool ImageMatchDetector::detect(const ImageViewRGB32& screen) const{
 
 
 ImageMatchWatcher::ImageMatchWatcher(
-    QImage reference_image, const ImageFloatBox& box,
+    std::shared_ptr<const ImageRGB32> reference_image, const ImageFloatBox& box,
     double max_rmsd, bool scale_brightness,
     std::chrono::milliseconds hold_duration,
     Color color
@@ -89,7 +90,7 @@ ImageMatchWatcher::ImageMatchWatcher(
 void ImageMatchWatcher::make_overlays(VideoOverlaySet& items) const{
     ImageMatchDetector::make_overlays(items);
 }
-bool ImageMatchWatcher::process_frame(const QImage& frame, WallClock){
+bool ImageMatchWatcher::process_frame(const ImageViewRGB32& frame, WallClock){
     if (!detect(frame)){
         m_last_match = false;
         return false;
