@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_Pokemon_DataTypes_H
 #define PokemonAutomation_Pokemon_DataTypes_H
 
-#include <QImage>
+#include <memory>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -52,7 +53,7 @@ inline bool is_confirmed_shiny(ShinyType type){
 struct ShinyDetectionResult{
     ShinyType shiny_type = ShinyType::UNKNOWN;
     double alpha = 0;
-    QImage best_screenshot;
+    std::shared_ptr<const ImageRGB32> best_screenshot;
 };
 
 

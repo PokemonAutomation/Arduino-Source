@@ -137,7 +137,7 @@ void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
 
 
 
-void ShinySparkleAggregator::add_frame(const QImage& image, const ShinySparkleSetBDSP& sparkles){
+void ShinySparkleAggregator::add_frame(const std::shared_ptr<const ImageRGB32>& image, const ShinySparkleSetBDSP& sparkles){
     double alpha = sparkles.alpha_overall();
     if (m_best_overall < alpha){
         m_best_overall = alpha;

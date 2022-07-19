@@ -59,22 +59,22 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_sparkle_tracker_wild.make_overlays(items);
     m_sparkle_tracker_own.make_overlays(items);
 }
-bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timestamp){
+bool ShinyEncounterTracker::process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp){
     using PokemonSwSh::EncounterState;
 
-    if (frame.isNull()){
+    if (!*frame){
         return false;
     }
-    if (frame.height() < 720){
+    if (frame->height() < 720){
         throw UserSetupError(m_logger, "Video resolution must be at least 720p.");
     }
-    double aspect_ratio = (double)frame.width() / frame.height();
+    double aspect_ratio = (double)frame->width() / frame->height();
     if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
         throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
     }
 
     // End shiny detection when we reach the battle menu
-    bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
+    bool battle_menu = m_battle_menu.process_frame(*frame, timestamp);
     if (battle_menu){
         m_dialog_tracker.push_end(timestamp);
         return true;
@@ -82,7 +82,7 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
 
     // Use m_dialog_tracker to track dialog timings. Dialogs partitions the opening of a battle into:
     // before anything -> wild pokemon animation -> player pokemon animation -> battle menu detected
-    m_dialog_tracker.process_frame(frame, timestamp);
+    m_dialog_tracker.process_frame(*frame, timestamp);
 
     switch (m_dialog_tracker.encounter_state()){
     case EncounterState::BEFORE_ANYTHING:
@@ -91,13 +91,13 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
         // Update the timestamp that records the end of wild animation
         m_wild_animation_end_timestamp = timestamp;
 
-        m_sparkle_tracker_wild.process_frame(frame, timestamp);
+        m_sparkle_tracker_wild.process_frame(*frame, timestamp);
         m_sparkle_tracker_own.clear_boxes();
         m_best_wild_overall.add_frame(frame, m_sparkles_wild);
 
-        ImagePixelBox box_overall = floatbox_to_pixelbox(frame.width(), frame.height(), {0.4, 0.02, 0.60, 0.93});
-        ImagePixelBox box_left = floatbox_to_pixelbox(frame.width(), frame.height(), m_box_wild_left);
-        ImagePixelBox box_right = floatbox_to_pixelbox(frame.width(), frame.height(), m_box_wild_right);
+        ImagePixelBox box_overall = floatbox_to_pixelbox(frame->width(), frame->height(), {0.4, 0.02, 0.60, 0.93});
+        ImagePixelBox box_left = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_left);
+        ImagePixelBox box_right = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_right);
         box_left.min_x -= box_overall.min_x;
         box_left.min_y -= box_overall.min_y;
         box_left.max_x -= box_overall.min_x;
@@ -107,8 +107,8 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
         box_right.max_x -= box_overall.min_x;
         box_right.max_y -= box_overall.min_y;
 
-        m_best_wild_left.add_frame(QImage(), m_sparkles_wild.extract_subbox(box_left));
-        m_best_wild_right.add_frame(QImage(), m_sparkles_wild.extract_subbox(box_right));
+        m_best_wild_left.add_frame(nullptr, m_sparkles_wild.extract_subbox(box_left));
+        m_best_wild_right.add_frame(nullptr, m_sparkles_wild.extract_subbox(box_right));
         break;
     }
     case EncounterState::YOUR_ANIMATION:
@@ -116,7 +116,7 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
         m_your_animation_end_timestamp = timestamp;
 
         m_sparkle_tracker_wild.clear_boxes();
-        m_sparkle_tracker_own.process_frame(frame, timestamp);
+        m_sparkle_tracker_own.process_frame(*frame, timestamp);
         m_best_own.add_frame(frame, m_sparkles_own);
         break;
     case EncounterState::POST_ENTRY:
@@ -222,7 +222,7 @@ void determine_shiny_status(
     }
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
-        dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.best_screenshot);
+        dump_image(env.logger(), env.program_info(), "LowShinyAlpha", *wild_result.best_screenshot);
         std::string str;
         str += "Low alpha shiny (alpha = ";
         str += tostr_default(alpha_wild_overall);
@@ -230,7 +230,7 @@ void determine_shiny_status(
         send_program_recoverable_error_notification(
             env, settings,
             str,
-            wild_result.best_screenshot
+            *wild_result.best_screenshot
         );
     }
 

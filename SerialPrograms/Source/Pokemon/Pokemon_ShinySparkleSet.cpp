@@ -30,7 +30,7 @@ void ShinySparkleTracker::clear_boxes(){
 void ShinySparkleTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool ShinySparkleTracker::process_frame(const QImage& frame, WallClock timestamp){
+bool ShinySparkleTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageViewRGB32 image = extract_box_reference(frame, m_box);
     m_current_sparkles.read_from_image(image);
     m_overlays.clear();

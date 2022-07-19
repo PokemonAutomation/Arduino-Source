@@ -90,7 +90,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
         m_settings.NOTIFICATION_SHINY,
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}}, result.alpha,
-        result.best_screenshot,
+        *result.best_screenshot,
         &m_frequencies
     );
 
@@ -150,7 +150,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         m_settings.NOTIFICATION_SHINY,
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}}, result.alpha,
-        result.best_screenshot,
+        *result.best_screenshot,
         &m_frequencies
     );
 
@@ -208,7 +208,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_settings.NOTIFICATION_SHINY,
         candidates_ptr, is_likely_shiny(result.shiny_type),
         {{candidates, result.shiny_type}}, result.alpha,
-        result.best_screenshot,
+        *result.best_screenshot,
         &m_frequencies
     );
 

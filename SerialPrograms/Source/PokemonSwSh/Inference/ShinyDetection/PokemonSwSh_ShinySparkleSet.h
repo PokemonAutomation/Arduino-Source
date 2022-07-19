@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinySparkleSet_H
 #define PokemonAutomation_PokemonSwSh_ShinySparkleSet_H
 
-#include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Pokemon_ShinySparkleSet.h"
 
@@ -55,16 +54,16 @@ public:
     double best_overall() const{ return m_best_overall; }
     double best_star() const{ return m_best_star; }
     double best_square() const{ return m_best_square; }
-    const QImage& best_image() const{ return m_best_image; }
+    const std::shared_ptr<const ImageRGB32>& best_image() const{ return m_best_image; }
 
-    void add_frame(const QImage& image, const ShinySparkleSetSwSh& sparkles);
+    void add_frame(const std::shared_ptr<const ImageRGB32>& image, const ShinySparkleSetSwSh& sparkles);
 
 private:
     double m_best_overall = 0;
     double m_best_star = 0;
     double m_best_square = 0;
     double m_best_type = 0;
-    QImage m_best_image;
+    std::shared_ptr<const ImageRGB32> m_best_image;
 };
 
 

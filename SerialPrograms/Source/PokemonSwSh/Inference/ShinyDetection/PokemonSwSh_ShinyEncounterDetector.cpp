@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -42,26 +43,26 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_dialog_tracker.make_overlays(items);
     m_sparkle_tracker.make_overlays(items);
 }
-bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timestamp){
-    if (frame.isNull()){
+bool ShinyEncounterTracker::process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp){
+    if (!*frame){
         return false;
     }
-    if (frame.height() < 720){
+    if (frame->height() < 720){
         throw UserSetupError(m_logger, "Video resolution must be at least 720p.");
     }
-    double aspect_ratio = (double)frame.width() / frame.height();
+    double aspect_ratio = (double)frame->width() / frame->height();
     if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
         throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
     }
 
-    bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
+    bool battle_menu = m_battle_menu.process_frame(*frame, timestamp);
     if (battle_menu){
         m_dialog_tracker.push_end(timestamp);
         return true;
     }
 
-    m_dialog_tracker.process_frame(frame, timestamp);
-    m_sparkle_tracker.process_frame(frame, timestamp);
+    m_dialog_tracker.process_frame(*frame, timestamp);
+    m_sparkle_tracker.process_frame(*frame, timestamp);
 
     switch (m_dialog_tracker.encounter_state()){
     case EncounterState::BEFORE_ANYTHING:
@@ -134,7 +135,7 @@ ShinyDetectionResult detect_shiny_battle(
     );
     if (result < 0){
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
-        return ShinyDetectionResult{ShinyType::UNKNOWN, 0, QImage()};
+        return ShinyDetectionResult{ShinyType::UNKNOWN, 0, std::make_shared<ImageRGB32>()};
     }
     double alpha;
     ShinyType shiny_type = determine_shiny_status(

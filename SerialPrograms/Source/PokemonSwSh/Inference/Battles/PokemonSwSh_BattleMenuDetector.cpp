@@ -258,7 +258,7 @@ StandardBattleMenuWatcher::StandardBattleMenuWatcher(bool den, Color color)
 void StandardBattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{
     return StandardBattleMenuDetector::make_overlays(items);
 }
-bool StandardBattleMenuWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool StandardBattleMenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;

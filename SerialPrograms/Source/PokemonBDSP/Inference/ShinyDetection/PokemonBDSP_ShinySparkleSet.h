@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinySparkleSet_H
 #define PokemonAutomation_PokemonBDSP_ShinySparkleSet_H
 
-#include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Pokemon_ShinySparkleSet.h"
 
@@ -49,13 +48,13 @@ private:
 class ShinySparkleAggregator{
 public:
     double best_overall() const{ return m_best_overall; }
-    const QImage& best_image() const{ return m_best_image; }
+    const std::shared_ptr<const ImageRGB32>& best_image() const{ return m_best_image; }
 
-    void add_frame(const QImage& image, const ShinySparkleSetBDSP& sparkles);
+    void add_frame(const std::shared_ptr<const ImageRGB32>& image, const ShinySparkleSetBDSP& sparkles);
 
 private:
     double m_best_overall = 0;
-    QImage m_best_image;
+    std::shared_ptr<const ImageRGB32> m_best_image;
 };
 
 

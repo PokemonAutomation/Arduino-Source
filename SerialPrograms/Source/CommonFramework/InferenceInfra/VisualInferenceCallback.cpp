@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 bool VisualInferenceCallback::process_frame(const QImage& frame, WallClock timestamp){
     return process_frame(std::make_shared<ImageRGB32>(frame), timestamp);
 }
-bool VisualInferenceCallback::process_frame(const std::shared_ptr<ImageRGB32>& frame, WallClock timestamp){
+bool VisualInferenceCallback::process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp){
     return process_frame(*frame, timestamp);
 }
 bool VisualInferenceCallback::process_frame(const ImageViewRGB32& frame, WallClock timestamp){

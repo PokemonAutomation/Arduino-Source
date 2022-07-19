@@ -35,7 +35,7 @@ EncounterDialogTracker::EncounterDialogTracker(
 void EncounterDialogTracker::make_overlays(VideoOverlaySet& items) const{
     m_dialog_detector.make_overlays(items);
 }
-bool EncounterDialogTracker::process_frame(const QImage& screen, WallClock timestamp){
+bool EncounterDialogTracker::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
     bool dialog_on = m_dialog_detector.detect(screen);
 //    cout << dialog_on << endl;
     if (dialog_on == m_dialog_on.load(std::memory_order_relaxed)){

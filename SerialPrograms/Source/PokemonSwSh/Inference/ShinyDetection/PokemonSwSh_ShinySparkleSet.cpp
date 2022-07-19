@@ -144,7 +144,7 @@ void ShinySparkleSetSwSh::read_from_image(const ImageViewRGB32& image){
 
 
 
-void ShinySparkleAggregator::add_frame(const QImage& image, const ShinySparkleSetSwSh& sparkles){
+void ShinySparkleAggregator::add_frame(const std::shared_ptr<const ImageRGB32>& image, const ShinySparkleSetSwSh& sparkles){
     m_best_overall = std::max(m_best_overall, sparkles.alpha_overall());
 
     double current_star = sparkles.alpha_star();

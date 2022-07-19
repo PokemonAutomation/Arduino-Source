@@ -42,11 +42,6 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
         return false;
     }
 
-//    const QImage& exclamation_mark = SELECTION_ARROW();
-//    QImage cropped = image.copy(
-//        (int)object.min_x, (int)object.min_y,
-//        (int)width, (int)height
-//    );
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
 //    static int c = 0;
