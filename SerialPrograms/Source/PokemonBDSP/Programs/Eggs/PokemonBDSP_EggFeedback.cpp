@@ -58,7 +58,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
 
     //  Hatch the egg.
     QImage overworld = console.video().snapshot();
-    overworld.save("test-0.png");
+//    overworld.save("test-0.png");
     {
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
