@@ -172,17 +172,17 @@ void EventDialogDetector::make_overlays(VideoOverlaySet& items) const{
 bool EventDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     size_t hits = 0;
 
-    auto blue_color_check = [](const ImageStats & stats) -> bool{
-        cout << "stats " << stats.average << " " << stats.stddev << endl;
+    auto dialog_bg_color_check = [](const ImageStats & stats) -> bool{
+        // cout << "stats " << stats.average << " " << stats.stddev << endl;
         const auto& avg = stats.average;
         return avg.r < 50.0 && avg.g < 70.0 && avg.b < 100.0 && avg.r < avg.b * 1.3 && avg.g < avg.b * 1.3 && stats.stddev.sum() < 20.;
     };
 
     ImageStats left_blue = image_stats(extract_box_reference(frame, m_left_blue));
-    hits += blue_color_check(left_blue);
+    hits += dialog_bg_color_check(left_blue);
 
     ImageStats right_blue = image_stats(extract_box_reference(frame, m_right_blue));
-    hits += blue_color_check(right_blue);
+    hits += dialog_bg_color_check(right_blue);
 
     m_yellow_arrow_detector.process_frame(frame, timestamp);
     hits += m_yellow_arrow_detector.detected();
