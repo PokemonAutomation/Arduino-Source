@@ -17,6 +17,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
@@ -24,7 +25,6 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
@@ -488,8 +488,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     pbf_mash_button(context, BUTTON_A, 350);
     context.wait_for_all_requests();
     
-    DialogueYellowArrowDetector yellow_arrow_detector(env.logger(), env.console.overlay(), true);
-    int ret = wait_until(env.console, context, std::chrono::seconds(10), {{yellow_arrow_detector}});
+    // Wait for the last dialog box before the MMO pokemon sprites are revealed.
+    EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
+    int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
     if (ret < 0){
         dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot().frame);
         throw OperationFailedException(env.console, "Dialog box not detected when waiting for MMO map.");
@@ -543,15 +544,22 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
     MMOSpriteStarSymbolDetector star_detector(sprites_screen, star_boxes);
 
+    env.log("Detect star symbols...");
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});
     for (size_t i = 0; i < new_boxes.size(); i++){
+        std::ostringstream os;
+        os << "- " << sprites[i] << " box [" << star_boxes[i].min_x << ", " << star_boxes[i].min_y
+           << star_boxes[i].max_x << ", " << star_boxes[i].max_y << "]"
+           <<  " motion: " << star_detector.animation_value(i)
+           << " color: " << star_detector.symbol_color(i);
         if (star_detector.is_star(i)){
             stats.stars++;
-            env.log("Sprite " + sprites[i] + " has star.");
+            os << ", has star";
             if (desired_star_MMOs.find(sprites[i]) != desired_star_MMOs.end()){
                 found.insert(sprites[i]);
             }
         }
+        env.log(os.str());
     }
 
     env.update_stats();

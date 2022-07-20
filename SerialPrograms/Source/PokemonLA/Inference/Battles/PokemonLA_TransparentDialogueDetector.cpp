@@ -1,4 +1,4 @@
-/*  Dialogue Ellipse Detector
+/*  Transparent Dialogue Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

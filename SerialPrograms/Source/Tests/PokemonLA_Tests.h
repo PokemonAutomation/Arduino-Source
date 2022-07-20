@@ -24,6 +24,8 @@ int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target)
 
 int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target);
 
+int test_pokemonLA_EventDialogDetector(const QImage& image, bool target);
+
 int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target);
 
 int test_pokemonLA_BlackOutDetector(const QImage& image, bool target);

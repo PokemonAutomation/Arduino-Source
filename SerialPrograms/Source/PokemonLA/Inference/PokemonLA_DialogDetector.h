@@ -10,6 +10,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,7 +39,9 @@ private:
     ArcPhoneDetector m_arc_phone;
 };
 
-
+// Detect normal dialogue that is used in cases like when you talk to gate guard Ross when leaving the village.
+// Note: it can only detect dialogue boxes with a title. Title appears when you talk to an NPC with known names.
+//   The Galaxy member at each camp that gives you access to the ranch and shop has no dialogue title.
 class NormalDialogDetector : public VisualInferenceCallback{
 public:
     NormalDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
@@ -61,7 +64,26 @@ private:
     ImageFloatBox m_bottom_white;
     ImageFloatBox m_left_white;
     ImageFloatBox m_right_white;
-    // ArcPhoneDetector m_arc_phone;
+};
+
+// Detect event dialogue that is used in cases like when you interact with the tent in a camp.
+class EventDialogDetector : public VisualInferenceCallback{
+public:
+    EventDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+
+    bool detected() const{
+        return m_detected.load(std::memory_order_acquire);
+    }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+
+private:
+    bool m_stop_on_detected;
+    std::atomic<bool> m_detected;
+    ImageFloatBox m_left_blue;
+    ImageFloatBox m_right_blue;
+    DialogueYellowArrowDetector m_yellow_arrow_detector;
 };
 
 }

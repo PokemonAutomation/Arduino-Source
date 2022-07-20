@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 
 DialogSurpriseDetector::DialogSurpriseDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
-    : VisualInferenceCallback("DialogDetector")
+    : VisualInferenceCallback("DialogSurpriseDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
     , m_title_top   (0.295, 0.722, 0.100, 0.005)
@@ -98,7 +98,7 @@ bool DialogSurpriseDetector::process_frame(const QImage& frame, WallClock timest
 
 
 NormalDialogDetector::NormalDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
-    : VisualInferenceCallback("DialogDetector")
+    : VisualInferenceCallback("NormalDialogDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
     , m_title_top   (0.278, 0.712, 0.100, 0.005)
@@ -154,6 +154,39 @@ bool NormalDialogDetector::process_frame(const QImage& frame, WallClock timestam
     return detected && m_stop_on_detected;
 }
 
+
+
+
+EventDialogDetector::EventDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+    : VisualInferenceCallback("EventDialogDetector")
+    , m_stop_on_detected(stop_on_detected)
+    , m_detected(false)
+    , m_left_blue (0.248, 0.768, 0.009, 0.135)
+    , m_right_blue(0.723, 0.766, 0.029, 0.063)
+    , m_yellow_arrow_detector(logger, overlay, false)
+{}
+void EventDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_left_blue);
+    items.add(COLOR_RED, m_right_blue);
+    m_yellow_arrow_detector.make_overlays(items);
+}
+bool EventDialogDetector::process_frame(const QImage& frame, WallClock timestamp){
+    size_t hits = 0;
+
+    ImageStats left_blue = image_stats(extract_box_reference(frame, m_left_blue));
+    hits += is_solid(left_blue, {0.23,0.34,0.43}, 0.2, 20);
+
+    ImageStats right_blue = image_stats(extract_box_reference(frame, m_right_blue));
+    hits += is_solid(right_blue, {0.23,0.34,0.43}, 0.2, 20);
+
+    m_yellow_arrow_detector.process_frame(frame, timestamp);
+    hits += m_yellow_arrow_detector.detected();
+
+    bool detected = hits == 3;
+    m_detected.store(detected, std::memory_order_release);
+
+    return detected && m_stop_on_detected;
+}
 }
 }
 }

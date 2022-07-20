@@ -17,6 +17,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
@@ -68,6 +69,17 @@ int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target)
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
     TransparentDialogueDetector detector(logger, overlay, stop_on_detected);
+
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLA_EventDialogDetector(const QImage& image, bool target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+    const bool stop_on_detected = true;
+    EventDialogDetector detector(logger, overlay, stop_on_detected);
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);

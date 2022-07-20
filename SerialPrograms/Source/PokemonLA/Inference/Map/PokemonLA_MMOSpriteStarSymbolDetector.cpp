@@ -41,6 +41,12 @@ void MMOSpriteStarSymbolDetector::make_overlays(VideoOverlaySet& items) const{
 
 //  Return true if the inference session should stop.
 bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    // If we already collect enough frames, then we should stop doing detection
+    if (m_num_frames >= 30){
+        return true;
+    }
+
+    // Collect image color stats:
     for(size_t i = 0; i < m_boxes.size(); i++){
         ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         double rmsd = ImageMatch::pixel_RMSD(m_initial_images[i], ref);
@@ -51,18 +57,25 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
 
     m_num_frames++;
 
+    // We don't have enough frames, continue collection:
     if (m_num_frames < 30){
         return false;
     }
 
+    // We have enough frames, compute stats to determine whether each sprite has a star symbol.
+    // Caller of this detector can query `m_is_star` to know the detection result.
+    // Details of the detection can be queried via `m_rmsd` and `m_symbol_colors`
+    // 
     for(size_t i = 0; i < m_boxes.size(); i++){
-        double rmsd = m_rmsd[i] / m_num_frames;
-        if (rmsd <= 20){
+        // Compute average values:
+        m_rmsd[i] = m_rmsd[i] / m_num_frames;
+        m_symbol_colors[i] = m_symbol_colors[i] / m_num_frames;
+
+        if (m_rmsd[i] <= 20){
             continue;
         }
 
-        auto symbol_color = m_symbol_colors[i] / m_num_frames;
-        if (symbol_color.r <= symbol_color.g * 1.3){
+        if (m_symbol_colors[i].r <= m_symbol_colors[i].g * 1.3){
             // It's not very red, so it's not a berry symbol
             m_is_star[i] = true;
         }
