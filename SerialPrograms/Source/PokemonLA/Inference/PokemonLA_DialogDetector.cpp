@@ -174,7 +174,8 @@ bool EventDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 
     auto blue_color_check = [](const ImageStats & stats) -> bool{
         cout << "stats " << stats.average << " " << stats.stddev << endl;
-        return stats.average.r < stats.average.b * 0.8 && stats.average.g < stats.average.b * 1.1 && stats.stddev.sum() < 20.;
+        const auto& avg = stats.average;
+        return avg.r < 50.0 && avg.g < 70.0 && avg.b < 100.0 && avg.r < avg.b * 1.3 && avg.g < avg.b * 1.3 && stats.stddev.sum() < 20.;
     };
 
     ImageStats left_blue = image_stats(extract_box_reference(frame, m_left_blue));
