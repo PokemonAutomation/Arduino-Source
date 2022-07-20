@@ -6,7 +6,6 @@
 
 #include <cmath>
 #include <map>
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonLA_FlagTracker.h"
 
@@ -85,7 +84,7 @@ bool FlagTracker::get(
     return true;
 }
 
-bool FlagTracker::process_frame(const QImage& frame, WallClock timestamp){
+bool FlagTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
 
     Sample sample;

@@ -100,7 +100,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     menu_to_box(context);
 
     context.wait_for_all_requests();
-    std::shared_ptr<const ImageRGB32> expected = std::make_shared<const ImageRGB32>(env.console.video().snapshot());
+    std::shared_ptr<const ImageRGB32> expected = env.console.video().snapshot();
     ImageMatchWatcher matcher(std::move(expected), {0.02, 0.25, 0.96, 0.73}, 20);
 
     for (uint16_t box = 0; box < BOXES; box++){
@@ -171,8 +171,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(500));
-        QImage current = env.console.video().snapshot();
-        if (!matcher.detect(current)){
+        if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
             throw OperationFailedException(env.console, "Failed to return to starting position. Something is wrong.");
         }

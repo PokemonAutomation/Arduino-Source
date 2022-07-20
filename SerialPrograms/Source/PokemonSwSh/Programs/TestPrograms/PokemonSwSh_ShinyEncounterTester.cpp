@@ -47,7 +47,7 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
         ENCOUNTER_TYPE == 0 ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,
         std::chrono::seconds(30)
     );
-    result.best_screenshot->save(now_to_filestring() + ".png");
+    result.get_best_screenshot().save(now_to_filestring() + ".png");
 }
 
 

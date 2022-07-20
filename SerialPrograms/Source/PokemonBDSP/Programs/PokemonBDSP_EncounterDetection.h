@@ -48,7 +48,7 @@ public:
     EncounterActionFull get_action();
 
 private:
-    std::set<std::string> read_name(const QImage& screen, const ImageFloatBox& box);
+    std::set<std::string> read_name(const ImageViewRGB32& screen, const ImageFloatBox& box);
 #if 0
     void run_overrides(
         std::vector<std::pair<EncounterAction, std::string>>& actions,

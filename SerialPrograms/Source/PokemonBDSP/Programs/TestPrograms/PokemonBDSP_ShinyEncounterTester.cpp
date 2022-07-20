@@ -63,9 +63,9 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
         USE_SOUND_DETECTION
     );
     if (ENCOUNTER_TYPE == 0){
-        result_own.best_screenshot->save(now_to_filestring() + ".png");
+        result_own.get_best_screenshot().save(now_to_filestring() + ".png");
     }else{
-        result_wild.best_screenshot->save(now_to_filestring() + ".png");
+        result_wild.get_best_screenshot().save(now_to_filestring() + ".png");
     }
 }
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_MapDetector.h"
@@ -27,7 +26,7 @@ void MapDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 //  Return true if the inference session should stop.
-bool MapDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool MapDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageStats bottom0 = image_stats(extract_box_reference(frame, m_bottom0));
 //    cout << bottom0.average << bottom0.stddev << endl;
     if (!is_solid(bottom0, {0.330212, 0.334083, 0.335705})){

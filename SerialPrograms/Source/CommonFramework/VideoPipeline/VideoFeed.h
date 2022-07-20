@@ -7,8 +7,10 @@
 #ifndef PokemonAutomation_VideoFeedInterface_H
 #define PokemonAutomation_VideoFeedInterface_H
 
+#include <memory>
 #include <QImage>
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 
@@ -16,12 +18,22 @@ namespace PokemonAutomation{
 struct VideoSnapshot{
     //  The frame itself. Null means no snapshot was available.
     QImage frame;
+    std::shared_ptr<const ImageRGB32> frame_ptr;
 
     //  The timestamp of when the frame was taken.
     //  This will be as close as possible to when the frame was taken.
     WallClock timestamp = WallClock::min();
 
-    operator QImage&(){ return frame; }
+    VideoSnapshot(QImage p_frame = QImage(), WallClock p_timestamp = WallClock::min())
+         : frame(std::move(p_frame))
+         , frame_ptr(std::make_shared<const ImageRGB32>(frame))
+         , timestamp(p_timestamp)
+    {}
+
+    operator const QImage&() const{ return frame; }
+
+    operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame_ptr); }
+    operator ImageViewRGB32() const{ return *frame_ptr; }
 };
 
 

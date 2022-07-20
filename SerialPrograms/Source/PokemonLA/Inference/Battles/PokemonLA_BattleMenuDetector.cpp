@@ -34,7 +34,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 
-bool BattleMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool BattleMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const ImageStats stroke_left = image_stats(extract_box_reference(frame, m_pokemon_stroke_bg_left));
     if (is_solid(stroke_left,{0.179,0.386,0.435}, 0.2, 15) == false){
         m_detected.store(false, std::memory_order_release);

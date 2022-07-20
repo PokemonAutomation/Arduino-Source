@@ -405,7 +405,7 @@ void EggAutonomousState::hatch_egg(){
     }
 
     //  Hatch the egg.
-    std::shared_ptr<const ImageRGB32> overworld = std::make_shared<const ImageRGB32>(m_console.video().snapshot());
+    std::shared_ptr<const ImageRGB32> overworld = m_console.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -517,8 +517,7 @@ bool EggAutonomousState::overworld_detect_and_run_state(){
     dump();
 
     //  Egg is hatching. Handle that now.
-    QImage screen = m_console.video().snapshot();
-    if (dialog.detect(screen)){
+    if (dialog.detect(m_console.video().snapshot())){
         m_console.log("Egg is hatching!");
         hatch_egg();
         return false;

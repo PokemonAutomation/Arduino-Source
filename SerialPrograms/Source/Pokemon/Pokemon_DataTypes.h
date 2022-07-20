@@ -54,6 +54,10 @@ struct ShinyDetectionResult{
     ShinyType shiny_type = ShinyType::UNKNOWN;
     double alpha = 0;
     std::shared_ptr<const ImageRGB32> best_screenshot;
+
+    ImageViewRGB32 get_best_screenshot() const{
+        return best_screenshot ? (ImageViewRGB32)*best_screenshot : ImageViewRGB32();
+    }
 };
 
 

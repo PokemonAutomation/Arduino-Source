@@ -40,14 +40,13 @@ void MMOSpriteStarSymbolDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 //  Return true if the inference session should stop.
-bool MMOSpriteStarSymbolDetector::process_frame(const QImage& frame, WallClock timestamp){
-    const ImageViewRGB32 frame_ref(frame);
+bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     for(size_t i = 0; i < m_boxes.size(); i++){
         ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         double rmsd = ImageMatch::pixel_RMSD(m_initial_images[i], ref);
         m_rmsd[i] += rmsd;
 
-        m_symbol_colors[i] += frame_ref.pixel(m_boxes[i].center_x(), m_boxes[i].center_y());
+        m_symbol_colors[i] += frame.pixel(m_boxes[i].center_x(), m_boxes[i].center_y());
     }
 
     m_num_frames++;

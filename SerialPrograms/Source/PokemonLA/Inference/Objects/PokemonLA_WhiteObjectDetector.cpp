@@ -122,7 +122,7 @@ WhiteObjectWatcher::WhiteObjectWatcher(
 void WhiteObjectWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool WhiteObjectWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool WhiteObjectWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     for (auto& detector : m_detectors){
         detector.first.clear();
     }

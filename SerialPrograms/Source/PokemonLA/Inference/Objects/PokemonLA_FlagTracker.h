@@ -29,7 +29,7 @@ public:
         WallClock timestamp = current_time()
     );
 
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     struct Sample{

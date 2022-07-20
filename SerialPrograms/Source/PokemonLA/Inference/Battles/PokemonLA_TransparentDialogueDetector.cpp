@@ -29,7 +29,7 @@ void TransparentDialogueDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 
-bool TransparentDialogueDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool TransparentDialogueDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool stop = m_arrow_detector.process_frame(frame, timestamp);
     bool detected = m_arrow_detector.detected();
     if (detected){

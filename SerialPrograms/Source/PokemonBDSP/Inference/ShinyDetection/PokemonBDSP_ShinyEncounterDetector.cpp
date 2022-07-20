@@ -222,7 +222,7 @@ void determine_shiny_status(
     }
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
-        dump_image(env.logger(), env.program_info(), "LowShinyAlpha", *wild_result.best_screenshot);
+        dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.get_best_screenshot());
         std::string str;
         str += "Low alpha shiny (alpha = ";
         str += tostr_default(alpha_wild_overall);
@@ -230,7 +230,7 @@ void determine_shiny_status(
         send_program_recoverable_error_notification(
             env, settings,
             str,
-            *wild_result.best_screenshot
+            wild_result.get_best_screenshot()
         );
     }
 

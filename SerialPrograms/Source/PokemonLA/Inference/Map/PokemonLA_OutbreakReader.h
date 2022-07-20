@@ -23,7 +23,7 @@ class OutbreakReader{
 public:
     OutbreakReader(LoggerQt& logger, Language language, VideoOverlay& overlay);
 
-    OCR::StringMatchResult read(const QImage& screen) const;
+    OCR::StringMatchResult read(const ImageViewRGB32& screen) const;
 
 
 private:

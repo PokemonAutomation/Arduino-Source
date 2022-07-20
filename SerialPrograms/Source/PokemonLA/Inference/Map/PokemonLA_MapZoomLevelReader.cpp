@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -20,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-int read_map_zoom_level(const QImage& screen){
+int read_map_zoom_level(const ImageViewRGB32& screen){
     
     // The three locations of the yellow disk on the zoom gauge, from left to right.
     // Left most is Hisui map, zoom level 0. Right most is local view, zoom level 2.

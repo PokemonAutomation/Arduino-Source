@@ -54,7 +54,7 @@ DialogueYellowArrowDetector::DialogueYellowArrowDetector(
 void DialogueYellowArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool DialogueYellowArrowDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     auto cropped_frame = extract_box_reference(frame, m_box);
 
     auto matrices = compress_rgb32_to_binary_range(cropped_frame,{

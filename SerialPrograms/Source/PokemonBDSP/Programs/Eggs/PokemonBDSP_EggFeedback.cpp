@@ -58,7 +58,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
 
 
     //  Hatch the egg.
-    std::shared_ptr<const ImageRGB32> overworld = std::make_shared<const ImageRGB32>(console.video().snapshot().frame);
+    std::shared_ptr<const ImageRGB32> overworld = console.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);

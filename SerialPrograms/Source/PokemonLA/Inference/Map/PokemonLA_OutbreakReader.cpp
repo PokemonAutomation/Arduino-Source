@@ -25,7 +25,7 @@ OutbreakReader::OutbreakReader(LoggerQt& logger, Language language, VideoOverlay
     , m_text_box(overlay, 0.050, 0.177, 0.200, 0.038)
 {}
 
-OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
+OCR::StringMatchResult OutbreakReader::read(const ImageViewRGB32& screen) const{
     OCR::StringMatchResult result;
     ImageStats box0 = image_stats(extract_box_reference(screen, m_dialog_box0));
     ImageStats box1 = image_stats(extract_box_reference(screen, m_dialog_box1));

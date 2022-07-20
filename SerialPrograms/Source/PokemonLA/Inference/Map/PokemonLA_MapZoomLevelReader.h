@@ -8,9 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_MapZoomLevelReader_H
 #define PokemonAutomation_PokemonLA_MapZoomLevelReader_H
 
-class QImage;
-
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -21,7 +20,7 @@ namespace PokemonLA{
 // zoom level 1: full region map view
 // zoom level 2: local view
 // Return -1 if the reading fails.
-int read_map_zoom_level(const QImage& screen);
+int read_map_zoom_level(const ImageViewRGB32& screen);
 
 
 }
