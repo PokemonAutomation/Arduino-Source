@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
@@ -126,7 +125,7 @@ void NotificationDetector::make_overlays(VideoOverlaySet& items) const{
     m_reader.make_overlays(items);
 }
 
-bool NotificationDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool NotificationDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  Throttle this to 1/sec.
     auto now = current_time();
     if (m_last_check + std::chrono::milliseconds(1000) > now){

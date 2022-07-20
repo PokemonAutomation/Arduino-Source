@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -59,8 +58,8 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         // Check whether we can send this pokemon to battle:
         const bool stop_on_detected = true;
         BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
-        QImage screen = console.video().snapshot();
-        if (switch_detector.process_frame(screen, current_time()) == false){
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        if (switch_detector.process_frame(*screen, current_time()) == false){
             // No longer at the switching pokemon screen
             break;
         }

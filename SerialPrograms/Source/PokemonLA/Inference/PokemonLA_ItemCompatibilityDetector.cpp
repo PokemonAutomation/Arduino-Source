@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -21,7 +20,7 @@ namespace PokemonLA{
 
 
 
-ItemCompatibility detect_item_compatibility(const QImage& screen){
+ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen){
     // The Compatible/Incompatible text region of the lead pokemon on the screen.
     const ImageFloatBox box(0.838, 0.1815, 0.090, 0.024);
 

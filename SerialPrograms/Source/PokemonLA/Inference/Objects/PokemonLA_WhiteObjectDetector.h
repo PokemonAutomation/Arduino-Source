@@ -67,7 +67,7 @@ protected:
 
 void find_overworld_white_objects(
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
-    const QImage& screen
+    const ImageViewRGB32& screen
 );
 
 class WhiteObjectWatcher : public VisualInferenceCallback{

@@ -40,7 +40,7 @@ public:
         }
     {}
 
-    std::array<int, 9> read_tasks(const QImage& screen) const
+    std::array<int, 9> read_tasks(const ImageViewRGB32& screen) const
     {
         std::array<int, 9> tasks{};
         for (size_t i = 0; i < m_tasks_box.size(); ++i)

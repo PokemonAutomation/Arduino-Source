@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonLA_ItemDropSoundDetector_H
 
 #include <functional>
-#include <QImage>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"

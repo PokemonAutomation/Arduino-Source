@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -399,8 +398,8 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     // {
-    //     // QImage image("./scripts/LA_switch_pokemon_Kuro.png");
-    //     QImage image("./PLA_test_data/ingoBattle/broken_dialogue_detector.png");
+    //     // ImageRGB32 image("./scripts/LA_switch_pokemon_Kuro.png");
+    //     ImageRGB32 image("./PLA_test_data/ingoBattle/broken_dialogue_detector.png");
     //     const bool stop_on_detected = true;
     //     NormalDialogDetector detector(env.console, env.console, stop_on_detected);
     //     bool detected = detector.process_frame(image, current_time());

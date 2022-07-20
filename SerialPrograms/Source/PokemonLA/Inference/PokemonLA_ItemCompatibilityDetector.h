@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_ItemCompatibilityDetector_H
 #define PokemonAutomation_PokemonLA_ItemCompatibilityDetector_H
 
-#include <QImage>
-
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -23,7 +22,7 @@ enum class ItemCompatibility{
 // The game shows blue "Compatible" if it can be used, red "Incompatible" otherwise.
 // This function uses the color of the text to detect which one is shown.
 // Return ItemCompatibility::NONE if the detection fails.
-ItemCompatibility detect_item_compatibility(const QImage& screen);
+ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen);
 
 
 }

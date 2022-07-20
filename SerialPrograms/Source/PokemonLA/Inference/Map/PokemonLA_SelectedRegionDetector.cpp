@@ -20,17 +20,18 @@ namespace PokemonLA{
 
 class MapLocationDetector : public VisualInferenceCallback{
 public:
-    MapLocationDetector(const QImage& screen)
+    MapLocationDetector(std::shared_ptr<const ImageRGB32> screen)
         : VisualInferenceCallback("MapLocationDetector")
+        , m_screen(std::move(screen))
         , m_current_region(MapRegion::NONE)
     {
-        m_regions.emplace_back(MapRegion::JUBILIFE,     ImageFloatBox(0.252, 0.400, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::FIELDLANDS,   ImageFloatBox(0.415, 0.550, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::MIRELANDS,    ImageFloatBox(0.750, 0.570, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::COASTLANDS,   ImageFloatBox(0.865, 0.240, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::HIGHLANDS,    ImageFloatBox(0.508, 0.320, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::ICELANDS,     ImageFloatBox(0.457, 0.060, 0.025, 0.150), screen);
-        m_regions.emplace_back(MapRegion::RETREAT,      ImageFloatBox(0.635, 0.285, 0.025, 0.150), screen);
+        m_regions.emplace_back(MapRegion::JUBILIFE,     ImageFloatBox(0.252, 0.400, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::FIELDLANDS,   ImageFloatBox(0.415, 0.550, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::MIRELANDS,    ImageFloatBox(0.750, 0.570, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::COASTLANDS,   ImageFloatBox(0.865, 0.240, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::HIGHLANDS,    ImageFloatBox(0.508, 0.320, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::ICELANDS,     ImageFloatBox(0.457, 0.060, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::RETREAT,      ImageFloatBox(0.635, 0.285, 0.025, 0.150), *m_screen);
     }
 
     MapRegion current_region() const{
@@ -43,8 +44,8 @@ public:
 //        }
     }
 
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
-        if (frame.isNull()){
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        if (!frame){
             return false;
         }
 
@@ -69,14 +70,15 @@ private:
     struct RegionState{
         MapRegion region;
         ImageFloatBox box;
-        QImage start;
-        RegionState(MapRegion p_region, const ImageFloatBox& p_box, const QImage& screen)
+        ImageViewRGB32 start;
+        RegionState(MapRegion p_region, const ImageFloatBox& p_box, const ImageViewRGB32& screen)
             : region(p_region)
             , box(p_box)
-            , start(extract_box_copy(screen, box))
+            , start(extract_box_reference(screen, box))
         {}
     };
 
+    std::shared_ptr<const ImageRGB32> m_screen;
     std::vector<RegionState> m_regions;
     MapRegion m_current_region;
 };

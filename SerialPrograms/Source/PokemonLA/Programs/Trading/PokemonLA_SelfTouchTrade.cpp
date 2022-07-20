@@ -89,13 +89,13 @@ bool SelfTouchTrade::trade_one(
 
     //  Read the name and see if the receiver still needs it.
     TradeNameReader name_reader(host, host, LANGUAGE);
-    QImage image = host.video().snapshot();
-    std::string slug = name_reader.read(image);
+    std::shared_ptr<const ImageRGB32> image = host.video().snapshot();
+    std::string slug = name_reader.read(*image);
     auto iter = trades_left.find(slug);
     if (iter == trades_left.end()){
         host.log("Unable to read name. Moving on...", COLOR_RED);
         stats.m_errors++;
-        dump_image(host, env.program_info(), "ReadName", image);
+        dump_image(host, env.program_info(), "ReadName", *image);
         return false;
     }
     if (iter->second <= 0){

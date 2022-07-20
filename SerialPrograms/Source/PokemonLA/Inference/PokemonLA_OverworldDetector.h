@@ -20,7 +20,7 @@ public:
     OverworldDetector(LoggerQt& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     ArcPhoneDetector m_arc_phone;

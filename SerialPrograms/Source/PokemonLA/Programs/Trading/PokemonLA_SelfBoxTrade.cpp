@@ -130,8 +130,8 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
                 return;
             }
 
-            QImage image1 = console.video().snapshot();
-            std::string slug = (console.index() == 0 ? name_reader0 : name_reader1).read(image1);
+            std::shared_ptr<const ImageRGB32> image1 = console.video().snapshot();
+            std::string slug = (console.index() == 0 ? name_reader0 : name_reader1).read(*image1);
             if (slug == "machoke" || slug == "haunter" || slug == "graveler" || slug == "kadabra"){
                 console.log("Skipping trade evolution: " + slug, COLOR_RED);
                 ok.store(false, std::memory_order_release);

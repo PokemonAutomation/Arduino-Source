@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 #define PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
@@ -42,10 +41,6 @@ public:
     virtual void add_shiny() = 0;
 };
 
-struct ShinySoundResults{
-    float error_coefficient;
-    QImage screenshot;
-};
 
 
 

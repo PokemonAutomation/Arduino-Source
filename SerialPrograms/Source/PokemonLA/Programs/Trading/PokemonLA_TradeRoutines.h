@@ -39,7 +39,7 @@ class TradeNameReader{
 public:
     TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Language language);
 
-    std::string read(const QImage& screen) const;
+    std::string read(const ImageViewRGB32& screen) const;
 
 private:
     LoggerQt& m_logger;

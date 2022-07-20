@@ -156,7 +156,7 @@ TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Langua
     }
 }
 
-std::string TradeNameReader::read(const QImage& screen) const{
+std::string TradeNameReader::read(const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_box);
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
         m_logger, m_language, image,

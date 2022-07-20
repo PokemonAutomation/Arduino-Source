@@ -28,7 +28,7 @@ void OverworldDetector::make_overlays(VideoOverlaySet& items) const{
     m_arc_phone.make_overlays(items);
     m_mount.make_overlays(items);
 }
-bool OverworldDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool OverworldDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     m_arc_phone.process_frame(frame, timestamp);
     if (!m_arc_phone.detected()){
         return false;

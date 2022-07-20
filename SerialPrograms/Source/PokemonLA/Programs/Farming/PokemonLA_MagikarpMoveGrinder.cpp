@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

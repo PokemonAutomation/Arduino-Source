@@ -103,7 +103,7 @@ ShinySymbolWatcher::ShinySymbolWatcher(VideoOverlay& overlay, const ImageFloatBo
 void ShinySymbolWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool ShinySymbolWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool ShinySymbolWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     m_matches = find_shiny_symbols(extract_box_reference(frame, m_box));
     m_overlays.clear();
     for (const ImagePixelBox& hit : m_matches){
@@ -114,7 +114,7 @@ bool ShinySymbolWatcher::process_frame(const QImage& frame, WallClock timestamp)
 }
 
 
-bool ShinySymbolWaiter::process_frame(const QImage& frame, WallClock timestamp){
+bool ShinySymbolWaiter::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ShinySymbolWatcher::process_frame(frame, timestamp);
     return !matches().empty();
 }

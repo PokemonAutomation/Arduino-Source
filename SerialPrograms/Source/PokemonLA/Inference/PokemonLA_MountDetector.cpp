@@ -38,13 +38,8 @@ public:
 
 #if 1
 
-QImage make_MountMatcher2Image(const char* path){
-    std::string qpath = RESOURCE_PATH() + path;
-    QImage image = open_image(qpath);
-
-    if (image.format() != QImage::Format_ARGB32){
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
+ImageRGB32 make_MountMatcher2Image(const char* path){
+    ImageRGB32 image(RESOURCE_PATH() + path);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
     auto session = make_WaterfillSession(matrix);
@@ -99,7 +94,7 @@ QImage make_MountMatcher2Image(const char* path){
     plus.merge_assume_no_overlap(arrowL);
     plus.merge_assume_no_overlap(arrowR);
 
-    return extract_box_copy(image, plus);
+    return extract_box_reference(image, plus).copy();
 }
 
 class MountMatcherButtons : public ImageMatch::ExactImageMatcher{
@@ -618,7 +613,7 @@ MountState MountTracker::state() const{
     return m_state.load(std::memory_order_acquire);
 }
 
-bool MountTracker::process_frame(const QImage& frame, WallClock timestamp){
+bool MountTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     MountState state = m_detector.detect(frame);
 //    cout << "state = " << (int)state << endl;
 
@@ -666,23 +661,22 @@ bool MountTracker::process_frame(const QImage& frame, WallClock timestamp){
 
 
 void make_mount_template(){
-    QImage image("MountOn-Braviary-Original.png");
-    image = image.convertToFormat(QImage::Format_ARGB32);
+    ImageRGB32 image("MountOn-Braviary-Original.png");
 
-    int width = image.width();
-    int height = image.height();
-    int plus_min_x = width - 29;
-    int plus_max_x = width - 10;
-    int plus_min_y = height - 23;
-    int plus_max_y = height - 4;
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    size_t width = image.width();
+    size_t height = image.height();
+    size_t plus_min_x = width < 29 ? 0 : width - 29;
+    size_t plus_max_x = width < 10 ? 0 : width - 10;
+    size_t plus_min_y = height < 23 ? 0 : height - 23;
+    size_t plus_max_y = height < 4 ? 0 : height - 4;
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             if (plus_min_x < c && c < plus_max_x && plus_min_y < r && r < plus_max_y){
                 continue;
             }
             QRgb pixel = image.pixel(c, r);
             if (qRed(pixel) < 128 || qGreen(pixel) < 128){
-                image.setPixel(c, r, 0);
+                image.get_pixel(c, r) = 0;
             }
         }
     }

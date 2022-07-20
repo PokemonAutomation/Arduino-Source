@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_BlackOutDetector.h"
@@ -59,11 +58,11 @@ void BlackOutDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 //  Return true if the inference session should stop.
-bool BlackOutDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool BlackOutDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
 
     auto save_image = [&](){
         static int count = 0;
-        frame.save(QString("BlackOut-") + QString::number(count) + QString(".png"));
+        frame.save("BlackOut-" + std::to_string(count) + ".png");
         count++;
     };
 

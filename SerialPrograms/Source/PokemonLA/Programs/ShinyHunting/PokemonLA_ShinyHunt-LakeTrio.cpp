@@ -83,7 +83,7 @@ std::unique_ptr<StatsTracker> ShinyHuntLakeTrio::make_stats() const{
 std::set<std::string> read_name(
     LoggerQt& logger,
     Language language,
-    const QImage& screen, const ImageFloatBox& box
+    const ImageViewRGB32& screen, const ImageFloatBox& box
 ){
     if (language == Language::None){
         return {};
@@ -161,13 +161,13 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {{watcher}}
             );
             if (ret < 0){
-                QImage screen = env.console.video().snapshot();
+                std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
                 env.log("No encounter detected after 60 seconds.", COLOR_RED);
                 stats.add_error();
                 dump_image(
                     env.logger(), ProgramInfo(),
                     "NoEncounter",
-                    screen
+                    *screen
                 );
                 send_program_recoverable_error_notification(
                     env, NOTIFICATION_ERROR_RECOVERABLE,
@@ -200,8 +200,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     {shiny_symbol},
                 }
             );
-            QImage screen = env.console.video().snapshot();
-            std::set<std::string> slugs = read_name(env.logger(), LANGUAGE, screen, {0.11, 0.868, 0.135, 0.043});
+            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+            std::set<std::string> slugs = read_name(env.logger(), LANGUAGE, *screen, {0.11, 0.868, 0.135, 0.043});
 
             if (ret < 0){
                 stats.add_non_shiny();
@@ -211,7 +211,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
                     true, false, {{std::move(slugs), ShinyType::NOT_SHINY}}, std::nan(""),
-                    screen
+                    *screen
                 );
             }else{
                 stats.add_unknown_shiny();
@@ -221,7 +221,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
                     true, true, {{std::move(slugs), ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                    screen
+                    *screen
                 );
                 if (VIDEO_ON_SHINY){
 //                    pbf_wait(context, 5 * TICKS_PER_SECOND);

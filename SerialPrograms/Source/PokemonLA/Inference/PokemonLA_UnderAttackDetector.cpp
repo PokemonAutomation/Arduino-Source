@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -36,7 +35,7 @@ UnderAttackWatcher::UnderAttackWatcher(LoggerQt& logger)
 void UnderAttackWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_box);
 }
-bool UnderAttackWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool UnderAttackWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     UnderAttackState state = detect(frame);
 
 //    SpinLockGuard lg(m_lock);
@@ -80,7 +79,7 @@ bool UnderAttackWatcher::process_frame(const QImage& frame, WallClock timestamp)
 }
 
 
-UnderAttackState UnderAttackWatcher::detect(const QImage& frame){
+UnderAttackState UnderAttackWatcher::detect(const ImageViewRGB32& frame){
     ImageStats stats = image_stats(extract_box_reference(frame, m_box));
 //    cout << stats.average << stats.stddev << endl;
 //    if (stats.stddev.sum() > 100){
