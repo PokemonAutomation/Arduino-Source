@@ -20,7 +20,7 @@ namespace PokemonLA{
 extern const ImageFloatBox SHINY_SYMBOL_BOX_BOTTOM;
 
 
-std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image);
+std::vector<ImagePixelBox> find_shiny_symbols(const ImageViewRGB32& image);
 
 
 class ShinySymbolWatcher : public VisualInferenceCallback{

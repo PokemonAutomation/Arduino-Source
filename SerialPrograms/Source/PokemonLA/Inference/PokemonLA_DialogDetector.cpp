@@ -169,7 +169,7 @@ void EventDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_blue);
     m_yellow_arrow_detector.make_overlays(items);
 }
-bool EventDialogDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool EventDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     size_t hits = 0;
 
     auto blue_color_check = [](const ImageStats & stats) -> bool{

@@ -5,7 +5,6 @@
  */
 
 #include <QDir>
-#include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -76,15 +75,16 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseC
     }
     path += "/";
 
-    std::vector<QImage> images = reader.dump_images(env.console.video().snapshot());
+    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+    std::vector<ImageViewRGB32> images = reader.dump_images(*screen);
 
     std::string now = now_to_filestring();
-    images[0].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[HP] + "-" + now + "a.png"));
-    images[1].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[ATTACK] + "-" + now + "b.png"));
-    images[2].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[DEFENSE] + "-" + now + "c.png"));
-    images[3].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPATK] + "-" + now + "d.png"));
-    images[4].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPDEF] + "-" + now + "e.png"));
-    images[5].save(QString::fromStdString(path + IVCheckerOptionOCR::TOKENS[SPEED] + "-" + now + "f.png"));
+    images[0].save(path + IVCheckerOptionOCR::TOKENS[HP] + "-" + now + "a.png");
+    images[1].save(path + IVCheckerOptionOCR::TOKENS[ATTACK] + "-" + now + "b.png");
+    images[2].save(path + IVCheckerOptionOCR::TOKENS[DEFENSE] + "-" + now + "c.png");
+    images[3].save(path + IVCheckerOptionOCR::TOKENS[SPATK] + "-" + now + "d.png");
+    images[4].save(path + IVCheckerOptionOCR::TOKENS[SPDEF] + "-" + now + "e.png");
+    images[5].save(path + IVCheckerOptionOCR::TOKENS[SPEED] + "-" + now + "f.png");
 
 }
 
