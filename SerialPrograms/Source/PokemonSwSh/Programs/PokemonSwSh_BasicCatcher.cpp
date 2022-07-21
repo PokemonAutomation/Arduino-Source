@@ -28,8 +28,8 @@ int move_to_ball(
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
-    QImage frame = console.video().snapshot();
-    std::string first_ball = reader.read_ball(frame);
+    std::shared_ptr<const ImageRGB32> frame = console.video().snapshot();
+    std::string first_ball = reader.read_ball(*frame);
     if (first_ball == ball_slug){
         return 0;
     }
@@ -39,7 +39,7 @@ int move_to_ball(
         pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
         context.wait_for_all_requests();
         frame = console.video().snapshot();
-        std::string current_ball = reader.read_ball(frame);
+        std::string current_ball = reader.read_ball(*frame);
         if (current_ball == ball_slug){
             return c;
         }

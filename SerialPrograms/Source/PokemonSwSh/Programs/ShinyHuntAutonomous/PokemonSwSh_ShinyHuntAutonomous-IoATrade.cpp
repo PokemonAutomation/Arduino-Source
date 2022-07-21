@@ -146,7 +146,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 false, false, {{{}, ShinyType::NOT_SHINY}}, std::nan(""),
-                QImage()
+                ImageViewRGB32()
             );
             break;
         case SummaryShinySymbolDetector::SHINY:

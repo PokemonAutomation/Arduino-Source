@@ -54,7 +54,7 @@ void send_raid_notification(
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
-    const QImage& screenshot,
+    const ImageViewRGB32& screenshot,
     const DenMonReadResults& results,
     const StatsTracker& stats_tracker
 ){
@@ -71,7 +71,7 @@ void send_raid_notification(
 
     std::string slugs;
 
-    if (!screenshot.isNull()){
+    if (!screenshot){
         if (results.type == DenMonReadResults::NOT_DETECTED){
             slugs += "Unable to detect - Not in den lobby.";
         }else if (results.slugs.results.empty()){
@@ -180,10 +180,10 @@ void run_autohost(
         context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
-        QImage screen = console.video().snapshot();
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
         DenMonReadResults results;
-        if (!screen.isNull()){
-            results = reader.read(screen);
+        if (!*screen){
+            results = reader.read(*screen);
             switch (results.type){
             case DenMonReadResults::RED_BEAM:
             case DenMonReadResults::PURPLE_BEAM:
@@ -215,7 +215,7 @@ void run_autohost(
             console,
             notifications,
             has_code, code,
-            screen, results, stats
+            *screen, results, stats
         );
     }
 

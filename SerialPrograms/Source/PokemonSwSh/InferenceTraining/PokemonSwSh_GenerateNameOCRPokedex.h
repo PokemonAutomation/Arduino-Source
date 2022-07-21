@@ -14,6 +14,7 @@
 
 namespace PokemonAutomation{
     class JsonArray;
+    class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -41,12 +42,12 @@ private:
     void read(
         JsonArray& output,
         LoggerQt& logger,
-        QImage image
+        const ImageViewRGB32& image
     ) const;
     void dump_images(
         const std::vector<std::string>& expected,
         size_t index,
-        const QImage& image
+        const ImageViewRGB32& image
     ) const;
 
 private:

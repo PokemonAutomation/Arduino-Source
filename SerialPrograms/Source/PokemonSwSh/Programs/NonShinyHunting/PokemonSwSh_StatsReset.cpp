@@ -113,7 +113,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     Stats& stats = env.current_stats<Stats>();
 
-    QImage screen;
+    std::shared_ptr<const ImageRGB32> screen;
     while (true){
         env.update_stats();
 
@@ -151,7 +151,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         {
             IVCheckerReaderScope reader(env.console, LANGUAGE);
             screen = env.console.video().snapshot();
-            IVCheckerReader::Results results = reader.read(env.console, screen);
+            IVCheckerReader::Results results = reader.read(env.console, *screen);
             bool ok = true;
             ok &= HP.matches(stats.errors, results.hp);
             ok &= ATTACK.matches(stats.errors, results.attack);
@@ -183,7 +183,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     send_program_finished_notification(
         env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        screen, false
+        *screen, false
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }

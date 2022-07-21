@@ -72,7 +72,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
 void GenerateNameOCRDataPokedex::read(
     JsonArray& output,
     LoggerQt& logger,
-    QImage image
+    const ImageViewRGB32& image
 ) const{
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         logger, LANGUAGE, image,
@@ -88,7 +88,7 @@ void GenerateNameOCRDataPokedex::read(
 void GenerateNameOCRDataPokedex::dump_images(
     const std::vector<std::string>& expected,
     size_t index,
-    const QImage& image
+    const ImageViewRGB32& image
 ) const{
     if (index >= expected.size()){
         return;
@@ -107,7 +107,7 @@ void GenerateNameOCRDataPokedex::dump_images(
     path += "-";
     path += now_to_filestring();
     path += ".png";
-    image.save(QString::fromStdString(path));
+    image.save(path);
 
 //    OCR::make_OCR_filter(image).apply(image);
 }
@@ -160,26 +160,26 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
         }
 //        cout << "dex: " << c << endl;
 
-        QImage frame = env.console.video().snapshot();
-        QImage image0 = extract_box_copy(frame, box0);
-        QImage image1 = extract_box_copy(frame, box1);
-        QImage image2 = extract_box_copy(frame, box2);
-        QImage image3 = extract_box_copy(frame, box3);
-        QImage image4 = extract_box_copy(frame, box4);
-        QImage image5 = extract_box_copy(frame, box5);
-        QImage image6 = extract_box_copy(frame, box6);
+        std::shared_ptr<const ImageRGB32> frame = env.console.video().snapshot();
+        ImageViewRGB32 image0 = extract_box_reference(*frame, box0);
+        ImageViewRGB32 image1 = extract_box_reference(*frame, box1);
+        ImageViewRGB32 image2 = extract_box_reference(*frame, box2);
+        ImageViewRGB32 image3 = extract_box_reference(*frame, box3);
+        ImageViewRGB32 image4 = extract_box_reference(*frame, box4);
+        ImageViewRGB32 image5 = extract_box_reference(*frame, box5);
+        ImageViewRGB32 image6 = extract_box_reference(*frame, box6);
 
 //        image1.save("test.png");
 
         switch (MODE){
         case Mode::READ_AND_SAVE:
-            read(actual, env.console, std::move(image0));
-            read(actual, env.console, std::move(image1));
-            read(actual, env.console, std::move(image2));
-            read(actual, env.console, std::move(image3));
-            read(actual, env.console, std::move(image4));
-            read(actual, env.console, std::move(image5));
-            read(actual, env.console, std::move(image6));
+            read(actual, env.console, image0);
+            read(actual, env.console, image1);
+            read(actual, env.console, image2);
+            read(actual, env.console, image3);
+            read(actual, env.console, image4);
+            read(actual, env.console, image5);
+            read(actual, env.console, image6);
             break;
         case Mode::GENERATE_TRAINING_DATA:
             dump_images(expected, c - 1 + 0, image0);
