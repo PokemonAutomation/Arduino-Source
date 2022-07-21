@@ -58,7 +58,7 @@ private:
         bool& bad_read,
         LoggerQt& logger,
         Language language,
-        const QImage& frame,
+        const ImageViewRGB32& frame,
         const ImageFloatBox& box,
         const std::set<std::string>& desired,
         const std::set<std::string>& exclusions
