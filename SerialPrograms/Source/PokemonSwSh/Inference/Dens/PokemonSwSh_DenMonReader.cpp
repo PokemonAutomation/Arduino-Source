@@ -133,7 +133,7 @@ std::string DenMonSelectOption::slug() const{
     if (index == 0){
         return "";
     }
-    return ((const QString&)*this).toStdString();
+    return *this;
 }
 
 
