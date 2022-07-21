@@ -59,7 +59,7 @@ class RaidLobbyReader{
 public:
     RaidLobbyReader(LoggerQt& logger, VideoOverlay& overlay);
 
-    RaidLobbyState read(const QImage& screen);
+    RaidLobbyState read(const ImageViewRGB32& screen);
 
 private:
     LoggerQt& m_logger;

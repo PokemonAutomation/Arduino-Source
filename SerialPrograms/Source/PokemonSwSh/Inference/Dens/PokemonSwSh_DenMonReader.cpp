@@ -47,7 +47,7 @@ public:
 DenSpriteMatcher make_DEN_SPRITE_MATCHER(){
     DenSpriteMatcher matcher;
     for (const auto& item : ALL_POKEMON_SILHOUETTES()){
-        matcher.add(item.first, item.second.sprite.to_QImage_owning());
+        matcher.add(item.first, item.second.sprite);
     }
     return matcher;
 }
@@ -69,9 +69,9 @@ DenMonReader::DenMonReader(LoggerQt& logger, VideoOverlay& overlay)
 {}
 
 
-DenMonReadResults DenMonReader::read(const QImage& screen) const{
+DenMonReadResults DenMonReader::read(const ImageViewRGB32& screen) const{
     DenMonReadResults results;
-    if (screen.isNull()){
+    if (!screen){
         return results;
     }
 

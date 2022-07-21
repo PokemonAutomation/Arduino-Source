@@ -10,6 +10,7 @@
 #include <chrono>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 
@@ -18,6 +19,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+    class VideoOverlay;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -29,7 +31,7 @@ public:
     bool detect(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     ImageFloatBox m_hook_box;
@@ -41,7 +43,7 @@ public:
     FishingHookDetector(VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     VideoOverlay& m_overlay;

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -31,7 +30,7 @@ void YCommMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_bottom);
 }
 
-bool YCommMenuDetector::detect(const QImage& screen){
+bool YCommMenuDetector::detect(const ImageViewRGB32& screen){
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
     if (!is_black(bottom)){
@@ -47,7 +46,7 @@ bool YCommMenuDetector::detect(const QImage& screen){
     return true;
 }
 
-bool YCommMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool YCommMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_is_on ? detect(frame) : !detect(frame);
 }
 

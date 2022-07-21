@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -36,13 +35,13 @@ void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_bot_left);
 }
 
-bool ReceivePokemonDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool ReceivePokemonDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool ret = receive_is_over(frame);
     bool triggered = m_triggered.load(std::memory_order_acquire);
     m_triggered.store(triggered | ret, std::memory_order_release);
     return ret && m_stop_on_detected;
 }
-bool ReceivePokemonDetector::receive_is_over(const QImage& frame){
+bool ReceivePokemonDetector::receive_is_over(const ImageViewRGB32& frame){
     ImageStats stats0 = image_stats(extract_box_reference(frame, m_box_top));
     ImageStats stats1 = image_stats(extract_box_reference(frame, m_box_top_right));
     ImageStats stats2 = image_stats(extract_box_reference(frame, m_box_bot_left));

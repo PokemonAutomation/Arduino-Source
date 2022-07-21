@@ -39,7 +39,7 @@ class DenMonReader{
 public:
     DenMonReader(LoggerQt& logger, VideoOverlay& overlay);
 
-    DenMonReadResults read(const QImage& screen) const;
+    DenMonReadResults read(const ImageViewRGB32& screen) const;
 
 private:
     const ImageMatch::SilhouetteDictionaryMatcher& m_matcher;

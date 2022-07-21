@@ -23,7 +23,7 @@ public:
     bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 protected:
     VideoOverlay& m_overlay;
@@ -46,7 +46,7 @@ public:
 
     //  These are not thread safe.
     int8_t detect(const ImageViewRGB32& screen);
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 
 private:

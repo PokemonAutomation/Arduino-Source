@@ -48,8 +48,8 @@ BattleBallReader::BattleBallReader(
     , m_box_quantity(console, 0.895, 0.624, 0.059, 0.060)
 {}
 
-std::string BattleBallReader::read_ball(const QImage& screen) const{
-    if (screen.isNull()){
+std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
+    if (!screen){
         return "";
     }
 
@@ -106,7 +106,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
     }
     return overlap[0];
 }
-uint16_t BattleBallReader::read_quantity(const QImage& screen) const{
+uint16_t BattleBallReader::read_quantity(const ImageViewRGB32& screen) const{
     ImageRGB32 image = to_blackwhite_rgb32_range(
         extract_box_reference(screen, m_box_quantity),
         0xff808080, 0xffffffff, true

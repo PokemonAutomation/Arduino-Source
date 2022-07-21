@@ -36,7 +36,7 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
 
 //    size_t width = object.width();
 //    size_t height = object.height();
-    QImage cropped = extract_box_reference(image, object).to_QImage_owning();
+    ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
     filter_rgb32(
         object.packed_matrix(),
@@ -85,7 +85,7 @@ bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
     }
     return !m_arrow_boxes.empty();
 }
-bool SelectionArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
+bool SelectionArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     detect(frame);
 //    cout << m_arrow_boxes.size() << endl;
     return !m_arrow_boxes.empty();
@@ -115,7 +115,7 @@ int8_t BattleMoveArrowFinder::detect(const ImageViewRGB32& screen){
     m_arrow_slot.store(slot, std::memory_order_release);
     return slot;
 }
-bool BattleMoveArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
+bool BattleMoveArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     detect(frame);
     return false;
 }

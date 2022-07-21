@@ -25,10 +25,10 @@ public:
     ReceivePokemonDetector(bool stop_on_detected);
 
     bool triggered() const{ return m_triggered.load(std::memory_order_acquire); }
-    bool receive_is_over(const QImage& frame);
+    bool receive_is_over(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     bool m_stop_on_detected;

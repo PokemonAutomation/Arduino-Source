@@ -7,7 +7,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -35,8 +34,8 @@ RaidLobbyReader::RaidLobbyReader(LoggerQt& logger, VideoOverlay& overlay)
     , m_spritebox3(overlay, 0.820, 0.337 + 0.0775*3, 0.034, 0.06)
 {}
 
-RaidLobbyState RaidLobbyReader::read(const QImage& screen){
-    if (screen.isNull()){
+RaidLobbyState RaidLobbyReader::read(const ImageViewRGB32& screen){
+    if (!screen){
         m_logger.log("RaidLobbyReader(): Screenshot failed.", COLOR_PURPLE);
         return RaidLobbyState();
     }

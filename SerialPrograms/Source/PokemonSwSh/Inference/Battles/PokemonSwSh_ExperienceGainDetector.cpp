@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -76,7 +75,7 @@ ExperienceGainWatcher::ExperienceGainWatcher(Color color)
 void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{
     ExperienceGainDetector::make_overlays(items);
 }
-bool ExperienceGainWatcher::process_frame(const QImage& frame, WallClock timestamp){
+bool ExperienceGainWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -41,7 +40,7 @@ bool FishingMissDetector::detect(const ImageViewRGB32& frame){
 
     return true;
 }
-bool FishingMissDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool FishingMissDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -53,7 +52,7 @@ FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
 void FishingHookDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
 }
-bool FishingHookDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool FishingHookDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageViewRGB32 hook_image = extract_box_reference(frame, m_hook_box);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);

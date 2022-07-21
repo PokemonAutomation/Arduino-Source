@@ -28,7 +28,7 @@ public:
     SilhouetteDictionaryMatcher() = default;
     virtual ~SilhouetteDictionaryMatcher() = default;
 
-    void add(const std::string& slug, ImageRGB32 image);
+    void add(const std::string& slug, const ImageViewRGB32& image);
 
     ImageMatchResult match(const ImageViewRGB32& image, double alpha_spread) const;
 

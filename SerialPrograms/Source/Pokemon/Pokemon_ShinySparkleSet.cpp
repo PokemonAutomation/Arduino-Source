@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon_ShinySparkleSet.h"

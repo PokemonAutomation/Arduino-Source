@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -151,7 +150,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
 //    return target->first <= m_max_alpha;
 }
 
-bool OverworldTargetTracker::process_frame(const QImage& frame, WallClock timestamp){
+bool OverworldTargetTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageViewRGB32 image = extract_box_reference(frame, m_search_area);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);

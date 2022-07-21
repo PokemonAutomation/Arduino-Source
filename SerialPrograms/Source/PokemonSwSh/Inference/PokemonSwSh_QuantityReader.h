@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{

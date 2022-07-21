@@ -53,7 +53,7 @@ void ReadableQuantity999::update_with_ocr(
     LoggerQt& logger, const ImageViewRGB32& image,
     int16_t max_quantity_differential
 ){
-    return update_with_ocr(OCR::read_number(logger, image), max_quantity_differential);
+    return update_with_ocr((int16_t)OCR::read_number(logger, image), max_quantity_differential);
 }
 
 

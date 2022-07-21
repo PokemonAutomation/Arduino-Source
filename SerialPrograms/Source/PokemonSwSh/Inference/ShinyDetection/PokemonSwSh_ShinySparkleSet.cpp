@@ -5,7 +5,6 @@
  */
 
 #include <sstream>
-#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"

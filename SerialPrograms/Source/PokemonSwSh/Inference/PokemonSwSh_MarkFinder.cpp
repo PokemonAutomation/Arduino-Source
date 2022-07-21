@@ -22,13 +22,12 @@ using namespace Kernels::Waterfill;
 
 
 void generate_exclamation_mark(){
-    QImage image("ExclamationMark1.png");
-    image = image.scaled(image.width() / 4, image.height() / 4);
-    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    uint32_t* ptr = (uint32_t*)image.bits();
-    size_t words = image.bytesPerLine() / sizeof(uint32_t);
-    for (int r = 0; r < image.height(); r++){
-        for (int c = 0; c < image.width(); c++){
+    ImageRGB32 image("ExclamationMark1.png");
+    image = image.scale_to(image.width() / 4, image.height() / 4);
+    uint32_t* ptr = image.data();
+    size_t words = image.bytes_per_row() / sizeof(uint32_t);
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
             uint32_t& pixel = ptr[r * words + c];
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
@@ -99,7 +98,6 @@ bool is_question_mark(const ImageViewRGB32& image, const WaterfillObject& object
         return false;
     }
 
-//    const QImage& exclamation_mark = QUESTION_TOP();
     ImageViewRGB32 scaled = extract_box_reference(image, object);
 //    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
     double rmsd = QUESTION_TOP().rmsd(scaled);

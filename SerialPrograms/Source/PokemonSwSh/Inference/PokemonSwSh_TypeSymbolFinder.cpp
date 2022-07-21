@@ -223,11 +223,11 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
     for (const auto& item : filtered){
 //        cout << get_type_slug(item.second.first) << ": " << item.first << " - [" << item.second.second.center_x() << "," << item.second.second.center_y() << "]" << endl;
         const ImagePixelBox& box = item.second.second;
-        QImage img = image.copy(
+        ImageViewRGB32 img = image.sub_image(
             box.min_x, box.min_y,
             box.width(), box.height()
         );
-//        img.save("test-" + QString::number(c++) + ".png");
+//        img.save("test-" + std::to_string(c++) + ".png");
     }
 #endif
 

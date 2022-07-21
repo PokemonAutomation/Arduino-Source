@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_LobbyWait_H
 #define PokemonAutomation_PokemonSwSh_LobbyWait_H
 
-#include <QImage>
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

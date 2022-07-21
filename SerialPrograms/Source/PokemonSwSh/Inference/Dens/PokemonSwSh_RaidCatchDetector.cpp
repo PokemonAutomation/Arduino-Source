@@ -34,7 +34,7 @@ void RaidCatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_text1);
     m_arrow.make_overlays(items);
 }
-bool RaidCatchDetector::detect(const QImage& screen){
+bool RaidCatchDetector::detect(const ImageViewRGB32& screen){
     ImageStats left0 = image_stats(extract_box_reference(screen, m_left0));
     if (!is_black(left0)){
         return false;
@@ -79,7 +79,7 @@ bool RaidCatchDetector::detect(const QImage& screen){
 
     return true;
 }
-bool RaidCatchDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool RaidCatchDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;

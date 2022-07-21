@@ -5,7 +5,6 @@
  */
 
 #include <sstream>
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -83,8 +82,8 @@ namespace{
         InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
         context.wait_for(k_wait_after_read);
 
-        QImage screen = console.video().snapshot();
-        ImageViewRGB32 frame = extract_box_reference(screen, box);
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        ImageViewRGB32 frame = extract_box_reference(*screen, box);
 
         OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
             console, language, frame,

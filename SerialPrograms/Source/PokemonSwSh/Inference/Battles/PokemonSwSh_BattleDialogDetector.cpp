@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"

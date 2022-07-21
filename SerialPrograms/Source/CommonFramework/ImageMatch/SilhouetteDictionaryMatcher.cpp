@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-void SilhouetteDictionaryMatcher::add(const std::string& slug, ImageRGB32 image){
+void SilhouetteDictionaryMatcher::add(const std::string& slug, const ImageViewRGB32& image){
     if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Null image.");
     }
