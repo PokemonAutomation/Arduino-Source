@@ -127,7 +127,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
 
 
-    QImage screen;
+    std::shared_ptr<const ImageRGB32> screen;
     while (true){
         roll_den(context, 0, 0, SKIPS, CATCHABILITY);
 
@@ -150,7 +150,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             context.wait_for_all_requests();
 
             screen = env.console.video().snapshot();
-            DenMonReadResults results = reader.read(screen);
+            DenMonReadResults results = reader.read(*screen);
 
             //  Give user time to look at the mon.
             if (FILTER == 0){
@@ -159,7 +159,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             }else if (results.slugs.results.empty()){
                 //  No detection. Keep going.
                 stats.errors++;
-                dump_image(env.console, env.program_info(), "ReadDenMon", screen);
+                dump_image(env.console, env.program_info(), "ReadDenMon", *screen);
                 pbf_wait(context, VIEW_TIME);
             }else{
                 //  Check if we got what we wanted.
@@ -189,7 +189,7 @@ StopProgram:
     send_program_finished_notification(
         env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        screen, false
+        *screen, false
     );
 }
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -45,12 +44,12 @@ void enter_loading_game(
         while (true){
             context.throw_if_cancelled();
 
-            QImage screen = console.video().snapshot();
-            if (screen.isNull()){
+            std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+            if (!screen){
                 console.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
-                bool black = is_black(extract_box_reference(screen, box));
+                bool black = is_black(extract_box_reference(*screen, box));
                 if (black){
                     if (!black_found){
                         console.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
