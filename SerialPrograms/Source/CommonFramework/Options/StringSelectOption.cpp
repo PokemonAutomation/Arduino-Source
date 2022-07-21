@@ -136,7 +136,7 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
     for (const auto& item : m_value.m_case_list){
         m_box->addItem(item.second, QString::fromStdString(item.first));
     }
-    m_box->setCurrentIndex((int)m_value);
+    m_box->setCurrentIndex((int)(size_t)m_value);
     m_box->update_size_cache();
 
     layout->addWidget(m_box, 1);
@@ -160,7 +160,7 @@ void StringSelectWidget::restore_defaults(){
     update_ui();
 }
 void StringSelectWidget::update_ui(){
-    m_box->setCurrentIndex((int)m_value);
+    m_box->setCurrentIndex((int)(size_t)m_value);
 }
 
 

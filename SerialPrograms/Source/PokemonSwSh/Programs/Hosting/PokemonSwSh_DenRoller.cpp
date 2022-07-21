@@ -131,7 +131,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     while (true){
         roll_den(context, 0, 0, SKIPS, CATCHABILITY);
 
-        if (FILTER == 0){
+        if ((size_t)FILTER == 0){
             ring_bell(context, 20);
         }else{
             context.wait_for_all_requests();
@@ -144,7 +144,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
             enter_den(context, 0, SKIPS != 0, false);
 
-            if (FILTER != 0){
+            if ((size_t)FILTER != 0){
                 pbf_wait(context, READ_DELAY);
             }
             context.wait_for_all_requests();
@@ -153,7 +153,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             DenMonReadResults results = reader.read(*screen);
 
             //  Give user time to look at the mon.
-            if (FILTER == 0){
+            if ((size_t)FILTER == 0){
                 //  No filter enabled. Keep going.
                 pbf_wait(context, VIEW_TIME);
             }else if (results.slugs.results.empty()){

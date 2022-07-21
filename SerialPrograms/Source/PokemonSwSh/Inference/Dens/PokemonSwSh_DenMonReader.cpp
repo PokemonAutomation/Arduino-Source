@@ -129,11 +129,11 @@ DenMonSelectOption::DenMonSelectOption(std::string label)
     : StringSelectOption(std::move(label), cases(), "")
 {}
 std::string DenMonSelectOption::slug() const{
-    size_t index = *this;
+    size_t index = (size_t)*this;
     if (index == 0){
         return "";
     }
-    return *this;
+    return (std::string)*this;
 }
 
 
