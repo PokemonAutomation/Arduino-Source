@@ -53,8 +53,8 @@ BeamSetter::Detection BeamSetter::run(
     double min_sigma_ratio
 ){
     //  Grab baseline image.
-    QImage baseline_image = m_console.video().snapshot();
-    if (baseline_image.isNull()){
+    std::shared_ptr<const ImageRGB32> baseline_image = m_console.video().snapshot();
+    if (!*baseline_image){
         m_console.log("BeamSetter(): Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
@@ -62,7 +62,7 @@ BeamSetter::Detection BeamSetter::run(
     std::vector<FloatPixel> baseline_values(m_boxes.size());
     std::vector<FloatPixel> baseline_ratios(m_boxes.size());
     for (size_t c = 0; c < m_boxes.size(); c++){
-        baseline_values[c] = image_average(extract_box_reference(baseline_image, m_boxes[c]));
+        baseline_values[c] = image_average(extract_box_reference(*baseline_image, m_boxes[c]));
         baseline_ratios[c] = baseline_values[c] / baseline_values[c].sum();
     }
 
@@ -82,22 +82,22 @@ BeamSetter::Detection BeamSetter::run(
         std::chrono::milliseconds(50)
     );
 
-    QImage last_screenshot = baseline_image;
+    std::shared_ptr<const ImageRGB32> last_screenshot = baseline_image;
     do{
         //  Take screenshot.
-        QImage current_screenshot = m_console.video().snapshot();
-        if (current_screenshot.isNull()){
+        std::shared_ptr<const ImageRGB32> current_screenshot = m_console.video().snapshot();
+        if (!*current_screenshot){
             m_console.log("BeamSetter(): Screenshot failed.", COLOR_PURPLE);
             return Detection::NO_DETECTION;
         }
 
         //  Text detection.
-        double text_stddev = image_stddev(extract_box_reference(current_screenshot, m_text_box)).sum();
+        double text_stddev = image_stddev(extract_box_reference(*current_screenshot, m_text_box)).sum();
         if (text_stddev < 10){
             low_stddev_flag = true;
         }
 
-        QImage baseline_diff = image_diff_greyscale(baseline_image, current_screenshot);
+        ImageRGB32 baseline_diff = image_diff_greyscale(*baseline_image, *current_screenshot);
         auto now = current_time();
 
         bool purple = false;
@@ -110,8 +110,8 @@ BeamSetter::Detection BeamSetter::run(
         for (size_t c = 0; c < m_boxes.size(); c++){
             FloatStatAccumulator stats = trackers[c].accumulate_all();
 
-            ImageViewRGB32 previous_box = extract_box_reference(last_screenshot, m_boxes[c]);
-            ImageViewRGB32 current_box = extract_box_reference(current_screenshot, m_boxes[c]);
+            ImageViewRGB32 previous_box = extract_box_reference(*last_screenshot, m_boxes[c]);
+            ImageViewRGB32 current_box = extract_box_reference(*current_screenshot, m_boxes[c]);
 
             FloatPixel current_average = image_average(current_box);
             double delta = ImageMatch::pixel_RMSD(current_box, previous_box);
@@ -171,7 +171,7 @@ BeamSetter::Detection BeamSetter::run(
             m_console.log(str, COLOR_BLUE);
             m_console.log("BeamReader(): Purple beam found!", COLOR_BLUE);
             if (save_screenshot){
-                current_screenshot.save("PurpleBeam-" + QString::fromStdString(now_to_filestring()) + ".png");
+                current_screenshot->save("PurpleBeam-" + now_to_filestring() + ".png");
             }
             return Detection::PURPLE;
         }else{

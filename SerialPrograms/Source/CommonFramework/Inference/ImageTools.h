@@ -7,13 +7,15 @@
 #ifndef PokemonAutomation_CommonFramework_ImageTools_H
 #define PokemonAutomation_CommonFramework_ImageTools_H
 
-class QImage;
 
 namespace PokemonAutomation{
 
+class ImageViewRGB32;
+class ImageRGB32;
+
 
 //  Deprecated
-QImage image_diff_greyscale(const QImage& x, const QImage& y);
+ImageRGB32 image_diff_greyscale(const ImageViewRGB32& x, const ImageViewRGB32& y);
 
 
 

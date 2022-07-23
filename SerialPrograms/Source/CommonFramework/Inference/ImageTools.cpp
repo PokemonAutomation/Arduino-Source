@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include <QImage>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "ImageTools.h"
@@ -14,31 +14,31 @@ namespace PokemonAutomation{
 
 
 
-QImage image_diff_greyscale(const QImage& x, const QImage& y){
-    if (x.isNull() || y.isNull()){
-        return QImage();
+ImageRGB32 image_diff_greyscale(const ImageViewRGB32& x, const ImageViewRGB32& y){
+    if (!x || !y){
+        return ImageRGB32();
     }
     if (x.width() != y.width()){
-        return QImage();
+        return ImageRGB32();
     }
     if (x.height() != y.height()){
-        return QImage();
+        return ImageRGB32();
     }
 
-    QImage image(x.width(), x.height(), x.format());
-    pxint_t width = x.width();
-    pxint_t height = x.height();
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
-            QRgb px = x.pixel(c, r);
-            QRgb py = y.pixel(c, r);
+    ImageRGB32 image(x.width(), x.height());
+    size_t width = x.width();
+    size_t height = x.height();
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
+            uint32_t px = x.pixel(c, r);
+            uint32_t py = y.pixel(c, r);
             if (qAlpha(px) == 0 || qAlpha(py) == 0){
-                image.setPixel(c, r, qRgb(0, 0, 0));
+                image.get_pixel(c, r) = 0xff000000;
             }else{
                 double distance = euclidean_distance(px, py);
                 distance *= 0.57735026918962576451;  //  1 / sqrt(3)
-                int dist_int = std::min((int)distance, 255);
-                image.setPixel(c, r, qRgb(dist_int, dist_int, dist_int));
+                uint32_t dist_int = std::min<uint32_t>((uint32_t)distance, 255);
+                image.get_pixel(c, r) = 0xff000000 + dist_int * 0x010101;
             }
         }
     }
