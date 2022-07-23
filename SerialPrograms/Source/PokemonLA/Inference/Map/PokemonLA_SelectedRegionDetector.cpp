@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -20,19 +19,10 @@ namespace PokemonLA{
 
 class MapLocationDetector : public VisualInferenceCallback{
 public:
-    MapLocationDetector(std::shared_ptr<const ImageRGB32> screen)
+    MapLocationDetector()
         : VisualInferenceCallback("MapLocationDetector")
-        , m_screen(std::move(screen))
         , m_current_region(MapRegion::NONE)
-    {
-        m_regions.emplace_back(MapRegion::JUBILIFE,     ImageFloatBox(0.252, 0.400, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::FIELDLANDS,   ImageFloatBox(0.415, 0.550, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::MIRELANDS,    ImageFloatBox(0.750, 0.570, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::COASTLANDS,   ImageFloatBox(0.865, 0.240, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::HIGHLANDS,    ImageFloatBox(0.508, 0.320, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::ICELANDS,     ImageFloatBox(0.457, 0.060, 0.025, 0.150), *m_screen);
-        m_regions.emplace_back(MapRegion::RETREAT,      ImageFloatBox(0.635, 0.285, 0.025, 0.150), *m_screen);
-    }
+    {}
 
     MapRegion current_region() const{
         return m_current_region;
@@ -44,17 +34,20 @@ public:
 //        }
     }
 
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
-        if (!frame){
+    virtual bool process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp) override{
+        if (!*frame){
             return false;
+        }
+        if (m_regions.empty()){
+            reload_reference(frame);
         }
 
         for (RegionState& region : m_regions){
-            ImageViewRGB32 current = extract_box_reference(frame, region.box);
+            ImageViewRGB32 current = extract_box_reference(*frame, region.box);
 
             if (current.width() != (size_t)region.start.width() || current.height() != (size_t)region.start.height()){
-                region.start = current.to_QImage_owning();
-                continue;
+                reload_reference(frame);
+                return false;
             }
 
             double rmsd = ImageMatch::pixel_RMSD(region.start, current);
@@ -64,6 +57,18 @@ public:
             }
         }
         return false;
+    }
+
+    void reload_reference(std::shared_ptr<const ImageRGB32> screen){
+        m_screen = std::move(screen);
+        m_regions.clear();
+        m_regions.emplace_back(MapRegion::JUBILIFE,     ImageFloatBox(0.252, 0.400, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::FIELDLANDS,   ImageFloatBox(0.415, 0.550, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::MIRELANDS,    ImageFloatBox(0.750, 0.570, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::COASTLANDS,   ImageFloatBox(0.865, 0.240, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::HIGHLANDS,    ImageFloatBox(0.508, 0.320, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::ICELANDS,     ImageFloatBox(0.457, 0.060, 0.025, 0.150), *m_screen);
+        m_regions.emplace_back(MapRegion::RETREAT,      ImageFloatBox(0.635, 0.285, 0.025, 0.150), *m_screen);
     }
 
 private:
@@ -85,7 +90,7 @@ private:
 
 
 MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context){
-    MapLocationDetector detector(console.video().snapshot());
+    MapLocationDetector detector;
     int ret = wait_until(
         console, context,
         std::chrono::seconds(2),
