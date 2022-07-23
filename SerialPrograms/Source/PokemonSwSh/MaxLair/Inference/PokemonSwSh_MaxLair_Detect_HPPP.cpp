@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -24,36 +23,6 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-
-
-#if 0
-double read_hp_green(const QImage& image){
-    int width = image.width();
-    int height = image.height();
-    int area = width * height;
-
-    ImageStats stats = image_stats(image);
-    QRgb color = stats.average.round();
-    int bar_R = 0;
-    int bar_G = 1;
-    int bar_B = 0;
-
-    int bar_area = 0;
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
-            QRgb pixel = image.pixel(c, r);
-            int R = qRed(pixel) - bar_R;
-            int G = qGreen(pixel) - bar_G;
-            int B = qBlue(pixel) - bar_B;
-            if (R*R + G*G + B*B < 100*100){
-                bar_area++;
-            }
-        }
-    }
-
-    return (double)bar_area / area;
-}
-#endif
 
 double read_hp_bar_internal(const ImageViewRGB32& image){
     size_t width = image.width();

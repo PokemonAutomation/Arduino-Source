@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -28,7 +27,7 @@ void ItemSelectDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_BLUE, m_bottom_right);
     items.add(COLOR_BLUE, m_blue);
 }
-bool ItemSelectDetector::detect(const QImage& screen) const{
+bool ItemSelectDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats bottom_main = image_stats(extract_box_reference(screen, m_bottom_main));
 //    cout << bottom_main.average << ", " << bottom_main.stddev << endl;
     if (!is_black(bottom_main)){
@@ -46,7 +45,7 @@ bool ItemSelectDetector::detect(const QImage& screen) const{
     }
     return true;
 }
-bool ItemSelectDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool ItemSelectDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);

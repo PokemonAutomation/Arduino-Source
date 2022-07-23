@@ -21,10 +21,10 @@ class PokemonCaughtMenuDetector : public VisualInferenceCallback{
 public:
     PokemonCaughtMenuDetector();
 
-    bool detect(const QImage& screen);
+    bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
@@ -41,7 +41,7 @@ private:
 
 
 
-size_t count_catches(VideoOverlay& overlay, const QImage& screen);
+size_t count_catches(VideoOverlay& overlay, const ImageViewRGB32& screen);
 
 
 

@@ -25,7 +25,7 @@ public:
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     Color m_color;
@@ -33,7 +33,7 @@ private:
     std::chrono::milliseconds m_timeout;
     double m_rmsd_threshold;
     WallClock m_timestamp;
-    ImageRGB32 m_last_delta;
+    ImageRGB32 m_previous;
 };
 
 

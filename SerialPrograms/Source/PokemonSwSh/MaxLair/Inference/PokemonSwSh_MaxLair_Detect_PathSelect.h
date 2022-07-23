@@ -26,10 +26,10 @@ class PathScreenDetector : public VisualInferenceCallback{
 public:
     PathScreenDetector();
 
-    bool detect(const QImage& screen) const;
+    bool detect(const ImageViewRGB32& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     ImageFloatBox m_bottom_main;
@@ -45,10 +45,10 @@ class PathSelectDetector : public PathScreenDetector{
 public:
     PathSelectDetector();
 
-    bool detect(const QImage& screen) const;
+    bool detect(const ImageViewRGB32& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
@@ -69,12 +69,12 @@ public:
     void read_sprites(
         LoggerQt& logger,
         GlobalState& state,
-        const QImage& screen
+        const ImageViewRGB32& screen
     ) const;
     void read_hp(
         LoggerQt& logger,
         GlobalState& state,
-        const QImage& screen
+        const ImageViewRGB32& screen
     ) const;
 
 
@@ -88,15 +88,15 @@ public:
     void read_side(
         LoggerQt& logger,
         GlobalState& state,
-        const QImage& screen
+        const ImageViewRGB32& screen
     );
 
 
 public:
-    void read_sprites(LoggerQt& logger, const QImage& screen, std::string slugs[4]) const;
-    void read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) const;
+    void read_sprites(LoggerQt& logger, const ImageViewRGB32& screen, std::string slugs[4]) const;
+    void read_hp(LoggerQt& logger, const ImageViewRGB32& screen, double hp[4]) const;
 
-    static int8_t read_side(const QImage& image, int p_min_rgb_sum);
+    static int8_t read_side(const ImageViewRGB32& image, int p_min_rgb_sum);
 
 private:
     size_t m_player_index;

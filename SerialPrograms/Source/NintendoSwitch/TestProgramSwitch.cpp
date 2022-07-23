@@ -105,10 +105,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    StandardBattleMenuDetector detector(false);
+    VideoOverlaySet overlays(overlay);
 
-    bool ret = detector.detect(ImageRGB32("screenshot-20220719-005748590044.png"));
+    MaxLairInternal::BattleMenuDetector detector;
+    detector.make_overlays(overlays);
+    bool ret = detector.detect(ImageRGB32("screenshot-20220722-231109920242.png"));
     cout << ret << endl;
+
+
+
+#if 0
+    StandardBattleMenuDetector detector(true);
+
+    bool ret = detector.detect(ImageRGB32("screenshot-20220722-231109920242.png"));
+    cout << ret << endl;
+#endif
+
 
 #if 0
     FrozenImageDetector detector(std::chrono::seconds(10), 20);

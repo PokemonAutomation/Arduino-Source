@@ -63,7 +63,7 @@ bool read_type_array(
     return true;
 }
 
-QImage read_type_array_retry(
+std::shared_ptr<const ImageRGB32> read_type_array_retry(
     ConsoleHandle& console, CancellableScope& scope,
     const ImageFloatBox& box,
     std::deque<InferenceBoxScope>& hits,
@@ -71,11 +71,11 @@ QImage read_type_array_retry(
     PokemonType* type, ImagePixelBox* boxes,
     size_t max_attempts = 3
 ){
-    QImage screen;
+    std::shared_ptr<const ImageRGB32> screen;
     for (size_t c = 0; c < max_attempts; c++){
         screen = console.video().snapshot();
-        if (read_type_array(console, screen, box, hits, count, type, boxes)){
-            return QImage();
+        if (read_type_array(console, *screen, box, hits, count, type, boxes)){
+            return nullptr;
         }
         scope.wait_for(std::chrono::milliseconds(200));
     }
@@ -92,10 +92,10 @@ bool read_path(
 
     std::deque<InferenceBoxScope> hits;
 
-    QImage error_image;
+    std::shared_ptr<const ImageRGB32> error_image;
     error_image = read_type_array_retry(console, context, box, hits, 2, path.mon1, nullptr);
-    if (!error_image.isNull()){
-        dump_image(console, env.program_info(), "ReadPath", error_image);
+    if (error_image){
+        dump_image(console, env.program_info(), "ReadPath", *error_image);
         return false;
     }
 
@@ -103,8 +103,8 @@ bool read_path(
     context.wait_for_all_requests();
     ImagePixelBox boxes[4];
     error_image = read_type_array_retry(console, context, box, hits, 4, path.mon2, boxes);
-    if (!error_image.isNull()){
-        dump_image(console, env.program_info(), "ReadPath", error_image);
+    if (error_image){
+        dump_image(console, env.program_info(), "ReadPath", *error_image);
         return false;
     }
 
@@ -113,17 +113,17 @@ bool read_path(
         context.wait_for_all_requests();
 
         error_image = read_type_array_retry(console, context, box, hits, 4, path.mon3, nullptr);
-        if (error_image.isNull()){
+        if (!error_image){
             break;
         }
         pbf_move_right_joystick(context, 128, 0, 20, 50);
         context.wait_for_all_requests();
         error_image = read_type_array_retry(console, context, box, hits, 4, path.mon3, nullptr);
-        if (error_image.isNull()){
+        if (!error_image){
             break;
         }
 
-        dump_image(console, env.program_info(), "ReadPath", error_image);
+        dump_image(console, env.program_info(), "ReadPath", *error_image);
         return false;
     }
 
@@ -131,8 +131,8 @@ bool read_path(
     context.wait_for_all_requests();
 
     error_image = read_type_array_retry(console, context, box, hits, 1, &path.boss, nullptr);
-    if (!error_image.isNull()){
-        dump_image(console, env.program_info(), "ReadPath", error_image);
+    if (error_image){
+        dump_image(console, env.program_info(), "ReadPath", *error_image);
         return false;
     }
 

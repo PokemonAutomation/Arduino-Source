@@ -16,32 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
-#if 0
-class LobbyReadyButtonDetector  : public VisualInferenceCallbackWithCommandStop{
-public:
-    LobbyReadyButtonDetector(VideoOverlay& overlay);
-
-    bool detect(const QImage& screen);
-
-    virtual bool on_frame(const QImage& frame, WallClock timestamp) override final;
-
-
-private:
-    InferenceBoxScope m_box0;
-    InferenceBoxScope m_box1;
-};
-#endif
-
 
 #if 1
 class LobbyDetector  : public VisualInferenceCallback{
 public:
     LobbyDetector(bool invert);
 
-    bool detect(const QImage& screen);
+    bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
@@ -56,10 +40,10 @@ class LobbyDoneConnecting  : public VisualInferenceCallback{
 public:
     LobbyDoneConnecting();
 
-    bool detect(const QImage& screen);
+    bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
@@ -72,10 +56,10 @@ class LobbyJoinedDetector : public VisualInferenceCallback{
 public:
     LobbyJoinedDetector(size_t consoles, bool invert);
 
-    size_t joined(const QImage& screen, WallClock timestamp);
+    size_t joined(const ImageViewRGB32& screen, WallClock timestamp);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 private:
     size_t m_consoles;
@@ -98,14 +82,11 @@ class LobbyReadyDetector : public VisualInferenceCallback{
 public:
     LobbyReadyDetector();
 
-    size_t ready_players(const QImage& screen);
+    size_t ready_players(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        WallClock timestamp
-    ) override final;
-    virtual bool detect(const QImage& screen) = 0;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
+    virtual bool detect(const ImageViewRGB32& screen) = 0;
 
 
 private:
@@ -118,7 +99,7 @@ private:
 class LobbyMinReadyDetector : public LobbyReadyDetector{
 public:
     LobbyMinReadyDetector(size_t consoles, bool invert);
-    virtual bool detect(const QImage& screen) override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 private:
     size_t m_consoles;
     bool m_invert;
@@ -126,7 +107,7 @@ private:
 class LobbyAllReadyDetector : public LobbyReadyDetector{
 public:
     LobbyAllReadyDetector(size_t consoles);
-    virtual bool detect(const QImage& screen) override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 private:
     size_t m_consoles;
 };

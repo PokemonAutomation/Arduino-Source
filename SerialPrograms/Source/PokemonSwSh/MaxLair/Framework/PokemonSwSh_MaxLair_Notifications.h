@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -48,7 +47,7 @@ void send_shiny_notification(
     const std::set<std::string>* slugs,
     const PathStats& path_stats,
     const Stats& session_stats,
-    const QImage& image
+    const ImageViewRGB32& image
 );
 
 

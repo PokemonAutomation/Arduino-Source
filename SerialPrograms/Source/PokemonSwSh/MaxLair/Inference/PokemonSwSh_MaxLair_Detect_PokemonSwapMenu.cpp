@@ -48,12 +48,12 @@ void PokemonSwapMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_bottom_main);
     items.add(COLOR_RED, m_bottom_right);
 }
-bool PokemonSwapMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool PokemonSwapMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);
 }
-bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
+bool PokemonSwapMenuDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats pink0 = image_stats(extract_box_reference(screen, m_pink0));
     if (!is_solid(pink0, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;
     ImageStats pink1 = image_stats(extract_box_reference(screen, m_pink1));
@@ -113,19 +113,19 @@ PokemonSwapMenuReader::PokemonSwapMenuReader(
     , m_hp2(overlay, 0.226, 0.3435 + 2*0.089, 0.112, 0.005)
     , m_hp3(overlay, 0.226, 0.3435 + 3*0.089, 0.112, 0.005)
 {}
-bool PokemonSwapMenuReader::my_turn(const QImage& screen){
+bool PokemonSwapMenuReader::my_turn(const ImageViewRGB32& screen){
     double box0 = image_average(extract_box_reference(screen, m_select0)).sum();
     if (box0 < 200) return true;
     double box1 = image_average(extract_box_reference(screen, m_select1)).sum();
     if (box1 < 200) return true;
     return false;
 }
-void PokemonSwapMenuReader::read_options(const QImage& screen, std::string option[2]){
+void PokemonSwapMenuReader::read_options(const ImageViewRGB32& screen, std::string option[2]){
     option[0] = read_pokemon_name_sprite(m_logger, screen, m_sprite0, m_name0, m_language, true);
     option[1] = read_pokemon_name_sprite(m_logger, screen, m_sprite1, m_name1, m_language, true);
 }
 
-void PokemonSwapMenuReader::read_hp(const QImage& screen, double hp[4]){
+void PokemonSwapMenuReader::read_hp(const ImageViewRGB32& screen, double hp[4]){
     hp[0] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp0));
     hp[1] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp1));
     hp[2] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp2));
@@ -134,7 +134,7 @@ void PokemonSwapMenuReader::read_hp(const QImage& screen, double hp[4]){
         dump_image(m_logger, MODULE_NAME, "PokemonSwapMenuReader-read_hp", screen);
     }
 }
-void PokemonSwapMenuReader::read_pp(const QImage& screen, int8_t pp[4]){
+void PokemonSwapMenuReader::read_pp(const ImageViewRGB32& screen, int8_t pp[4]){
     pp[0] = read_pp_text(m_logger, extract_box_reference(screen, m_pp0));
     pp[1] = read_pp_text(m_logger, extract_box_reference(screen, m_pp1));
     pp[2] = read_pp_text(m_logger, extract_box_reference(screen, m_pp2));

@@ -5,9 +5,9 @@
  */
 
 #include <cmath>
-#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
@@ -282,16 +282,10 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
         return false;
     }
 
-    QImage cropped = extract_box_reference(image, object).to_QImage_owning();
+    ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
-//    QImage cropped = cropped0;
     PackedBinaryMatrix2 matrix = object.packed_matrix();
-    filter_rgb32(
-        matrix,
-        cropped,
-        Color(0),
-        true
-    );
+    filter_rgb32(matrix, cropped, Color(0), true);
 
 
     ImageStats stats = image_stats(cropped);

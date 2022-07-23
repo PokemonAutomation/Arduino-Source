@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -39,12 +38,12 @@ void PokemonCaughtMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_MAGENTA, m_bottom_black);
     items.add(COLOR_MAGENTA, m_bottom_options);
 }
-bool PokemonCaughtMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool PokemonCaughtMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
 
-bool PokemonCaughtMenuDetector::detect(const QImage& screen){
+bool PokemonCaughtMenuDetector::detect(const ImageViewRGB32& screen){
     ImageStats top_white = image_stats(extract_box_reference(screen, m_top_white));
 //    cout << top_white.average << ", " << top_white.stddev << endl;
     if (!is_solid(top_white, {0.316068, 0.341966, 0.341966})){
@@ -90,7 +89,7 @@ bool PokemonCaughtMenuDetector::detect(const QImage& screen){
 
 
 
-size_t count_catches(VideoOverlay& overlay, const QImage& screen){
+size_t count_catches(VideoOverlay& overlay, const ImageViewRGB32& screen){
     InferenceBoxScope box0(overlay, 0.780, 0.400 + 0*0.133, 0.030, 0.030, COLOR_BLUE);
     InferenceBoxScope box1(overlay, 0.780, 0.400 + 1*0.133, 0.030, 0.030, COLOR_BLUE);
     InferenceBoxScope box2(overlay, 0.780, 0.400 + 2*0.133, 0.030, 0.030, COLOR_BLUE);

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 
-#include <QImage>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -19,17 +19,17 @@ namespace MaxLairInternal{
 
 class EntranceDetector : public VisualInferenceCallback{
 public:
-    EntranceDetector(const QImage& entrance_screen);
+    EntranceDetector(const ImageViewRGB32& entrance_screen);
 
-    bool detect(const QImage& screen);
+    bool detect(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
     ImageFloatBox m_box0;
-    QImage m_entrance_screen;
+    ImageRGB32 m_entrance_screen;
 
 };
 

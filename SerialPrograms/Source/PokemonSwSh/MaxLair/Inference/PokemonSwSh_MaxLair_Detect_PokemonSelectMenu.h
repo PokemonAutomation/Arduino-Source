@@ -23,10 +23,10 @@ class PokemonSelectMenuDetector : public VisualInferenceCallback{
 public:
     PokemonSelectMenuDetector(bool stop_no_detect);
 
-    bool detect(const QImage& screen) const;
+    bool detect(const ImageViewRGB32& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
 
 
 private:
@@ -66,10 +66,10 @@ public:
         Language language
     );
 
-    int8_t who_is_selecting(const QImage& screen) const;
+    int8_t who_is_selecting(const ImageViewRGB32& screen) const;
 
-    std::string read_option(const QImage& screen, size_t index);
-//    void read_options(const QImage& screen, std::string option[3]);
+    std::string read_option(const ImageViewRGB32& screen, size_t index);
+//    void read_options(const ImageViewRGB32& screen, std::string option[3]);
 
 
 private:

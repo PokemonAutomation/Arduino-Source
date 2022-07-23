@@ -75,8 +75,7 @@ struct SpeciesReadDatabase{
 
 std::string read_boss_sprite(ConsoleHandle& console){
     DenMonReader reader(console, console);
-    QImage screen = console.video().snapshot();
-    DenMonReadResults results = reader.read(screen);
+    DenMonReadResults results = reader.read(console.video().snapshot());
 
     std::string sprite_slug;
     {
@@ -147,11 +146,6 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     const ImageFloatBox& box,
     bool allow_exact_match_fallback
 ){
-//    const QImage& sprite = get_pokemon_sprite("galvantula").sprite();
-//    sprite.save("sprite.png");
-//    extract_box(screen, box).scaled(sprite.size()).save("test.png");
-
-
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
     //  Try with cropped matcher.
@@ -287,9 +281,6 @@ std::string read_pokemon_name_sprite(
     const ImageFloatBox& name_box, Language language,
     bool allow_exact_match_fallback
 ){
-//    QImage sprite = extract_box(screen, sprite_box);
-//    QImage name = extract_box(screen, name_box);
-
     ImageViewRGB32 image = extract_box_reference(screen, name_box);
 
     std::set<std::string> ocr_slugs = read_pokemon_name(logger, language, image);

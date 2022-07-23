@@ -49,7 +49,7 @@ bool PokemonSelectMenuDetector::is_pink(const ImageStats& stats){
     }
     return is_solid(stats, {0.448935, 0.176565, 0.3745});
 }
-bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
+bool PokemonSelectMenuDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats box0 = image_stats(extract_box_reference(screen, m_box0));
     if (!is_pink(box0)) return false;
     ImageStats box1 = image_stats(extract_box_reference(screen, m_box1));
@@ -80,7 +80,7 @@ bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
 //    if (select2 < 200) return true;
     return false;
 }
-bool PokemonSelectMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool PokemonSelectMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);
@@ -105,7 +105,7 @@ PokemonSelectMenuReader::PokemonSelectMenuReader(
     , m_player2(overlay, 0.200, 0.335 + 2*0.090, 0.200, 0.060)
     , m_player3(overlay, 0.200, 0.335 + 3*0.090, 0.200, 0.060)
 {}
-int8_t PokemonSelectMenuReader::who_is_selecting(const QImage& screen) const{
+int8_t PokemonSelectMenuReader::who_is_selecting(const ImageViewRGB32& screen) const{
 //    cout << slot0.average << ", " << slot0.stddev << endl;
     ImageStats slot3 = image_stats(extract_box_reference(screen, m_player3));
     if (slot3.stddev.sum() > 30) return 3;
@@ -117,7 +117,7 @@ int8_t PokemonSelectMenuReader::who_is_selecting(const QImage& screen) const{
     if (slot0.stddev.sum() > 30) return 0;
     return -1;
 }
-std::string PokemonSelectMenuReader::read_option(const QImage& screen, size_t index){
+std::string PokemonSelectMenuReader::read_option(const ImageViewRGB32& screen, size_t index){
     switch (index){
     case 0: return read_pokemon_name_sprite(m_logger, screen, m_sprite0, m_name0, m_language, true);
     case 1: return read_pokemon_name_sprite(m_logger, screen, m_sprite1, m_name1, m_language, true);

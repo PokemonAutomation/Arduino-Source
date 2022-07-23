@@ -12,8 +12,6 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
-class QImage;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

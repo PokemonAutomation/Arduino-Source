@@ -21,21 +21,6 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-#if 0
-LobbyReadyButtonDetector::LobbyReadyButtonDetector(VideoOverlay& overlay)
-    : m_box0(overlay, 0.630, 0.695, 0.034, 0.04)
-    , m_box1(overlay, 0.910, 0.695, 0.034, 0.04)
-{}
-bool LobbyReadyButtonDetector::on_frame(const QImage& frame, WallClock timestamp){
-    return detect(frame);
-}
-bool LobbyReadyButtonDetector::detect(const QImage& screen){
-    ImageStats stats0 = pixel_stats(extract_box(screen, m_box0));
-    ImageStats stats1 = pixel_stats(extract_box(screen, m_box1));
-    return is_white(stats0) && is_white(stats1);
-}
-#endif
-
 
 #if 1
 LobbyDetector::LobbyDetector(bool invert)
@@ -48,10 +33,10 @@ void LobbyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_pink);
     items.add(COLOR_RED, m_white);
 }
-bool LobbyDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool LobbyDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
-bool LobbyDetector::detect(const QImage& screen){
+bool LobbyDetector::detect(const ImageViewRGB32& screen){
     ImageStats stats0 = image_stats(extract_box_reference(screen, m_pink));
     ImageStats stats1 = image_stats(extract_box_reference(screen, m_white));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
@@ -76,10 +61,10 @@ void LobbyDoneConnecting::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
     items.add(COLOR_RED, m_player0);
 }
-bool LobbyDoneConnecting::process_frame(const QImage& frame, WallClock timestamp){
+bool LobbyDoneConnecting::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
-bool LobbyDoneConnecting::detect(const QImage& screen){
+bool LobbyDoneConnecting::detect(const ImageViewRGB32& screen){
     ImageStats stats0 = image_stats(extract_box_reference(screen, m_box));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
     if (is_grey(stats0, 0, 200)){
@@ -120,16 +105,16 @@ void LobbyJoinedDetector::make_overlays(VideoOverlaySet& items) const{
     m_player3.make_overlays(items);
 }
 
-size_t LobbyJoinedDetector::joined(const QImage& screen, WallClock timestamp){
+size_t LobbyJoinedDetector::joined(const ImageViewRGB32& screen, WallClock timestamp){
     size_t count = 0;
-    if (m_player0.process_frame(extract_box_copy(screen, m_box0), timestamp)) count++;
-    if (m_player1.process_frame(extract_box_copy(screen, m_box1), timestamp)) count++;
-    if (m_player2.process_frame(extract_box_copy(screen, m_box2), timestamp)) count++;
-    if (m_player3.process_frame(extract_box_copy(screen, m_box3), timestamp)) count++;
+    if (m_player0.process_frame(extract_box_reference(screen, m_box0), timestamp)) count++;
+    if (m_player1.process_frame(extract_box_reference(screen, m_box1), timestamp)) count++;
+    if (m_player2.process_frame(extract_box_reference(screen, m_box2), timestamp)) count++;
+    if (m_player3.process_frame(extract_box_reference(screen, m_box3), timestamp)) count++;
     return count;
 }
 
-bool LobbyJoinedDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool LobbyJoinedDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_invert
         ? joined(frame, timestamp) < m_consoles
         : joined(frame, timestamp) >= m_consoles;
@@ -151,7 +136,7 @@ void LobbyReadyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_checkbox2);
     items.add(COLOR_RED, m_checkbox3);
 }
-size_t LobbyReadyDetector::ready_players(const QImage& screen){
+size_t LobbyReadyDetector::ready_players(const ImageViewRGB32& screen){
     size_t ready = 0;
     ImageStats stats0 = image_stats(extract_box_reference(screen, m_checkbox0));
     ImageStats stats1 = image_stats(extract_box_reference(screen, m_checkbox1));
@@ -163,7 +148,7 @@ size_t LobbyReadyDetector::ready_players(const QImage& screen){
     if (stats3.stddev.sum() > 50) ready++;
     return ready;
 }
-bool LobbyReadyDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool LobbyReadyDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -171,7 +156,7 @@ LobbyMinReadyDetector::LobbyMinReadyDetector(size_t consoles, bool invert)
     : m_consoles(consoles)
     , m_invert(invert)
 {}
-bool LobbyMinReadyDetector::detect(const QImage& screen){
+bool LobbyMinReadyDetector::detect(const ImageViewRGB32& screen){
     return m_invert
         ? ready_players(screen) < m_consoles
         : ready_players(screen) >= m_consoles;
@@ -180,7 +165,7 @@ bool LobbyMinReadyDetector::detect(const QImage& screen){
 LobbyAllReadyDetector::LobbyAllReadyDetector(size_t consoles)
     : m_consoles(consoles)
 {}
-bool LobbyAllReadyDetector::detect(const QImage& screen){
+bool LobbyAllReadyDetector::detect(const ImageViewRGB32& screen){
     return ready_players(screen) >= m_consoles;
 }
 

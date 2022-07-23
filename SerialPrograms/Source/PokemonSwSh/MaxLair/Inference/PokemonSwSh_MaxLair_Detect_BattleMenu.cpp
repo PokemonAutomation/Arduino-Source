@@ -54,7 +54,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_status0);
     items.add(COLOR_YELLOW, m_status1);
 }
-bool BattleMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool BattleMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;
@@ -65,7 +65,7 @@ bool BattleMenuDetector::process_frame(const QImage& frame, WallClock timestamp)
 }
 
 
-bool BattleMenuDetector::detect(const QImage& screen){
+bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     bool fight;
 
     fight = false;
@@ -150,6 +150,7 @@ bool BattleMenuDetector::detect(const QImage& screen){
         m_cheer = fight;
     }
     if (!fight){
+//        cout << "Failed: m_icon_fight" << endl;
         return false;
     }
 
@@ -165,6 +166,7 @@ bool BattleMenuDetector::detect(const QImage& screen){
         qRgb(8, 158, 18), 1.0
     );
     if (!pokemon){
+//        cout << "Failed: m_icon_pokemon" << endl;
         return false;
     }
 
@@ -180,6 +182,7 @@ bool BattleMenuDetector::detect(const QImage& screen){
         qRgb(179, 15, 195), 1.0
     );
     if (!run){
+//        cout << "Failed: m_icon_run" << endl;
         return false;
     }
 
@@ -187,7 +190,9 @@ bool BattleMenuDetector::detect(const QImage& screen){
     //  Check for white status bar in bottom left corner.
     ImageStats status = image_stats(extract_box_reference(screen, m_status0));
     ImageStats health = image_stats(extract_box_reference(screen, m_status1));
+    extract_box_reference(screen, m_status1).save("test.png");
 //    cout << status.average << ", " << status.stddev << endl;
+//    cout << health.average << ", " << health.stddev << endl;
     if (is_white(status, 500, 20) && is_white(health)){
         m_dmaxed = false;
         return true;
@@ -236,10 +241,10 @@ std::set<std::string> BattleMenuReader::read_opponent(
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
-    QImage screen;
+    std::shared_ptr<const ImageRGB32> screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
-        ImageViewRGB32 image = extract_box_reference(screen, m_opponent_name);
+        ImageViewRGB32 image = extract_box_reference(*screen, m_opponent_name);
         result = read_pokemon_name(logger, m_language, image);
         if (!result.empty()){
             return result;
@@ -247,7 +252,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
         logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
         scope.wait_for(std::chrono::seconds(1));
     }
-    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
+    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", *screen);
     return result;
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const ImageViewRGB32& screen) const{
@@ -402,7 +407,7 @@ bool dmax_circle_ready(const ImageViewRGB32& image){
 
     w = 200;
     h = 200;
-    QImage processed = image.scaled_to_QImage(w, h);
+    ImageRGB32 processed = image.scale_to(w, h);
     if (image_stats(processed).stddev.sum() < 75){
         return false;
     }

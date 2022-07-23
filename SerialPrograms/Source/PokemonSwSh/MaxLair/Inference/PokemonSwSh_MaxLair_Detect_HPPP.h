@@ -18,8 +18,6 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-//double read_hp_bar(const QImage& image);
-
 double read_hp_bar(LoggerQt& logger, const ImageViewRGB32& image);
 Health read_in_battle_hp_box(LoggerQt& logger, const ImageViewRGB32& sprite, const ImageViewRGB32& hp_bar);
 int8_t read_pp_text(LoggerQt& logger, const ImageViewRGB32& image);

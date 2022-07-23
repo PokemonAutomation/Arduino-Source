@@ -44,7 +44,7 @@ void PathScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_box3);
 }
 
-bool PathScreenDetector::detect(const QImage& screen) const{
+bool PathScreenDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats box0 = image_stats(extract_box_reference(screen, m_box0));
     if (!is_white(box0, 500, 40)){
 //        global_logger().log("box0 out");
@@ -82,7 +82,7 @@ bool PathScreenDetector::detect(const QImage& screen) const{
     }
     return true;
 }
-bool PathScreenDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool PathScreenDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool ret = detect(frame);
 //    global_logger().log(std::to_string(ret));
     return ret;
@@ -106,7 +106,7 @@ void PathSelectDetector::make_overlays(VideoOverlaySet& items) const{
 //    items.add(COLOR_CYAN, m_dialog_right);
     items.add(COLOR_CYAN, m_left);
 }
-bool PathSelectDetector::detect(const QImage& screen) const{
+bool PathSelectDetector::detect(const ImageViewRGB32& screen) const{
     if (!PathScreenDetector::detect(screen)){
         return false;
     }
@@ -149,7 +149,7 @@ bool PathSelectDetector::detect(const QImage& screen) const{
 //    }
     return true;
 }
-bool PathSelectDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool PathSelectDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool ret = detect(frame);
 //    global_logger().log(std::to_string(ret));
     return ret;
@@ -181,7 +181,7 @@ PathReader::PathReader(VideoOverlay& overlay, size_t player_index)
 {}
 
 
-void PathReader::read_sprites(LoggerQt& logger, const QImage& screen, std::string slugs[4]) const{
+void PathReader::read_sprites(LoggerQt& logger, const ImageViewRGB32& screen, std::string slugs[4]) const{
     slugs[0] = read_pokemon_sprite_with_item(logger, screen, m_sprite0);
     slugs[1] = read_pokemon_sprite_with_item(logger, screen, m_sprite1);
     slugs[2] = read_pokemon_sprite_with_item(logger, screen, m_sprite2);
@@ -193,7 +193,7 @@ void PathReader::read_sprites(LoggerQt& logger, const QImage& screen, std::strin
 void PathReader::read_sprites(
     LoggerQt& logger,
     GlobalState& state,
-    const QImage& screen
+    const ImageViewRGB32& screen
 ) const{
     std::string mons[4];
     read_sprites(logger, screen, mons);
@@ -208,7 +208,7 @@ void PathReader::read_sprites(
 }
 
 
-void PathReader::read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) const{
+void PathReader::read_hp(LoggerQt& logger, const ImageViewRGB32& screen, double hp[4]) const{
     hp[0] = read_hp_bar(logger, extract_box_reference(screen, m_hp0));
     hp[1] = read_hp_bar(logger, extract_box_reference(screen, m_hp1));
     hp[2] = read_hp_bar(logger, extract_box_reference(screen, m_hp2));
@@ -220,7 +220,7 @@ void PathReader::read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) c
 void PathReader::read_hp(
     LoggerQt& logger,
     GlobalState& state,
-    const QImage& screen
+    const ImageViewRGB32& screen
 ) const{
     double hp[4];
     read_hp(logger, screen, hp);
@@ -255,7 +255,7 @@ void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, BotB
 void PathReader::read_side(
     LoggerQt& logger,
     GlobalState& state,
-    const QImage& screen
+    const ImageViewRGB32& screen
 ){
     int8_t path_side = MaxLairInternal::read_side(extract_box_reference(screen, m_path));
     switch (path_side){

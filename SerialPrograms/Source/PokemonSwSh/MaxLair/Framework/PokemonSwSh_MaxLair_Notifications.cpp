@@ -86,7 +86,7 @@ void send_raid_notification(
         return;
     }
 
-    QImage screen = console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
 
     std::vector<std::pair<std::string, std::string>> embeds;
 
@@ -134,7 +134,7 @@ void send_raid_notification(
         env.program_info(),
         "Max Lair Notification",
         embeds,
-        screen, false
+        *screen, false
     );
 
 }
@@ -147,7 +147,7 @@ void send_shiny_notification(
     const std::set<std::string>* slugs,
     const PathStats& path_stats,
     const Stats& session_stats,
-    const QImage& image
+    const ImageViewRGB32& image
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
     embeds.emplace_back(

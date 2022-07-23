@@ -37,19 +37,19 @@ FrozenImageDetector::FrozenImageDetector(
 void FrozenImageDetector::make_overlays(VideoOverlaySet& set) const{
     set.add(m_color, m_box);
 }
-bool FrozenImageDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool FrozenImageDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageRGB32 image = extract_box_reference(frame, m_box).copy();
-    if (m_last_delta.width() != image.width() || m_last_delta.height() != image.height()){
+    if (m_previous.width() != image.width() || m_previous.height() != image.height()){
         m_timestamp = timestamp;
-        m_last_delta = std::move(image);
+        m_previous = std::move(image);
         return false;
     }
 
-    double rmsd = ImageMatch::pixel_RMSD(m_last_delta, image);
+    double rmsd = ImageMatch::pixel_RMSD(m_previous, image);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd > m_rmsd_threshold){
         m_timestamp = timestamp;
-        m_last_delta = std::move(image);
+        m_previous = std::move(image);
         return false;
     }
 
