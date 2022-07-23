@@ -10,6 +10,7 @@
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageBoxes.h"
 
 #include <iostream>
@@ -245,8 +246,8 @@ QImage extract_object_from_inner_feature(
 }
 
 
-void draw_box(const ImageRef& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
-    if (thickness == 0 || image.width() <= 0 || image.height() <= 0){
+void draw_box(const ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
+    if (thickness == 0 || image.width() == 0 || image.height() == 0){
         return;
     }
 
@@ -271,7 +272,7 @@ void draw_box(const ImageRef& image, const ImagePixelBox& pixel_box, uint32_t co
         for (pxint_t y = start_y; y <= end_y; ++y){
             for (pxint_t x = start_x; x <= end_x; ++x){
                 // setPixelColor(x, y, qColor);
-                image.pixel(x, y) = color;
+                image.get_pixel(x, y) = color;
             }
         }
     };

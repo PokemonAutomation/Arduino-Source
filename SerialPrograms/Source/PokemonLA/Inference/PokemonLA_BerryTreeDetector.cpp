@@ -14,6 +14,7 @@
 #include "Common/Cpp/Time.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
@@ -87,7 +88,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
 }
 
 
-bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, QImage* image, size_t offset_x, size_t offset_y){
+bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, ImageRGB32* image, size_t offset_x, size_t offset_y){
     PackedBinaryMatrix2 matrix = object.packed_matrix();
 
     cout << "Object area in detection sphere: " << object.area << endl;
@@ -112,19 +113,18 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, QImage* im
         num_regions++;
 
         if (image){
-            QColor color = QColor(0, 0, 255);
+            Color color(0, 0, 255);
             if (num_regions == 1){
-                color = QColor(128, 128, 255);
+                color = Color(128, 128, 255);
             }
             // cout << "cut area " << obj.area << endl;
             for (size_t x = 0; x < obj.width(); x++){
                 for (size_t y = 0; y < obj.height(); y++){
                     if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                        image->setPixelColor(
+                        image->get_pixel(
                             (pxint_t)(object.min_x + offset_x + obj.min_x + x),
-                            (pxint_t)(offset_y + object.min_y + obj.min_y + y),
-                            color
-                        );
+                            (pxint_t)(offset_y + object.min_y + obj.min_y + y)
+                        ) = (uint32_t)color;
                         // cout << "Set color at " << offset_x + object.min_x + obj.min_x + x << ", " << offset_y + object.min_y + obj.min_y + y << endl;
                     }
                 }
@@ -200,7 +200,7 @@ void BerryTreeDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 //  Return true if the inference session should stop.
-bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
+bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     
     // First, use the core-color of the berry to find candidate locations:
 
@@ -215,7 +215,7 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
             // {combine_rgb(70, 30, 0), combine_rgb(160, 110, 100)}
         });
 
-    QImage debug_image = frame.copy();
+    ImageRGB32 debug_image = frame.copy();
 
     //  Create the session and reuse it for each matrix.
     std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
