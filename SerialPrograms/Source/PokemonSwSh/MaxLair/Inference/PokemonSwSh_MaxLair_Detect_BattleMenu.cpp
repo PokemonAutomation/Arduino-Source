@@ -41,7 +41,7 @@ BattleMenuDetector::BattleMenuDetector()
 //    , m_info_left   (0.907, 0.500, 0.02, 0.03)
 //    , m_info_right  (0.970, 0.500, 0.02, 0.03)
     , m_status0     (0.280, 0.870, 0.015, 0.030)
-    , m_status1     (0.165, 0.945, 0.100, 0.020)
+    , m_status1     (0.165, 0.945, 0.100, 0.015)
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_icon_fight);

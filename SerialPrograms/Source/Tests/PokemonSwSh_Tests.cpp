@@ -10,6 +10,7 @@
 #include "TestUtils.h"
 
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
 #include <QFileInfo>
 #include <QImage>
@@ -31,6 +32,14 @@ int test_pokemonSwSh_YCommMenuDetector(const QImage& image, bool target){
     YCommMenuDetector detector(true);
 
     bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSwSh_MaxLair_BattleMenuDetector(const QImage& image, bool target){
+    MaxLairInternal::BattleMenuDetector detector;
+
+    bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }

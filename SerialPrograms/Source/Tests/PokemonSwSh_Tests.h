@@ -18,6 +18,8 @@ namespace PokemonAutomation{
 
 int test_pokemonSwSh_YCommMenuDetector(const QImage& image, bool target);
 
+int test_pokemonSwSh_MaxLair_BattleMenuDetector(const QImage& image, bool target);
+
 
 }
 
