@@ -117,7 +117,7 @@ bool on_shiny_callback(
         env.program_info(),
         "Detected Shiny Sound",
         embeds,
-        console.video().snapshot().frame, true
+        console.video().snapshot(), true
     );
     return false;
 }

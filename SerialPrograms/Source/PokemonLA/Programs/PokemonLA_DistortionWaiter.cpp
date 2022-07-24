@@ -144,7 +144,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         env.program_info(),
         "Found Distortion",
         {{"Session Stats", stats.to_str()}},
-        env.console.video().snapshot().frame
+        env.console.video().snapshot()
     );
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
 }

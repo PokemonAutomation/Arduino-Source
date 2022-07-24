@@ -82,7 +82,7 @@ bool reset_game_from_home(
     ok &= switch_home_to_gamemenu(console, context, tolerate_update_menu);
     ok &= gamemenu_to_ingame(console, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
     if (!ok){
-        dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot().frame);
+        dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);

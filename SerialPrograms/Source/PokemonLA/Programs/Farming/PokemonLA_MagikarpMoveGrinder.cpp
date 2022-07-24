@@ -113,7 +113,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot().frame);
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
@@ -183,7 +183,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot().frame);
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 

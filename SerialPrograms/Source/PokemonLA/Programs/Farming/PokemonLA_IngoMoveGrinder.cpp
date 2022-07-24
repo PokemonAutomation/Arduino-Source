@@ -210,7 +210,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot().frame);
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
             throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 

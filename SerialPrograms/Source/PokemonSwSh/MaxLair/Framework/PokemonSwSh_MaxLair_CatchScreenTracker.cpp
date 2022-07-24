@@ -87,7 +87,7 @@ void CaughtPokemonScreen::leave_summary(){
         m_context.wait_for_all_requests();
         break;
     default:
-        dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot().frame);
+        dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
         throw OperationFailedException(m_console, "Failed to detect caught menu.");
     }
 
@@ -115,7 +115,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        dump_image(m_console, m_env.program_info(), "SummaryScreen", m_console.video().snapshot().frame);
+        dump_image(m_console, m_env.program_info(), "SummaryScreen", m_console.video().snapshot());
         throw OperationFailedException(m_console, "Failed to detect summary screen.");
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
@@ -123,7 +123,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot().frame);
+            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
         throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a non-shiny.");
         }
         break;
@@ -133,7 +133,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot().frame);
+            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
             throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a shiny.");
         }
         break;

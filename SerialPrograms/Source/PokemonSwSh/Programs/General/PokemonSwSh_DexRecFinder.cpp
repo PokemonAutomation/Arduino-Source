@@ -243,7 +243,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     send_program_finished_notification(
         env, NOTIFICATION_PROGRAM_FINISH,
         "Found a match!",
-        env.console.video().snapshot().frame, false
+        env.console.video().snapshot(), false
     );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }

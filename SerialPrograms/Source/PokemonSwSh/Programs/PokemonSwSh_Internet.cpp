@@ -41,7 +41,7 @@ bool connect_to_internet_with_inference(
             console.log("Y-COMM detected.");
         }else{
             console.log("Failed to detect Y-COMM after timeout.", COLOR_RED);
-            dump_image(console, ProgramInfo(), "connect_to_internet_with_inference", console.video().snapshot().frame);
+            dump_image(console, ProgramInfo(), "connect_to_internet_with_inference", console.video().snapshot());
             ok = false;
         }
     }

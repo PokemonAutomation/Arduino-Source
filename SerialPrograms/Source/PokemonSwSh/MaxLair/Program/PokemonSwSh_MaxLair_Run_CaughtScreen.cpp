@@ -50,7 +50,7 @@ StateMachineAction mash_A_to_entrance(
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
         runtime.session_stats.add_error();
-        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot().frame);
+        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
         return StateMachineAction::RESET_RECOVER;
     }
     return StateMachineAction::KEEP_GOING;

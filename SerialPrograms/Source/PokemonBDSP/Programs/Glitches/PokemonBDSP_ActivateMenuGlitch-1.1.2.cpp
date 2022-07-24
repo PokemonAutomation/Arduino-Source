@@ -73,7 +73,7 @@ void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
 
     context.wait_for(std::chrono::milliseconds(500));
     ShortDialogDetector dialog;
-    while (dialog.detect(console.video().snapshot().frame)){
+    while (dialog.detect(console.video().snapshot())){
         console.log("Overshot mashing. Backing out.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_B, 20, 105);
         context.wait_for_all_requests();

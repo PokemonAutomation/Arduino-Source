@@ -65,7 +65,7 @@ bool read_battle_menu(
         pbf_press_dpad(context, DPAD_UP, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
-        mon = reader.read_opponent_in_summary(console, console.video().snapshot().frame);
+        mon = reader.read_opponent_in_summary(console, console.video().snapshot());
         pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
         state.opponent = std::move(mon);
 
@@ -85,7 +85,7 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot().frame);
+        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot());
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",
