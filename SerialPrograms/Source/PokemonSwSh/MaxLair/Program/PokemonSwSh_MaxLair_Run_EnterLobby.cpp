@@ -54,7 +54,7 @@ public:
         items.add(COLOR_RED, m_box0);
         items.add(COLOR_RED, m_box1);
     }
-    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         return detect(frame);
     }
 
