@@ -168,9 +168,9 @@ bool CameraHolder::determine_frame_orientation(){
     //  This function cannot be called on the UI thread.
     //  This function must be called under the lock.
 
-    QImage reference = m_screenshotter.snapshot().frame;
+    std::shared_ptr<const ImageRGB32> reference = m_screenshotter.snapshot();
     QImage frame = direct_snapshot_probe(false);
-    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
+    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, *reference, frame, m_flip_vertical);
     return m_orientation_known;
 }
 VideoSnapshot CameraHolder::snapshot_image(){
@@ -184,7 +184,7 @@ VideoSnapshot CameraHolder::snapshot_image(){
     {
         SpinLockGuard lg1(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.frame.isNull()){
+        if (m_last_image){
             if (m_probe){
                 //  If we have the probe enabled, we know if a new frame has been pushed.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
@@ -209,6 +209,7 @@ VideoSnapshot CameraHolder::snapshot_image(){
     return m_last_image;
 }
 VideoSnapshot CameraHolder::snapshot_probe(){
+//    cout << "snapshot_probe()" << endl;
 //    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
@@ -222,7 +223,7 @@ VideoSnapshot CameraHolder::snapshot_probe(){
     {
         SpinLockGuard lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.frame.isNull() && m_last_image_seqnum == frame_seqnum){
+        if (m_last_image && m_last_image_seqnum == frame_seqnum){
             return m_last_image;
         }
         frame = m_last_frame;
@@ -231,8 +232,10 @@ VideoSnapshot CameraHolder::snapshot_probe(){
 
     WallClock time0 = current_time();
 
-    m_last_image.frame = frame_to_image(m_logger, frame, m_flip_vertical);
-    m_last_image.timestamp = frame_timestamp;
+    m_last_image = VideoSnapshot(
+        frame_to_image(m_logger, frame, m_flip_vertical),
+        frame_timestamp
+    );
     m_last_image_seqnum = frame_seqnum;
 
     WallClock time1 = current_time();

@@ -88,18 +88,18 @@ QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical){
 
 
 bool determine_frame_orientation(
-    Logger& logger, const QImage& reference, const QImage& image,
+    Logger& logger, const ImageViewRGB32& reference, const ImageViewRGB32& image,
     bool& flip_vertical
 ){
     std::string str;
     str += "Attempting to determine frame orientation... ";
 
-    if (reference.isNull()){
+    if (!reference){
         str += "Image is null.";
         logger.log(str, COLOR_RED);
         return false;
     }
-    if (image.isNull()){
+    if (!image){
         str += "Frame is null.";
         logger.log(str, COLOR_RED);
         return false;
@@ -127,7 +127,7 @@ bool determine_frame_orientation(
     stddev_inv = 1 / stddev_inv;
 
     double identity         = stddev_inv * ImageMatch::pixel_RMSD(reference, image);
-    double flipped_vertical = stddev_inv * ImageMatch::pixel_RMSD(reference, image.mirrored(false, true));
+    double flipped_vertical = stddev_inv * ImageMatch::pixel_RMSD(reference, image.to_QImage_ref().mirrored(false, true));
     str += "    Identity = " + tostr_default(identity) + "\n";
     str += "    Flipped Vertical = " + tostr_default(flipped_vertical) + "\n";
 

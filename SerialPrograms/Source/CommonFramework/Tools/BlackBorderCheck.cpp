@@ -20,7 +20,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
         return;
     }
 
-    ImageRGB32 screen = console.video().snapshot().frame;
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
 
     if (!screen){
         if (feedback == FeedbackType::REQUIRED){
@@ -33,7 +33,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
     VideoOverlaySet set(console);
     detector.make_overlays(set);
 
-    if (detector.detect(screen)){
+    if (detector.detect(*screen)){
         throw UserSetupError(console, "Black border detected! Please set your screen size to 100%.");
     }
 }

@@ -150,7 +150,7 @@ QImage CameraModeSelfRender::get_display_image(){
     return m_last_display;
 }
 uint64_t CameraModeSelfRender::snapshot(VideoSnapshot& image){
-    if (!m_last_image.frame.isNull() && m_last_image_seqnum == m_last_frame_seqnum){
+    if (m_last_image && m_last_image_seqnum == m_last_frame_seqnum){
         image = m_last_image;
         return m_last_frame_seqnum;
     }
@@ -162,8 +162,10 @@ uint64_t CameraModeSelfRender::snapshot(VideoSnapshot& image){
         image = m_last_image;
         return m_last_frame_seqnum;
     }
-    m_last_image.frame = std::move(current_image);
-    m_last_image.timestamp = m_last_frame_timestamp;
+    m_last_image = VideoSnapshot(
+        std::move(current_image),
+        m_last_frame_timestamp
+    );
     m_last_image_seqnum = m_last_frame_seqnum;
 
     WallClock time1 = current_time();

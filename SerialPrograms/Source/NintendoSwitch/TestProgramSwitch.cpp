@@ -105,13 +105,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    std::shared_ptr<const ImageRGB32> image = feed.snapshot();
+
+    cout << image->width() << " x " << image->height() << endl;
+
+    cout << image->save("test.png") << endl;
+
+
+#if 0
     VideoOverlaySet overlays(overlay);
 
     MaxLairInternal::BattleMenuDetector detector;
     detector.make_overlays(overlays);
     bool ret = detector.detect(ImageRGB32("screenshot-20220722-231109920242.png"));
     cout << ret << endl;
-
+#endif
 
 
 #if 0

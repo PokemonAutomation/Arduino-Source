@@ -20,6 +20,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
 #include "CameraImplementations.h"
+#include "VideoToolsQt5.h"
 #include "VideoWidget.h"
 
 namespace PokemonAutomation{
@@ -60,7 +61,7 @@ public:
 
 private:
     //  All of these must be called under the lock.
-    QImage direct_snapshot_image();
+    VideoSnapshot direct_snapshot_image();
     QImage direct_snapshot_probe(bool flip_vertical);
 
     VideoSnapshot snapshot_image();

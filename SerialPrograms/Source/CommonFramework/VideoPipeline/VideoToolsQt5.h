@@ -31,7 +31,7 @@ std::string qt5_get_camera_name(const CameraInfo& info);
 QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical);
 
 bool determine_frame_orientation(
-    Logger& logger, const QImage& reference, const QImage& image,
+    Logger& logger, const ImageViewRGB32& reference, const ImageViewRGB32& image,
     bool& flip_vertical
 );
 

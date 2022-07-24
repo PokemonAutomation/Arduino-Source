@@ -155,12 +155,12 @@ void VideoWidget::set_resolution(const QSize& size){
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
-QImage VideoWidget::direct_snapshot_image(){
+VideoSnapshot VideoWidget::direct_snapshot_image(){
 //    std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
-        return QImage();
+        return VideoSnapshot();
     }
-    return m_screenshotter.snapshot().frame;
+    return m_screenshotter.snapshot();
 }
 QImage VideoWidget::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
@@ -217,9 +217,10 @@ VideoSnapshot VideoWidget::snapshot_image(){
     m_last_image_seqnum = frame_seqnum;
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+    return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
 VideoSnapshot VideoWidget::snapshot_probe(){
+//    cout << "snapshot_probe()" << endl;
 //    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
@@ -249,7 +250,7 @@ VideoSnapshot VideoWidget::snapshot_probe(){
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
-    return VideoSnapshot{m_last_image, frame_timestamp};
+    return VideoSnapshot(m_last_image, frame_timestamp);
 }
 
 VideoSnapshot VideoWidget::snapshot(){
@@ -314,9 +315,9 @@ bool VideoWidget::determine_frame_orientation(){
     //  This function cannot be called on the UI thread.
     //  This function must be called under the lock.
 
-    QImage reference = direct_snapshot_image();
+    std::shared_ptr<const ImageRGB32> reference = direct_snapshot_image();
     QImage frame = direct_snapshot_probe(false);
-    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
+    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, *reference, frame, m_flip_vertical);
     return m_orientation_known;
 }
 
