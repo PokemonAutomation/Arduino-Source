@@ -124,8 +124,8 @@ void TrainingSession::generate_small_dictionary(
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
-                QImage image(QString::fromStdString(m_directory + sample.filepath));
-                if (image.isNull()){
+                ImageRGB32 image(m_directory + sample.filepath);
+                if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }
@@ -206,8 +206,8 @@ void TrainingSession::generate_large_dictionary(
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
-                QImage image(QString::fromStdString(m_directory + sample.filepath));
-                if (image.isNull()){
+                ImageRGB32 image(m_directory + sample.filepath);
+                if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }

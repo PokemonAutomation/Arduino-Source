@@ -8,13 +8,11 @@
 #ifndef PokemonAutomation_CommonFramework_WaterfillUtilities_H
 #define PokemonAutomation_CommonFramework_WaterfillUtilities_H
 
+#include <utility>
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
-#include <utility>
-
-class QImage;
-
 namespace PokemonAutomation{
+    class ImageRGB32;
 namespace Kernels{
 namespace Waterfill{
     class WaterfillObject;
@@ -41,7 +39,7 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
 // offset_x, offset_y: the offset of the matrix when rendered on the image.
 void draw_matrix_on_image(
     const PackedBinaryMatrix2& matrix,
-    uint32_t color, QImage& image, size_t offset_x, size_t offset_y
+    uint32_t color, ImageRGB32& image, size_t offset_x, size_t offset_y
 );
 
 // Draw waterfill object on an image. Used for debugging the waterfill object.
@@ -50,7 +48,7 @@ void draw_matrix_on_image(
 // offset_x, offset_y: the offset of the object when rendered on the image.
 void draw_object_on_image(
     const Kernels::Waterfill::WaterfillObject& object,
-    const uint32_t& color, QImage& image, size_t offset_x, size_t offset_y
+    const uint32_t& color, ImageRGB32& image, size_t offset_x, size_t offset_y
 );
 
 }

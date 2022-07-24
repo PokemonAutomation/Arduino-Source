@@ -5,8 +5,8 @@
  */
 
 #include <cmath>
-#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -40,7 +40,7 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
         {combine_rgb(120, 0, 0), combine_rgb(255, 100, 100)},
     });
 
-    QImage output = region.to_QImage_owning();
+    ImageRGB32 output = region.copy();
 
     std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
     session->set_source(matrix);
@@ -126,7 +126,7 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     float red_marker_direction = end_angles[(min_angle_distance_index+2)%3];
     cout << "Found red marker direction " << red_marker_direction << endl;
 
-    output.setPixelColor((int)red_marker_obj.center_x(), (int)red_marker_obj.center_y(), QColor(255, 0, 0));
+    output.pixel(red_marker_obj.center_x(), red_marker_obj.center_y()) = (uint32_t)Color(255, 0, 0);
     output.save("./test_map_location.png");
 
     return red_marker_direction;

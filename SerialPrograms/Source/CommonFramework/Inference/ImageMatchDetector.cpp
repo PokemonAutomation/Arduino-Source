@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <QImage>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"

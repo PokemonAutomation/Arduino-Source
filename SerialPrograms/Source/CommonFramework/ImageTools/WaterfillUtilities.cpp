@@ -5,10 +5,9 @@
  */
 
 #include <map>
-#include <QImage>
-#include <QColor>
 #include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "WaterfillUtilities.h"
 
 namespace PokemonAutomation{
@@ -65,18 +64,12 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
 
 void draw_matrix_on_image(
     const PackedBinaryMatrix2& matrix,
-    uint32_t color, QImage& image, size_t offset_x, size_t offset_y
+    uint32_t color, ImageRGB32& image, size_t offset_x, size_t offset_y
 ){
-    const Color c(color);
-    const QColor q_color(c.r(), c.g(), c.b());
     for (size_t x = 0; x < matrix.width(); x++){
         for (size_t y = 0; y < matrix.height(); y++){
             if (matrix.get(x, y)){
-                image.setPixelColor(
-                    int(offset_x + x),
-                    int(offset_y + y),
-                    q_color
-                );
+                image.pixel(offset_x + x, offset_y + y) = (uint32_t)color;
             }
         }
     }
@@ -85,18 +78,12 @@ void draw_matrix_on_image(
 
 void draw_object_on_image(
     const Kernels::Waterfill::WaterfillObject& obj,
-    const uint32_t& color, QImage& image, size_t offset_x, size_t offset_y
+    const uint32_t& color, ImageRGB32& image, size_t offset_x, size_t offset_y
 ){
-    const Color c(color);
-    const QColor q_color(c.r(), c.g(), c.b());
     for (size_t x = 0; x < obj.width(); x++){
         for (size_t y = 0; y < obj.height(); y++){
             if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                image.setPixelColor(
-                    int(offset_x + obj.min_x + x),
-                    int(offset_y + obj.min_y + y),
-                    q_color
-                );
+                image.pixel(offset_x + obj.min_x + x, offset_y + obj.min_y + y) = color;
                 // cout << "Set color at " << offset_x + object.min_x + obj.min_x + x << ", " << offset_y + object.min_y + obj.min_y + y << endl;
             }
         }

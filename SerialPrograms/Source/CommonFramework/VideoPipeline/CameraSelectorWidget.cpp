@@ -210,12 +210,12 @@ void CameraSelectorWidget::set_overlay_enabled(bool enabled){
 
 VideoSnapshot CameraSelectorWidget::snapshot(){
     if (!m_snapshots_allowed.load(std::memory_order_acquire)){
-        return VideoSnapshot{QImage(), current_time()};
+        return VideoSnapshot();
     }
 
     std::unique_lock<std::mutex> lg(m_camera_lock);
     if (!m_display){
-        return VideoSnapshot{QImage(), current_time()};
+        return VideoSnapshot();
     }
 
     return m_display.snapshot();

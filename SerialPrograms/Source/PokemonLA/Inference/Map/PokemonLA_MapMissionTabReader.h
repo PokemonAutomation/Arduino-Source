@@ -8,9 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_MapMissionTabReader_H
 #define PokemonAutomation_PokemonLA_MapMissionTabReader_H
 
-class QImage;
-
 namespace PokemonAutomation{
+    class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

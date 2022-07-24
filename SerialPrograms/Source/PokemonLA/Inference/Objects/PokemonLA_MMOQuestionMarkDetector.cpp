@@ -5,7 +5,6 @@
  */
 
 #include <functional>
-#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -111,10 +110,10 @@ bool detect_template_by_single_pass_waterfill(
     auto matrix = compress_rgb32_to_binary_multirange(image, filters);
 
     static int debug_count = 0;
-    std::unique_ptr<QImage> debug_image;
+    ImageRGB32 debug_image;
     if (debug_params){
-        debug_image = std::make_unique<QImage>(image.to_QImage_owning());
-        draw_matrix_on_image(matrix, debug_params->filter_color, *debug_image, 0, 0);
+        debug_image = image.copy();
+        draw_matrix_on_image(matrix, debug_params->filter_color, debug_image, 0, 0);
     }
 
     std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
@@ -136,7 +135,7 @@ bool detect_template_by_single_pass_waterfill(
         
         if (rmsd < rmsd_threshold){
             if (debug_params){
-                draw_object_on_image(object, debug_params->match_color, *debug_image, 0, 0);
+                draw_object_on_image(object, debug_params->match_color, debug_image, 0, 0);
             }
             detected = true;
             
@@ -149,7 +148,7 @@ bool detect_template_by_single_pass_waterfill(
     if (debug_params){
         std::ostringstream os;
         os << debug_params->base_filename << std::setfill('0') << std::setw(3) << debug_count << ".png";
-        debug_image->save(QString::fromStdString(os.str()));
+        debug_image.save(os.str());
         debug_count++;
     }
 

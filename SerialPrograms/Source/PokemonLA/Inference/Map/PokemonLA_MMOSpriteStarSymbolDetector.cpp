@@ -80,7 +80,7 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
         }
     }
 
-    // QImage output = frame;
+    // ImageRGB32 output = frame.copy();
     // for(size_t i = 0; i < m_boxes.size(); i++){
     //     draw_box(output, m_boxes[i], combine_rgb(255, 0,0));
     //     draw_box(output, ImagePixelBox(m_boxes[i].center_x()-1, m_boxes[i].center_y()-1, m_boxes[i].center_x()+1, m_boxes[i].center_y()+1), 

@@ -7,8 +7,6 @@
 #include "ImageBoxes.h"
 #include "SolidColorTest.h"
 
-#include <QImage>
-
 #include <sstream>
 #include <iostream>
 using std::cout;
@@ -69,12 +67,12 @@ bool is_solid(
     return distance <= max_euclidean_distance;
 }
 
-bool ImageSolidCheck::check(const QImage& frame) const{
+bool ImageSolidCheck::check(const ImageViewRGB32& frame) const{
     const ImageStats stats = image_stats(extract_box_reference(frame, box));
     return is_solid(stats, expected_color_ratio, max_euclidean_distance, max_stddev_sum);
 }
 
-std::string ImageSolidCheck::debug_string(const QImage& frame) const{
+std::string ImageSolidCheck::debug_string(const ImageViewRGB32& frame) const{
     std::ostringstream oss;
     const ImageStats stats = image_stats(extract_box_reference(frame, box));
     oss << "Box (" << box.x << ", " << box.y << ", " << box.width << ", " << box.height << ") ";

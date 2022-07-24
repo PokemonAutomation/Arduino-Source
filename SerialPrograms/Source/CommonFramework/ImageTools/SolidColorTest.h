@@ -15,8 +15,6 @@
 //using std::cout;
 //using std::endl;
 
-class QImage;
-
 namespace PokemonAutomation{
 
 
@@ -96,10 +94,10 @@ struct ImageSolidCheck{
         , max_stddev_sum(max_stddev_sum) {}
     
     // Check if the area on the image is a solid color.
-    bool check(const QImage& image) const;
+    bool check(const ImageViewRGB32& image) const;
 
     // Return a debug string on the checks performed on the image.
-    std::string debug_string(const QImage& image) const;
+    std::string debug_string(const ImageViewRGB32& image) const;
 };
 
 
