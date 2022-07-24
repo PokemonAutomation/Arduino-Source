@@ -31,19 +31,22 @@ public:
     ImageRGB32(size_t width, size_t height);
     ImageRGB32(const std::string& filename);
 
+    //  Fill the entire image with the specified pixel.
     using ImageViewPlanar32::fill;
 
 
 public:
+    //  Returns true if this image is valid. (non-null and non-zero dimensions)
     using ImageViewRGB32::operator bool;
 
-    using ImageViewRGB32::data;
-    uint32_t* data(){ return m_ptr; }
+    const uint32_t* data() const{ return m_ptr; }
+          uint32_t* data(){ return m_ptr; }
 
     using ImageViewRGB32::bytes_per_row;
     using ImageViewRGB32::width;
     using ImageViewRGB32::height;
 
+    //  Direct Pixel Access
     PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{
         return ImageViewPlanar32::pixel(x, y);
     }

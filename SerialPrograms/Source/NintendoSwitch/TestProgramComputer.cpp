@@ -131,11 +131,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image(100, 100);
+    image.fill(0xffff0000);
+    image.save("test.png");
+
+
+#if 0
     ImageRGB32 image0("Avermedia-Qt5.png");
     ImageRGB32 image1(std::move(image0));
 
     image1.sub_image(100, 100, 100, 100).save("test.png");
-
+#endif
 
 
 #if 0

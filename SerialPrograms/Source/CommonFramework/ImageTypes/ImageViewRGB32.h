@@ -32,6 +32,7 @@ public:
 #endif
 
 public:
+    //  Returns true if this image is valid. (non-null and non-zero dimensions)
     using ImageViewPlanar32::operator bool;
 
     using ImageViewPlanar32::data;
@@ -39,6 +40,7 @@ public:
     using ImageViewPlanar32::width;
     using ImageViewPlanar32::height;
 
+    //  Direct Pixel Access
     PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{
         return ImageViewPlanar32::pixel(x, y);
     }

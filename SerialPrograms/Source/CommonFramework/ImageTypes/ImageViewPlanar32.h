@@ -24,6 +24,7 @@ public:
 
 
 public:
+    //  Returns true if this image is valid. (non-null and non-zero dimensions)
     PA_FORCE_INLINE operator bool() const{ return m_ptr != nullptr; }
 
     PA_FORCE_INLINE const uint32_t* data            () const{ return m_ptr; }
@@ -31,6 +32,7 @@ public:
     PA_FORCE_INLINE size_t          width           () const{ return m_width; }
     PA_FORCE_INLINE size_t          height          () const{ return m_height; }
 
+    //  Direct Pixel Access
     PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{
         return *(const uint32_t*)((const char*)m_ptr + x * sizeof(uint32_t) + y * m_bytes_per_row);
     }
@@ -43,7 +45,11 @@ protected:
     PA_FORCE_INLINE uint32_t& pixel(size_t x, size_t y){
         return *(uint32_t*)((char*)m_ptr + x * sizeof(uint32_t) + y * m_bytes_per_row);
     }
+
+    //  Fill the entire image with the specified pixel.
     void fill(uint32_t pixel);
+
+    //  Copy the contents of the "source" into this object. The dimensions must match.
     void copy_from(const ImageViewPlanar32& source);
 
 
