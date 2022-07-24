@@ -48,6 +48,7 @@ void ImageRGB32::operator=(const ImageRGB32& x){
 }
 #endif
 
+ImageRGB32::ImageRGB32() = default;
 
 ImageRGB32::ImageRGB32(size_t width, size_t height)
     : ImageViewRGB32(nullptr, (width * sizeof(uint32_t) + PA_ALIGNMENT - 1) & ~(size_t)(PA_ALIGNMENT - 1), width, height)

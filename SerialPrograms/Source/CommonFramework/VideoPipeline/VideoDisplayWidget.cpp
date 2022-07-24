@@ -73,7 +73,7 @@ void VideoDisplayWidget::set_resolution(const QSize& resolution){
 }
 VideoSnapshot VideoDisplayWidget::snapshot(){
     if (m_video == nullptr){
-        return VideoSnapshot{QImage(), current_time()};
+        return VideoSnapshot();
     }
     return m_video->snapshot();
 }

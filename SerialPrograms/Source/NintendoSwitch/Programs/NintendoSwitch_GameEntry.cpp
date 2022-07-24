@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"

@@ -27,7 +27,7 @@ private:
 
 
 public:
-    ImageRGB32() = default;
+    ImageRGB32();
     ImageRGB32(size_t width, size_t height);
     ImageRGB32(const std::string& filename);
 

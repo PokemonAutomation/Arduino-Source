@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
-#include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
