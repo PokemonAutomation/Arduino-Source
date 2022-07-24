@@ -25,11 +25,6 @@ EntranceDetector::EntranceDetector(const ImageViewRGB32& entrance_screen)
     , m_box0(0.020, 0.020, 0.500, 0.750)
     , m_watch_box(extract_box_reference(entrance_screen, m_box0))
 {}
-EntranceDetector::EntranceDetector(std::shared_ptr<const ImageRGB32> entrance_screen)
-    : EntranceDetector(*entrance_screen)
-{
-    m_entrance_screen = std::move(entrance_screen);
-}
 void EntranceDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_DARKGREEN, m_box0);
 }

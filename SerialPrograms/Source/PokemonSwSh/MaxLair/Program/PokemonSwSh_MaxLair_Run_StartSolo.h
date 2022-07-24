@@ -24,12 +24,12 @@ namespace MaxLairInternal{
 
 bool wait_for_a_player(
     ConsoleHandle& console, BotBaseContext& context,
-    std::shared_ptr<const ImageRGB32> entrance,
+    const ImageViewRGB32& entrance,
     WallClock time_limit
 );
 bool wait_for_lobby_ready(
     ConsoleHandle& console, BotBaseContext& context,
-    std::shared_ptr<const ImageRGB32> entrance,
+    const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
     WallClock time_limit

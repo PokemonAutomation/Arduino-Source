@@ -25,11 +25,11 @@ namespace MaxLairInternal{
 
 bool wait_for_a_player(
     ConsoleHandle& console, BotBaseContext& context,
-    std::shared_ptr<const ImageRGB32> entrance,
+    const ImageViewRGB32& entrance,
     WallClock time_limit
 ){
     LobbyDoneConnecting done_connecting_detector;
-    EntranceDetector entrance_detector(std::move(entrance));
+    EntranceDetector entrance_detector(entrance);
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
@@ -61,13 +61,13 @@ bool wait_for_a_player(
 
 bool wait_for_lobby_ready(
     ConsoleHandle& console, BotBaseContext& context,
-    std::shared_ptr<const ImageRGB32> entrance,
+    const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
     WallClock time_limit
 ){
     LobbyAllReadyDetector ready_detector(start_players);
-    EntranceDetector entrance_detector(std::move(entrance));
+    EntranceDetector entrance_detector(entrance);
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
@@ -209,7 +209,7 @@ bool start_raid_host_solo(
     auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
-    if (!wait_for_a_player(console, context, entrance, time_limit)){
+    if (!wait_for_a_player(console, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return start_raid_self_solo(console, context, state_tracker, entrance, boss_slot, ore);
     }
@@ -220,7 +220,7 @@ bool start_raid_host_solo(
     context.wait_for_all_requests();
 
     //  Wait
-    if (!wait_for_lobby_ready(console, context, entrance, 1, 4, time_limit)){
+    if (!wait_for_lobby_ready(console, context, *entrance, 1, 4, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
