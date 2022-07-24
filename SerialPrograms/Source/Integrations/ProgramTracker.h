@@ -48,7 +48,7 @@ public:
 
     std::map<uint64_t, ProgramTrackingState> all_programs();
 
-    std::string grab_screenshot     (uint64_t console_id, ImageRGB32& image);
+    std::string grab_screenshot     (uint64_t console_id, std::shared_ptr<const ImageRGB32>& image);
     std::string reset_camera        (uint64_t console_id);
     std::string reset_serial        (uint64_t console_id);
 //    void change_program (uint64_t program_id, std::string program_identifier);

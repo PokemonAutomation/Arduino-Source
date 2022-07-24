@@ -78,13 +78,13 @@ void pai_status(DllSafeString& description){
     description = str;
 }
 void pai_screenshot(DllSafeString& error, uint64_t console_id, const char* path){
-    ImageRGB32 image;
+    std::shared_ptr<const ImageRGB32> image;
     std::string err = ProgramTracker::instance().grab_screenshot(console_id, image);
     if (!err.empty()){
         error = err;
         return;
     }
-    if (image.save(path)){
+    if (image->save(path)){
         error = DllSafeString();
     }else{
         error = std::string("Failed to save image to: ") + path;

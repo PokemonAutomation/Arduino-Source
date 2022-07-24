@@ -51,7 +51,7 @@ std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
     return info;
 }
 
-std::string ProgramTracker::grab_screenshot(uint64_t console_id, ImageRGB32& image){
+std::string ProgramTracker::grab_screenshot(uint64_t console_id, std::shared_ptr<const ImageRGB32>& image){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
@@ -59,7 +59,7 @@ std::string ProgramTracker::grab_screenshot(uint64_t console_id, ImageRGB32& ima
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    image = iter->second.first->video().snapshot().frame;
+    image = iter->second.first->video().snapshot();
     return "";
 }
 std::string ProgramTracker::reset_camera(uint64_t console_id){
