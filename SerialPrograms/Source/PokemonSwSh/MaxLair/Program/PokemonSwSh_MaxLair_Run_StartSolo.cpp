@@ -25,11 +25,11 @@ namespace MaxLairInternal{
 
 bool wait_for_a_player(
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance,
+    std::shared_ptr<const ImageRGB32> entrance,
     WallClock time_limit
 ){
     LobbyDoneConnecting done_connecting_detector;
-    EntranceDetector entrance_detector(entrance);
+    EntranceDetector entrance_detector(std::move(entrance));
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
@@ -61,13 +61,13 @@ bool wait_for_a_player(
 
 bool wait_for_lobby_ready(
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance,
+    std::shared_ptr<const ImageRGB32> entrance,
     size_t min_players,
     size_t start_players,
     WallClock time_limit
 ){
     LobbyAllReadyDetector ready_detector(start_players);
-    EntranceDetector entrance_detector(entrance);
+    EntranceDetector entrance_detector(std::move(entrance));
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
@@ -94,8 +94,7 @@ bool wait_for_lobby_ready(
 }
 bool start_adventure(
     ConsoleHandle& console, BotBaseContext& context,
-    size_t consoles,
-    const QImage& entrance
+    size_t consoles
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
     if (ready_detector.ready_players(console.video().snapshot()) < consoles){
@@ -131,7 +130,7 @@ bool start_adventure(
 bool start_raid_self_solo(
     ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
-    QImage& entrance, size_t boss_slot,
+    std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
 ){
     console.log("Entering lobby...");
@@ -140,7 +139,7 @@ bool start_raid_self_solo(
 
     //  Enter lobby.
     entrance = enter_lobby(console, context, boss_slot, false, ore);
-    if (entrance.isNull()){
+    if (!*entrance){
         return false;
     }
 
@@ -158,7 +157,7 @@ bool start_raid_self_solo(
 bool start_raid_host_solo(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
-    QImage& entrance, size_t boss_slot,
+    std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,
     const PathStats& path_stats,
     const StatsTracker& session_stats,
@@ -177,7 +176,7 @@ bool start_raid_host_solo(
         (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
-    if (entrance.isNull()){
+    if (!*entrance){
         return false;
     }
 
@@ -228,7 +227,7 @@ bool start_raid_host_solo(
 
     //  Start
     context.wait_for_all_requests();
-    if (!start_adventure(console, context, 1, entrance)){
+    if (!start_adventure(console, context, 1)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }

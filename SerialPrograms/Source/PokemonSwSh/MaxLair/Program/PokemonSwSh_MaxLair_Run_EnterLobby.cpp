@@ -66,7 +66,7 @@ private:
 
 
 
-QImage enter_lobby(
+std::shared_ptr<const ImageRGB32> enter_lobby(
     ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
@@ -132,7 +132,7 @@ QImage enter_lobby(
         if (dialog_detector.detect(screen)){
             console.log("Detected save dialog.");
             context.wait_for_all_requests();
-            QImage entrance = console.video().snapshot();
+            std::shared_ptr<const ImageRGB32> entrance = console.video().snapshot();
             pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
             return entrance;
@@ -152,7 +152,7 @@ QImage enter_lobby(
         }
     }
 
-    return QImage();
+    return std::make_shared<ImageRGB32>();
 }
 
 

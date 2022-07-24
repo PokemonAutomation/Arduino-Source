@@ -42,7 +42,7 @@ bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope,
 
 bool wait_for_all_join(
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance,
+    const std::shared_ptr<const ImageRGB32>& entrance,
     size_t start_players
 ){
     LobbyJoinedDetector joined_detector(start_players, false);
@@ -130,7 +130,7 @@ private:
 bool start_raid_local(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     GlobalStateTracker& state_tracker,
-    QImage entrance[4],
+    std::shared_ptr<const ImageRGB32> entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     const HostingSettings& settings,
     ConsoleRuntime console_stats[4]
@@ -159,7 +159,7 @@ bool start_raid_local(
             (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
         );
-        if (entrance[index].isNull()){
+        if (!*entrance[index]){
             errors.fetch_add(1);
             return;
         }
@@ -263,8 +263,7 @@ bool start_raid_local(
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Start
-        size_t index = console.index();
-        if (!start_adventure(console, context, env.consoles.size(), entrance[index])){
+        if (!start_adventure(console, context, env.consoles.size())){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;
@@ -280,7 +279,7 @@ bool start_raid_local(
 bool start_raid_host(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     GlobalStateTracker& state_tracker,
-    QImage entrance[4],
+    std::shared_ptr<const ImageRGB32> entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
     const PathStats& path_stats,
@@ -316,7 +315,7 @@ bool start_raid_host(
             (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
         );
-        if (entrance[index].isNull()){
+        if (!*entrance[index]){
             errors.fetch_add(1);
             return;
         }
@@ -432,8 +431,7 @@ bool start_raid_host(
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Start
-        size_t index = console.index();
-        if (!start_adventure(console, context, env.consoles.size(), entrance[index])){
+        if (!start_adventure(console, context, env.consoles.size())){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;
@@ -451,7 +449,7 @@ bool start_raid_host(
 bool start_adventure(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     GlobalStateTracker& state_tracker,
-    QImage entrance[4],
+    std::shared_ptr<const ImageRGB32> entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
     const PathStats& path_stats,

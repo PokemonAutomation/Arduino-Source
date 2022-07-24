@@ -20,6 +20,7 @@ namespace MaxLairInternal{
 class EntranceDetector : public VisualInferenceCallback{
 public:
     EntranceDetector(const ImageViewRGB32& entrance_screen);
+    EntranceDetector(std::shared_ptr<const ImageRGB32> entrance_screen);
 
     bool detect(const ImageViewRGB32& screen);
 
@@ -29,8 +30,8 @@ public:
 
 private:
     ImageFloatBox m_box0;
-    ImageRGB32 m_entrance_screen;
-
+    ImageViewRGB32 m_watch_box;
+    std::shared_ptr<const ImageRGB32> m_entrance_screen;
 };
 
 

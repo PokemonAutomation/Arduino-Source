@@ -23,8 +23,13 @@ namespace MaxLairInternal{
 EntranceDetector::EntranceDetector(const ImageViewRGB32& entrance_screen)
     : VisualInferenceCallback("EntranceDetector")
     , m_box0(0.020, 0.020, 0.500, 0.750)
-    , m_entrance_screen(extract_box_reference(entrance_screen, m_box0).copy())
+    , m_watch_box(extract_box_reference(entrance_screen, m_box0))
 {}
+EntranceDetector::EntranceDetector(std::shared_ptr<const ImageRGB32> entrance_screen)
+    : EntranceDetector(*entrance_screen)
+{
+    m_entrance_screen = std::move(entrance_screen);
+}
 void EntranceDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_DARKGREEN, m_box0);
 }
@@ -40,12 +45,12 @@ bool EntranceDetector::detect(const ImageViewRGB32& screen){
     ImageRGB32 copy;
 
     ImageViewRGB32 image = extract_box_reference(screen, m_box0);
-    if (image.width() != (size_t)m_entrance_screen.width() || image.height() != (size_t)m_entrance_screen.height()){
-        copy = image.scale_to(m_entrance_screen.width(), m_entrance_screen.height());
+    if (image.width() != (size_t)m_watch_box.width() || image.height() != (size_t)m_watch_box.height()){
+        copy = image.scale_to(m_watch_box.width(), m_watch_box.height());
         image = copy;
     }
 
-    double diff = ImageMatch::pixel_RMSD(m_entrance_screen, image);
+    double diff = ImageMatch::pixel_RMSD(m_watch_box, image);
 //    cout << diff << endl;
 
     return diff < 20;

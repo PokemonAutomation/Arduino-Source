@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
@@ -16,7 +17,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-QImage enter_lobby(
+std::shared_ptr<const ImageRGB32> enter_lobby(
     ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore

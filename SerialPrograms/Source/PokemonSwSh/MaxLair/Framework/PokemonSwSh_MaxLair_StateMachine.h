@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
 #include "Common/Cpp/SpinLock.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
@@ -100,7 +101,7 @@ StateMachineAction run_state_iteration(
     bool save_path,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& boss_action,
-    const QImage& entrance
+    const ImageViewRGB32& entrance
 );
 
 

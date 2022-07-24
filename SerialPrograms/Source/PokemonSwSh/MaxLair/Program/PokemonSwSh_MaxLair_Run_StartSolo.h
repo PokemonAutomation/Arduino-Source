@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
@@ -23,34 +24,33 @@ namespace MaxLairInternal{
 
 bool wait_for_a_player(
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance,
+    std::shared_ptr<const ImageRGB32> entrance,
     WallClock time_limit
 );
 bool wait_for_lobby_ready(
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance,
+    std::shared_ptr<const ImageRGB32> entrance,
     size_t min_players,
     size_t start_players,
     WallClock time_limit
 );
 bool start_adventure(
     ConsoleHandle& console, BotBaseContext& context,
-    size_t consoles,
-    const QImage& entrance
+    size_t consoles
 );
 
 
 bool start_raid_self_solo(
     ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
-    QImage& entrance, size_t boss_slot,
+    std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
 );
 
 bool start_raid_host_solo(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
-    QImage& entrance, size_t boss_slot,
+    std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,
     const PathStats& path_stats,
     const StatsTracker& session_stats,

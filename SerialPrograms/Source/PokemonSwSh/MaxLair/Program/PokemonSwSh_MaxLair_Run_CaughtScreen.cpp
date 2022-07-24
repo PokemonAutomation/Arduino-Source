@@ -34,7 +34,7 @@ namespace MaxLairInternal{
 StateMachineAction mash_A_to_entrance(
     AdventureRuntime& runtime,
     ConsoleHandle& console, BotBaseContext& context,
-    const QImage& entrance
+    const ImageViewRGB32& entrance
 ){
     EntranceDetector entrance_detector(entrance);
 
@@ -71,7 +71,7 @@ StateMachineAction run_caught_screen(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
-    const QImage& entrance
+    const ImageViewRGB32& entrance
 ){
     size_t console_index = console.index();
     bool is_host = console_index == runtime.host_index;

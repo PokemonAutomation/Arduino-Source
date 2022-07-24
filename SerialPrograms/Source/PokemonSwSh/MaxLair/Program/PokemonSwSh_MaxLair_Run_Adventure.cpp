@@ -33,7 +33,7 @@ AdventureResult run_adventure(
 
     send_status_notification(env, runtime);
 
-    QImage entrance[4];
+    std::shared_ptr<const ImageRGB32> entrance[4];
     GlobalStateTracker state_tracker(scope, env.consoles.size());
 
     if (!start_adventure(
@@ -74,7 +74,7 @@ AdventureResult run_adventure(
                 runtime, index,
                 env, console, context, boss_slot != 0 && console.index() == runtime.host_index,
                 state_tracker, runtime.actions,
-                entrance[index]
+                *entrance[index]
             );
             switch (action){
             case StateMachineAction::KEEP_GOING:

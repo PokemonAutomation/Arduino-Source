@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_Start_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_Start_H
 
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
@@ -23,7 +24,7 @@ namespace MaxLairInternal{
 bool start_adventure(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     GlobalStateTracker& state_tracker,
-    QImage entrance[4],
+    std::shared_ptr<const ImageRGB32> entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
     const PathStats& path_stats,

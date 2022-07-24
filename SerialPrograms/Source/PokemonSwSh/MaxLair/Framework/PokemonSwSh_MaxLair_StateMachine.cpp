@@ -43,7 +43,7 @@ StateMachineAction run_state_iteration(
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,
-    const QImage& entrance
+    const ImageViewRGB32& entrance
 ){
     GlobalState state = global_state.infer_actual_state(console.index());
 //    uint8_t wins = state.wins;
