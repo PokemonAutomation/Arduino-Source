@@ -184,29 +184,29 @@ VideoSnapshot CameraHolder::snapshot_image(){
     {
         SpinLockGuard lg1(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (m_last_image){
+        if (m_last_snapshot){
             if (m_probe){
                 //  If we have the probe enabled, we know if a new frame has been pushed.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_last_image_seqnum == frame_seqnum){
 //                    cout << "cached 0" << endl;
-                    return m_last_image;
+                    return m_last_snapshot;
                 }
             }else{
                 //  Otherwise, we have to use time.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_last_image.timestamp + m_frame_period > now){
+                if (m_last_snapshot.timestamp + m_frame_period > now){
 //                    cout << "cached 1" << endl;
-                    return m_last_image;
+                    return m_last_snapshot;
                 }
             }
         }
     }
 
-    m_last_image = m_screenshotter.snapshot();
+    m_last_snapshot = m_screenshotter.snapshot();
     m_last_image_seqnum = frame_seqnum;
 
-    return m_last_image;
+    return m_last_snapshot;
 }
 VideoSnapshot CameraHolder::snapshot_probe(){
 //    cout << "snapshot_probe()" << endl;
@@ -223,8 +223,8 @@ VideoSnapshot CameraHolder::snapshot_probe(){
     {
         SpinLockGuard lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (m_last_image && m_last_image_seqnum == frame_seqnum){
-            return m_last_image;
+        if (m_last_snapshot && m_last_image_seqnum == frame_seqnum){
+            return m_last_snapshot;
         }
         frame = m_last_frame;
         frame_timestamp = m_last_frame_timestamp;
@@ -232,7 +232,7 @@ VideoSnapshot CameraHolder::snapshot_probe(){
 
     WallClock time0 = current_time();
 
-    m_last_image = VideoSnapshot(
+    m_last_snapshot = VideoSnapshot(
         frame_to_image(m_logger, frame, m_flip_vertical),
         frame_timestamp
     );
@@ -241,7 +241,7 @@ VideoSnapshot CameraHolder::snapshot_probe(){
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
-    return m_last_image;
+    return m_last_snapshot;
 }
 VideoSnapshot CameraHolder::snapshot(){
     std::unique_lock<std::mutex> lg(m_state_lock);

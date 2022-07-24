@@ -185,7 +185,7 @@ VideoSnapshot VideoWidget::snapshot(){
     std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
-        return VideoSnapshot{QImage(), current_time()};
+        return VideoSnapshot();
     }
 
     //  Frame is already cached and is not stale.
@@ -196,7 +196,7 @@ VideoSnapshot VideoWidget::snapshot(){
         SpinLockGuard lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
         if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-            return VideoSnapshot{m_last_image, m_last_image_timestamp};
+            return VideoSnapshot(m_last_image, m_last_image_timestamp);
         }
         frame = m_last_frame;
         frame_timestamp = m_last_frame_timestamp;
@@ -217,7 +217,7 @@ VideoSnapshot VideoWidget::snapshot(){
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
-    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+    return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
 
 

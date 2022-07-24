@@ -57,7 +57,7 @@ VideoWidget::VideoWidget(
 //    , m_use_probe_frames(true)
 //    , m_flip_vertical(true)
     , m_last_frame_seqnum(0)
-    , m_last_image_timestamp(WallClock::min())
+//    , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
     logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinder");
@@ -191,20 +191,20 @@ VideoSnapshot VideoWidget::snapshot_image(){
     {
         SpinLockGuard lg1(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull()){
+        if (m_last_snapshot){
             if (m_probe){
                 //  If we have the probe enabled, we know if a new frame has been pushed.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_last_image_seqnum == frame_seqnum){
 //                    cout << "cached 0" << endl;
-                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+                    return m_last_snapshot;
                 }
             }else{
                 //  Otherwise, we have to use time.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_last_image_timestamp + m_frame_period > now){
+                if (m_last_snapshot.timestamp + m_frame_period > now){
 //                    cout << "cached 1" << endl;
-                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+                    return m_last_snapshot;
                 }
             }
         }
@@ -212,12 +212,11 @@ VideoSnapshot VideoWidget::snapshot_image(){
 
     WallClock time0 = current_time();
 
-    m_last_image = m_screenshotter.snapshot().frame;
-    m_last_image_timestamp = now;
+    m_last_snapshot = m_screenshotter.snapshot();
     m_last_image_seqnum = frame_seqnum;
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return VideoSnapshot(m_last_image, m_last_image_timestamp);
+    return m_last_snapshot;
 }
 VideoSnapshot VideoWidget::snapshot_probe(){
 //    cout << "snapshot_probe()" << endl;
@@ -234,8 +233,8 @@ VideoSnapshot VideoWidget::snapshot_probe(){
     {
         SpinLockGuard lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-            return VideoSnapshot{m_last_image, m_last_image_timestamp};
+        if (m_last_snapshot && m_last_image_seqnum == frame_seqnum){
+            return m_last_snapshot;
         }
         frame = m_last_frame;
         frame_timestamp = m_last_frame_timestamp;
@@ -243,14 +242,16 @@ VideoSnapshot VideoWidget::snapshot_probe(){
 
     WallClock time0 = current_time();
 
-    m_last_image = frame_to_image(m_logger, frame, m_flip_vertical);
-    m_last_image_timestamp = frame_timestamp;
+    m_last_snapshot = VideoSnapshot(
+        frame_to_image(m_logger, frame, m_flip_vertical),
+        frame_timestamp
+    );
     m_last_image_seqnum = frame_seqnum;
 
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
-    return VideoSnapshot(m_last_image, frame_timestamp);
+    return m_last_snapshot;
 }
 
 VideoSnapshot VideoWidget::snapshot(){

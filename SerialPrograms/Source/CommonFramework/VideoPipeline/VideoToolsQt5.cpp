@@ -230,7 +230,7 @@ VideoSnapshot CameraScreenshotter::snapshot(){
 
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - timestamp).count());
-    return VideoSnapshot{image, timestamp};
+    return VideoSnapshot(image, timestamp);
 }
 
 

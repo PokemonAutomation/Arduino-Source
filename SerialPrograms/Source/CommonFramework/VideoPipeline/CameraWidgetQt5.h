@@ -110,8 +110,9 @@ private:
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
+//    QImage m_last_image;
+//    WallClock m_last_image_timestamp;
+    VideoSnapshot m_last_snapshot;
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 };

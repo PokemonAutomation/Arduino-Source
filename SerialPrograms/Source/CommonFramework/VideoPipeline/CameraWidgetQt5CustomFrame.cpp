@@ -190,7 +190,7 @@ void CameraModeSelfRender::thread_loop(){
         );
 #if 1
         if (seqnum != m_last_display_seqnum || m_last_display.size() != widget_size){
-            m_last_display = frame.frame.scaled(widget_size);
+            m_last_display = frame.frame_ptr->to_QImage_ref().scaled(widget_size);
             m_last_display_seqnum = seqnum;
             emit new_frame();
         }

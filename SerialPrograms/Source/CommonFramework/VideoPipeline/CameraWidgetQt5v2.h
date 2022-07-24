@@ -108,7 +108,7 @@ private:
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
-    VideoSnapshot m_last_image;
+    VideoSnapshot m_last_snapshot;
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 };
