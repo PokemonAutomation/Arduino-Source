@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "VisualInferenceCallback.h"
@@ -12,9 +11,6 @@
 namespace PokemonAutomation{
 
 
-bool VisualInferenceCallback::process_frame(const QImage& frame, WallClock timestamp){
-    return process_frame(std::make_shared<ImageRGB32>(frame), timestamp);
-}
 bool VisualInferenceCallback::process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp){
     return process_frame(*frame, timestamp);
 }
