@@ -152,26 +152,6 @@ ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFlo
 }
 
 
-QImage extract_box_copy(const QImage& image, const ImagePixelBox& box){
-    return image.copy(box.min_x, box.min_y, box.width(), box.height());
-}
-QImage extract_box_copy(const QImage& image, const ImageFloatBox& box){
-    return image.copy(
-        (pxint_t)(image.width() * box.x + 0.5),
-        (pxint_t)(image.height() * box.y + 0.5),
-        (pxint_t)(image.width() * box.width + 0.5),
-        (pxint_t)(image.height() * box.height + 0.5)
-    );
-}
-QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y){
-    return image.copy(
-        (pxint_t)(image.width() * box.x + 0.5) + offset_x,
-        (pxint_t)(image.height() * box.y + 0.5) + offset_y,
-        (pxint_t)(image.width() * box.width + 0.5),
-        (pxint_t)(image.height() * box.height + 0.5)
-    );
-}
-
 
 ImageFloatBox translate_to_parent(
     const ImageViewRGB32& original_image,
@@ -231,22 +211,9 @@ ImagePixelBox extract_object_from_inner_feature(
         (pxint_t)(shift_y + scale_y + 0.5)
     );
 }
-QImage extract_object_from_inner_feature(
-    const QImage& image,
-    const ImagePixelBox& inner_relative_to_image,
-    const ImageFloatBox& inner_relative_to_object
-){
-    return extract_box_copy(
-        image,
-        extract_object_from_inner_feature(
-            inner_relative_to_image,
-            inner_relative_to_object
-        )
-    );
-}
 
 
-void draw_box(const ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
+void draw_box(ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
     if (thickness == 0 || image.width() == 0 || image.height() == 0){
         return;
     }
@@ -272,7 +239,7 @@ void draw_box(const ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t 
         for (pxint_t y = start_y; y <= end_y; ++y){
             for (pxint_t x = start_x; x <= end_x; ++x){
                 // setPixelColor(x, y, qColor);
-                image.get_pixel(x, y) = color;
+                image.pixel(x, y) = color;
             }
         }
     };

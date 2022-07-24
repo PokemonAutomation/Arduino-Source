@@ -107,10 +107,6 @@ ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFlo
 
 
 
-//  Deep copy the sub-region.
-QImage extract_box_copy(const QImage& image, const ImagePixelBox& box);
-QImage extract_box_copy(const QImage& image, const ImageFloatBox& box);
-QImage extract_box_copy(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 //  Given:
 //      -   "inference_box" is a box within "original_image".
@@ -147,17 +143,12 @@ ImagePixelBox extract_object_from_inner_feature(
     const ImagePixelBox& inner_relative_to_image,
     const ImageFloatBox& inner_relative_to_object
 );
-QImage extract_object_from_inner_feature(
-    const QImage& image,
-    const ImagePixelBox& inner_relative_to_image,
-    const ImageFloatBox& inner_relative_to_object
-);
 
 // Draw a box on the image. Used for debugging purposes:
 // save inference results to an image on the disk.
 // color: the color of the pixel. See Common/Cpp/Color.h:Color on the color format.
 // thickness: thickness (in unit of pixels) of the box border.
-void draw_box(const ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness = 1);
+void draw_box(ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness = 1);
 
 
 
