@@ -26,8 +26,10 @@ class ImageViewRGB32 : public ImageViewPlanar32{
 public:
     using ImageViewPlanar32::ImageViewPlanar32;
 
+#if 1
     ImageViewRGB32(const ConstImageRef& image);
     ImageViewRGB32(const ImageRef& image);
+#endif
 
 public:
     using ImageViewPlanar32::operator bool;
@@ -37,9 +39,11 @@ public:
     using ImageViewPlanar32::width;
     using ImageViewPlanar32::height;
 
-    using ImageViewPlanar32::pixel;
+    PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{
+        return ImageViewPlanar32::pixel(x, y);
+    }
 
-    ImageViewRGB32 sub_image(size_t min_x, size_t min_y, size_t width, size_t height) const{
+    PA_FORCE_INLINE ImageViewRGB32 sub_image(size_t min_x, size_t min_y, size_t width, size_t height) const{
         return ImageViewPlanar32::sub_image(min_x, min_y, width, height);
     }
 
@@ -55,7 +59,7 @@ public:
     QImage scaled_to_QImage(size_t width, size_t height) const;
 
 private:
-    ImageViewRGB32(const ImageViewPlanar32& x)
+    PA_FORCE_INLINE ImageViewRGB32(const ImageViewPlanar32& x)
         : ImageViewPlanar32(x)
     {}
 };

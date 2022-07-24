@@ -13,6 +13,7 @@
 namespace PokemonAutomation{
 
 
+#if 1
 
 ImageViewRGB32::ImageViewRGB32(const ConstImageRef& image)
     : ImageViewPlanar32((uint32_t*)image.data(), image.bytes_per_row(), image.width(), image.height())
@@ -21,6 +22,7 @@ ImageViewRGB32::ImageViewRGB32(const ImageRef& image)
     : ImageViewPlanar32((uint32_t*)image.data(), image.bytes_per_row(), image.width(), image.height())
 {}
 
+#endif
 
 
 
@@ -30,20 +32,7 @@ ImageRGB32 ImageViewRGB32::copy() const{
         return ImageRGB32();
     }
     ImageRGB32 ret(m_width, m_height);
-    if (ret.m_bytes_per_row == m_bytes_per_row){
-        memcpy(
-            ret.m_ptr, m_ptr,
-            (m_height - 1) * m_bytes_per_row + m_width * sizeof(uint32_t)
-        );
-    }else{
-        char* dst = (char*)ret.m_ptr;
-        const char* src = (const char*)m_ptr;
-        for (size_t c = 0; c < m_height; c++){
-            memcpy(dst, src, m_width * sizeof(uint32_t));
-            dst += ret.m_bytes_per_row;
-            src += m_bytes_per_row;
-        }
-    }
+    ret.copy_from(*this);
     return ret;
 }
 bool ImageViewRGB32::save(const std::string& path) const{

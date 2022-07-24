@@ -69,6 +69,7 @@ ImageRGB32::ImageRGB32(const std::string& filename){
 
 
 
+
 ImageRGB32::ImageRGB32(QImage image){
     if (image.isNull()){
         return;

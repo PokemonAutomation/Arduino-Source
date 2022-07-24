@@ -120,7 +120,7 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, ImageRGB32
             for (size_t x = 0; x < obj.width(); x++){
                 for (size_t y = 0; y < obj.height(); y++){
                     if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                        image->get_pixel(
+                        image->pixel(
                             (pxint_t)(object.min_x + offset_x + obj.min_x + x),
                             (pxint_t)(offset_y + object.min_y + obj.min_y + y)
                         ) = (uint32_t)color;

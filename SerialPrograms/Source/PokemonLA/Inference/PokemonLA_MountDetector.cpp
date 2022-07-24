@@ -676,7 +676,7 @@ void make_mount_template(){
             }
             QRgb pixel = image.pixel(c, r);
             if (qRed(pixel) < 128 || qGreen(pixel) < 128){
-                image.get_pixel(c, r) = 0;
+                image.pixel(c, r) = 0;
             }
         }
     }

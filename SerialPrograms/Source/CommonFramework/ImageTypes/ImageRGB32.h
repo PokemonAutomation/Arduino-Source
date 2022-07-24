@@ -31,6 +31,8 @@ public:
     ImageRGB32(size_t width, size_t height);
     ImageRGB32(const std::string& filename);
 
+    using ImageViewPlanar32::fill;
+
 
 public:
     using ImageViewRGB32::operator bool;
@@ -42,9 +44,14 @@ public:
     using ImageViewRGB32::width;
     using ImageViewRGB32::height;
 
-    using ImageViewRGB32::pixel;
-    using ImageViewRGB32::get_pixel;
+    PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{
+        return ImageViewPlanar32::pixel(x, y);
+    }
+    PA_FORCE_INLINE uint32_t& pixel(size_t x, size_t y){
+        return ImageViewPlanar32::pixel(x, y);
+    }
 
+public:
     using ImageViewRGB32::sub_image;
 
 

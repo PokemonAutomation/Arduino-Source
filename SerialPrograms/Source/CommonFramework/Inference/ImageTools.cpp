@@ -33,12 +33,12 @@ ImageRGB32 image_diff_greyscale(const ImageViewRGB32& x, const ImageViewRGB32& y
             uint32_t px = x.pixel(c, r);
             uint32_t py = y.pixel(c, r);
             if (qAlpha(px) == 0 || qAlpha(py) == 0){
-                image.get_pixel(c, r) = 0xff000000;
+                image.pixel(c, r) = 0xff000000;
             }else{
                 double distance = euclidean_distance(px, py);
                 distance *= 0.57735026918962576451;  //  1 / sqrt(3)
                 uint32_t dist_int = std::min<uint32_t>((uint32_t)distance, 255);
-                image.get_pixel(c, r) = 0xff000000 + dist_int * 0x010101;
+                image.pixel(c, r) = 0xff000000 + dist_int * 0x010101;
             }
         }
     }
