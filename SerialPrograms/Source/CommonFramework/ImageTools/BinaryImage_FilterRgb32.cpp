@@ -127,24 +127,6 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
 
 void filter_rgb32(
     const PackedBinaryMatrix2& matrix,
-    const ImageRef& image,
-    Color replace_with,
-    bool replace_if_zero
-){
-    if (matrix.width() > image.width()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
-    }
-    if (matrix.height() > image.height()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
-    }
-    Kernels::filter_rgb32(
-        matrix,
-        image.data(), image.bytes_per_row(),
-        (uint32_t)replace_with, replace_if_zero
-    );
-}
-void filter_rgb32(
-    const PackedBinaryMatrix2& matrix,
     ImageRGB32& image,
     Color replace_with,
     bool replace_if_zero    //  If false, replace if one.
