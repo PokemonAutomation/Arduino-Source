@@ -143,17 +143,17 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
     m_console.log(message, COLOR_RED);
-    ImageRGB32 screen = m_console.video().snapshot().frame;
+    std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();
     dump_image(
         m_console, m_env.program_info(),
         name,
-        screen
+        *screen
     );
     send_program_recoverable_error_notification(
         m_env,
         m_notification_error,
         message,
-        screen
+        *screen
     );
     throw OperationFailedException(m_console, message);
 }
@@ -207,8 +207,8 @@ bool EggAutonomousState::process_party(){
     shiny_reader.make_overlays(set);
 
     //  Make sure the stats menu is up.
-    ImageRGB32 screen = m_console.video().snapshot().frame;
-    if (!shiny_reader.is_panel(screen)){
+    std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();
+    if (!shiny_reader.is_panel(*screen)){
         process_error("StatsPanel", "Stats panel not detected.");
     }
 
@@ -221,22 +221,22 @@ bool EggAutonomousState::process_party(){
             m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
 
-            screen = m_console.video().snapshot().frame;
-            if (!shiny_reader.is_panel(screen)){
+            screen = m_console.video().snapshot();
+            if (!shiny_reader.is_panel(*screen)){
                 process_error("StatsPanel", "Stats panel not detected.");
             }
         }
 //        m_context.wait_for_all_requests();
 
-        bool shiny = shiny_reader.detect(screen);
+        bool shiny = shiny_reader.detect(*screen);
         if (shiny){
             m_console.log("Pokemon " + std::to_string(c) + " is shiny!", COLOR_BLUE);
-            process_shiny(screen);
+            process_shiny(*screen);
         }else{
             m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
-        IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
-        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
+        IVCheckerReader::Results IVs = iv_reader.read(m_console, *screen);
+        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, *screen);
 
         EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
 
@@ -249,7 +249,7 @@ bool EggAutonomousState::process_party(){
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
                     false, false, {}, std::nan(""),
-                    screen
+                    *screen
                 );
             }
             return true;
@@ -261,7 +261,7 @@ bool EggAutonomousState::process_party(){
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
                     false, false, {}, std::nan(""),
-                    screen
+                    *screen
                 );
             }
             pbf_press_button(m_context, BUTTON_ZL, 20, 105);

@@ -31,7 +31,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
     do{
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
-        if (dialog.detect(console.video().snapshot().frame)){
+        if (dialog.detect(console.video().snapshot())){
             break;
         }
 
@@ -135,8 +135,7 @@ void release(ConsoleHandle& console, BotBaseContext& context){
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){
         context.wait_for_all_requests();
-        ImageRGB32 screen = console.video().snapshot().frame;
-        if (!detector.detect(screen)){
+        if (!detector.detect(console.video().snapshot())){
             return;
         }
         pbf_press_button(context, BUTTON_ZL, 20, 105);
