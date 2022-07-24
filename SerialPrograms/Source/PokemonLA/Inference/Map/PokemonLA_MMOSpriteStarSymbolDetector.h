@@ -8,13 +8,10 @@
 #ifndef PokemonAutomation_PokemonLA_MMOSpriteStarSymbolDetector_H
 #define PokemonAutomation_PokemonLA_MMOSpriteStarSymbolDetector_H
 
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-
-#include "CommonFramework/ImageTools/FloatPixel.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
-
 #include <vector>
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

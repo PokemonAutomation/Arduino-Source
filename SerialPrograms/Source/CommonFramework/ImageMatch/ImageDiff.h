@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_CommonFramework_ImageDiff_H
 #define PokemonAutomation_CommonFramework_ImageDiff_H
 
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 
 namespace PokemonAutomation{
@@ -25,7 +24,6 @@ FloatPixel pixel_average(const ImageViewRGB32& image, const ImageViewRGB32& alph
 
 //  Multiply every pixel by "multiplier". Alpha channels are ignored.
 void scale_brightness(ImageRGB32& image, const FloatPixel& multiplier);
-void scale_brightness(const ImageRef& image, const FloatPixel& multiplier);
 
 
 //  Compute root-mean-square deviation of the two images.

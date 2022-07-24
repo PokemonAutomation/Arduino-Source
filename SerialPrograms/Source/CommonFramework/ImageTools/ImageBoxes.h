@@ -95,16 +95,11 @@ struct ImageFloatBox{
 //  Return a reference to the sub-region of the image.
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box);
-ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
-ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
-//  Disable these as they tend to lead to dangling references.
-//ImageViewRGB32 extract_box_reference(ImageRGB32&& image, const ImagePixelBox& box) = delete;
-//ImageViewRGB32 extract_box_reference(ImageRGB32&& image, const ImageFloatBox& box) = delete;
-//ImageViewRGB32 extract_box_reference(QImage&& image, const ImagePixelBox& box) = delete;
-//ImageViewRGB32 extract_box_reference(QImage&& image, const ImageFloatBox& box) = delete;
-
+//  Deprecated
+ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
+ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 
 
 

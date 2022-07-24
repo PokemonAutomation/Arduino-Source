@@ -8,7 +8,6 @@
 #define PokemonAutomation_Pokemon_BerryNameReader_H
 
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{

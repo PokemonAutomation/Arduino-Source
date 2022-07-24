@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageFilter.h"

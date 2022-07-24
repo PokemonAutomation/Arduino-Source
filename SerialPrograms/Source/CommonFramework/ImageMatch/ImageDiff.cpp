@@ -51,13 +51,6 @@ void scale_brightness(ImageRGB32& image, const FloatPixel& multiplier){
         (float)multiplier.r, (float)multiplier.g, (float)multiplier.b
     );
 }
-void scale_brightness(const ImageRef& image, const FloatPixel& multiplier){
-    Kernels::scale_brightness(
-        image.width(), image.height(),
-        image.data(), image.bytes_per_row(),
-        (float)multiplier.r, (float)multiplier.g, (float)multiplier.b
-    );
-}
 
 
 
