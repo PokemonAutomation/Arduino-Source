@@ -174,8 +174,6 @@ void loop_adventures(
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-//                QImage screen = console.video().snapshot();
-//                dump_image(console, MODULE_NAME, "ResetRecovery", screen);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });

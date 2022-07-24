@@ -5,7 +5,6 @@
  */
 
 #include <mutex>
-#include <QImage>
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -32,9 +31,9 @@ void run_professor_swap(
 
     PathReader reader(console, player_index);
     {
-        QImage screen = console.video().snapshot();
-        reader.read_sprites(console, state, screen);
-        reader.read_hp(console, state, screen);
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        reader.read_sprites(console, state, *screen);
+        reader.read_hp(console, state, *screen);
     }
 
 
@@ -89,9 +88,9 @@ void run_professor_swap(
     context.wait_for(std::chrono::milliseconds(100));
 
     {
-        QImage screen = console.video().snapshot();
-        reader.read_sprites(console, state, screen);
-        reader.read_hp(console, state, screen);
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        reader.read_sprites(console, state, *screen);
+        reader.read_hp(console, state, *screen);
     }
 }
 

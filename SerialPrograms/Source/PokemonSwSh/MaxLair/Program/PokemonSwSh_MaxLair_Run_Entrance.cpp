@@ -49,8 +49,8 @@ void run_entrance(
         }
         context.wait_for_all_requests();
 
-        QImage screen = console.video().snapshot();
-        ImageStats stats = image_stats(extract_box_reference(screen, box));
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        ImageStats stats = image_stats(extract_box_reference(*screen, box));
         if (!is_grey(stats, 400, 1000)){
             break;
         }

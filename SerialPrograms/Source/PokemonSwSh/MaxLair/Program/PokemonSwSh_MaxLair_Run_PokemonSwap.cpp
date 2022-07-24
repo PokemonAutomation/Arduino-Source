@@ -44,13 +44,13 @@ void run_swap_pokemon(
 
     //  Now read the options.
     std::string options[2];
-    QImage screen = console.video().snapshot();
-    reader.read_options(screen, options);
-    reader.read_pp(screen, player.pp);
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    reader.read_options(*screen, options);
+    reader.read_pp(*screen, player.pp);
 
     //  Read HP of party.
     double hp[4];
-    reader.read_hp(screen,hp);
+    reader.read_hp(*screen,hp);
     if (hp[0] >= 0) state.players[0].health = Health{hp[0], 0};
     if (hp[1] >= 0) state.players[1].health = Health{hp[1], 0};
     if (hp[2] >= 0) state.players[2].health = Health{hp[2], 0};

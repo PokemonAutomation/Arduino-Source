@@ -36,14 +36,14 @@ void run_path_select(
     PathReader reader(console, player_index);
     context.wait_for(std::chrono::milliseconds(500));
 
-    QImage screen = console.video().snapshot();
-    reader.read_sprites(console, state, screen);
-    reader.read_hp(console, state, screen);
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    reader.read_sprites(console, state, *screen);
+    reader.read_hp(console, state, *screen);
 
     if (state.wins == 0){
         reader.read_path(env, console, context, state);
     }else{
-        reader.read_side(console, state, screen);
+        reader.read_side(console, state, *screen);
     }
 
 

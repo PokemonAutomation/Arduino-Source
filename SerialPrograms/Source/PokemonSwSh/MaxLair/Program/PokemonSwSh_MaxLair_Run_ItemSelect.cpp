@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -30,9 +29,9 @@ void run_item_select(
 
     PathReader reader(console, player_index);
     {
-        QImage screen = console.video().snapshot();
-        reader.read_sprites(console, state, screen);
-        reader.read_hp(console, state, screen);
+        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        reader.read_sprites(console, state, *screen);
+        reader.read_hp(console, state, *screen);
     }
 
 

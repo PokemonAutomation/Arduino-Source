@@ -101,8 +101,8 @@ bool read_battle_menu(
     }
 
     //  Read misc.
-    QImage screen = console.video().snapshot();
-    state.opponent_hp = reader.read_opponent_hp(console, screen);
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    state.opponent_hp = reader.read_opponent_hp(console, *screen);
     if (cheer_only){
         player.dmax_turns_left = 0;
         player.health = Health{0, 1};
@@ -119,7 +119,7 @@ bool read_battle_menu(
             player.dmax_turns_left = 1;
         }
     }else{
-        std::string name = reader.read_own_mon(console, screen);
+        std::string name = reader.read_own_mon(console, *screen);
         if (!name.empty()){
             state.players[player_index].pokemon = std::move(name);
         }
@@ -135,7 +135,7 @@ bool read_battle_menu(
     }
 
     Health health[4];
-    reader.read_hp(console, screen, health, player_index);
+    reader.read_hp(console, *screen, health, player_index);
     if (health[0].hp >= 0) state.players[0].health = health[0];
     if (health[1].hp >= 0) state.players[1].health = health[1];
     if (health[2].hp >= 0) state.players[2].health = health[2];
@@ -157,20 +157,20 @@ bool read_battle_menu(
     screen = console.video().snapshot();
 
     int8_t pp[4] = {-1, -1, -1, -1};
-    reader.read_own_pp(console, screen, pp);
+    reader.read_own_pp(console, *screen, pp);
     player.pp[0] = pp[0];
     player.pp[1] = pp[1];
     player.pp[2] = pp[2];
     player.pp[3] = pp[3];
 
-    player.can_dmax = reader.can_dmax(screen);
+    player.can_dmax = reader.can_dmax(*screen);
 
     //  Read move slot.
 //    int8_t move_slot = arrow_finder.get_slot();
-    int8_t move_slot = arrow_finder.detect(screen);
+    int8_t move_slot = arrow_finder.detect(*screen);
     if (move_slot < 0){
         console.log("Unable to detect move slot.", COLOR_RED);
-        dump_image(console, MODULE_NAME, "MoveSlot", screen);
+        dump_image(console, MODULE_NAME, "MoveSlot", *screen);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
         pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
