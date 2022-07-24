@@ -323,7 +323,7 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
 // Load a text file with each line the pokemon in the MMO event, with filename <_XXX.txt>. If more than one pokemon of the same species appears,
 // add a number as the number of appearance at end of that line.
 int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
-    const QString full_path(filepath.c_str());
+    const QString full_path(QString::fromStdString(filepath));
     const QFileInfo fileinfo(full_path);
     const QString filename = fileinfo.fileName();
     const QDir parent_dir = fileinfo.dir();
@@ -358,14 +358,14 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     const QString mmo_revealed_image_path = parent_dir.filePath("_" + filename);
     const QString mmo_revealed_txt_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
 
-    QImage question_mark_image(full_path);
-    QImage sprite_image(mmo_revealed_image_path);
+    ImageRGB32 question_mark_image(filepath);
+    ImageRGB32 sprite_image(mmo_revealed_image_path.toStdString());
     
-    if (question_mark_image.isNull()){
+    if (!question_mark_image){
         cerr << "Error: cannot load MMO quesiton mark image file " << filepath << endl;
         return 1;
     }
-    if (sprite_image.isNull()){
+    if (!sprite_image){
         cerr << "Error: cannot load MMO revealed sprites image file " << mmo_revealed_image_path.toStdString() << endl;
         return 1;
     }
@@ -396,8 +396,8 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     }
 
     static int count = 0;
-    QImage output_sprite = sprite_image;
-    QImage output_quest = question_mark_image;
+    ImageRGB32 output_sprite = sprite_image.copy();
+    ImageRGB32 output_quest = question_mark_image.copy();
     std::vector<ImagePixelBox> new_boxes;
     for (size_t i = 0; i < quest_results.size(); i++){
         auto box = quest_results[i];
@@ -415,8 +415,8 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         std::string sprite_filename = os.str();
         extract_box_reference(sprite_image, new_box).save(sprite_filename);
     }
-    output_quest.save("test_MMO_question_mark_detection_" + QString::number(count) + ".png");
-    output_sprite.save("test_sprite_detection_" + QString::number(count) + ".png");
+    output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
+    output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
 
     size_t success_count = 0;
     for (size_t i = 0; i < quest_results.size(); i++){
