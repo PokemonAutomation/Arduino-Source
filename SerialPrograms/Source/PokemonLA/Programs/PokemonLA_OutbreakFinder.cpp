@@ -200,7 +200,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 
     MMOQuestionMarkDetector question_mark_detector(env.logger());
     VideoOverlaySet mmo_overlay_set(env.console);
-    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot().frame);
+    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
     add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
@@ -210,7 +210,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         size_t current_wild_area_index = (int)current_region - 2;
         pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
         context.wait_for_all_requests();
-        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot().frame);
+        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
         if (new_mmo_read[current_wild_area_index]){
             add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
@@ -316,7 +316,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         context.wait_for_all_requests();
     }
     if (is_wild_land(current_region) == false){
-        dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot().frame);
+        dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
         throw OperationFailedException(env.console, std::string("Unable to find a wild land"));
     }
 
@@ -427,10 +427,10 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     context.wait_for_all_requests();
 
     // Take a photo of the map before 
-    QImage question_mark_image = env.console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> question_mark_image = env.console.video().snapshot();
 
     // Fix zoom level:
-    const int zoom_level = read_map_zoom_level(question_mark_image);
+    const int zoom_level = read_map_zoom_level(*question_mark_image);
     if (zoom_level < 0){
         throw OperationFailedException(env.console, "Canot read map zoom level.");
     }
@@ -450,7 +450,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     context.wait_for_all_requests();
 
     // Fix Missions & Requests tab:
-    if (is_map_mission_tab_raised(question_mark_image)){
+    if (is_map_mission_tab_raised(*question_mark_image)){
         pbf_press_button(context, BUTTON_R, 50, 100);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
@@ -459,7 +459,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     // Now detect question marks:
     MMOQuestionMarkDetector question_mark_detector(env.logger());
 
-    const auto quest_results = question_mark_detector.detect_MMOs_on_region_map(question_mark_image);
+    const auto quest_results = question_mark_detector.detect_MMOs_on_region_map(*question_mark_image);
     env.log("Detected MMO question marks:");
     for(const auto& box : quest_results){
         std::ostringstream os;
@@ -492,7 +492,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
     int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot().frame);
+        dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot());
         throw OperationFailedException(env.console, "Dialog box not detected when waiting for MMO map.");
     }
 
@@ -501,14 +501,14 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "MapNotDetected", env.console.video().snapshot().frame);
+        dump_image(env.console.logger(), env.program_info(), "MapNotDetected", env.console.video().snapshot());
         throw OperationFailedException(env.console, "Map not detected after talking to Mai.");
     }
     env.console.log("Found revealed map thanks to Munchlax!");
 
     VideoOverlaySet mmo_sprites_overlay(env.console);
     for (size_t i = 0; i < new_boxes.size(); i++){
-        mmo_sprites_overlay.add(COLOR_BLUE, pixelbox_to_floatbox(question_mark_image, new_boxes[i]));
+        mmo_sprites_overlay.add(COLOR_BLUE, pixelbox_to_floatbox(*question_mark_image, new_boxes[i]));
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
@@ -519,9 +519,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
     // Check MMO results:
     std::vector<std::string> sprites;
-    QImage sprites_screen = env.console.video().snapshot();
+    std::shared_ptr<const ImageRGB32> sprites_screen = env.console.video().snapshot();
     for (size_t i = 0; i < new_boxes.size(); i++){
-        auto result = match_sprite_on_map(sprites_screen, new_boxes[i], region);
+        auto result = match_sprite_on_map(*sprites_screen, new_boxes[i], region);
         env.console.log("Found MMO sprite " + result.slug);
         stats.mmo_pokemon++;
 
@@ -542,7 +542,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         star_boxes.push_back(std::move(star_box));
     }
 
-    MMOSpriteStarSymbolDetector star_detector(sprites_screen, star_boxes);
+    MMOSpriteStarSymbolDetector star_detector(*sprites_screen, star_boxes);
 
     env.log("Detect star symbols...");
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});
@@ -728,7 +728,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.program_info(),
         "Found Outbreak",
         {{"Session Stats", stats.to_str()}},
-        env.console.video().snapshot().frame
+        env.console.video().snapshot()
     );
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
