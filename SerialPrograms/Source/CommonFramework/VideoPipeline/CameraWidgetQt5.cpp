@@ -160,7 +160,7 @@ QImage VideoWidget::direct_snapshot_image(){
     if (m_camera == nullptr){
         return QImage();
     }
-    return m_screenshotter.snapshot();
+    return m_screenshotter.snapshot().frame;
 }
 QImage VideoWidget::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
@@ -212,7 +212,7 @@ VideoSnapshot VideoWidget::snapshot_image(){
 
     WallClock time0 = current_time();
 
-    m_last_image = m_screenshotter.snapshot();
+    m_last_image = m_screenshotter.snapshot().frame;
     m_last_image_timestamp = now;
     m_last_image_seqnum = frame_seqnum;
     WallClock time1 = current_time();

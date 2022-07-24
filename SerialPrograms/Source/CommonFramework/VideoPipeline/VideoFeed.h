@@ -30,7 +30,9 @@ struct VideoSnapshot{
          , timestamp(p_timestamp)
     {}
 
-    operator const QImage&() const{ return frame; }
+    operator bool() const{ return !frame.isNull(); }
+
+//    operator const QImage&() const{ return frame; }
 
     operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame_ptr); }
     operator ImageViewRGB32() const{ return *frame_ptr; }
