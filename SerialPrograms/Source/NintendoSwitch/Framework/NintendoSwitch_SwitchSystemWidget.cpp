@@ -99,13 +99,13 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [=](){
             global_dispatcher.dispatch([=]{
-                QImage image = m_video_display->snapshot();
-                if (image.isNull()){
+                std::shared_ptr<const ImageRGB32> image = m_video_display->snapshot();
+                if (!*image){
                     return;
                 }
                 std::string filename = "screenshot-" + now_to_filestring() + ".png";
                 m_logger.log("Saving screenshot to: " + filename, COLOR_PURPLE);
-                image.save(QString::fromStdString(filename));
+                image->save(filename);
             });
         }
     );

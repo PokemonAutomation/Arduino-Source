@@ -36,7 +36,7 @@ bool connect_to_internet(
     if (!host_online){
         return true;
     }
-    if (console.video().snapshot().frame.isNull()){
+    if (!console.video().snapshot()){
         connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
         return true;
     }
@@ -242,7 +242,7 @@ void run_autohost(
         BlackScreenOverWatcher black_screen;
         uint32_t now = start;
         while (true){
-            if (black_screen.black_is_over(console.video().snapshot().frame)){
+            if (black_screen.black_is_over(console.video().snapshot())){
                 env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;
