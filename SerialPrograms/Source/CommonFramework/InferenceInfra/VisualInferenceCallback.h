@@ -32,7 +32,7 @@ public:
 
     //  Return true if the inference session should stop.
     //  You must override at least one of these.
-    virtual bool process_frame(const QImage& frame, WallClock timestamp);   //  Deprecated
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) final;   //  Disabled.
     virtual bool process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp);
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp);
 
