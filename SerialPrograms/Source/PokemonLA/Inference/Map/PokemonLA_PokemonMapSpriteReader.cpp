@@ -106,9 +106,9 @@ std::string feature_to_str(const FeatureVector& a){
     return os.str();
 }
 
-void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(int x, int y, int sum_x[3], int sum_y[3])> proces_gradient){
-    const int width = (int)image.width();
-    const int height = (int)image.height();
+void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(size_t x, size_t y, int sum_x[3], int sum_y[3])> process_gradient){
+    const size_t width = image.width();
+    const size_t height = image.height();
     // Kernel for computing gradient along x axis
     const int kx[3][3] = {
         {-1, 0, 1},
@@ -122,16 +122,19 @@ void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(i
         {-1, -2, -1},
     };
     const int ksz = 3; // kernel size
-    const int x_end = width - ksz + 1;
-    const int y_end = height - ksz + 1;
+    if (width <= ksz || height <= ksz){
+        return;
+    }
+    const size_t x_end = width - ksz + 1;
+    const size_t y_end = height - ksz + 1;
 
-    for(int y = 0; y < y_end; y++){
-        for(int x = 0; x < x_end; x++){
+    for(size_t y = 0; y < y_end; y++){
+        for(size_t x = 0; x < x_end; x++){
             int sum_x[3] = {0, 0, 0};
             int sum_y[3] = {0, 0, 0};
             bool has_alpha_pixel = false;
-            for(int sy = 0; sy < 3; sy++){
-                for(int sx = 0; sx < 3; sx++){
+            for(size_t sy = 0; sy < 3; sy++){
+                for(size_t sx = 0; sx < 3; sx++){
                     uint32_t p = image.pixel(x + sx, y + sy);
                     int alpha = p >> 24;
                     if (alpha < 128){
@@ -156,20 +159,19 @@ void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(i
                 continue;
             }
 
-            proces_gradient(x+1, y+1, sum_x, sum_y);
+            process_gradient(x+1, y+1, sum_x, sum_y);
         }
     }
 }
 
-QImage smooth_image(const ImageViewRGB32& image){
+ImageRGB32 smooth_image(const ImageViewRGB32& image){
     // static int count = 0;
     // {
     //     image.save("./test_smooth_before_" + QString::number(count) + ".png");
     // }
 
-    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
-    result.fill(QColor(0,0,0,0));
-    ImageRef result_ref(result);
+    ImageRGB32 result(image.width(), image.height());
+    result.fill(0);
 
     const float filter[5] = {0.062f, 0.244f, 0.388f, 0.244f, 0.062f};
 
@@ -208,13 +210,12 @@ QImage smooth_image(const ImageViewRGB32& image){
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
                 c[ch] = v;
             }
-            result_ref.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
+            result.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
         }
     }
 
-    QImage result2((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
-    result2.fill(QColor(0,0,0,0));
-    ImageRef result_ref2(result2);
+    ImageRGB32 result2(image.width(), image.height());
+    result2.fill(0);
 
     for(int y = 0; y < image_height; y++){
         for(int x = 0; x < image_width; x++){
@@ -250,13 +251,13 @@ QImage smooth_image(const ImageViewRGB32& image){
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
                 c[ch] = v;
             }
-            result_ref2.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
+            result2.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
         }
     }
 
     // {
-    //     result_ref.save("./test_smooth_middle_" + QString::number(count) + ".png");
-    //     result_ref2.save("./test_smooth_after_" + QString::number(count) + ".png");
+    //     result_ref.save("./test_smooth_middle_" + std::to_string(count) + ".png");
+    //     result_ref2.save("./test_smooth_after_" + std::to_string(count) + ".png");
     //     count++;
     // }
     // exit(0);
@@ -304,19 +305,18 @@ QImage convert_to_hsv(const ImageViewRGB32& image){
 }
 
 
-QImage compute_image_gradient(const ImageViewRGB32& image){
-    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
-    result.fill(QColor(0,0,0,0));
-    ImageRef result_ref(result);
+ImageRGB32 compute_image_gradient(const ImageViewRGB32& image){
+    ImageRGB32 result(image.width(), image.height());
+    result.fill(0);
 
-    run_Sobel_gradient_filter(image, [&](int x, int y, int sum_x[3], int sum_y[3]){
+    run_Sobel_gradient_filter(image, [&](size_t x, size_t y, int sum_x[3], int sum_y[3]){
         int gx = (sum_x[0] + sum_x[1] + sum_x[2] + 1) / 3;
         int gy = (sum_y[0] + sum_y[1] + sum_y[2] + 1) / 3;
 
         int gxc = std::min(std::abs(gx), 255);
         int gyc = std::min(std::abs(gy), 255);
 
-        result_ref.pixel(x, y) = combine_rgb(gxc, gyc, 0);
+        result.pixel(x, y) = combine_rgb(gxc, gyc, 0);
     });
 
     return result;
@@ -331,7 +331,7 @@ FeatureVector compute_gradient_histogram(const ImageViewRGB32& image){
 
     int num_grad = 0;
 
-    run_Sobel_gradient_filter(image, [&](int x, int y, int sum_x[3], int sum_y[3]){
+    run_Sobel_gradient_filter(image, [&](size_t x, size_t y, int sum_x[3], int sum_y[3]){
         int gx = sum_x[0] + sum_x[1] + sum_x[2];
         int gy = sum_y[0] + sum_y[1] + sum_y[2];
         if (gx*gx + gy*gy <= 2000){
@@ -366,20 +366,19 @@ FeatureVector compute_gradient_histogram(const ImageViewRGB32& image){
 } // end anonymous namespace
 
 FeatureVector compute_feature(const ImageViewRGB32& input_image){
-    QImage image = input_image.to_QImage_owning().convertToFormat(QImage::Format::Format_ARGB32);
-    ImageRef image_ref(image);
-    int width = image.width();
-    int height = image.height();
+    ImageRGB32 image = input_image.copy();
+    size_t width = image.width();
+    size_t height = image.height();
 
     // Set pixel outside the sprite circle to transparent:
     float r = (width + height) / 4.0;
     float center_x  = (width-1) / 2.0f;
     float center_y = (height-1) / 2.0f;
     float r2 = r * r;
-    for(int y = 0; y < height; y++){
-        for(int x = 0; x < width; x++){
+    for(size_t y = 0; y < height; y++){
+        for(size_t x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
-                image_ref.pixel(x, y) = 0;
+                image.pixel(x, y) = 0;
             }
         }
     }    
@@ -438,9 +437,9 @@ MMOSpriteMatchingData build_MMO_sprite_matching_data(){
         color_matcher.add(slug, sprite);
         QImage sprite_hsv = convert_to_hsv(sprite);
         color_matcher_hsv.add(slug, sprite_hsv);
-        QImage smoothed_sprite = smooth_image(sprite);
-        QImage sprite_gradient = compute_image_gradient(smoothed_sprite);
-        gradient_matcher.add(slug, sprite_gradient);
+        ImageRGB32 smoothed_sprite = smooth_image(sprite);
+        ImageRGB32 sprite_gradient = compute_image_gradient(smoothed_sprite);
+        gradient_matcher.add(slug, std::move(sprite_gradient));
 
         features.emplace(slug, compute_feature(smoothed_sprite));
     });
@@ -514,24 +513,27 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageV
 
 
 // For a sprite on the screenshot, create gradient image of it
-QImage compute_MMO_sprite_gradient(const ImageViewRGB32& image){
+ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
 
-    QImage result = smooth_image(image);
+    ImageRGB32 result = smooth_image(image);
     result = compute_image_gradient(result);
-    ImageRef result_ref(result);
     
-    int width = (int)image.width();
-    int height = (int)image.height();
+    size_t width = image.width();
+    size_t height = image.height();
+    if (width == 0 || height == 0){
+        return result;
+    }
+
     float r = (width + height) / 4.0;
     float center_x  = (width-1) / 2.0f;
     float center_y = (height-1) / 2.0f;
     // -r/8 to remove some boundary areas
     float dist2_th = (r - r/8) * (r - r/8);
-    for(int y = 0; y < height; y++){
-        for(int x = 0; x < width; x++){
+    for(size_t y = 0; y < height; y++){
+        for(size_t x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= dist2_th){
                 // gradients outside of the sprite circle is set to zero
-                result_ref.pixel(x, y) = combine_argb(0,0,0,0);
+                result.pixel(x, y) = combine_argb(0,0,0,0);
             }
         }
     }    
@@ -584,14 +586,14 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
 
             float match_score = 0.0;
             int num_gradients = 0;
-            for(int y = 0; y < gradient.height(); y++){
-                for(int x = 0; x < gradient.width(); x++){
+            for(size_t y = 0; y < gradient.height(); y++){
+                for(size_t x = 0; x < gradient.width(); x++){
                     uint32_t g = gradient.pixel(x, y);
                     if (is_transparent(g)){
                         continue;
                     }
-                    int my = y + oy; // moved y
-                    int mx = x + ox; // moved x
+                    int my = (int)(y + oy); // moved y
+                    int mx = (int)(x + ox); // moved x
                     if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
                         continue;
                     }
@@ -626,8 +628,8 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
 #ifdef USE_PIXEL_LEVEL_TRANSLATION
     score = 0;
     int num_gradients = 0;
-    for(int y = 0; y < gradient.height(); y++){
-        for(int x = 0; x < gradient.width(); x++){
+    for(size_t y = 0; y < gradient.height(); y++){
+        for(size_t x = 0; x < gradient.width(); x++){
             uint32_t g = gradient.pixel(x, y);
             uint32_t gx = uint32_t(0xff) & (g >> 16);
             uint32_t gy = uint32_t(0xff) & (g >> 8);
@@ -639,8 +641,8 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
             float min_pixel_score = FLT_MAX;
             for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
                 for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
-                    int my = y + oy; // moved y
-                    int mx = x + ox; // moved x
+                    int my = (int)(y + oy); // moved y
+                    int mx = (int)(x + ox); // moved x
                     if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
                         continue;
                     }
@@ -911,7 +913,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     }
 
     cout << "Gradient matching..." << endl;
-    QImage gradient_image = compute_MMO_sprite_gradient(extract_box_reference(screen, box));
+    ImageRGB32 gradient_image = compute_MMO_sprite_gradient(extract_box_reference(screen, box));
     
     // std::ostringstream os;
     // os << "test_sprite_gradient" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
