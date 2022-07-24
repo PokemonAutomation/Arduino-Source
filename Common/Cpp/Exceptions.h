@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 //  Base class. Don't use this directly. This is for the infra to catch everything.
 class Exception{
 public:
+    virtual ~Exception() = default;
     virtual const char* name() const = 0;
     virtual std::string message() const;
     virtual std::string to_str() const;
