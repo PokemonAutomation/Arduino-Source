@@ -92,8 +92,14 @@ bool ImagePixelBox::inside(size_t x, size_t y) const{
 void ImagePixelBox::clip(size_t image_width, size_t image_height){
     min_x = std::max(0, min_x);
     min_y = std::max(0, min_y);
-    max_x = std::min(max_x, image_width > 0 ? (int)image_width-1 : 0);
-    max_y = std::min(max_y, image_height > 0 ? (int)image_height-1 : 0);
+    max_x = std::min(max_x, (pxint_t)image_width);
+    max_y = std::min(max_y, (pxint_t)image_height);
+}
+void ImagePixelBox::clip(const ImagePixelBox& box){
+    min_x = std::max(min_x, box.min_x);
+    min_y = std::max(min_y, box.min_y);
+    max_x = std::min(max_x, box.max_x);
+    max_y = std::min(max_y, box.max_y);
 }
 
 size_t ImagePixelBox::distance_x(const ImagePixelBox& box) const{

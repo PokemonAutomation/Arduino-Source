@@ -45,27 +45,30 @@ struct ImagePixelBox{
     size_t center_x() const{ return (min_x + max_x)/2; }
     size_t center_y() const{ return (min_y + max_y)/2; }
 
-    // Create a box covering both `this` box and the parameter `box` passed in.
-    // If the parameter `box` has 0 area, do no change.
-    // If `this` box has 0 area, `this` becomes the parameter `box`.
+    //  Create a box covering both `this` box and the parameter `box` passed in.
+    //  If the parameter `box` has 0 area, do no change.
+    //  If `this` box has 0 area, `this` becomes the parameter `box`.
     void merge_with(const ImagePixelBox& box);
 
-    // Return whether two boxes overlap. Boxes touching each other does not count as overlap.
+    //  Return whether two boxes overlap. Boxes touching each other does not count as overlap.
     bool overlap(const ImagePixelBox& box) const;
 
-    // Return the overlapping area of `this` box and the parameter `box` passed in.
+    //  Return the overlapping area of `this` box and the parameter `box` passed in.
     size_t overlap_with(const ImagePixelBox& box) const;
 
-    // Whether a point (x, y) is inside the box. Points on the border of the box does not
-    // count as inside.
+    //  Whether a point (x, y) is inside the box. Points on the border of the box does not
+    //  count as inside.
     bool inside(size_t x, size_t y) const;
 
-    // clip the box to be within the image size.
+    //  Clip this box to be within the image size.
     void clip(size_t image_width, size_t image_height);
+
+    //  Clip this box to be within the specified box.
+    void clip(const ImagePixelBox& box);
     
-    // The distance to another box on x axis. If two boxes overlap, the distance is 0.
+    //  The distance to another box on x axis. If two boxes overlap, the distance is 0.
     size_t distance_x(const ImagePixelBox& box) const;
-    // The distance to another box on y axis. If two boxes overlap, the distance is 0.
+    //  The distance to another box on y axis. If two boxes overlap, the distance is 0.
     size_t distance_y(const ImagePixelBox& box) const;
 };
 

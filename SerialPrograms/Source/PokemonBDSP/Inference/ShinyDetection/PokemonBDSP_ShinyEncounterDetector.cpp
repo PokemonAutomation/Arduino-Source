@@ -98,6 +98,8 @@ bool ShinyEncounterTracker::process_frame(const std::shared_ptr<const ImageRGB32
         ImagePixelBox box_overall = floatbox_to_pixelbox(frame->width(), frame->height(), {0.4, 0.02, 0.60, 0.93});
         ImagePixelBox box_left = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_left);
         ImagePixelBox box_right = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_right);
+        box_left.clip(box_overall);
+        box_right.clip(box_overall);
         box_left.min_x -= box_overall.min_x;
         box_left.min_y -= box_overall.min_y;
         box_left.max_x -= box_overall.min_x;
