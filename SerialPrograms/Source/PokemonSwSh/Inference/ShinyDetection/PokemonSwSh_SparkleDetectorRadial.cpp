@@ -69,14 +69,14 @@ bool RadialSparkleDetector::is_ball() const{
     }
 
     //  Compute angles for the 4 largest regions.
-    pxint_t center_x = (pxint_t)(m_object.center_x() - m_object.min_x);
-    pxint_t center_y = (pxint_t)(m_object.center_y() - m_object.min_y);
+    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_x() - m_object.min_x);
+    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_y() - m_object.min_y);
     std::set<double> angles;
     {
         size_t c = 0;
         for (const auto& region : m_regions){
-            pxint_t x = (pxint_t)region.second.center_x() - center_x;
-            pxint_t y = (pxint_t)region.second.center_y() - center_y;
+            ptrdiff_t x = (ptrdiff_t)region.second.center_x() - center_x;
+            ptrdiff_t y = (ptrdiff_t)region.second.center_y() - center_y;
             double angle = std::atan2(y, x) * 57.29577951308232;
             if (angle < 0){
                 angle += 360;
@@ -106,9 +106,9 @@ bool RadialSparkleDetector::is_ball() const{
                 continue;
             }
             double distance = std::sqrt(center_x*center_x + center_y*center_y);
-            pxint_t dist_x = std::abs((pxint_t)(c - center_x));
-            pxint_t dist_y = std::abs((pxint_t)(r - center_y));
-            pxint_t dist = std::abs((pxint_t)(dist_y - dist_x));
+            ptrdiff_t dist_x = std::abs((ptrdiff_t)(c - center_x));
+            ptrdiff_t dist_y = std::abs((ptrdiff_t)(r - center_y));
+            ptrdiff_t dist = std::abs((ptrdiff_t)(dist_y - dist_x));
             if (dist > 2 + distance / 5.){
                 return false;
             }
@@ -132,13 +132,13 @@ bool RadialSparkleDetector::is_star() const{
     }
 
     //  Compute angles for the 5 largest regions.
-    pxint_t center_x = (pxint_t)(m_object.center_x() - m_object.min_x);
-    pxint_t center_y = (pxint_t)(m_object.center_y() - m_object.min_y);
+    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_x() - m_object.min_x);
+    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_y() - m_object.min_y);
     std::set<double> angles;
     size_t c = 0;
     for (const auto& region : m_regions){
-        pxint_t x = (pxint_t)region.second.center_x() - center_x;
-        pxint_t y = (pxint_t)region.second.center_y() - center_y;
+        ptrdiff_t x = (ptrdiff_t)region.second.center_x() - center_x;
+        ptrdiff_t y = (ptrdiff_t)region.second.center_y() - center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;

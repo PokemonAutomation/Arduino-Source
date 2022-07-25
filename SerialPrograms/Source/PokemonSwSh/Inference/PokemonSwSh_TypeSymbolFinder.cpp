@@ -33,14 +33,14 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
         return 0;
     }
 
-    pxint_t dist_x = 0;
+    ptrdiff_t dist_x = 0;
     if (!overlap_x){
         dist_x = a.max_x < b.min_x
             ? b.min_x - a.max_x
             : a.min_x - b.max_x;
     }
 
-    pxint_t dist_y = 0;
+    ptrdiff_t dist_y = 0;
     if (!overlap_y){
         dist_y = a.max_y < b.min_y
             ? b.min_y - a.max_y

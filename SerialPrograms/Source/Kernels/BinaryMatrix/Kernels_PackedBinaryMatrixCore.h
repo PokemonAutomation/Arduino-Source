@@ -20,9 +20,6 @@ namespace Kernels{
 
 class TileIndex{
 public:
-//    TileIndex(pxint_t x, pxint_t y)
-//        : m_index((uint32_t)x | ((uint64_t)y << 32))
-//    {}
     TileIndex(size_t x, size_t y)
         : m_index((uint32_t)x | ((uint64_t)y << 32))
     {

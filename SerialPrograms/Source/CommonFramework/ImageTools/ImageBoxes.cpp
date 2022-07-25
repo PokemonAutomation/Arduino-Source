@@ -131,7 +131,7 @@ ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box){
     return extract_box_reference(ImageRef(image), box);
 }
 
-ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, int offset_x, int offset_y){
+ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, ptrdiff_t offset_x, ptrdiff_t offset_y){
     ptrdiff_t min_x = (ptrdiff_t)(image.width() * box.x + 0.5) + offset_x;
     ptrdiff_t min_y = (ptrdiff_t)(image.height() * box.y + 0.5) + offset_y;
     ptrdiff_t width = (ptrdiff_t)(image.width() * box.width + 0.5);
@@ -160,8 +160,8 @@ ImageFloatBox translate_to_parent(
 ){
     double width = original_image.width();
     double height = original_image.height();
-    pxint_t box_x = (pxint_t)(width * inference_box.x + 0.5);
-    pxint_t box_y = (pxint_t)(height * inference_box.y + 0.5);
+    ptrdiff_t box_x = (ptrdiff_t)(width * inference_box.x + 0.5);
+    ptrdiff_t box_y = (ptrdiff_t)(height * inference_box.y + 0.5);
     return ImageFloatBox(
         (box_x + box.min_x) / width,
         (box_y + box.min_y) / height,

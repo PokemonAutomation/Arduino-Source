@@ -38,7 +38,7 @@ bool read_type_array(
         return false;
     }
 
-    std::multimap<pxint_t, const std::pair<PokemonType, ImagePixelBox>*> sorted;
+    std::multimap<size_t, const std::pair<PokemonType, ImagePixelBox>*> sorted;
 //    std::deque<InferenceBoxScope> hits;
     hits.clear();
     size_t c = 0;

@@ -38,13 +38,13 @@ std::vector<ImageRGB32> make_image_set(
 //    cout << std::sqrt(image / num_template_pixels) << endl;
     // scale: roughly the relative size between the input image and the template.
     // e.g. if the input image is 10 x 6 and template is 5 x 3, then `scale` is 2.
-    pxint_t scale = (pxint_t)(std::sqrt(num_image_pixels / num_template_pixels) + 0.5);
-    scale = std::max(scale, 1);
+    ptrdiff_t scale = (ptrdiff_t)(std::sqrt(num_image_pixels / num_template_pixels) + 0.5);
+    scale = std::max<ptrdiff_t>(scale, 1);
 
     std::vector<ImageRGB32> ret;
-    pxint_t limit = (pxint_t)tolerance;
-    for (pxint_t y = -limit; y <= limit; y++){
-        for (pxint_t x = -limit; x <= limit; x++){
+    ptrdiff_t limit = (ptrdiff_t)tolerance;
+    for (ptrdiff_t y = -limit; y <= limit; y++){
+        for (ptrdiff_t x = -limit; x <= limit; x++){
 //            if (x != 0 || y != -4){
 //                continue;
 //            }
