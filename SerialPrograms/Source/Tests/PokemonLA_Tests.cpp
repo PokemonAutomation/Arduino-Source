@@ -404,9 +404,9 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         draw_box(output_quest, box, combine_rgb(255, 0, 0));
         draw_box(output_sprite, box, combine_rgb(255, 0, 0));
 
-        int radius = int((box.width() + box.height()) / 4 + 0.5);
-        int center_x = box.center_x();
-        int center_y = box.center_y();
+        pxint_t radius = (pxint_t)((box.width() + box.height()) / 4 + 0.5);
+        pxint_t center_x = (pxint_t)box.center_x();
+        pxint_t center_y = (pxint_t)box.center_y();
         auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
         new_boxes.push_back(new_box);
         

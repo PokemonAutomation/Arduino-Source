@@ -36,6 +36,18 @@ ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, siz
             "Pixel Overflow: y = (" + std::to_string(p_min_y) + "," + std::to_string(p_max_y) + ")"
         );
     }
+    if (min_x > max_x){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid Box: min_x = " + std::to_string(min_x) + ", max_x = " + std::to_string(max_x)
+        );
+    }
+    if (min_y > max_y){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid Box: min_y = " + std::to_string(min_y) + ", max_y = " + std::to_string(max_y)
+        );
+    }
 }
 ImagePixelBox::ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object)
     : ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
@@ -73,8 +85,8 @@ size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
     return (size_t)(max_x - min_x) * (size_t)(max_y - min_y);
 }
 
-bool ImagePixelBox::inside(pxint_t x, pxint_t y) const{
-    return x > min_x && x < max_x && y > min_y && y < max_y;
+bool ImagePixelBox::inside(size_t x, size_t y) const{
+    return x > (size_t)min_x && x < (size_t)max_x && y > (size_t)min_y && y < (size_t)max_y;
 }
 
 void ImagePixelBox::clip(size_t image_width, size_t image_height){

@@ -261,7 +261,7 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
             size_t min_y = object.min_y + map_min_y;
             size_t max_x = object.max_x + map_min_x;
             size_t max_y = object.max_y + map_min_y;
-            results.emplace_back((pxint_t)min_x, (pxint_t)min_y, (pxint_t)max_x, (pxint_t)max_y);
+            results.emplace_back(min_x, min_y, max_x, max_y);
             return false;
         },
         debug_params.get()

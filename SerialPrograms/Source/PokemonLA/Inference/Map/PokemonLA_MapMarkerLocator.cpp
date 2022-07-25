@@ -96,8 +96,8 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     // The angle of each marker end relative to the marker center
     float end_angles[3] = {0.0f, 0.0f, 0.0f};
     for(int i = 0; i < 3; i++){
-        pxint_t x = (pxint_t)marker_ends[i].center_x() - (pxint_t)local_marker_center_x;
-        pxint_t y = (pxint_t)marker_ends[i].center_y() - (pxint_t)local_marker_center_y;
+        ptrdiff_t x = (ptrdiff_t)marker_ends[i].center_x() - (ptrdiff_t)local_marker_center_x;
+        ptrdiff_t y = (ptrdiff_t)marker_ends[i].center_y() - (ptrdiff_t)local_marker_center_y;
         float angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;

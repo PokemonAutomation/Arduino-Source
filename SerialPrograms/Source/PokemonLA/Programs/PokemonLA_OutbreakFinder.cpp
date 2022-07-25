@@ -472,9 +472,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     for (size_t i = 0; i < quest_results.size(); i++){
         const auto& box = quest_results[i];
 
-        int radius = int((box.width() + box.height()) / 4 + 0.5);
-        int center_x = box.center_x();
-        int center_y = box.center_y();
+        pxint_t radius = (pxint_t)((box.width() + box.height()) / 4 + 0.5);
+        pxint_t center_x = (pxint_t)box.center_x();
+        pxint_t center_y = (pxint_t)box.center_y();
         auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
         new_boxes.push_back(new_box);
     }
@@ -535,10 +535,15 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     std::vector<ImagePixelBox> star_boxes;
     for (size_t i = 0; i < new_boxes.size(); i++){
         const auto& sprite_box = new_boxes[i];
-        int radius = sprite_box.width() / 2;
-        int center_x = sprite_box.center_x();
-        int center_y = sprite_box.center_y();
-        ImagePixelBox star_box(center_x + radius/10, center_y - radius*16/10, center_x + radius * 5/4, center_y);
+        pxint_t radius = (pxint_t)sprite_box.width() / 2;
+        pxint_t center_x = (pxint_t)sprite_box.center_x();
+        pxint_t center_y = (pxint_t)sprite_box.center_y();
+        ImagePixelBox star_box(
+            center_x + radius/10,
+            center_y - radius*16/10,
+            center_x + radius * 5/4,
+            center_y
+        );
         star_boxes.push_back(std::move(star_box));
     }
 

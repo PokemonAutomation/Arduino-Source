@@ -248,7 +248,7 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
             continue;
         }
         // Skip if it overlaps with the main character.
-        if (character_area.inside((pxint_t)object.center_x(), (pxint_t)object.center_y())){
+        if (character_area.inside(object.center_x(), object.center_y())){
             continue;
         }
         
@@ -328,10 +328,10 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
         size_t enlarged_width = berry_box.width() + berry_box.width() / 2;
         size_t enlarged_height = berry_box.height() + berry_box.height() / 2;
         size_t enlarged_box_size = enlarged_width * enlarged_height;
-        enlarged_box.min_x = berry_box.center_x() - (pxint_t)enlarged_width/2;
-        enlarged_box.max_x = berry_box.center_x() + (pxint_t)enlarged_width/2;
-        enlarged_box.min_y = berry_box.center_y() - (pxint_t)enlarged_height/2;
-        enlarged_box.max_y = berry_box.center_y() + (pxint_t)enlarged_height/2;
+        enlarged_box.min_x = (pxint_t)berry_box.center_x() - (pxint_t)enlarged_width/2;
+        enlarged_box.max_x = (pxint_t)berry_box.center_x() + (pxint_t)enlarged_width/2;
+        enlarged_box.min_y = (pxint_t)berry_box.center_y() - (pxint_t)enlarged_height/2;
+        enlarged_box.max_y = (pxint_t)berry_box.center_y() + (pxint_t)enlarged_height/2;
 
         size_t potential_leaf_area = enlarged_box_size - berry_box.width() * berry_box.height();
 

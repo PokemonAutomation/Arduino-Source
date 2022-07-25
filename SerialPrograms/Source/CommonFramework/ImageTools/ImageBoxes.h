@@ -38,12 +38,12 @@ struct ImagePixelBox{
     ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y);
     ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object);
 
-    pxint_t width() const{ return max_x - min_x; }
-    pxint_t height() const{ return max_y - min_y; }
+    size_t width() const{ return max_x - min_x; }
+    size_t height() const{ return max_y - min_y; }
     size_t area() const{ return (size_t)width() * (size_t)height(); }
 
-    pxint_t center_x() const{ return (min_x + max_x)/2; }
-    pxint_t center_y() const{ return (min_y + max_y)/2; }
+    size_t center_x() const{ return (min_x + max_x)/2; }
+    size_t center_y() const{ return (min_y + max_y)/2; }
 
     // Create a box covering both `this` box and the parameter `box` passed in.
     // If the parameter `box` has 0 area, do no change.
@@ -58,7 +58,7 @@ struct ImagePixelBox{
 
     // Whether a point (x, y) is inside the box. Points on the border of the box does not
     // count as inside.
-    bool inside(pxint_t x, pxint_t y) const;
+    bool inside(size_t x, size_t y) const;
 
     // clip the box to be within the image size.
     void clip(size_t image_width, size_t image_height);
