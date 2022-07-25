@@ -106,9 +106,9 @@ bool RadialSparkleDetector::is_ball() const{
                 continue;
             }
             double distance = std::sqrt(center_x*center_x + center_y*center_y);
-            ptrdiff_t dist_x = std::abs((ptrdiff_t)(c - center_x));
-            ptrdiff_t dist_y = std::abs((ptrdiff_t)(r - center_y));
-            ptrdiff_t dist = std::abs((ptrdiff_t)(dist_y - dist_x));
+            ptrdiff_t dist_x = std::abs((ptrdiff_t)c - center_x);
+            ptrdiff_t dist_y = std::abs((ptrdiff_t)r - center_y);
+            ptrdiff_t dist = std::abs(dist_y - dist_x);
             if (dist > 2 + distance / 5.){
                 return false;
             }

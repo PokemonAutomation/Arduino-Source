@@ -852,7 +852,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
             float score = FLT_MAX;
             for(size_t ox = 0; ox <= 4; ox++){
                 for(size_t oy = 0; oy <= 4; oy++){
-                    ImagePixelBox shifted_box((pxint_t)ox, (pxint_t)oy, (pxint_t)box.width(), (pxint_t)box.height());
+                    ImagePixelBox shifted_box(ox, oy, box.width(), box.height());
                     float match_score = compute_MMO_sprite_hsv_distance(
                         candidate_template,
                         extract_box_reference(sprite_hsv, shifted_box)

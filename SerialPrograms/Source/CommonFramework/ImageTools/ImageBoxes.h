@@ -22,20 +22,20 @@ namespace Waterfill{
 } // end namespace Kernels
 
 
-using pxint_t = int;
+//  Deprecated
+using pxint_t = size_t;
 
 
 struct ImagePixelBox{
-    pxint_t min_x;
-    pxint_t min_y;
-    pxint_t max_x;  //  One past the end.
-    pxint_t max_y;  //  One past the end.
+    size_t min_x;
+    size_t min_y;
+    size_t max_x;  //  One past the end.
+    size_t max_y;  //  One past the end.
 
     ImagePixelBox() = default;
-    ImagePixelBox(pxint_t p_min_x, pxint_t p_min_y, pxint_t p_max_x, pxint_t p_max_y)
-        : min_x(p_min_x), min_y(p_min_y), max_x(p_max_x), max_y(p_max_y)
+    ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y)
+        : min_x(p_min_x) , min_y(p_min_y) , max_x(p_max_x) , max_y(p_max_y)
     {}
-    ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y);
     ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object);
 
     size_t width() const{ return max_x - min_x; }
