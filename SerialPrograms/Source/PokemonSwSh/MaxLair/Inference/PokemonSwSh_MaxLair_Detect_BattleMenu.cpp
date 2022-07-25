@@ -190,7 +190,7 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     //  Check for white status bar in bottom left corner.
     ImageStats status = image_stats(extract_box_reference(screen, m_status0));
     ImageStats health = image_stats(extract_box_reference(screen, m_status1));
-    extract_box_reference(screen, m_status1).save("test.png");
+//    extract_box_reference(screen, m_status1).save("test.png");
 //    cout << status.average << ", " << status.stddev << endl;
 //    cout << health.average << ", " << health.stddev << endl;
     if (is_white(status, 500, 20) && is_white(health)){
