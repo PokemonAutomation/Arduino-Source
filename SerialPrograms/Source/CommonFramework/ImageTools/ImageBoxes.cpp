@@ -20,6 +20,25 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+
+ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y)
+    : min_x(p_min_x) , min_y(p_min_y) , max_x(p_max_x) , max_y(p_max_y)
+{
+    if (min_x > max_x){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid Box: min_x = " + std::to_string(min_x) + ", max_x = " + std::to_string(max_x)
+        );
+    }
+    if (min_y > max_y){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid Box: min_y = " + std::to_string(min_y) + ", max_y = " + std::to_string(max_y)
+        );
+    }
+}
+
+
 ImagePixelBox::ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object)
     : ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
 {}
@@ -209,11 +228,11 @@ void draw_box(ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color,
 
     auto clamp_x = [&](ptrdiff_t x){
         x = std::max<ptrdiff_t>(x, 0);
-        return std::min<size_t>((size_t)x, image.width());
+        return std::min(x, (ptrdiff_t)image.width() - 1);
     };
     auto clamp_y = [&](ptrdiff_t y){
         y = std::max<ptrdiff_t>(y, 0);
-        return std::min<size_t>((size_t)y, image.height());
+        return std::min(y, (ptrdiff_t)image.height() - 1);
     };
 
     auto draw_solid_rect = [&](ptrdiff_t start_x, ptrdiff_t start_y, ptrdiff_t end_x, ptrdiff_t end_y){
@@ -221,14 +240,8 @@ void draw_box(ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color,
         end_x = clamp_x(end_x);
         start_y = clamp_y(start_y);
         end_y = clamp_y(end_y);
-        if (start_x > end_x){
-            std::swap(start_x, end_x);
-        }
-        if (start_y > end_y){
-            std::swap(start_y, end_y);
-        }
-        for (ptrdiff_t y = start_y; y < end_y; ++y){
-            for (ptrdiff_t x = start_x; x < end_x; ++x){
+        for (ptrdiff_t y = start_y; y <= end_y; ++y){
+            for (ptrdiff_t x = start_x; x <= end_x; ++x){
                 // setPixelColor(x, y, qColor);
                 image.pixel(x, y) = color;
             }
@@ -237,16 +250,17 @@ void draw_box(ImageRGB32& image, const ImagePixelBox& pixel_box, uint32_t color,
 
     ptrdiff_t lo = ((ptrdiff_t)thickness - 1) / 2; // lower offset
     ptrdiff_t uo = (ptrdiff_t)thickness - lo - 1; // upper offset
-    
+
     // draw the upper horizontal line
-    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo, pixel_box.min_y+uo);
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo-1, pixel_box.min_y+uo);
     // draw the lower horizontal line
-    draw_solid_rect(pixel_box.min_x-lo, pixel_box.max_y-lo, pixel_box.max_x+uo, pixel_box.max_y+uo);
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.max_y-lo-1, pixel_box.max_x+uo-1, pixel_box.max_y+uo-1);
     // draw the left vertical line
-    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.min_x+uo, pixel_box.max_y+uo);
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.min_x+uo, pixel_box.max_y+uo-1);
     // draw the right vertical line
-    draw_solid_rect(pixel_box.max_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo, pixel_box.max_y+uo);
+    draw_solid_rect(pixel_box.max_x-lo-1, pixel_box.min_y-lo, pixel_box.max_x+uo-1, pixel_box.max_y+uo-1);
 }
+
 
 
 }
