@@ -175,17 +175,17 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
 
     const float filter[5] = {0.062f, 0.244f, 0.388f, 0.244f, 0.062f};
 
-    int image_width = (int)image.width();
-    int image_height = (int)image.height();
-    for(int y = 0; y < image_height; y++){
-        for(int x = 0; x < image_width; x++){
+    size_t image_width = image.width();
+    size_t image_height = image.height();
+    for(size_t y = 0; y < image_height; y++){
+        for(size_t x = 0; x < image_width; x++){
             float sum[3] = {0,0,0};
             float weights = 0.0;
-            for(int i = 0; i < 5; i++){
-                int sx = x + i - 2;
-                if (sx < 0 || sx >= image_width){
+            for(size_t i = 0; i < 5; i++){
+                if (x + i < 2 || x + i >= image_width + 2){
                     continue;
                 }
+                size_t sx = x + i - 2;
             
                 uint32_t p = image.pixel(sx, y);
                 if (is_transparent(p)){
@@ -217,16 +217,15 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
     ImageRGB32 result2(image.width(), image.height());
     result2.fill(0);
 
-    for(int y = 0; y < image_height; y++){
-        for(int x = 0; x < image_width; x++){
+    for(size_t y = 0; y < image_height; y++){
+        for(size_t x = 0; x < image_width; x++){
             float sum[3] = {0,0,0};
             float weights = 0.0;
-            for(int i = 0; i < 5; i++){
-                int sy = y + i - 2;
-                
-                if (sy < 0 || sy >= image_height){
+            for(size_t i = 0; i < 5; i++){
+                if (y + i < 2 || y + i - 2 >= image_height){
                     continue;
                 }
+                size_t sy = y + i - 2;
 
                 uint32_t p = result.pixel(x, sy);
                 if (is_transparent(p)){
@@ -270,8 +269,8 @@ QImage convert_to_hsv(const ImageViewRGB32& image){
     result.fill(QColor(0,0,0,0));
     ImageRef result_ref(result);
 
-    for(int y = 0; y < (int)image.height(); y++){
-        for(int x = 0; x < (int)image.width(); x++){
+    for(size_t y = 0; y < image.height(); y++){
+        for(size_t x = 0; x < image.width(); x++){
             uint32_t p = image.pixel(x, y);
             if (is_transparent(p)){
                 continue;
@@ -536,7 +535,7 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
                 result.pixel(x, y) = combine_argb(0,0,0,0);
             }
         }
-    }    
+    }
     return result;
 }
 
@@ -764,26 +763,24 @@ float compute_hsv_dist2(uint32_t template_color, uint32_t color){
 }
 
 float compute_MMO_sprite_hsv_distance(const ImageViewRGB32& image_template, const ImageViewRGB32& query_image){
-    int tempt_width = (int)image_template.width();
-    int tempt_height = (int)image_template.height();
+    size_t tempt_width = image_template.width();
+    size_t tempt_height = image_template.height();
 
     // cout << tempt_width << " " << tempt_height << " " << query_image.width() << " " << query_image.height() << endl;
     float score = 0.0;
     int num_pixels = 0;
-    for(int y = 0; y < (int)query_image.height(); y++){
-        for(int x = 0; x < (int)query_image.width(); x++){
+    for(size_t y = 0; y < query_image.height(); y++){
+        for(size_t x = 0; x < query_image.width(); x++){
             uint32_t p = query_image.pixel(x, y);
             if (is_transparent(p)){
                 // cout << "Skip query pixel " << x << " " << y << endl;
                 continue;
             }
-            int mx = x;
-            int my = y;
-            if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
+            if (x >= tempt_width || y >= tempt_height){
                 continue;
             }
 
-            uint32_t t_p = image_template.pixel(mx, my);
+            uint32_t t_p = image_template.pixel(x, y);
             if (is_transparent(t_p)){
                 // cout << "Skip template pixel " << x << " " << y << endl;
                 continue;
@@ -847,14 +844,15 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
         // auto color_match_results = color_matcher.subset_match(result.candidates, screen,
         //     pixelbox_to_floatbox(screen, box), 1, 10);
         // result.color_match_results = std::move(color_match_results.results);
-        ImagePixelBox expanded_box(box.min_x - 2, box.min_y - 2, box.max_x + 2, box.max_y + 2);
+
+        ImagePixelBox expanded_box(box.min_x < 2 ? 0 : box.min_x - 2, box.min_y < 2 ? 0 : box.min_y - 2, box.max_x + 2, box.max_y + 2);
         QImage sprite_hsv = convert_to_hsv(extract_box_reference(screen, expanded_box));
         for(const auto& slug: result.candidates){
             ImageViewRGB32 candidate_template = color_matcher_hsv.image_template(slug);
             float score = FLT_MAX;
-            for(int ox = -2; ox <= 2; ox++){
-                for(int oy = -2; oy <= 2; oy++){
-                    ImagePixelBox shifted_box(ox+2, oy+2, (pxint_t)box.width(), (pxint_t)box.height());
+            for(size_t ox = 0; ox <= 4; ox++){
+                for(size_t oy = 0; oy <= 4; oy++){
+                    ImagePixelBox shifted_box((pxint_t)ox, (pxint_t)oy, (pxint_t)box.width(), (pxint_t)box.height());
                     float match_score = compute_MMO_sprite_hsv_distance(
                         candidate_template,
                         extract_box_reference(sprite_hsv, shifted_box)
