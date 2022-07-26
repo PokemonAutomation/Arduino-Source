@@ -4,6 +4,7 @@
  *
  */
 
+#include <string.h>
 #include "Common/Cpp/Exceptions.h"
 #include "ImageReference.h"
 #include "ImageHSV32.h"
