@@ -58,7 +58,10 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     )
     , NUM_EGGS_IN_COLUMN(
         "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
-        0, 0, 5
+        {
+            "0", "1", "2", "3", "4", "5"
+        },
+        0
     )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
@@ -176,7 +179,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         TRAVEL_TIME_PER_FETCH,
         FILTERS,
         MAX_KEEPERS,
-        NUM_EGGS_IN_COLUMN
+        static_cast<uint8_t>(size_t(NUM_EGGS_IN_COLUMN))
     );
     EggAutonomousState saved_state = current_state;
 
