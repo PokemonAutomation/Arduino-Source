@@ -13,8 +13,6 @@
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 
 #include <QFileInfo>
-#include <QImage>
-#include <QImageReader>
 
 #include <iostream>
 #include <algorithm>
@@ -32,17 +30,17 @@ namespace PokemonAutomation{
 // files, read data from test file names or gold files and possibly more.
 // To reuse the code, we design the following helper functions.
 
-using ImageFilenameFunction = std::function<int(const QImage& image, const std::string& filename_base)>;
+using ImageFilenameFunction = std::function<int(const ImageViewRGB32& image, const std::string& filename_base)>;
 
-using ImageBoolDetectorFunction = std::function<int(const QImage& image, bool target)>;
+using ImageBoolDetectorFunction = std::function<int(const ImageViewRGB32& image, bool target)>;
 
-using ImageFloatDetectorFunction = std::function<int(const QImage& image, float target, float threshold)>;
+using ImageFloatDetectorFunction = std::function<int(const ImageViewRGB32& image, float target, float threshold)>;
 
-using ImageIntDetectorFunction = std::function<int(const QImage& image, int target)>;
+using ImageIntDetectorFunction = std::function<int(const ImageViewRGB32& image, int target)>;
 
-using ImageWordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& words)>;
+using ImageWordsDetectorFunction = std::function<int(const ImageViewRGB32& image, const std::vector<std::string>& words)>;
 
-using ImageVoidDetectorFunction = std::function<void(const QImage& image)>;
+using ImageVoidDetectorFunction = std::function<void(const ImageViewRGB32& image)>;
 
 using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpectrum>& spectrums, bool target)>;
 
@@ -52,16 +50,14 @@ using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpect
 // Helper for testing code that reads an image and uses filename to get the target outcome for the code.
 // test_func: reads an image and the image filename base and returns an int code.
 int image_filename_detector_helper(ImageFilenameFunction test_func, const std::string& test_path){
-    const QString file_path = QString::fromStdString(test_path);
-    QImageReader reader(file_path);
-    if (reader.canRead() == false){
+    try{
+        ImageRGB32 image(test_path);
+        QFileInfo file_info(QString::fromStdString(test_path));
+        return test_func(image, file_info.baseName().toStdString());
+    }catch (FileException&){
         cout << "Skip " << test_path << " as it cannot be read as image" << endl;
         return -1;
     }
-
-    QFileInfo file_info(file_path);
-    const QImage image = reader.read();
-    return test_func(image, file_info.baseName().toStdString());
 }
 
 
@@ -69,7 +65,7 @@ int image_filename_detector_helper(ImageFilenameFunction test_func, const std::s
 // The target test result (whether this test file should be detected as true or false)
 // is stored as part of the filename. For example, IngoBattleDayTime-True.png.
 int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
+    auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::string& filename_base){
         const auto name_base = QString::fromStdString(filename_base);
         bool target_bool = false;
         if (name_base.endsWith("-True")){
@@ -91,7 +87,7 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
 // by words included in the test filename.
 // The helper will split the filename by "-" into words and send it in the same order to the test function.
 int image_words_detector_helper(ImageWordsDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
+    auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::string& filename_base){
         return test_func(image, parse_words(filename_base));
     };
 
@@ -101,7 +97,7 @@ int image_words_detector_helper(ImageWordsDetectorFunction test_func, const std:
 // Helper for testing detector code that reads an image and returns a non-negative float that can be described
 // in the filename for example <name_base>-0.4.png.
 int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& words) -> int{
+    auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::vector<std::string>& words) -> int{
         if (words.size() < 2){
             cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
             return 1;
@@ -121,7 +117,7 @@ int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_fun
 }
 
 int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
-    auto parse_filename_and_run_test = [&](const QImage& image, const std::vector<std::string>& words) -> int{
+    auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::vector<std::string>& words) -> int{
         if (words.size() == 0){
             cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
             return 1;
@@ -145,8 +141,7 @@ int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const
 // This is used for developing visual inference code where the developer writes custom
 // debugging output. So no need to get target values from the test framework.
 int image_void_detector_helper(ImageVoidDetectorFunction test_func, const std::string& test_path){
-    const QString file_path = QString::fromStdString(test_path);
-    auto run_test = [&](const QImage& image, const std::string&) -> int{
+    auto run_test = [&](const ImageViewRGB32& image, const std::string&) -> int{
         test_func(image);
         return 0;
     };
