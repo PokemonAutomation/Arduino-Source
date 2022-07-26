@@ -74,7 +74,7 @@
  *  TestMap.h:int screen_bool_detector_helper(ScreenBoolDetectorFunction test_func, const std::string& test_path)
  *  screen_bool_detector_helper helps implement visual inference test with single bool as output (just like BattleMenuDetector).
  *  It implements skipping non-image files and parse filename to get target output bool.
- *  It then calls ScreenBoolDetectorFunction = std::function<int(const QImage& image, bool target)> test_func which will be implemented by the test developer
+ *  It then calls ScreenBoolDetectorFunction = std::function<int(const ImageViewRGB32& image, bool target)> test_func which will be implemented by the test developer
  *  to call the actual inference code and check its result against the target bool.
  *  
  *  So in order to implement a test for, let's say, BattleMenuDetector:

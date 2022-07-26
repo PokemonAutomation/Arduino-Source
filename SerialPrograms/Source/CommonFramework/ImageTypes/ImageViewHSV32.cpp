@@ -4,7 +4,6 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "ImageReference.h"
 #include "ImageHSV32.h"

@@ -9,16 +9,16 @@
 #ifndef PokemonAutomation_Tests_PokemonSwSh_Tests_H
 #define PokemonAutomation_Tests_PokemonSwSh_Tests_H
 
-class QImage;
-
 #include <vector>
 #include <string>
 
 namespace PokemonAutomation{
 
-int test_pokemonSwSh_YCommMenuDetector(const QImage& image, bool target);
+class ImageViewRGB32;
 
-int test_pokemonSwSh_MaxLair_BattleMenuDetector(const QImage& image, bool target);
+int test_pokemonSwSh_YCommMenuDetector(const ImageViewRGB32& image, bool target);
+
+int test_pokemonSwSh_MaxLair_BattleMenuDetector(const ImageViewRGB32& image, bool target);
 
 
 }

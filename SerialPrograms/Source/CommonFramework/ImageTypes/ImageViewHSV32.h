@@ -10,8 +10,6 @@
 #include <string>
 #include "ImageViewPlanar32.h"
 
-class QImage;
-
 namespace PokemonAutomation{
 
 

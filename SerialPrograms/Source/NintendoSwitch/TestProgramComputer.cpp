@@ -73,6 +73,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 
@@ -131,6 +132,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+    ImageRGB32 image("screenshot-20220725-170822724101.png");
+    ImageHSV32 hsv(image);
 
 
 

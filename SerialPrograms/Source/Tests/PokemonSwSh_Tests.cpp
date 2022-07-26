@@ -13,7 +13,6 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
 #include <QFileInfo>
-#include <QImage>
 #include <QDir>
 #include <cmath>
 #include <iostream>
@@ -28,7 +27,7 @@ namespace PokemonAutomation{
 
 using namespace NintendoSwitch::PokemonSwSh;
 
-int test_pokemonSwSh_YCommMenuDetector(const QImage& image, bool target){
+int test_pokemonSwSh_YCommMenuDetector(const ImageViewRGB32& image, bool target){
     YCommMenuDetector detector(true);
 
     bool result = detector.process_frame(image, current_time());
@@ -36,7 +35,7 @@ int test_pokemonSwSh_YCommMenuDetector(const QImage& image, bool target){
     return 0;
 }
 
-int test_pokemonSwSh_MaxLair_BattleMenuDetector(const QImage& image, bool target){
+int test_pokemonSwSh_MaxLair_BattleMenuDetector(const ImageViewRGB32& image, bool target){
     MaxLairInternal::BattleMenuDetector detector;
 
     bool result = detector.detect(image);
