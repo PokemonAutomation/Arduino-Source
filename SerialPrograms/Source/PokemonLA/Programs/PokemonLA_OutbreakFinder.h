@@ -82,6 +82,7 @@ private:
     class Stats;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    BooleanCheckBoxOption RESET_WHEN_MMO_FOUND;
 
     OCR::LanguageOCR LANGUAGE;
 

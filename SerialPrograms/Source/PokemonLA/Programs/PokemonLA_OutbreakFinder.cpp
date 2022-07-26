@@ -89,6 +89,32 @@ const Pokemon::ExtraNames& MMO_NAMES(){
     return mmo_names;
 }
 
+struct RegionLocationCamp
+{
+    MapRegion region = MapRegion::FIELDLANDS;
+    TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
+    Camp camp = Camp::FIELDLANDS_FIELDLANDS;
+};
+
+RegionLocationCamp get_region_location_camp(const std::string& mmo_name){
+    for (size_t i = 0; i < 5; i++) {
+        if (mmo_name == MMO_NAMES().name_list[i]) {
+            switch (i) {
+            case 0:
+                return {MapRegion::FIELDLANDS, TravelLocations::instance().Fieldlands_Fieldlands, Camp::FIELDLANDS_FIELDLANDS};
+            case 1:
+                return {MapRegion::MIRELANDS, TravelLocations::instance().Mirelands_Mirelands, Camp::MIRELANDS_MIRELANDS};
+            case 2:
+                return {MapRegion::COASTLANDS, TravelLocations::instance().Coastlands_Beachside, Camp::COASTLANDS_BEACHSIDE};
+            case 3:
+                return {MapRegion::HIGHLANDS, TravelLocations::instance().Highlands_Highlands, Camp::HIGHLANDS_HIGHLANDS};
+            case 4:
+                return {MapRegion::ICELANDS, TravelLocations::instance().Icelands_Snowfields, Camp::ICELANDS_SNOWFIELDS};
+            }
+        }
+    }
+    return {};
+}
 
 } // anonymous namespace
 
@@ -108,6 +134,9 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
 OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
+    , RESET_WHEN_MMO_FOUND(
+        "<b>Reset game when a MMO " + STRING_POKEMON + " has been found:</b><br>"
+        "When the program finds a good MMO " + STRING_POKEMON + ", reset the game to save Agav berries and travel back to the appropriate location.", false)
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , DESIRED_MO_SLUGS(
         "<b>Desired Outbreak " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
@@ -142,6 +171,7 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(RESET_WHEN_MMO_FOUND);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(DESIRED_MO_SLUGS);
     PA_ADD_OPTION(DESIRED_MMO_SLUGS);
@@ -381,40 +411,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 ){
     Stats& stats = env.current_stats<Stats>();
 
-    MapRegion region = MapRegion::NONE;
-    TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
-    Camp camp = Camp::FIELDLANDS_FIELDLANDS;
-    for(size_t i = 0; i < 5; i++){
-        if (mmo_name == MMO_NAMES().name_list[i]){
-            switch (i){
-            case 0:
-                region = MapRegion::FIELDLANDS;
-                location = TravelLocations::instance().Fieldlands_Fieldlands;
-                camp = Camp::FIELDLANDS_FIELDLANDS;
-                break;
-            case 1:
-                region = MapRegion::MIRELANDS;
-                location = TravelLocations::instance().Mirelands_Mirelands;
-                camp = Camp::MIRELANDS_MIRELANDS;
-                break;
-            case 2:
-                region = MapRegion::COASTLANDS;
-                location = TravelLocations::instance().Coastlands_Beachside;
-                camp = Camp::COASTLANDS_BEACHSIDE;
-                break;
-            case 3:
-                region = MapRegion::HIGHLANDS;
-                location = TravelLocations::instance().Highlands_Highlands;
-                camp = Camp::HIGHLANDS_HIGHLANDS;
-                break;
-            case 4:
-                region = MapRegion::ICELANDS;
-                location = TravelLocations::instance().Icelands_Snowfields;
-                camp = Camp::ICELANDS_SNOWFIELDS;
-                break;
-            }
-        }
-    }
+    const auto [region, location, camp] = get_region_location_camp(mmo_name);
     if (region == MapRegion::NONE){
         throw OperationFailedException(env.console, "Program internal error. No MMO region name found.");
     }
@@ -642,7 +639,29 @@ bool OutbreakFinder::run_iteration(
                 for (const auto& pokemon : found_pokemon){
                     os << pokemon << ", ";
                 }
+                const auto [region, location, camp] = get_region_location_camp(mmo_name);
+                os << "(in region " << MAP_REGION_NAMES[(int)region] << ")";
                 env.log(os.str());
+
+                if (RESET_WHEN_MMO_FOUND){
+                    // Send notification now, to get the embed with the detected mmo pokemon on the map
+                    env.update_stats();
+                    send_program_notification(
+                        env.console, NOTIFICATION_MATCHED,
+                        COLOR_GREEN,
+                        env.program_info(),
+                        "Found Outbreak",
+                        {{"Session Stats", stats.to_str()}},
+                        env.console.video().snapshot()
+                    );
+
+                    env.log("Resetting the game and going back to location to save 5 agav berries...");
+                    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    env.log("Going back to " + std::string(MAP_REGION_NAMES[(int)region]) + ".");
+                    goto_camp_from_jubilife(env, env.console, context, location);
+                }
+
                 return true;
             }
 
