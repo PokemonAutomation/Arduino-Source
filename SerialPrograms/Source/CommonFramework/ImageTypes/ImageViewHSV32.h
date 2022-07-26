@@ -42,13 +42,6 @@ public:
 
 public:
     ImageHSV32 copy() const;
-    bool save(const std::string& path) const;
-    ImageHSV32 scale_to(size_t width, size_t height) const;
-
-public:
-    ImageViewHSV32(const QImage& image);
-    QImage to_QImage_ref() const;       //  Return a shallow copy-on-write reference that points to this buffer. (fast)
-    QImage to_QImage_owning() const;    //  Return a copy that owns its own buffer. (slow)
 
 private:
     ImageViewHSV32(const ImageViewPlanar32& x)

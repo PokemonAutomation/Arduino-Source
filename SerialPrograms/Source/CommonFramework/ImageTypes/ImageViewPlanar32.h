@@ -25,7 +25,7 @@ public:
 
 public:
     //  Returns true if this image is valid. (non-null and non-zero dimensions)
-    PA_FORCE_INLINE operator bool() const{ return m_ptr != nullptr; }
+    PA_FORCE_INLINE explicit operator bool() const{ return m_ptr != nullptr; }
 
     PA_FORCE_INLINE const uint32_t* data            () const{ return m_ptr; }
     PA_FORCE_INLINE size_t          bytes_per_row   () const{ return m_bytes_per_row; }

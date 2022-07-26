@@ -35,31 +35,9 @@ ImageHSV32 ImageViewHSV32::copy() const{
     }
     return ret;
 }
-bool ImageViewHSV32::save(const std::string& path) const{
-    return to_QImage_ref().save(QString::fromStdString(path));
-}
 
 
 
-ImageViewHSV32::ImageViewHSV32(const QImage& image){
-    if (image.isNull()){
-        return;
-    }
-    QImage::Format format = image.format();
-    if (format != QImage::Format_AHSV32 && format != QImage::Format_HSV32){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format.");
-    }
-    m_width = image.width();
-    m_height = image.height();
-    m_bytes_per_row = image.bytesPerLine();
-    m_ptr = (uint32_t*)image.bits();    //  Intentionally casting away const. It won't be modified.
-}
-QImage ImageViewHSV32::to_QImage_ref() const{
-    return QImage((const uchar*)m_ptr, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_AHSV32);
-}
-QImage ImageViewHSV32::to_QImage_owning() const{
-    return to_QImage_ref().copy();
-}
 
 
 

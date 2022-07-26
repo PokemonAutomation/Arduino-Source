@@ -156,8 +156,10 @@ SOURCES += \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
+    Source/CommonFramework/ImageTypes/ImageHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp \
     Source/CommonFramework/ImageTypes/ImageReference.cpp \
+    Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
@@ -847,8 +849,10 @@ HEADERS += \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/ImageTools/WaterfillUtilities.h \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
+    Source/CommonFramework/ImageTypes/ImageHSV32.h \
     Source/CommonFramework/ImageTypes/ImageRGB32.h \
     Source/CommonFramework/ImageTypes/ImageReference.h \
+    Source/CommonFramework/ImageTypes/ImageViewHSV32.h \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.h \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
