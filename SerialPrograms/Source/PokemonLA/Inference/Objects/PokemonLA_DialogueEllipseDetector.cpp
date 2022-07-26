@@ -48,7 +48,7 @@ void DialogueEllipseTracker::process_object(const ImageViewRGB32& image, const W
     }
 }
 
-void DialogueEllipseTracker::finish(){
+void DialogueEllipseTracker::finish(const ImageViewRGB32& image){
     merge_heavily_overlapping();
 }
 

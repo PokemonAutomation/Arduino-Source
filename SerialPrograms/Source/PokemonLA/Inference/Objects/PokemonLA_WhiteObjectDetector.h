@@ -49,7 +49,7 @@ public:
     void clear(){ m_detections.clear(); }
 
     virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) = 0;
-    virtual void finish(){}
+    virtual void finish(const ImageViewRGB32& image){}
 
 protected:
     void merge_heavily_overlapping(double tolerance = 0.2);

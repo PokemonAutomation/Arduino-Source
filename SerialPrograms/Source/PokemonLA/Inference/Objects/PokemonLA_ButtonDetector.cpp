@@ -135,7 +135,7 @@ void ButtonTracker::process_object(const ImageViewRGB32& image, const WaterfillO
         m_detections.emplace_back(object);
     }
 }
-void ButtonTracker::finish(){
+void ButtonTracker::finish(const ImageViewRGB32& image){
     merge_heavily_overlapping();
 }
 

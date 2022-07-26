@@ -50,10 +50,13 @@ void find_overworld_white_objects(
 #if 1
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
         for (size_t c = 0; c < filters.size(); c++){
+//            cout << matrix[c].width() << " x " << matrix[c].height() << endl;
+//            cout << matrix[c].dump() << endl;
             session->set_source(matrix[c]);
             auto finder = session->make_iterator(50);
             WaterfillObject object;
             while (finder->find_next(object, false)){
+//                cout << object.area << endl;
                 for (const auto& detector : detectors){
                     const std::set<Color>& thresholds = detector.first.thresholds();
                     if (thresholds.find((Color)filters[c].first) != thresholds.end()){
@@ -66,7 +69,7 @@ void find_overworld_white_objects(
     }
 
     for (const auto& detector : detectors){
-        detector.first.finish();
+        detector.first.finish(image);
     }
 }
 

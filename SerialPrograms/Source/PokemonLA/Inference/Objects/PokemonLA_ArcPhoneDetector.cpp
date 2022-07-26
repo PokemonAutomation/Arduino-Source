@@ -63,7 +63,7 @@ void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const Waterfil
         m_detections.emplace_back(object);
     }
 }
-void ArcPhoneTracker::finish(){
+void ArcPhoneTracker::finish(const ImageViewRGB32& image){
     merge_heavily_overlapping();
 }
 

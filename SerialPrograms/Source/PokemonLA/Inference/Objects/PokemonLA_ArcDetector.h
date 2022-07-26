@@ -19,7 +19,7 @@ class ArcDetector : public WhiteObjectDetector{
 public:
     ArcDetector();
     virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) override;
-    virtual void finish() override;
+    virtual void finish(const ImageViewRGB32& image) override;
 
 private:
     std::list<ImagePixelBox> m_left;

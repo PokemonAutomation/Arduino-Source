@@ -71,7 +71,7 @@ void BubbleDetector::process_object(const ImageViewRGB32& image, const Waterfill
         m_detections.emplace_back(object_box);
     }
 }
-void BubbleDetector::finish(){
+void BubbleDetector::finish(const ImageViewRGB32& image){
     merge_heavily_overlapping();
 }
 

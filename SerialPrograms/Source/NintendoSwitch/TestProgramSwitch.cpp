@@ -105,12 +105,33 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+
+
+    ImageRGB32 image("screenshot-20220725-170822724101.png");
+
+    NintendoSwitch::PokemonLA::FlagTracker tracker(logger, overlay);
+
+    tracker.process_frame(image, current_time());
+
+#if 0
+    BotBaseContext context(scope, console.botbase());
+    wait_until(
+        console, context, std::chrono::seconds(60),
+        {
+            {tracker}
+        },
+        std::chrono::seconds(50)
+    );
+#endif
+
+
+#if 0
     std::shared_ptr<const ImageRGB32> image = feed.snapshot();
 
     cout << image->width() << " x " << image->height() << endl;
 
     cout << image->save("test.png") << endl;
-
+#endif
 
 #if 0
     VideoOverlaySet overlays(overlay);

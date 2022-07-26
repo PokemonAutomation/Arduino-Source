@@ -103,6 +103,7 @@ FlagDetector::FlagDetector()
     )
 {}
 void FlagDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+//    cout << "FlagDetector::process_object()" << endl;
     if (object.area < 50){
         return;
     }
@@ -117,18 +118,39 @@ void FlagDetector::process_object(const ImageViewRGB32& image, const WaterfillOb
     }
     ImagePixelBox object_box;
 
+//    static int count = 0;
+//    extract_box_reference(image, object).save("test-" + std::to_string(count++) + ".png");
+
 //    cout << "left" << endl;
     if (FlagMatcher::left().matches(object_box, image, object)){
+//        static int count = 0;
+//        extract_box_reference(image, object_box).save("test-left-" + std::to_string(count++) + ".png");
         m_left.emplace_back(object_box);
     }
 //    cout << "right" << endl;
     if (FlagMatcher::right().matches(object_box, image, object)){
+//        static int count = 0;
+//        extract_box_reference(image, object_box).save("test-right-" + std::to_string(count++) + ".png");
         m_right.emplace_back(object_box);
     }
-}
-void FlagDetector::finish(){
+
 //    cout << "left  = " << m_left.size() << endl;
 //    cout << "right = " << m_right.size() << endl;
+}
+void FlagDetector::finish(const ImageViewRGB32& image){
+#if 0
+    cout << "left  = " << m_left.size() << endl;
+    cout << "right = " << m_right.size() << endl;
+
+    for (const ImagePixelBox& box : m_left){
+        static int count = 0;
+        extract_box_reference(image, box).save("test-left-" + std::to_string(count++) + ".png");
+    }
+    for (const ImagePixelBox& box : m_right){
+        static int count = 0;
+        extract_box_reference(image, box).save("test-right-" + std::to_string(count++) + ".png");
+    }
+#endif
 
     //  Merge left/right parts.
     for (auto iter0 = m_left.begin(); iter0 != m_left.end();){
@@ -138,20 +160,24 @@ void FlagDetector::finish(){
         for (auto iter1 = m_right.begin(); iter1 != m_right.end(); ++iter1){
             double height_ratio = height / iter1->height();
             if (height_ratio < 0.8 || height_ratio > 1.2){
+//                cout << "bad height ratio: " << height_ratio << endl;
                 continue;
             }
             double width_ratio = width / iter1->width();
             if (width_ratio < 0.8 || width_ratio > 1.2){
+//                cout << "bad width ratio: " << width_ratio << endl;
                 continue;
             }
 
-            double horizontal_offset = std::abs((iter0->min_x - iter1->min_x) / width);
-            if (horizontal_offset > 0.1){
+            double horizontal_offset = ((ptrdiff_t)iter0->min_x - (ptrdiff_t)iter1->min_x) / width;
+            if (std::abs(horizontal_offset) > 0.1){
+//                cout << "bad horizontal offset: " << horizontal_offset << endl;
                 continue;
             }
 
-            double vertical_offset = std::abs((iter0->min_y - iter1->min_y) / height);
-            if (vertical_offset > 0.1){
+            double vertical_offset = ((ptrdiff_t)iter0->min_y - (ptrdiff_t)iter1->min_y) / height;
+            if (std::abs(vertical_offset) > 0.1){
+//                cout << "bad vertical offset: " << vertical_offset << endl;
                 continue;
             }
 
@@ -172,6 +198,7 @@ void FlagDetector::finish(){
     }
     m_left.clear();
     m_right.clear();
+//    cout << "m_detections = " << m_detections.size() << endl;
     merge_heavily_overlapping(0.3);
 }
 

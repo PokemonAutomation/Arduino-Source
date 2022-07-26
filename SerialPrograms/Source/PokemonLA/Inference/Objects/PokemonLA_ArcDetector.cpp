@@ -78,7 +78,7 @@ void ArcDetector::process_object(const ImageViewRGB32& image, const WaterfillObj
         m_right.emplace_back(object_box);
     }
 }
-void ArcDetector::finish(){
+void ArcDetector::finish(const ImageViewRGB32& image){
     //  Merge left/right arcs.
     for (auto iter0 = m_left.begin(); iter0 != m_left.end();){
         double height = (double)iter0->height();
@@ -89,12 +89,12 @@ void ArcDetector::finish(){
                 continue;
             }
 
-            double vertical_offset = std::abs((iter0->min_y - iter1->min_y) / height);
-            if (vertical_offset > 0.1){
+            double vertical_offset = ((ptrdiff_t)iter0->min_y - (ptrdiff_t)iter1->min_y) / height;
+            if (std::abs(vertical_offset) > 0.1){
                 continue;
             }
 
-            double horizontal_offset = (iter1->min_x - iter0->min_x) / height - 1.27;
+            double horizontal_offset = ((ptrdiff_t)iter1->min_x - (ptrdiff_t)iter0->min_x) / height - 1.27;
             if (horizontal_offset < -0.1 || horizontal_offset > 0.8){
                 continue;
             }

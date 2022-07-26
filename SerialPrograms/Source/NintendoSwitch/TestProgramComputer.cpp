@@ -74,6 +74,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 
 
 
@@ -131,10 +132,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+
+#if 0
     ImageRGB32 image(100, 100);
     image.fill(0xffff0000);
     image.save("test.png");
-
+#endif
 
 #if 0
     ImageRGB32 image0("Avermedia-Qt5.png");
