@@ -27,7 +27,6 @@
 #include "PokemonLA/PokemonLA_Locations.h"
 
 #include <QFileInfo>
-#include <QImage>
 #include <QDir>
 #include <cmath>
 #include <iostream>
@@ -42,7 +41,7 @@ namespace PokemonAutomation{
 
 using namespace NintendoSwitch::PokemonLA;
 
-int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target){
+int test_pokemonLA_BattleMenuDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -53,7 +52,7 @@ int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target){
     return 0;
 }
 
-int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target) {
+int test_pokemonLA_BattlePokemonSwitchDetector(const ImageViewRGB32& image, bool target) {
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -64,7 +63,7 @@ int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target)
     return 0;
 }
 
-int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target){
+int test_pokemonLA_TransparentDialogueDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -75,7 +74,7 @@ int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target)
     return 0;
 }
 
-int test_pokemonLA_EventDialogDetector(const QImage& image, bool target){
+int test_pokemonLA_EventDialogDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -86,7 +85,7 @@ int test_pokemonLA_EventDialogDetector(const QImage& image, bool target){
     return 0;
 }
 
-int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target){
+int test_pokemonLA_DialogueYellowArrowDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -97,7 +96,7 @@ int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target)
     return 0;
 }
 
-int test_pokemonLA_BlackOutDetector(const QImage& image, bool target){
+int test_pokemonLA_BlackOutDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
 
@@ -107,7 +106,7 @@ int test_pokemonLA_BlackOutDetector(const QImage& image, bool target){
     return 0;
 }
 
-int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vector<std::string>& keywords){
+int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
     bool hisui_kw_found = false;
     std::array<bool, 5> target_hisui_region_has_MMO = {false};
 
@@ -197,7 +196,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image, const std::vecto
     return 0;
 }
 
-int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords){
+int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
     // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
     if (keywords.size() < 5){
         cerr << "Error: not enough number of keywords in the filename, found only " << keywords.size() << "." << endl;
@@ -276,25 +275,25 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
     return 0;
 }
 
-int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, float threshold){
+int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold){
     float angle = get_orientation_on_map(image);
     TEST_RESULT_APPROXIMATE(angle, target_angle, threshold);
     return 0;
 }
 
-int test_pokemonLA_MapZoomLevelReader(const QImage& image, int target){
+int test_pokemonLA_MapZoomLevelReader(const ImageViewRGB32& image, int target){
     int zoom = read_map_zoom_level(image);
     TEST_RESULT_EQUAL(zoom, target);
     return 0;
 }
 
-int test_pokemonLA_MapMissionTabReader(const QImage& image, bool target){
+int test_pokemonLA_MapMissionTabReader(const ImageViewRGB32& image, bool target){
     bool result = is_map_mission_tab_raised(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
-void test_pokemonLA_BerryTreeDetector(const QImage& image){
+void test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image){
     BerryTreeDetector detector;
 
     detector.process_frame(image, current_time());

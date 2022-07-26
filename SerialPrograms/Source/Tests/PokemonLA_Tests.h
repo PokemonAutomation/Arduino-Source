@@ -9,8 +9,6 @@
 #ifndef PokemonAutomation_Tests_PokemonLA_Tests_H
 #define PokemonAutomation_Tests_PokemonLA_Tests_H
 
-class QImage;
-
 #include <vector>
 #include <string>
 
@@ -18,29 +16,32 @@ class QImage;
 
 namespace PokemonAutomation{
 
-int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target);
+class ImageViewRGB32;
 
-int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target);
 
-int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target);
+int test_pokemonLA_BattleMenuDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_EventDialogDetector(const QImage& image, bool target);
+int test_pokemonLA_BattlePokemonSwitchDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target);
+int test_pokemonLA_TransparentDialogueDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_BlackOutDetector(const QImage& image, bool target);
+int test_pokemonLA_EventDialogDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_MMOQuestionMarkDetector(const QImage& image,  const std::vector<std::string>& keywords);
+int test_pokemonLA_DialogueYellowArrowDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords);
+int test_pokemonLA_BlackOutDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, float threshold);
+int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image,  const std::vector<std::string>& keywords);
 
-int test_pokemonLA_MapZoomLevelReader(const QImage& image, int target);
+int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
-int test_pokemonLA_MapMissionTabReader(const QImage& image, bool target);
+int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold);
 
-void test_pokemonLA_BerryTreeDetector(const QImage& image);
+int test_pokemonLA_MapZoomLevelReader(const ImageViewRGB32& image, int target);
+
+int test_pokemonLA_MapMissionTabReader(const ImageViewRGB32& image, bool target);
+
+void test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image);
 
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target);
 

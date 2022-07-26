@@ -24,6 +24,29 @@ namespace PokemonAutomation{
 ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y)
     : min_x(p_min_x) , min_y(p_min_y) , max_x(p_max_x) , max_y(p_max_y)
 {
+    const size_t MAX_VALUE = 0xffffffff;
+
+    //  Check for potential negative values being passed here.
+    if (min_x > MAX_VALUE){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, "Pixel Overflow: min_x = " + std::to_string(min_x)
+        );
+    }
+    if (min_y > MAX_VALUE){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, "Pixel Overflow: min_y = " + std::to_string(min_y)
+        );
+    }
+    if (max_x > MAX_VALUE){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, "Pixel Overflow: max_x = " + std::to_string(max_x)
+        );
+    }
+    if (max_y > MAX_VALUE){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, "Pixel Overflow: max_y = " + std::to_string(max_y)
+        );
+    }
     if (min_x > max_x){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -211,6 +234,8 @@ ImagePixelBox extract_object_from_inner_feature(
 
     double shift_x = inner_relative_to_image.min_x - inner_relative_to_object.x * scale_x;
     double shift_y = inner_relative_to_image.min_y - inner_relative_to_object.y * scale_y;
+    shift_x = std::max<double>(shift_x, 0);
+    shift_y = std::max<double>(shift_y, 0);
 
     return ImagePixelBox(
         (size_t)(shift_x + 0.5),

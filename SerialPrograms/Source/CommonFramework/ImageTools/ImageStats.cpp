@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include <QImage>
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageBoxes.h"

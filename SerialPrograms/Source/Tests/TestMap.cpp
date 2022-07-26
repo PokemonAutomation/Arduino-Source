@@ -145,7 +145,7 @@ int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const
 // This is used for developing visual inference code where the developer writes custom
 // debugging output. So no need to get target values from the test framework.
 int image_void_detector_helper(ImageVoidDetectorFunction test_func, const std::string& test_path){
-const QString file_path = QString::fromStdString(test_path);
+    const QString file_path = QString::fromStdString(test_path);
     auto run_test = [&](const QImage& image, const std::string&) -> int{
         test_func(image);
         return 0;
