@@ -61,6 +61,8 @@ ImageHSV32::ImageHSV32(const ImageViewRGB32& image)
     )
     , m_data(CONSTRUCT_TOKEN, m_bytes_per_row / sizeof(uint32_t) * m_height)
 {
+    m_ptr = m_data->self.data();
+
     size_t width = image.width();
     size_t height = image.height();
     for (size_t y = 0; y < height; y++){
