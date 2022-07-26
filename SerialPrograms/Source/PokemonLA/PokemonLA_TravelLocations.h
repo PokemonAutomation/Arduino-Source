@@ -15,8 +15,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_Locations.h"
 
-class QString;
-
 namespace PokemonAutomation{
     class ConsoleHandle;
 namespace NintendoSwitch{

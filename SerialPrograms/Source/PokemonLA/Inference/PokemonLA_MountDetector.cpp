@@ -59,7 +59,7 @@ ImageRGB32 make_MountMatcher2Image(const char* path){
     WaterfillObject object;
     while (finder->find_next(object, false)){
         ImageViewRGB32 cropped = extract_box_reference(image, object);
-//        cropped.save("test-" + QString::number(c++) + ".png");
+//        cropped.save("test-" + std::to_string(c++) + ".png");
 
         double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
         if (rmsd_plus > current_rmsd_plus){
@@ -317,21 +317,6 @@ const char* MOUNT_STATE_STRINGS[] = {
     "Braviary On",
 };
 
-const std::map<QString, MountState> MOUNT_STATE_MAP{
-    {MOUNT_STATE_STRINGS[0], MountState::NOTHING},
-    {MOUNT_STATE_STRINGS[1], MountState::WYRDEER_OFF},
-    {MOUNT_STATE_STRINGS[2], MountState::WYRDEER_ON},
-    {MOUNT_STATE_STRINGS[3], MountState::URSALUNA_OFF},
-    {MOUNT_STATE_STRINGS[4], MountState::URSALUNA_ON},
-    {MOUNT_STATE_STRINGS[5], MountState::BASCULEGION_OFF},
-    {MOUNT_STATE_STRINGS[6], MountState::BASCULEGION_ON},
-    {MOUNT_STATE_STRINGS[7], MountState::SNEASLER_OFF},
-    {MOUNT_STATE_STRINGS[8], MountState::SNEASLER_ON},
-    {MOUNT_STATE_STRINGS[9], MountState::BRAVIARY_OFF},
-    {MOUNT_STATE_STRINGS[10], MountState::BRAVIARY_ON},
-};
-
-
 
 MountDetector::MountDetector(MountDetectorLogging logging)
     : m_box(0.905, 0.65, 0.08, 0.13)
@@ -439,7 +424,7 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
                 ImageViewRGB32 cropped = extract_box_reference(image, object);
 
 //                cout << "object = " << c << endl;
-//                cropped.save("object-" + QString::number(c) + ".png");
+//                cropped.save("object-" + std::to_string(c) + ".png");
 
 
                 //  Read the buttons.
@@ -572,7 +557,7 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
                 candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered_cropped), MountState::BRAVIARY_ON);
                 candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(cropped         ), MountState::BRAVIARY_ON);
 #endif
-//                extract_box(image, object).save("test-" + QString::number(i) + ".png");
+//                extract_box(image, object).save("test-" + std::to_string(i) + ".png");
 //                i++;
             }
         }

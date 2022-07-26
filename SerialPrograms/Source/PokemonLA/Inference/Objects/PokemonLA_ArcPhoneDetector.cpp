@@ -44,9 +44,9 @@ void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const Waterfil
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    cout << "c = " << c << endl;
-//    extract_box_reference(image, object).save("test-" + QString::number(c++) + ".png");
-//    image.save("test-" + QString::number(c++) + "-A.png");
-//    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
+//    extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
+//    image.save("test-" + std::to_string(c++) + "-A.png");
+//    extract_box(image, object).save("test-" + std::to_string(c++) + "-B.png");
 
     double width = (double)object.width() / image.width();
     if (width < 0.40 || width > 0.50){
@@ -119,7 +119,7 @@ bool ArcPhoneDetector::process_frame(const ImageViewRGB32& frame, WallClock time
 #if 0
     if (detected){
         static size_t c = 0;
-        frame.save("ArcPhoneTriggered-" + QString::number(c++) + ".png");
+        frame.save("ArcPhoneTriggered-" + std::to_string(c++) + ".png");
     }
 #endif
 

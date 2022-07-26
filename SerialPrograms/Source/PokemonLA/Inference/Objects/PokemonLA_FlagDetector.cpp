@@ -302,7 +302,7 @@ int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_
                 }
 
 //                static int c = 0;
-//                extract_box_reference(image, object).save("image-" + QString::number(c++) + ".png");
+//                extract_box_reference(image, object).save("image-" + std::to_string(c++) + ".png");
 
                 std::pair<double, int> digit = read_digit(image, object);
                 if (digit.second >= 0){

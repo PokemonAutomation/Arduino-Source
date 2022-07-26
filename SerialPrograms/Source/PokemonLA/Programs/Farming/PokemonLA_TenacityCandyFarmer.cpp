@@ -300,7 +300,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                 // env.console.context().wait_for_all_requests();
                 cur_move = (cur_move + 1) % 4;
-                env.console.log("No PP. Use next move, " + QString::number(cur_move), COLOR_RED);
+                env.console.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);
             }
 
             num_turns++;

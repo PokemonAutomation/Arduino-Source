@@ -86,7 +86,7 @@ bool DialogueEllipseDetector::process_frame(const ImageViewRGB32& frame, WallClo
 
     // static int count = 0;
     // if (detected){
-    //     frame.save("./debug_transparentEllipse" + QString::number(count) + ".png");
+    //     frame.save("./debug_transparentEllipse" + std::to_string(count) + ".png");
     //     count++;
     // }
     return detected && m_stop_on_detected;

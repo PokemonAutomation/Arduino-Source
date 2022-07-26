@@ -69,7 +69,7 @@ bool OverworldTargetTracker::has_good_target(){
 //        m_logger.log("has_good_target(): < 0");
         return false;
     }
-//    m_logger.log("has_good_target(): " + QString::number(m_best_target.first));
+//    m_logger.log("has_good_target(): " + std::to_string(m_best_target.first));
     return m_best_target.first <= m_max_alpha;
 }
 std::pair<double, OverworldTarget> OverworldTargetTracker::best_target(){

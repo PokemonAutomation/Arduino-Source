@@ -45,7 +45,7 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
 //    static int c = 0;
-//    scaled.save("test-" + QString::number(c++) + ".png");
+//    scaled.save("test-" + std::to_string(c++) + ".png");
 
     double rmsd = SELECTION_ARROW().rmsd(cropped);
 

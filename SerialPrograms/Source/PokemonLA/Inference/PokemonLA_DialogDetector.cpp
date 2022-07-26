@@ -83,7 +83,7 @@ bool DialogSurpriseDetector::process_frame(const ImageViewRGB32& frame, WallCloc
 #if 0
     if (detected){
         static size_t c = 0;
-        frame.save("SurpriseDialogueBoxTriggered-" + QString::number(c++) + ".png");
+        frame.save("SurpriseDialogueBoxTriggered-" + std::to_string(c++) + ".png");
     }
 #endif
 

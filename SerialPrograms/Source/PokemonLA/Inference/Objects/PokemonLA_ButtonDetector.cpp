@@ -124,9 +124,9 @@ ButtonTracker::ButtonTracker(ButtonType type)
 void ButtonTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
 //    cout << "asdf" << endl;
 //    static int c = 0;
-//    extract_box(image, object).save("test-" + QString::number(c++) + ".png");
-//    image.save("test-" + QString::number(c++) + "-A.png");
-//    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
+//    extract_box(image, object).save("test-" + std::to_string(c++) + ".png");
+//    image.save("test-" + std::to_string(c++) + "-A.png");
+//    extract_box(image, object).save("test-" + std::to_string(c++) + "-B.png");
 
     double rmsd = m_matcher.rmsd_precropped(extract_box_reference(image, object), object);
 //    cout << "rmsd = " << rmsd << endl;

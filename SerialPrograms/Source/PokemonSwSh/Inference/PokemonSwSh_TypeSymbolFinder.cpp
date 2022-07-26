@@ -69,7 +69,7 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
     }
 
 //    static int c = 0;
-//    image.save("test-" + QString::number(threshold) + "-" + QString::number(c++) + ".png");
+//    image.save("test-" + std::to_string(threshold) + "-" + std::to_string(c++) + ".png");
 
 //    std::map<double, PokemonType> rank;
     double best_score = 0.4;
@@ -128,7 +128,7 @@ void find_symbol_candidates(
 
 //        image.copy(
 //            objects[c].min_x, objects[c].min_y, objects[c].width(), objects[c].height()
-//        ).save("test-" + QString::number(index++) + ".png");
+//        ).save("test-" + std::to_string(index++) + ".png");
     }
 
 //    cout << "begin = " << objmap.size() << endl;

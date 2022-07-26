@@ -340,7 +340,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                     pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     // env.console.context().wait_for_all_requests();
                     cur_move++;
-                    env.console.log("No PP. Use next move, " + QString::number(cur_move), COLOR_RED);
+                    env.console.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);
                     
                     style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
                 }
@@ -351,7 +351,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 if (last_battle == false){
                     last_battle = POKEMON_ACTIONS.stop_battle(cur_pokemon, pokemon_move_attempts[cur_pokemon]);
                     if (last_battle){
-                        env.log("Target move attempts reached: " + QString::number(pokemon_move_attempts[cur_pokemon]) + 
+                        env.log("Target move attempts reached: " + std::to_string(pokemon_move_attempts[cur_pokemon]) +
                             ". Stop program after this battle finishes.");
                     }
                 }

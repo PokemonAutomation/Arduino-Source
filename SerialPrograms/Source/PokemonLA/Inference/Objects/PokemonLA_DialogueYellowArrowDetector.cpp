@@ -103,7 +103,7 @@ bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, Wal
 #if 0
     if (detected){
         static size_t c = 0;
-        frame.save("YellowArrowTriggered-" + QString::number(c++) + ".png");
+        frame.save("YellowArrowTriggered-" + std::to_string(c++) + ".png");
     }
 #endif
 

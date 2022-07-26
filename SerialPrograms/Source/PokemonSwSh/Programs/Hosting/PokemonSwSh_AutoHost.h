@@ -29,11 +29,12 @@ bool connect_to_internet(
 );
 
 void send_raid_notification(
-    const QString& program_name,
-    const ProgramInfo& info,
+    const ProgramEnvironment& env,
+    ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
-    const DenMonReader& reader,
+    const ImageViewRGB32& screenshot,
+    const DenMonReadResults& results,
     const StatsTracker& stats_tracker
 );
 

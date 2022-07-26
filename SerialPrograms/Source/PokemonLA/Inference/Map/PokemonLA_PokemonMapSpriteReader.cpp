@@ -167,7 +167,7 @@ void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(s
 ImageRGB32 smooth_image(const ImageViewRGB32& image){
     // static int count = 0;
     // {
-    //     image.save("./test_smooth_before_" + QString::number(count) + ".png");
+    //     image.save("./test_smooth_before_" + std::to_string(count) + ".png");
     // }
 
     ImageRGB32 result(image.width(), image.height());
@@ -916,7 +916,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     // std::ostringstream os;
     // os << "test_sprite_gradient" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
     // std::string sprite_filename = os.str();
-    // gradient_image.save(QString::fromStdString(sprite_filename));
+    // gradient_image.save(sprite_filename);
 
     for(const auto& p : result.color_match_results){
         const auto& slug = p.second;

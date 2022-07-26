@@ -39,7 +39,7 @@ bool ReceivePokemonDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     }
     m_received = true;
 //    static int c = 0;
-//    frame.save("test-" + QString::number(c++) + ".png");
+//    frame.save("test-" + std::to_string(c++) + ".png");
     return false;
 }
 

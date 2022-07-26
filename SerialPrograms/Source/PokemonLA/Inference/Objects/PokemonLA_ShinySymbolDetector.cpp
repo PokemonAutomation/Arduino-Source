@@ -87,7 +87,7 @@ std::vector<ImagePixelBox> find_shiny_symbols(const ImageViewRGB32& image){
     for (const auto& object : objects){
         image.copy(
             object.min_x, object.min_y, object.width(), object.height()
-        ).save("test-" + QString::number(c++) + ".png");
+        ).save("test-" + std::to_string(c++) + ".png");
     }
 #endif
     return ret;

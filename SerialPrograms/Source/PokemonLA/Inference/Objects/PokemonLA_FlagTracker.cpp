@@ -101,7 +101,7 @@ bool FlagTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp
 //        cout << sample.distance << endl;
         if (sample.distance > 0 && sample.distance < 10){
             static int c = 0;
-            frame.save("test-" + QString::number(c++) + ".png");
+            frame.save("test-" + std::to_string(c++) + ".png");
         }
 #endif
     }else{

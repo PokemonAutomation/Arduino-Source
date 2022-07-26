@@ -297,8 +297,7 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     inverted.invert();
 
 //    static int c = 0;
-//    QString file = "test-" + QString::number(c++) + ".png";
-//    cout << file.toStdString() << endl;
+//    std::string file = "test-" + std::to_string(c++) + ".png";
 //    cout << object.min_x << endl;
 //    cropped0.save(file);
 

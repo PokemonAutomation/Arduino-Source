@@ -237,7 +237,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
                 else
                 {
                     pbf_press_button(context, BUTTON_B, 20, 2 * TICKS_PER_SECOND);
-                    env.console.log("No PP left for pokemon " + QString::number(cur_pokemon) + " and move " + QString::number(cur_move));
+                    env.console.log("No PP left for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
                     if (get_next_move_to_switch_to() == 4)
                     {
                         // Press down to select pokemons
@@ -253,7 +253,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
             }
             else
             {
-                env.console.log("Done grinding for pokemon " + QString::number(cur_pokemon) + " and move " + QString::number(cur_move));
+                env.console.log("Done grinding for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
                 if (get_next_move_to_switch_to() == 4)
                 {
                     // Press down to select pokemons

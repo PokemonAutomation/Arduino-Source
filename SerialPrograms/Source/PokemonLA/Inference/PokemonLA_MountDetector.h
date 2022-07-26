@@ -33,7 +33,6 @@ enum class MountState{
     BRAVIARY_ON,
 };
 extern const char* MOUNT_STATE_STRINGS[];
-extern const std::map<QString, MountState> MOUNT_STATE_MAP;
 
 
 enum class MountDetectorLogging{

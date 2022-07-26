@@ -10,9 +10,6 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
 
-class QString;
-
-
 namespace PokemonAutomation{
 namespace Pokemon{
 

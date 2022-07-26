@@ -85,7 +85,7 @@ double read_hp_bar(const ImageViewRGB32& image){
 double read_hp_bar(LoggerQt& logger, const ImageViewRGB32& image){
     double hp = read_hp_bar(image);
 //    static int c = 0;
-//    image.save("test-" + QString::number(c++) + ".png");
+//    image.save("test-" + std::to_string(c++) + ".png");
     if (hp < 0){
         logger.log("HP Read: ?", COLOR_RED);
     }else{

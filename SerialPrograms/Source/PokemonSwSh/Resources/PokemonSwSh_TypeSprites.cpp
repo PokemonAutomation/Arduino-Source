@@ -81,7 +81,7 @@ TypeSprite::TypeSprite(const std::string& slug)
         object.merge_assume_no_overlap(item);
     }
 
-//    sprite.save("symbol-" + QString::fromStdString(slug) + ".png");
+//    sprite.save("symbol-" + std::to_string(slug) + ".png");
     m_matcher.reset(
         new ImageMatch::WeightedExactImageMatcher(
             sprite.sub_image(object.min_x, object.min_y, object.width(), object.height()).copy(),

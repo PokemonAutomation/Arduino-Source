@@ -132,7 +132,7 @@ bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemo
 #ifdef DEBUG_NO_PP
     if (still_on_move_screen == false){
         static int count = 0;
-        screen.save("./no_pp." + QString::number(count++) + ".png");
+        screen.save("./no_pp." + std::to_string(count++) + ".png");
     }
 #endif
 
