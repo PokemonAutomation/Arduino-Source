@@ -51,7 +51,7 @@ void ImageRGB32::operator=(const ImageRGB32& x){
 ImageRGB32::ImageRGB32() = default;
 
 ImageRGB32::ImageRGB32(size_t width, size_t height)
-    : ImageViewRGB32(nullptr, (width * sizeof(uint32_t) + PA_ALIGNMENT - 1) & ~(size_t)(PA_ALIGNMENT - 1), width, height)
+    : ImageViewRGB32(width, height)
     , m_data(CONSTRUCT_TOKEN, m_bytes_per_row / sizeof(uint32_t) * height)
 {
     m_ptr = m_data->self.data();

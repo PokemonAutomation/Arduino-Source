@@ -17,6 +17,10 @@ namespace PokemonAutomation{
 class ImageViewPlanar32{
 public:
     PA_FORCE_INLINE ImageViewPlanar32() = default;
+    PA_FORCE_INLINE ImageViewPlanar32(size_t width, size_t height)
+        : m_width(width), m_height(height)
+        , m_bytes_per_row((width * sizeof(uint32_t) + PA_ALIGNMENT - 1) & ~(size_t)(PA_ALIGNMENT - 1))
+    {}
     PA_FORCE_INLINE ImageViewPlanar32(uint32_t* ptr, size_t bytes_per_row, size_t width, size_t height)
         : m_width(width), m_height(height)
         , m_bytes_per_row(bytes_per_row), m_ptr(ptr)

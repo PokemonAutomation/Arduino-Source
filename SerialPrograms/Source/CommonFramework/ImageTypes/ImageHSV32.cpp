@@ -46,7 +46,7 @@ ImageHSV32& ImageHSV32::operator=(ImageHSV32&& x) noexcept{
 ImageHSV32::ImageHSV32() = default;
 
 ImageHSV32::ImageHSV32(size_t width, size_t height)
-    : ImageViewHSV32(nullptr, (width * sizeof(uint32_t) + PA_ALIGNMENT - 1) & ~(size_t)(PA_ALIGNMENT - 1), width, height)
+    : ImageViewHSV32(width, height)
     , m_data(CONSTRUCT_TOKEN, m_bytes_per_row / sizeof(uint32_t) * height)
 {
     m_ptr = m_data->self.data();
@@ -55,10 +55,7 @@ ImageHSV32::ImageHSV32(size_t width, size_t height)
 
 
 ImageHSV32::ImageHSV32(const ImageViewRGB32& image)
-    : ImageViewHSV32(
-        nullptr, (image.width() * sizeof(uint32_t) + PA_ALIGNMENT - 1) & ~(size_t)(PA_ALIGNMENT - 1),
-        image.width(), image.height()
-    )
+    : ImageViewHSV32(image.width(), image.height())
     , m_data(CONSTRUCT_TOKEN, m_bytes_per_row / sizeof(uint32_t) * m_height)
 {
     m_ptr = m_data->self.data();
