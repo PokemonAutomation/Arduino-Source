@@ -13,12 +13,13 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
@@ -54,25 +55,20 @@ using FeatureVector = std::vector<FeatureType>;
 
 using ImageMatch::ExactImageDictionaryMatcher;
 
-// defined locally stored data for matching MMO sprites
-struct MMOSpriteMatchingData {
-    ExactImageDictionaryMatcher color_matcher;
-    ExactImageDictionaryMatcher color_matcher_hsv;
-    ExactImageDictionaryMatcher gradient_matcher;
-    // sprite slug -> features
-    std::map<std::string, FeatureVector> features;
+// Defined locally stored data for matching MMO sprites:
+// Store data belonging to one sprite
+struct PerSpriteMatchingData {
+    
+    FeatureVector feature;
 
-    MMOSpriteMatchingData(
-        ExactImageDictionaryMatcher c_matcher,
-        ExactImageDictionaryMatcher c_matcher_hsv,
-        ExactImageDictionaryMatcher g_matcher,
-        std::map<std::string, FeatureVector> f
-    )
-        : color_matcher(std::move(c_matcher))
-        , color_matcher_hsv(std::move(c_matcher_hsv))
-        , gradient_matcher(std::move(g_matcher))
-        , features(f) {}
+    ImageStats rgb_stats;
+    
+    ImageHSV32 hsv_image;
+    
+    ImageRGB32 gradient_image;
 };
+
+using MMOSpriteMatchingMap = std::map<std::string, PerSpriteMatchingData>;
 
 inline bool is_transparent(uint32_t g){
     return (g >> 24) < 128;
@@ -264,45 +260,6 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
     return result2;
 }
 
-QImage convert_to_hsv(const ImageViewRGB32& image){
-    QImage result((int)image.width(), (int)image.height(), QImage::Format::Format_ARGB32);
-    result.fill(QColor(0,0,0,0));
-    ImageRef result_ref(result);
-
-    for(size_t y = 0; y < image.height(); y++){
-        for(size_t x = 0; x < image.width(); x++){
-            uint32_t p = image.pixel(x, y);
-            if (is_transparent(p)){
-                continue;
-            }
-
-            int r = (uint32_t(0xff) & (p >> 16));
-            int g = (uint32_t(0xff) & (p >> 8));
-            int b = (uint32_t(0xff) & p);
-
-            int M = std::max(std::max(r, g), b);
-            int m = std::min(std::min(r, g), b);
-
-            int S = 0;
-            if (M > 0){
-                S = std::min(std::max(255 - (m*255 + M/2)/M, 0), 255);
-            }
-
-            double cosH = std::sqrt(r*r + g*g + b*b - r*g - r*b - g*b) * (r - 0.5*g - 0.5*b);
-            double Hf = std::acos(std::min(std::max(cosH, -1.0), 1.0)) * (180 / M_PI);
-            if (b > g){
-                Hf = 360 - Hf;
-            }
-            // Convert Hf range from [0, 360) to [0, 256)
-            int H = std::max(int(Hf * 256.0 / 360.0 + 0.5) % 256, 0);
-
-            result_ref.pixel(x, y) = combine_rgb(H, S, M);
-        }
-    }
-
-    return result;
-}
-
 
 ImageRGB32 compute_image_gradient(const ImageViewRGB32& image){
     ImageRGB32 result(image.width(), image.height());
@@ -407,51 +364,36 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
     return result;
 }
 
-void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const QImage& sprite)> visit_sprit){
+void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const ImageRGB32& sprite)> visit_sprit){
     static const SpriteDatabase database("PokemonLA/MMOSprites.png", "PokemonLA/MMOSprites.json");
     for (const auto& item : database){
         // cout << "sprite " << count << endl;
         const std::string& slug = item.first;
-        visit_sprit(slug, item.second.sprite.scaled_to_QImage(50, 50));
+        visit_sprit(slug, item.second.sprite.scale_to(50, 50));
     }
 }
 
-MMOSpriteMatchingData build_MMO_sprite_matching_data(){
-    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight color_stddev_weight;
-    color_stddev_weight.stddev_coefficient = 0.004;
-    // stddev_weight.stddev_coefficient = 0.1;
-    color_stddev_weight.offset = 1.0;
-    ExactImageDictionaryMatcher color_matcher(color_stddev_weight);
+MMOSpriteMatchingMap build_MMO_sprite_matching_data(){
 
-    ImageMatch::WeightedExactImageMatcher::InverseStddevWeight gradient_stddev_weight;
-    gradient_stddev_weight.stddev_coefficient = 0.000;
-    // stddev_weight.stddev_coefficient = 0.1;
-    gradient_stddev_weight.offset = 1.0;
-    ExactImageDictionaryMatcher gradient_matcher(gradient_stddev_weight);
-    ExactImageDictionaryMatcher color_matcher_hsv(color_stddev_weight);
+    MMOSpriteMatchingMap sprite_map;
 
-    std::map<std::string, FeatureVector> features;
+    load_and_visit_MMO_sprite([&](const std::string& slug, const ImageRGB32& sprite){
+    
+        PerSpriteMatchingData per_sprite_data;
 
-    load_and_visit_MMO_sprite([&](const std::string& slug, const QImage& sprite){
-        color_matcher.add(slug, sprite);
-        QImage sprite_hsv = convert_to_hsv(sprite);
-        color_matcher_hsv.add(slug, sprite_hsv);
+        per_sprite_data.rgb_stats = image_stats(sprite);
+        per_sprite_data.hsv_image = ImageHSV32(sprite);
         ImageRGB32 smoothed_sprite = smooth_image(sprite);
-        ImageRGB32 sprite_gradient = compute_image_gradient(smoothed_sprite);
-        gradient_matcher.add(slug, std::move(sprite_gradient));
+        per_sprite_data.gradient_image = compute_image_gradient(smoothed_sprite);
+        per_sprite_data.feature = compute_feature(smoothed_sprite);
 
-        features.emplace(slug, compute_feature(smoothed_sprite));
+        sprite_map.emplace(slug, std::move(per_sprite_data));
     });
 
-    return MMOSpriteMatchingData(
-        std::move(color_matcher),
-        std::move(color_matcher_hsv),
-        std::move(gradient_matcher),
-        std::move(features)
-    );
+    return sprite_map;
 }
 
-const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
+const MMOSpriteMatchingMap& MMO_SPRITE_MATCHING_DATA(){
     const static auto& sprite_matching_data = build_MMO_sprite_matching_data();
 
     return sprite_matching_data;
@@ -461,7 +403,7 @@ const MMOSpriteMatchingData& MMO_SPRITE_MATCHING_DATA(){
 std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageViewRGB32& image, MapRegion region){
     const FeatureVector& image_feature = compute_feature(image);
 
-    const std::map<std::string, FeatureVector>& features = MMO_SPRITE_MATCHING_DATA().features;
+    const MMOSpriteMatchingMap& sprite_map = MMO_SPRITE_MATCHING_DATA();
 
     const std::array<std::vector<std::string>, 5>& region_available_sprites = MMO_FIRST_WAVE_REGION_SPRITE_SLUGS();
     int region_index = 0;
@@ -494,12 +436,12 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageV
     std::multimap<double, std::string> result;
 
     for(const auto& slug : region_available_sprites[region_index]){
-        auto it = features.find(slug);
-        if (it == features.end()){
+        auto it = sprite_map.find(slug);
+        if (it == sprite_map.end()){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Inconsistent sprite slug definitions in resource: " + slug);
         }
 
-        const FeatureVector& feature = it->second;
+        const FeatureVector& feature = it->second.feature;
         const FeatureType dist = feature_distance(image_feature, feature);
         result.emplace(dist, slug);
     }
@@ -552,13 +494,6 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
 float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_template, const ImageViewRGB32& gradient){
     int tempt_width = (int)gradient_template.width();
     int tempt_height = (int)gradient_template.height();
-
-    // static int count = 0;
-    // QImage output(gradient.width(), gradient.height(), QImage::Format::Format_ARGB32);
-    // output.fill(QColor(0,0,0,0));
-
-    // cout << "Size check " << tempt_width << " x " << tempt_height << ",  " <<
-    // gradient.width() << " x " << gradient.height() << endl;
 
     float score = 0.0f;
     int max_offset = 2;
@@ -762,7 +697,7 @@ float compute_hsv_dist2(uint32_t template_color, uint32_t color){
     return h_dif * h_dif + (t_s - s) * (t_s - s) + 0.5 * (t_v - v) * (t_v - v);
 }
 
-float compute_MMO_sprite_hsv_distance(const ImageViewRGB32& image_template, const ImageViewRGB32& query_image){
+float compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, const ImageViewHSV32& query_image){
     size_t tempt_width = image_template.width();
     size_t tempt_height = image_template.height();
 
@@ -801,10 +736,7 @@ float compute_MMO_sprite_hsv_distance(const ImageViewRGB32& image_template, cons
 
 
 MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region){
-    const static auto& sprite_matching_data = MMO_SPRITE_MATCHING_DATA();
-    const ExactImageDictionaryMatcher& color_matcher = sprite_matching_data.color_matcher;
-    const ExactImageDictionaryMatcher& color_matcher_hsv = sprite_matching_data.color_matcher_hsv;
-    const ExactImageDictionaryMatcher& gradient_matcher = sprite_matching_data.gradient_matcher;
+    const static auto& sprite_map = MMO_SPRITE_MATCHING_DATA();
 
     // configs for the algorithm:
     const size_t num_feature_candidates = 10;
@@ -841,14 +773,10 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
 
     cout << "Color matching..." << endl;
     {
-        // auto color_match_results = color_matcher.subset_match(result.candidates, screen,
-        //     pixelbox_to_floatbox(screen, box), 1, 10);
-        // result.color_match_results = std::move(color_match_results.results);
-
         ImagePixelBox expanded_box(box.min_x < 2 ? 0 : box.min_x - 2, box.min_y < 2 ? 0 : box.min_y - 2, box.max_x + 2, box.max_y + 2);
-        QImage sprite_hsv = convert_to_hsv(extract_box_reference(screen, expanded_box));
+        ImageHSV32 sprite_hsv(extract_box_reference(screen, expanded_box));
         for(const auto& slug: result.candidates){
-            ImageViewRGB32 candidate_template = color_matcher_hsv.image_template(slug);
+            const ImageHSV32& candidate_template = sprite_map.find(slug)->second.hsv_image;
             float score = FLT_MAX;
             for(size_t ox = 0; ox <= 4; ox++){
                 for(size_t oy = 0; oy <= 4; oy++){
@@ -873,7 +801,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
         const auto& slug = p.second;
         color_match_sprite_scores.emplace(slug, p.first);
         if (result_count < 5){
-            const auto& stats = color_matcher.image_matcher(slug).stats();
+            const auto& stats = sprite_map.find(slug)->second.rgb_stats;
             cout << p.first << " - " << slug << " " << stats.stddev.sum() << endl;
         }
         if (result_count == 5){
@@ -920,7 +848,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
 
     for(const auto& p : result.color_match_results){
         const auto& slug = p.second;
-        ImageViewRGB32 template_gradient = gradient_matcher.image_template(slug);
+        ImageViewRGB32 template_gradient = sprite_map.find(slug)->second.gradient_image;
         double score = compute_MMO_sprite_gradient_distance(template_gradient, gradient_image);
         result.gradient_match_results.emplace(score, slug);
     }

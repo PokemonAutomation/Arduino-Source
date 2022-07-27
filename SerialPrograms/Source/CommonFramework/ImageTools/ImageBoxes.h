@@ -15,6 +15,7 @@ class QImage;
 namespace PokemonAutomation{
     class ImageViewRGB32;
     class ImageRGB32;
+    class ImageViewHSV32;
 namespace Kernels{
 namespace Waterfill{
     class WaterfillObject;
@@ -97,6 +98,10 @@ struct ImageFloatBox{
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box);
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFloatBox& box, ptrdiff_t offset_x, ptrdiff_t offset_y);
+
+ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImagePixelBox& box);
+ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImageFloatBox& box);
+ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImageFloatBox& box, ptrdiff_t offset_x, ptrdiff_t offset_y);
 
 //  Deprecated
 ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
