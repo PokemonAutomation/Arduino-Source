@@ -736,9 +736,9 @@ MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32&
     auto save_debug_image_if_required = [&](const MapSpriteMatchResult& result){
         if (debug_mode){
             const std::string debug_path = std::string("PokemonLA/PokemonMapSpriteReader/") + std::string(WILD_REGION_SHORT_NAMES[(int)region-2])
-                 + "/" + result.slug; 
+                 + "/" + result.slug;
 
-            dump_debug_image(logger, debug_path, "sprite", extract_box_reference(screen, box.expand_as(5)));
+            dump_debug_image(logger, debug_path, result.slug, extract_box_reference(screen, box.expand_as(5)));
         }
     };
 
