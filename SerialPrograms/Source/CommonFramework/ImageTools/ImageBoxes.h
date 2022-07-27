@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_ImageBoxes_H
 
 #include <stddef.h>
-#include "CommonFramework/ImageTypes/ImageReference.h"
+#include <stdint.h>
 
 class QImage;
 
@@ -106,10 +106,6 @@ ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImageFlo
 ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImagePixelBox& box);
 ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImageFloatBox& box);
 ImageViewHSV32 extract_box_reference(const ImageViewHSV32& image, const ImageFloatBox& box, ptrdiff_t offset_x, ptrdiff_t offset_y);
-
-//  Deprecated
-ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
-ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 
 
 

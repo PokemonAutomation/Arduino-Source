@@ -6,23 +6,10 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "ImageReference.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{
-
-
-#if 1
-
-ImageViewRGB32::ImageViewRGB32(const ConstImageRef& image)
-    : ImageViewPlanar32((uint32_t*)image.data(), image.bytes_per_row(), image.width(), image.height())
-{}
-ImageViewRGB32::ImageViewRGB32(const ImageRef& image)
-    : ImageViewPlanar32((uint32_t*)image.data(), image.bytes_per_row(), image.width(), image.height())
-{}
-
-#endif
 
 
 

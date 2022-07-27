@@ -11,7 +11,6 @@
 #include <map>
 #include <vector>
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
 struct ImagePixelBox;

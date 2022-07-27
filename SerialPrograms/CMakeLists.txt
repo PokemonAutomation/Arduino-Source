@@ -273,8 +273,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTypes/ImageHSV32.h
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp
     Source/CommonFramework/ImageTypes/ImageRGB32.h
-    Source/CommonFramework/ImageTypes/ImageReference.cpp
-    Source/CommonFramework/ImageTypes/ImageReference.h
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp

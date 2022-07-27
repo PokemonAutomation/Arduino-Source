@@ -141,24 +141,6 @@ size_t ImagePixelBox::distance_y(const ImagePixelBox& box) const{
 }
 
 
-ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box){
-    return image.sub_image(box.min_x, box.min_y, box.width(), box.height());
-}
-ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box){
-    size_t min_x = (size_t)(image.width() * box.x + 0.5);
-    size_t min_y = (size_t)(image.height() * box.y + 0.5);
-    size_t width = (size_t)(image.width() * box.width + 0.5);
-    size_t height = (size_t)(image.height() * box.height + 0.5);
-    return image.sub_image(min_x, min_y, width, height);
-}
-ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box){
-    return extract_box_reference(ImageRef(image), box);
-}
-ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box){
-    return extract_box_reference(ImageRef(image), box);
-}
-
-
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box){
     return image.sub_image(box.min_x, box.min_y, box.width(), box.height());
 }

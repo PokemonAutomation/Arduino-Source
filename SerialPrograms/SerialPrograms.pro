@@ -158,7 +158,6 @@ SOURCES += \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageRGB32.cpp \
-    Source/CommonFramework/ImageTypes/ImageReference.cpp \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp \
@@ -852,7 +851,6 @@ HEADERS += \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
     Source/CommonFramework/ImageTypes/ImageHSV32.h \
     Source/CommonFramework/ImageTypes/ImageRGB32.h \
-    Source/CommonFramework/ImageTypes/ImageReference.h \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.h \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h \

@@ -13,10 +13,6 @@
 namespace PokemonAutomation{
 
 
-class ConstImageRef;
-class ImageRef;
-
-
 class ImageHSV32;
 
 

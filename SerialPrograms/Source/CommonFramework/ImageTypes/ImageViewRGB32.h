@@ -15,22 +15,12 @@ class QImage;
 namespace PokemonAutomation{
 
 
-class ConstImageRef;
-class ImageRef;
-
-
 class ImageRGB32;
 
 
 class ImageViewRGB32 : public ImageViewPlanar32{
 public:
     using ImageViewPlanar32::ImageViewPlanar32;
-
-#if 1
-    //  Deprecated
-    ImageViewRGB32(const ConstImageRef& image);
-    ImageViewRGB32(const ImageRef& image);
-#endif
 
 public:
     //  Returns true if this image is valid. (non-null and non-zero dimensions)
