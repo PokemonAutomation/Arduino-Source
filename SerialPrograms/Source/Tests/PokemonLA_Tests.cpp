@@ -409,13 +409,13 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
         new_boxes.push_back(new_box);
         
-        std::ostringstream os;
-        os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
-        std::string sprite_filename = os.str();
-        extract_box_reference(sprite_image, new_box).save(sprite_filename);
+        // std::ostringstream os;
+        // os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
+        // std::string sprite_filename = os.str();
+        // extract_box_reference(sprite_image, new_box).save(sprite_filename);
     }
-    output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
-    output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
+    // output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
+    // output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
 
     size_t success_count = 0;
     for (size_t i = 0; i < quest_results.size(); i++){

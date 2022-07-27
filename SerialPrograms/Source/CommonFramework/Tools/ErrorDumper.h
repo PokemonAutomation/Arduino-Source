@@ -7,14 +7,15 @@
 #ifndef PokemonAutomation_ErrorDumper_H
 #define PokemonAutomation_ErrorDumper_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 
 class ImageViewRGB32;
+class LoggerQt;
 
-
+// Dump error image to ./ErrorDumps/ folder.
+// Return image path.
 std::string dump_image(
     LoggerQt& logger,
     const ProgramInfo& program_info, const std::string& label,

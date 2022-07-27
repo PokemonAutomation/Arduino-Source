@@ -232,6 +232,7 @@ SOURCES += \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ConsoleHandle.cpp \
+    Source/CommonFramework/Tools/DebugDumper.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
@@ -935,6 +936,7 @@ HEADERS += \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
+    Source/CommonFramework/Tools/DebugDumper.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
     Source/CommonFramework/Tools/MultiConsoleErrors.h \

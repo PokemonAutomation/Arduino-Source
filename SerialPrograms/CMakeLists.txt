@@ -269,18 +269,18 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/WaterfillUtilities.h
     Source/CommonFramework/ImageTypes/BinaryImage.cpp
     Source/CommonFramework/ImageTypes/BinaryImage.h
-    Source/CommonFramework/ImageTypes/ImageReference.cpp
-    Source/CommonFramework/ImageTypes/ImageReference.h
-    Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp
-    Source/CommonFramework/ImageTypes/ImageViewPlanar32.h
-    Source/CommonFramework/ImageTypes/ImageRGB32.cpp
-    Source/CommonFramework/ImageTypes/ImageRGB32.h
-    Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp
-    Source/CommonFramework/ImageTypes/ImageViewRGB32.h
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp
     Source/CommonFramework/ImageTypes/ImageHSV32.h
+    Source/CommonFramework/ImageTypes/ImageRGB32.cpp
+    Source/CommonFramework/ImageTypes/ImageRGB32.h
+    Source/CommonFramework/ImageTypes/ImageReference.cpp
+    Source/CommonFramework/ImageTypes/ImageReference.h
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h
+    Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp
+    Source/CommonFramework/ImageTypes/ImageViewPlanar32.h
+    Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp
+    Source/CommonFramework/ImageTypes/ImageViewRGB32.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
     Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp
@@ -434,6 +434,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/BotBaseHandle.h
     Source/CommonFramework/Tools/ConsoleHandle.cpp
     Source/CommonFramework/Tools/ConsoleHandle.h
+    Source/CommonFramework/Tools/DebugDumper.cpp
+    Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/InterruptableCommands.cpp
