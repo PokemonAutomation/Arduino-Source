@@ -17,6 +17,9 @@
 struct ImagePixelBox;
 
 namespace PokemonAutomation{
+
+class LoggerQt;
+
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -46,7 +49,13 @@ struct MapSpriteMatchResult{
     std::string second_slug;
 };
 
-MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region);
+MapSpriteMatchResult match_sprite_on_map(
+    LoggerQt& logger,
+    const ImageViewRGB32& screen,
+    const ImagePixelBox& box,
+    MapRegion region,
+    bool debug_mode = false
+);
 
 
 }

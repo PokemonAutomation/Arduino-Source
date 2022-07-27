@@ -89,6 +89,8 @@ private:
     Pokemon::PokemonNameList DESIRED_MMO_SLUGS;
     Pokemon::PokemonNameList DESIRED_STAR_MMO_SLUGS;
 
+    BooleanCheckBoxOption DEBUG_MODE;
+
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_MATCHED;
     EventNotificationsOption NOTIFICATIONS;

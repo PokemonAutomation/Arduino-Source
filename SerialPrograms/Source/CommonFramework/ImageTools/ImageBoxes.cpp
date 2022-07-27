@@ -116,6 +116,12 @@ void ImagePixelBox::clip(const ImagePixelBox& box){
     max_y = std::min(max_y, box.max_y);
 }
 
+ImagePixelBox ImagePixelBox::expand_as(size_t per_side_increase) const{
+    size_t new_min_x = min_x >= per_side_increase ? min_x - per_side_increase : 0;
+    size_t new_min_y = min_y >= per_side_increase ? min_y - per_side_increase : 0;
+    return ImagePixelBox(new_min_x, new_min_y, max_x + per_side_increase, max_y + per_side_increase);
+}
+
 size_t ImagePixelBox::distance_x(const ImagePixelBox& box) const{
     size_t min_x = std::max(this->min_x, box.min_x);
     size_t max_x = std::min(this->max_x, box.max_x);

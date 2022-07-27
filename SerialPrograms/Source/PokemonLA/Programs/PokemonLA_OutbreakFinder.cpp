@@ -6,10 +6,11 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -128,6 +129,9 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
         MMO_FIRST_WAVE_SPRITE_SLUGS(),
         &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
     )
+    , DEBUG_MODE(
+        "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.", false
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(
         "Match Found",
@@ -147,6 +151,10 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     PA_ADD_OPTION(DESIRED_MMO_SLUGS);
     PA_ADD_OPTION(DESIRED_STAR_MMO_SLUGS);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(DEBUG_MODE);
+    }
 }
 
 
@@ -521,7 +529,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     std::vector<std::string> sprites;
     std::shared_ptr<const ImageRGB32> sprites_screen = env.console.video().snapshot();
     for (size_t i = 0; i < new_boxes.size(); i++){
-        auto result = match_sprite_on_map(*sprites_screen, new_boxes[i], region);
+        auto result = match_sprite_on_map(env.logger(), *sprites_screen, new_boxes[i], region, DEBUG_MODE);
         env.console.log("Found MMO sprite " + result.slug);
         stats.mmo_pokemon++;
 

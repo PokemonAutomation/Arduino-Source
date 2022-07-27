@@ -64,6 +64,10 @@ struct ImagePixelBox{
 
     //  Clip this box to be within the specified box.
     void clip(const ImagePixelBox& box);
+
+    //  Return a new box with an increased size. Each side of the box is increased by `per_side_increase`.
+    //  `min_x` and `min_y` are clamped to 0 if becoming negative.
+    ImagePixelBox expand_as(size_t per_side_increase) const;
     
     //  The distance to another box on x axis. If two boxes overlap, the distance is 0.
     size_t distance_x(const ImagePixelBox& box) const;

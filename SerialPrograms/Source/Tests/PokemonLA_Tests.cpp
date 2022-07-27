@@ -322,6 +322,7 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
 // Load a text file with each line the pokemon in the MMO event, with filename <_XXX.txt>. If more than one pokemon of the same species appears,
 // add a number as the number of appearance at end of that line.
 int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
+    auto& logger = global_logger_command_line();
     const QString full_path(QString::fromStdString(filepath));
     const QFileInfo fileinfo(full_path);
     const QString filename = fileinfo.fileName();
@@ -379,7 +380,6 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "- " << slug << endl;
     }
 
-    auto& logger = global_logger_command_line();
     MMOQuestionMarkDetector detector(logger);
 
     const auto quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
@@ -426,7 +426,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "--------------------------------------------------------------------" << endl;
         cout << i << ": Target slug: " << target_sprites[i] << endl;
 
-        auto result = match_sprite_on_map(sprite_image, new_boxes[i], region);
+        auto result = match_sprite_on_map(logger, sprite_image, new_boxes[i], region);
         if (result.slug == target_sprites[i]){
             success_count++;
             cout << "Match SUCCESS" << endl;

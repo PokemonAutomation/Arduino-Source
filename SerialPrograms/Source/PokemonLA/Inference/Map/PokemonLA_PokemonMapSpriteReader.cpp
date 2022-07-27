@@ -20,17 +20,12 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
-
-#include "Common/Compiler.h"
-#include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/ImageOpener.h"
-#include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/Globals.h"
 
 #include <set>
 #include <map>
@@ -735,8 +730,17 @@ float compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, cons
 }
 
 
-MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region){
+MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region, bool debug_mode){
     const static auto& sprite_map = MMO_SPRITE_MATCHING_DATA();
+
+    auto save_debug_image_if_required = [&](const MapSpriteMatchResult& result){
+        if (debug_mode){
+            const std::string debug_path = std::string("PokemonLA/PokemonMapSpriteReader/") + std::string(WILD_REGION_SHORT_NAMES[(int)region-2])
+                 + "/" + result.slug; 
+
+            dump_debug_image(logger, debug_path, "sprite", extract_box_reference(screen, box.expand_as(5)));
+        }
+    };
 
     // configs for the algorithm:
     const size_t num_feature_candidates = 10;
@@ -745,7 +749,7 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     const double color_to_gradient_confidence_scale = 2.0;
 
     MapSpriteMatchResult result;
-    cout << "Map sprite matching:" << endl;
+    logger.log("Start map MMO sprite matching:");
 
     // This map has the match score for all sprites.
     // This map must be not empty for subsequent computation.
@@ -757,21 +761,25 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
             break;
         }
     }
-    cout << "  Candidates: ";
-    for(size_t i = 0; i < result.candidates.size(); i++){
-        if (i > 0){
-            cout << ", ";
+
+    {
+        std::ostringstream os;
+        os << "  Candidates: ";
+        for(size_t i = 0; i < result.candidates.size(); i++){
+            if (i > 0){
+                os << ", ";
+            }
+            os << result.candidates[i];
         }
-        cout << result.candidates[i];
+        logger.log(os.str());
     }
-    cout << endl;
 
     // Should not happen if we correctly loads the sprite data.
     if (result.candidates.size() == 0){
         return result;
     }
 
-    cout << "Color matching..." << endl;
+    logger.log("Color matching...");
     {
         ImagePixelBox expanded_box(box.min_x < 2 ? 0 : box.min_x - 2, box.min_y < 2 ? 0 : box.min_y - 2, box.max_x + 2, box.max_y + 2);
         ImageHSV32 sprite_hsv(extract_box_reference(screen, expanded_box));
@@ -802,12 +810,17 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
         color_match_sprite_scores.emplace(slug, p.first);
         if (result_count < 5){
             const auto& stats = sprite_map.find(slug)->second.rgb_stats;
-            cout << p.first << " - " << slug << " " << stats.stddev.sum() << endl;
+            std::ostringstream os;
+            os << p.first << " - " << slug << " " << stats.stddev.sum();
+            logger.log(os.str());
         }
         if (result_count == 5){
             size_t num_rest_results = result.color_match_results.size() - 5;
-            cout << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "") << endl;
+            std::ostringstream os;
+            os << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "");
+            logger.log(os.str());
         }
+        
         result_count++;
     }
 
@@ -822,23 +835,28 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     if (color_second == result.color_match_results.end()){
         // we only have one color match result.
         result.color_lead = DBL_MAX;
-        cout << "Single color match result: " << color_top_slug << endl;
+        logger.log("Single color match result: " + color_top_slug);
+        save_debug_image_if_required(result);
         return result;
     }
 
     // We have some sprites which have closer scores to the top color match:
     // Find the difference between the top and second match score
     result.color_lead = color_second->first - result.color_score;
-
-    cout << "Top color score: " << result.color_score << " diff to second: " << result.color_lead << endl;
+    {
+        std::ostringstream os;
+        os << "Top color score: " << result.color_score << " diff to second: " << result.color_lead;
+        logger.log(os.str());
+    }
 
     if (result.color_lead >= color_difference_threshold){
-        cout << "Color difference large enough. Good match: " << result.slug << endl;
+        logger.log("Color difference large enough. Good match: " + result.slug);
         result.second_slug = color_second->second;
+        save_debug_image_if_required(result);
         return result;
     }
 
-    cout << "Gradient matching..." << endl;
+    logger.log("Gradient matching...");
     ImageRGB32 gradient_image = compute_MMO_sprite_gradient(extract_box_reference(screen, box));
     
     // std::ostringstream os;
@@ -857,10 +875,14 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     for(const auto& p : result.gradient_match_results){
         if (result_count == 5){
             size_t num_rest_results = result.gradient_match_results.size() - 5;
-            cout << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "") << endl;
+            std::ostringstream os;
+            os << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "");
+            logger.log(os.str());
             break;
         }
-        cout << p.first << " - " << p.second << endl;
+        std::ostringstream os;
+        os << p.first << " - " << p.second;
+        logger.log(os.str());
         result_count++;
     }
 
@@ -876,10 +898,15 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     result.gradient_lead = gradient_second->first - gradient_top->first;
     result.second_slug = gradient_second_slug;
 
-    cout << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead << endl;
+    {
+        std::ostringstream os;
+        os << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead;
+        logger.log(os.str());
+    }
 
     if (result.gradient_lead >= gradient_confidence_threshold){
-        cout << "Gradient difference large enough. Good match: " << result.slug << endl;
+        logger.log("Gradient difference large enough. Good match: " + result.slug);
+        save_debug_image_if_required(result);
         return result;
     }
 
@@ -889,22 +916,27 @@ MapSpriteMatchResult match_sprite_on_map(const ImageViewRGB32& screen, const Ima
     result.gradient_second_color_score = color_match_sprite_scores[gradient_second_slug];
     double color_diff = result.gradient_second_color_score - result.graident_top_color_score;
 
-    cout << "Gradient difference not large enough. Check color difference: " << 
-        result.graident_top_color_score << " vs " << result.gradient_second_color_score << ", diff: " <<
-        color_diff << endl;
+    {
+        std::ostringstream os;
+        os << "Gradient difference not large enough. Check color difference: " << 
+            result.graident_top_color_score << " vs " << result.gradient_second_color_score << ", diff: " <<
+            color_diff;
+        logger.log(os.str());
+    }
     
     // If color score is more confident in telling those two sprites apart
     if (std::fabs(color_diff) > result.gradient_lead * color_to_gradient_confidence_scale){ 
         if (color_diff < 0){ // second gradient sprite is better in color matching than the first graident sprite:
             result.pick_gradient_second = true;
             std::swap(result.slug, result.second_slug);
-            cout << "Switch to more confident color result: " << result.slug << endl;
+            logger.log("Switch to more confident color result: " + result.slug);
         }
     }
     else{
-        cout << "Low confidence match: " << result.slug << endl;
+        logger.log("Low confidence match: " + result.slug);
     }
 
+    save_debug_image_if_required(result);
     return result;
 }
 
