@@ -1469,7 +1469,7 @@ if (MSVC)
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
 
-    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX)
+    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
