@@ -4,7 +4,6 @@
  *
  */
 
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -28,7 +27,7 @@ ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
         "PokemonBDSP:ActivateMenuGlitch112",
         STRING_POKEMON + " BDSP", "Activate Menu Glitch (1.1.2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-Poketch.md",
-        "Activate the menu glitch using the Pok" + QString(QChar(0xe9)).toStdString() + "tch. "
+        "Activate the menu glitch using the Pok\u00e9tch. "
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB

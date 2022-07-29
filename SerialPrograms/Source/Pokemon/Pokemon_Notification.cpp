@@ -34,9 +34,9 @@ std::string shiny_symbol(ShinyType shiny_type){
         return ":question:";
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
-        return QString(QChar(0x2728)).toStdString();
+        return "\u2728";
     case ShinyType::SQUARE_SHINY:
-        return QString(QChar(0x2733)).toStdString();    //  Green square asterisk
+        return "\u2733";    //  Green square asterisk
     default:
         return "";
     }
