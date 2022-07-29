@@ -91,7 +91,7 @@ void send_program_notification(
             field["url"] = "attachment://" + file->filename();
             embed["image"] = std::move(field);
         }
-        embeds.push_back(std::move(embed));
+        embeds.push_back(embed.clone());
         embed_sleepy = std::move(embed);
     }
 
