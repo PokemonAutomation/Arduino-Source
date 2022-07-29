@@ -16,7 +16,6 @@ namespace PokemonAutomation{
 
 class ImageRGB32 : public ImageViewRGB32{
 public:
-public:
     ~ImageRGB32();
     ImageRGB32(ImageRGB32&& x) noexcept;
     ImageRGB32& operator=(ImageRGB32&& x) noexcept;
