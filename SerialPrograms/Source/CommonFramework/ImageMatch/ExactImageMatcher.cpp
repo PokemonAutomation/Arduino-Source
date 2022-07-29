@@ -56,8 +56,8 @@ double ExactImageMatcher::rmsd(const ImageViewRGB32& image) const{
 
 #if 0
     static int c = 0;
-    image.save("test-" + QString::number(c) + "-image.png");
-    reference.save("test-" + QString::number(c) + "-sprite.png");
+    image.save("test-" + std::to_string(c) + "-image.png");
+    reference.save("test-" + std::to_string(c) + "-sprite.png");
     c++;
 #endif
 

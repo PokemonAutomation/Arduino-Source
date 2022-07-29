@@ -141,7 +141,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/CollapsibleGroupBox.h
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
-    ../Common/Qt/ImageOpener.h
     ../Common/Qt/NoWheelComboBox.h
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h

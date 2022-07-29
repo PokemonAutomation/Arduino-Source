@@ -6,7 +6,6 @@
 
 #include <sstream>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/ImageOpener.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"

@@ -88,6 +88,7 @@ SOURCES += \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/StreamConverters.cpp \
+    ../Common/Cpp/StringTools.cpp \
     ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Microcontroller/DeviceRoutines.cpp \
@@ -756,6 +757,7 @@ HEADERS += \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/SpinPause.h \
     ../Common/Cpp/StreamConverters.h \
+    ../Common/Cpp/StringTools.h \
     ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
     ../Common/Microcontroller/DeviceRoutines.h \
@@ -777,7 +779,6 @@ HEADERS += \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/CollapsibleGroupBox.h \
     ../Common/Qt/ExpressionEvaluator.h \
-    ../Common/Qt/ImageOpener.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h \

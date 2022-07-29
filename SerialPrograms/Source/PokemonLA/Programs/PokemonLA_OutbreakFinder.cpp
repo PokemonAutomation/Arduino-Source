@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/ImageOpener.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
@@ -66,7 +65,7 @@ Pokemon::ExtraNames load_mmo_names(){
     };
 
     std::string mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
-    QImage mmo_sprite = open_image(mmo_symbol_path);
+    ImageRGB32 mmo_sprite(mmo_symbol_path);
     QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite).to_QImage_ref());
 
 

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -83,7 +82,7 @@ public:
 
 
 const ImageMatch::ExactImageMatcher& QUESTION_TOP(){
-    static ImageMatch::ExactImageMatcher matcher(open_image(RESOURCE_PATH() + "PokemonSwSh/QuestionTop.png"));
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSwSh/QuestionTop.png");
     return matcher;
 }
 

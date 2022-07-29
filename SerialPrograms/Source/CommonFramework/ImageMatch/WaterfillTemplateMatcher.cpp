@@ -91,7 +91,7 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_i
 
 //    if (rmsd <= m_max_rmsd){
 //        static int c = 0;
-//        cropped_image.save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//        cropped_image.save("test-" + std::to_string(c++) + "-" + std::to_string(rmsd) + ".png");
 //    }
 
     return rmsd;
@@ -119,7 +119,7 @@ double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_im
 
 //    if (rmsd <= m_max_rmsd){
 //        static int c = 0;
-//        extract_box(image, object).save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//        extract_box(image, object).save("test-" + std::to_string(c++) + "-" + std::to_string(rmsd) + ".png");
 //    }
 
     return rmsd;

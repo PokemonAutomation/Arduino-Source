@@ -177,7 +177,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
-                if (QString::fromStdString(display_name).contains("MiraBox")){
+                if (display_name.find("MiraBox") != std::string::npos){
                     preferred_index += 2;
                 }else{
                     preferred_index += 1;

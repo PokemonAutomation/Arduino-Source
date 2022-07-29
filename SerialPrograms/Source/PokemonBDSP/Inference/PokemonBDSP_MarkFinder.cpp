@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -26,7 +25,7 @@ using namespace Kernels::Waterfill;
 
 
 const ImageMatch::ExactImageMatcher& EXCLAMATION_MARK(){
-    static ImageMatch::ExactImageMatcher matcher(open_image(RESOURCE_PATH() + "PokemonBDSP/ExclamationMark-WhiteFill.png"));
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonBDSP/ExclamationMark-WhiteFill.png");
     return matcher;
 }
 

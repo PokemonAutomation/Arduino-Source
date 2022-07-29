@@ -127,7 +127,7 @@ bool SubObjectTemplateMatcher::matches(
 
 //    if (rmsd <= m_max_rmsd){
 //        static int c = 0;
-//        extract_box(image, object_box).save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//        extract_box(image, object_box).save("test-" + std::to_string(c++) + "-" + std::to_string(rmsd) + ".png");
 //    }
 
     return rmsd <= m_max_rmsd;

@@ -16,8 +16,6 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
-class QString;
-
 namespace PokemonAutomation{
     class JsonArray;
     class JsonObject;

@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <thread>
 #include <QFile>
-#include <QString>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/StringTools.h"
 #include "Common/Cpp/PanicDump.h"
