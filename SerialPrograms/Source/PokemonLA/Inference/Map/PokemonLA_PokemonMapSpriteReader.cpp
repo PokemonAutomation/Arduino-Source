@@ -50,6 +50,13 @@ using FeatureVector = std::vector<FeatureType>;
 
 using ImageMatch::ExactImageDictionaryMatcher;
 
+// We set each sprite resolution to be 50 x 50 during image matching.
+const size_t IMAGE_TEMPLATE_SIZE = 50;
+// The amount of pixel offset allowed in color matching
+const size_t IMAGE_COLOR_MATCH_EXTRA_SIDE_EXT = 2;
+
+const size_t EXTENDED_IMAGE_SIZE = IMAGE_TEMPLATE_SIZE + IMAGE_COLOR_MATCH_EXTRA_SIDE_EXT * 2;
+
 // Defined locally stored data for matching MMO sprites:
 // Store data belonging to one sprite
 struct PerSpriteMatchingData {
@@ -336,7 +343,7 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
 
     // Divide the image into 4 areas, compute average color on each.
     // Note: we skip the upper right area because that area may overlap with
-    // the berry or bonus wave symbol.
+    // the berry or star (bonus wave) symbol.
     const int num_divisions = 2;
     const float portion = 1.0 / (float)num_divisions;
     FeatureVector result;
@@ -359,12 +366,16 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
     return result;
 }
 
-void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const ImageRGB32& sprite)> visit_sprit){
+void load_and_visit_MMO_sprite(std::function<void(const std::string& slug, const ImageViewRGB32& sprite)> visit_sprit){
     static const SpriteDatabase database("PokemonLA/MMOSprites.png", "PokemonLA/MMOSprites.json");
     for (const auto& item : database){
         // cout << "sprite " << count << endl;
         const std::string& slug = item.first;
-        visit_sprit(slug, item.second.sprite.scale_to(50, 50));
+        const auto& sprite = item.second.sprite;
+        if (sprite.width() != 128 || sprite.height() != 128){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Wrong size of Loaded MMO Sprite sprite: " + slug);
+        }
+        visit_sprit(slug, item.second.sprite.sub_image(12, 12, 104, 104).scale_to(50, 50));
     }
 }
 
@@ -372,12 +383,13 @@ MMOSpriteMatchingMap build_MMO_sprite_matching_data(){
 
     MMOSpriteMatchingMap sprite_map;
 
-    load_and_visit_MMO_sprite([&](const std::string& slug, const ImageRGB32& sprite){
-    
+    load_and_visit_MMO_sprite([&](const std::string& slug, const ImageViewRGB32& sprite){
+
         PerSpriteMatchingData per_sprite_data;
 
         per_sprite_data.rgb_stats = image_stats(sprite);
         per_sprite_data.hsv_image = ImageHSV32(sprite);
+
         ImageRGB32 smoothed_sprite = smooth_image(sprite);
         per_sprite_data.gradient_image = compute_image_gradient(smoothed_sprite);
         per_sprite_data.feature = compute_feature(smoothed_sprite);
@@ -448,10 +460,52 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageV
 }
 
 
+ImageHSV32 compute_MMO_sprite_color_hsv(const ImageViewRGB32& image_rgb){
+    // Convert the image to HSV during ImageHSV32 class construction
+    ImageHSV32 result = [&](){
+        if (image_rgb.width() == EXTENDED_IMAGE_SIZE || image_rgb.height() == EXTENDED_IMAGE_SIZE){
+            return ImageHSV32(image_rgb);
+        }
+        // First scale the image
+        return ImageHSV32(image_rgb.scale_to(EXTENDED_IMAGE_SIZE, EXTENDED_IMAGE_SIZE));
+    }();
+    
+    const size_t width = result.width();
+    const size_t height = result.height();
+    
+    // Set all the pixels outside the sprite area transparent to avoid matching the template to background colors.
+    float r = (width + height) / 4.0;
+    float center_x  = (width-1) / 2.0f;
+    float center_y = (height-1) / 2.0f;
+    // -r/12 to remove some boundary areas
+    float dist2_th = (r - r/12) * (r - r/12);
+    for(size_t y = 0; y < height; y++){
+        for(size_t x = 0; x < width; x++){
+            if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= dist2_th){
+                // color outside of the sprite circle is set to zero transparency
+                result.pixel(x, y) = uint32_t(0);
+            }
+            // else if (x > center_x && y < center_y){
+            //     // Upper-right part of the sprite is set to zero transparency to avoid matching the 
+            //     // berry or star symbol
+            //     result.pixel(x, y) = uint32_t(0);
+            // }
+        }
+    }
+    return result;
+}
+
+
 // For a sprite on the screenshot, create gradient image of it
 ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
 
-    ImageRGB32 result = smooth_image(image);
+    ImageRGB32 result = [&](){
+        if (image.width() == IMAGE_TEMPLATE_SIZE || image.height() == IMAGE_TEMPLATE_SIZE){
+            return smooth_image(image);
+        }
+        // First scale the image
+        return smooth_image(image.scale_to(IMAGE_TEMPLATE_SIZE, IMAGE_TEMPLATE_SIZE));
+    }();
     result = compute_image_gradient(result);
     
     size_t width = image.width();
@@ -460,6 +514,7 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
         return result;
     }
 
+    // Remove gradients outside of the image area
     float r = (width + height) / 4.0;
     float center_x  = (width-1) / 2.0f;
     float center_y = (height-1) / 2.0f;
@@ -471,6 +526,11 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
                 // gradients outside of the sprite circle is set to zero
                 result.pixel(x, y) = combine_argb(0,0,0,0);
             }
+            // else if (x > center_x && y < center_y){
+            //     // Upper-right part of the sprite is set to zero transparency to avoid matching the 
+            //     // berry or star symbol
+            //     result.pixel(x, y) = uint32_t(0);
+            // }
         }
     }
     return result;
@@ -734,12 +794,13 @@ MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32&
     const static auto& sprite_map = MMO_SPRITE_MATCHING_DATA();
 
     auto save_debug_image_if_required = [&](const MapSpriteMatchResult& result){
-        if (debug_mode){
-            const std::string debug_path = std::string("PokemonLA/PokemonMapSpriteReader/") + std::string(WILD_REGION_SHORT_NAMES[(int)region-2])
-                 + "/" + result.slug;
-
-            dump_debug_image(logger, debug_path, result.slug, extract_box_reference(screen, box.expand_as(5)));
+        if (debug_mode == false){
+            return;
         }
+        const std::string debug_path = std::string("PokemonLA/PokemonMapSpriteReader/") + std::string(WILD_REGION_SHORT_NAMES[(int)region-2])
+             + "/" + result.slug;
+
+        dump_debug_image(logger, debug_path, result.slug, extract_box_reference(screen, box.expand_as(5)));
     };
 
     // configs for the algorithm:
@@ -781,8 +842,9 @@ MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32&
 
     logger.log("Color matching...");
     {
-        ImagePixelBox expanded_box(box.min_x < 2 ? 0 : box.min_x - 2, box.min_y < 2 ? 0 : box.min_y - 2, box.max_x + 2, box.max_y + 2);
-        ImageHSV32 sprite_hsv(extract_box_reference(screen, expanded_box));
+        const ImagePixelBox expanded_box = box.expand_as(2);
+        const ImageHSV32 sprite_hsv = compute_MMO_sprite_color_hsv(extract_box_reference(screen, expanded_box));
+        
         for(const auto& slug: result.candidates){
             const ImageHSV32& candidate_template = sprite_map.find(slug)->second.hsv_image;
             float score = FLT_MAX;
@@ -800,7 +862,6 @@ MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32&
             result.color_match_results.emplace(score, slug);
         }
     }
-
 
     // Build a map from sprite to their color score and output scores for debugging
     std::map<std::string, double> color_match_sprite_scores;

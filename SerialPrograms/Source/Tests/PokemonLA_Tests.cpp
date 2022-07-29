@@ -426,7 +426,8 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "--------------------------------------------------------------------" << endl;
         cout << i << ": Target slug: " << target_sprites[i] << endl;
 
-        auto result = match_sprite_on_map(logger, sprite_image, new_boxes[i], region);
+        bool debug_mode = false;
+        auto result = match_sprite_on_map(logger, sprite_image, new_boxes[i], region, debug_mode);
         if (result.slug == target_sprites[i]){
             success_count++;
             cout << "Match SUCCESS" << endl;
@@ -438,7 +439,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     if (success_count == target_sprites.size()){
         cout << "ALL SUCCESS" << endl;
     }else{
-        cout << "FAILURE: " << success_count << "/" << target_sprites.size() << endl;
+        cout << "FAILURE: " << target_sprites.size() - success_count << "/" << target_sprites.size() << endl;
         return 1;
     }
     count++;
