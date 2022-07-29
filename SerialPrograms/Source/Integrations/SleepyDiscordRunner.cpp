@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/StringTools.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Globals.h"
@@ -495,10 +496,6 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
 void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags, const std::string& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file) {
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
-//        //  TODO: Once file cleanup works, remove this.
-//        if (file){
-//            file->extend_lifetime();
-//        }
 
         std::set<std::string> tag_set;
         for (const std::string& tag : tags){
@@ -589,21 +586,19 @@ bool initialize_sleepy_settings() {
         return false;
     }
 
-    //  TODO: REMOVE QString
-
     bool suffix = settings.integration.use_suffix;
     std::string param_string;
-    param_string += QString::fromStdString(settings.integration.token.get()).replace(" ", "").toStdString() + "|";
+    param_string += StringTools::replace(settings.integration.token.get(), " ", "") + "|";
     param_string += settings.integration.command_prefix.get() + "|";
-    param_string += QString::fromStdString(settings.integration.owner.get()).replace(" ", "").toStdString() + "|";
+    param_string += StringTools::replace(settings.integration.owner.get(), " ", "") + "|";
     param_string += settings.integration.game_status.get() + "|";
-    param_string += QString::fromStdString(settings.integration.hello_message.get()).replace("@", "").toStdString() + "|";
+    param_string += StringTools::replace(settings.integration.hello_message.get(), "@", "") + "|";
     param_string += PROGRAM_VERSION + "|";
     param_string += PROJECT_SOURCE_URL;
 
-    std::string sudo = QString::fromStdString(settings.integration.sudo.get()).replace(" ", "").toStdString();
+    std::string sudo = StringTools::replace(settings.integration.sudo.get(), " ", "");
 
-//    std::string w_channels = settings.integration.channels_whitelist.get().replace(" ", "").toStdString();
+//    std::string w_channels = StringTools::replace(settings.integration.channels_whitelist.get(), " ", "");
     std::string w_channels;
     for (const std::string& channel_id : settings.integration.channels.command_channels()){
         if (!w_channels.empty()){
@@ -619,19 +614,17 @@ bool initialize_sleepy_settings() {
 
 bool check_if_empty(const DiscordSettingsOption& settings) {
 
-    //  TODO: REMOVE QString
-
     if (!settings.integration.enabled()){
         return false;
     }
     if (settings.integration.token.get().empty()) {
         return false;
     }
-    else if (QString::fromStdString(settings.integration.token.get()).contains(",")) {
+    else if (settings.integration.token.get().find(",") != std::string::npos) {
         sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
     }
-    else if (QString::fromStdString(settings.integration.owner.get()).contains(",")) {
+    else if (settings.integration.owner.get().find(",") != std::string::npos) {
         sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
     }

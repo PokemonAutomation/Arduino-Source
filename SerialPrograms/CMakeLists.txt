@@ -109,6 +109,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/SpinPause.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
+    ../Common/Cpp/StringTools.cpp
+    ../Common/Cpp/StringTools.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/Unicode.cpp

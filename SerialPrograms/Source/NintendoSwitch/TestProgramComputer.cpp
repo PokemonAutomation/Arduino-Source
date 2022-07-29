@@ -76,6 +76,7 @@
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
+#include "Common/Cpp/StringTools.h"
 
 
 
@@ -125,6 +126,8 @@ using namespace Kernels;
 
 
 
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
@@ -132,10 +135,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+//    env.log(QString(QChar(0x2728)));
+//    env.log("\u2728\u2733");
 
+    cout << StringTools::replace("asdf asdf adsf", "123", "---") << endl;
+
+
+
+#if 0
     ImageRGB32 image("screenshot-20220725-170822724101.png");
     ImageHSV32 hsv(image);
-
+#endif
 
 
 #if 0

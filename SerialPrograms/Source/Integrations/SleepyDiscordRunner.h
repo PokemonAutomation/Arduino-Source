@@ -79,8 +79,6 @@ enum SleepyRequest {
 #ifdef __cplusplus
 }
 
-class QString;
-
 namespace PokemonAutomation{
 namespace Integration{
 namespace SleepyDiscordRunner{
