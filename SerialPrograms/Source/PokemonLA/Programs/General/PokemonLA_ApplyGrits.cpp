@@ -43,7 +43,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
 ApplyGrits::ApplyGrits(const ApplyGrits_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , NUM_POKEMON(
-        "<b>Num " + STRING_POKEMON + " to apply grits</b>:",
+        "<b>Num " + STRING_POKEMON + " to Apply Grits</b>:",
         {"1", "2", "3", "4", "5", "6"}, 0
     )
     , NOTIFICATIONS({
