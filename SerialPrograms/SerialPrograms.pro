@@ -47,11 +47,12 @@ win32-msvc{
     QMAKE_CXXFLAGS += -MP
 
     DEFINES += WIN32
-    DEFINES += PA_TESSERACT
+    DEFINES += NOMINMAX
     DEFINES += PA_AutoDispatch_x64_08_Nehalem
+
+    DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/tesseractPA.lib
 
-    DEFINES += WIN32
     DEFINES += PA_SLEEPY
     LIBS += ../SerialPrograms/Sleepy.lib
 }
