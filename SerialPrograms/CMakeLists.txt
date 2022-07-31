@@ -1009,6 +1009,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
+    Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp

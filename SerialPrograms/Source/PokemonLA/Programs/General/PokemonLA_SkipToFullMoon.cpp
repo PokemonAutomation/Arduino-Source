@@ -18,7 +18,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
@@ -26,7 +27,7 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         "PokemonLA:SkipToFullMoon",
         STRING_POKEMON + " LA", "Skip to Full Moon",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SkipToFullMoon.md",
-        "Skip nights unitl full moon.",
+        "Skip nights until full moon.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )

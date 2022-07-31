@@ -500,6 +500,7 @@ SOURCES += \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.cpp \
@@ -1232,6 +1233,7 @@ HEADERS += \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
+    Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h \
     Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h \

@@ -16,6 +16,7 @@
 #include "Programs/General/PokemonLA_SkipToFullMoon.h"
 #include "Programs/General/PokemonLA_PokedexTasksReader.h"
 #include "Programs/General/PokemonLA_RamanasIslandCombee.h"
+#include "Programs/General/PokemonLA_ApplyGrits.h"
 
 #include "Programs/Trading/PokemonLA_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
@@ -59,6 +60,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
     add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
     add_program<SkipToFullMoon_Descriptor, SkipToFullMoon>();
+    add_program<ApplyGrits_Descriptor, ApplyGrits>();
     add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
     add_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>();
 
