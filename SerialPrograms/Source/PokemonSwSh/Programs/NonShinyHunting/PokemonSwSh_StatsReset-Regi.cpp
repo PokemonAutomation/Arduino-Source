@@ -35,6 +35,36 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct StatsResetRegi_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : pokemon_caught(m_stats["Pokemon caught"])
+        , pokemon_fainted(m_stats["Pokemon fainted"])
+        , own_fainted(m_stats["Own fainted"])
+        , out_of_balls(m_stats["Out of balls"])
+        , errors(m_stats["Errors"])
+        , total_balls_thrown(m_stats["Total balls thrown"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back(Stat("Pokemon caught"));
+        m_display_order.emplace_back(Stat("Pokemon fainted"));
+        m_display_order.emplace_back(Stat("Own fainted"));
+        m_display_order.emplace_back(Stat("Out of balls"));
+        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back(Stat("Total balls thrown"));
+        m_display_order.emplace_back(Stat("Matches"));
+    }
+
+    std::atomic<uint64_t>& pokemon_caught;
+    std::atomic<uint64_t>& pokemon_fainted;
+    std::atomic<uint64_t>& own_fainted;
+    std::atomic<uint64_t>& out_of_balls;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& total_balls_thrown;
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> StatsResetRegi_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -79,39 +109,6 @@ StatsResetRegi::StatsResetRegi(const StatsResetRegi_Descriptor& descriptor)
 
 
 
-struct StatsResetRegi::Stats : public StatsTracker{
-    Stats()
-        : pokemon_caught(m_stats["Pokemon caught"])
-        , pokemon_fainted(m_stats["Pokemon fainted"])
-        , own_fainted(m_stats["Own fainted"])
-        , out_of_balls(m_stats["Out of balls"])
-        , errors(m_stats["Errors"])
-        , total_balls_thrown(m_stats["Total balls thrown"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back(Stat("Pokemon caught"));
-        m_display_order.emplace_back(Stat("Pokemon fainted"));
-        m_display_order.emplace_back(Stat("Own fainted"));
-        m_display_order.emplace_back(Stat("Out of balls"));
-        m_display_order.emplace_back(Stat("Errors"));
-        m_display_order.emplace_back(Stat("Total balls thrown"));
-        m_display_order.emplace_back(Stat("Matches"));
-    }
-
-    std::atomic<uint64_t>& pokemon_caught;
-    std::atomic<uint64_t>& pokemon_fainted;
-    std::atomic<uint64_t>& own_fainted;
-    std::atomic<uint64_t>& out_of_balls;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& total_balls_thrown;
-    std::atomic<uint64_t>& matches;
-};
-std::unique_ptr<StatsTracker> StatsResetRegi::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
 void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -120,7 +117,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.current_stats<Stats>();
+    StatsResetRegi_Descriptor::Stats& stats = env.current_stats<StatsResetRegi_Descriptor::Stats>();
 
     bool match_found = false;
     while (!match_found){

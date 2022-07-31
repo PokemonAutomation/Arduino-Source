@@ -21,6 +21,9 @@ namespace PokemonSwSh{
 class CurryHunter_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     CurryHunter_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -28,13 +31,9 @@ public:
 class CurryHunter : public SingleSwitchProgramInstance{
 public:
     CurryHunter(const CurryHunter_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    struct Stats;
-
     StartInGripOrGameOption START_IN_GRIP_MENU;
     TimeExpressionOption<uint16_t> WALK_UP_DELAY;
     BooleanCheckBoxOption TAKE_VIDEO;

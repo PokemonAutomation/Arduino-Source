@@ -21,19 +21,16 @@ namespace PokemonBDSP{
 class AmitySquarePickUpFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     AmitySquarePickUpFarmer_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance{
 public:
     AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
-
-
-private:
-    struct Stats;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

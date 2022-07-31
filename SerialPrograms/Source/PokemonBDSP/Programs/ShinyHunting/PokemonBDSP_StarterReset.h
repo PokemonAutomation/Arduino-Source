@@ -21,19 +21,19 @@ namespace PokemonBDSP{
 class StarterReset_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     StarterReset_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class StarterReset : public SingleSwitchProgramInstance{
 public:
     StarterReset(const StarterReset_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    struct Stats;
     void run_trigger(BotBaseContext& context) const;
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 

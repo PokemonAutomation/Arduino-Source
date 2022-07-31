@@ -35,6 +35,9 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new EggAutonomousStats());
+}
 
 
 EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
@@ -118,10 +121,6 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
 }
 
 
-std::unique_ptr<StatsTracker> EggAutonomous::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new EggAutonomousStats());
-//    return nullptr;
-}
 
 
 

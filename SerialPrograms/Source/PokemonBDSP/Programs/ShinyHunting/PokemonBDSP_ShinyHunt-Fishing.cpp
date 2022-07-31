@@ -32,6 +32,21 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct ShinyHuntFishing_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+        , m_nothing(m_stats["Nothing"])
+        , m_misses(m_stats["Misses"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Nothing"));
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Misses"));
+    }
+    std::atomic<uint64_t>& m_nothing;
+    std::atomic<uint64_t>& m_misses;
+};
+std::unique_ptr<StatsTracker> ShinyHuntFishing_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor)
@@ -72,26 +87,11 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
 
 
 
-struct ShinyHuntFishing::Stats : public PokemonSwSh::ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(false)
-        , m_nothing(m_stats["Nothing"])
-        , m_misses(m_stats["Misses"])
-    {
-        m_display_order.insert(m_display_order.begin() + 1, Stat("Nothing"));
-        m_display_order.insert(m_display_order.begin() + 2, Stat("Misses"));
-    }
-    std::atomic<uint64_t>& m_nothing;
-    std::atomic<uint64_t>& m_misses;
-};
-std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 
 void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntFishing_Descriptor::Stats>();
 
     StandardEncounterHandler handler(
         env, env.console, context,

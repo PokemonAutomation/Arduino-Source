@@ -22,6 +22,8 @@ namespace PokemonBDSP{
 class LegendaryReset_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     LegendaryReset_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -29,7 +31,6 @@ class LegendaryReset : public SingleSwitchProgramInstance{
 public:
     LegendaryReset(const LegendaryReset_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

@@ -35,6 +35,39 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class LeapGrinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , leaps(m_stats["Leaps"])
+        , found(m_stats["Found"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+        , leap_alphas(m_stats["Leap Alphas"])
+        , leap_shinies(m_stats["Leap Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Leaps");
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_display_order.emplace_back("Leap Alphas");
+        m_display_order.emplace_back("Leap Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+        m_aliases["Alphas"] = "Leap Alphas";
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& leaps;
+    std::atomic<uint64_t>& found;
+    std::atomic<uint64_t>& enroute_shinies;
+    std::atomic<uint64_t>& leap_alphas;
+    std::atomic<uint64_t>& leap_shinies;
+};
+std::unique_ptr<StatsTracker> LeapGrinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
@@ -112,44 +145,9 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
 }
 
 
-class LeapGrinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , leaps(m_stats["Leaps"])
-        , found(m_stats["Found"])
-        , enroute_shinies(m_stats["Enroute Shinies"])
-        , leap_alphas(m_stats["Leap Alphas"])
-        , leap_shinies(m_stats["Leap Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Leaps");
-        m_display_order.emplace_back("Found");
-        m_display_order.emplace_back("Enroute Shinies");
-        m_display_order.emplace_back("Leap Alphas");
-        m_display_order.emplace_back("Leap Shinies");
-        m_aliases["Shinies"] = "Enroute Shinies";
-        m_aliases["Alphas"] = "Leap Alphas";
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& leaps;
-    std::atomic<uint64_t>& found;
-    std::atomic<uint64_t>& enroute_shinies;
-    std::atomic<uint64_t>& leap_alphas;
-    std::atomic<uint64_t>& leap_shinies;
-};
-
-std::unique_ptr<StatsTracker> LeapGrinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    Stats& stats = env.current_stats<Stats>();
+    LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
 
     env.console.log("Starting route and shiny detection...");
@@ -265,7 +263,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

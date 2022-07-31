@@ -20,20 +20,19 @@ namespace PokemonLA{
 class DistortionWaiter_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     DistortionWaiter_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class DistortionWaiter : public SingleSwitchProgramInstance{
 public:
     DistortionWaiter(const DistortionWaiter_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    class Stats;
-
     OCR::LanguageOCR LANGUAGE;
 
     EventNotificationOption NOTIFICATION_DISTORTION;

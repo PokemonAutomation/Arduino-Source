@@ -35,6 +35,26 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct DenRoller_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : rolls(m_stats["Rolls"])
+        , skips(m_stats["Day Skips"])
+        , errors(m_stats["Errors"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back(Stat("Rolls"));
+        m_display_order.emplace_back(Stat("Day Skips"));
+        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back(Stat("Matches"));
+    }
+    std::atomic<uint64_t>& rolls;
+    std::atomic<uint64_t>& skips;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> DenRoller_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -80,29 +100,6 @@ DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
 
 
 
-struct DenRoller::Stats : public StatsTracker{
-    Stats()
-        : rolls(m_stats["Rolls"])
-        , skips(m_stats["Day Skips"])
-        , errors(m_stats["Errors"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back(Stat("Rolls"));
-        m_display_order.emplace_back(Stat("Day Skips"));
-        m_display_order.emplace_back(Stat("Errors"));
-        m_display_order.emplace_back(Stat("Matches"));
-    }
-    std::atomic<uint64_t>& rolls;
-    std::atomic<uint64_t>& skips;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& matches;
-};
-std::unique_ptr<StatsTracker> DenRoller::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
 
 void DenRoller::ring_bell(BotBaseContext& context, int count) const{
     for (int c = 0; c < count; c++){
@@ -112,7 +109,7 @@ void DenRoller::ring_bell(BotBaseContext& context, int count) const{
 }
 
 void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
     std::string desired_slug = FILTER.slug();
 

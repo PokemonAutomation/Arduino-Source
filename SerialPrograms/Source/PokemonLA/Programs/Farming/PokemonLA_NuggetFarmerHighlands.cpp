@@ -42,28 +42,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-
-
-NuggetFarmerHighlands::NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS({
-        &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
-        &NOTIFICATION_PROGRAM_FINISH,
-//        &NOTIFICATION_ERROR_RECOVERABLE,
-        &NOTIFICATION_ERROR_FATAL,
-    })
-{
-    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(SHINY_DETECTED);
-    PA_ADD_OPTION(NOTIFICATIONS);
-}
-
-
-
-class NuggetFarmerHighlands::Stats : public StatsTracker, public ShinyStatIncrementer{
+class NuggetFarmerHighlands_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
@@ -88,17 +67,32 @@ public:
     std::atomic<uint64_t>& coin;
     std::atomic<uint64_t>& shinies;
 };
-
-std::unique_ptr<StatsTracker> NuggetFarmerHighlands::make_stats() const{
+std::unique_ptr<StatsTracker> NuggetFarmerHighlands_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
+NuggetFarmerHighlands::NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS,
+        &SHINY_DETECTED.NOTIFICATIONS,
+        &NOTIFICATION_PROGRAM_FINISH,
+//        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+{
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
 
 
 
 bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Highlands_Mountain);
@@ -217,7 +211,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, B
 
 
 void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

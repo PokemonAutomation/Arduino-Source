@@ -37,6 +37,9 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         2, 2, 2
     )
 {}
+std::unique_ptr<StatsTracker> SelfTouchTrade_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new TradeStats());
+}
 
 
 
@@ -67,12 +70,6 @@ SelfTouchTrade::SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor)
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(TRADE_COUNTS);
     PA_ADD_OPTION(NOTIFICATIONS);
-}
-
-
-
-std::unique_ptr<StatsTracker> SelfTouchTrade::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new TradeStats());
 }
 
 

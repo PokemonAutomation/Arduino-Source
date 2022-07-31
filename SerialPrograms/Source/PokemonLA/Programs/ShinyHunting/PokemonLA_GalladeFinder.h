@@ -19,22 +19,21 @@ namespace PokemonLA{
 class GalladeFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     GalladeFinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class GalladeFinder : public SingleSwitchProgramInstance{
 public:
     GalladeFinder(const GalladeFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    class Stats;
-
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;

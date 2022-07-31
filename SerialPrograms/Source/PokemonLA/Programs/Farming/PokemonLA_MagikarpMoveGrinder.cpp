@@ -43,6 +43,26 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class MagikarpMoveGrinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : magikarp(m_stats["Magikarp"])
+        , move_attempts(m_stats["Move Attempts"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Magikarp");
+        m_display_order.emplace_back("Move Attempts");
+        m_display_order.emplace_back("Errors", true);
+    }
+
+    std::atomic<uint64_t>& magikarp;
+    std::atomic<uint64_t>& move_attempts;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> MagikarpMoveGrinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 
 
 MagikarpMoveGrinder::MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor)
@@ -67,30 +87,8 @@ MagikarpMoveGrinder::MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& d
 
 
 
-class MagikarpMoveGrinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : magikarp(m_stats["Magikarp"])
-        , move_attempts(m_stats["Move Attempts"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Magikarp");
-        m_display_order.emplace_back("Move Attempts");
-        m_display_order.emplace_back("Errors", true);
-    }
-
-    std::atomic<uint64_t>& magikarp;
-    std::atomic<uint64_t>& move_attempts;
-    std::atomic<uint64_t>& errors;
-};
-
-std::unique_ptr<StatsTracker> MagikarpMoveGrinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
     env.log("Special case: grinding Mimic...");
 
     // Which pokemon in the party is not fainted
@@ -163,7 +161,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     // Which pokemon in the party is not fainted
     size_t cur_pokemon = 0;
@@ -238,7 +236,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
 
 
 void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
         throw OperationFailedException(env.console, "No Pokemon sepecified to grind.");

@@ -49,13 +49,14 @@ extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[];
 class IngoBattleGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     IngoBattleGrinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class IngoBattleGrinder : public SingleSwitchProgramInstance{
 public:
     IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -65,8 +66,6 @@ private:
     bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
 
 private:
-    class Stats;
-
     EnumDropdownOption OPPONENT;
     BattlePokemonActionTable POKEMON_ACTIONS;
 

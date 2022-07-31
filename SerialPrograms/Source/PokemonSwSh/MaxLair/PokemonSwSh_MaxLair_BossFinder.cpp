@@ -32,6 +32,9 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         1, 4, 1
     )
 {}
+std::unique_ptr<StatsTracker> MaxLairBossFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -98,9 +101,6 @@ std::string MaxLairBossFinder::check_validity() const{
 void MaxLairBossFinder::update_active_consoles(){
     size_t consoles = system_count();
     CONSOLES.set_active_consoles(consoles);
-}
-std::unique_ptr<StatsTracker> MaxLairBossFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 

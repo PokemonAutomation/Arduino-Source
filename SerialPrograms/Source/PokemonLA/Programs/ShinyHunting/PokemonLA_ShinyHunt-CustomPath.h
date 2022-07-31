@@ -28,14 +28,15 @@ namespace PokemonLA{
 class ShinyHuntCustomPath_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntCustomPath_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
     ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -46,8 +47,6 @@ private:
     void do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index);
 
 private:
-    class Stats;
-
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
 //    TravelLocationOption TRAVEL_LOCATION;

@@ -21,14 +21,14 @@ namespace PokemonLA{
 class SelfBoxTrade_Descriptor : public MultiSwitchProgramDescriptor{
 public:
     SelfBoxTrade_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class SelfBoxTrade : public MultiSwitchProgramInstance{
 public:
     SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
@@ -38,8 +38,6 @@ private:
     );
 
 private:
-    class Stats;
-
     OCR::LanguageOCR LANGUAGE_LEFT;
     OCR::LanguageOCR LANGUAGE_RIGHT;
 

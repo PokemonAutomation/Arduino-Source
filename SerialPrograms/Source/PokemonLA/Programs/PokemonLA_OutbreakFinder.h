@@ -22,14 +22,15 @@ namespace PokemonLA{
 class OutbreakFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     OutbreakFinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class OutbreakFinder : public SingleSwitchProgramInstance{
 public:
     OutbreakFinder(const OutbreakFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
@@ -79,8 +80,6 @@ private:
 
 
 private:
-    class Stats;
-
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCR LANGUAGE;

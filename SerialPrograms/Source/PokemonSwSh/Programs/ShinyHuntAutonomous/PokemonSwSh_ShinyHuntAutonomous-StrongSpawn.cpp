@@ -32,6 +32,14 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(
+        new ShinyHuntTracker(
+            true,
+            {{"Timeouts", "Errors"}}
+        )
+    );
+}
 
 
 
@@ -61,18 +69,6 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAu
 //    if (PERSISTENT_SETTINGS().developer_mode){
 //        PA_ADD_STATIC(m_advanced_options);
 //    }
-}
-
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const{
-    return std::unique_ptr<StatsTracker>(
-        new ShinyHuntTracker(
-            true,
-            {{"Timeouts", "Errors"}}
-        )
-    );
 }
 
 

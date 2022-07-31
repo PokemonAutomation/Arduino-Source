@@ -24,6 +24,9 @@ namespace PokemonSwSh{
 class PurpleBeamFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     PurpleBeamFinder_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -31,13 +34,9 @@ public:
 class PurpleBeamFinder : public SingleSwitchProgramInstance{
 public:
     PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    struct Stats;
-
     StartInGripOrGameOption START_IN_GRIP_MENU;
     BooleanCheckBoxOption EXTRA_LINE;
 

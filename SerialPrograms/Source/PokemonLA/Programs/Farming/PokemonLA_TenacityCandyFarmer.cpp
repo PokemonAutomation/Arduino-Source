@@ -47,6 +47,28 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class TenacityCandyFarmer_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : battles(m_stats["Battles"])
+        , faint_switches(m_stats["Faint Switches"])
+        , fourth_moves(m_stats["Fourth Moves"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Battles");
+        m_display_order.emplace_back("Faint Switches", true);
+        m_display_order.emplace_back("Fourth Moves", true);
+        m_display_order.emplace_back("Errors", true);
+    }
+
+    std::atomic<uint64_t>& battles;
+    std::atomic<uint64_t>& faint_switches;
+    std::atomic<uint64_t>& fourth_moves;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> TenacityCandyFarmer_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
@@ -78,32 +100,8 @@ TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& d
 
 
 
-class TenacityCandyFarmer::Stats : public StatsTracker{
-public:
-    Stats()
-        : battles(m_stats["Battles"])
-        , faint_switches(m_stats["Faint Switches"])
-        , fourth_moves(m_stats["Fourth Moves"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Battles");
-        m_display_order.emplace_back("Faint Switches", true);
-        m_display_order.emplace_back("Fourth Moves", true);
-        m_display_order.emplace_back("Errors", true);
-    }
-
-    std::atomic<uint64_t>& battles;
-    std::atomic<uint64_t>& faint_switches;
-    std::atomic<uint64_t>& fourth_moves;
-    std::atomic<uint64_t>& errors;
-};
-
-std::unique_ptr<StatsTracker> TenacityCandyFarmer::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    TenacityCandyFarmer_Descriptor::Stats& stats = env.current_stats<TenacityCandyFarmer_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
 
@@ -342,7 +340,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
 
 void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    TenacityCandyFarmer_Descriptor::Stats& stats = env.current_stats<TenacityCandyFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

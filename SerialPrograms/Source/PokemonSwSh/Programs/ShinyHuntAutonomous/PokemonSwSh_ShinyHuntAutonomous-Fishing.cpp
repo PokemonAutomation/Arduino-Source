@@ -35,6 +35,20 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_misses(m_stats["Misses"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Misses"));
+        m_aliases["Timeouts"] = "Errors";
+        m_aliases["Unexpected Battles"] = "Errors";
+    }
+    std::atomic<uint64_t>& m_misses;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -77,23 +91,6 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomous
 
 
 
-struct ShinyHuntAutonomousFishing::Stats : public ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(true)
-        , m_misses(m_stats["Misses"])
-    {
-        m_display_order.insert(m_display_order.begin() + 1, Stat("Misses"));
-        m_aliases["Timeouts"] = "Errors";
-        m_aliases["Unexpected Battles"] = "Errors";
-    }
-    std::atomic<uint64_t>& m_misses;
-};
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
 void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -105,7 +102,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock(context);
 
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntAutonomousFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousFishing_Descriptor::Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(

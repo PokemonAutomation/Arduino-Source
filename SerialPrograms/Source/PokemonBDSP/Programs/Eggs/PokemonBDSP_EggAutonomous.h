@@ -27,6 +27,7 @@ namespace PokemonBDSP{
 class EggAutonomous_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     EggAutonomous_Descriptor();
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -34,7 +35,6 @@ class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous(const EggAutonomous_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

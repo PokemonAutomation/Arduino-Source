@@ -37,6 +37,28 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class ShinyHuntCustomPath_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> ShinyHuntCustomPath_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor)
@@ -83,29 +105,6 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-class ShinyHuntCustomPath::Stats : public StatsTracker, public ShinyStatIncrementer{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , shinies(m_stats["Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
-    }
-    virtual void add_shiny() override{
-        shinies++;
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& shinies;
-};
-
-std::unique_ptr<StatsTracker> ShinyHuntCustomPath::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index){
     const auto& row = PATH.get_action(action_index);
@@ -206,7 +205,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 
 
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     std::atomic<bool> listen_for_shiny(false);
     float shiny_coefficient = 1.0;
@@ -250,7 +249,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

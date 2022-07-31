@@ -24,6 +24,9 @@ namespace PokemonSwSh{
 class StatsResetMoltres_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     StatsResetMoltres_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -31,13 +34,9 @@ public:
 class StatsResetMoltres : public SingleSwitchProgramInstance{
 public:
     StatsResetMoltres(const StatsResetMoltres_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    struct Stats;
-
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

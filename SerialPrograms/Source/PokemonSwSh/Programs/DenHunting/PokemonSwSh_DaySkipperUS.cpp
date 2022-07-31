@@ -30,6 +30,9 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}
+std::unique_ptr<StatsTracker> DaySkipperUS_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
 
 
 
@@ -64,9 +67,6 @@ DaySkipperUS::DaySkipperUS(const DaySkipperUS_Descriptor& descriptor)
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
-std::unique_ptr<StatsTracker> DaySkipperUS::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new SkipperStats());
-}
 
 void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();

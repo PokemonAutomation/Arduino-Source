@@ -24,13 +24,14 @@ namespace PokemonLA{
 class LeapGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     LeapGrinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class LeapGrinder : public SingleSwitchProgramInstance{
 public:
     LeapGrinder(const LeapGrinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -38,7 +39,6 @@ private:
     bool quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    class Stats;
     class RunRoute;
 
     OCR::LanguageOCR LANGUAGE;

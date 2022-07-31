@@ -47,6 +47,27 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct DexRecFinder_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Read Errors"])
+        , excluded(m_stats["Excluded"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back(Stat("Attempts"));
+        m_display_order.emplace_back(Stat("Read Errors"));
+        m_display_order.emplace_back(Stat("Excluded"));
+        m_display_order.emplace_back(Stat("Matches"));
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& excluded;
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> DexRecFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -111,29 +132,6 @@ DexRecFinder::DexRecFinder(const DexRecFinder_Descriptor& descriptor)
 }
 
 
-struct DexRecFinder::Stats : public StatsTracker{
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Read Errors"])
-        , excluded(m_stats["Excluded"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back(Stat("Attempts"));
-        m_display_order.emplace_back(Stat("Read Errors"));
-        m_display_order.emplace_back(Stat("Excluded"));
-        m_display_order.emplace_back(Stat("Matches"));
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& excluded;
-    std::atomic<uint64_t>& matches;
-};
-std::unique_ptr<StatsTracker> DexRecFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 void DexRecFinder::read_line(
     bool& found,
     bool& excluded,
@@ -180,7 +178,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         exclusions.insert(FILTERS.EXCLUSIONS[c]);
     }
 
-    Stats& stats = env.current_stats<Stats>();
+    DexRecFinder_Descriptor::Stats& stats = env.current_stats<DexRecFinder_Descriptor::Stats>();
 
     while (true){
         home_to_date_time(context, true, true);

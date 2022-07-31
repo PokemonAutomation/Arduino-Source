@@ -60,6 +60,17 @@ GiftBerryReset_Descriptor::GiftBerryReset_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct GiftBerryReset_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_attempts(m_stats["Fetch Attempts"])
+    {
+        m_display_order.emplace_back("Fetch Attempts");
+    }
+    std::atomic<uint64_t>& m_attempts;
+};
+std::unique_ptr<StatsTracker> GiftBerryReset_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 GiftBerryReset::GiftBerryReset(const GiftBerryReset_Descriptor& descriptor)
@@ -86,21 +97,10 @@ GiftBerryReset::GiftBerryReset(const GiftBerryReset_Descriptor& descriptor)
 }
 
 
-struct GiftBerryReset::Stats : public StatsTracker{
-    Stats()
-        : m_attempts(m_stats["Fetch Attempts"])
-    {
-        m_display_order.emplace_back("Fetch Attempts");
-    }
-    std::atomic<uint64_t>& m_attempts;
-};
-std::unique_ptr<StatsTracker> GiftBerryReset::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    GiftBerryReset_Descriptor::Stats& stats = env.current_stats<GiftBerryReset_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.

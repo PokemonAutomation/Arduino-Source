@@ -28,6 +28,19 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct MassRelease_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_boxes_released(m_stats["Boxes Released"])
+    {
+        m_display_order.emplace_back("Boxes Released");
+    }
+    std::atomic<uint64_t>& m_boxes_released;
+};
+std::unique_ptr<StatsTracker> MassRelease_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
 
 MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
@@ -47,24 +60,13 @@ MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
 }
 
 
-struct MassRelease::Stats : public StatsTracker{
-    Stats()
-        : m_boxes_released(m_stats["Boxes Released"])
-    {
-        m_display_order.emplace_back("Boxes Released");
-    }
-    std::atomic<uint64_t>& m_boxes_released;
-};
-std::unique_ptr<StatsTracker> MassRelease::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 
 
 
 void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.

@@ -35,6 +35,14 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(
+        new ShinyHuntTracker(
+            true,
+            {{"Timeouts", "Errors"}}
+        )
+    );
+}
 
 
 
@@ -70,18 +78,6 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
-}
-
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
-    return std::unique_ptr<StatsTracker>(
-        new ShinyHuntTracker(
-            true,
-            {{"Timeouts", "Errors"}}
-        )
-    );
 }
 
 

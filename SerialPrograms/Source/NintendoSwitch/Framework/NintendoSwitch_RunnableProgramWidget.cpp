@@ -159,7 +159,7 @@ void RunnableSwitchProgramWidget::run_program(){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_current_stats = instance.make_stats();
+        m_current_stats = instance.descriptor().make_stats();
     }
 
     const std::string& program_identifier = instance.descriptor().identifier();

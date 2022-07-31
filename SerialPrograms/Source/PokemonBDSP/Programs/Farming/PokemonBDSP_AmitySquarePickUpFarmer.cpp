@@ -27,6 +27,17 @@ AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct AmitySquarePickUpFarmer_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_attempts(m_stats["Fetch Attempts"])
+    {
+        m_display_order.emplace_back("Fetch Attempts");
+    }
+    std::atomic<uint64_t>& m_attempts;
+};
+std::unique_ptr<StatsTracker> AmitySquarePickUpFarmer_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 AmitySquarePickUpFarmer::AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_Descriptor& descriptor)
@@ -64,21 +75,10 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_D
 }
 
 
-struct AmitySquarePickUpFarmer::Stats : public StatsTracker{
-    Stats()
-        : m_attempts(m_stats["Fetch Attempts"])
-    {
-        m_display_order.emplace_back("Fetch Attempts");
-    }
-    std::atomic<uint64_t>& m_attempts;
-};
-std::unique_ptr<StatsTracker> AmitySquarePickUpFarmer::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    AmitySquarePickUpFarmer_Descriptor::Stats& stats = env.current_stats<AmitySquarePickUpFarmer_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.

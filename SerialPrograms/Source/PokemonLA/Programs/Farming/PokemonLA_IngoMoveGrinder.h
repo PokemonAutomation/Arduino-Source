@@ -22,13 +22,14 @@ namespace PokemonLA{
 class IngoMoveGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     IngoMoveGrinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class IngoMoveGrinder : public SingleSwitchProgramInstance{
 public:
     IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -44,7 +45,6 @@ private:
     size_t get_next_pokemon_to_switch_to() const;
     std::string debug_current_info() const;
     std::string debug_move_attempts_info() const;
-    class Stats;
 
     EnumDropdownOption OPPONENT;
     MoveGrinderActionTable POKEMON_ACTIONS;

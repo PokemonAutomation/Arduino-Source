@@ -35,6 +35,24 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct CloneItemsBoxCopy2_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_boxes(m_stats["Boxes Cloned"])
+        , m_errors(m_stats["Errors"])
+//        , m_resets(m_stats["Resets"])
+    {
+        m_display_order.emplace_back("Boxes Cloned");
+        m_display_order.emplace_back("Errors", true);
+//        m_display_order.emplace_back("Resets");
+    }
+    std::atomic<uint64_t>& m_boxes;
+    std::atomic<uint64_t>& m_errors;
+//    std::atomic<uint64_t>& m_resets;
+};
+std::unique_ptr<StatsTracker> CloneItemsBoxCopy2_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 
 CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
@@ -62,26 +80,9 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& desc
 }
 
 
-struct CloneItemsBoxCopy2::Stats : public StatsTracker{
-    Stats()
-        : m_boxes(m_stats["Boxes Cloned"])
-        , m_errors(m_stats["Errors"])
-//        , m_resets(m_stats["Resets"])
-    {
-        m_display_order.emplace_back("Boxes Cloned");
-        m_display_order.emplace_back("Errors", true);
-//        m_display_order.emplace_back("Resets");
-    }
-    std::atomic<uint64_t>& m_boxes;
-    std::atomic<uint64_t>& m_errors;
-//    std::atomic<uint64_t>& m_resets;
-};
-std::unique_ptr<StatsTracker> CloneItemsBoxCopy2::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    CloneItemsBoxCopy2_Descriptor::Stats& stats = env.current_stats<CloneItemsBoxCopy2_Descriptor::Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
 //    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;

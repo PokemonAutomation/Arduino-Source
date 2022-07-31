@@ -32,6 +32,14 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(
+        new ShinyHuntTracker(
+            true,
+            {{"Light Resets", "Errors"}}
+        )
+    );
+}
 
 
 
@@ -75,18 +83,6 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
     PA_ADD_OPTION(TRANSITION_DELAY);
-}
-
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
-    return std::unique_ptr<StatsTracker>(
-        new ShinyHuntTracker(
-            true,
-            {{"Light Resets", "Errors"}}
-        )
-    );
 }
 
 

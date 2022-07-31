@@ -38,6 +38,9 @@ ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntLakeTrio_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
+}
 
 
 ShinyHuntLakeTrio::ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descriptor)
@@ -71,11 +74,6 @@ ShinyHuntLakeTrio::ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descrip
 
 //    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
-}
-
-
-std::unique_ptr<StatsTracker> ShinyHuntLakeTrio::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
 }
 
 

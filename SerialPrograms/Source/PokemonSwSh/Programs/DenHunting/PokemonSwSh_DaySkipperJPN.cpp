@@ -31,6 +31,10 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
     )
 {}
 
+std::unique_ptr<StatsTracker> DaySkipperJPN_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
+
 
 
 DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
@@ -57,10 +61,6 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
     PA_ADD_OPTION(NOTIFICATIONS);
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_SKIPS);
-}
-
-std::unique_ptr<StatsTracker> DaySkipperJPN::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
 void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

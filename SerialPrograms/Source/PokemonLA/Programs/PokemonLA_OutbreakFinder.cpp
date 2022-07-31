@@ -103,6 +103,40 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class OutbreakFinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : checks(m_stats["Checks"])
+        , errors(m_stats["Errors"])
+        , outbreaks(m_stats["Outbreaks"])
+        , mmos(m_stats["MMOs"])
+        , mmo_pokemon(m_stats["MMO Pokemon"])
+        , stars(m_stats["Stars"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back("Checks");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Outbreaks");
+        m_display_order.emplace_back("MMOs");
+        m_display_order.emplace_back("MMO Pokemon");
+        m_display_order.emplace_back("Stars");
+        m_display_order.emplace_back("Matches", true);
+    }
+
+    std::atomic<uint64_t>& checks;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& outbreaks;
+    std::atomic<uint64_t>& mmos;
+    std::atomic<uint64_t>& mmo_pokemon;
+    std::atomic<uint64_t>& stars; // MMO star symbols
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> OutbreakFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
+
 
 
 OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
@@ -157,45 +191,11 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
 }
 
 
-class OutbreakFinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : checks(m_stats["Checks"])
-        , errors(m_stats["Errors"])
-        , outbreaks(m_stats["Outbreaks"])
-        , mmos(m_stats["MMOs"])
-        , mmo_pokemon(m_stats["MMO Pokemon"])
-        , stars(m_stats["Stars"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back("Checks");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Outbreaks");
-        m_display_order.emplace_back("MMOs");
-        m_display_order.emplace_back("MMO Pokemon");
-        m_display_order.emplace_back("Stars");
-        m_display_order.emplace_back("Matches", true);
-    }
-
-    std::atomic<uint64_t>& checks;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& outbreaks;
-    std::atomic<uint64_t>& mmos;
-    std::atomic<uint64_t>& mmo_pokemon;
-    std::atomic<uint64_t>& stars; // MMO star symbols
-    std::atomic<uint64_t>& matches;
-};
-
-
-std::unique_ptr<StatsTracker> OutbreakFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const std::set<std::string>& desired_events
 ){
-    Stats& stats = env.current_stats<Stats>();
+    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     MapRegion start_region = MapRegion::NONE;
 
@@ -293,7 +293,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     bool inside_travel_map
 ){
-    Stats& stats = env.current_stats<Stats>();
+    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     if (inside_travel_map == false){
         // Move to guard to open map
@@ -386,7 +386,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     const std::set<std::string>& desired_MMOs,
     const std::set<std::string>& desired_star_MMOs
 ){
-    Stats& stats = env.current_stats<Stats>();
+    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     MapRegion region = MapRegion::NONE;
     TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
@@ -587,7 +587,7 @@ bool OutbreakFinder::run_iteration(
     const std::set<std::string>& desired_MMOs,
     const std::set<std::string>& desired_star_MMOs
 ){
-    Stats& stats = env.current_stats<Stats>();
+    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     //  Enter map.
     try{
@@ -672,7 +672,7 @@ bool OutbreakFinder::run_iteration(
 
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);
     // return;

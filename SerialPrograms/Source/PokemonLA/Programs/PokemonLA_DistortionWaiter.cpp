@@ -32,6 +32,28 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class DistortionWaiter_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : minutes_waited(m_stats["Minutes Waited"])
+        , distortions(m_stats["Distortions"])
+        , other(m_stats["Other Notifications"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Minutes Waited");
+        m_display_order.emplace_back("Distortions");
+        m_display_order.emplace_back("Other Notifications", true);
+        m_display_order.emplace_back("Errors", true);
+    }
+
+    std::atomic<uint64_t>& minutes_waited;
+    std::atomic<uint64_t>& distortions;
+    std::atomic<uint64_t>& other;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> DistortionWaiter_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 DistortionWaiter::DistortionWaiter(const DistortionWaiter_Descriptor& descriptor)
@@ -54,37 +76,8 @@ DistortionWaiter::DistortionWaiter(const DistortionWaiter_Descriptor& descriptor
 
 
 
-
-class DistortionWaiter::Stats : public StatsTracker{
-public:
-    Stats()
-        : minutes_waited(m_stats["Minutes Waited"])
-        , distortions(m_stats["Distortions"])
-        , other(m_stats["Other Notifications"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Minutes Waited");
-        m_display_order.emplace_back("Distortions");
-        m_display_order.emplace_back("Other Notifications", true);
-        m_display_order.emplace_back("Errors", true);
-    }
-
-    std::atomic<uint64_t>& minutes_waited;
-    std::atomic<uint64_t>& distortions;
-    std::atomic<uint64_t>& other;
-    std::atomic<uint64_t>& errors;
-};
-
-
-
-
-std::unique_ptr<StatsTracker> DistortionWaiter::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    DistortionWaiter_Descriptor::Stats& stats = env.current_stats<DistortionWaiter_Descriptor::Stats>();
 
 
     //  Connect the controller.

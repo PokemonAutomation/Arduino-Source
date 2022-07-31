@@ -33,6 +33,9 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
+}
 
 
 LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
@@ -59,9 +62,6 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
 }
 
 
-std::unique_ptr<StatsTracker> LegendaryReset::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
-}
 
 
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

@@ -36,6 +36,28 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class GalladeFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> GalladeFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
@@ -68,35 +90,10 @@ GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
 
 
 
-class GalladeFinder::Stats : public StatsTracker, public ShinyStatIncrementer{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , shinies(m_stats["Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
-    }
-    virtual void add_shiny() override{
-        shinies++;
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& shinies;
-};
-
-std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
-    Stats& stats = env.current_stats<Stats>();
+    GalladeFinder_Descriptor::Stats& stats = env.current_stats<GalladeFinder_Descriptor::Stats>();
 
     stats.attempts++;
 
@@ -175,7 +172,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 
 void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    GalladeFinder_Descriptor::Stats& stats = env.current_stats<GalladeFinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

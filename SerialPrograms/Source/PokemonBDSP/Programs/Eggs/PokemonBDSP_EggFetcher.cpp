@@ -18,6 +18,7 @@ namespace PokemonBDSP{
     using namespace Pokemon;
 
 
+
 EggFetcher_Descriptor::EggFetcher_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:EggFetcher",
@@ -28,6 +29,18 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct EggFetcher_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_attempts(m_stats["Fetch Attempts"])
+    {
+        m_display_order.emplace_back("Fetch Attempts");
+    }
+    std::atomic<uint64_t>& m_attempts;
+};
+std::unique_ptr<StatsTracker> EggFetcher_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 
 
 EggFetcher::EggFetcher(const EggFetcher_Descriptor& descriptor)
@@ -57,21 +70,8 @@ EggFetcher::EggFetcher(const EggFetcher_Descriptor& descriptor)
 }
 
 
-struct EggFetcher::Stats : public StatsTracker{
-    Stats()
-        : m_attempts(m_stats["Fetch Attempts"])
-    {
-        m_display_order.emplace_back("Fetch Attempts");
-    }
-    std::atomic<uint64_t>& m_attempts;
-};
-std::unique_ptr<StatsTracker> EggFetcher::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.

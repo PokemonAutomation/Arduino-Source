@@ -21,14 +21,15 @@ namespace PokemonLA{
 class RamanasCombeeFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     RamanasCombeeFinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class RamanasCombeeFinder: public SingleSwitchProgramInstance{
 public:
     RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -41,7 +42,6 @@ private:
     void enable_shiny_sound(BotBaseContext& context);
 
 private:
-    class Stats;
     class RunRoute;
 
     std::atomic<bool> m_enable_shiny_sound{true};

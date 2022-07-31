@@ -90,6 +90,31 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class IngoBattleGrinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : battles(m_stats["Battles"])
+        , turns(m_stats["Turns"])
+        , lead_move_attempts(m_stats["Lead Move Attempts"])
+        , faint_switches(m_stats["Faint Switches"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Battles");
+        m_display_order.emplace_back("Turns");
+        m_display_order.emplace_back("Lead Move Attempts");
+        m_display_order.emplace_back("Faint Switches", true);
+        m_display_order.emplace_back("Errors", true);
+    }
+
+    std::atomic<uint64_t>& battles;
+    std::atomic<uint64_t>& turns;
+    std::atomic<uint64_t>& lead_move_attempts;
+    std::atomic<uint64_t>& faint_switches;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> IngoBattleGrinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor)
@@ -113,33 +138,6 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
 }
 
 
-
-class IngoBattleGrinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : battles(m_stats["Battles"])
-        , turns(m_stats["Turns"])
-        , lead_move_attempts(m_stats["Lead Move Attempts"])
-        , faint_switches(m_stats["Faint Switches"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Battles");
-        m_display_order.emplace_back("Turns");
-        m_display_order.emplace_back("Lead Move Attempts");
-        m_display_order.emplace_back("Faint Switches", true);
-        m_display_order.emplace_back("Errors", true);
-    }
-
-    std::atomic<uint64_t>& battles;
-    std::atomic<uint64_t>& turns;
-    std::atomic<uint64_t>& lead_move_attempts;
-    std::atomic<uint64_t>& faint_switches;
-    std::atomic<uint64_t>& errors;
-};
-
-std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& context){
     // First press A to start talking with Ingo.
@@ -201,7 +199,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
 
 
 bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::map<size_t, size_t>& pokemon_move_attempts){
-    Stats& stats = env.current_stats<Stats>();
+    IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
 
@@ -392,7 +390,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
 
 void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

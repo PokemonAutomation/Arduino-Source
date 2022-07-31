@@ -34,6 +34,28 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class ShinyHuntFlagPin_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> ShinyHuntFlagPin_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor)
@@ -105,33 +127,10 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
     PA_ADD_OPTION(NAVIGATION_TIMEOUT);
 }
 
-class ShinyHuntFlagPin::Stats : public StatsTracker, public ShinyStatIncrementer{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , shinies(m_stats["Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
-    }
-    virtual void add_shiny() override{
-        shinies++;
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& shinies;
-};
-
-std::unique_ptr<StatsTracker> ShinyHuntFlagPin::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
     stats.attempts++;
 
     {
@@ -189,7 +188,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
 
 
 void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

@@ -302,7 +302,7 @@ void RunnablePanelWidget::restore_defaults(){
 }
 void RunnablePanelWidget::load_historical_stats(){
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
-    std::unique_ptr<StatsTracker> stats = instance.make_stats();
+    std::unique_ptr<StatsTracker> stats = instance.descriptor().make_stats();
     std::string stats_str;
     if (stats){
         StatSet set;

@@ -36,6 +36,9 @@ MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
         1, 4, 1
     )
 {}
+std::unique_ptr<StatsTracker> MaxLairStandard_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -112,9 +115,6 @@ std::string MaxLairStandard::check_validity() const{
 void MaxLairStandard::update_active_consoles(){
     size_t consoles = system_count();
     CONSOLES.set_active_consoles(consoles);
-}
-std::unique_ptr<StatsTracker> MaxLairStandard::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 

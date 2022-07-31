@@ -38,6 +38,28 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> CrobatFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
@@ -69,34 +91,10 @@ CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
 }
 
 
-class CrobatFinder::Stats : public StatsTracker, public ShinyStatIncrementer{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , shinies(m_stats["Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
-    }
-    virtual void add_shiny() override{
-        shinies++;
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& shinies;
-};
-
-std::unique_ptr<StatsTracker> CrobatFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 
 void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
-    Stats& stats = env.current_stats<Stats>();
+    CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     stats.attempts++;
 
@@ -185,7 +183,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
 
 
 void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

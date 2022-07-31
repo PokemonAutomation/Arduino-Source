@@ -29,6 +29,9 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}
+std::unique_ptr<StatsTracker> DaySkipperJPN7p8k_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
 
 
 
@@ -63,9 +66,6 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descrip
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
-std::unique_ptr<StatsTracker> DaySkipperJPN7p8k::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new SkipperStats());
-}
 
 const uint8_t DAYS_PER_MONTH[] = {
     31, //  January

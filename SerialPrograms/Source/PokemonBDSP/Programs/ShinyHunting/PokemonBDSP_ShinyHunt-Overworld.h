@@ -24,20 +24,19 @@ namespace PokemonBDSP{
 class ShinyHuntOverworld_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntOverworld_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class ShinyHuntOverworld : public SingleSwitchProgramInstance{
 public:
     ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    struct Stats;
-
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     Pokemon::EncounterBotLanguage LANGUAGE;

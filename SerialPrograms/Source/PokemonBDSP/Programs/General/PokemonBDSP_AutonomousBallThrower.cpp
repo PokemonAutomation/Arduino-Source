@@ -33,6 +33,33 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : pokemon_caught(m_stats["Pokemon caught"])
+        , pokemon_fainted(m_stats["Pokemon fainted"])
+        , own_fainted(m_stats["Own fainted"])
+        , out_of_balls(m_stats["Out of balls"])
+        , errors(m_stats["Errors"])
+        , total_balls_thrown(m_stats["Total balls thrown"])
+    {
+        m_display_order.emplace_back(Stat("Pokemon caught"));
+        m_display_order.emplace_back(Stat("Pokemon fainted"));
+        m_display_order.emplace_back(Stat("Own fainted"));
+        m_display_order.emplace_back(Stat("Out of balls"));
+        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back(Stat("Total balls thrown"));
+    }
+
+    std::atomic<uint64_t>& pokemon_caught;
+    std::atomic<uint64_t>& pokemon_fainted;
+    std::atomic<uint64_t>& own_fainted;
+    std::atomic<uint64_t>& out_of_balls;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& total_balls_thrown;
+};
+std::unique_ptr<StatsTracker> AutonomousBallThrower_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -72,38 +99,9 @@ AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descrip
 
 
 
-struct AutonomousBallThrower::Stats : public StatsTracker{
-    Stats()
-        : pokemon_caught(m_stats["Pokemon caught"])
-        , pokemon_fainted(m_stats["Pokemon fainted"])
-        , own_fainted(m_stats["Own fainted"])
-        , out_of_balls(m_stats["Out of balls"])
-        , errors(m_stats["Errors"])
-        , total_balls_thrown(m_stats["Total balls thrown"])
-    {
-        m_display_order.emplace_back(Stat("Pokemon caught"));
-        m_display_order.emplace_back(Stat("Pokemon fainted"));
-        m_display_order.emplace_back(Stat("Own fainted"));
-        m_display_order.emplace_back(Stat("Out of balls"));
-        m_display_order.emplace_back(Stat("Errors"));
-        m_display_order.emplace_back(Stat("Total balls thrown"));
-    }
-
-    std::atomic<uint64_t>& pokemon_caught;
-    std::atomic<uint64_t>& pokemon_fainted;
-    std::atomic<uint64_t>& own_fainted;
-    std::atomic<uint64_t>& out_of_balls;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& total_balls_thrown;
-};
-std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.

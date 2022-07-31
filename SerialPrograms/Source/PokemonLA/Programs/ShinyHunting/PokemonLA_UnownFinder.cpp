@@ -42,6 +42,30 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> UnownFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
 
 
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
@@ -72,30 +96,6 @@ UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
 }
 
 
-class UnownFinder::Stats : public StatsTracker, public ShinyStatIncrementer{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , shinies(m_stats["Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
-    }
-    virtual void add_shiny() override{
-        shinies++;
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& shinies;
-};
-
-std::unique_ptr<StatsTracker> UnownFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 void ruins_entrance_route(BotBaseContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
@@ -118,7 +118,7 @@ void enter_ruins(BotBaseContext& context){
 
 
 void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
 
@@ -168,7 +168,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 
 void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

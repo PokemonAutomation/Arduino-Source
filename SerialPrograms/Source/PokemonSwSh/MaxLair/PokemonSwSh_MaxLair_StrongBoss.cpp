@@ -32,6 +32,9 @@ MaxLairStrongBoss_Descriptor::MaxLairStrongBoss_Descriptor()
         1, 4, 1
     )
 {}
+std::unique_ptr<StatsTracker> MaxLairStrongBoss_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 class MaxLairStrongBoss_ConsoleOptions : public ConsoleSpecificOptions{
@@ -134,9 +137,6 @@ std::string MaxLairStrongBoss::check_validity() const{
 void MaxLairStrongBoss::update_active_consoles(){
     size_t consoles = system_count();
     CONSOLES.set_active_consoles(consoles);
-}
-std::unique_ptr<StatsTracker> MaxLairStrongBoss::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 

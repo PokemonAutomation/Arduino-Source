@@ -23,6 +23,10 @@ namespace PokemonBDSP{
 class EggFetcher_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     EggFetcher_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+
 };
 
 
@@ -31,13 +35,7 @@ public:
 class EggFetcher : public SingleSwitchProgramInstance{
 public:
     EggFetcher(const EggFetcher_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
-
-
-private:
-    struct Stats;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -33,6 +33,19 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct DoublesLeveling_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+//        , m_resets(m_stats["Resets"])
+    {
+//        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
+//        m_aliases["Unexpected Battles"] = "Errors";
+    }
+//    std::atomic<uint64_t>& m_resets;
+};
+std::unique_ptr<StatsTracker> DoublesLeveling_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
@@ -79,25 +92,12 @@ DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
 
 
 
-struct DoublesLeveling::Stats : public PokemonSwSh::ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(false)
-//        , m_resets(m_stats["Resets"])
-    {
-//        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
-//        m_aliases["Unexpected Battles"] = "Errors";
-    }
-//    std::atomic<uint64_t>& m_resets;
-};
-std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 
 
 bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
 
     env.log("Starting battle!");
 
@@ -150,7 +150,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
 void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(

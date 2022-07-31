@@ -35,6 +35,19 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct ShinyHuntAutonomousWhistling_Descriptor::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_unexpected_battles(m_stats["Unexpected Battles"])
+    {
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Unexpected Battles"));
+        m_aliases["Timeouts"] = "Errors";
+    }
+    std::atomic<uint64_t>& m_unexpected_battles;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -72,24 +85,6 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutono
 
 
 
-struct ShinyHuntAutonomousWhistling::Stats : public ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(true)
-        , m_unexpected_battles(m_stats["Unexpected Battles"])
-    {
-        m_display_order.insert(m_display_order.begin() + 2, Stat("Unexpected Battles"));
-        m_aliases["Timeouts"] = "Errors";
-    }
-    std::atomic<uint64_t>& m_unexpected_battles;
-};
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
-
-
 void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -101,7 +96,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock(context);
 
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntAutonomousWhistling_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousWhistling_Descriptor::Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(

@@ -35,6 +35,34 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , timeouts(m_stats["Timeouts"])
+        , red_detected(m_stats["Red Detected"])
+        , red_presumed(m_stats["Red Presumed"])
+        , red(m_stats["Red"])
+        , purple(m_stats["Purple"])
+    {
+        m_display_order.emplace_back(Stat("Attempts"));
+        m_display_order.emplace_back(Stat("Timeouts"));
+//        m_display_order.emplace_back(Stat("Red Detected"));
+//        m_display_order.emplace_back(Stat("Red Presumed"));
+        m_display_order.emplace_back(Stat("Red"));
+        m_display_order.emplace_back(Stat("Purple"));
+        m_aliases["Red Detected"] = "Red";
+        m_aliases["Red Presumed"] = "Red";
+    }
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& timeouts;
+    std::atomic<uint64_t>& red_detected;
+    std::atomic<uint64_t>& red_presumed;
+    std::atomic<uint64_t>& red;
+    std::atomic<uint64_t>& purple;
+};
+std::unique_ptr<StatsTracker> PurpleBeamFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -99,38 +127,6 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
 
 
 
-struct PurpleBeamFinder::Stats : public StatsTracker{
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , timeouts(m_stats["Timeouts"])
-        , red_detected(m_stats["Red Detected"])
-        , red_presumed(m_stats["Red Presumed"])
-        , red(m_stats["Red"])
-        , purple(m_stats["Purple"])
-    {
-        m_display_order.emplace_back(Stat("Attempts"));
-        m_display_order.emplace_back(Stat("Timeouts"));
-//        m_display_order.emplace_back(Stat("Red Detected"));
-//        m_display_order.emplace_back(Stat("Red Presumed"));
-        m_display_order.emplace_back(Stat("Red"));
-        m_display_order.emplace_back(Stat("Purple"));
-        m_aliases["Red Detected"] = "Red";
-        m_aliases["Red Presumed"] = "Red";
-    }
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& timeouts;
-    std::atomic<uint64_t>& red_detected;
-    std::atomic<uint64_t>& red_presumed;
-    std::atomic<uint64_t>& red;
-    std::atomic<uint64_t>& purple;
-};
-std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
-
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -142,7 +138,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     context.wait_for_all_requests();
 
 
-    Stats& stats = env.current_stats<Stats>();
+    PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
 
 
     bool exit = false;

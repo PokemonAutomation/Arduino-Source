@@ -38,6 +38,25 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct StatsResetMoltres_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : resets(m_stats["Resets"])
+        , errors(m_stats["Errors"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back(Stat("Resets"));
+        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back(Stat("Matches"));
+    }
+
+    std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> StatsResetMoltres_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 
 
 
@@ -76,27 +95,6 @@ StatsResetMoltres::StatsResetMoltres(const StatsResetMoltres_Descriptor& descrip
 
 
 
-struct StatsResetMoltres::Stats : public StatsTracker{
-    Stats()
-        : resets(m_stats["Resets"])
-        , errors(m_stats["Errors"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back(Stat("Resets"));
-        m_display_order.emplace_back(Stat("Errors"));
-        m_display_order.emplace_back(Stat("Matches"));
-    }
-
-    std::atomic<uint64_t>& resets;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& matches;
-};
-std::unique_ptr<StatsTracker> StatsResetMoltres::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
 void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -105,7 +103,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.current_stats<Stats>();
+    StatsResetMoltres_Descriptor::Stats& stats = env.current_stats<StatsResetMoltres_Descriptor::Stats>();
 
     while (true){
         context.wait_for_all_requests();

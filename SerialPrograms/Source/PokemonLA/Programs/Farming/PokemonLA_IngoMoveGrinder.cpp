@@ -39,6 +39,31 @@ IngoMoveGrinder_Descriptor::IngoMoveGrinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class IngoMoveGrinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : battles(m_stats["Battles"])
+        , turns(m_stats["Turns"])
+        , move_attempts(m_stats["Move Attempts"])
+        , faint_switches(m_stats["Faint Switches"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Battles");
+        m_display_order.emplace_back("Turns");
+        m_display_order.emplace_back("Move Attempts");
+        m_display_order.emplace_back("Faint Switches", true);
+        m_display_order.emplace_back("Errors", true);
+    }
+
+    std::atomic<uint64_t>& battles;
+    std::atomic<uint64_t>& turns;
+    std::atomic<uint64_t>& move_attempts;
+    std::atomic<uint64_t>& faint_switches;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> IngoMoveGrinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 IngoMoveGrinder::IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor)
@@ -61,34 +86,6 @@ IngoMoveGrinder::IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor)
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-
-
-class IngoMoveGrinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : battles(m_stats["Battles"])
-        , turns(m_stats["Turns"])
-        , move_attempts(m_stats["Move Attempts"])
-        , faint_switches(m_stats["Faint Switches"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Battles");
-        m_display_order.emplace_back("Turns");
-        m_display_order.emplace_back("Move Attempts");
-        m_display_order.emplace_back("Faint Switches", true);
-        m_display_order.emplace_back("Errors", true);
-    }
-
-    std::atomic<uint64_t>& battles;
-    std::atomic<uint64_t>& turns;
-    std::atomic<uint64_t>& move_attempts;
-    std::atomic<uint64_t>& faint_switches;
-    std::atomic<uint64_t>& errors;
-};
-
-std::unique_ptr<StatsTracker> IngoMoveGrinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& context){
     // First press A to start talking with Ingo.
@@ -149,7 +146,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
 }
 
 bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
 
@@ -313,7 +310,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
 
 
 void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

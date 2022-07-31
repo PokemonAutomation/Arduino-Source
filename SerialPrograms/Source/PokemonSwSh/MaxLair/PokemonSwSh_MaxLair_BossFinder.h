@@ -26,6 +26,8 @@ namespace PokemonSwSh{
 class MaxLairBossFinder_Descriptor : public MultiSwitchProgramDescriptor{
 public:
     MaxLairBossFinder_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -35,8 +37,6 @@ public:
 
     virtual std::string check_validity() const override;
     virtual void update_active_consoles() override;
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 

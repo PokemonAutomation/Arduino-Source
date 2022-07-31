@@ -20,6 +20,8 @@ namespace PokemonSwSh{
 class DaySkipperEU_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     DaySkipperEU_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -27,8 +29,6 @@ public:
 class DaySkipperEU : public SingleSwitchProgramInstance{
 public:
     DaySkipperEU(const DaySkipperEU_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

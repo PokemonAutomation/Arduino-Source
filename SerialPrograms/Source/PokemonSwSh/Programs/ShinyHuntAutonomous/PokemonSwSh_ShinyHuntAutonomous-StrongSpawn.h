@@ -26,6 +26,8 @@ namespace PokemonSwSh{
 class ShinyHuntAutonomousStrongSpawn_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousStrongSpawn_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -33,8 +35,6 @@ public:
 class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousStrongSpawn(const ShinyHuntAutonomousStrongSpawn_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

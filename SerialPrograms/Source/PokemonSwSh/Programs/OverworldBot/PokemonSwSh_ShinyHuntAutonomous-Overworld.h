@@ -29,6 +29,9 @@ namespace PokemonSwSh{
 class ShinyHuntAutonomousOverworld_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousOverworld_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -36,17 +39,13 @@ public:
 class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousOverworld(const ShinyHuntAutonomousOverworld_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    struct Stats;
-
     bool find_encounter(
         ConsoleHandle& console, BotBaseContext& context,
-        Stats& stats,
+        ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
         WallClock expiration
     ) const;
 

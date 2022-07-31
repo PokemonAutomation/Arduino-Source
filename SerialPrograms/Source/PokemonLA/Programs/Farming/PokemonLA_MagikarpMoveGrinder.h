@@ -20,13 +20,14 @@ namespace PokemonLA{
 class MagikarpMoveGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     MagikarpMoveGrinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class MagikarpMoveGrinder : public SingleSwitchProgramInstance{
 public:
     MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -35,8 +36,6 @@ private:
     void grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    class Stats;
-
     OneMoveBattlePokemonActionTable POKEMON_ACTIONS;
 
     BooleanCheckBoxOption SPECIAL_CASE_MIMIC;

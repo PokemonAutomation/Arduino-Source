@@ -32,9 +32,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-
-
-struct CurryHunter::Stats : public ShinyHuntTracker{
+struct CurryHunter_Descriptor::Stats : public ShinyHuntTracker{
     Stats()
         : ShinyHuntTracker(true)
         , m_attempts(m_stats["Attempts"])
@@ -46,7 +44,7 @@ struct CurryHunter::Stats : public ShinyHuntTracker{
     }
     std::atomic<uint64_t>& m_attempts;
 };
-std::unique_ptr<StatsTracker> CurryHunter::make_stats() const{
+std::unique_ptr<StatsTracker> CurryHunter_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
@@ -83,7 +81,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     }
 
 
-    Stats& stats = env.current_stats<Stats>();
+    CurryHunter_Descriptor::Stats& stats = env.current_stats<CurryHunter_Descriptor::Stats>();
     env.update_stats();
 
 

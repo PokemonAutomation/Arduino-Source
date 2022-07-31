@@ -27,7 +27,12 @@ public:
     );
 };
 #endif
-using RunnablePanelDescriptor = PanelDescriptor;
+class RunnablePanelDescriptor : public PanelDescriptor{
+public:
+    using PanelDescriptor::PanelDescriptor;
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const;
+};
 
 
 
@@ -42,8 +47,6 @@ public:
     const RunnablePanelDescriptor& descriptor() const{
         return static_cast<const RunnablePanelDescriptor&>(m_descriptor);
     }
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const;
 
     virtual std::string check_validity() const;
     virtual void restore_defaults();

@@ -20,22 +20,21 @@ namespace PokemonLA{
 class PostMMOSpawnReset_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     PostMMOSpawnReset_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class PostMMOSpawnReset : public SingleSwitchProgramInstance{
 public:
     PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    class Stats;
-
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
     TimeExpressionOption<int16_t> TURN_DURATION;

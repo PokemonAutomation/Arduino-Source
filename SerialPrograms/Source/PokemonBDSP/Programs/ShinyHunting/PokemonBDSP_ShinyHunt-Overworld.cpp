@@ -30,6 +30,19 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct ShinyHuntOverworld_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+//        , m_resets(m_stats["Resets"])
+    {
+//        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
+//        m_aliases["Unexpected Battles"] = "Errors";
+    }
+//    std::atomic<uint64_t>& m_resets;
+};
+std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -71,25 +84,10 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
 
 
 
-struct ShinyHuntOverworld::Stats : public PokemonSwSh::ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(false)
-//        , m_resets(m_stats["Resets"])
-    {
-//        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
-//        m_aliases["Unexpected Battles"] = "Errors";
-    }
-//    std::atomic<uint64_t>& m_resets;
-};
-std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 
 
 void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntOverworld_Descriptor::Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(

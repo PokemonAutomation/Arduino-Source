@@ -31,6 +31,9 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
+}
 
 
 ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor)
@@ -64,12 +67,6 @@ ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor
     PA_ADD_STATIC(m_advanced_options);
 //    PA_ADD_OPTION(WATCHDOG_TIMER);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-}
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
 }
 
 

@@ -35,6 +35,9 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new ShinyHuntTracker(false));
+}
 
 
 
@@ -88,14 +91,6 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomo
         PA_ADD_OPTION(RUN_FROM_EVERYTHING);
     }
 }
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new ShinyHuntTracker(false));
-}
-
-
 
 
 void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

@@ -21,13 +21,15 @@ namespace PokemonLA{
 class BurmyFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     BurmyFinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class BurmyFinder : public SingleSwitchProgramInstance{
 public:
     BurmyFinder(const BurmyFinder_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -78,7 +80,6 @@ private:
 
 
 private:
-    class Stats;
     class RunRoute;
 
     // Atomic bool to control whether to skip shiny sound for shiny sound detector.

@@ -34,6 +34,32 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_searches(m_stats["Searches"])
+        , m_errors(m_stats["Errors"])
+        , m_nothing(m_stats["No React"])
+        , m_man(m_stats["Man Only"])
+        , m_woman(m_stats["Woman Only"])
+        , m_both(m_stats["Both"])
+    {
+        m_display_order.emplace_back("Searches");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("No React");
+        m_display_order.emplace_back("Man Only");
+        m_display_order.emplace_back("Woman Only");
+        m_display_order.emplace_back("Both");
+    }
+    std::atomic<uint64_t>& m_searches;
+    std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_nothing;
+    std::atomic<uint64_t>& m_man;
+    std::atomic<uint64_t>& m_woman;
+    std::atomic<uint64_t>& m_both;
+};
+std::unique_ptr<StatsTracker> MoneyFarmerRoute212_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& descriptor)
@@ -86,36 +112,9 @@ MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& d
 
 
 
-struct MoneyFarmerRoute212::Stats : public StatsTracker{
-    Stats()
-        : m_searches(m_stats["Searches"])
-        , m_errors(m_stats["Errors"])
-        , m_nothing(m_stats["No React"])
-        , m_man(m_stats["Man Only"])
-        , m_woman(m_stats["Woman Only"])
-        , m_both(m_stats["Both"])
-    {
-        m_display_order.emplace_back("Searches");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("No React");
-        m_display_order.emplace_back("Man Only");
-        m_display_order.emplace_back("Woman Only");
-        m_display_order.emplace_back("Both");
-    }
-    std::atomic<uint64_t>& m_searches;
-    std::atomic<uint64_t>& m_errors;
-    std::atomic<uint64_t>& m_nothing;
-    std::atomic<uint64_t>& m_man;
-    std::atomic<uint64_t>& m_woman;
-    std::atomic<uint64_t>& m_both;
-};
-std::unique_ptr<StatsTracker> MoneyFarmerRoute212::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 
 bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man){
-    Stats& stats = env.current_stats<Stats>();
+    MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
 
     if (man){
         env.log("Starting battle with man (left).");
@@ -281,7 +280,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 
 
 void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
 
     uint8_t pp[4] = {
         MOVE1_PP,

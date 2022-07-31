@@ -12,6 +12,13 @@ namespace PokemonAutomation{
 
 
 
+std::unique_ptr<StatsTracker> RunnablePanelDescriptor::make_stats() const{
+    return nullptr;
+}
+
+
+
+
 RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
     : PanelInstance(descriptor)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
@@ -28,10 +35,6 @@ RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
         {"Notifs", "LiveHost"}
     )
 {}
-
-std::unique_ptr<StatsTracker> RunnablePanelInstance::make_stats() const{
-    return nullptr;
-}
 
 void RunnablePanelInstance::from_json(const JsonValue& json){
     m_options.load_json(json);

@@ -36,6 +36,18 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+        , m_shiny_starly(m_stats["Shiny Starly"])
+    {
+        m_display_order.emplace_back("Shiny Starly", true);
+    }
+    std::atomic<uint64_t>& m_shiny_starly;
+};
+std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
@@ -83,24 +95,10 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
 
 
 
-struct StarterReset::Stats : public PokemonSwSh::ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(false)
-        , m_shiny_starly(m_stats["Shiny Starly"])
-    {
-        m_display_order.emplace_back("Shiny Starly", true);
-    }
-    std::atomic<uint64_t>& m_shiny_starly;
-};
-std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 
 
 void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 

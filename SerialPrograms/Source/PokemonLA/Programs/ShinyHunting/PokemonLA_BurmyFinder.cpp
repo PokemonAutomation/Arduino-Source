@@ -41,6 +41,43 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class BurmyFinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , trees(m_stats["Trees"])
+        , errors(m_stats["Errors"])
+        , blackouts(m_stats["Blackouts"])
+        , found(m_stats["Found"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+        , tree_alphas(m_stats["Tree Alphas"])
+        , tree_shinies(m_stats["Tree Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Trees");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Blackouts", true);
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_display_order.emplace_back("Tree Alphas");
+        m_display_order.emplace_back("Tree Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+        m_aliases["Alphas"] = "Tree Alphas";
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& trees;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& blackouts;
+    std::atomic<uint64_t>& found;
+    std::atomic<uint64_t>& enroute_shinies;
+    std::atomic<uint64_t>& tree_alphas;
+    std::atomic<uint64_t>& tree_shinies;
+
+};
+std::unique_ptr<StatsTracker> BurmyFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
@@ -97,45 +134,6 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
 }
 
 
-class BurmyFinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , trees(m_stats["Trees"])
-        , errors(m_stats["Errors"])
-        , blackouts(m_stats["Blackouts"])
-        , found(m_stats["Found"])
-        , enroute_shinies(m_stats["Enroute Shinies"])
-        , tree_alphas(m_stats["Tree Alphas"])
-        , tree_shinies(m_stats["Tree Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Trees");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Blackouts", true);
-        m_display_order.emplace_back("Found");
-        m_display_order.emplace_back("Enroute Shinies");
-        m_display_order.emplace_back("Tree Alphas");
-        m_display_order.emplace_back("Tree Shinies");
-        m_aliases["Shinies"] = "Enroute Shinies";
-        m_aliases["Alphas"] = "Tree Alphas";
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& trees;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& blackouts;
-    std::atomic<uint64_t>& found;
-    std::atomic<uint64_t>& enroute_shinies;
-    std::atomic<uint64_t>& tree_alphas;
-    std::atomic<uint64_t>& tree_shinies;
-
-};
-
-std::unique_ptr<StatsTracker> BurmyFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
 
 struct BurmyFinder::TreeCounter{
     std::array<uint64_t, 16> tree = {};
@@ -153,7 +151,7 @@ struct BurmyFinder::TreeCounter{
 };
 
 bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
@@ -216,7 +214,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     disable_shiny_sound(context);
     bool battle_found = check_tree_or_ore_for_battle(env.console, context);
-    env.current_stats<Stats>().trees++;
+    env.current_stats<BurmyFinder_Descriptor::Stats>().trees++;
     env.update_stats();
 
     context.wait_for_all_requests();
@@ -237,7 +235,7 @@ void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBas
     // Throw pokemon
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    env.current_stats<Stats>().trees++;
+    env.current_stats<BurmyFinder_Descriptor::Stats>().trees++;
     env.update_stats();
 //    enable_shiny_sound(context);
 }
@@ -709,7 +707,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
-    Stats& stats = env.current_stats<Stats>();
+    BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
     env.console.log("Starting route and shiny detection...");
@@ -778,7 +776,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

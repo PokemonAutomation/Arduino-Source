@@ -35,6 +35,9 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new AutoHostStats());
+}
 
 
 
@@ -97,10 +100,6 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
     PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
 }
 
-
-std::unique_ptr<StatsTracker> AutoHostMultiGame::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new AutoHostStats());
-}
 
 
 

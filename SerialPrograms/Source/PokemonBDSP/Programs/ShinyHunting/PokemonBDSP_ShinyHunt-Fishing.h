@@ -25,19 +25,19 @@ namespace PokemonBDSP{
 class ShinyHuntFishing_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntFishing_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class ShinyHuntFishing : public SingleSwitchProgramInstance{
 public:
     ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    struct Stats;
     void run_trigger(BotBaseContext& context) const;
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 

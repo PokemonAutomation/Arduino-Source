@@ -25,6 +25,9 @@ namespace PokemonSwSh{
 class StatsReset_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     StatsReset_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -32,12 +35,7 @@ public:
 class StatsReset : public SingleSwitchProgramInstance{
 public:
     StatsReset(const StatsReset_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
-
-private:
-    struct Stats;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

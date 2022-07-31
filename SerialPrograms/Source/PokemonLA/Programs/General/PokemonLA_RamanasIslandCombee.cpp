@@ -41,6 +41,36 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class RamanasCombeeFinder_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , trees(m_stats["Trees"])
+        , errors(m_stats["Errors"])
+        , blackouts(m_stats["Blackouts"])
+        , found(m_stats["Found"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Trees");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Blackouts", true);
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& trees;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& blackouts;
+    std::atomic<uint64_t>& found;
+    std::atomic<uint64_t>& enroute_shinies;
+};
+std::unique_ptr<StatsTracker> RamanasCombeeFinder_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 
 RamanasCombeeFinder:: RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
@@ -69,36 +99,6 @@ RamanasCombeeFinder:: RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& 
     }
 }
 
-class RamanasCombeeFinder::Stats : public StatsTracker{
-public:
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , trees(m_stats["Trees"])
-        , errors(m_stats["Errors"])
-        , blackouts(m_stats["Blackouts"])
-        , found(m_stats["Found"])
-        , enroute_shinies(m_stats["Enroute Shinies"])
-    {
-        m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Trees");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Blackouts", true);
-        m_display_order.emplace_back("Found");
-        m_display_order.emplace_back("Enroute Shinies");
-        m_aliases["Shinies"] = "Enroute Shinies";
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& trees;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& blackouts;
-    std::atomic<uint64_t>& found;
-    std::atomic<uint64_t>& enroute_shinies;
-};
-
-std::unique_ptr<StatsTracker> RamanasCombeeFinder::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     context.wait_for_all_requests();
@@ -106,7 +106,7 @@ void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env
     // Throw pokemon
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    env.current_stats<Stats>().trees++;
+    env.current_stats<RamanasCombeeFinder_Descriptor::Stats>().trees++;
     env.update_stats();
 }
 
@@ -115,7 +115,7 @@ bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBas
 
     disable_shiny_sound(context);
     bool battle_found = check_tree_or_ore_for_battle(env.console, context);
-    env.current_stats<Stats>().trees++;
+    env.current_stats<RamanasCombeeFinder_Descriptor::Stats>().trees++;
     env.update_stats();
 
     context.wait_for_all_requests();
@@ -141,7 +141,7 @@ void RamanasCombeeFinder::enable_shiny_sound(BotBaseContext& context){
 }
 
 bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
@@ -234,7 +234,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
 }
 
 void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
     env.console.log("Starting route and shiny detection...");
@@ -297,7 +297,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 }
 
 void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);

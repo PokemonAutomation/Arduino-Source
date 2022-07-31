@@ -40,6 +40,19 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct ShinyHuntAutonomousOverworld_Descriptor::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_resets(m_stats["Resets"])
+    {
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
+        m_aliases["Unexpected Battles"] = "Errors";
+    }
+    std::atomic<uint64_t>& m_resets;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -131,28 +144,10 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
 
 
 
-struct ShinyHuntAutonomousOverworld::Stats : public ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(true)
-        , m_resets(m_stats["Resets"])
-    {
-        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
-        m_aliases["Unexpected Battles"] = "Errors";
-    }
-    std::atomic<uint64_t>& m_resets;
-};
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
-
-
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
     ConsoleHandle& console, BotBaseContext& context,
-    Stats& stats,
+    ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
     InferenceBoxScope self(
@@ -370,7 +365,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock(context);
 
-    Stats& stats = env.current_stats<Stats>();
+    ShinyHuntAutonomousOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousOverworld_Descriptor::Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(

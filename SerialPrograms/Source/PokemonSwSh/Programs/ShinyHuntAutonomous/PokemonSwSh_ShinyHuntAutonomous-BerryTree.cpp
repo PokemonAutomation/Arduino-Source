@@ -35,6 +35,9 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new ShinyHuntTracker(true));
+}
 
 
 
@@ -67,12 +70,6 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutono
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-}
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new ShinyHuntTracker(true));
 }
 
 

@@ -31,6 +31,17 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct EggHatcher_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_batches(m_stats["Batches"])
+    {
+        m_display_order.emplace_back("Batches");
+    }
+    std::atomic<uint64_t>& m_batches;
+};
+std::unique_ptr<StatsTracker> EggHatcher_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
@@ -75,22 +86,9 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
 
 
 
-struct EggHatcher::Stats : public StatsTracker{
-    Stats()
-        : m_batches(m_stats["Batches"])
-    {
-        m_display_order.emplace_back("Batches");
-    }
-    std::atomic<uint64_t>& m_batches;
-};
-std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
 
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
     uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME0 + HATCH_DELAY;

@@ -20,20 +20,20 @@ namespace PokemonLA{
 class FroslassFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     FroslassFinder_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class FroslassFinder : public SingleSwitchProgramInstance{
 public:
     FroslassFinder(const FroslassFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    class Stats;
     class RunRoute;
 
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

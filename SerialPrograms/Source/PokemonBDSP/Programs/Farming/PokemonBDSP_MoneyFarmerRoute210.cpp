@@ -34,6 +34,26 @@ MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct MoneyFarmerRoute210_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_searches(m_stats["Searches"])
+        , m_errors(m_stats["Errors"])
+        , m_noreact(m_stats["No React"])
+        , m_react(m_stats["React"])
+    {
+        m_display_order.emplace_back("Searches");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("No React");
+        m_display_order.emplace_back("React");
+    }
+    std::atomic<uint64_t>& m_searches;
+    std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_noreact;
+    std::atomic<uint64_t>& m_react;
+};
+std::unique_ptr<StatsTracker> MoneyFarmerRoute210_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -94,30 +114,10 @@ MoneyFarmerRoute210::MoneyFarmerRoute210(const MoneyFarmerRoute210_Descriptor& d
 }
 
 
-struct MoneyFarmerRoute210::Stats : public StatsTracker{
-    Stats()
-        : m_searches(m_stats["Searches"])
-        , m_errors(m_stats["Errors"])
-        , m_noreact(m_stats["No React"])
-        , m_react(m_stats["React"])
-    {
-        m_display_order.emplace_back("Searches");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("No React");
-        m_display_order.emplace_back("React");
-    }
-    std::atomic<uint64_t>& m_searches;
-    std::atomic<uint64_t>& m_errors;
-    std::atomic<uint64_t>& m_noreact;
-    std::atomic<uint64_t>& m_react;
-};
-std::unique_ptr<StatsTracker> MoneyFarmerRoute210::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
-    Stats& stats = env.current_stats<Stats>();
+    MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
 
@@ -319,7 +319,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    Stats& stats = env.current_stats<Stats>();
+    MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     uint8_t pp0[4] = {
         MON0_MOVE1_PP,

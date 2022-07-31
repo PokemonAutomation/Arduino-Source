@@ -33,6 +33,9 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         2, 2, 2
     )
 {}
+std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new TradeStats());
+}
 
 
 
@@ -59,9 +62,6 @@ SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
 
 
 
-std::unique_ptr<StatsTracker> SelfBoxTrade::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new TradeStats());
-}
 
 
 bool SelfBoxTrade::move_to_next(

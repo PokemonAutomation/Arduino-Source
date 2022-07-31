@@ -28,6 +28,11 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         2, 2, 2
     )
 {}
+std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new TradeStats());
+}
+
+
 
 SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
     : MultiSwitchProgramInstance(descriptor)
@@ -44,12 +49,6 @@ SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
 {
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(NOTIFICATIONS);
-}
-
-
-
-std::unique_ptr<StatsTracker> SelfBoxTrade::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new TradeStats());
 }
 
 

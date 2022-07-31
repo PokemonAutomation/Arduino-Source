@@ -30,6 +30,9 @@ using namespace Pokemon;
 class DexRecFinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     DexRecFinder_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -47,8 +50,6 @@ public:
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder(const DexRecFinder_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
@@ -63,9 +64,6 @@ private:
         const std::set<std::string>& desired,
         const std::set<std::string>& exclusions
     );
-
-private:
-    struct Stats;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -24,6 +24,9 @@ namespace PokemonSwSh{
 class DenRoller_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     DenRoller_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -32,14 +35,10 @@ class DenRoller : public SingleSwitchProgramInstance{
 public:
     DenRoller(const DenRoller_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
-
     void ring_bell(BotBaseContext& context, int count) const;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    struct Stats;
-
     StartInGripOrGameOption START_IN_GRIP_MENU;
     SimpleIntegerOption<uint8_t> SKIPS;
     DenMonSelectOption FILTER;

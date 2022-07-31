@@ -21,6 +21,8 @@ namespace PokemonLA{
 class ShinyHuntLakeTrio_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinyHuntLakeTrio_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -28,7 +30,6 @@ class ShinyHuntLakeTrio : public SingleSwitchProgramInstance{
 public:
     ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

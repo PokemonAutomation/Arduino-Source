@@ -34,6 +34,14 @@ ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustic
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(
+        new ShinyHuntTracker(
+            true,
+            {{"Timeouts", "Errors"}}
+        )
+    );
+}
 
 
 
@@ -81,18 +89,6 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const Shi
     PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
     PA_ADD_OPTION(ENTER_CAMP_DELAY);
 }
-
-
-
-std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice::make_stats() const{
-    return std::unique_ptr<StatsTracker>(
-        new ShinyHuntTracker(
-            true,
-            {{"Timeouts", "Errors"}}
-        )
-    );
-}
-
 
 
 

@@ -34,6 +34,24 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct StatsReset_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , matches(m_stats["Matches"])
+    {
+        m_display_order.emplace_back(Stat("Attempts"));
+        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back(Stat("Matches"));
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& matches;
+};
+std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -82,27 +100,6 @@ StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
 
 
 
-struct StatsReset::Stats : public StatsTracker{
-    Stats()
-        : attempts(m_stats["Attempts"])
-        , errors(m_stats["Errors"])
-        , matches(m_stats["Matches"])
-    {
-        m_display_order.emplace_back(Stat("Attempts"));
-        m_display_order.emplace_back(Stat("Errors"));
-        m_display_order.emplace_back(Stat("Matches"));
-    }
-
-    std::atomic<uint64_t>& attempts;
-    std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& matches;
-};
-std::unique_ptr<StatsTracker> StatsReset::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
-
-
-
 void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
@@ -111,7 +108,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    Stats& stats = env.current_stats<Stats>();
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     std::shared_ptr<const ImageRGB32> screen;
     while (true){

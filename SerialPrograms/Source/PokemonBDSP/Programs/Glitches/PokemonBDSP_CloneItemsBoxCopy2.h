@@ -22,6 +22,8 @@ namespace PokemonBDSP{
 class CloneItemsBoxCopy2_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     CloneItemsBoxCopy2_Descriptor();
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -30,11 +32,7 @@ class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
     CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
-
-private:
-    struct Stats;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

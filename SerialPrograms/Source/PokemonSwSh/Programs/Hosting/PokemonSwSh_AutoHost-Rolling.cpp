@@ -35,6 +35,9 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new AutoHostStats());
+}
 
 
 
@@ -124,12 +127,6 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
     PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY);
     PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY);
     PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
-}
-
-
-
-std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new AutoHostStats());
 }
 
 

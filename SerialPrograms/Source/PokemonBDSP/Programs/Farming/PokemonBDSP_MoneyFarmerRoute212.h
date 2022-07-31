@@ -22,18 +22,18 @@ namespace PokemonBDSP{
 class MoneyFarmerRoute212_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     MoneyFarmerRoute212_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 class MoneyFarmerRoute212 : public SingleSwitchProgramInstance{
 public:
     MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    struct Stats;
     // Run the battle loop. Return true if the program should stop.
     bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man);
     // From the row above the old couple, heal Pokemon and return.

@@ -29,6 +29,8 @@ namespace PokemonSwSh{
 class AutoHostMultiGame_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     AutoHostMultiGame_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -36,8 +38,6 @@ public:
 class AutoHostMultiGame : public SingleSwitchProgramInstance{
 public:
     AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descriptor);
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
