@@ -56,7 +56,7 @@ public:
         std::chrono::seconds rate_limit = std::chrono::seconds(0)
     );
 
-    const std::string&      label       () const{ return m_label; }
+    const std::string&  label           () const{ return m_label; }
     bool                ping            () const{ return m_current.ping; }
     ImageAttachmentMode screenshot      () const{ return m_current.screenshot; }
     const std::vector<std::string>& tags() const{ return m_current.tags; }

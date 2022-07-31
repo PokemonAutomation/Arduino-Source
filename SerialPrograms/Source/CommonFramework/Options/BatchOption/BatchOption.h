@@ -22,8 +22,8 @@ public:
 //    BatchOption();
     void add_option(ConfigOption& option, std::string serialization_string);
 
-#define PA_ADD_OPTION(x)    add_option(x, #x)
 #define PA_ADD_STATIC(x)    add_option(x, "")
+#define PA_ADD_OPTION(x)    add_option(x, #x)
 
 
 public:

@@ -31,21 +31,27 @@ protected:
 
     void handle_panel_clicked(const std::string& text);
 
-    template <typename Descriptor, typename Instance, class... Args>
-    void add_settings(Args&&... args){
-        add_program<Descriptor, Instance>(std::forward<Args>(args)...);
+    template <typename Descriptor, typename Instance>
+    void add_settings(){
+        add_program<Descriptor, Instance>();
         //  Need to force initialize a settings panel so that it loads and
         //  updates the globals from serialization.
         m_panels.back().second->make_panel()->from_json();
     }
 
-    template <typename Descriptor, typename Instance, class... Args>
-    void add_program(Args&&... args){
+    template <typename Descriptor, typename Instance>
+    void add_program(){
         std::unique_ptr<PanelDescriptor> panel(
-            new PanelDescriptorWrapper<Descriptor, Instance>(std::forward<Args>(args)...)
+            new PanelDescriptorWrapper<Descriptor, Instance>()
         );
         m_panels.emplace_back(panel->display_name(), std::move(panel));
     }
+
+    void add_panel(std::unique_ptr<PanelDescriptor> panel){
+        const std::string& name = panel->display_name();
+        m_panels.emplace_back(name, std::move(panel));
+    }
+
     void finish_panel_setup();
 
 protected:

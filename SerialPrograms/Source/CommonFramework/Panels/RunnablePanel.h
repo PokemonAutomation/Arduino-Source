@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_RunnablePanel_H
-#define PokemonAutomation_RunnablePanel_H
+#ifndef PokemonAutomation_CommonFramework_RunnablePanel_H
+#define PokemonAutomation_CommonFramework_RunnablePanel_H
 
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"

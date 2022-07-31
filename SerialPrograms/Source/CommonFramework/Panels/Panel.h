@@ -64,7 +64,6 @@ private:
 template <typename Descriptor, typename Instance>
 class PanelDescriptorWrapper : public Descriptor{
 public:
-    using Descriptor::Descriptor;
     virtual std::unique_ptr<PanelInstance> make_panel() const override{
         return std::unique_ptr<PanelInstance>(new Instance(*this));
     }
