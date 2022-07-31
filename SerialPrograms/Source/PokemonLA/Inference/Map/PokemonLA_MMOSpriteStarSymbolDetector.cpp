@@ -74,7 +74,7 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
             continue;
         }
 
-        if (m_symbol_colors[i].r <= m_symbol_colors[i].g * 1.2){
+        if (m_symbol_colors[i].r <= m_symbol_colors[i].g * 1.2 && m_symbol_colors[i].g > 200 && m_symbol_colors[i].r > 220) {
             // It's not very red, so it's not a berry symbol
             m_is_star[i] = true;
         }
