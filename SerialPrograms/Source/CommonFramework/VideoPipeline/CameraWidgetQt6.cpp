@@ -145,7 +145,6 @@ void Camera::add_listener(Listener& listener){
 void Camera::remove_listener(Listener& listener){
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.erase(&listener);
-
 }
 
 QSize Camera::current_resolution() const{

@@ -39,12 +39,12 @@ bool determine_frame_orientation(
 
 class CameraScreenshotter : public QObject{
 public:
-    CameraScreenshotter(LoggerQt& logger, QCamera& camera);
+    CameraScreenshotter(Logger& logger, QCamera& camera);
     virtual ~CameraScreenshotter();
     VideoSnapshot snapshot();
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     QCamera& m_camera;
     PeriodicStatsReporterI32 m_stats_conversion;
 

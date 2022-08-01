@@ -167,7 +167,6 @@ private:
 private:
     Camera m_camera;
     QMediaCaptureSession m_captureSession;
-
 };
 
 

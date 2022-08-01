@@ -159,7 +159,7 @@ bool determine_frame_orientation(
 
 
 
-CameraScreenshotter::CameraScreenshotter(LoggerQt& logger, QCamera& camera)
+CameraScreenshotter::CameraScreenshotter(Logger& logger, QCamera& camera)
     : m_logger(logger)
     , m_camera(camera)
     , m_stats_conversion("Snapshot", "ms", 1000, std::chrono::seconds(10))
@@ -183,7 +183,7 @@ CameraScreenshotter::CameraScreenshotter(LoggerQt& logger, QCamera& camera)
         this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
             std::lock_guard<std::mutex> lg(m_lock);
             m_logger.log(
-                "QCameraImageCapture::error(): Capture ID: " + errorString,
+                "QCameraImageCapture::error(): Capture ID: " + errorString.toStdString(),
                 COLOR_RED
             );
             m_screenshot = QImage();

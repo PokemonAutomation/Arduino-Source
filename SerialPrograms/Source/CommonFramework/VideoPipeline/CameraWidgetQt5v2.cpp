@@ -44,11 +44,10 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
 
 
 CameraHolder::CameraHolder(
-    LoggerQt& logger, VideoWidget& widget,
+    LoggerQt& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
     : m_logger(logger)
-    , m_widget(widget)
     , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
     , m_screenshotter(logger, *m_camera)
     , m_last_orientation_attempt(WallClock::min())
@@ -297,7 +296,7 @@ VideoWidget::VideoWidget(
     layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    m_holder = std::make_unique<CameraHolder>(logger, *this, info, desired_resolution);
+    m_holder = std::make_unique<CameraHolder>(logger, info, desired_resolution);
 
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);

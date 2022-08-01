@@ -48,22 +48,22 @@ public:
 class VideoWidget;
 
 
-class CameraHolder : public QObject{
+class CameraHolder : public QObject, public PokemonAutomation::Camera{
     Q_OBJECT
 public:
     CameraHolder(
-        LoggerQt& logger, VideoWidget& widget,
+        LoggerQt& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~CameraHolder();
 
-    QSize current_resolution() const{ return m_current_resolution; }
-    std::vector<QSize> supported_resolutions() const{ return m_supported_resolutions; }
+    virtual QSize current_resolution() const override{ return m_current_resolution; }
+    virtual std::vector<QSize> supported_resolutions() const override{ return m_supported_resolutions; }
 
-    VideoSnapshot snapshot();
+    virtual VideoSnapshot snapshot() override;
 
 public slots:
-    void set_resolution(const QSize& size);
+    virtual void set_resolution(const QSize& size) override;
 
 signals:
     void stop();
@@ -83,7 +83,6 @@ private:
     friend class VideoWidget;
 
     LoggerQt& m_logger;
-    VideoWidget& m_widget;
     QCamera* m_camera = nullptr;
     CameraScreenshotter m_screenshotter;
 

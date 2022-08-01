@@ -152,7 +152,7 @@ private:
 
 
 
-class CameraHolder : public QObject{
+class CameraHolder : public QObject, public PokemonAutomation::Camera{
     Q_OBJECT
 public:
     CameraHolder(
@@ -161,17 +161,17 @@ public:
     );
     virtual ~CameraHolder();
 
-    QSize current_resolution() const{ return m_current_resolution; }
-    std::vector<QSize> supported_resolutions() const{ return m_supported_resolutions; }
+    virtual QSize current_resolution() const override{ return m_current_resolution; }
+    virtual std::vector<QSize> supported_resolutions() const override{ return m_supported_resolutions; }
 
     void set_view_finder(QCameraViewfinder* widget);
     void set_widget_dimensions(QSize size);
 
-    VideoSnapshot snapshot();
+    virtual VideoSnapshot snapshot() override;
     QImage get_display_image();
 
 public slots:
-    void set_resolution(const QSize& size);
+    virtual void set_resolution(const QSize& size) override;
 
 signals:
     void use_view_finder(bool enabled);
