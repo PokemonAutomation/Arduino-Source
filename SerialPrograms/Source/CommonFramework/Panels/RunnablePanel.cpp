@@ -32,7 +32,7 @@ RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
         "Program Error (Fatal)",
         true, true,
 //        ImageAttachmentMode::PNG,
-        {"Notifs", "LiveHost"}
+        {"Notifs"}
     )
 {}
 
