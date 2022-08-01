@@ -14,7 +14,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioDisplayWidget.h"
 #include "CommonFramework/AudioPipeline/AudioSelectorWidget.h"
-#include "CommonFramework/ControllerDevices/SerialSelectorWidget.h"
+#include "CommonFramework/ControllerDevices/SerialPortWidget.h"
 #include "CommonFramework/VideoPipeline/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/VideoDisplayWidget.h"
 #include "NintendoSwitch_CommandRow.h"
@@ -34,6 +34,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     : SwitchSetupWidget(parent, factory)
     , m_factory(factory)
     , m_logger(raw_logger, factory.m_logger_tag)
+    , m_serial(factory.m_serial, m_logger)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -49,8 +50,8 @@ SwitchSystemWidget::SwitchSystemWidget(
     group_layout->setContentsMargins(0, 0, 0, 0);
 
     {
-        m_serial = factory.m_serial.make_ui(*widget, m_logger);
-        group_layout->addWidget(m_serial);
+        m_serial_widget = new SerialPortWidget(parent, m_serial, m_logger);
+        group_layout->addWidget(m_serial_widget);
 
         m_video_display = new VideoDisplayWidget(*this);
         m_audio_display = new AudioDisplayWidget(*this);
@@ -63,7 +64,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
         m_command = new CommandRow(
             *widget,
-            m_serial->botbase(),
+            m_serial_widget->botbase(),
             factory.m_feedback, factory.m_allow_commands_while_running
         );
         group_layout->addWidget(m_command);
@@ -78,7 +79,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
 
     connect(
-        m_serial, &SerialSelectorWidget::on_ready,
+        m_serial_widget, &SerialPortWidget::signal_on_ready,
         m_command, [=](bool ready){
             m_command->update_ui();
         }
@@ -114,13 +115,13 @@ SwitchSystemWidget::SwitchSystemWidget(
 }
 SwitchSystemWidget::~SwitchSystemWidget(){
     ProgramTracker::instance().remove_console(m_instance_id);
-    m_serial->stop();
+    m_serial_widget->stop();
 }
 ProgramState SwitchSystemWidget::last_known_state() const{
     return m_command->last_known_state();
 }
 bool SwitchSystemWidget::serial_ok() const{
-    return m_serial->is_ready();
+    return m_serial_widget->is_ready();
 }
 void SwitchSystemWidget::wait_for_all_requests(){
     BotBase* botbase = this->botbase();
@@ -133,7 +134,7 @@ LoggerQt& SwitchSystemWidget::logger(){
     return m_logger;
 }
 BotBase* SwitchSystemWidget::botbase(){
-    return m_serial->botbase().botbase();
+    return m_serial_widget->botbase().botbase();
 }
 VideoFeed& SwitchSystemWidget::camera(){
     return *m_camera;
@@ -145,38 +146,38 @@ AudioFeed& SwitchSystemWidget::audio(){
     return *m_audio;
 }
 void SwitchSystemWidget::stop_serial(){
-    m_serial->stop();
+    m_serial_widget->stop();
 }
 void SwitchSystemWidget::reset_serial(){
-    m_serial->reset();
+    m_serial_widget->reset();
 }
 
 VideoFeed& SwitchSystemWidget::video(){
     return *m_camera;
 }
 BotBaseHandle& SwitchSystemWidget::sender(){
-    return m_serial->botbase();
+    return m_serial_widget->botbase();
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){
     if (!m_factory.m_allow_commands_while_running){
-        m_serial->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
+        m_serial_widget->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
     }
     switch (state){
     case ProgramState::NOT_READY:
-        m_serial->set_options_enabled(false);
+        m_serial_widget->set_options_enabled(false);
         m_camera->set_camera_enabled(false);
         m_camera->set_resolution_enabled(false);
         break;
     case ProgramState::STOPPED:
-        m_serial->set_options_enabled(true);
+        m_serial_widget->set_options_enabled(true);
         m_camera->set_camera_enabled(true);
         m_camera->set_resolution_enabled(true);
         break;
     case ProgramState::RUNNING:
 //    case ProgramState::FINISHED:
     case ProgramState::STOPPING:
-        m_serial->set_options_enabled(false);
+        m_serial_widget->set_options_enabled(false);
 #if 0
         if (m_factory.m_lock_camera_when_running){
             m_camera->set_camera_enabled(false);

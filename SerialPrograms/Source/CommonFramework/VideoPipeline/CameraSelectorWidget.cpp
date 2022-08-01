@@ -23,7 +23,7 @@ CameraSelectorWidget::~CameraSelectorWidget(){
 CameraSelectorWidget::CameraSelectorWidget(
     QWidget& parent,
     LoggerQt& logger,
-    CameraSelector& value,
+    CameraOption& value,
     VideoDisplayWidget& holder
 )
     : QWidget(&parent)

@@ -8,27 +8,27 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CameraSelector.h"
+#include "CameraOption.h"
 #include "CameraSelectorWidget.h"
 
 namespace PokemonAutomation{
 
 
-const std::string CameraSelector::JSON_CAMERA       = "Device";
-const std::string CameraSelector::JSON_RESOLUTION   = "Resolution";
+const std::string CameraOption::JSON_CAMERA       = "Device";
+const std::string CameraOption::JSON_RESOLUTION   = "Resolution";
 
 
-CameraSelector::CameraSelector(QSize default_resolution)
+CameraOption::CameraOption(QSize default_resolution)
     : m_default_resolution(default_resolution)
     , m_current_resolution(default_resolution)
 {}
-CameraSelector::CameraSelector(QSize default_resolution, const JsonValue& json)
-    : CameraSelector(default_resolution)
+CameraOption::CameraOption(QSize default_resolution, const JsonValue& json)
+    : CameraOption(default_resolution)
 {
     load_json(json);
 }
 
-void CameraSelector::load_json(const JsonValue& json){
+void CameraOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
@@ -51,7 +51,7 @@ void CameraSelector::load_json(const JsonValue& json){
         }while (false);
     }
 }
-JsonValue CameraSelector::to_json() const{
+JsonValue CameraOption::to_json() const{
     JsonObject root;
     root[JSON_CAMERA] = m_camera.device_name();
     JsonArray res;
@@ -61,7 +61,7 @@ JsonValue CameraSelector::to_json() const{
     return root;
 }
 
-CameraSelectorWidget* CameraSelector::make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder){
+CameraSelectorWidget* CameraOption::make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder){
     return new CameraSelectorWidget(parent, logger, *this, holder);
 }
 

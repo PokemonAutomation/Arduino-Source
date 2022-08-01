@@ -210,10 +210,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
     Source/CommonFramework/AudioPipeline/WavFile.cpp
     Source/CommonFramework/AudioPipeline/WavFile.h
-    Source/CommonFramework/ControllerDevices/SerialSelector.cpp
-    Source/CommonFramework/ControllerDevices/SerialSelector.h
-    Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp
-    Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h
+    Source/CommonFramework/ControllerDevices/SerialPortOption.cpp
+    Source/CommonFramework/ControllerDevices/SerialPortOption.h
+    Source/CommonFramework/ControllerDevices/SerialPortSession.cpp
+    Source/CommonFramework/ControllerDevices/SerialPortSession.h
+    Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp
+    Source/CommonFramework/ControllerDevices/SerialPortWidget.h
     Source/CommonFramework/CrashDump.cpp
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/Environment/Environment.cpp
@@ -452,8 +454,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraImplementations.cpp
     Source/CommonFramework/VideoPipeline/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
-    Source/CommonFramework/VideoPipeline/CameraSelector.cpp
-    Source/CommonFramework/VideoPipeline/CameraSelector.h
+    Source/CommonFramework/VideoPipeline/CameraOption.cpp
+    Source/CommonFramework/VideoPipeline/CameraOption.h
+    Source/CommonFramework/VideoPipeline/CameraSession.cpp
+    Source/CommonFramework/VideoPipeline/CameraSession.h
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp

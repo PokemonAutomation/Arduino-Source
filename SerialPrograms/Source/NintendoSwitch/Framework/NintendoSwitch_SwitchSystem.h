@@ -8,8 +8,8 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystem_H
 
 #include "CommonFramework/AudioPipeline/AudioSelector.h"
-#include "CommonFramework/ControllerDevices/SerialSelector.h"
-#include "CommonFramework/VideoPipeline/CameraSelector.h"
+#include "CommonFramework/ControllerDevices/SerialPortOption.h"
+#include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "NintendoSwitch_SwitchSetup.h"
 
 namespace PokemonAutomation{
@@ -49,8 +49,8 @@ private:
     std::string m_logger_tag;
 
 //    bool m_settings_visible;
-    SerialSelector m_serial;
-    CameraSelector m_camera;
+    SerialPortOption m_serial;
+    CameraOption m_camera;
     AudioSelector m_audio;
 };
 

@@ -8,7 +8,7 @@
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "SerialSelectorWidget.h"
+#include "SerialPortWidget.h"
 
 #include <iostream>
 using std::cout;
@@ -17,15 +17,15 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-SerialSelectorWidget::SerialSelectorWidget(
+SerialPortWidget::SerialPortWidget(
     QWidget& parent,
-    SerialSelector& value,
+    SerialPortSession& session,
     LoggerQt& logger
 )
     : QWidget(&parent)
-    , m_value(value)
-    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
-    , m_connection(m_logger, *value.m_port, value.m_minimum_pabotbase)
+    , m_session(session)
+//    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+//    , m_connection(m_logger, *value.m_port, value.m_minimum_pabotbase)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);
     serial_row->setContentsMargins(0, 0, 0, 0);
@@ -58,7 +58,7 @@ SerialSelectorWidget::SerialSelectorWidget(
     connect(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            QSerialPortInfo& current_port = *m_value.m_port;
+            QSerialPortInfo& current_port = *m_session->m_port;
             if (index <= 0 || (size_t)index > m_ports.size()){
                 current_port = QSerialPortInfo();
             }else{
@@ -72,7 +72,7 @@ SerialSelectorWidget::SerialSelectorWidget(
         }
     );
     connect(
-        &m_connection, &BotBaseHandle::on_not_connected,
+        &m_session.botbase(), &BotBaseHandle::on_not_connected,
         this, [=](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"red\">Not Connected</font>");
@@ -83,21 +83,21 @@ SerialSelectorWidget::SerialSelectorWidget(
         }
     );
     connect(
-        &m_connection, &BotBaseHandle::on_connecting,
+        &m_session.botbase(), &BotBaseHandle::on_connecting,
         this, [=](){
             m_serial_program->setText("<font color=\"green\">Connecting...</font>");
             m_serial_uptime->hide();
         }
     );
     connect(
-        &m_connection, &BotBaseHandle::on_ready,
+        &m_session.botbase(), &BotBaseHandle::on_ready,
         this, [=](std::string description){
             m_serial_program->setText(QString::fromStdString(description));
-            emit on_ready(true);
+            emit signal_on_ready(true);
         }
     );
     connect(
-        &m_connection, &BotBaseHandle::on_stopped,
+        &m_session.botbase(), &BotBaseHandle::on_stopped,
         this, [=](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"orange\">Stopping...</font>");
@@ -107,7 +107,7 @@ SerialSelectorWidget::SerialSelectorWidget(
         }
     );
     connect(
-        &m_connection, &BotBaseHandle::uptime_status,
+        &m_session.botbase(), &BotBaseHandle::uptime_status,
         this, [=](std::string status){
             m_serial_uptime->setText(QString::fromStdString(status));
             m_serial_uptime->show();
@@ -119,9 +119,13 @@ SerialSelectorWidget::SerialSelectorWidget(
             reset();
         }
     );
+
+    m_session.add_listener(*this);
 }
-SerialSelectorWidget::~SerialSelectorWidget(){}
-void SerialSelectorWidget::refresh(){
+SerialPortWidget::~SerialPortWidget(){
+    m_session.remove_listener(*this);
+}
+void SerialPortWidget::refresh(){
     m_serial_box->clear();
     m_serial_box->addItem("(none)");
 
@@ -136,7 +140,7 @@ void SerialSelectorWidget::refresh(){
         m_ports.emplace_back(std::move(port));
     }
 
-    QSerialPortInfo& current_port = *m_value.m_port;
+    QSerialPortInfo& current_port = *m_session->m_port;
 
     size_t index = 0;
     for (size_t c = 0; c < m_ports.size(); c++){
@@ -154,26 +158,27 @@ void SerialSelectorWidget::refresh(){
         m_serial_box->setCurrentIndex(0);
     }
 }
+void SerialPortWidget::on_ready(bool ready){
+    emit signal_on_ready(ready);
+}
 
-bool SerialSelectorWidget::is_ready() const{
-    return m_connection.state() == BotBaseHandle::State::READY;
+bool SerialPortWidget::is_ready() const{
+    return m_session.is_ready();
 }
-BotBaseHandle& SerialSelectorWidget::botbase(){
-    return m_connection;
+BotBaseHandle& SerialPortWidget::botbase(){
+    return m_session.botbase();
 }
-void SerialSelectorWidget::set_options_enabled(bool enabled){
+void SerialPortWidget::set_options_enabled(bool enabled){
     m_serial_box->setEnabled(enabled);
     m_reset_button->setEnabled(enabled);
 }
 
-void SerialSelectorWidget::stop(){
-    m_connection.stop();
+void SerialPortWidget::stop(){
+    m_session.stop();
 }
-void SerialSelectorWidget::reset(){
-    stop();
-    emit on_ready(false);
+void SerialPortWidget::reset(){
+    m_session.reset();
     refresh();
-    m_connection.reset(*m_value.m_port);
 }
 
 

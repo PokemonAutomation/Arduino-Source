@@ -1,32 +1,33 @@
-/*  Serial Connection Selector
+/*  Serial Port Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_SerialSelectorWidget_H
-#define PokemonAutomation_SerialSelectorWidget_H
+#ifndef PokemonAutomation_SerialPortWidget_H
+#define PokemonAutomation_SerialPortWidget_H
 
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "ClientSource/Connection/MessageLogger.h"
-#include "SerialSelector.h"
+#include "SerialPortOption.h"
+#include "SerialPortSession.h"
 
 namespace PokemonAutomation{
 
 
-class SerialSelectorWidget : public QWidget{
+class SerialPortWidget : public QWidget, public SerialPortSession::Listener{
     Q_OBJECT
 
 public:
-    SerialSelectorWidget(
+    SerialPortWidget(
         QWidget& parent,
-        SerialSelector& value,
+        SerialPortSession& session,
         LoggerQt& logger
     );
-    ~SerialSelectorWidget();
+    ~SerialPortWidget();
 
     bool is_ready() const;
     BotBaseHandle& botbase();
@@ -37,14 +38,14 @@ public:
     void reset();
 
 signals:
-    void on_ready(bool ready);
+    void signal_on_ready(bool ready);
 
 private:
     void refresh();
+    virtual void on_ready(bool ready) override;
 
 private:
-    SerialSelector& m_value;
-    SerialLogger m_logger;
+    SerialPortSession& m_session;
 
     QComboBox* m_serial_box;
     QLabel* m_serial_program;
@@ -52,7 +53,6 @@ private:
     QPushButton* m_reset_button;
 
     std::vector<QSerialPortInfo> m_ports;
-    BotBaseHandle m_connection;
 };
 
 

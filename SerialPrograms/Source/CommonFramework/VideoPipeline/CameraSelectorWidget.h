@@ -12,7 +12,7 @@
 #include <mutex>
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CameraSelector.h"
+#include "CameraOption.h"
 
 class QComboBox;
 class QPushButton;
@@ -36,7 +36,7 @@ public:
     CameraSelectorWidget(
         QWidget& parent,
         LoggerQt& logger,
-        CameraSelector& value,
+        CameraOption& value,
         VideoDisplayWidget& holder
     );
     ~CameraSelectorWidget();
@@ -67,7 +67,7 @@ private:
 
 private:
     LoggerQt& m_logger;
-    CameraSelector& m_value;
+    CameraOption& m_value;
 
     VideoDisplayWidget& m_display;
     std::vector<QSize> m_resolutions;

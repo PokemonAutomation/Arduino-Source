@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include "Integrations/ProgramTracker.h"
+#include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
@@ -64,7 +65,9 @@ private:
 
     CollapsibleGroupBox* m_group_box;
 
-    SerialSelectorWidget* m_serial;
+    SerialPortSession m_serial;
+    SerialPortWidget* m_serial_widget;
+
     CommandRow* m_command;
     CameraSelectorWidget* m_camera;
     AudioSelectorWidget* m_audio;

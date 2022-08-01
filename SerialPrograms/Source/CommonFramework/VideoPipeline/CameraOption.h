@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_CameraSelector_H
-#define PokemonAutomation_VideoPipeline_CameraSelector_H
+#ifndef PokemonAutomation_VideoPipeline_CameraOption_H
+#define PokemonAutomation_VideoPipeline_CameraOption_H
 
 #include <QSize>
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -21,17 +21,17 @@ class VideoDisplayWidget;
 
 class CameraSelectorWidget;
 
-// Handles the state of video selection: video source and resolution.
-// Call make_ui() to generate the UI friend class CameraSelectorWidget,
-// which directly modifies CameraSelector's internal state.
-// This separates state from UI.
-class CameraSelector{
+//  Handles the state of video selection: video source and resolution.
+//  Call make_ui() to generate the UI friend class CameraSelectorWidget,
+//  which directly modifies CameraOption's internal state.
+//  This separates state from UI.
+class CameraOption{
     static const std::string JSON_CAMERA;
     static const std::string JSON_RESOLUTION;
 
 public:
-    CameraSelector(QSize default_resolution);
-    CameraSelector(QSize default_resolution, const JsonValue& json);
+    CameraOption(QSize default_resolution);
+    CameraOption(QSize default_resolution, const JsonValue& json);
 
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
