@@ -35,7 +35,7 @@ std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
 std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return std::make_unique<CameraHolder>(logger, info, desired_resolution);
 }
@@ -50,7 +50,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return new VideoWidget(&parent, logger, info, desired_resolution);
 }
@@ -60,7 +60,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
 
 CameraHolder::CameraHolder(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : m_logger(logger)
     , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
@@ -74,7 +74,7 @@ CameraHolder::CameraHolder(
     m_camera->start();
 
     for (const auto& size : m_camera->supportedViewfinderResolutions()){
-        m_supported_resolutions.emplace_back(size);
+        m_supported_resolutions.emplace_back(size.width(), size.height());
     }
 
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
@@ -83,19 +83,22 @@ CameraHolder::CameraHolder(
     if (0 < m_max_frame_rate){
         m_frame_period = std::chrono::milliseconds((uint64_t)(1.0 / m_max_frame_rate * 1000));
     }
-    m_current_resolution = settings.resolution();
+    {
+        QSize resolution = settings.resolution();
+        m_current_resolution = Resolution(resolution.width(), resolution.height());
+    }
 
 
     //  Check if we can apply the recommended resolution.
-    QSize new_resolution = m_current_resolution;
-    for (const QSize& size : m_supported_resolutions){
+    Resolution new_resolution = m_current_resolution;
+    for (const Resolution& size : m_supported_resolutions){
         if (size == desired_resolution){
             new_resolution = desired_resolution;
             break;
         }
     }
     if (m_current_resolution != new_resolution){
-        settings.setResolution(new_resolution);
+        settings.setResolution(QSize(new_resolution.width, new_resolution.height));
         m_camera->setViewfinderSettings(settings);
         m_current_resolution = new_resolution;
     }
@@ -149,13 +152,14 @@ CameraHolder::~CameraHolder(){
     std::unique_lock<std::mutex> lg(m_state_lock);
     m_cv.wait(lg, [=]{ return m_stopped; });
 }
-void CameraHolder::set_resolution(const QSize& size){
+void CameraHolder::set_resolution(const Resolution& size){
     std::unique_lock<std::mutex> lg(m_state_lock);
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    if (settings.resolution() == size){
+    QSize resolution = settings.resolution();
+    if (Resolution(resolution.width(), resolution.height()) == size){
         return;
     }
-    settings.setResolution(size);
+    settings.setResolution(QSize(size.width, size.height));
     m_camera->setViewfinderSettings(settings);
     m_current_resolution = size;
 }
@@ -327,7 +331,7 @@ VideoWidget::VideoWidget(QWidget* parent, CameraHolder& camera)
 VideoWidget::VideoWidget(
     QWidget* parent,
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
@@ -364,27 +368,6 @@ VideoWidget::~VideoWidget(){
     m_backing.reset();
     m_thread.quit();
     m_thread.wait();
-}
-QSize VideoWidget::current_resolution() const{
-    if (!m_holder){
-        return QSize();
-    }
-    return m_holder->current_resolution();
-}
-std::vector<QSize> VideoWidget::supported_resolutions() const{
-    if (!m_holder){
-        return std::vector<QSize>();
-    }
-    return m_holder->supported_resolutions();
-}
-void VideoWidget::set_resolution(const QSize& size){
-    emit internal_set_resolution(size);
-}
-VideoSnapshot VideoWidget::snapshot(){
-    if (!m_holder){
-        return VideoSnapshot{QImage(), current_time()};
-    }
-    return m_holder->snapshot();
 }
 void VideoWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);

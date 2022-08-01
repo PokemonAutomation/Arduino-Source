@@ -10,6 +10,7 @@
 #include <functional>
 #include <deque>
 #include <set>
+#include "Common/Cpp/ImageResolution.h"
 #include "VideoFeed.h"
 #include "VideoOverlay.h"
 #include "VideoWidget.h"
@@ -39,9 +40,9 @@ public:
     //  Set video using a factory lambda. The video is constructed using this class as the parent.
     void set_video(std::function<VideoWidget*(QWidget& parent)> video_factory);
 
-    QSize resolution() const;
-    std::vector<QSize> resolutions() const;
-    void set_resolution(const QSize& resolution);
+    Resolution resolution() const;
+    std::vector<Resolution> resolutions() const;
+    void set_resolution(const Resolution& resolution);
 
     VideoSnapshot snapshot();
 
@@ -49,7 +50,7 @@ private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;
     virtual void remove_box(const ImageFloatBox& box) override;
 
-    void update_size(QSize resolution = QSize());
+    void update_size(Resolution resolution = Resolution());
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:

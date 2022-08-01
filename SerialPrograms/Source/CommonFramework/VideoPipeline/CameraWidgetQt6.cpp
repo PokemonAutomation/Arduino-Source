@@ -45,7 +45,7 @@ std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
 std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return std::make_unique<Camera>(logger, info, desired_resolution);
 }
@@ -60,7 +60,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return new VideoWidget2(&parent, logger, info, desired_resolution);
 }
@@ -69,7 +69,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
 
 Camera::Camera(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : m_logger(logger)
     , m_last_frame_seqnum(0)
@@ -138,12 +138,14 @@ Camera::Camera(
     }
 
     for (const auto& format : m_formats){
-        m_resolutions.emplace_back(format.resolution());
+        QSize resolution = format.resolution();
+        m_resolutions.emplace_back(Resolution(resolution.width(), resolution.height()));
     }
 
     //  Check if we can apply the recommended resolution.
     for (const auto& format : m_formats){
-        if (format.resolution() == desired_resolution){
+        QSize resolution = format.resolution();
+        if (Resolution(resolution.width(), resolution.height()) == desired_resolution){
             m_camera->setCameraFormat(format);
             break;
         }
@@ -162,29 +164,32 @@ void Camera::remove_listener(Listener& listener){
     m_listeners.erase(&listener);
 }
 
-QSize Camera::current_resolution() const{
+Resolution Camera::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
-        return QSize();
+        return Resolution();
     }
-    return m_camera->cameraFormat().resolution();
+    QSize size = m_camera->cameraFormat().resolution();
+    return Resolution(size.width(), size.height());
 }
-std::vector<QSize> Camera::supported_resolutions() const{
+std::vector<Resolution> Camera::supported_resolutions() const{
     std::lock_guard<std::mutex> lg(m_lock);
     return m_resolutions;
 }
-void Camera::set_resolution(const QSize& size){
+void Camera::set_resolution(const Resolution& size){
 //    cout << "set_resolution(): " << size.width() << " x " << size.height() << endl;
     std::lock_guard<std::mutex> lg(m_lock);
     {
         const QCameraFormat format = m_camera->cameraFormat();
-        if (format.resolution() == size){
+        QSize resolution = format.resolution();
+        if (Resolution(resolution.width(), resolution.height()) == size){
             return;
         }
     }
     bool formatSet = false;
     for(const auto& format : m_formats){
-        if (format.resolution() == size){
+        QSize resolution = format.resolution();
+        if (Resolution(resolution.width(), resolution.height()) == size){
             m_camera->stop();
             m_camera->setCameraFormat(format);
             m_camera->start();
@@ -194,7 +199,7 @@ void Camera::set_resolution(const QSize& size){
     }
     if (formatSet == false){
         m_logger.log(
-            "Camera doesn't support: " + std::to_string(size.width()) + " x " + std::to_string(size.height()),
+            "Camera doesn't support: " + std::to_string(size.width) + " x " + std::to_string(size.height),
             COLOR_RED
         );
     }
@@ -267,7 +272,7 @@ VideoWidget2::VideoWidget2(QWidget* parent, Camera& camera)
 VideoWidget2::VideoWidget2(
     QWidget* parent,
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : PokemonAutomation::VideoWidget(parent)
     , m_backing(new Camera(logger, info, desired_resolution))
@@ -288,18 +293,6 @@ VideoWidget2::~VideoWidget2(){
     m_camera.remove_listener(*this);
 }
 
-QSize VideoWidget2::current_resolution() const{
-    return m_camera.current_resolution();
-}
-std::vector<QSize> VideoWidget2::supported_resolutions() const{
-    return m_camera.supported_resolutions();
-}
-void VideoWidget2::set_resolution(const QSize& size){
-    m_camera.set_resolution(size);
-}
-VideoSnapshot VideoWidget2::snapshot(){
-    return m_camera.snapshot();
-}
 void VideoWidget2::new_frame_available(){
     this->update();
 }

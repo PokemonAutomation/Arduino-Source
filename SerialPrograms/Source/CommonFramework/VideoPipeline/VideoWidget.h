@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <QWidget>
+#include "Common/Cpp/ImageResolution.h"
 #include "VideoFeed.h"
 
 namespace PokemonAutomation{
@@ -20,9 +21,9 @@ public:
 
     //  Everything here needs to be thread-safe.
 
-    virtual QSize current_resolution() const = 0;
-    virtual std::vector<QSize> supported_resolutions() const = 0;
-    virtual void set_resolution(const QSize& size) = 0;
+    virtual Resolution current_resolution() const = 0;
+    virtual std::vector<Resolution> supported_resolutions() const = 0;
+    virtual void set_resolution(const Resolution& size) = 0;
 
     //  This snapshot function will be called asynchronously from many threads
     //  at a very high rate. It is advised to cache snapshots if the video frame
@@ -43,21 +44,6 @@ public:
 
     //  Get the camera associated with this VideoWidget.
     virtual Camera& camera() = 0;
-
-    //  These will be called from the UI thread.
-    virtual QSize current_resolution() const = 0;
-    virtual std::vector<QSize> supported_resolutions() const = 0;
-    virtual void set_resolution(const QSize& size) = 0;
-
-    //  This snapshot function will be called asynchronously from many threads
-    //  at a very high rate. So it needs to be thread-safe with both itself
-    //  and all the functions above and should cache the image if there has been
-    //  no new frames since the previous call.
-    //  This function will never be called on the UI thread.
-    //
-    //  If "timestamp" is not null, it will be set to the best known timestamp
-    //  of the screenshot that is returned.
-    virtual VideoSnapshot snapshot() = 0;
 };
 
 

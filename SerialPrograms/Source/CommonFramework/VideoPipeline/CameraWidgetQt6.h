@@ -37,7 +37,7 @@ public:
     virtual std::unique_ptr<Camera> make_camera(
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const override;
 
     virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const override;
@@ -46,7 +46,7 @@ public:
         QWidget& parent,
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const override;
 };
 
@@ -60,7 +60,7 @@ public:
 public:
     Camera(
         Logger& logger,
-        const CameraInfo& info, const QSize& desired_resolution
+        const CameraInfo& info, const Resolution& desired_resolution
     );
     virtual ~Camera();
 
@@ -70,9 +70,9 @@ public:
 public:
     //  These are all thread-safe.
 
-    virtual QSize current_resolution() const override;
-    virtual std::vector<QSize> supported_resolutions() const override;
-    virtual void set_resolution(const QSize& size) override;
+    virtual Resolution current_resolution() const override;
+    virtual std::vector<Resolution> supported_resolutions() const override;
+    virtual void set_resolution(const Resolution& size) override;
 
     QVideoFrame latest_frame();
     virtual VideoSnapshot snapshot() override;
@@ -81,7 +81,7 @@ private:
     friend class VideoWidget2;
 
     Logger& m_logger;
-    std::vector<QSize> m_resolutions;
+    std::vector<Resolution> m_resolutions;
 
     QCameraDevice m_info;
     QCamera* m_camera = nullptr;
@@ -113,17 +113,11 @@ public:
     VideoWidget2(
         QWidget* parent,
         Logger& logger,
-        const CameraInfo& info, const QSize& desired_resolution
+        const CameraInfo& info, const Resolution& desired_resolution
     );
     virtual ~VideoWidget2();
 
     virtual Camera& camera() override{ return m_camera; }
-
-    virtual QSize current_resolution() const override;
-    virtual std::vector<QSize> supported_resolutions() const override;
-    virtual void set_resolution(const QSize& size) override;
-
-    virtual VideoSnapshot snapshot() override;
 
 private:
     virtual void new_frame_available() override;

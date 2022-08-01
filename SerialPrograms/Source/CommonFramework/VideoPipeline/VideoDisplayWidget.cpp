@@ -52,30 +52,30 @@ void VideoDisplayWidget::set_video(std::function<VideoWidget*(QWidget& parent)> 
     update_size();
 }
 
-QSize VideoDisplayWidget::resolution() const{
+Resolution VideoDisplayWidget::resolution() const{
     if (m_video == nullptr){
-        return QSize();
+        return Resolution();
     }
-    return m_video->current_resolution();
+    return m_video->camera().current_resolution();
 }
-std::vector<QSize> VideoDisplayWidget::resolutions() const{
+std::vector<Resolution> VideoDisplayWidget::resolutions() const{
     if (m_video == nullptr){
         return {};
     }
-    return m_video->supported_resolutions();
+    return m_video->camera().supported_resolutions();
 }
-void VideoDisplayWidget::set_resolution(const QSize& resolution){
+void VideoDisplayWidget::set_resolution(const Resolution& resolution){
     if (m_video == nullptr){
         return;
     }
-    m_video->set_resolution(resolution);
+    m_video->camera().set_resolution(resolution);
     update_size(resolution);
 }
 VideoSnapshot VideoDisplayWidget::snapshot(){
     if (m_video == nullptr){
         return VideoSnapshot();
     }
-    return m_video->snapshot();
+    return m_video->camera().snapshot();
 }
 
 
@@ -89,19 +89,19 @@ void VideoDisplayWidget::remove_box(const ImageFloatBox& box){
 
 
 
-void VideoDisplayWidget::update_size(QSize resolution){
+void VideoDisplayWidget::update_size(Resolution resolution){
     if (m_video == nullptr){
         this->setFixedHeight(45);
         return;
     }
     int width = this->width();
     double aspect_ratio = 16. / 9;
-    if (!resolution.isValid()){
-        resolution = m_video->current_resolution();
+    if (!resolution){
+        resolution = m_video->camera().current_resolution();
     }
 //    cout << "resolution: " << resolution.width() << " x " << resolution.height() << endl;
-    if (resolution.isValid()){
-        aspect_ratio = (double)resolution.height() / resolution.width();
+    if (resolution){
+        aspect_ratio = (double)resolution.height / resolution.width;
         int height = (int)(width * aspect_ratio);
         this->setFixedHeight(height);
     }

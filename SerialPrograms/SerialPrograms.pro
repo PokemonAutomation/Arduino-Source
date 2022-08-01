@@ -78,6 +78,7 @@ SOURCES += \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
+    ../Common/Cpp/ImageResolution.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
     ../Common/Cpp/Json/JsonTools.cpp \
@@ -745,6 +746,7 @@ HEADERS += \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/FixedLimitVector.tpp \
+    ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
     ../Common/Cpp/Json/JsonTools.h \

@@ -11,6 +11,7 @@
 #include <atomic>
 #include <mutex>
 #include <QWidget>
+#include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CameraOption.h"
 
@@ -63,14 +64,13 @@ signals:
 
 private:
     void refresh();
-    static std::string aspect_ratio(const QSize& size);
 
 private:
     LoggerQt& m_logger;
     CameraOption& m_value;
 
     VideoDisplayWidget& m_display;
-    std::vector<QSize> m_resolutions;
+    std::vector<Resolution> m_resolutions;
 
     QComboBox* m_camera_box;
     QComboBox* m_resolution_box;

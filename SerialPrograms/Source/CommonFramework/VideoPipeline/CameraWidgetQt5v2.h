@@ -40,7 +40,7 @@ public:
     virtual std::unique_ptr<Camera> make_camera(
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const override;
 
     virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const override;
@@ -49,7 +49,7 @@ public:
         QWidget& parent,
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const override;
 };
 
@@ -62,17 +62,17 @@ class CameraHolder : public QObject, public PokemonAutomation::Camera{
 public:
     CameraHolder(
         Logger& logger,
-        const CameraInfo& info, const QSize& desired_resolution
+        const CameraInfo& info, const Resolution& desired_resolution
     );
     virtual ~CameraHolder();
 
-    virtual QSize current_resolution() const override{ return m_current_resolution; }
-    virtual std::vector<QSize> supported_resolutions() const override{ return m_supported_resolutions; }
+    virtual Resolution current_resolution() const override{ return m_current_resolution; }
+    virtual std::vector<Resolution> supported_resolutions() const override{ return m_supported_resolutions; }
 
     virtual VideoSnapshot snapshot() override;
 
 public slots:
-    virtual void set_resolution(const QSize& size) override;
+    virtual void set_resolution(const Resolution& size) override;
 
 signals:
     void stop();
@@ -101,8 +101,8 @@ private:
 
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
-    std::vector<QSize> m_supported_resolutions;
-    QSize m_current_resolution;
+    std::vector<Resolution> m_supported_resolutions;
+    Resolution m_current_resolution;
 
     QVideoProbe* m_probe = nullptr;
 
@@ -130,23 +130,15 @@ public:
     VideoWidget(
         QWidget* parent,
         Logger& logger,
-        const CameraInfo& info, const QSize& desired_resolution
+        const CameraInfo& info, const Resolution& desired_resolution
     );
     virtual ~VideoWidget();
 
     virtual Camera& camera() override{ return *m_holder; }
-
-    virtual QSize current_resolution() const override;
-    virtual std::vector<QSize> supported_resolutions() const override;
-    virtual void set_resolution(const QSize& size) override;
-
-    //  Cannot call from UI thread or it will deadlock.
-    virtual VideoSnapshot snapshot() override;
-
     virtual void resizeEvent(QResizeEvent* event) override;
 
 signals:
-    void internal_set_resolution(const QSize& size);
+    void internal_set_resolution(const Resolution& size);
 
 private:
 //    mutable std::mutex m_lock;

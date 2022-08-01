@@ -77,7 +77,7 @@ CameraSelectorWidget::CameraSelectorWidget(
             if (index < 0 || index >= (int)m_resolutions.size()){
                 return;
             }
-            QSize resolution = m_resolutions[index];
+            Resolution resolution = m_resolutions[index];
             m_value.m_current_resolution = resolution;
             m_display.set_resolution(resolution);
         }
@@ -118,31 +118,6 @@ void CameraSelectorWidget::refresh(){
         m_camera_box->setCurrentIndex(0);
     }
 }
-std::string CameraSelectorWidget::aspect_ratio(const QSize& size){
-    int w = size.width();
-    int h = size.height();
-    if (w <= 0 || h <= 0){
-        return "";
-    }
-    int gcd;
-    while (true){
-        if (h == 0){
-            gcd = w;
-            break;
-        }
-        w %= h;
-        if (w == 0){
-            gcd = h;
-            break;
-        }
-        h %= w;
-    }
-    w = size.width();
-    h = size.height();
-    w /= gcd;
-    h /= gcd;
-    return "(" + std::to_string(w) + ":" + std::to_string(h) + ")";
-}
 
 
 
@@ -156,7 +131,7 @@ void CameraSelectorWidget::reset_video(){
         m_display.set_video(make_video_factory(m_logger, info, m_value.m_current_resolution));
     }
 
-    QSize resolution = m_display.resolution();
+    Resolution resolution = m_display.resolution();
 
     //  Update resolutions dropdown.
     m_resolution_box->clear();
@@ -165,10 +140,12 @@ void CameraSelectorWidget::reset_video(){
     int index = -1;
     bool resolution_match = false;
     for (int c = 0; c < (int)m_resolutions.size(); c++){
-        const QSize& size = m_resolutions[c];
+        const Resolution& size = m_resolutions[c];
         m_resolution_box->addItem(
             QString::fromStdString(
-                std::to_string(size.width()) + " x " + std::to_string(size.height()) + " " + aspect_ratio(size)
+                std::to_string(size.width) + " x " +
+                std::to_string(size.height) + " " +
+                aspect_ratio_as_string(size)
             )
         );
         if (size == m_value.m_current_resolution){

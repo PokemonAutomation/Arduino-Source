@@ -74,14 +74,14 @@ std::string get_camera_name(const CameraInfo& info){
 }
 std::unique_ptr<Camera> make_camera(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 ){
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.make_camera(logger, info, desired_resolution);
 }
 std::function<VideoWidget*(QWidget& parent)> make_video_factory(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 ){
     return [&](QWidget& parent){
         const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;

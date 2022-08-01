@@ -33,7 +33,7 @@ std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
 std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return std::make_unique<Camera>(logger, info, desired_resolution);
 }
@@ -48,7 +48,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
     Logger& logger,
     const CameraInfo& info,
-    const QSize& desired_resolution
+    const Resolution& desired_resolution
 ) const{
     return new VideoWidget2(&parent, logger, info, desired_resolution);
 }
@@ -57,7 +57,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
 
 Camera::Camera(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : m_logger(logger)
     , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
@@ -88,7 +88,7 @@ Camera::Camera(
     m_camera->start();
 
     for (const auto& size : m_camera->supportedViewfinderResolutions()){
-        m_resolutions.emplace_back(size);
+        m_resolutions.emplace_back(Resolution(size.width(), size.height()));
     }
 
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
@@ -97,22 +97,25 @@ Camera::Camera(
     if (0 < m_max_frame_rate){
         m_frame_period = std::chrono::milliseconds((uint64_t)(1.0 / m_max_frame_rate * 1000));
     }
-    m_resolution = settings.resolution();
+    {
+        QSize resolution = settings.resolution();
+        m_resolution = Resolution(resolution.width(), resolution.height());
+    }
 
 //    cout << "min = " << settings.minimumFrameRate() << endl;
 //    cout << "max = " << settings.maximumFrameRate() << endl;
 
 
     //  Check if we can apply the recommended resolution.
-    QSize new_resolution = m_resolution;
-    for (const QSize& size : m_resolutions){
+    Resolution new_resolution = m_resolution;
+    for (const Resolution& size : m_resolutions){
         if (size == desired_resolution){
             new_resolution = desired_resolution;
             break;
         }
     }
     if (m_resolution != new_resolution){
-        settings.setResolution(new_resolution);
+        settings.setResolution(QSize(new_resolution.width, new_resolution.height));
         m_camera->setViewfinderSettings(settings);
         m_resolution = new_resolution;
     }
@@ -146,24 +149,26 @@ void Camera::remove_listener(Listener& listener){
 }
 #endif
 
-QSize Camera::current_resolution() const{
+Resolution Camera::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
-        return QSize();
+        return Resolution();
     }
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    return settings.resolution();
+    QSize resolution = settings.resolution();
+    return Resolution(resolution.width(), resolution.height());
 }
-std::vector<QSize> Camera::supported_resolutions() const{
+std::vector<Resolution> Camera::supported_resolutions() const{
     return m_resolutions;
 }
-void Camera::set_resolution(const QSize& size){
+void Camera::set_resolution(const Resolution& size){
     std::lock_guard<std::mutex> lg(m_lock);
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    if (settings.resolution() == size){
+    QSize resolution = settings.resolution();
+    if (Resolution(resolution.width(), resolution.height()) == size){
         return;
     }
-    settings.setResolution(size);
+    settings.setResolution(QSize(size.width, size.height));
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
@@ -339,7 +344,7 @@ VideoWidget2::VideoWidget2(QWidget* parent, Camera& camera)
 VideoWidget2::VideoWidget2(
     QWidget* parent,
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 )
     : PokemonAutomation::VideoWidget(parent)
     , m_backing(new Camera(logger, info, desired_resolution))
@@ -366,18 +371,6 @@ VideoWidget2::~VideoWidget2(){
 //    m_camera.remove_listener(*this);
 }
 
-QSize VideoWidget2::current_resolution() const{
-    return m_camera.current_resolution();
-}
-std::vector<QSize> VideoWidget2::supported_resolutions() const{
-    return m_camera.supported_resolutions();
-}
-void VideoWidget2::set_resolution(const QSize& size){
-    m_camera.set_resolution(size);
-}
-VideoSnapshot VideoWidget2::snapshot(){
-    return m_camera.snapshot();
-}
 
 
 

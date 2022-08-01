@@ -32,7 +32,7 @@ public:
     virtual std::unique_ptr<Camera> make_camera(
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const = 0;
 
     virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const = 0;
@@ -41,7 +41,7 @@ public:
         QWidget& parent,
         Logger& logger,
         const CameraInfo& info,
-        const QSize& desired_resolution
+        const Resolution& desired_resolution
     ) const = 0;
 
     virtual ~CameraBackend() {}
@@ -54,11 +54,11 @@ std::string get_camera_name(const CameraInfo& info);
 
 std::unique_ptr<Camera> make_camera(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 );
 std::function<VideoWidget*(QWidget& parent)> make_video_factory(
     Logger& logger,
-    const CameraInfo& info, const QSize& desired_resolution
+    const CameraInfo& info, const Resolution& desired_resolution
 );
 
 

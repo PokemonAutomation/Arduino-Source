@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_VideoPipeline_CameraOption_H
 #define PokemonAutomation_VideoPipeline_CameraOption_H
 
-#include <QSize>
+#include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
 
@@ -30,8 +30,8 @@ class CameraOption{
     static const std::string JSON_RESOLUTION;
 
 public:
-    CameraOption(QSize default_resolution);
-    CameraOption(QSize default_resolution, const JsonValue& json);
+    CameraOption(Resolution default_resolution);
+    CameraOption(Resolution default_resolution, const JsonValue& json);
 
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
@@ -42,9 +42,9 @@ private:
     friend class CameraSession;
     friend class CameraSelectorWidget;
 
-    const QSize m_default_resolution;
+    const Resolution m_default_resolution;
     CameraInfo m_camera;
-    QSize m_current_resolution;
+    Resolution m_current_resolution;
 };
 
 

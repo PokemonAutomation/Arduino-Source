@@ -90,6 +90,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonTools.h
     ../Common/Cpp/Json/JsonValue.cpp
     ../Common/Cpp/Json/JsonValue.h
+    ../Common/Cpp/ImageResolution.cpp
+    ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/PanicDump.cpp

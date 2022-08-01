@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_Settings_H
 #define PokemonAutomation_NintendoSwitch_Settings_H
 
-#include <QSize>
+#include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-extern const QSize DEFAULT_RESOLUTION;
+extern const Resolution DEFAULT_RESOLUTION;
 
 
 
