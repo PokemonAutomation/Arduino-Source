@@ -116,6 +116,9 @@ SwitchSystemWidget::SwitchSystemWidget(
 SwitchSystemWidget::~SwitchSystemWidget(){
     ProgramTracker::instance().remove_console(m_instance_id);
     m_serial_widget->stop();
+
+    //  Force delete this early so it detaches from "m_serial" before that is destructed.
+    delete m_serial_widget;
 }
 ProgramState SwitchSystemWidget::last_known_state() const{
     return m_command->last_known_state();

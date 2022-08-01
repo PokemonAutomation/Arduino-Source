@@ -66,7 +66,7 @@ private:
     CollapsibleGroupBox* m_group_box;
 
     SerialPortSession m_serial;
-    SerialPortWidget* m_serial_widget;
+    SerialPortWidget* m_serial_widget = nullptr;
 
     CommandRow* m_command;
     CameraSelectorWidget* m_camera;

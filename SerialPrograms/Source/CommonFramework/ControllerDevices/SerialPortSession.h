@@ -8,6 +8,7 @@
 #define PokemonAutomation_SerialPortSession_H
 
 #include <set>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "ClientSource/Connection/MessageLogger.h"
 #include "SerialPortOption.h"
@@ -54,6 +55,8 @@ private:
 
     std::mutex m_lock;
     std::set<Listener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 
