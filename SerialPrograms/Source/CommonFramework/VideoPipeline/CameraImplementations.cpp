@@ -12,7 +12,6 @@
 #include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
 #include "CameraWidgetQt5v2.h"
-#include "CameraWidgetQt5CustomFrame.h"
 #elif QT_VERSION_MAJOR == 6
 #include "CameraWidgetQt6.h"
 #endif
@@ -31,9 +30,6 @@ struct CameraBackends{
 #if QT_VERSION_MAJOR == 5
         m_backends.emplace_back("Qt5: QCameraViewfinder",                   new CameraQt5QCameraViewfinder::CameraBackend());
         m_backends.emplace_back("Qt5: QCameraViewfinder (separate thread)", new CameraQt5QCameraViewfinderSeparateThread::CameraBackend());
-        if (PreloadSettings::instance().DEVELOPER_MODE){
-            m_backends.emplace_back("Qt5: Custom Frame", new CameraQt5CustomFrame::CameraBackend());
-        }
 #endif
 #if QT_VERSION_MAJOR == 6
         m_backends.emplace_back("Qt6: QVideoSink",                          new CameraQt6QVideoSink::CameraBackend());
@@ -76,8 +72,15 @@ std::string get_camera_name(const CameraInfo& info){
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.get_camera_name(info);
 }
+std::unique_ptr<Camera> make_camera(
+    Logger& logger,
+    const CameraInfo& info, const QSize& desired_resolution
+){
+    const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
+    return backend.make_camera(logger, info, desired_resolution);
+}
 std::function<VideoWidget*(QWidget& parent)> make_video_factory(
-    LoggerQt& logger,
+    Logger& logger,
     const CameraInfo& info, const QSize& desired_resolution
 ){
     return [&](QWidget& parent){

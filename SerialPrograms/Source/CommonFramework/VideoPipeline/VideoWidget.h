@@ -41,6 +41,9 @@ public:
     using QWidget::QWidget;
     virtual ~VideoWidget() = default;
 
+    //  Get the camera associated with this VideoWidget.
+    virtual Camera& camera() = 0;
+
     //  These will be called from the UI thread.
     virtual QSize current_resolution() const = 0;
     virtual std::vector<QSize> supported_resolutions() const = 0;

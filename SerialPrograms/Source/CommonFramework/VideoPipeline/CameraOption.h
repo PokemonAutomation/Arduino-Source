@@ -39,7 +39,9 @@ public:
     CameraSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder);
 
 private:
+    friend class CameraSession;
     friend class CameraSelectorWidget;
+
     const QSize m_default_resolution;
     CameraInfo m_camera;
     QSize m_current_resolution;

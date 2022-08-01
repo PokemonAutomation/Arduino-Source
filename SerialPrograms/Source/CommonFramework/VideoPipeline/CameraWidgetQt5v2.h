@@ -36,9 +36,18 @@ class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
     virtual std::vector<CameraInfo> get_all_cameras() const override;
     virtual std::string get_camera_name(const CameraInfo& info) const override;
+
+    virtual std::unique_ptr<Camera> make_camera(
+        Logger& logger,
+        const CameraInfo& info,
+        const QSize& desired_resolution
+    ) const override;
+
+    virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const override;
+
     virtual VideoWidget* make_video_widget(
         QWidget& parent,
-        LoggerQt& logger,
+        Logger& logger,
         const CameraInfo& info,
         const QSize& desired_resolution
     ) const override;
@@ -52,7 +61,7 @@ class CameraHolder : public QObject, public PokemonAutomation::Camera{
     Q_OBJECT
 public:
     CameraHolder(
-        LoggerQt& logger,
+        Logger& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~CameraHolder();
@@ -82,7 +91,7 @@ private:
 private:
     friend class VideoWidget;
 
-    LoggerQt& m_logger;
+    Logger& m_logger;
     QCamera* m_camera = nullptr;
     CameraScreenshotter m_screenshotter;
 
@@ -117,12 +126,16 @@ private:
 class VideoWidget : public PokemonAutomation::VideoWidget{
     Q_OBJECT
 public:
+    VideoWidget(QWidget* parent, CameraHolder& camera);
     VideoWidget(
         QWidget* parent,
-        LoggerQt& logger,
+        Logger& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~VideoWidget();
+
+    virtual Camera& camera() override{ return *m_holder; }
+
     virtual QSize current_resolution() const override;
     virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
@@ -138,8 +151,9 @@ signals:
 private:
 //    mutable std::mutex m_lock;
 
-    LoggerQt& m_logger;
-    std::unique_ptr<CameraHolder> m_holder;
+    Logger& m_logger;
+    std::unique_ptr<CameraHolder> m_backing;
+    CameraHolder* m_holder = nullptr;
     QThread m_thread;
 
     QCameraViewfinder* m_camera_view = nullptr;

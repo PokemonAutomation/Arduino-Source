@@ -14,6 +14,7 @@
 #include <QCameraImageCapture>
 #include <QCameraViewfinder>
 #include <QVideoProbe>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "VideoToolsQt5.h"
@@ -31,9 +32,23 @@ std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
 std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
     return qt5_get_camera_name(info);
 }
+std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
+    Logger& logger,
+    const CameraInfo& info,
+    const QSize& desired_resolution
+) const{
+    return std::make_unique<CameraHolder>(logger, info, desired_resolution);
+}
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(QWidget& parent, PokemonAutomation::Camera& camera) const{
+    CameraHolder* casted = dynamic_cast<CameraHolder*>(&camera);
+    if (casted == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching camera session/widget types.");
+    }
+    return new VideoWidget(&parent, *casted);
+}
 PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
-    LoggerQt& logger,
+    Logger& logger,
     const CameraInfo& info,
     const QSize& desired_resolution
 ) const{
@@ -44,7 +59,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
 
 
 CameraHolder::CameraHolder(
-    LoggerQt& logger,
+    Logger& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
     : m_logger(logger)
@@ -279,24 +294,19 @@ VideoSnapshot CameraHolder::snapshot(){
 
 
 
-VideoWidget::VideoWidget(
-    QWidget* parent,
-    LoggerQt& logger,
-    const CameraInfo& info, const QSize& desired_resolution
-)
+VideoWidget::VideoWidget(QWidget* parent, CameraHolder& camera)
     : PokemonAutomation::VideoWidget(parent)
-    , m_logger(logger)
+    , m_logger(camera.m_logger)
+    , m_holder(&camera)
 {
-    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinderSeparateThread");
-    if (!info){
+    m_logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinderSeparateThread");
+    if (camera.m_camera == nullptr){
         return;
     }
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
-
-    m_holder = std::make_unique<CameraHolder>(logger, info, desired_resolution);
 
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);
@@ -311,11 +321,47 @@ VideoWidget::VideoWidget(
 
     connect(
         this, &VideoWidget::internal_set_resolution,
-        m_holder.get(), &CameraHolder::set_resolution
+        m_holder, &CameraHolder::set_resolution
+    );
+}
+VideoWidget::VideoWidget(
+    QWidget* parent,
+    Logger& logger,
+    const CameraInfo& info, const QSize& desired_resolution
+)
+    : PokemonAutomation::VideoWidget(parent)
+    , m_logger(logger)
+{
+    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinderSeparateThread");
+    if (!info){
+        return;
+    }
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setAlignment(Qt::AlignTop);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    m_backing = std::make_unique<CameraHolder>(logger, info, desired_resolution);
+    m_holder = m_backing.get();
+
+    m_camera_view = new QCameraViewfinder(this);
+    layout->addWidget(m_camera_view);
+    m_camera_view->setMinimumSize(80, 45);
+    m_holder->m_camera->setViewfinder(m_camera_view);
+//    m_holder->m_camera->setViewfinder((QVideoWidget*)nullptr);
+
+    m_holder->moveToThread(&m_thread);
+//    connect(&m_thread, &QThread::finished, m_holder.get(), &QObject::deleteLater);
+    m_thread.start();
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_thread);
+
+    connect(
+        this, &VideoWidget::internal_set_resolution,
+        m_holder, &CameraHolder::set_resolution
     );
 }
 VideoWidget::~VideoWidget(){
-    m_holder.reset();
+    m_backing.reset();
     m_thread.quit();
     m_thread.wait();
 }
