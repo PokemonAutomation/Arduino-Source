@@ -120,6 +120,7 @@ SerialPortWidget::SerialPortWidget(
         }
     );
 
+    m_serial_program->setText(QString::fromStdString(m_session.botbase().label()));
     m_session.add_listener(*this);
 }
 SerialPortWidget::~SerialPortWidget(){

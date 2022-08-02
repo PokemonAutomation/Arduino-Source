@@ -38,6 +38,7 @@ BotBaseHandle::BotBaseHandle(
     , m_current_pabotbase(PABotBaseLevel::NOT_PABOTBASE)
     , m_state(State::NOT_CONNECTED)
     , m_allow_user_commands(true)
+    , m_label("<font color=\"red\">Not Connected</font>")
 {
     reset(port);
 }
@@ -58,6 +59,10 @@ BotBaseHandle::State BotBaseHandle::state() const{
 bool BotBaseHandle::accepting_commands() const{
     return state() == State::READY &&
         m_current_pabotbase.load(std::memory_order_acquire) > PABotBaseLevel::NOT_PABOTBASE;
+}
+std::string BotBaseHandle::label() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_label;
 }
 
 void BotBaseHandle::set_allow_user_commands(bool allow){
@@ -160,6 +165,7 @@ void BotBaseHandle::stop_unprotected(){
     }
 
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
+    m_label = "<font color=\"red\">Not Connected</font>";
     emit on_not_connected("");
 }
 void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
@@ -183,8 +189,10 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
             "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
             "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
         );
-        emit on_not_connected(html_color_text("Cannot connect to Prolific controller.", COLOR_RED));
-        m_logger.log("Unable to connect due to Prolific controller.");
+        std::string text = "Cannot connect to Prolific controller.";
+        m_logger.log(text, COLOR_RED);
+        m_label = html_color_text(text, COLOR_RED);
+        emit on_not_connected(m_label);
         return;
     }
 
@@ -199,9 +207,11 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
     }
     if (error.empty()){
         m_state.store(State::CONNECTING, std::memory_order_release);
+        m_label = "<font color=\"green\">Connecting...</font>";
         emit on_connecting();
     }else{
-        emit on_not_connected(html_color_text("Unable to open port.", COLOR_RED));
+        m_label = html_color_text("Unable to open port.", COLOR_RED);
+        emit on_not_connected(m_label);
 //        m_logger.log(error, Color());
         return;
     }
@@ -257,6 +267,7 @@ void BotBaseHandle::thread_body(){
             m_botbase->connect();
         }catch (InvalidConnectionStateException&){
             m_botbase->stop();
+            m_label = "";
             emit on_stopped("");
             return;
         }catch (SerialProtocolException& e){
@@ -264,7 +275,8 @@ void BotBaseHandle::thread_body(){
         }
         if (!error.empty()){
             m_botbase->stop();
-            emit on_stopped(html_color_text(error, COLOR_RED));
+            m_label = html_color_text(error, COLOR_RED);
+            emit on_stopped(m_label);
             return;
         }
     }
@@ -286,10 +298,12 @@ void BotBaseHandle::thread_body(){
         if (error.empty()){
             m_state.store(State::READY, std::memory_order_release);
             std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(version) + ")";
-            emit on_ready(html_color_text(text, theme_friendly_darkblue()));
+            m_label = html_color_text(text, theme_friendly_darkblue());
+            emit on_ready(m_label);
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            emit on_stopped(html_color_text(error, COLOR_RED));
+            m_label = html_color_text(error, COLOR_RED);
+            emit on_stopped(m_label);
             m_botbase->stop();
             return;
         }

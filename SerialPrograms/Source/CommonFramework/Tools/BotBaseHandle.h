@@ -59,6 +59,8 @@ public:
     State state() const;
     bool accepting_commands() const;
 
+    std::string label() const;
+    std::string status() const;
 
 public:
     //  Async external requests. (typically from integration commands)
@@ -96,9 +98,11 @@ private:
     std::atomic<State> m_state;
     std::atomic<bool> m_allow_user_commands;
 
+    std::string m_label;
+
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
 };
