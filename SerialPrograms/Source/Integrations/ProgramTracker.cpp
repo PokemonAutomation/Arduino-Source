@@ -70,7 +70,7 @@ std::string ProgramTracker::reset_camera(uint64_t console_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    iter->second.first->video().request_reset_video();
+    iter->second.first->video().reset();
     return "";
 }
 std::string ProgramTracker::reset_serial(uint64_t console_id){
@@ -92,7 +92,7 @@ std::string ProgramTracker::start_program(uint64_t program_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    iter->second->program.async_start();
+    emit iter->second->program.async_start();
     return "";
 }
 std::string ProgramTracker::stop_program(uint64_t program_id){
@@ -103,7 +103,7 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    iter->second->program.async_stop();
+    emit iter->second->program.async_stop();
     return "";
 }
 std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button, uint16_t ticks){

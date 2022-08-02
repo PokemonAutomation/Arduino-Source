@@ -45,9 +45,8 @@ struct VideoSnapshot{
 //  by programs.
 class VideoFeed{
 public:
-    //  Request to reset the video. This will return immediately and there is no
-    //  guarantee that the reset will actually succeed.
-    virtual void request_reset_video() = 0;
+    //  Reset the video. Note that this may return early.
+    virtual void reset() = 0;
 
     //  Do not call this on the main thread or it may deadlock.
     virtual VideoSnapshot snapshot() = 0;

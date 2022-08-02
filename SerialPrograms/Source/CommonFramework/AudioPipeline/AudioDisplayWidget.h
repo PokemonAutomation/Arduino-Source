@@ -8,24 +8,20 @@
 #define PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 
 #include <memory>
-#include <string>
 #include <deque>
 #include <set>
-#include <list>
-#include <fstream>
 #include <QWidget>
-#include <QThread>
-#include <QAudioFormat>
-#include "Common/Cpp/AlignedVector.h"
-#include "Spectrograph.h"
-#include "AudioFeed.h"
-#include "AudioSelector.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
+#include "AudioOption.h"
+#include "AudioSpectrumHolder.h"
 
 namespace PokemonAutomation{
 
 class AudioThreadController;
 class AudioDeviceInfo;
 class LoggerQt;
+
+
 
 // Display audio on the UI panel.
 // This class will use AudioThreadController to control an audio thread doing the
@@ -37,7 +33,7 @@ class LoggerQt;
 // audio display mode to use, is made by AudioSelectorWidget.
 // AudioSelectorWidget owns a reference of this class, and control this class based
 // on the audio configuration the selector widget manages.
-class AudioDisplayWidget : public QWidget{
+class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
@@ -47,6 +43,8 @@ public:
 
     AudioDisplayWidget(QWidget& parent);
     virtual ~AudioDisplayWidget();
+
+    AudioSpectrumHolder& state(){ return m_spectrum_holder; }
 
     // outputVolume: range [0.f, 1.f]
     void set_audio(
@@ -61,7 +59,6 @@ public:
     void close_audio();
 
     void resizeEvent(QResizeEvent* event) override;
-
     void paintEvent(QPaintEvent* event) override;
 
     // Set audio display type: no display, frequency bars or spectrogram.
@@ -72,25 +69,17 @@ public:
     // AudioSelectWidget inherits AudioFeed, and calls the functions below to fulfill the AudioFeed interface.
     // See class `AudioFeed` for the comments of those functions.
 
-    std::vector<AudioSpectrum> spectrums_since(size_t startingStamp);
-
-    std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
-
     void add_overlay(size_t startingStamp, size_t endStamp, Color color);
-
-public:
-    // Development usage: save the FFT results to disk so that it can be examined
-    // and edited to be used as samples for future audio matching.
-    void saveAudioFrequenciesToDisk(bool enable);
 
 signals:
     // Used to pass the changed volume from AudioSelectorWidget to audio thread.
     void volumeChanged(float volume);
 
-public slots:
-    // The audio thread (managed by m_audioThreadController) sends signal
-    // to this slot to pass FFT outputs to the display.
-    void loadFFTOutput(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput);
+
+private:
+    virtual void audio_cleared() override;
+    virtual void on_new_spectrum() override;
+    virtual void on_new_overlay() override;
 
 private:
     void update_size();
@@ -100,59 +89,16 @@ private:
     void render_spectrograph();
 
 private:
-    AudioThreadController* m_audioThreadController = nullptr;
+    AudioSpectrumHolder m_spectrum_holder;
 
-    // Num frequencies to store for the output of one fft computation.
-    const size_t m_numFreqs;
-    // Num sliding fft windows to visualize.
-    const size_t m_numFreqWindows;
-    // Num blocks of frequencies to visualize for one sliding window.
-    const size_t m_numFreqVisBlocks;
-
-    // The boundaries to separate each frequency vis block.
-    // i-th freq vis block is made by frequencies whose indices in m_spectrums
-    // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )
-    std::vector<size_t> m_freqVisBlockBoundaries;
-
-    std::vector<float> m_last_buckets;
-    std::vector<uint32_t> m_last_spectrum;
-    Spectrograph m_spectrograph;
-
-    // The timestamp of each window that's been visualized.
-    std::vector<size_t> m_freqVisStamps;
-    // The index of the next window in m_freqVisBlocks.
-    size_t m_nextFFTWindowIndex = 0;
+    std::unique_ptr<AudioThreadController> m_audioThreadController;
 
     std::deque<int> m_width_history;
     std::set<int> m_recent_widths;
 
     AudioDisplayType m_audioDisplayType = AudioDisplayType::NO_DISPLAY;
 
-    // record the past FFT output frequencies to serve as the interface
-    // of audio inference for automation programs.
-    // The head of the list is the most recent FFT window, while the tail
-    // is the oldest in history.
-    std::list<AudioSpectrum> m_spectrums;
-    size_t m_spectrum_history_length = 40;
-    // Since the spectrums will be probided to the automation programs in
-    // other threads, we need to have a lock here.
-    std::mutex m_spectrums_lock;
-    // The initial timestamp for the incoming spectrums.
-    size_t m_spectrum_stamp_start = 0;
-
-    // The inference boxes <box starting stamp, box end stamp, box color>
-    // to highlight FFT windows on spectrogram. Used to tell user which part
-    // of the audio is detected.
-    // The head of the list is the most recent overlay added.
-    std::list<std::tuple<size_t, size_t, Color>> m_overlay;
-    // The overlay will be modified by the automation programs in other
-    // threads to show inference boxes on the visualized spectrogram. So
-    // we need a lock for it.
-    std::mutex m_overlay_lock;
-
-    // Develop purpose: used to save received frequencies to disk
-    bool m_saveFreqToDisk = false;
-    std::ofstream m_freqStream;
+    LifetimeSanitizer m_sanitizer;
 };
 
 

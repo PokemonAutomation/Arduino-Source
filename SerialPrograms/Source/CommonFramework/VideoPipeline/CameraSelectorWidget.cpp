@@ -167,10 +167,12 @@ void CameraSelectorWidget::update_resolution_list(){
 }
 
 void CameraSelectorWidget::camera_startup(Camera& camera){
-    queue_on_main_thread([&]{
-        m_display.set_video(get_camera_backend().make_video_widget(nullptr, camera));
-        update_resolution_list();
-    });
+    QMetaObject::invokeMethod(
+        this, [&]{
+            m_display.set_video(get_camera_backend().make_video_widget(nullptr, camera));
+            update_resolution_list();
+        }, Qt::QueuedConnection
+    );
 }
 void CameraSelectorWidget::camera_shutdown(){
     m_display.close_video();

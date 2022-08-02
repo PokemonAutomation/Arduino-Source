@@ -27,8 +27,6 @@ AudioThreadController::AudioThreadController(
     const AudioDeviceInfo& outputInfo,
     float outputVolume
 ){
-    QObject::setParent(parent);
-
 //    std::cout << "Controller thread " << QThread::currentThread() << " " << inputAbsoluteFilepath.toStdString() << std::endl;
 
     // Note: there is no audio initialization work in AudioWorker constructor. This is intended.
@@ -45,7 +43,13 @@ AudioThreadController::AudioThreadController(
     // Connect this controller to the audio worker to start the audio initialization on the audio thread.
     connect(this, &AudioThreadController::operate, m_AudioWorker, &AudioWorker::startAudio);
 
-    connect(m_AudioWorker, &AudioWorker::fftOutputReady, parent, &AudioDisplayWidget::loadFFTOutput);
+    connect(
+        m_AudioWorker, &AudioWorker::fftOutputReady,
+        parent, [=](size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput){
+            parent->state().push_spectrum(sampleRate, std::move(fftOutput));
+        },
+        Qt::DirectConnection
+    );
 
     connect(parent, &AudioDisplayWidget::volumeChanged, m_AudioWorker, &AudioWorker::setVolume);
 

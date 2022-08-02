@@ -20,6 +20,11 @@ Spectrograph::Spectrograph(size_t buckets, size_t frames)
 {
     memset(m_buffer.data(), 0, m_buffer.size() * sizeof(uint32_t));
 }
+
+void Spectrograph::clear(){
+    memset(m_buffer.data(), 0, m_buffer.size() * sizeof(uint32_t));
+}
+
 void Spectrograph::push_spectrum(const uint32_t* spectrum){
     uint32_t* ptr = m_buffer.data() + m_current_index;
     for (size_t c = 0; c < m_buckets; c++){

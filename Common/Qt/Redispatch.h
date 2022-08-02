@@ -12,8 +12,10 @@
 namespace PokemonAutomation{
 
 
-void dispatch_to_main_thread(std::function<void()> lambda);
-void queue_on_main_thread(std::function<void()> lambda);
+//  Disable these since they are dangerous.
+//void dispatch_to_main_thread(std::function<void()> lambda);
+//void queue_on_main_thread(std::function<void()> lambda);
+
 void run_on_main_thread_and_wait(std::function<void()> lambda);
 
 

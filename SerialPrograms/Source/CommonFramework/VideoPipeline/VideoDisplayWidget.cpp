@@ -37,19 +37,9 @@ void VideoDisplayWidget::set_video(VideoWidget* video){
     m_overlay->setVisible(true);
     m_overlay->setHidden(false);
     m_overlay->raise();
-    update_size();
-}
-void VideoDisplayWidget::set_video(std::function<VideoWidget*(QWidget& parent)> video_factory){
-    if (m_video != nullptr){
-        delete m_video;
-        m_video = nullptr;
-    }
-    m_video = video_factory(*this);
-    m_video->setVisible(true);
-    m_overlay->setVisible(true);
-    m_overlay->setHidden(false);
-    m_overlay->raise();
-    update_size();
+    Resolution resolution = video->camera().current_resolution();
+    update_size(resolution);
+//    cout << "res = " << resolution << endl;
 }
 
 Resolution VideoDisplayWidget::resolution() const{

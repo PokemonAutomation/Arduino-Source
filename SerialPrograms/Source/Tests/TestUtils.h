@@ -85,7 +85,7 @@ public:
     DummyVideoFeed() {}
 
     //  Can call from anywhere.
-    virtual void request_reset_video() override {}
+    virtual void reset() override {}
 
     virtual VideoSnapshot snapshot() override { return VideoSnapshot(); }
 };

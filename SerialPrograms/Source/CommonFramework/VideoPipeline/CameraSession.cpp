@@ -139,9 +139,6 @@ void CameraSession::reset(){
         push_camera_startup();
     });
 }
-void CameraSession::request_reset_video(){
-    queue_on_main_thread([=]{ reset(); });
-}
 
 
 bool CameraSession::allow_snapshots() const{

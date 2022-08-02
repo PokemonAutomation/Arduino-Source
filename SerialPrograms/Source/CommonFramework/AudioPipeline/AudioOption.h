@@ -1,11 +1,11 @@
-/*  Audio Input Device Selector
+/*  Audio Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_AudioPipeline_AudioSelector_H
-#define PokemonAutomation_AudioPipeline_AudioSelector_H
+#ifndef PokemonAutomation_AudioPipeline_AudioOption_H
+#define PokemonAutomation_AudioPipeline_AudioOption_H
 
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"

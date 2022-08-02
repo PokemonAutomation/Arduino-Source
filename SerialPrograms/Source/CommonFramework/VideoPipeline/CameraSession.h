@@ -49,7 +49,7 @@ public:
     CameraInfo info() const;
     Resolution resolution() const;
 
-    virtual void request_reset_video() override;
+    virtual void reset() override;
     virtual VideoSnapshot snapshot() override;
 
     //  Not thread-safe with camera changing.
@@ -62,7 +62,6 @@ public:
 
     void start_camera();
     void stop_camera();
-    void reset();
 
 
 public:

@@ -19,6 +19,8 @@ void dispatch_to_main_thread(std::function<void()> lambda){
 void queue_on_main_thread(std::function<void()> lambda){
     QMetaObject::invokeMethod(QCoreApplication::instance(), lambda, Qt::QueuedConnection);
 }
+
+
 void run_on_main_thread_and_wait(std::function<void()> lambda){
     if (QCoreApplication::instance()->thread() == QThread::currentThread()){
         lambda();

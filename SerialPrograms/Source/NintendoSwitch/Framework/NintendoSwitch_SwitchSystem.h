@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystem_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystem_H
 
-#include "CommonFramework/AudioPipeline/AudioSelector.h"
+#include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "NintendoSwitch_SwitchSetup.h"

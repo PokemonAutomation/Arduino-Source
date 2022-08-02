@@ -37,9 +37,6 @@ public:
     //  Set video using an already constructed video. This takes ownership of the video.
     void set_video(VideoWidget* video);
 
-    //  Set video using a factory lambda. The video is constructed using this class as the parent.
-    void set_video(std::function<VideoWidget*(QWidget& parent)> video_factory);
-
     Resolution resolution() const;
     std::vector<Resolution> resolutions() const;
     void set_resolution(const Resolution& resolution);

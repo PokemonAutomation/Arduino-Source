@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QSlider>
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "AudioSelector.h"
+#include "AudioOption.h"
 
 class QComboBox;
 class QPushButton;

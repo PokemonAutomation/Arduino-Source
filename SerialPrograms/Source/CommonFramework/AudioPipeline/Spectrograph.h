@@ -20,6 +20,8 @@ public:
     Spectrograph(size_t buckets, size_t frames);
     ~Spectrograph();
 
+    void clear();
+
     void push_spectrum(const uint32_t* spectrum);
 
     ImageRGB32 to_image() const;

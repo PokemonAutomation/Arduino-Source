@@ -150,10 +150,14 @@ Resolution Camera::current_resolution() const{
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     QSize resolution = settings.resolution();
 //    cout << "QCameraViewfinderSettings::resolution() = " << resolution.width() << " x " << resolution.height() << endl;
+
+    //  If we can invalid resolution, return what we think it is. There is a bug in Qt5
+    //  where the camera will temporarily return 0x0 immediately after setting a
+    //  view finder for it.
     if (resolution.isValid()){
         return Resolution(resolution.width(), resolution.height());
     }else{
-        return Resolution();
+        return m_resolution;
     }
 }
 std::vector<Resolution> Camera::supported_resolutions() const{

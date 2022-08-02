@@ -193,10 +193,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
-    Source/CommonFramework/AudioPipeline/AudioSelector.cpp
-    Source/CommonFramework/AudioPipeline/AudioSelector.h
+    Source/CommonFramework/AudioPipeline/AudioOption.cpp
+    Source/CommonFramework/AudioPipeline/AudioOption.h
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
+    Source/CommonFramework/AudioPipeline/AudioSpectrumHolder.cpp
+    Source/CommonFramework/AudioPipeline/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/AudioStream.cpp
     Source/CommonFramework/AudioPipeline/AudioStream.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
