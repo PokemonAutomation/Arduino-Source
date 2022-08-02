@@ -56,14 +56,6 @@ VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation
     }
     return new VideoWidget2(parent, *casted);
 }
-PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
-    QWidget& parent,
-    Logger& logger,
-    const CameraInfo& info,
-    const Resolution& desired_resolution
-) const{
-    return new VideoWidget2(&parent, logger, info, desired_resolution);
-}
 
 
 
@@ -262,26 +254,6 @@ VideoSnapshot Camera::snapshot(){
 VideoWidget2::VideoWidget2(QWidget* parent, Camera& camera)
     : PokemonAutomation::VideoWidget(parent)
     , m_camera(camera)
-{
-    if (m_camera.m_camera == nullptr){
-        return;
-    }
-
-    m_captureSession.setCamera(m_camera.m_camera);
-    m_captureSession.setVideoOutput(m_camera.m_videoSink);
-
-    this->setMinimumSize(80, 45);
-
-    m_camera.add_listener(*this);
-}
-VideoWidget2::VideoWidget2(
-    QWidget* parent,
-    Logger& logger,
-    const CameraInfo& info, const Resolution& desired_resolution
-)
-    : PokemonAutomation::VideoWidget(parent)
-    , m_backing(new Camera(logger, info, desired_resolution))
-    , m_camera(*m_backing)
 {
     if (m_camera.m_camera == nullptr){
         return;

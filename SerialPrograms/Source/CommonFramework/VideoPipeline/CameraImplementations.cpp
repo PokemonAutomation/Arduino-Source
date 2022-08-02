@@ -86,15 +86,6 @@ std::unique_ptr<Camera> make_camera(
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.make_camera(logger, info, desired_resolution);
 }
-std::function<VideoWidget*(QWidget& parent)> make_video_factory(
-    Logger& logger,
-    const CameraInfo& info, const Resolution& desired_resolution
-){
-    return [&](QWidget& parent){
-        const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
-        return backend.make_video_widget(parent, logger, info, desired_resolution);
-    };
-}
 
 
 }

@@ -44,14 +44,6 @@ VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation
     }
     return new VideoWidget2(parent, *casted);
 }
-PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
-    QWidget& parent,
-    Logger& logger,
-    const CameraInfo& info,
-    const Resolution& desired_resolution
-) const{
-    return new VideoWidget2(&parent, logger, info, desired_resolution);
-}
 
 
 
@@ -346,32 +338,6 @@ VideoWidget2::VideoWidget2(QWidget* parent, Camera& camera)
     layout->addWidget(m_camera_view);
     m_camera_view->setMinimumSize(80, 45);
     m_camera.m_camera->setViewfinder(m_camera_view);
-}
-VideoWidget2::VideoWidget2(
-    QWidget* parent,
-    Logger& logger,
-    const CameraInfo& info, const Resolution& desired_resolution
-)
-    : PokemonAutomation::VideoWidget(parent)
-    , m_backing(new Camera(logger, info, desired_resolution))
-    , m_camera(*m_backing)
-{
-    if (m_camera.m_camera == nullptr){
-        return;
-    }
-
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setAlignment(Qt::AlignTop);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-
-    //  Setup the video display.
-    m_camera_view = new QCameraViewfinder(this);
-    layout->addWidget(m_camera_view);
-    m_camera_view->setMinimumSize(80, 45);
-    m_camera.m_camera->setViewfinder(m_camera_view);
-
-//    m_camera.add_listener(*this);
 }
 VideoWidget2::~VideoWidget2(){
 //    m_camera.remove_listener(*this);

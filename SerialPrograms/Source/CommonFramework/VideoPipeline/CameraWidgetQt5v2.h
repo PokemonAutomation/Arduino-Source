@@ -44,13 +44,6 @@ public:
     ) const override;
 
     virtual VideoWidget* make_video_widget(QWidget* parent, Camera& camera) const override;
-
-    virtual VideoWidget* make_video_widget(
-        QWidget& parent,
-        Logger& logger,
-        const CameraInfo& info,
-        const Resolution& desired_resolution
-    ) const override;
 };
 
 
@@ -127,11 +120,6 @@ class VideoWidget : public PokemonAutomation::VideoWidget{
     Q_OBJECT
 public:
     VideoWidget(QWidget* parent, CameraHolder& camera);
-    VideoWidget(
-        QWidget* parent,
-        Logger& logger,
-        const CameraInfo& info, const Resolution& desired_resolution
-    );
     virtual ~VideoWidget();
 
     virtual Camera& camera() override{ return *m_holder; }
@@ -144,7 +132,6 @@ private:
 //    mutable std::mutex m_lock;
 
     Logger& m_logger;
-    std::unique_ptr<CameraHolder> m_backing;
     CameraHolder* m_holder = nullptr;
     QThread m_thread;
 

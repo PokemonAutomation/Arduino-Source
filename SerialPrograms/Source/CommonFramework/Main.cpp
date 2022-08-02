@@ -1,6 +1,7 @@
 
 #include <QApplication>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
 #include "CrashDump.h"
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>("std::string");
+    qRegisterMetaType<Resolution>("Resolution");
     
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);

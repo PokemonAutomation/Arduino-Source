@@ -46,14 +46,6 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(QWidget* parent
     }
     return new VideoWidget(parent, *casted);
 }
-PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
-    QWidget& parent,
-    Logger& logger,
-    const CameraInfo& info,
-    const Resolution& desired_resolution
-) const{
-    return new VideoWidget(&parent, logger, info, desired_resolution);
-}
 
 
 
@@ -328,44 +320,7 @@ VideoWidget::VideoWidget(QWidget* parent, CameraHolder& camera)
         m_holder, &CameraHolder::set_resolution
     );
 }
-VideoWidget::VideoWidget(
-    QWidget* parent,
-    Logger& logger,
-    const CameraInfo& info, const Resolution& desired_resolution
-)
-    : PokemonAutomation::VideoWidget(parent)
-    , m_logger(logger)
-{
-    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinderSeparateThread");
-    if (!info){
-        return;
-    }
-
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setAlignment(Qt::AlignTop);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    m_backing = std::make_unique<CameraHolder>(logger, info, desired_resolution);
-    m_holder = m_backing.get();
-
-    m_camera_view = new QCameraViewfinder(this);
-    layout->addWidget(m_camera_view);
-    m_camera_view->setMinimumSize(80, 45);
-    m_holder->m_camera->setViewfinder(m_camera_view);
-//    m_holder->m_camera->setViewfinder((QVideoWidget*)nullptr);
-
-    m_holder->moveToThread(&m_thread);
-//    connect(&m_thread, &QThread::finished, m_holder.get(), &QObject::deleteLater);
-    m_thread.start();
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_thread);
-
-    connect(
-        this, &VideoWidget::internal_set_resolution,
-        m_holder, &CameraHolder::set_resolution
-    );
-}
 VideoWidget::~VideoWidget(){
-    m_backing.reset();
     m_thread.quit();
     m_thread.wait();
 }
