@@ -16,8 +16,12 @@ namespace PokemonAutomation{
 SerialPortOption::~SerialPortOption(){}
 SerialPortOption::SerialPortOption(PABotBaseLevel minimum_pabotbase)
     : m_minimum_pabotbase(minimum_pabotbase)
-    , m_port(CONSTRUCT_TOKEN)
 {}
+
+void SerialPortOption::clear(){
+    m_port.clear();
+}
+
 void SerialPortOption::load_json(const JsonValue& json){
     const std::string* name = json.get_string();
     if (name == nullptr || name->empty()){
@@ -34,6 +38,13 @@ const QSerialPortInfo* SerialPortOption::port() const{
         return nullptr;
     }
     return m_port.get();
+}
+void SerialPortOption::set_port(QSerialPortInfo port){
+    if (!m_port){
+        m_port.reset(std::move(port));
+    }else{
+        *m_port = std::move(port);
+    }
 }
 
 

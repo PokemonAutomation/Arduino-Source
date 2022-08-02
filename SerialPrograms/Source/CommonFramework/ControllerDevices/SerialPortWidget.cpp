@@ -58,15 +58,16 @@ SerialPortWidget::SerialPortWidget(
     connect(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            QSerialPortInfo& current_port = *m_session->m_port;
+            SerialPortOption& option = m_session.option();
+            const QSerialPortInfo* current_port = option.port();
             if (index <= 0 || (size_t)index > m_ports.size()){
-                current_port = QSerialPortInfo();
+                option.clear();
             }else{
                 const QSerialPortInfo& port = m_ports[index - 1];
-                if (!current_port.isNull() && current_port.systemLocation() == port.systemLocation()){
+                if (current_port && current_port->systemLocation() == port.systemLocation()){
                     return;
                 }
-                current_port = port;
+                option.set_port(port);
             }
             reset();
         }
@@ -141,21 +142,22 @@ void SerialPortWidget::refresh(){
         m_ports.emplace_back(std::move(port));
     }
 
-    QSerialPortInfo& current_port = *m_session->m_port;
+    SerialPortOption& option = m_session.option();
+    const QSerialPortInfo* current_port = option.port();
 
     size_t index = 0;
     for (size_t c = 0; c < m_ports.size(); c++){
         const QSerialPortInfo& port = m_ports[c];
         m_serial_box->addItem(port.portName() + " - " + port.description());
 
-        if (!current_port.isNull() && current_port.systemLocation() == port.systemLocation()){
+        if (current_port && current_port->systemLocation() == port.systemLocation()){
             index = c + 1;
         }
     }
     if (index != 0){
         m_serial_box->setCurrentIndex((int)index);
     }else{
-        current_port = QSerialPortInfo();
+        option.clear();
         m_serial_box->setCurrentIndex(0);
     }
 }

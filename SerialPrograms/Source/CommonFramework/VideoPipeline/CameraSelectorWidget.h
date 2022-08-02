@@ -32,8 +32,6 @@ class VideoDisplayWidget;
 //  VideoDisplayWidget, the video feed UI, when the video state
 //  is changed. The VideoDisplayWidget is passed in the constructor
 //  too.
-//  CameraSelectorWidget inherits VideoFeed to provide function
-//  async_reset_video() and snapshot().
 class CameraSelectorWidget : public QWidget, public CameraSession::Listener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.

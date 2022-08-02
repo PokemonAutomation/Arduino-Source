@@ -25,15 +25,20 @@ public:
     ~SerialPortOption();
     SerialPortOption(PABotBaseLevel minimum_pabotbase);
 
+    void clear();
+
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
+
+public:
+    PABotBaseLevel minimum_pabotbase() const{ return m_minimum_pabotbase; }
+
     const QSerialPortInfo* port() const;
+    void set_port(QSerialPortInfo port);
+
 
 private:
-    friend class SerialPortSession;
-    friend class SerialPortWidget;
-
     const PABotBaseLevel m_minimum_pabotbase;
 
     Pimpl<QSerialPortInfo> m_port;

@@ -39,13 +39,13 @@ public:
     //  Must call on main thread.
     BotBaseHandle(
         SerialLogger& logger,
-        const QSerialPortInfo& port,
+        const QSerialPortInfo* port,
         PABotBaseLevel minimum_pabotbase
     );
     ~BotBaseHandle();
 
     void stop();
-    void reset(const QSerialPortInfo& port);
+    void reset(const QSerialPortInfo* port);
 
     void set_allow_user_commands(bool allow);
 
@@ -82,7 +82,7 @@ private:
     const char* check_accepting_commands();
 
     void stop_unprotected();
-    void reset_unprotected(const QSerialPortInfo& port);
+    void reset_unprotected(const QSerialPortInfo* port);
 
     void verify_protocol();
     uint8_t verify_pabotbase();
@@ -92,7 +92,7 @@ private:
 private:
     SerialLogger& m_logger;
 
-    const QSerialPortInfo m_port;
+    const QSerialPortInfo* m_port;
     PABotBaseLevel m_minimum_pabotbase;
     std::atomic<PABotBaseLevel> m_current_pabotbase;
     std::atomic<State> m_state;

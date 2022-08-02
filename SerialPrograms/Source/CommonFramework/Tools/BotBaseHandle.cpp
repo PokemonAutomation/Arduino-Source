@@ -29,7 +29,7 @@ namespace PokemonAutomation{
 
 BotBaseHandle::BotBaseHandle(
     SerialLogger& logger,
-    const QSerialPortInfo& port,
+    const QSerialPortInfo* port,
     PABotBaseLevel minimum_pabotbase
 )
     : m_logger(logger)
@@ -168,19 +168,19 @@ void BotBaseHandle::stop_unprotected(){
     m_label = "<font color=\"red\">Not Connected</font>";
     emit on_not_connected("");
 }
-void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
+void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     using namespace PokemonAutomation;
 
     stop_unprotected();
-    if (port.isNull()){
+    if (port == nullptr || port->isNull()){
         return;
     }
 
-    std::string name = port.systemLocation().toUtf8().data();
+    std::string name = port->systemLocation().toUtf8().data();
     std::string error;
 
 
-    if (port.description().indexOf("Prolific") != -1){
+    if (port->description().indexOf("Prolific") != -1){
         QMessageBox box;
         box.critical(
             nullptr,
@@ -223,7 +223,7 @@ void BotBaseHandle::stop(){
     std::lock_guard<std::mutex> lg(m_lock);
     stop_unprotected();
 }
-void BotBaseHandle::reset(const QSerialPortInfo& port){
+void BotBaseHandle::reset(const QSerialPortInfo* port){
     std::lock_guard<std::mutex> lg(m_lock);
     reset_unprotected(port);
 }

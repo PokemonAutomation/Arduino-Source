@@ -2,6 +2,15 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      CameraSession represents a live camera. It holds onto a Camera object
+ *  and can be started/stopped/queried, etc...
+ *
+ *  This class is not responsible for any UI. However, any changes made to this
+ *  class will be forwarded to any UI components that are attached to it.
+ *
+ *  The UI that allows a user to control this class is in CameraSelectorWidget.
+ *  The actual display of the video from the camera is in VideoDisplayWidget.
+ *
  */
 
 #ifndef PokemonAutomation_VideoPipeline_CameraSession_H
