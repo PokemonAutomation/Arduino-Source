@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 class Logger;
 class Camera;
 
-class CameraSession{
+class CameraSession : public VideoFeed{
 public:
     struct Listener{
         virtual void camera_startup(Camera& camera) = 0;
@@ -40,7 +40,8 @@ public:
     CameraInfo info() const;
     Resolution resolution() const;
 
-    VideoSnapshot snapshot();
+    virtual void request_reset_video() override;
+    virtual VideoSnapshot snapshot() override;
 
     //  Not thread-safe with camera changing.
     Camera* camera(){ return m_camera.get(); }

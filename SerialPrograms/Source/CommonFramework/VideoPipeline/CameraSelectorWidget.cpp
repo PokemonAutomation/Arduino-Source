@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
+#include "Common/Qt/Redispatch.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "VideoDisplayWidget.h"
 #include "CameraImplementations.h"
@@ -76,7 +77,6 @@ CameraSelectorWidget::CameraSelectorWidget(
                 info = camera;
             }
             m_session.set_info(info);
-            update_resolution_list();
         }
     );
     connect(
@@ -97,13 +97,7 @@ CameraSelectorWidget::CameraSelectorWidget(
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [=](bool){
-            reset_video();
-        }
-    );
-    connect(
-        this, &CameraSelectorWidget::internal_async_reset_video,
-        this, [=]{
-            reset_video();
+            m_session.reset();
         }
     );
 
@@ -173,7 +167,10 @@ void CameraSelectorWidget::update_resolution_list(){
 }
 
 void CameraSelectorWidget::camera_startup(Camera& camera){
-    m_display.set_video(get_camera_backend().make_video_widget(nullptr, *m_session.camera()));
+    queue_on_main_thread([&]{
+        m_display.set_video(get_camera_backend().make_video_widget(nullptr, camera));
+        update_resolution_list();
+    });
 }
 void CameraSelectorWidget::camera_shutdown(){
     m_display.close_video();
@@ -182,15 +179,6 @@ void CameraSelectorWidget::camera_shutdown(){
 }
 
 
-
-
-void CameraSelectorWidget::reset_video(){
-    m_session.reset();
-    update_resolution_list();
-}
-void CameraSelectorWidget::async_reset_video(){
-    emit internal_async_reset_video();
-}
 
 
 
@@ -207,9 +195,6 @@ void CameraSelectorWidget::set_overlay_enabled(bool enabled){
     m_display.overlay().setHidden(!enabled);
 }
 
-VideoSnapshot CameraSelectorWidget::snapshot(){
-    return m_session.snapshot();
-}
 
 
 

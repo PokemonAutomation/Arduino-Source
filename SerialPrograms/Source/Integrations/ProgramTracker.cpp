@@ -70,7 +70,7 @@ std::string ProgramTracker::reset_camera(uint64_t console_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    iter->second.first->video().async_reset_video();
+    iter->second.first->video().request_reset_video();
     return "";
 }
 std::string ProgramTracker::reset_serial(uint64_t console_id){

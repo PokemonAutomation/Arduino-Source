@@ -66,20 +66,20 @@ private:
     SwitchSystemFactory& m_factory;
     TaggedLogger m_logger;
 
+    SerialPortSession m_serial;
+    CameraSession m_camera;
+
     CollapsibleGroupBox* m_group_box;
 
-    SerialPortSession m_serial;
     SerialPortWidget* m_serial_widget = nullptr;
+
+    VideoDisplayWidget* m_video_display;
+    AudioDisplayWidget* m_audio_display;
 
     CommandRow* m_command;
 
-    CameraSession m_camera;
     CameraSelectorWidget* m_camera_widget;
-
-    AudioSelectorWidget* m_audio;
-    
-    VideoDisplayWidget* m_video_display;
-    AudioDisplayWidget* m_audio_display;
+    AudioSelectorWidget* m_audio_widget;
 };
 
 

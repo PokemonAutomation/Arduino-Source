@@ -60,8 +60,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
         group_layout->addWidget(m_camera_widget);
 
-        m_audio = factory.m_audio.make_ui(*widget, m_logger, *m_audio_display);
-        group_layout->addWidget(m_audio);
+        m_audio_widget = factory.m_audio.make_ui(*widget, m_logger, *m_audio_display);
+        group_layout->addWidget(m_audio_widget);
 
         m_command = new CommandRow(
             *widget,
@@ -74,7 +74,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
 //    m_camera->reset_video();
-    m_audio->reset_audio();
+    m_audio_widget->reset_audio();
 
     setFocusPolicy(Qt::StrongFocus);
 
@@ -139,16 +139,16 @@ LoggerQt& SwitchSystemWidget::logger(){
     return m_logger;
 }
 BotBase* SwitchSystemWidget::botbase(){
-    return m_serial_widget->botbase().botbase();
+    return m_serial.botbase().botbase();
 }
 VideoFeed& SwitchSystemWidget::camera(){
-    return *m_camera_widget;
+    return m_camera;
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
 }
 AudioFeed& SwitchSystemWidget::audio(){
-    return *m_audio;
+    return *m_audio_widget;
 }
 void SwitchSystemWidget::stop_serial(){
     m_serial_widget->stop();
@@ -158,10 +158,10 @@ void SwitchSystemWidget::reset_serial(){
 }
 
 VideoFeed& SwitchSystemWidget::video(){
-    return *m_camera_widget;
+    return m_camera;
 }
 BotBaseHandle& SwitchSystemWidget::sender(){
-    return m_serial_widget->botbase();
+    return m_serial.botbase();
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){

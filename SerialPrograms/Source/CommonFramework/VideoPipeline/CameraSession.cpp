@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Qt/Redispatch.h"
 #include "VideoWidget.h"
 #include "CameraImplementations.h"
 #include "CameraSession.h"
@@ -27,8 +28,6 @@ CameraSession::CameraSession(
     if (option.m_info){
         m_camera = make_camera(logger, option.m_info, option.m_current_resolution);
     }
-//    cout << "CameraSession() = " << option.m_current_resolution << endl;
-//    cout << "CameraSession() = " << option.m_info.device_name() << endl;
 }
 CameraSession::~CameraSession(){
 }
@@ -62,7 +61,7 @@ CameraInfo CameraSession::info() const{
 Resolution CameraSession::resolution() const{
     SpinLockGuard lg(m_lock);
     if (m_camera){
-        return m_camera->current_resolution();
+        return m_option.m_current_resolution;
     }else{
         return Resolution();
     }
@@ -80,58 +79,68 @@ VideoSnapshot CameraSession::snapshot(){
 
 
 void CameraSession::set_info(const CameraInfo& info){
-    SpinLockGuard lg(m_lock);
-    if (m_camera){
-        push_camera_shutdown();
-        m_camera.reset();
-    }
-    m_option.m_info = info;
-    if (info){
-        m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
-        m_option.m_current_resolution = m_camera->current_resolution();
-        cout << "set_info() = " << m_option.m_current_resolution << endl;
-        push_camera_startup();
-    }
+    run_on_main_thread_and_wait([=]{
+        SpinLockGuard lg(m_lock);
+        if (m_camera){
+            push_camera_shutdown();
+            m_camera.reset();
+        }
+        m_option.m_info = info;
+        if (info){
+            m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
+            m_option.m_current_resolution = m_camera->current_resolution();
+            push_camera_startup();
+        }
+    });
+
 }
 void CameraSession::set_resolution(const Resolution& resolution){
-    SpinLockGuard lg(m_lock);
-    if (m_camera){
-        m_camera->set_resolution(resolution);
-        m_option.m_current_resolution = m_camera->current_resolution();
-//        cout << "set_resolution() = " << m_option.m_current_resolution << endl;
-    }
+    run_on_main_thread_and_wait([=]{
+        SpinLockGuard lg(m_lock);
+        if (m_camera){
+            m_camera->set_resolution(resolution);
+            m_option.m_current_resolution = m_camera->current_resolution();
+        }
+    });
 }
 
 
 void CameraSession::start_camera(){
-    SpinLockGuard lg(m_lock);
-    if (m_camera){
-        m_logger.log("Camera is already started.", COLOR_RED);
-        return;
-    }
-    m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
-    m_option.m_current_resolution = m_camera->current_resolution();
-    cout << "start_camera() = " << m_option.m_current_resolution << endl;
-    push_camera_startup();
+    run_on_main_thread_and_wait([=]{
+        SpinLockGuard lg(m_lock);
+        if (m_camera){
+            m_logger.log("Camera is already started.", COLOR_RED);
+            return;
+        }
+        m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
+        m_option.m_current_resolution = m_camera->current_resolution();
+        push_camera_startup();
+    });
 }
 void CameraSession::stop_camera(){
-    SpinLockGuard lg(m_lock);
-    if (m_camera){
-        push_camera_shutdown();
-        m_camera.reset();
-    }
+    run_on_main_thread_and_wait([=]{
+        SpinLockGuard lg(m_lock);
+        if (m_camera){
+            push_camera_shutdown();
+            m_camera.reset();
+        }
+    });
 }
 
 void CameraSession::reset(){
-    SpinLockGuard lg(m_lock);
-    if (m_camera){
-        push_camera_shutdown();
-        m_camera.reset();
-    }
-    m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
-    m_option.m_current_resolution = m_camera->current_resolution();
-    cout << "reset() = " << m_option.m_current_resolution << endl;
-    push_camera_startup();
+    run_on_main_thread_and_wait([=]{
+        SpinLockGuard lg(m_lock);
+        if (m_camera){
+            push_camera_shutdown();
+            m_camera.reset();
+        }
+        m_camera = make_camera(m_logger, m_option.m_info, m_option.m_current_resolution);
+        m_option.m_current_resolution = m_camera->current_resolution();
+        push_camera_startup();
+    });
+}
+void CameraSession::request_reset_video(){
+    queue_on_main_thread([=]{ reset(); });
 }
 
 

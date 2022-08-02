@@ -34,7 +34,7 @@ class VideoDisplayWidget;
 //  too.
 //  CameraSelectorWidget inherits VideoFeed to provide function
 //  async_reset_video() and snapshot().
-class CameraSelectorWidget : public QWidget, public VideoFeed, public CameraSession::Listener{
+class CameraSelectorWidget : public QWidget, public CameraSession::Listener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
@@ -51,26 +51,9 @@ public:
     void set_snapshots_allowed(bool enabled);
     void set_overlay_enabled(bool enabled);
 
-    //  Must be called from UI thread.
-    void reset_video();
-
-    //  Override VideoFeed::async_reset_video().
-    //  Can be called from any thread.
-    virtual void async_reset_video() override;
-
-    //  Override VideoFeed::snapshot().
-    //  Cannot be called from UI thread.
-    virtual VideoSnapshot snapshot() override;
-
-signals:
-    // Need to define this version of async_reset_video()
-    // because it will be used as a signal.
-    void internal_async_reset_video();
-
 private:
     void update_camera_list();
     void update_resolution_list();
-
 
     virtual void camera_startup(Camera& camera) override;
     virtual void camera_shutdown() override;
