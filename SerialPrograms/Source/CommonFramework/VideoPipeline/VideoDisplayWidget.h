@@ -46,11 +46,12 @@ public:
 
     VideoSnapshot snapshot();
 
+    void update_size(Resolution resolution = Resolution());
+
 private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;
     virtual void remove_box(const ImageFloatBox& box) override;
 
-    void update_size(Resolution resolution = Resolution());
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:

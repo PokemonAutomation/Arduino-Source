@@ -37,12 +37,12 @@ std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
 ) const{
     return std::make_unique<Camera>(logger, info, desired_resolution);
 }
-VideoWidget* CameraBackend::make_video_widget(QWidget& parent, PokemonAutomation::Camera& camera) const{
+VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation::Camera& camera) const{
     Camera* casted = dynamic_cast<Camera*>(&camera);
     if (casted == nullptr){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching camera session/widget types.");
     }
-    return new VideoWidget2(&parent, *casted);
+    return new VideoWidget2(parent, *casted);
 }
 PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
@@ -100,6 +100,7 @@ Camera::Camera(
     {
         QSize resolution = settings.resolution();
         m_resolution = Resolution(resolution.width(), resolution.height());
+//        cout << "Start Resolution = " << m_resolution << endl;
     }
 
 //    cout << "min = " << settings.minimumFrameRate() << endl;
@@ -115,7 +116,7 @@ Camera::Camera(
         }
     }
     if (m_resolution != new_resolution){
-        settings.setResolution(QSize(new_resolution.width, new_resolution.height));
+        settings.setResolution(QSize((int)new_resolution.width, (int)new_resolution.height));
         m_camera->setViewfinderSettings(settings);
         m_resolution = new_resolution;
     }
@@ -156,7 +157,12 @@ Resolution Camera::current_resolution() const{
     }
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     QSize resolution = settings.resolution();
-    return Resolution(resolution.width(), resolution.height());
+//    cout << "QCameraViewfinderSettings::resolution() = " << resolution.width() << " x " << resolution.height() << endl;
+    if (resolution.isValid()){
+        return Resolution(resolution.width(), resolution.height());
+    }else{
+        return Resolution();
+    }
 }
 std::vector<Resolution> Camera::supported_resolutions() const{
     return m_resolutions;
@@ -168,7 +174,7 @@ void Camera::set_resolution(const Resolution& size){
     if (Resolution(resolution.width(), resolution.height()) == size){
         return;
     }
-    settings.setResolution(QSize(size.width, size.height));
+    settings.setResolution(QSize((int)size.width, (int)size.height));
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }

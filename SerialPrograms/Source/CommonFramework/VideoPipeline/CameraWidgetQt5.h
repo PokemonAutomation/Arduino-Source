@@ -39,7 +39,7 @@ public:
         const Resolution& desired_resolution
     ) const override;
 
-    virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const override;
+    virtual VideoWidget* make_video_widget(QWidget* parent, Camera& camera) const override;
 
     virtual VideoWidget* make_video_widget(
         QWidget& parent,

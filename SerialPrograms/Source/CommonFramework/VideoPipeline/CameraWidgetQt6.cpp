@@ -49,12 +49,12 @@ std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
 ) const{
     return std::make_unique<Camera>(logger, info, desired_resolution);
 }
-VideoWidget* CameraBackend::make_video_widget(QWidget& parent, PokemonAutomation::Camera& camera) const{
+VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation::Camera& camera) const{
     Camera* casted = dynamic_cast<Camera*>(&camera);
     if (casted == nullptr){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching camera session/widget types.");
     }
-    return new VideoWidget2(&parent, *casted);
+    return new VideoWidget2(parent, *casted);
 }
 PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
@@ -165,12 +165,17 @@ void Camera::remove_listener(Listener& listener){
 }
 
 Resolution Camera::current_resolution() const{
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return Resolution();
     }
     QSize size = m_camera->cameraFormat().resolution();
-    return Resolution(size.width(), size.height());
+    if (size.isValid()){
+        return Resolution(size.width(), size.height());
+    }else{
+        return Resolution();
+    }
 }
 std::vector<Resolution> Camera::supported_resolutions() const{
     std::lock_guard<std::mutex> lg(m_lock);

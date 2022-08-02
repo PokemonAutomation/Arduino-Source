@@ -43,7 +43,7 @@ private:
     friend class CameraSelectorWidget;
 
     const Resolution m_default_resolution;
-    CameraInfo m_camera;
+    CameraInfo m_info;
     Resolution m_current_resolution;
 };
 

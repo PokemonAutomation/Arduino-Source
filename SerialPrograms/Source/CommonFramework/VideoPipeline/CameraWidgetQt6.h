@@ -16,6 +16,7 @@
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
 #include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
@@ -40,7 +41,7 @@ public:
         const Resolution& desired_resolution
     ) const override;
 
-    virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const override;
+    virtual VideoWidget* make_video_widget(QWidget* parent, Camera& camera) const override;
 
     virtual VideoWidget* make_video_widget(
         QWidget& parent,
@@ -104,6 +105,8 @@ private:
     PeriodicStatsReporterI32 m_stats_conversion;
 
     std::set<Listener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

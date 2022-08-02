@@ -246,6 +246,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/CameraOption.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp \
+    Source/CommonFramework/VideoPipeline/CameraSession.cpp \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.cpp \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp \
@@ -952,6 +953,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \
     Source/CommonFramework/VideoPipeline/CameraOption.h \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h \
+    Source/CommonFramework/VideoPipeline/CameraSession.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \

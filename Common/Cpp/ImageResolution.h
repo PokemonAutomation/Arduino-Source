@@ -30,6 +30,8 @@ struct Resolution{
     bool operator!=(const Resolution& x) const{
         return width != x.width || height != x.height;
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Resolution& resolution);
 };
 
 std::string aspect_ratio_as_string(const Resolution& resolution);

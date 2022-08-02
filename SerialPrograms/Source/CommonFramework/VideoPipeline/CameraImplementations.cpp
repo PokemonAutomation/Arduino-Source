@@ -29,7 +29,9 @@ struct CameraBackends{
     CameraBackends(){
 #if QT_VERSION_MAJOR == 5
         m_backends.emplace_back("Qt5: QCameraViewfinder",                   new CameraQt5QCameraViewfinder::CameraBackend());
-        m_backends.emplace_back("Qt5: QCameraViewfinder (separate thread)", new CameraQt5QCameraViewfinderSeparateThread::CameraBackend());
+        if (PreloadSettings::instance().DEVELOPER_MODE){
+            m_backends.emplace_back("Qt5: QCameraViewfinder (separate thread)", new CameraQt5QCameraViewfinderSeparateThread::CameraBackend());
+        }
 #endif
 #if QT_VERSION_MAJOR == 6
         m_backends.emplace_back("Qt6: QVideoSink",                          new CameraQt6QVideoSink::CameraBackend());
@@ -51,7 +53,7 @@ VideoBackendOption::VideoBackendOption()
         "<b>Video Pipeline Backend:</b>",
         CameraBackends::instance().m_cases,
 #if QT_VERSION_MAJOR == 5
-        1
+        0
 #elif QT_VERSION_MAJOR == 6
         0
 #endif
@@ -72,6 +74,11 @@ std::string get_camera_name(const CameraInfo& info){
     const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
     return backend.get_camera_name(info);
 }
+
+const CameraBackend& get_camera_backend(){
+    return *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
+}
+
 std::unique_ptr<Camera> make_camera(
     Logger& logger,
     const CameraInfo& info, const Resolution& desired_resolution

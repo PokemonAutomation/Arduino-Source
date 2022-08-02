@@ -4,10 +4,16 @@
  *
  */
 
+#include <ostream>
 #include "ImageResolution.h"
 
 namespace PokemonAutomation{
 
+
+std::ostream& operator<<(std::ostream& os, const Resolution& resolution){
+    os << resolution.width << " x " << resolution.height;
+    return os;
+}
 
 std::string aspect_ratio_as_string(const Resolution& resolution){
     size_t w = resolution.width;

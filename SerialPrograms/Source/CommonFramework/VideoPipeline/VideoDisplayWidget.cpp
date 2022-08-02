@@ -97,7 +97,8 @@ void VideoDisplayWidget::update_size(Resolution resolution){
     int width = this->width();
     double aspect_ratio = 16. / 9;
     if (!resolution){
-        resolution = m_video->camera().current_resolution();
+        Camera* camera = &m_video->camera();
+        resolution = camera->current_resolution();
     }
 //    cout << "resolution: " << resolution.width() << " x " << resolution.height() << endl;
     if (resolution){

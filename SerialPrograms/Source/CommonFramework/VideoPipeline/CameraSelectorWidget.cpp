@@ -13,26 +13,31 @@
 #include "CameraImplementations.h"
 #include "CameraSelectorWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 
 CameraSelectorWidget::~CameraSelectorWidget(){
 //    cout << "~CameraSelectorUI()" << endl;
+    m_display.close_video();
+    m_session.remove_listener(*this);
 }
 CameraSelectorWidget::CameraSelectorWidget(
     QWidget& parent,
-    LoggerQt& logger,
+    Logger& logger,
     CameraOption& value,
     VideoDisplayWidget& holder
 )
     : QWidget(&parent)
     , m_logger(logger)
-    , m_value(value)
+    , m_session(value, logger)
     , m_display(holder)
     , m_camera_box(nullptr)
     , m_resolution_box(nullptr)
-    , m_snapshots_allowed(true)
 {
     QHBoxLayout* camera_row = new QHBoxLayout(this);
     camera_row->setContentsMargins(0, 0, 0, 0);
@@ -42,7 +47,7 @@ CameraSelectorWidget::CameraSelectorWidget(
 
     m_camera_box = new NoWheelComboBox(this);
     camera_row->addWidget(m_camera_box, 5);
-    refresh();
+    update_camera_list();
     camera_row->addSpacing(5);
 
     m_resolution_box = new NoWheelComboBox(this);
@@ -52,25 +57,34 @@ CameraSelectorWidget::CameraSelectorWidget(
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
+    Camera* camera = m_session.camera();
+    if (camera){
+        m_display.set_video(get_camera_backend().make_video_widget(nullptr, *camera));
+        update_resolution_list();
+    }
+
     connect(
         m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            CameraInfo& current = m_value.m_camera;
+//            cout << "m_camera_box" << endl;
+            CameraInfo info = m_session.info();
             if (index <= 0 || index > (int)m_cameras.size()){
-                current = CameraInfo();
+                info = CameraInfo();
             }else{
                 const CameraInfo& camera = m_cameras[index - 1];
-                if (current == camera){
+                if (info == camera){
                     return;
                 }
-                current = camera;
+                info = camera;
             }
-            reset_video();
+            m_session.set_info(info);
+            update_resolution_list();
         }
     );
     connect(
         m_resolution_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
+//            cout << "m_resolution_box" << endl;
             if (!m_display){
                 return;
             }
@@ -78,8 +92,8 @@ CameraSelectorWidget::CameraSelectorWidget(
                 return;
             }
             Resolution resolution = m_resolutions[index];
-            m_value.m_current_resolution = resolution;
-            m_display.set_resolution(resolution);
+            m_session.set_resolution(resolution);
+            m_display.update_size(resolution);
         }
     );
     connect(
@@ -94,51 +108,48 @@ CameraSelectorWidget::CameraSelectorWidget(
             reset_video();
         }
     );
+
+    m_session.add_listener(*this);
 }
-void CameraSelectorWidget::refresh(){
+void CameraSelectorWidget::update_camera_list(){
     m_camera_box->clear();
     m_camera_box->addItem("(none)");
 
     m_cameras = get_all_cameras();
-    CameraInfo& current_camera = m_value.m_camera;
+    CameraInfo info = m_session.info();
 
     size_t index = 0;
     for (size_t c = 0; c < m_cameras.size(); c++){
         const CameraInfo& camera = m_cameras[c];
         m_camera_box->addItem(QString::fromStdString(get_camera_name(camera)));
 
-        if (current_camera == camera){
+        if (info == camera){
             index = c + 1;
         }
     }
     if (index != 0){
         m_camera_box->setCurrentIndex((int)index);
     }else{
-        current_camera = CameraInfo();
+        info = CameraInfo();
         m_camera_box->setCurrentIndex(0);
     }
 }
+void CameraSelectorWidget::update_resolution_list(){
+    Resolution camera_resolution = m_session.resolution();
+//    cout << "camera_resolution = " << camera_resolution << endl;
 
+    m_resolution_box->clear();
+    m_resolutions.clear();
 
-
-
-void CameraSelectorWidget::reset_video(){
-    std::lock_guard<std::mutex> lg(m_camera_lock);
-    m_display.close_video();
-
-    const CameraInfo& info = m_value.m_camera;
-    if (info){
-        m_display.set_video(make_video_factory(m_logger, info, m_value.m_current_resolution));
+    Camera* camera = m_session.camera();
+    if (camera == nullptr){
+        return;
     }
 
-    Resolution resolution = m_display.resolution();
+    m_resolutions = camera->supported_resolutions();
 
-    //  Update resolutions dropdown.
-    m_resolution_box->clear();
-    m_resolutions = m_display.resolutions();
-
-    int index = -1;
-    bool resolution_match = false;
+    int camera_index = -1;
+//    int current_index = -1;
     for (int c = 0; c < (int)m_resolutions.size(); c++){
         const Resolution& size = m_resolutions[c];
         m_resolution_box->addItem(
@@ -148,23 +159,36 @@ void CameraSelectorWidget::reset_video(){
                 aspect_ratio_as_string(size)
             )
         );
-        if (size == m_value.m_current_resolution){
-            resolution_match = true;
-            index = c;
-//            cout << "index0 = " << index << endl;
+//        cout << "size = " << camera_resolution << endl;
+        if (size == camera_resolution){
+            camera_index = c;
         }
-        if (!resolution_match && size == resolution){
-            index = c;
-        }
+//        if (size == m_session.){
+//            camera_index = c;
+//        }
     }
-    if (index >= 0){
-        m_value.m_current_resolution = m_resolutions[index];
-        m_resolution_box->setCurrentIndex(index);
-        emit m_resolution_box->activated(index);
+    if (camera_index >= 0){
+        m_resolution_box->setCurrentIndex(camera_index);
     }else{
-        //  Reset to default resolution.
-        m_value.m_current_resolution = m_value.m_default_resolution;
+        m_logger.log("Unable to find entry for this resolution.", COLOR_RED);
     }
+}
+
+void CameraSelectorWidget::camera_startup(Camera& camera){
+    m_display.set_video(get_camera_backend().make_video_widget(nullptr, *m_session.camera()));
+}
+void CameraSelectorWidget::camera_shutdown(){
+    m_display.close_video();
+    m_resolution_box->clear();
+    m_resolutions.clear();
+}
+
+
+
+
+void CameraSelectorWidget::reset_video(){
+    m_session.reset();
+    update_resolution_list();
 }
 void CameraSelectorWidget::async_reset_video(){
     emit internal_async_reset_video();
@@ -179,23 +203,14 @@ void CameraSelectorWidget::set_resolution_enabled(bool enabled){
     m_resolution_box->setEnabled(enabled);
 }
 void CameraSelectorWidget::set_snapshots_allowed(bool enabled){
-    m_snapshots_allowed.store(enabled, std::memory_order_release);
+    m_session.set_allow_snapshots(enabled);
 }
 void CameraSelectorWidget::set_overlay_enabled(bool enabled){
     m_display.overlay().setHidden(!enabled);
 }
 
 VideoSnapshot CameraSelectorWidget::snapshot(){
-    if (!m_snapshots_allowed.load(std::memory_order_acquire)){
-        return VideoSnapshot();
-    }
-
-    std::unique_lock<std::mutex> lg(m_camera_lock);
-    if (!m_display){
-        return VideoSnapshot();
-    }
-
-    return m_display.snapshot();
+    return m_session.snapshot();
 }
 
 

@@ -35,7 +35,7 @@ public:
         const Resolution& desired_resolution
     ) const = 0;
 
-    virtual VideoWidget* make_video_widget(QWidget& parent, Camera& camera) const = 0;
+    virtual VideoWidget* make_video_widget(QWidget* parent, Camera& camera) const = 0;
 
     virtual VideoWidget* make_video_widget(
         QWidget& parent,
@@ -51,6 +51,8 @@ public:
 
 std::vector<CameraInfo> get_all_cameras();
 std::string get_camera_name(const CameraInfo& info);
+
+const CameraBackend& get_camera_backend();
 
 std::unique_ptr<Camera> make_camera(
     Logger& logger,

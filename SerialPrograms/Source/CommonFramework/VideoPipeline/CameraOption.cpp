@@ -35,7 +35,7 @@ void CameraOption::load_json(const JsonValue& json){
     }
     const std::string* name = obj->get_string(JSON_CAMERA);
     if (name != nullptr){
-        m_camera = CameraInfo(*name);
+        m_info = CameraInfo(*name);
     }
     const JsonArray* res = obj->get_array(JSON_RESOLUTION);
     if (res != nullptr && res->size() == 2){
@@ -53,7 +53,7 @@ void CameraOption::load_json(const JsonValue& json){
 }
 JsonValue CameraOption::to_json() const{
     JsonObject root;
-    root[JSON_CAMERA] = m_camera.device_name();
+    root[JSON_CAMERA] = m_info.device_name();
     JsonArray res;
     res.push_back(m_current_resolution.width);
     res.push_back(m_current_resolution.height);

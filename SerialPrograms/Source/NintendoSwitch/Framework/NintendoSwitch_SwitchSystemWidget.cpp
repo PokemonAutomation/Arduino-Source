@@ -72,7 +72,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
     layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
-    m_camera->reset_video();
+//    m_camera->reset_video();
     m_audio->reset_audio();
 
     setFocusPolicy(Qt::StrongFocus);

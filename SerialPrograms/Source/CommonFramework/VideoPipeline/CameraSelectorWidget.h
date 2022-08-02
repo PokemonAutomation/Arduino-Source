@@ -14,6 +14,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CameraOption.h"
+#include "CameraSession.h"
 
 class QComboBox;
 class QPushButton;
@@ -29,14 +30,14 @@ namespace PokemonAutomation{
 //  too.
 //  CameraSelectorWidget inherits VideoFeed to provide function
 //  async_reset_video() and snapshot().
-class CameraSelectorWidget : public QWidget, public VideoFeed{
+class CameraSelectorWidget : public QWidget, public VideoFeed, public CameraSession::Listener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
 public:
     CameraSelectorWidget(
         QWidget& parent,
-        LoggerQt& logger,
+        Logger& logger,
         CameraOption& value,
         VideoDisplayWidget& holder
     );
@@ -47,6 +48,7 @@ public:
     void set_snapshots_allowed(bool enabled);
     void set_overlay_enabled(bool enabled);
 
+    //  Must be called from UI thread.
     void reset_video();
 
     //  Override VideoFeed::async_reset_video().
@@ -63,11 +65,16 @@ signals:
     void internal_async_reset_video();
 
 private:
-    void refresh();
+    void update_camera_list();
+    void update_resolution_list();
+
+
+    virtual void camera_startup(Camera& camera) override;
+    virtual void camera_shutdown() override;
 
 private:
-    LoggerQt& m_logger;
-    CameraOption& m_value;
+    Logger& m_logger;
+    CameraSession m_session;
 
     VideoDisplayWidget& m_display;
     std::vector<Resolution> m_resolutions;
@@ -78,7 +85,7 @@ private:
 
     std::vector<CameraInfo> m_cameras;
 
-    std::atomic<bool> m_snapshots_allowed;
+//    std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;
 };
 

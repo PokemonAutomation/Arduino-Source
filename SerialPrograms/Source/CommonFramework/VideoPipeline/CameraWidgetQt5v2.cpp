@@ -39,12 +39,12 @@ std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
 ) const{
     return std::make_unique<CameraHolder>(logger, info, desired_resolution);
 }
-PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(QWidget& parent, PokemonAutomation::Camera& camera) const{
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation::Camera& camera) const{
     CameraHolder* casted = dynamic_cast<CameraHolder*>(&camera);
     if (casted == nullptr){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching camera session/widget types.");
     }
-    return new VideoWidget(&parent, *casted);
+    return new VideoWidget(parent, *casted);
 }
 PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     QWidget& parent,
@@ -98,7 +98,7 @@ CameraHolder::CameraHolder(
         }
     }
     if (m_current_resolution != new_resolution){
-        settings.setResolution(QSize(new_resolution.width, new_resolution.height));
+        settings.setResolution(QSize((int)new_resolution.width, (int)new_resolution.height));
         m_camera->setViewfinderSettings(settings);
         m_current_resolution = new_resolution;
     }
@@ -159,7 +159,7 @@ void CameraHolder::set_resolution(const Resolution& size){
     if (Resolution(resolution.width(), resolution.height()) == size){
         return;
     }
-    settings.setResolution(QSize(size.width, size.height));
+    settings.setResolution(QSize((int)size.width, (int)size.height));
     m_camera->setViewfinderSettings(settings);
     m_current_resolution = size;
 }
