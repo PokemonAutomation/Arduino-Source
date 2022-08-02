@@ -31,21 +31,15 @@ CameraSession::CameraSession(
 //    cout << "CameraSession() = " << option.m_info.device_name() << endl;
 }
 CameraSession::~CameraSession(){
-    push_camera_shutdown();
-
-    //  Wait for all listeners to detach.
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [=]{ return m_listeners.empty(); });
 }
 
 void CameraSession::add_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     m_listeners.insert(&listener);
 }
 void CameraSession::remove_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     m_listeners.erase(&listener);
-    m_cv.notify_all();
 }
 
 void CameraSession::push_camera_startup(){
@@ -62,11 +56,11 @@ void CameraSession::push_camera_shutdown(){
 
 
 CameraInfo CameraSession::info() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     return m_option.m_info;
 }
 Resolution CameraSession::resolution() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         return m_camera->current_resolution();
     }else{
@@ -76,7 +70,7 @@ Resolution CameraSession::resolution() const{
 
 
 VideoSnapshot CameraSession::snapshot(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera && m_allow_snapshots.load(std::memory_order_relaxed)){
         return m_camera->snapshot();
     }else{
@@ -86,7 +80,7 @@ VideoSnapshot CameraSession::snapshot(){
 
 
 void CameraSession::set_info(const CameraInfo& info){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         push_camera_shutdown();
         m_camera.reset();
@@ -100,17 +94,17 @@ void CameraSession::set_info(const CameraInfo& info){
     }
 }
 void CameraSession::set_resolution(const Resolution& resolution){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         m_camera->set_resolution(resolution);
         m_option.m_current_resolution = m_camera->current_resolution();
-        cout << "set_resolution() = " << m_option.m_current_resolution << endl;
+//        cout << "set_resolution() = " << m_option.m_current_resolution << endl;
     }
 }
 
 
 void CameraSession::start_camera(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         m_logger.log("Camera is already started.", COLOR_RED);
         return;
@@ -121,7 +115,7 @@ void CameraSession::start_camera(){
     push_camera_startup();
 }
 void CameraSession::stop_camera(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         push_camera_shutdown();
         m_camera.reset();
@@ -129,7 +123,7 @@ void CameraSession::stop_camera(){
 }
 
 void CameraSession::reset(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    SpinLockGuard lg(m_lock);
     if (m_camera){
         push_camera_shutdown();
         m_camera.reset();

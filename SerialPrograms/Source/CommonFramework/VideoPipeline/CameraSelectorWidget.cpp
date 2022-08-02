@@ -27,14 +27,12 @@ CameraSelectorWidget::~CameraSelectorWidget(){
     m_session.remove_listener(*this);
 }
 CameraSelectorWidget::CameraSelectorWidget(
-    QWidget& parent,
+    CameraSession& session,
     Logger& logger,
-    CameraOption& value,
     VideoDisplayWidget& holder
 )
-    : QWidget(&parent)
-    , m_logger(logger)
-    , m_session(value, logger)
+    : m_logger(logger)
+    , m_session(session)
     , m_display(holder)
     , m_camera_box(nullptr)
     , m_resolution_box(nullptr)

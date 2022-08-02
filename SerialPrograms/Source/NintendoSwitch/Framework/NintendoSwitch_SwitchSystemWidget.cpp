@@ -35,6 +35,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     , m_factory(factory)
     , m_logger(raw_logger, factory.m_logger_tag)
     , m_serial(factory.m_serial, m_logger)
+    , m_camera(factory.m_camera, m_logger)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -56,8 +57,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_video_display = new VideoDisplayWidget(*this);
         m_audio_display = new AudioDisplayWidget(*this);
 
-        m_camera = factory.m_camera.make_ui(*widget, m_logger, *m_video_display);
-        group_layout->addWidget(m_camera);
+        m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
+        group_layout->addWidget(m_camera_widget);
 
         m_audio = factory.m_audio.make_ui(*widget, m_logger, *m_audio_display);
         group_layout->addWidget(m_audio);
@@ -86,14 +87,14 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
     connect(
         m_command, &CommandRow::set_feedback_enabled,
-        m_camera, [=](bool enabled){
-            m_camera->set_snapshots_allowed(enabled);
+        m_camera_widget, [=](bool enabled){
+            m_camera_widget->set_snapshots_allowed(enabled);
         }
     );
     connect(
         m_command, &CommandRow::set_inference_boxes,
-        m_camera, [=](bool enabled){
-            m_camera->set_overlay_enabled(enabled);
+        m_camera_widget, [=](bool enabled){
+            m_camera_widget->set_overlay_enabled(enabled);
         }
     );
     connect(
@@ -119,6 +120,7 @@ SwitchSystemWidget::~SwitchSystemWidget(){
 
     //  Force delete this early so it detaches from "m_serial" before that is destructed.
     delete m_serial_widget;
+    delete m_camera_widget;
 }
 ProgramState SwitchSystemWidget::last_known_state() const{
     return m_command->last_known_state();
@@ -140,7 +142,7 @@ BotBase* SwitchSystemWidget::botbase(){
     return m_serial_widget->botbase().botbase();
 }
 VideoFeed& SwitchSystemWidget::camera(){
-    return *m_camera;
+    return *m_camera_widget;
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
@@ -156,7 +158,7 @@ void SwitchSystemWidget::reset_serial(){
 }
 
 VideoFeed& SwitchSystemWidget::video(){
-    return *m_camera;
+    return *m_camera_widget;
 }
 BotBaseHandle& SwitchSystemWidget::sender(){
     return m_serial_widget->botbase();
@@ -169,13 +171,13 @@ void SwitchSystemWidget::update_ui(ProgramState state){
     switch (state){
     case ProgramState::NOT_READY:
         m_serial_widget->set_options_enabled(false);
-        m_camera->set_camera_enabled(false);
-        m_camera->set_resolution_enabled(false);
+        m_camera_widget->set_camera_enabled(false);
+        m_camera_widget->set_resolution_enabled(false);
         break;
     case ProgramState::STOPPED:
         m_serial_widget->set_options_enabled(true);
-        m_camera->set_camera_enabled(true);
-        m_camera->set_resolution_enabled(true);
+        m_camera_widget->set_camera_enabled(true);
+        m_camera_widget->set_resolution_enabled(true);
         break;
     case ProgramState::RUNNING:
 //    case ProgramState::FINISHED:

@@ -8,13 +8,13 @@
 #define PokemonAutomation_VideoPipeline_CameraSession_H
 
 #include <set>
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CameraOption.h"
 
 namespace PokemonAutomation{
 
+class Logger;
 class Camera;
 
 class CameraSession{
@@ -72,8 +72,7 @@ private:
 
     std::atomic<bool> m_allow_snapshots;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable SpinLock m_lock;
 
     std::unique_ptr<Camera> m_camera;
 

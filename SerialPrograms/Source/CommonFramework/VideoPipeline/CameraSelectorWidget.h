@@ -21,6 +21,10 @@ class QPushButton;
 
 namespace PokemonAutomation{
 
+class Logger;
+class VideoDisplayWidget;
+
+
 //  Widget to handle UI that selects video source and resolution.
 //  The video state is managed by a class CameraSelector
 //  object passed in the constructor.
@@ -36,9 +40,8 @@ class CameraSelectorWidget : public QWidget, public VideoFeed, public CameraSess
     Q_OBJECT
 public:
     CameraSelectorWidget(
-        QWidget& parent,
+        CameraSession& session,
         Logger& logger,
-        CameraOption& value,
         VideoDisplayWidget& holder
     );
     ~CameraSelectorWidget();
@@ -74,7 +77,7 @@ private:
 
 private:
     Logger& m_logger;
-    CameraSession m_session;
+    CameraSession& m_session;
 
     VideoDisplayWidget& m_display;
     std::vector<Resolution> m_resolutions;

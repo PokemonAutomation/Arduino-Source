@@ -8,18 +8,13 @@
 #define PokemonAutomation_VideoPipeline_CameraOption_H
 
 #include "Common/Cpp/ImageResolution.h"
-#include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
-
-class QWidget;
 
 namespace PokemonAutomation{
 
 class JsonValue;
-class VideoDisplayWidget;
 
 
-class CameraSelectorWidget;
 
 //  Handles the state of video selection: video source and resolution.
 //  Call make_ui() to generate the UI friend class CameraSelectorWidget,
@@ -36,7 +31,6 @@ public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
-    CameraSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder);
 
 private:
     friend class CameraSession;

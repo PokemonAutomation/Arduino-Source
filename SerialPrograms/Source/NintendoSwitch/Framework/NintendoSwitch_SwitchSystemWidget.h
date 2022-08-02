@@ -9,12 +9,15 @@
 
 #include "Integrations/ProgramTracker.h"
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
+#include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
     class AudioFeed;
+    class CameraSelectorWidget;
+    class VideoDisplayWidget;
     class AudioDisplayWidget;
     class VideoOverlay;
 
@@ -69,7 +72,10 @@ private:
     SerialPortWidget* m_serial_widget = nullptr;
 
     CommandRow* m_command;
-    CameraSelectorWidget* m_camera;
+
+    CameraSession m_camera;
+    CameraSelectorWidget* m_camera_widget;
+
     AudioSelectorWidget* m_audio;
     
     VideoDisplayWidget* m_video_display;
