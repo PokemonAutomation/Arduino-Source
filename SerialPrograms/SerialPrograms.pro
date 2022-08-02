@@ -455,6 +455,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.cpp \
@@ -486,6 +487,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.cpp \
@@ -1192,6 +1194,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.h \
@@ -1223,6 +1226,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h \

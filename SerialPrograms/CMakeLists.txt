@@ -462,10 +462,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
-    Source/CommonFramework/VideoPipeline/CameraSession.cpp
-    Source/CommonFramework/VideoPipeline/CameraSession.h
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h
+    Source/CommonFramework/VideoPipeline/CameraSession.cpp
+    Source/CommonFramework/VideoPipeline/CameraSession.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.cpp
@@ -915,6 +915,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h
     Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.cpp
@@ -977,6 +979,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h
+    Source/PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.h
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp

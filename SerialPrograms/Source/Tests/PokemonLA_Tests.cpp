@@ -15,10 +15,12 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
+#include "PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
@@ -101,6 +103,26 @@ int test_pokemonLA_BlackOutDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
 
     BlackOutDetector detector(logger, overlay);
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLA_BattleStartDetector(const ImageViewRGB32& image, bool target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    BattleStartDetector detector(logger, overlay);
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, bool target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    WildPokemonFocusDetector detector(logger, overlay);
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
     return 0;

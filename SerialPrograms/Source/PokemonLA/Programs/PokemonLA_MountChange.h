@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_MountChange_H
 #define PokemonAutomation_PokemonLA_MountChange_H
 
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 

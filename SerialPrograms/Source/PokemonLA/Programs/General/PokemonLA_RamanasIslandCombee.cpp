@@ -7,6 +7,7 @@
 #include <array>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"

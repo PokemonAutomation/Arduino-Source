@@ -19,6 +19,7 @@ using namespace Pokemon;
 
 namespace {
 
+// For each grit item, how many levels it can increase:
 const size_t grit_level_increase[4] = {3, 3, 3, 1};
 
 }
@@ -72,6 +73,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Bot
             pbf_press_dpad(context, DPAD_DOWN, 20, 80);
         }
 
+        // Select the pokemon
         pbf_press_button(context, BUTTON_A, 20, 80);
 
         // For each of the size pokemon attributes: HP, Attack, Defense, Sp. Atk, Sp. Def, Speed
