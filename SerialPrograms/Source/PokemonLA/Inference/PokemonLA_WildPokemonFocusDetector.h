@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Detect the black out screen when player character blacks out.
+ *  Detect the lower left dark translucent tab when player focuses on one pokemon
  */
 
 #ifndef PokemonAutomation_PokemonLA_WildPokemonFocusDetector_H
@@ -41,12 +41,15 @@ private:
     ImageFloatBox m_pokemon_tab_right_bound;
 };
 
-
+// Read the pokemon details: name, alpha, shiny, gender from the focused tab.
 PokemonDetails read_focused_wild_pokemon_info(
     LoggerQt& logger, VideoOverlay& overlay,
     const ImageViewRGB32& frame,
     Language language
 );
+
+// Detect the A button to know whether you can press A to change focus.
+bool can_change_focus(LoggerQt& logger, VideoOverlay& overlay, const ImageViewRGB32& frame);
 
 
 }

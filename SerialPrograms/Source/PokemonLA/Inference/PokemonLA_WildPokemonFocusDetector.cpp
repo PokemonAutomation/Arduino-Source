@@ -4,11 +4,17 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/OCR/OCR_Routines.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA_WildPokemonFocusDetector.h"
 
-#include <array>
 #include <sstream>
 #include <iostream>
 using std::cout;
@@ -129,13 +135,78 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
 }
 
 
-// PokemonDetails read_focused_wild_pokemon_info(
-//     LoggerQt& logger, VideoOverlay& overlay,
-//     const ImageViewRGB32& frame,
-//     Language language
-// ){
+PokemonDetails read_focused_wild_pokemon_info(
+    LoggerQt& logger, VideoOverlay& overlay,
+    const ImageViewRGB32& frame,
+    Language language
+){
+    PokemonDetails ret;
 
-// }
+    const InferenceBoxScope name_box(overlay, 0.108, 0.868, 0.135, 0.037, COLOR_BLACK);
+    const InferenceBoxScope gender_box(overlay, 0.307, 0.873, 0.016, 0.030, COLOR_PURPLE);
+    const InferenceBoxScope alpha_box(overlay, 0.307, 0.920, 0.016, 0.029, COLOR_RED);
+
+    const ImageViewRGB32 name_image = extract_box_reference(frame, name_box);
+
+    const OCR::StringMatchResult name_result = Pokemon::PokemonNameReader::instance().read_substring(
+        logger, language, name_image,
+        OCR::WHITE_TEXT_FILTERS());
+    for (const auto& item : name_result.results){
+        ret.name_candidates.insert(std::move(item.second.token));
+    }
+
+    // Replacing white color of the gender symbol with zero-alpha color so that they won't be counted in
+    // the following image_stats().
+    // The white color is defined as the color between (160, 160, 160) and (255, 255, 255).
+    bool replace_color_range = true;
+    const ImageStats gender_stats = image_stats(filter_rgb32_range(
+        extract_box_reference(frame, gender_box),
+        combine_rgb(160, 160, 160), combine_rgb(255, 255, 255), Color(0), replace_color_range
+    ));
+    const FloatPixel gender_avg = gender_stats.average;
+    if (gender_stats.count > 0 && gender_avg.r > gender_avg.b + 50.0 && gender_avg.r > 150.0){
+        ret.gender = Gender::Female;
+        logger.log("Gender Female, color " + gender_avg.to_string());
+    } else if (gender_stats.count > 0 && gender_avg.b > gender_avg.r + 50.0 && gender_avg.b > 150.0){
+        ret.gender = Gender::Male;
+        logger.log("Gender Male, color " + gender_avg.to_string());
+    } else{
+        ret.gender = Gender::Genderless;
+        logger.log("Gender Genderless, color " + gender_avg.to_string());
+    }
+
+    // Replace non-red color with zero-alpha color so that they won't be counted in
+    // the following image_stats().
+    // The red color is defined as ranging from (200, 0, 0) to (255, 100, 100).
+    replace_color_range = false;
+    const ImageStats alpha_stats = image_stats(filter_rgb32_range(
+        extract_box_reference(frame, alpha_box),
+        combine_rgb(200, 0, 0), combine_rgb(255, 100, 100), Color(0), replace_color_range
+    ));
+    const FloatPixel alpha_avg = alpha_stats.average;
+    logger.log("Alpha color " + alpha_avg.to_string());
+    if (alpha_stats.count > 0 && alpha_avg.r > alpha_avg.g + 100.0 && alpha_avg.r > alpha_avg.b + 100.0 && alpha_avg.r > 200.0){
+        ret.is_alpha = true;
+        logger.log("Is alpha, color " + alpha_avg.to_string());
+    }
+    
+    const std::vector<ImagePixelBox> shiny_locations = find_shiny_symbols(frame);
+    if (shiny_locations.size() > 0){
+        ret.is_shiny = true;
+        logger.log("Found shiny symbol.");
+    }
+
+    return ret;
+}
+
+
+bool can_change_focus(LoggerQt& logger, VideoOverlay& overlay, const ImageViewRGB32& frame){
+    const bool stop_on_detect = true;
+    ButtonDetector button(logger, overlay, ButtonType::ButtonA, {0.244, 0.815, 0.026, 0.047},
+        std::chrono::milliseconds(0), stop_on_detect);
+    
+    return button.process_frame(frame, current_time());
+}
 
 
 

@@ -33,11 +33,11 @@ int test_pokemonLA_BlackOutDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonLA_BattleStartDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, bool target);
-
 int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image,  const std::vector<std::string>& keywords);
 
 int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
+
+int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
 int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold);
 

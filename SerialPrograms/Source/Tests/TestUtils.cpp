@@ -21,7 +21,7 @@ std::vector<std::string> parse_words(const std::string& filename_base){
     std::vector<std::string> words;
     std::istringstream is(filename_base);
     std::string keyword;
-    while (getline(is, keyword, '-')){
+    while (getline(is, keyword, '_')){
         words.push_back(keyword);
     }
 
@@ -39,6 +39,17 @@ bool parse_float(const std::string& word, float& number){
     std::istringstream iss(word);
     iss >> number;
     return iss.eof() && !iss.fail();
+}
+
+bool parse_bool(const std::string& word, bool& value){
+    if (word == "True"){
+        value = true;
+        return true;
+    } else if (word == "False"){
+        value = false;
+        return true;
+    }
+    return false;
 }
 
 bool load_sprite_count(const std::string& txt_path, std::map<std::string, int>& sprites){

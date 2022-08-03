@@ -34,6 +34,9 @@ bool parse_int(const std::string& word, int& number);
 // Convert string to float. Return true if succeed.
 bool parse_float(const std::string& word, float& number);
 
+// Convert string of "True" or "False" to bool. Return true if succeed.
+bool parse_bool(const std::string& word, bool& value);
+
 // Load sprite counts from a text file.
 // Each line is:
 // <slug> (optional number of slug count, default 1)

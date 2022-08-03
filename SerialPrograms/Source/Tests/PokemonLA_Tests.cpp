@@ -118,16 +118,6 @@ int test_pokemonLA_BattleStartDetector(const ImageViewRGB32& image, bool target)
     return 0;
 }
 
-int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, bool target){
-    auto& logger = global_logger_command_line();
-    auto overlay = DummyVideoOverlay();
-
-    WildPokemonFocusDetector detector(logger, overlay);
-    bool result = detector.process_frame(image, current_time());
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
-
 int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
     bool hisui_kw_found = false;
     std::array<bool, 5> target_hisui_region_has_MMO = {false};
@@ -218,66 +208,64 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
     return 0;
 }
 
-int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+int read_pokemon_info_from_words(const std::vector<std::string>& keywords, Language& language, PokemonDetails& details){
     // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
+
     if (keywords.size() < 5){
-        cerr << "Error: not enough number of keywords in the filename, found only " << keywords.size() << "." << endl;
+        cerr << "Error: not enough number of keywords in the filename to generate PokemonDetails. Found only " << keywords.size() << "." << endl;
         return 1;
     }
 
-    const Language language = language_code_to_enum(keywords[keywords.size()-5]);
+    language = language_code_to_enum(keywords[keywords.size()-5]);
     if (language == Language::None || language == Language::EndOfList){
         cerr << "Error: language keyword " << keywords[keywords.size()-5] << " is wrong." << endl;
         return 1;
     }
 
     const std::string& pokemon_slug = keywords[keywords.size()-4];
+    details.name_candidates.insert(pokemon_slug);
 
     const std::string& shiny_word = keywords[keywords.size()-3];
-    bool is_shiny = true;
     if (shiny_word == "Shiny"){
-        is_shiny = true;
+        details.is_shiny = true;
     } else if (shiny_word == "NotShiny"){
-        is_shiny = false;
+        details.is_shiny = false;
     } else{
         cerr << "Error: shiny keyword " << shiny_word << " is wrong. Must be \"Shiny\" or \"NotShiny\"." << endl;
         return 1;
     }
 
     const std::string& alpha_word = keywords[keywords.size()-2];
-    bool is_alpha = true;
     if (alpha_word == "Alpha"){
-        is_alpha = true;
+        details.is_alpha = true;
     } else if (alpha_word == "NotAlpha"){
-        is_alpha = false;
+        details.is_alpha = false;
     } else{
         cerr << "Error: alpha keyword " << alpha_word << " is wrong. Must be \"Alpha\" or \"NotAlpha\"." << endl;
         return 1;
     }
 
     const std::string& gender_word = keywords[keywords.size()-1];
-
-    Gender gender = Gender::Genderless;
     if (gender_word == "Male"){
-        gender = Gender::Male;
+        details.gender = Gender::Male;
     } else if (gender_word == "Female"){
-        gender = Gender::Female;
+        details.gender = Gender::Female;
     } else if (gender_word == "Genderless"){
-        gender = Gender::Genderless;
+        details.gender = Gender::Genderless;
     } else {
         cerr << "Error: gender keyword " << gender_word << " is wrong. Must be \"Male\", \"Female\" or \"Genderless\"." << endl;
         return 1;
     }
 
-    auto& logger = global_logger_command_line();
-    auto overlay = DummyVideoOverlay();
+    return 0;
+}
 
-    const PokemonDetails details = read_status_info(logger, overlay, image, language);
+int test_pokemon_details(const PokemonDetails& details, const PokemonDetails& target){
+    TEST_RESULT_COMPONENT_EQUAL(details.is_shiny, target.is_shiny, "shiny");
+    TEST_RESULT_COMPONENT_EQUAL(details.is_alpha, target.is_alpha, "alpha");
+    TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC(details.gender, target.gender, "gender", get_gender_str);
 
-    TEST_RESULT_COMPONENT_EQUAL(details.is_shiny, is_shiny, "shiny");
-    TEST_RESULT_COMPONENT_EQUAL(details.is_alpha, is_alpha, "alpha");
-    TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC(details.gender, gender, "gender", get_gender_str);
-
+    const std::string& pokemon_slug = *target.name_candidates.begin();
     bool found_name = false;
     for(const auto& slg : details.name_candidates){
         if (slg == pokemon_slug){
@@ -293,9 +281,93 @@ int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const s
         cerr << "but should be " << pokemon_slug << "." << endl;
         return 1;
     }
+    
+    return 0;
+}
+
+int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
+    Language language = Language::None;
+    PokemonDetails target;
+
+    int ret = read_pokemon_info_from_words(keywords, language, target);
+    if (ret != 0){
+        return ret;
+    }
+
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+    const PokemonDetails details = read_status_info(logger, overlay, image, language);
+
+    return test_pokemon_details(details, target);
+}
+
+int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    // two keywords: <True/False> <True/False>
+    if (keywords.size() < 2){
+        cerr << "Error: not enough number of keywords in the filename. Found only " << keywords.size() << "." << endl;
+        return 1;
+    }
+
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    WildPokemonFocusDetector detector(logger, overlay);
+    bool result_has_focus = detector.process_frame(image, current_time());
+
+    auto check_can_change_focus = [&](const std::string& word) -> int {
+        bool result_can_change = can_change_focus(logger, overlay, image);
+        bool target_can_change = false;
+        if (parse_bool(word, target_can_change) == false){
+            cerr << "Error: True/False keyword " << word << " is wrong. Must be \"True\" or \"False\"." << endl;
+            return 1;
+        }
+        TEST_RESULT_EQUAL(result_can_change, target_can_change);
+        return 0;
+    };
+
+    bool target_has_focus = false;
+    if (parse_bool(keywords[keywords.size()-2], target_has_focus) == true){
+        TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+
+        return check_can_change_focus(keywords[keywords.size()-1]);
+    }
+
+    // Or seven keywords:
+    // the last seven keywords should be: <True/False> <True/False> <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
+    if (keywords.size() < 7){
+        cerr << "Error: not enough number of keywords in the filename. Found only " << keywords.size() << "." << endl;
+        return 1;
+    }
+
+    if (parse_bool(keywords[keywords.size()-7], target_has_focus) == false){
+        cerr << "Error: True/False keyword " << keywords[keywords.size()-7] << " is wrong. Must be \"True\" or \"False\"." << endl;
+        return 1;
+    }
+    
+    TEST_RESULT_EQUAL(result_has_focus, target_has_focus);
+
+    if (result_has_focus){
+        int ret = check_can_change_focus(keywords[keywords.size()-6]);
+        if (ret != 0){
+            return ret;
+        }
+
+        Language language = Language::None;
+        PokemonDetails target_info;
+        ret = read_pokemon_info_from_words(keywords, language, target_info);
+        if (ret != 0){
+            return ret;
+        }
+
+        const auto info = read_focused_wild_pokemon_info(logger, overlay, image, language);
+
+        return test_pokemon_details(info, target_info);
+    }
 
     return 0;
 }
+
 
 int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold){
     float angle = get_orientation_on_map(image);
