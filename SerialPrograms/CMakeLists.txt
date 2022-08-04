@@ -84,6 +84,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/FixedLimitVector.tpp
+    ../Common/Cpp/ImageResolution.cpp
+    ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
     ../Common/Cpp/Json/JsonArray.h
     ../Common/Cpp/Json/JsonObject.cpp
@@ -92,8 +94,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonTools.h
     ../Common/Cpp/Json/JsonValue.cpp
     ../Common/Cpp/Json/JsonValue.h
-    ../Common/Cpp/ImageResolution.cpp
-    ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/PanicDump.cpp
@@ -278,6 +278,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/ImageBoxes.h
     Source/CommonFramework/ImageTools/ImageFilter.cpp
     Source/CommonFramework/ImageTools/ImageFilter.h
+    Source/CommonFramework/ImageTools/ImageGradient.cpp
+    Source/CommonFramework/ImageTools/ImageGradient.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/SolidColorTest.cpp
@@ -1060,6 +1062,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp

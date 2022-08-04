@@ -29,6 +29,7 @@
 #include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
+#include "Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
@@ -86,6 +87,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
     add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
+    add_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>();
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");

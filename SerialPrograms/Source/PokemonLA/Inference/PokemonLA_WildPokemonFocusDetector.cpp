@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/ImageGradient.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -14,6 +15,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA_WildPokemonFocusDetector.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 
 #include <sstream>
 #include <iostream>
@@ -24,67 +26,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, const Color& threshold, bool dark_top);
-
-size_t count_vertical_translucent_border_pixels(const ImageViewRGB32& image, const Color& threshold, bool dark_left){
-    if (image.height() == 0 || image.width() == 0){
-        return 0;
-    }
-
-    size_t num_border_pixels = 0;
-    int16_t thres_c[3] = {threshold.r(), threshold.g(), threshold.b()};
-
-    size_t num_cols = image.width() - 1;
-    // Go through each row in the image
-    for(size_t y = 0; y < image.height(); y++){
-        // Record the border gradient of this row:
-        bool is_black[3] = {false};
-        int16_t gradients[3] = {0};
-        for(size_t col_index = 0; col_index < num_cols; col_index++){
-            uint32_t p_left = image.pixel(col_index, y);
-            uint32_t p_right = image.pixel(col_index+1, y);
-
-            // c1 may be darker, while c2 is not yet covered by the dark translucent region
-            Color c1(dark_left ? p_left : p_right);
-            Color c2(dark_left ? p_right : p_left);
-
-            if (c1.r() == 0 && c2.r() > 0){
-                is_black[0] = true;
-            }
-            if (c1.g() == 0 && c2.g() > 0){
-                is_black[1] = true;
-            }
-            if (c1.b() == 0 && c2.b() > 0){
-                is_black[2] = true;
-            }
-
-            gradients[0] = std::max(gradients[0], int16_t((int)c2.r() - (int) c1.r()));
-            gradients[1] = std::max(gradients[1], int16_t((int)c2.g() - (int) c1.g()));
-            gradients[2] = std::max(gradients[2], int16_t((int)c2.b() - (int) c1.b()));
-        }
-
-        bool has_non_border_channel = false;
-        for(int c = 0; c < 3; c++){
-            if (is_black[c] == false && gradients[c] < thres_c[c]){
-                has_non_border_channel = true;
-                break;
-            }
-        }
-        num_border_pixels += !has_non_border_channel;
-
-        // cout << y << ": (" << gradients[0] << (is_black[0] ? "*" : "");
-        // cout << ", " << gradients[1] << (is_black[1] ? "*" : "");
-        // cout << ", " << gradients[2] << (is_black[2] ? "*" : "") << ")\n";
-        // cout << "has_non_border_channel " << has_non_border_channel << endl;
-    }
-    
-    cout << "num border pixels proportion: " << num_border_pixels / (float)image.height() << endl;
-
-    return num_border_pixels;
-}
 
 WildPokemonFocusDetector::WildPokemonFocusDetector(LoggerQt& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("WildPokemonFocusDetector")
+    , m_logger(logger)
+    , m_overlay(overlay)
     , m_pokemon_tab_upper_bound(0.109, 0.853, 0.24, 0.012)
     , m_pokemon_tab_lower_bound(0.109, 0.952, 0.24, 0.012)
     , m_pokemon_tab_left_bound(0.100, 0.875, 0.007, 0.045)
@@ -131,6 +77,11 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
         return false;
     }
 
+
+    dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Detected", frame);
+
+    m_details = read_focused_wild_pokemon_info(m_logger, m_overlay, frame, Language::English);
+    m_change_focus = can_change_focus(m_logger, m_overlay, frame);
     return true;
 }
 

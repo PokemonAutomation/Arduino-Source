@@ -161,6 +161,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
+    Source/CommonFramework/ImageTools/ImageGradient.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
@@ -525,6 +526,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp \
@@ -866,6 +868,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
     Source/CommonFramework/ImageTools/ImageFilter.h \
+    Source/CommonFramework/ImageTools/ImageGradient.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/ImageTools/WaterfillUtilities.h \
@@ -1269,6 +1272,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h \
