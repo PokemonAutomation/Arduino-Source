@@ -16,10 +16,13 @@
 #include "Common/Cpp/AlignedVector.h"
 #include "AudioInfo.h"
 #include "AudioStream.h"
-#include "AudioInputReader.h"
+#include "IO/AudioSource.h"
+
+class QObject;
 
 namespace PokemonAutomation{
 
+class AudioSink;
 
 
 // QIODevice defines an interface for IO.
@@ -40,7 +43,8 @@ public:
     AudioIODevice(Logger& logger, const AudioDeviceInfo& device, AudioFormat our_format, AudioSampleFormat input_format);
     virtual ~AudioIODevice();
 
-    void setAudioSinkDevice(QIODevice* audioSinkDevice, AudioSampleFormat output_format);
+    void setAudioSinkDevice(std::unique_ptr<AudioSink> writer);
+    void set_volume(float volume);
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.
@@ -54,10 +58,11 @@ private:
 private:
     AudioFormat m_format;
 
-    std::unique_ptr<AudioInputReader> m_reader;
+    std::unique_ptr<AudioSource> m_reader;
     std::unique_ptr<AudioSinkWriter> m_output;
     std::unique_ptr<FFTRunner> m_fft_runner;
 
+    std::unique_ptr<AudioSink> m_writer;
     QIODevice* m_audioSinkDevice = nullptr;
 
 

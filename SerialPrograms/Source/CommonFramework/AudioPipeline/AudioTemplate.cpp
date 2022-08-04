@@ -9,8 +9,8 @@
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioTemplate.h"
-#include "AudioFileLoader.h"
-#include "AudioFormatUtils.h"
+#include "Tools/AudioFormatUtils.h"
+#include "IO/AudioFileLoader.h"
 
 #include <iostream>
 using std::cout;

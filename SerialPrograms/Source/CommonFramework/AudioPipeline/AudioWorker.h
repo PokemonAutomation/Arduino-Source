@@ -19,7 +19,8 @@
 #include "Common/Cpp/AlignedVector.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
-#include "AudioInputReader.h"
+#include "IO/AudioSource.h"
+#include "IO/AudioSink.h"
 #include "AudioIODevice.h"
 
 
@@ -91,14 +92,7 @@ private:
 
     AudioIODevice* m_audioIODevice = nullptr;
 
-#if QT_VERSION_MAJOR == 5
-//    QAudioInput* m_audioSource = nullptr;
-    QAudioOutput* m_audioSink = nullptr;
-#elif QT_VERSION_MAJOR == 6
-//    QAudioSource* m_audioSource = nullptr;
-    QAudioSink* m_audioSink = nullptr;
-#endif
-
+//    std::unique_ptr<AudioSink> m_output;
     float m_volume = 1.0f;
 
     AudioFileLoader* m_FileLoader = nullptr;

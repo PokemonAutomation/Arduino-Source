@@ -12,8 +12,8 @@
 #include <mutex>
 #include <fstream>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "Spectrograph.h"
-#include "AudioFeed.h"
 
 namespace PokemonAutomation{
 

@@ -66,6 +66,7 @@ macx{
 
 
 SOURCES += \
+    ../3rdParty/QtWavFile/WavFile.cpp \
     ../ClientSource/Connection/MessageLogger.cpp \
     ../ClientSource/Connection/PABotBase.cpp \
     ../ClientSource/Connection/PABotBaseConnection.cpp \
@@ -119,22 +120,22 @@ SOURCES += \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
-    Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp \
-    Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp \
     Source/CommonFramework/AudioPipeline/AudioIODevice.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
-    Source/CommonFramework/AudioPipeline/AudioInputReader.cpp \
     Source/CommonFramework/AudioPipeline/AudioOption.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
-    Source/CommonFramework/AudioPipeline/AudioSpectrumHolder.cpp \
     Source/CommonFramework/AudioPipeline/AudioStream.cpp \
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp \
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp \
     Source/CommonFramework/AudioPipeline/AudioWorker.cpp \
-    Source/CommonFramework/AudioPipeline/Spectrograph.cpp \
-    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
-    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
-    Source/CommonFramework/AudioPipeline/WavFile.cpp \
+    Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp \
+    Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp \
+    Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp \
+    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp \
+    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.cpp \
+    Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp \
+    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.cpp \
+    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortOption.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortSession.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp \
@@ -724,6 +725,8 @@ SOURCES += \
     Source/Tests/TestUtils.cpp
 
 HEADERS += \
+    ../3rdParty/QtWavFile/WavFile.h \
+    ../3rdParty/nlohmann/json.hpp \
     ../ClientSource/Connection/BotBase.h \
     ../ClientSource/Connection/BotBaseMessage.h \
     ../ClientSource/Connection/MessageLogger.h \
@@ -811,24 +814,24 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
-    Source/CommonFramework/AudioPipeline/AudioFileLoader.h \
-    Source/CommonFramework/AudioPipeline/AudioFormatUtils.h \
     Source/CommonFramework/AudioPipeline/AudioIODevice.h \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
-    Source/CommonFramework/AudioPipeline/AudioInputReader.h \
-    Source/CommonFramework/AudioPipeline/AudioNormalization.h \
     Source/CommonFramework/AudioPipeline/AudioOption.h \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h \
-    Source/CommonFramework/AudioPipeline/AudioSpectrumHolder.h \
     Source/CommonFramework/AudioPipeline/AudioStream.h \
     Source/CommonFramework/AudioPipeline/AudioTemplate.h \
     Source/CommonFramework/AudioPipeline/AudioThreadController.h \
     Source/CommonFramework/AudioPipeline/AudioWorker.h \
-    Source/CommonFramework/AudioPipeline/Spectrograph.h \
-    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h \
-    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
-    Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
-    Source/CommonFramework/AudioPipeline/WavFile.h \
+    Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h \
+    Source/CommonFramework/AudioPipeline/IO/AudioSink.h \
+    Source/CommonFramework/AudioPipeline/IO/AudioSource.h \
+    Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h \
+    Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h \
+    Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h \
+    Source/CommonFramework/AudioPipeline/Tools/AudioNormalization.h \
+    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.h \
+    Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.h \
+    Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h \
     Source/CommonFramework/ControllerDevices/SerialPortOption.h \
     Source/CommonFramework/ControllerDevices/SerialPortSession.h \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h \

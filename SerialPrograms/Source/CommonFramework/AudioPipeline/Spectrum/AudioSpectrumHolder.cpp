@@ -7,7 +7,7 @@
 #include <string.h>
 #include <cmath>
 #include <cassert>
-#include "AudioConstants.h"
+#include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "AudioSpectrumHolder.h"
 
 namespace PokemonAutomation{

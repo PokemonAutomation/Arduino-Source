@@ -7,8 +7,8 @@
 #include "AudioConstants.h"
 #include "AudioInfo.h"
 #include "AudioWorker.h"
-#include "AudioFileLoader.h"
-#include "AudioFormatUtils.h"
+#include "Tools/AudioFormatUtils.h"
+#include "IO/AudioFileLoader.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
 #include <QIODevice>
@@ -19,15 +19,13 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QtEndian>
-using AudioSource = QAudioInput;
 using AudioSink = QAudioOutput;
 #elif QT_VERSION_MAJOR == 6
 #include <QMediaDevices>
 #include <QAudioSource>
 #include <QAudioSink>
 #include <QAudioDevice>
-using AudioSource = QAudioSource;
-using AudioSink = QAudioSink;
+using NativeAudioSink = QAudioSink;
 #endif
 
 
@@ -160,6 +158,22 @@ void AudioWorker::startAudio(){
         return;
     }
 
+    AudioFormat outputFormat = m_inputFormat;
+    switch (m_inputFormat){
+    case AudioFormat::MONO_48000:
+    case AudioFormat::MONO_96000:
+    case AudioFormat::DUAL_44100:
+    case AudioFormat::DUAL_48000:
+        break;
+    case AudioFormat::INTERLEAVE_LR_96000:
+    case AudioFormat::INTERLEAVE_RL_96000:
+        outputFormat = AudioFormat::DUAL_48000;
+        break;
+    default:
+        m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)m_inputFormat], COLOR_RED);
+        return;
+    }
+
 
     connect(m_audioIODevice, &AudioIODevice::fftOutputReady, this, &AudioWorker::fftOutputReady);
 
@@ -168,18 +182,10 @@ void AudioWorker::startAudio(){
         bool outputSupported = chosenAudioOutputDevice.isFormatSupported(outputAudioFormat);
         if (!outputSupported){
             std::cout << "Error the audio output device does not support the requested audio format" << std::endl;
-        } else{
-            m_audioSink = new AudioSink(chosenAudioOutputDevice, outputAudioFormat, this);
-            m_audioSink->setBufferSize(32768);
-            m_audioSink->setVolume(m_volume);
-            m_audioIODevice->setAudioSinkDevice(m_audioSink->start(), get_stream_format(outputAudioFormat));
-
-            connect(
-                m_audioSink, &AudioSink::stateChanged,
-                this, [&](QAudio::State newState){
-                    this->handleDeviceErrorState(newState, m_audioSink->error(), "AudioSink");
-                }
-            );
+        }else{
+            m_audioIODevice->setAudioSinkDevice(std::make_unique<AudioSink>(
+                m_logger, m_outputInfo, outputFormat
+            ));
         }
     }
 }
@@ -188,13 +194,7 @@ AudioWorker::~AudioWorker(){
     if (m_audioIODevice){
         // Close the connection between m_audioIODevice and 
         // m_audioSink.
-        m_audioIODevice->setAudioSinkDevice(nullptr, AudioSampleFormat::INVALID);
-    }
-
-    if (m_audioSink){
-        m_audioSink->stop();
-        delete m_audioSink;
-        m_audioSink = nullptr;
+        m_audioIODevice->setAudioSinkDevice(nullptr);
     }
 
     if (m_FileLoader){
@@ -213,9 +213,10 @@ AudioWorker::~AudioWorker(){
 void AudioWorker::setVolume(float volume){
     volume = std::max(std::min(volume, 1.0f), 0.0f);
     m_volume = volume;
-    if (m_audioSink){
-        m_audioSink->setVolume(volume);
-    }
+//    if (m_audioSink){
+//        m_audioSink->setVolume(volume);
+//    }
+    m_audioIODevice->set_volume(volume);
 }
 
 void AudioWorker::handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType){

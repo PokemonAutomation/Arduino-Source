@@ -2,6 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      Holds a history of the most recent FFT spectrums as colors.
+ *  This is used to render the spectrograph.
+ *
  */
 
 #ifndef PokemonAutomation_AudioPipeline_Spectrograph_H
@@ -17,7 +20,7 @@ class ImageRGB32;
 
 class Spectrograph{
 public:
-    Spectrograph(size_t buckets, size_t frames);
+    Spectrograph(size_t buckets_per_spectrum, size_t frames);
     ~Spectrograph();
 
     void clear();

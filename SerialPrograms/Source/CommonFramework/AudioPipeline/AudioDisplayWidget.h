@@ -13,7 +13,7 @@
 #include <QWidget>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "AudioOption.h"
-#include "AudioSpectrumHolder.h"
+#include "Spectrum/AudioSpectrumHolder.h"
 
 namespace PokemonAutomation{
 

@@ -11,10 +11,10 @@
 #include <QAudioFormat>
 #include <QTimer>
 #include <QEventLoop>
+#include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"
-#include "AudioFormatUtils.h"
-#include "WavFile.h"
 
 
 
