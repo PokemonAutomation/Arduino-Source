@@ -14,6 +14,7 @@ using NativeAudioSink = QAudioSink;
 #endif
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
@@ -88,6 +89,7 @@ void AudioSink::set_volume(float volume){
     if (!m_device){
         return;
     }
+    m_logger.log("Volume set to: " + tostr_default(volume));
     static_cast<NativeAudioSink&>(*m_device).setVolume(volume);
 }
 
