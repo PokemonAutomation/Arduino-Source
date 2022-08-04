@@ -59,7 +59,6 @@ private:
     AudioFormat m_format;
 
     std::unique_ptr<AudioSource> m_reader;
-    std::unique_ptr<AudioSinkWriter> m_output;
     std::unique_ptr<FFTRunner> m_fft_runner;
 
     std::unique_ptr<AudioSink> m_writer;

@@ -79,7 +79,7 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
     }
 }
 
-AudioSampleFormat get_stream_format(QAudioFormat& native_format){
+AudioSampleFormat get_sample_format(QAudioFormat& native_format){
 #if QT_VERSION_MAJOR == 5
     if (native_format.sampleType() == QAudioFormat::SampleType::Float){
         return AudioSampleFormat::FLOAT32;

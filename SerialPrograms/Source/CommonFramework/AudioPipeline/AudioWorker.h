@@ -80,8 +80,6 @@ signals:
 //    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
     void fftOutputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftOutput);
 
-private:
-    void handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType);
 
 private:
     Logger& m_logger;
@@ -92,7 +90,6 @@ private:
 
     AudioIODevice* m_audioIODevice = nullptr;
 
-//    std::unique_ptr<AudioSink> m_output;
     float m_volume = 1.0f;
 
     AudioFileLoader* m_FileLoader = nullptr;

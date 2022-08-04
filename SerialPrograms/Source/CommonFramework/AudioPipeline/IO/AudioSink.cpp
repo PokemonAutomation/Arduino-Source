@@ -31,13 +31,18 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioFormat 
 
     set_format(native_format, format);
 
-    AudioSampleFormat stream_format = get_stream_format(native_format);
+    AudioSampleFormat stream_format = get_sample_format(native_format);
     if (stream_format == AudioSampleFormat::INVALID){
         stream_format = AudioSampleFormat::FLOAT32;
         setSampleFormatToFloat(native_format);
     }
 
     logger.log("AudioOutputDevice(): " + dumpAudioFormat(native_format));
+
+    if (!native_info.isFormatSupported(native_format)){
+        logger.log("Audio output device does not support the requested audio format.", COLOR_RED);
+        return;
+    }
 
     NativeAudioSink* sink = new NativeAudioSink(native_info, native_format);
     m_device.reset(sink);

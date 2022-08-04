@@ -42,10 +42,6 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/AlignedVector.tpp"
-#include "CommonFramework/AudioPipeline/TimeSampleWriter.h"
-#include "CommonFramework/AudioPipeline/TimeSampleBuffer.h"
-#include "CommonFramework/AudioPipeline/TimeSampleBufferReader.h"
-#include "CommonFramework/AudioPipeline/AudioNormalization.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -254,7 +250,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-    AudioSourceReader reader(AudioStreamFormat::SINT16, 1, false);
+    AudioSourceReader reader(AudioSampleFormat::SINT16, 1, false);
     AudioListener listener(1);
     reader += listener;
 
@@ -266,7 +262,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-//    AudioStreamReader2 reader(2, AudioStreamFormat::SINT16);
+//    AudioStreamReader2 reader(2, AudioSampleFormat::SINT16);
 
 
 

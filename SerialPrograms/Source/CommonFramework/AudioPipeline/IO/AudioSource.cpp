@@ -136,7 +136,7 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFor
 
     set_format(native_format, format);
 
-    AudioSampleFormat stream_format = get_stream_format(native_format);
+    AudioSampleFormat stream_format = get_sample_format(native_format);
     if (stream_format == AudioSampleFormat::INVALID){
         stream_format = AudioSampleFormat::FLOAT32;
         setSampleFormatToFloat(native_format);

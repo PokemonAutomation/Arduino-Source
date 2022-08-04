@@ -161,9 +161,18 @@ void AudioSpectrumHolder::push_spectrum(size_t sampleRate, std::shared_ptr<const
         m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
     }
 
+    //  Scale the by the square root of the transform length.
+    //  For random noise input, the frequency domain will have an average
+    //  magnitude of sqrt(transform length).
     float scale = std::sqrt(0.5f / (float)output.size());
-//    scale *= m_numFreqVisBlocks;
-//    scale *= 100;
+
+//    //  Divide by output size. Since samples can never be larger than 1.0, the
+//    //  frequency domain can never be larger than the FFT length. So we scale by
+//    //  the FFT length to guarantee that it also stays less than 1.0.
+//    float scale = 0.5f / (float)output.size();
+
+//    float skew_factor = 999.;
+//    float skew_scale = 1.f / (float)std::log1pf(skew_factor);
 
     // For one window, use how many blocks to show all frequencies:
     float previous = 0;
@@ -182,18 +191,11 @@ void AudioSpectrumHolder::push_spectrum(size_t sampleRate, std::shared_ptr<const
             mag *= scale;
 
             mag = std::sqrt(mag);
-#if 0
-//            cout << mag << endl;
-//            mag = std::log10(mag * 1000 + 1);
-//            mag /= 3;
-
-            mag = std::log(mag * 10.0f + 1.0f);
-            // TODO: may need to scale based on game audio volume setting
-            // Assuming the max freq magnitude we can get is 20.0, so
-            // log(20 * 10 + 1.0) = log(201)
-            const float max_log = std::log(201.f);
-            mag /= max_log;
-#endif
+//            mag = std::log1pf(mag * skew_factor) * skew_scale;
+//            mag = std::log1pf(std::sqrtf(mag)) * std::log1pf(1);
+//            mag = std::sqrt(2*mag - mag*mag);
+//            float m1 = 1 - mag;
+//            mag = std::sqrtf(1 - m1*m1);
 
             // Clamp to [0.0, 1.0]
             mag = std::min(mag, 1.0f);
