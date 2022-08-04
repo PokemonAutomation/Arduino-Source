@@ -41,20 +41,21 @@ size_t sample_size(AudioSampleFormat format){
 }
 
 
-void AudioSourceReader::add_listener(AudioFloatStreamListener& listener){
+
+void AudioStreamToFloat::add_listener(AudioFloatStreamListener& listener){
     if (listener.samples_per_frame != m_samples_per_frame){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
     }
     m_listeners.insert(&listener);
 }
-void AudioSourceReader::remove_listener(AudioFloatStreamListener& listener){
+void AudioStreamToFloat::remove_listener(AudioFloatStreamListener& listener){
     m_listeners.erase(&listener);
 }
 
-AudioSourceReader::~AudioSourceReader(){
+AudioStreamToFloat::~AudioStreamToFloat(){
     MisalignedStreamConverter::remove_listener(*this);
 }
-AudioSourceReader::AudioSourceReader(
+AudioStreamToFloat::AudioStreamToFloat(
     AudioSampleFormat input_format,
     size_t samples_per_frame,
     bool reverse_channels
@@ -79,12 +80,12 @@ AudioSourceReader::AudioSourceReader(
     }
     MisalignedStreamConverter::add_listener(*this);
 }
-void AudioSourceReader::on_objects(const void* data, size_t objects){
+void AudioStreamToFloat::on_objects(const void* data, size_t objects){
     for (AudioFloatStreamListener* listener : m_listeners){
         listener->on_samples((const float*)data, objects);
     }
 }
-void AudioSourceReader::convert(void* out, const void* in, size_t count){
+void AudioStreamToFloat::convert(void* out, const void* in, size_t count){
     switch (m_format){
     case AudioSampleFormat::UINT8:
         Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)out, (const uint8_t*)in, count * m_samples_per_frame);
@@ -115,17 +116,26 @@ void AudioSourceReader::convert(void* out, const void* in, size_t count){
 
 
 
+void AudioFloatToStream::add_listener(StreamListener& listener){
+    if (listener.object_size != m_frame_size){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
+    }
+    m_listeners.insert(&listener);
+}
+void AudioFloatToStream::remove_listener(StreamListener& listener){
+    m_listeners.erase(&listener);
+}
 
-AudioSinkWriter::AudioSinkWriter(QIODevice& audio_sink, AudioSampleFormat format, size_t samples_per_frame)
+AudioFloatToStream::AudioFloatToStream(QIODevice* audio_sink, AudioSampleFormat output_format, size_t samples_per_frame)
     : AudioFloatStreamListener(samples_per_frame)
     , m_audio_sink(audio_sink)
-    , m_format(format)
+    , m_format(output_format)
     , m_samples_per_frame(samples_per_frame)
-    , m_sample_size(sample_size(format))
+    , m_sample_size(sample_size(output_format))
     , m_frame_size(m_sample_size * samples_per_frame)
     , m_buffer_size(AUDIO_BUFFER_SIZE)
 {
-    switch (format){
+    switch (output_format){
     case AudioSampleFormat::INVALID:
     case AudioSampleFormat::FLOAT32:
         break;
@@ -133,13 +143,18 @@ AudioSinkWriter::AudioSinkWriter(QIODevice& audio_sink, AudioSampleFormat format
         m_buffer = AlignedVector<char>(m_frame_size * m_buffer_size);
     }
 }
-AudioSinkWriter::~AudioSinkWriter(){}
-void AudioSinkWriter::on_samples(const float* data, size_t frames){
+AudioFloatToStream::~AudioFloatToStream(){}
+void AudioFloatToStream::on_samples(const float* data, size_t frames){
     if (m_format == AudioSampleFormat::INVALID){
         return;
     }
     if (m_format == AudioSampleFormat::FLOAT32){
-        m_audio_sink.write((const char*)data, frames * m_frame_size);
+        if (m_audio_sink){
+            m_audio_sink->write((const char*)data, frames * m_frame_size);
+        }
+        for (StreamListener* listener : m_listeners){
+            listener->on_objects(data, frames);
+        }
         return;
     }
 
@@ -161,7 +176,12 @@ void AudioSinkWriter::on_samples(const float* data, size_t frames){
         default:
             return;
         }
-        m_audio_sink.write(m_buffer.data(), block * m_frame_size);
+        if (m_audio_sink){
+            m_audio_sink->write(m_buffer.data(), block * m_frame_size);
+        }
+        for (StreamListener* listener : m_listeners){
+            listener->on_objects(m_buffer.data(), block);
+        }
         data = (const float*)((const char*)data + block * m_frame_size);
         frames -= block;
     }

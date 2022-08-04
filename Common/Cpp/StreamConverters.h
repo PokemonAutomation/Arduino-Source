@@ -28,16 +28,16 @@ public:
 
 class StreamConverter{
 public:
+    void add_listener(StreamListener& listener);
+    void remove_listener(StreamListener& listener);
+
+public:
     StreamConverter(
         size_t object_size_in,
         size_t object_size_out,
         size_t buffer_capacity
     );
     virtual ~StreamConverter();
-
-    //  Attach/detach listeners.
-    void add_listener(StreamListener& listener);
-    void remove_listener(StreamListener& listener);
 
     void push_objects(const void* data, size_t objects);
 
@@ -58,16 +58,16 @@ private:
 
 class MisalignedStreamConverter{
 public:
+    void add_listener(StreamListener& listener);
+    void remove_listener(StreamListener& listener);
+
+public:
     MisalignedStreamConverter(
         size_t object_size_in,
         size_t object_size_out,
         size_t buffer_capacity
     );
     virtual ~MisalignedStreamConverter();
-
-    //  Attach/detach listeners.
-    void add_listener(StreamListener& listener);
-    void remove_listener(StreamListener& listener);
 
     void push_bytes(const void* data, size_t bytes);
 

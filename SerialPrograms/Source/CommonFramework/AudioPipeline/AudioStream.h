@@ -32,21 +32,19 @@ public:
 
 
 
-//  Listen in on a byte stream that contains audio samples.
-//  Even if the stream splits frames, this class will reconstruct them
-//  and present them as whole frames.
-class AudioSourceReader : private MisalignedStreamConverter, private StreamListener{
+//  Convert a stream of raw audio and output to aligned frames of float samples.
+class AudioStreamToFloat : private MisalignedStreamConverter, private StreamListener{
 public:
     void add_listener(AudioFloatStreamListener& listener);
     void remove_listener(AudioFloatStreamListener& listener);
 
 public:
-    AudioSourceReader(
+    AudioStreamToFloat(
         AudioSampleFormat input_format,
         size_t samples_per_frame,   //  Typically the # of channels. Can be higher if you want to group more into each frame.
         bool reverse_channels       //  Only valid if "samples_per_frame == 2".
     );
-    virtual ~AudioSourceReader();
+    virtual ~AudioStreamToFloat();
 
     using MisalignedStreamConverter::push_bytes;
 
@@ -65,21 +63,26 @@ private:
 
 
 
-//  Listen to an audio stream and pass it to an audio output.
-class AudioSinkWriter : public AudioFloatStreamListener{
+//  Convert a stream of float samples to raw audio.
+class AudioFloatToStream : public AudioFloatStreamListener{
 public:
-    AudioSinkWriter(QIODevice& audio_sink, AudioSampleFormat format, size_t samples_per_frame);
-    virtual ~AudioSinkWriter();
+    void add_listener(StreamListener& listener);
+    void remove_listener(StreamListener& listener);
+
+public:
+    AudioFloatToStream(QIODevice* audio_sink, AudioSampleFormat output_format, size_t samples_per_frame);
+    virtual ~AudioFloatToStream();
     virtual void on_samples(const float* data, size_t frames) override;
 
 private:
-    QIODevice& m_audio_sink;
+    QIODevice* m_audio_sink;
     AudioSampleFormat m_format;
     size_t m_samples_per_frame;
     size_t m_sample_size;
     size_t m_frame_size;
     size_t m_buffer_size;
     AlignedVector<char> m_buffer;
+    std::set<StreamListener*> m_listeners;
 };
 
 

@@ -20,7 +20,7 @@ class QObject;
 namespace PokemonAutomation{
 
 class Logger;
-class AudioSinkWriter;
+class AudioOutputDevice;
 
 
 class AudioSink{
@@ -32,7 +32,7 @@ public:
     size_t channels() const{ return m_channels; }
     size_t samples_per_frame() const{ return m_channels * m_multiplier; }
 
-    operator AudioFloatStreamListener&(){ return *m_writer; }
+    operator AudioFloatStreamListener&();
 
     void set_volume(float volume);
 
@@ -44,8 +44,7 @@ private:
     size_t m_channels;
     size_t m_multiplier;
 
-    std::unique_ptr<QObject> m_device;
-    std::unique_ptr<AudioSinkWriter> m_writer;
+    std::unique_ptr<AudioOutputDevice> m_writer;
 };
 
 

@@ -31,7 +31,7 @@ namespace PokemonAutomation{
 class AudioInputFile final : public QObject{
 public:
     AudioInputFile(
-        Logger& logger, AudioSourceReader& reader,
+        Logger& logger, AudioStreamToFloat& reader,
         const std::string& file, const QAudioFormat& format
     )
          : m_reader(reader)
@@ -45,14 +45,14 @@ public:
     }
 
 private:
-    AudioSourceReader& m_reader;
+    AudioStreamToFloat& m_reader;
     std::unique_ptr<AudioFileLoader> m_source;
 };
 
 class AudioInputDevice final : public QIODevice{
 public:
     AudioInputDevice(
-        Logger& logger, AudioSourceReader& reader,
+        Logger& logger, AudioStreamToFloat& reader,
         const NativeAudioInfo& device, const QAudioFormat& format
     )
          : m_reader(reader)
@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    AudioSourceReader& m_reader;
+    AudioStreamToFloat& m_reader;
     std::unique_ptr<NativeAudioSource> m_source;
 };
 
@@ -119,18 +119,14 @@ void AudioSource::remove_listener(AudioFloatStreamListener& listener){
 
 AudioSource::~AudioSource(){}
 
-AudioSource::AudioSource(Logger& logger, const std::string& file, AudioFormat format)
-    : m_logger(logger)
-{
+AudioSource::AudioSource(Logger& logger, const std::string& file, AudioFormat format){
     QAudioFormat native_format;
     setSampleFormatToFloat(native_format);
     set_format(native_format, format);
     init(format, AudioSampleFormat::FLOAT32);
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
 }
-AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFormat format)
-    : m_logger(logger)
-{
+AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFormat format){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
 
@@ -152,19 +148,19 @@ void AudioSource::init(AudioFormat format, AudioSampleFormat stream_format){
         m_sample_rate = 48000;
         m_channels = 1;
         m_multiplier = 1;
-        m_reader.reset(new AudioSourceReader(stream_format, 1, false));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 1, false));
         break;
     case AudioFormat::DUAL_44100:
         m_sample_rate = 44100;
         m_channels = 2;
         m_multiplier = 1;
-        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
     case AudioFormat::DUAL_48000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
-        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
     case AudioFormat::MONO_96000:
         //  Treat mono-96000 as 2-sample frames.
@@ -173,19 +169,19 @@ void AudioSource::init(AudioFormat format, AudioSampleFormat stream_format){
         m_sample_rate = 96000;
         m_channels = 1;
         m_multiplier = 2;
-        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
     case AudioFormat::INTERLEAVE_LR_96000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
-        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
     case AudioFormat::INTERLEAVE_RL_96000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
-        m_reader.reset(new AudioSourceReader(stream_format, 2, true));
+        m_reader.reset(new AudioStreamToFloat(stream_format, 2, true));
         break;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));

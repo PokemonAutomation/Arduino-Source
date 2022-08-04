@@ -20,7 +20,7 @@
 namespace PokemonAutomation{
 
 class Logger;
-class AudioSourceReader;
+class AudioStreamToFloat;
 class AudioInputFile;
 class AudioInputDevice;
 
@@ -49,8 +49,6 @@ private:
 private:
     class InternalListener;
 
-    Logger& m_logger;
-
     size_t m_sample_rate;
     size_t m_channels;
     size_t m_multiplier;
@@ -58,7 +56,7 @@ private:
     SpinLock m_lock;
 
     std::unique_ptr<InternalListener> m_internal_listener;
-    std::unique_ptr<AudioSourceReader> m_reader;
+    std::unique_ptr<AudioStreamToFloat> m_reader;
 
     std::unique_ptr<AudioInputFile> m_input_file;
     std::unique_ptr<AudioInputDevice> m_input_device;
