@@ -57,8 +57,6 @@ private:
 
     AudioWorker* m_AudioWorker = nullptr;
 
-    QThread m_fftThread;
-
     int m_sampleRate = 0;
 
 };

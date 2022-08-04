@@ -49,7 +49,7 @@ public:
     // Functions below are implementations of the interfaces in `AudioFeed`.
     // See class `AudioFeed` for the comments of those functions.
 
-    virtual void async_reset_audio() override;
+    virtual void reset() override;
 
     virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) override;
 

@@ -18,6 +18,7 @@ public:
     StreamListener(size_t p_object_size)
         : object_size(p_object_size)
     {}
+    virtual ~StreamListener() = default;
     virtual void on_objects(const void* data, size_t objects) = 0;
 
     const size_t object_size;
@@ -32,11 +33,11 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
-    ~StreamConverter();
+    virtual ~StreamConverter();
 
     //  Attach/detach listeners.
-    void operator+=(StreamListener& listener);
-    void operator-=(StreamListener& listener);
+    void add_listener(StreamListener& listener);
+    void remove_listener(StreamListener& listener);
 
     void push_objects(const void* data, size_t objects);
 
@@ -62,11 +63,11 @@ public:
         size_t object_size_out,
         size_t buffer_capacity
     );
-    ~MisalignedStreamConverter();
+    virtual ~MisalignedStreamConverter();
 
     //  Attach/detach listeners.
-    void operator+=(StreamListener& listener);
-    void operator-=(StreamListener& listener);
+    void add_listener(StreamListener& listener);
+    void remove_listener(StreamListener& listener);
 
     void push_bytes(const void* data, size_t bytes);
 

@@ -26,13 +26,15 @@ public:
         virtual void on_new_overlay() = 0;
     };
 
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
 
 public:
     AudioSpectrumHolder();
-    void clear();
 
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
+    void clear();
+//    virtual void reset() override;
 
 
 public:
@@ -43,8 +45,8 @@ public:
 public:
     //  Asynchronous and thread-safe getters.
 
-    std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) const;
-    std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) const;
+    std::vector<AudioSpectrum> spectrums_since(size_t startingStamp);
+    std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
 
     struct SpectrumSnapshot{
         std::vector<float> values;

@@ -19,42 +19,63 @@ class AudioIODevice;
 
 
 
+class AudioFloatStreamListener{
+public:
+    AudioFloatStreamListener(size_t p_samples_per_frame)
+        : samples_per_frame(p_samples_per_frame)
+    {}
+    virtual ~AudioFloatStreamListener() = default;
+    virtual void on_samples(const float* data, size_t frames) = 0;
+
+    const size_t samples_per_frame;
+};
+
+
+
 //  Listen in on a byte stream that contains audio samples.
 //  Even if the stream splits frames, this class will reconstruct them
 //  and present them as whole frames.
-class AudioSourceReader : public MisalignedStreamConverter{
+class AudioSourceReader : private MisalignedStreamConverter, private StreamListener{
+public:
+    void add_listener(AudioFloatStreamListener& listener);
+    void remove_listener(AudioFloatStreamListener& listener);
+
 public:
     AudioSourceReader(
-        AudioStreamFormat format,
+        AudioSampleFormat input_format,
         size_t samples_per_frame,   //  Typically the # of channels. Can be higher if you want to group more into each frame.
         bool reverse_channels       //  Only valid if "samples_per_frame == 2".
     );
-    virtual ~AudioSourceReader() {}
+    virtual ~AudioSourceReader();
+
+    using MisalignedStreamConverter::push_bytes;
 
 private:
+    virtual void on_objects(const void* data, size_t objects) override;
     virtual void convert(void* out, const void* in, size_t count) override;
 
 private:
-    AudioStreamFormat m_format;
+    AudioSampleFormat m_format;
     size_t m_samples_per_frame;
     bool m_reverse_channels;
     size_t m_sample_size;
     size_t m_frame_size;
+    std::set<AudioFloatStreamListener*> m_listeners;
 };
 
 
 
 //  Listen to an audio stream and pass it to an audio output.
-class AudioSinkWriter : public StreamListener{
+class AudioSinkWriter : public AudioFloatStreamListener{
 public:
-    AudioSinkWriter(QIODevice& audio_sink, AudioStreamFormat format, size_t channels);
+    AudioSinkWriter(QIODevice& audio_sink, AudioSampleFormat format, size_t samples_per_frame);
     virtual ~AudioSinkWriter();
-    virtual void on_objects(const void* data, size_t frames) override;
+    virtual void on_samples(const float* data, size_t frames) override;
 
 private:
     QIODevice& m_audio_sink;
-    AudioStreamFormat m_format;
-    size_t m_channels;
+    AudioSampleFormat m_format;
+    size_t m_samples_per_frame;
     size_t m_sample_size;
     size_t m_frame_size;
     size_t m_buffer_size;
@@ -64,14 +85,14 @@ private:
 
 
 //  Listen to an audio stream and compute FFTs on it.
-class FFTRunner : public StreamListener{
+class FFTRunner : public AudioFloatStreamListener{
 public:
     FFTRunner(
         AudioIODevice& device, size_t sample_rate,
         size_t samples_per_frame, bool average_pairs
     );
     virtual ~FFTRunner();
-    virtual void on_objects(const void* data, size_t frames) override;
+    virtual void on_samples(const float* data, size_t frames) override;
 
 private:
     void convert(float* fft_input, const float* audio_stream, size_t frames);

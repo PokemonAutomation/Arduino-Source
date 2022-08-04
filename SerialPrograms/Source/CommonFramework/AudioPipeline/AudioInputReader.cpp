@@ -1,0 +1,214 @@
+/*  Audio Input Reader
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+#include <QAudioDeviceInfo>
+#include <QAudioInput>
+#include <QAudioOutput>
+#include <QtEndian>
+using AudioSource = QAudioInput;
+using AudioSink = QAudioOutput;
+#elif QT_VERSION_MAJOR == 6
+#include <QMediaDevices>
+#include <QAudioSource>
+#include <QAudioSink>
+#include <QAudioDevice>
+using AudioSource = QAudioSource;
+using AudioSink = QAudioSink;
+#endif
+
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/StreamConverters.h"
+#include "AudioStream.h"
+#include "AudioFormatUtils.h"
+#include "AudioFileLoader.h"
+#include "AudioInputReader.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+namespace PokemonAutomation{
+
+
+
+class AudioInputFile final : public QObject{
+public:
+    AudioInputFile(
+        Logger& logger, AudioSourceReader& reader,
+        const std::string& file, const QAudioFormat& format
+    )
+         : m_reader(reader)
+    {
+        logger.log("AudioInputFile(): " + dumpAudioFormat(format));
+        m_source = std::make_unique<AudioFileLoader>(nullptr, file, format);
+        connect(m_source.get(), &AudioFileLoader::bufferReady, this, [=](const char* data, size_t len){
+            m_reader.push_bytes(data, len);
+        });
+        m_source->start();
+    }
+
+private:
+    AudioSourceReader& m_reader;
+    std::unique_ptr<AudioFileLoader> m_source;
+};
+
+class AudioInputDevice final : public QIODevice{
+public:
+    AudioInputDevice(
+        Logger& logger, AudioSourceReader& reader,
+        const NativeAudioInfo& device, const QAudioFormat& format
+    )
+         : m_reader(reader)
+    {
+        logger.log("AudioInputDevice(): " + dumpAudioFormat(format));
+        if (!device.isFormatSupported(format)){
+            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dumpAudioFormat(format));
+        }
+        m_source = std::make_unique<AudioSource>(device, format);
+
+        this->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
+        m_source->start(this);
+    }
+    ~AudioInputDevice(){
+        m_source->stop();
+    }
+
+    virtual bool isSequential() const override { return true; }
+    virtual qint64 readData(char* data, qint64 maxlen) override { return 0; }
+    virtual qint64 writeData(const char* data, qint64 len) override{
+        m_reader.push_bytes(data, len);
+        return len;
+    }
+
+private:
+    AudioSourceReader& m_reader;
+    std::unique_ptr<AudioSource> m_source;
+};
+
+
+
+class AudioInputReader::InternalListener : public AudioFloatStreamListener{
+public:
+    InternalListener(AudioInputReader& parent)
+        : AudioFloatStreamListener(parent.m_channels * parent.m_multiplier)
+        , m_parent(parent)
+    {}
+
+private:
+    virtual void on_samples(const float* data, size_t objects) override{
+//        cout << "objects = " << objects << endl;
+        SpinLockGuard lg(m_parent.m_lock);
+        for (AudioFloatStreamListener* listener : m_parent.m_listeners){
+//            listener->on_samples(data, objects * m_parent.m_multiplier);
+            listener->on_samples(data, objects);
+        }
+    }
+
+    AudioInputReader& m_parent;
+};
+
+
+
+
+void AudioInputReader::add_listener(AudioFloatStreamListener& listener){
+    SpinLockGuard lg(m_lock);
+    m_listeners.insert(&listener);
+}
+void AudioInputReader::remove_listener(AudioFloatStreamListener& listener){
+    SpinLockGuard lg(m_lock);
+    m_listeners.erase(&listener);
+}
+
+
+AudioInputReader::~AudioInputReader(){}
+
+AudioInputReader::AudioInputReader(Logger& logger, const std::string& file, AudioFormat format)
+    : m_logger(logger)
+{
+    QAudioFormat native_format;
+    setSampleFormatToFloat(native_format);
+    set_format(native_format, format);
+    init(format, AudioSampleFormat::FLOAT32);
+    m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
+}
+AudioInputReader::AudioInputReader(Logger& logger, const AudioDeviceInfo& device, AudioFormat format)
+    : m_logger(logger)
+{
+    NativeAudioInfo native_info = device.native_info();
+    QAudioFormat native_format = native_info.preferredFormat();
+
+    set_format(native_format, format);
+
+    AudioSampleFormat stream_format = get_stream_format(native_format);
+    if (stream_format == AudioSampleFormat::INVALID){
+        stream_format = AudioSampleFormat::FLOAT32;
+        setSampleFormatToFloat(native_format);
+    }
+
+    init(format, stream_format);
+    m_input_device = std::make_unique<AudioInputDevice>(logger, *m_reader, native_info, native_format);
+}
+
+void AudioInputReader::init(AudioFormat format, AudioSampleFormat stream_format){
+    switch (format){
+    case AudioFormat::MONO_48000:
+        m_channels = 1;
+        m_sample_rate = 48000;
+        m_multiplier = 1;
+        m_reader.reset(new AudioSourceReader(stream_format, 1, false));
+        break;
+    case AudioFormat::DUAL_44100:
+        m_channels = 2;
+        m_sample_rate = 44100;
+        m_multiplier = 1;
+        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        break;
+    case AudioFormat::DUAL_48000:
+        m_channels = 2;
+        m_sample_rate = 48000;
+        m_multiplier = 1;
+        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        break;
+    case AudioFormat::MONO_96000:
+        //  Treat mono-96000 as 2-sample frames.
+        //  The FFT will then average each pair to produce 48000Hz.
+        //  The output will push the same stream at the original 4 bytes * 96000Hz.
+        m_channels = 1;
+        m_sample_rate = 96000;
+        m_multiplier = 2;
+        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        break;
+    case AudioFormat::INTERLEAVE_LR_96000:
+        m_channels = 2;
+        m_sample_rate = 48000;
+        m_multiplier = 1;
+        m_reader.reset(new AudioSourceReader(stream_format, 2, false));
+        break;
+    case AudioFormat::INTERLEAVE_RL_96000:
+        m_channels = 2;
+        m_sample_rate = 48000;
+        m_multiplier = 1;
+        m_reader.reset(new AudioSourceReader(stream_format, 2, true));
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
+    }
+
+    m_internal_listener = std::make_unique<InternalListener>(*this);
+    m_reader->add_listener(*m_internal_listener);
+}
+
+
+
+
+
+
+
+
+
+}

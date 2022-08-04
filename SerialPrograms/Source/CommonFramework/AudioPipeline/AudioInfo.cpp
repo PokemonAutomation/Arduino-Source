@@ -79,31 +79,31 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
     }
 }
 
-AudioStreamFormat get_stream_format(QAudioFormat& native_format){
+AudioSampleFormat get_stream_format(QAudioFormat& native_format){
 #if QT_VERSION_MAJOR == 5
     if (native_format.sampleType() == QAudioFormat::SampleType::Float){
-        return AudioStreamFormat::FLOAT32;
+        return AudioSampleFormat::FLOAT32;
     }else if (native_format.sampleType() == QAudioFormat::SampleType::UnSignedInt && native_format.sampleSize() == 8){
-        return AudioStreamFormat::UINT8;
+        return AudioSampleFormat::UINT8;
     }else if (native_format.sampleType() == QAudioFormat::SampleType::SignedInt && native_format.sampleSize() == 16){
-        return AudioStreamFormat::SINT16;
+        return AudioSampleFormat::SINT16;
     }else if (native_format.sampleType() == QAudioFormat::SampleType::SignedInt && native_format.sampleSize() == 32){
-        return AudioStreamFormat::SINT32;
+        return AudioSampleFormat::SINT32;
     }else{
-        return AudioStreamFormat::INVALID;
+        return AudioSampleFormat::INVALID;
     }
 #elif QT_VERSION_MAJOR == 6
     switch (native_format.sampleFormat()){
     case QAudioFormat::SampleFormat::Float:
-        return AudioStreamFormat::FLOAT32;
+        return AudioSampleFormat::FLOAT32;
     case QAudioFormat::SampleFormat::UInt8:
-        return AudioStreamFormat::UINT8;
+        return AudioSampleFormat::UINT8;
     case QAudioFormat::SampleFormat::Int16:
-        return AudioStreamFormat::SINT16;
+        return AudioSampleFormat::SINT16;
     case QAudioFormat::SampleFormat::Int32:
-        return AudioStreamFormat::SINT32;
+        return AudioSampleFormat::SINT32;
     default:
-        return AudioStreamFormat::INVALID;
+        return AudioSampleFormat::INVALID;
     }
 #else
 #error "Unknown Qt version."

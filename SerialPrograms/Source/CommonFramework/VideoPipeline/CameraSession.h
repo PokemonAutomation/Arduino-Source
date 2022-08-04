@@ -33,6 +33,9 @@ public:
         virtual void camera_shutdown() = 0;
     };
 
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
 
 public:
     CameraSession(
@@ -40,9 +43,6 @@ public:
         Logger& logger
     );
     ~CameraSession();
-
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
 
 
 public:

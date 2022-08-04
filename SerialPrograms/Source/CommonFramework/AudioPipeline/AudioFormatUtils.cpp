@@ -132,7 +132,7 @@ std::string dumpAudioFormat(const QAudioFormat& format){
             channelConfigStr = "Stereo";
             break;
         case QAudioFormat::ChannelConfig::ChannelConfigUnknown:
-            channelConfigStr = "Unkown";
+            channelConfigStr = "Unknown";
             break;
         default:
             channelConfigStr = "Non Mono or Stereo";

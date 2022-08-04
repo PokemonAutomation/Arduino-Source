@@ -115,6 +115,8 @@ void AudioSpectrumHolder::clear(){
     }
 }
 
+//void AudioSpectrumHolder::reset(){}
+
 
 // TODO: move this to a common lib folder:
 PA_FORCE_INLINE uint32_t jetColorMap(float v){
@@ -240,7 +242,7 @@ void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp,
     }
 }
 
-std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(size_t startingStamp) const{
+std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(size_t startingStamp){
     std::vector<AudioSpectrum> spectrums;
 
     std::lock_guard<std::mutex> lg(m_state_lock);
@@ -254,7 +256,7 @@ std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(size_t startingS
     }
     return spectrums;
 }
-std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t numLatestSpectrums) const{
+std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t numLatestSpectrums){
     std::vector<AudioSpectrum> spectrums;
 
     std::lock_guard<std::mutex> lg(m_state_lock);

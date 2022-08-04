@@ -192,6 +192,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioIODevice.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
+    Source/CommonFramework/AudioPipeline/AudioInputReader.cpp
+    Source/CommonFramework/AudioPipeline/AudioInputReader.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h

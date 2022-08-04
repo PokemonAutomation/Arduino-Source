@@ -27,13 +27,13 @@ StreamConverter::StreamConverter(
     , m_buffer(object_size_out * buffer_capacity)
 {}
 StreamConverter::~StreamConverter(){}
-void StreamConverter::operator+=(StreamListener& listener){
+void StreamConverter::add_listener(StreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");
     }
     m_listeners.insert(&listener);
 }
-void StreamConverter::operator-=(StreamListener& listener){
+void StreamConverter::remove_listener(StreamListener& listener){
     m_listeners.erase(&listener);
 }
 void StreamConverter::push_objects(const void* data, size_t objects){
@@ -64,13 +64,13 @@ MisalignedStreamConverter::MisalignedStreamConverter(
     , m_buffer(object_size_out * buffer_capacity)
 {}
 MisalignedStreamConverter::~MisalignedStreamConverter(){}
-void MisalignedStreamConverter::operator+=(StreamListener& listener){
+void MisalignedStreamConverter::add_listener(StreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");
     }
     m_listeners.insert(&listener);
 }
-void MisalignedStreamConverter::operator-=(StreamListener& listener){
+void MisalignedStreamConverter::remove_listener(StreamListener& listener){
     m_listeners.erase(&listener);
 }
 void MisalignedStreamConverter::push_bytes(const void* data, size_t bytes){

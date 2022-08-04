@@ -49,7 +49,7 @@ namespace PokemonAutomation{
 
 
 AudioWorker::AudioWorker(
-    LoggerQt& logger,
+    Logger& logger,
     const AudioDeviceInfo& inputInfo,
     AudioFormat inputFormat,
     const std::string& inputAbsoluteFilepath,
@@ -86,31 +86,9 @@ void AudioWorker::startAudio(){
 
     // If input filename is not empty, load audio from file:
     if (m_inputAbsoluteFilepath.size() > 0){
-        // We hard code file audio format to be mono channel 48KHz.
-        inputAudioFormat.setChannelCount(2);
-#if QT_VERSION_MAJOR == 5
-        inputAudioFormat.setCodec("audio/pcm");
-#endif
-        inputAudioFormat.setSampleRate(48000);
-        setSampleFormatToFloat(inputAudioFormat);
-        m_inputFormat = AudioFormat::DUAL_48000;
-
-        // Note: m_inputAbsoluteFilepath must be an absolute file path. Otherwise it may trigger a bug
-        // in QAudioDecoder used in AudioFileLoader, which will either stops the audio stream
-        // halfway or crash the program when deleting QAudioDecoder.
-        m_FileLoader = new AudioFileLoader(this, m_inputAbsoluteFilepath, inputAudioFormat);
-        if (m_FileLoader->start() == false){
-            return;
-        }
-        outputAudioFormat = m_FileLoader->audioFormat();
-        m_logger.log("Set output audio format to: " + dumpAudioFormat(outputAudioFormat));
-
-        connect(m_FileLoader, &AudioFileLoader::bufferReady, this, [&](const char* data, size_t len){
-            if (m_audioIODevice){
-                m_audioIODevice->writeData(data, len);
-            }
-        });
-
+        m_audioIODevice = new AudioIODevice(m_logger, m_inputAbsoluteFilepath, AudioFormat::DUAL_48000, AudioSampleFormat::FLOAT32);
+        setSampleFormatToFloat(outputAudioFormat);
+        set_format(outputAudioFormat, AudioFormat::DUAL_48000);
     }else{
         // Load from audio input device:
 
@@ -129,7 +107,7 @@ void AudioWorker::startAudio(){
         set_format(inputAudioFormat, m_inputFormat);
 
         //  See if the default format is good.
-        if (get_stream_format(inputAudioFormat) == AudioStreamFormat::INVALID){
+        if (get_stream_format(inputAudioFormat) == AudioSampleFormat::INVALID){
             //  If not, force it to float.
             setSampleFormatToFloat(inputAudioFormat);
         }
@@ -174,26 +152,17 @@ void AudioWorker::startAudio(){
         }
 #endif
 
-        m_audioSource = new AudioSource(chosenAudioInputDevice, inputAudioFormat, this);
-
-        connect(
-            m_audioSource, &AudioSource::stateChanged,
-            this, [&](QAudio::State newState){
-                this->handleDeviceErrorState(newState, m_audioSource->error(), "AudioSource");
-            }
-        );
+        m_audioIODevice = new AudioIODevice(m_logger, m_inputInfo, m_inputFormat, get_stream_format(inputAudioFormat));
     } // end if load audio from input audio device
-    
 
 
-    m_audioIODevice = new AudioIODevice(m_inputFormat, get_stream_format(inputAudioFormat));
-    m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
-//    connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
-    connect(m_audioIODevice, &AudioIODevice::fftOutputReady, this, &AudioWorker::fftOutputReady);
-    
-    if (m_audioSource){
-        m_audioSource->start(m_audioIODevice);
+    if (m_audioIODevice == nullptr){
+        return;
     }
+
+
+    connect(m_audioIODevice, &AudioIODevice::fftOutputReady, this, &AudioWorker::fftOutputReady);
+
 
     if (foundAudioOutputInfo){
         bool outputSupported = chosenAudioOutputDevice.isFormatSupported(outputAudioFormat);
@@ -219,19 +188,13 @@ AudioWorker::~AudioWorker(){
     if (m_audioIODevice){
         // Close the connection between m_audioIODevice and 
         // m_audioSink.
-        m_audioIODevice->setAudioSinkDevice(nullptr, AudioStreamFormat::INVALID);
+        m_audioIODevice->setAudioSinkDevice(nullptr, AudioSampleFormat::INVALID);
     }
 
     if (m_audioSink){
         m_audioSink->stop();
         delete m_audioSink;
         m_audioSink = nullptr;
-    }
-
-    if (m_audioSource){
-        m_audioSource->stop();
-        delete m_audioSource;
-        m_audioSource = nullptr;
     }
 
     if (m_FileLoader){

@@ -49,15 +49,15 @@ class Camera : public QObject, public PokemonAutomation::Camera{
 //        virtual void new_frame_available() = 0;
 //    };
 
+//    void add_listener(Listener& listener);
+//    void remove_listener(Listener& listener);
+
 public:
     Camera(
         Logger& logger,
         const CameraInfo& info, const Resolution& desired_resolution
     );
     virtual ~Camera();
-
-//    void add_listener(Listener& listener);
-//    void remove_listener(Listener& listener);
 
 public:
     //  These are all thread-safe.

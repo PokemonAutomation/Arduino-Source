@@ -41,8 +41,8 @@ public:
 //  All the functions in the interface should be thread safe.
 class AudioFeed{
 public:
-    //  Reset audio; Can be called from any thread.
-    virtual void async_reset_audio() = 0;
+    //  Reset the video. Note that this may return early.
+    virtual void reset() = 0;
 
     //  Return all the spectrums with stamps greater or equal to `startingStamp`
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.

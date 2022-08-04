@@ -335,7 +335,7 @@ void AudioSelectorWidget::reset_audio(){
         );
     }
 }
-void AudioSelectorWidget::async_reset_audio(){
+void AudioSelectorWidget::reset(){
     emit internal_async_reset_audio();
 }
 

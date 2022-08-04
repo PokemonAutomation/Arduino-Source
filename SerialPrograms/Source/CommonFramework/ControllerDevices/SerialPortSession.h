@@ -30,6 +30,9 @@ public:
         virtual void on_ready(bool ready) = 0;
     };
 
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
 
 public:
     SerialPortSession(
@@ -37,9 +40,6 @@ public:
         Logger& logger
     );
     ~SerialPortSession();
-
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
 
 
 public:

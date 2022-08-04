@@ -106,7 +106,7 @@ public:
 class DummyAudioFeed: public AudioFeed{
 public:
     DummyAudioFeed() {}
-    virtual void async_reset_audio() override {}
+    virtual void reset() override {}
 
     virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) override { return std::vector<AudioSpectrum>(); }
 
