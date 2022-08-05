@@ -59,7 +59,9 @@ public:
     {
         logger.log("AudioInputDevice(): " + dumpAudioFormat(format));
         if (!device.isFormatSupported(format)){
-            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dumpAudioFormat(format));
+//            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dumpAudioFormat(format));
+            logger.log("Format not supported: " + dumpAudioFormat(format), COLOR_RED);
+            return;
         }
         m_source = std::make_unique<NativeAudioSource>(device, format);
 
@@ -67,7 +69,9 @@ public:
         m_source->start(this);
     }
     ~AudioInputDevice(){
-        m_source->stop();
+        if (m_source){
+            m_source->stop();
+        }
     }
 
     virtual bool isSequential() const override { return true; }
@@ -119,14 +123,14 @@ void AudioSource::remove_listener(AudioFloatStreamListener& listener){
 
 AudioSource::~AudioSource(){}
 
-AudioSource::AudioSource(Logger& logger, const std::string& file, AudioFormat format){
+AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format){
     QAudioFormat native_format;
     setSampleFormatToFloat(native_format);
     set_format(native_format, format);
     init(format, AudioSampleFormat::FLOAT32);
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
 }
-AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFormat format){
+AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
 
@@ -142,27 +146,27 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFor
     m_input_device = std::make_unique<AudioInputDevice>(logger, *m_reader, native_info, native_format);
 }
 
-void AudioSource::init(AudioFormat format, AudioSampleFormat stream_format){
+void AudioSource::init(AudioChannelFormat format, AudioSampleFormat stream_format){
     switch (format){
-    case AudioFormat::MONO_48000:
+    case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;
         m_channels = 1;
         m_multiplier = 1;
         m_reader.reset(new AudioStreamToFloat(stream_format, 1, false));
         break;
-    case AudioFormat::DUAL_44100:
+    case AudioChannelFormat::DUAL_44100:
         m_sample_rate = 44100;
         m_channels = 2;
         m_multiplier = 1;
         m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
-    case AudioFormat::DUAL_48000:
+    case AudioChannelFormat::DUAL_48000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
         m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
-    case AudioFormat::MONO_96000:
+    case AudioChannelFormat::MONO_96000:
         //  Treat mono-96000 as 2-sample frames.
         //  The FFT will then average each pair to produce 48000Hz.
         //  The output will push the same stream at the original 4 bytes * 96000Hz.
@@ -171,13 +175,13 @@ void AudioSource::init(AudioFormat format, AudioSampleFormat stream_format){
         m_multiplier = 2;
         m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
-    case AudioFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
         m_reader.reset(new AudioStreamToFloat(stream_format, 2, false));
         break;
-    case AudioFormat::INTERLEAVE_RL_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;

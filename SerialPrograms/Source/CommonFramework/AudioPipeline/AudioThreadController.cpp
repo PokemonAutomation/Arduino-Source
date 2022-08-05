@@ -22,7 +22,7 @@ AudioThreadController::AudioThreadController(
     LoggerQt& logger,
     AudioDisplayWidget* parent,
     const AudioDeviceInfo& inputInfo,
-    AudioFormat inputFormat,
+    AudioChannelFormat inputFormat,
     const std::string& inputAbsoluteFilepath,
     const AudioDeviceInfo& outputInfo,
     float outputVolume

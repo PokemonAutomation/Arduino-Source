@@ -57,7 +57,7 @@ void AudioSelector::load_json(const JsonValue& json){
     }
     str = obj->get_string(JSON_INPUT_FORMAT);
     if (str != nullptr){
-        for (AudioFormat format : m_inputDevice.supported_formats()){
+        for (AudioChannelFormat format : m_inputDevice.supported_formats()){
             if (AUDIO_FORMAT_LABELS[(size_t)format] == *str){
                 m_inputFormat = format;
                 break;

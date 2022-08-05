@@ -9,7 +9,6 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CameraOption.h"
-#include "CameraSelectorWidget.h"
 
 namespace PokemonAutomation{
 

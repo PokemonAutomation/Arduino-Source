@@ -11,8 +11,8 @@
 #include <vector>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CameraInfo.h"
-#include "VideoWidget.h"
+#include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "CommonFramework/VideoPipeline/UI/VideoWidget.h"
 
 namespace PokemonAutomation{
 

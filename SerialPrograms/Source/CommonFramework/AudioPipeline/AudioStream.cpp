@@ -4,13 +4,11 @@
  *
  */
 
-#include <QIODevice>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "Kernels/AudioStreamConversion/AudioStreamConversion.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
-#include "AudioIODevice.h"
 #include "AudioStream.h"
 
 #include <iostream>
@@ -126,9 +124,8 @@ void AudioFloatToStream::remove_listener(StreamListener& listener){
     m_listeners.erase(&listener);
 }
 
-AudioFloatToStream::AudioFloatToStream(QIODevice* audio_sink, AudioSampleFormat output_format, size_t samples_per_frame)
+AudioFloatToStream::AudioFloatToStream(AudioSampleFormat output_format, size_t samples_per_frame)
     : AudioFloatStreamListener(samples_per_frame)
-    , m_audio_sink(audio_sink)
     , m_format(output_format)
     , m_samples_per_frame(samples_per_frame)
     , m_sample_size(sample_size(output_format))
@@ -149,9 +146,6 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         return;
     }
     if (m_format == AudioSampleFormat::FLOAT32){
-        if (m_audio_sink){
-            m_audio_sink->write((const char*)data, frames * m_frame_size);
-        }
         for (StreamListener* listener : m_listeners){
             listener->on_objects(data, frames);
         }
@@ -176,9 +170,6 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         default:
             return;
         }
-        if (m_audio_sink){
-            m_audio_sink->write(m_buffer.data(), block * m_frame_size);
-        }
         for (StreamListener* listener : m_listeners){
             listener->on_objects(m_buffer.data(), block);
         }
@@ -189,97 +180,6 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
 
 
 
-
-
-FFTRunner::FFTRunner(
-    AudioIODevice& device, size_t sample_rate,
-    size_t samples_per_frame, bool average_pairs
-)
-    : AudioFloatStreamListener(samples_per_frame)
-    , m_device(device)
-    , m_sample_rate(sample_rate)
-    , m_average(average_pairs)
-    , m_fft_sample_size(average_pairs ? 2 : 1)
-    , m_buffer(NUM_FFT_SAMPLES)
-    , m_buffered(NUM_FFT_SAMPLES)
-    , m_fft_input(NUM_FFT_SAMPLES)
-{
-    if (samples_per_frame == 0 || samples_per_frame > 2){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Channels must be 1 or 2.");
-    }
-    memset(m_buffer.data(), 0, m_buffer.size() * sizeof(float));
-}
-FFTRunner::~FFTRunner(){}
-void FFTRunner::on_samples(const float* data, size_t frames){
-//    cout << "objects = " << objects << endl;
-    const float* ptr = data;
-    while (frames > 0){
-        //  Figure out how much space we can write contiguously.
-        size_t block = m_buffer.size() - std::max(m_buffered, m_end);
-
-        //  Don't write more than we have.
-        block = std::min(block, frames);
-
-//        cout << "block = " << block << endl;
-
-        //  Write it.
-        convert(&m_buffer[m_end], ptr, block);
-        m_buffered += block;
-        m_end += block;
-        if (m_end == m_buffer.size()){
-            m_end = 0;
-        }
-        ptr += block * m_fft_sample_size;
-        frames -= block;
-
-        //  Buffer is full. Time to run FFT!
-        if (m_buffered == m_buffer.size()){
-//            cout << "run_fft()" << endl;
-            run_fft();
-            drop_from_front(FFT_SLIDING_WINDOW_STEP);
-        }
-    }
-}
-void FFTRunner::convert(float* fft_input, const float* audio_stream, size_t frames){
-    if (!m_average){
-        memcpy(fft_input, audio_stream, frames * sizeof(float));
-        return;
-    }
-    for (size_t c = 0; c < frames; c++){
-        fft_input[c] = (audio_stream[2*c + 0] + audio_stream[2*c + 1]) * 0.5;
-    }
-}
-void FFTRunner::run_fft(){
-    float* ptr = m_fft_input.data();
-    size_t remaining = NUM_FFT_SAMPLES;
-    size_t index = m_start;
-    while (remaining > 0){
-        size_t block = std::min(remaining, m_buffer.size() - index);
-        memcpy(ptr, &m_buffer[index], block * sizeof(float));
-        ptr += block;
-        remaining -= block;
-        index += block;
-        if (index == m_buffer.size()){
-            index = 0;
-        }
-    }
-    std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES / 2);
-    Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, out->data(), m_fft_input.data());
-    emit m_device.fftOutputReady(m_sample_rate, std::move(out));
-}
-void FFTRunner::drop_from_front(size_t frames){
-    if (frames >= m_buffered){
-        m_buffered = 0;
-        m_start = 0;
-        m_end = 0;
-        return;
-    }
-    m_buffered -= frames;
-    m_start += frames;
-    while (m_start >= m_buffer.size()){
-        m_start -= m_buffer.size();
-    }
-}
 
 
 

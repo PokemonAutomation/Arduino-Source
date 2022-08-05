@@ -142,7 +142,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     m_templateNorm = buildTemplateNorm();
 }
 
-size_t SpectrogramMatcher::latestTimestamp() const{
+uint64_t SpectrogramMatcher::latestTimestamp() const{
     if (m_spectrums.size() == 0){
         return SIZE_MAX;
     }

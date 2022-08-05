@@ -2,8 +2,6 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This the new exceptions header.
- *
  */
 
 #ifndef PokemonAutomation_Exceptions_H

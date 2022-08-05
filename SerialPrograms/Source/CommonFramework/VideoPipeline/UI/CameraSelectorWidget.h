@@ -13,8 +13,8 @@
 #include <QWidget>
 #include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CameraOption.h"
-#include "CameraSession.h"
+#include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "CommonFramework/VideoPipeline/CameraSession.h"
 
 class QComboBox;
 class QPushButton;

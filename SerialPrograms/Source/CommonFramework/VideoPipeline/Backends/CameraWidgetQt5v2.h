@@ -4,28 +4,31 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
-#define PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
+#ifndef PokemonAutomation_VideoPipeline_VideoWidgetQt5v2_H
+#define PokemonAutomation_VideoPipeline_VideoWidgetQt5v2_H
 
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 5
 
-#include <set>
+#include <mutex>
 #include <condition_variable>
+#include <QVideoFrame>
 #include <QThread>
-#include <QCameraViewfinder>
-#include <QCameraImageCapture>
-#include <QVideoProbe>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
-#include "CameraInfo.h"
+#include "CommonFramework/VideoPipeline/UI/VideoWidget.h"
 #include "CameraImplementations.h"
 #include "VideoToolsQt5.h"
-#include "VideoWidget.h"
+
+class QCamera;
+class QCameraImageCapture;
+class QCameraViewfinder;
+class QVideoProbe;
 
 namespace PokemonAutomation{
-namespace CameraQt5QCameraViewfinder{
+    class LoggerQt;
+    class CameraInfo;
+namespace CameraQt5QCameraViewfinderSeparateThread{
 
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
@@ -43,34 +46,33 @@ public:
 };
 
 
-class Camera : public QObject, public PokemonAutomation::Camera{
-//public:
-//    struct Listener{
-//        virtual void new_frame_available() = 0;
-//    };
+class VideoWidget;
 
-//    void add_listener(Listener& listener);
-//    void remove_listener(Listener& listener);
 
+class CameraHolder : public QObject, public PokemonAutomation::Camera{
+    Q_OBJECT
 public:
-    Camera(
+    CameraHolder(
         Logger& logger,
         const CameraInfo& info, const Resolution& desired_resolution
     );
-    virtual ~Camera();
+    virtual ~CameraHolder();
 
-public:
-    //  These are all thread-safe.
-
-    virtual Resolution current_resolution() const override;
-    virtual std::vector<Resolution> supported_resolutions() const override;
-    virtual void set_resolution(const Resolution& size) override;
+    virtual Resolution current_resolution() const override{ return m_current_resolution; }
+    virtual std::vector<Resolution> supported_resolutions() const override{ return m_supported_resolutions; }
 
     virtual VideoSnapshot snapshot() override;
 
+public slots:
+    virtual void set_resolution(const Resolution& size) override;
+
+signals:
+    void stop();
+
 private:
-    //  All of these must be called under the lock.
-    VideoSnapshot direct_snapshot_image();
+//    void internal_shutdown();
+
+    //  All of these must be called under the state lock.
     QImage direct_snapshot_probe(bool flip_vertical);
 
     VideoSnapshot snapshot_image();
@@ -79,61 +81,61 @@ private:
     bool determine_frame_orientation();
 
 private:
-    friend class VideoWidget2;
+    friend class VideoWidget;
 
     Logger& m_logger;
     QCamera* m_camera = nullptr;
     CameraScreenshotter m_screenshotter;
 
+    std::mutex m_state_lock;
+    std::condition_variable m_cv;
+    bool m_stopped = false;
+
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
-    std::vector<Resolution> m_resolutions;
+    std::vector<Resolution> m_supported_resolutions;
+    Resolution m_current_resolution;
 
-    mutable std::mutex m_lock;
-    Resolution m_resolution;
-
-//    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;
+
     WallClock m_last_orientation_attempt;
     bool m_orientation_known = false;
-//    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
 
     SpinLock m_frame_lock;
-
-    //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
-//    QImage m_last_image;
-//    WallClock m_last_image_timestamp;
     VideoSnapshot m_last_snapshot;
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
-
-//    std::set<Listener*> m_listeners;
 };
 
 
 
-
-class VideoWidget2 : public PokemonAutomation::VideoWidget{
+class VideoWidget : public PokemonAutomation::VideoWidget{
+    Q_OBJECT
 public:
-    VideoWidget2(QWidget* parent, Camera& camera);
-    virtual ~VideoWidget2();
+    VideoWidget(QWidget* parent, CameraHolder& camera);
+    virtual ~VideoWidget();
 
-    virtual Camera& camera() override{ return m_camera; }
+    virtual Camera& camera() override{ return *m_holder; }
+    virtual void resizeEvent(QResizeEvent* event) override;
+
+signals:
+    void internal_set_resolution(const Resolution& size);
 
 private:
-    Camera& m_camera;
+//    mutable std::mutex m_lock;
+
+    Logger& m_logger;
+    CameraHolder* m_holder = nullptr;
+    QThread m_thread;
+
     QCameraViewfinder* m_camera_view = nullptr;
 };
-
-
-
-
 
 
 

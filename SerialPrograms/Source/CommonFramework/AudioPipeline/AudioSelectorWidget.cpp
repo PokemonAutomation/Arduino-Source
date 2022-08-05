@@ -134,7 +134,7 @@ AudioSelectorWidget::AudioSelectorWidget(
                 }
                 current = audio;
             }
-            m_value.m_inputFormat = AudioFormat::NONE;
+            m_value.m_inputFormat = AudioChannelFormat::NONE;
             update_formats();
             reset_audio();
         }
@@ -142,10 +142,10 @@ AudioSelectorWidget::AudioSelectorWidget(
     connect(
         m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            AudioFormat& current = m_value.m_inputFormat;
-            const std::vector<AudioFormat>& supported_formats = m_value.m_inputDevice.supported_formats();
+            AudioChannelFormat& current = m_value.m_inputFormat;
+            const std::vector<AudioChannelFormat>& supported_formats = m_value.m_inputDevice.supported_formats();
             if (supported_formats.empty()){
-                current = AudioFormat::NONE;
+                current = AudioChannelFormat::NONE;
             }else{
                 index = std::max(index, 0);
                 index = std::min(index, (int)supported_formats.size() - 1);
@@ -240,13 +240,13 @@ AudioSelectorWidget::AudioSelectorWidget(
 }
 void AudioSelectorWidget::update_formats(){
     const AudioDeviceInfo& device = m_value.m_inputDevice;
-    AudioFormat current_format = m_value.m_inputFormat;
+    AudioChannelFormat current_format = m_value.m_inputFormat;
 
     m_audio_format_box->clear();
-    const std::vector<AudioFormat>& supported_formats = device.supported_formats();
+    const std::vector<AudioChannelFormat>& supported_formats = device.supported_formats();
 
     if (supported_formats.empty()){
-        m_value.m_inputFormat = AudioFormat::NONE;
+        m_value.m_inputFormat = AudioChannelFormat::NONE;
         return;
     }
 
@@ -324,7 +324,7 @@ void AudioSelectorWidget::reset_audio(){
     m_display.close_audio();
 
     const AudioDeviceInfo& info = m_value.m_inputDevice;
-    if ((info && m_value.m_inputFormat != AudioFormat::NONE) || m_absoluteFilepath.size() > 0){
+    if ((info && m_value.m_inputFormat != AudioChannelFormat::NONE) || m_absoluteFilepath.size() > 0){
         m_display.set_audio(
             m_logger,
             info,
@@ -339,7 +339,7 @@ void AudioSelectorWidget::reset(){
     emit internal_async_reset_audio();
 }
 
-std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(size_t startingStamp){
+std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(uint64_t startingStamp){
     return m_display.state().spectrums_since(startingStamp);
 }
 
@@ -347,7 +347,7 @@ std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_latest(size_t numLates
     return m_display.state().spectrums_latest(numLatestSpectrums);
 }
 
-void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
+void AudioSelectorWidget::add_overlay(uint64_t startingStamp, size_t endStamp, Color color){
     m_display.add_overlay(startingStamp, endStamp, color);
 }
 

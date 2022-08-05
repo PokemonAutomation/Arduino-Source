@@ -56,6 +56,8 @@ private:
 
 
 
+//  Given a stream of objects A that is arbitrarily broken up with no regards to
+//  alignment, convert it to a stream of objects B.
 class MisalignedStreamConverter{
 public:
     void add_listener(StreamListener& listener);

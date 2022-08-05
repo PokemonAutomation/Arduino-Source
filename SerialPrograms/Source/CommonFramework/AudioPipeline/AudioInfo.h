@@ -39,7 +39,7 @@ enum class AudioSampleFormat{
 size_t sample_size(AudioSampleFormat format);
 
 
-enum class AudioFormat{
+enum class AudioChannelFormat{
     NONE,
     MONO_48000,
     DUAL_44100,
@@ -52,7 +52,7 @@ enum class AudioFormat{
 extern const char* AUDIO_FORMAT_LABELS[];
 
 //  Set the QAudioFormat to the our audio format enum.
-void set_format(QAudioFormat& native_format, AudioFormat format);
+void set_format(QAudioFormat& native_format, AudioChannelFormat format);
 
 
 AudioSampleFormat get_sample_format(QAudioFormat& native_format);
@@ -75,7 +75,7 @@ public:
     const std::string& display_name() const;
     const std::string& device_name() const;
 
-    const std::vector<AudioFormat>& supported_formats() const;
+    const std::vector<AudioChannelFormat>& supported_formats() const;
     int preferred_format_index() const;
     QAudioFormat preferred_format() const;
 

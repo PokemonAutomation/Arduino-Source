@@ -244,7 +244,7 @@ void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp,
     }
 }
 
-std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(size_t startingStamp){
+std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t startingStamp){
     std::vector<AudioSpectrum> spectrums;
 
     std::lock_guard<std::mutex> lg(m_state_lock);

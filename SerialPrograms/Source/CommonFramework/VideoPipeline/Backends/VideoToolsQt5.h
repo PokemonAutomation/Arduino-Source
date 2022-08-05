@@ -16,8 +16,8 @@
 #include <QCameraImageCapture>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
-#include "CameraInfo.h"
-#include "VideoFeed.h"
+#include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 namespace PokemonAutomation{
 

@@ -14,7 +14,7 @@
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/VideoPipeline/CameraImplementations.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 

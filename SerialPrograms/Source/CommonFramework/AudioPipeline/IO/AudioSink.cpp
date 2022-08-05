@@ -28,13 +28,15 @@ public:
     AudioOutputDevice(
         Logger& logger,
         const NativeAudioInfo& device, const QAudioFormat& format,
-        AudioSampleFormat sample_format, size_t samples_per_frame
+        AudioSampleFormat sample_format, size_t samples_per_frame,
+        float volume
     )
-        : AudioFloatToStream(nullptr, sample_format, samples_per_frame)
+        : AudioFloatToStream(sample_format, samples_per_frame)
         , StreamListener(samples_per_frame * sample_size(sample_format))
         , m_sink(device, format)
     {
         m_io_device = m_sink.start();
+        m_sink.setVolume(volume);
         add_listener(*this);
     }
     ~AudioOutputDevice(){
@@ -57,7 +59,7 @@ private:
 
 AudioSink::~AudioSink(){}
 
-AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioFormat format)
+AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume)
     : m_logger(logger)
 {
     NativeAudioInfo native_info = device.native_info();
@@ -78,22 +80,22 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioFormat 
     }
 
     switch (format){
-    case AudioFormat::MONO_48000:
+    case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;
         m_channels = 1;
         m_multiplier = 1;
         break;
-    case AudioFormat::DUAL_44100:
+    case AudioChannelFormat::DUAL_44100:
         m_sample_rate = 44100;
         m_channels = 2;
         m_multiplier = 1;
         break;
-    case AudioFormat::DUAL_48000:
+    case AudioChannelFormat::DUAL_48000:
         m_sample_rate = 48000;
         m_channels = 2;
         m_multiplier = 1;
         break;
-    case AudioFormat::MONO_96000:
+    case AudioChannelFormat::MONO_96000:
         //  Treat mono-96000 as 2-sample frames.
         //  The FFT will then average each pair to produce 48000Hz.
         //  The output will push the same stream at the original 4 bytes * 96000Hz.
@@ -101,8 +103,8 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioFormat 
         m_channels = 1;
         m_multiplier = 2;
         break;
-    case AudioFormat::INTERLEAVE_LR_96000:
-    case AudioFormat::INTERLEAVE_RL_96000:
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Interleaved format not allowed for audio output.");
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
@@ -111,7 +113,8 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioFormat 
     m_writer = std::make_unique<AudioOutputDevice>(
         logger,
         native_info, native_format,
-        sample_format, m_channels * m_multiplier
+        sample_format, m_channels * m_multiplier,
+        volume
     );
 }
 

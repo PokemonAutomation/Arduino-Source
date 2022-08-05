@@ -8,63 +8,69 @@
 #define PokemonAutomation_AudioPipeline_AudioIODevice_H
 
 #include <memory>
-#include <QVector>
-#include <QAudioFormat>
-#include <QIODevice>
-#include "Common/Compiler.h"
-#include "Common/Cpp/Time.h"
-#include "Common/Cpp/AlignedVector.h"
+#include <set>
+#include "Common/Cpp/SpinLock.h"
 #include "AudioInfo.h"
-#include "AudioStream.h"
-#include "IO/AudioSource.h"
-
-class QObject;
+#include "AudioPassthroughPair.h"
 
 namespace PokemonAutomation{
 
+class Logger;
+class AudioSource;
 class AudioSink;
+class AudioFloatToFFT;
+//struct AudioFloatStreamListener;
+struct FFTListener;
 
 
-// QIODevice defines an interface for IO.
-// QAudioSource reads from an audio input device and writes data to a QIODevice.
-// The data is then passed to QAudioSink's internal QIODevice and sends to an audio output device.
-// This class inherits a QIODevice to receive data from QAudioSource and push the data to
-// QAudioSink.
-// When enough audio samples are collected for the next FFT window, this class also emits a signal
-// containing the FFT input samples so that the FFTWorker in the FFT thread can receive it
-// to do FFT asynchronously, without blocking the audio thread.
-class AudioIODevice : public QObject{
-    //  Need to define this Q_OBJECT to use Qt's extra features
-    //  like signals and slots on this class.
-    Q_OBJECT
+
+//  A fully thread-safe class that holds the audio input and output devices.
+//  You can asynchronously change the input and output devices.
+//  This class will also broadcast FFT spectrums.
+class AudioIODevice{
+public:
+    void add_listener(FFTListener& listener);
+    void remove_listener(FFTListener& listener);
+
 
 public:
-    AudioIODevice(Logger& logger, const std::string& file, AudioFormat our_format, AudioSampleFormat input_format);
-    AudioIODevice(Logger& logger, const AudioDeviceInfo& device, AudioFormat our_format, AudioSampleFormat input_format);
     virtual ~AudioIODevice();
+    AudioIODevice(Logger& logger);
 
-    void setAudioSinkDevice(std::unique_ptr<AudioSink> writer);
-    void set_volume(float volume);
+    void clear_audio_source();
+    void set_audio_source(const std::string& file);
+    void set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format);
 
-signals:
-    // Signal filed whenever the FFT input buffer is filled.
-//    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
-    void fftOutputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftOutput);
+    void clear_audio_sink();
+    void set_audio_sink(const AudioDeviceInfo& device, float volume);
+
+    void set_sink_volume(float volume);
 
 
 private:
-    void make_FFT_runner();
+    class SampleListener;
+    class InternalFFTListener;
+
+    void init_audio_sink();
+
 
 private:
-    AudioFormat m_format;
+    Logger& m_logger;
 
+    mutable SpinLock m_lock;
+
+    AudioChannelFormat m_input_format;
     std::unique_ptr<AudioSource> m_reader;
-    std::unique_ptr<FFTRunner> m_fft_runner;
+    std::unique_ptr<SampleListener> m_sample_listener;
 
+    AudioDeviceInfo m_output_device;
+    float m_volume = 1.0;
     std::unique_ptr<AudioSink> m_writer;
-    QIODevice* m_audioSinkDevice = nullptr;
 
+    std::unique_ptr<AudioFloatToFFT> m_fft_runner;
+    std::unique_ptr<InternalFFTListener> m_fft_listener;
 
+    std::set<FFTListener*> m_listeners;
 };
 
 

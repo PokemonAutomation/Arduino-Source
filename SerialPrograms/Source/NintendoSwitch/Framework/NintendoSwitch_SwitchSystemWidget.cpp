@@ -15,8 +15,8 @@
 #include "CommonFramework/AudioPipeline/AudioDisplayWidget.h"
 #include "CommonFramework/AudioPipeline/AudioSelectorWidget.h"
 #include "CommonFramework/ControllerDevices/SerialPortWidget.h"
-#include "CommonFramework/VideoPipeline/CameraSelectorWidget.h"
-#include "CommonFramework/VideoPipeline/VideoDisplayWidget.h"
+#include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
+#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 

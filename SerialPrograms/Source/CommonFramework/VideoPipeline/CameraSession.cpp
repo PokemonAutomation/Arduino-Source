@@ -5,8 +5,8 @@
  */
 
 #include "Common/Qt/Redispatch.h"
-#include "VideoWidget.h"
-#include "CameraImplementations.h"
+#include "CameraBase.h"
+#include "Backends/CameraImplementations.h"
 #include "CameraSession.h"
 
 #include <iostream>

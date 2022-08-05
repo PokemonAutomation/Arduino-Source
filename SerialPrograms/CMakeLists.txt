@@ -193,6 +193,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
     Source/CommonFramework/AudioPipeline/AudioStream.cpp
@@ -211,6 +212,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
+    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
+    Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h
     Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp
@@ -462,30 +465,31 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsTracking.h
     Source/CommonFramework/Tools/SuperControlSession.cpp
     Source/CommonFramework/Tools/SuperControlSession.h
-    Source/CommonFramework/VideoPipeline/CameraImplementations.cpp
-    Source/CommonFramework/VideoPipeline/CameraImplementations.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
+    Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
+    Source/CommonFramework/VideoPipeline/CameraBase.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
-    Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp
-    Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/CameraSession.cpp
     Source/CommonFramework/VideoPipeline/CameraSession.h
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.cpp
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.h
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp
-    Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h
-    Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp
-    Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h
+    Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
+    Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h
+    Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp
+    Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
+    Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
-    Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp
-    Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h
-    Source/CommonFramework/VideoPipeline/VideoToolsQt5.cpp
-    Source/CommonFramework/VideoPipeline/VideoToolsQt5.h
-    Source/CommonFramework/VideoPipeline/VideoWidget.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp

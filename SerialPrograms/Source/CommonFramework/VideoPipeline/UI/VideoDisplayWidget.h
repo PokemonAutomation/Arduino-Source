@@ -11,8 +11,8 @@
 #include <deque>
 #include <set>
 #include "Common/Cpp/ImageResolution.h"
-#include "VideoFeed.h"
-#include "VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 

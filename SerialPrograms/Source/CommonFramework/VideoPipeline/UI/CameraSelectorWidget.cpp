@@ -11,7 +11,7 @@
 #include "Common/Qt/Redispatch.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "VideoDisplayWidget.h"
-#include "CameraImplementations.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CameraSelectorWidget.h"
 
 #include <iostream>

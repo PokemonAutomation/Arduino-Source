@@ -33,7 +33,7 @@ inline void fft_abs_k2(float abs[2], float real[4]){
     t3 = real[1] - real[3];
     t0 += t1;
     abs[0] = std::abs(t0);
-    abs[1] = std::sqrtf(t2*t2 + t3*t3);
+    abs[1] = std::sqrt(t2*t2 + t3*t3);
 }
 template <typename Context>
 void fft_abs_k3(const TwiddleTable<Context>& table, float abs[4], float real[8]){

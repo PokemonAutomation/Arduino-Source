@@ -45,7 +45,7 @@ public:
 public:
     //  Asynchronous and thread-safe getters.
 
-    std::vector<AudioSpectrum> spectrums_since(size_t startingStamp);
+    std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp);
     std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
 
     struct SpectrumSnapshot{

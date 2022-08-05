@@ -51,7 +51,7 @@ public:
 private:
     friend class AudioSelectorWidget;
     AudioDeviceInfo m_inputDevice;
-    AudioFormat m_inputFormat = AudioFormat::NONE;
+    AudioChannelFormat m_inputFormat = AudioChannelFormat::NONE;
     AudioDeviceInfo m_outputDevice;
     AudioDisplayType m_audioDisplayType = AudioDisplayType::NO_DISPLAY;
     int m_volume = 100; // volume range: [0, 100]

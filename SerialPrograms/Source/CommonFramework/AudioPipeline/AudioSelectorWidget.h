@@ -51,11 +51,11 @@ public:
 
     virtual void reset() override;
 
-    virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) override;
+    virtual std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp) override;
 
     virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) override;
 
-    virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) override;
+    virtual void add_overlay(uint64_t startingStamp, size_t endStamp, Color color) override;
 
 signals:
     // Need to define this version of async_reset_audio()

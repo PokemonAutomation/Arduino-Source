@@ -22,7 +22,7 @@ class AudioSpectrum{
 public:
     //  The stamp to denote which audio window it is from.
     //  the stamp starts at 0 and becomes larger for later windows in the stream.
-    size_t stamp = 0;
+    uint64_t stamp = 0;
 
     size_t sample_rate;
 
@@ -30,7 +30,7 @@ public:
     //  higher frequencies.
     std::shared_ptr<const AlignedVector<float>> magnitudes;
 
-    AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m)
+    AudioSpectrum(uint64_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m)
         : stamp(s)
         , sample_rate(rate)
         , magnitudes(std::move(m))
@@ -46,14 +46,14 @@ public:
 
     //  Return all the spectrums with stamps greater or equal to `startingStamp`
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
-    virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) = 0;
+    virtual std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp) = 0;
 
     //  Return a specific number of latest spectrums.
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
     virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) = 0;
 
     //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp` with `color`.
-    virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) = 0;
+    virtual void add_overlay(uint64_t startingStamp, size_t endStamp, Color color) = 0;
 };
 
 

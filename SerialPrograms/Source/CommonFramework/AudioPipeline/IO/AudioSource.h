@@ -34,17 +34,17 @@ public:
     ~AudioSource();
 
     //  Read from an audio file. (i.e. .wav or .mp3)
-    AudioSource(Logger& logger, const std::string& file, AudioFormat format);
+    AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format);
 
     //  Read from an audio input device. (i.e. capture card)
-    AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioFormat format);
+    AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format);
 
     size_t sample_rate() const{ return m_sample_rate; }
     size_t channels() const{ return m_channels; }
     size_t samples_per_frame() const{ return m_channels * m_multiplier; }
 
 private:
-    void init(AudioFormat format, AudioSampleFormat stream_format);
+    void init(AudioChannelFormat format, AudioSampleFormat stream_format);
 
 private:
     class InternalListener;

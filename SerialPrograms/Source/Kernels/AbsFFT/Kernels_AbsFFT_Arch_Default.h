@@ -49,7 +49,7 @@ static PA_FORCE_INLINE void cmul_pp(
     Xi = (Xi * Wr) + t1;
 }
 static PA_FORCE_INLINE vtype abs(vtype r, vtype i){
-    return std::sqrtf(r*r + i*i);
+    return std::sqrt(r*r + i*i);
 }
 static PA_FORCE_INLINE void swap_odd(vtype& L, vtype& H){
 }

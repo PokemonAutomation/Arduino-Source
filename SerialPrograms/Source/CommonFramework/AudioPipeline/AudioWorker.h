@@ -21,6 +21,7 @@
 #include "AudioInfo.h"
 #include "IO/AudioSource.h"
 #include "IO/AudioSink.h"
+#include "Spectrum/FFTStreamer.h"
 #include "AudioIODevice.h"
 
 
@@ -42,7 +43,7 @@ class AudioFileLoader;
 // This class will be moved into a QThread, separate from the main Qt UI thread so
 // that audio processing does not block the UI and vice versa.
 // The class, AudioThreadController is responsible for the management of the QThread.
-class AudioWorker: public QObject{
+class AudioWorker: public QObject, private FFTListener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
@@ -56,7 +57,7 @@ public:
     AudioWorker(
         Logger& logger,
         const AudioDeviceInfo& inputInfo,
-        AudioFormat inputFormat,
+        AudioChannelFormat inputFormat,
         const std::string& inputAbsoluteFilepath,
         const AudioDeviceInfo& outputInfo,
         float outputVolume
@@ -82,17 +83,18 @@ signals:
 
 
 private:
+    virtual void on_fft(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftOutput) override;
+
+private:
     Logger& m_logger;
     AudioDeviceInfo m_inputInfo;
-    AudioFormat m_inputFormat;
+    AudioChannelFormat m_inputFormat;
     std::string m_inputAbsoluteFilepath;
     AudioDeviceInfo m_outputInfo;
 
-    AudioIODevice* m_audioIODevice = nullptr;
+    AudioIODevice m_audioIODevice;
 
     float m_volume = 1.0f;
-
-    AudioFileLoader* m_FileLoader = nullptr;
 };
 
 

@@ -38,9 +38,9 @@ const char* AUDIO_FORMAT_LABELS[] = {
     "1 x 96,000 Hz (Interleaved Stereo R/L)",
 };
 
-void set_format(QAudioFormat& native_format, AudioFormat format){
+void set_format(QAudioFormat& native_format, AudioChannelFormat format){
     switch (format){
-    case AudioFormat::MONO_48000:
+    case AudioChannelFormat::MONO_48000:
         if (native_format.channelCount() != 1){
             native_format.setChannelCount(1);
         }
@@ -48,7 +48,7 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
             native_format.setSampleRate(48000);
         }
         break;
-    case AudioFormat::DUAL_44100:
+    case AudioChannelFormat::DUAL_44100:
         if (native_format.channelCount() != 2){
             native_format.setChannelCount(2);
         }
@@ -56,7 +56,7 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
             native_format.setSampleRate(44100);
         }
         break;
-    case AudioFormat::DUAL_48000:
+    case AudioChannelFormat::DUAL_48000:
         if (native_format.channelCount() != 2){
             native_format.setChannelCount(2);
         }
@@ -64,9 +64,9 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
             native_format.setSampleRate(48000);
         }
         break;
-    case AudioFormat::MONO_96000:
-    case AudioFormat::INTERLEAVE_LR_96000:
-    case AudioFormat::INTERLEAVE_RL_96000:
+    case AudioChannelFormat::MONO_96000:
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
         if (native_format.channelCount() != 1){
             native_format.setChannelCount(1);
         }
@@ -114,7 +114,7 @@ AudioSampleFormat get_sample_format(QAudioFormat& native_format){
 //  Return a list of our formats that are supported by this device.
 //  "preferred_index" is set to the index of the list that is preferred by the device.
 //  If no preferred format matches our formats, -1 is returned.
-std::vector<AudioFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const std::string& display_name){
+std::vector<AudioChannelFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const std::string& display_name){
     QAudioFormat preferred_format = info.preferredFormat();
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
@@ -132,40 +132,40 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
     preferred_rate = 96000;
 #endif
 
-    std::vector<AudioFormat> ret;
+    std::vector<AudioChannelFormat> ret;
     preferred_index = -1;
 
 //    bool stereo = false;
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::MONO_48000);
+        set_format(format, AudioChannelFormat::MONO_48000);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::MONO_48000);
+            ret.emplace_back(AudioChannelFormat::MONO_48000);
         }
     }
 #if 1
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::DUAL_44100);
+        set_format(format, AudioChannelFormat::DUAL_44100);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::DUAL_44100);
+            ret.emplace_back(AudioChannelFormat::DUAL_44100);
 //            stereo = true;
         }
     }
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::DUAL_48000);
+        set_format(format, AudioChannelFormat::DUAL_48000);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::DUAL_48000);
+            ret.emplace_back(AudioChannelFormat::DUAL_48000);
 //            stereo = true;
         }
     }
@@ -173,7 +173,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
 
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::INTERLEAVE_LR_96000);
+        set_format(format, AudioChannelFormat::INTERLEAVE_LR_96000);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
@@ -183,50 +183,50 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
                     preferred_index += 1;
                 }
             }
-            ret.emplace_back(AudioFormat::MONO_96000);
-            ret.emplace_back(AudioFormat::INTERLEAVE_LR_96000);
-            ret.emplace_back(AudioFormat::INTERLEAVE_RL_96000);
+            ret.emplace_back(AudioChannelFormat::MONO_96000);
+            ret.emplace_back(AudioChannelFormat::INTERLEAVE_LR_96000);
+            ret.emplace_back(AudioChannelFormat::INTERLEAVE_RL_96000);
         }
     }
 
     return ret;
 }
-std::vector<AudioFormat> supported_output_formats(int& preferred_index, const NativeAudioInfo& info){
+std::vector<AudioChannelFormat> supported_output_formats(int& preferred_index, const NativeAudioInfo& info){
     QAudioFormat preferred_format = info.preferredFormat();
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
 
-    std::vector<AudioFormat> ret;
+    std::vector<AudioChannelFormat> ret;
     preferred_index = -1;
 
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::MONO_48000);
+        set_format(format, AudioChannelFormat::MONO_48000);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::MONO_48000);
+            ret.emplace_back(AudioChannelFormat::MONO_48000);
         }
     }
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::DUAL_44100);
+        set_format(format, AudioChannelFormat::DUAL_44100);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::DUAL_44100);
+            ret.emplace_back(AudioChannelFormat::DUAL_44100);
         }
     }
     {
         QAudioFormat format = preferred_format;
-        set_format(format, AudioFormat::DUAL_48000);
+        set_format(format, AudioChannelFormat::DUAL_48000);
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
             }
-            ret.emplace_back(AudioFormat::DUAL_48000);
+            ret.emplace_back(AudioChannelFormat::DUAL_48000);
         }
     }
 
@@ -240,7 +240,7 @@ struct AudioDeviceInfo::Data{
     std::string device_name;    //  For serialization
     std::string display_name;
 
-    std::vector<AudioFormat> supported_formats;
+    std::vector<AudioChannelFormat> supported_formats;
     int preferred_format_index;
 
 #if QT_VERSION_MAJOR == 5
@@ -424,7 +424,7 @@ const std::string& AudioDeviceInfo::display_name() const{
 const std::string& AudioDeviceInfo::device_name() const{
     return m_body->device_name;
 }
-const std::vector<AudioFormat>& AudioDeviceInfo::supported_formats() const{
+const std::vector<AudioChannelFormat>& AudioDeviceInfo::supported_formats() const{
     return m_body->supported_formats;
 }
 int AudioDeviceInfo::preferred_format_index() const{

@@ -71,7 +71,7 @@ public:
 
     // Return latest timestamp from the stored audio spectrum stream.
     // Return SIZE_MAX if there is no stored spectrum yet.
-    size_t latestTimestamp() const;
+    uint64_t latestTimestamp() const;
 
     // Return the scale found by the matcher to scale the input audio stream to best
     // match the template in the last `match()`.

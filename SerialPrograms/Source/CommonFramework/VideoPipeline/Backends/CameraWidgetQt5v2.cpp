@@ -18,7 +18,7 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "VideoToolsQt5.h"
-#include "CameraInfo.h"
+#include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CameraWidgetQt5v2.h"
 
 namespace PokemonAutomation{

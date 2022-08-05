@@ -4,27 +4,12 @@
  *
  */
 
-#include <QtGlobal>
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-#include <QAudioInput>
-#include <QAudioOutput>
-#include <QtEndian>
-using AudioSource = QAudioInput;
-using AudioSink = QAudioOutput;
-#elif QT_VERSION_MAJOR == 6
-#include <QMediaDevices>
-#include <QAudioSource>
-#include <QAudioSink>
-#include <QAudioDevice>
-using AudioSource = QAudioSource;
-using AudioSink = QAudioSink;
-#endif
-
 #include "Common/Cpp/Exceptions.h"
 #include "AudioConstants.h"
 #include "Tools/AudioFormatUtils.h"
+#include "IO/AudioSource.h"
 #include "IO/AudioSink.h"
+#include "Spectrum/FFTStreamer.h"
 #include "AudioIODevice.h"
 
 #include <iostream>
@@ -35,69 +20,163 @@ namespace PokemonAutomation{
 
 
 
+void AudioIODevice::add_listener(FFTListener& listener){
+    SpinLockGuard lg(m_lock);
+    m_listeners.insert(&listener);
+}
+void AudioIODevice::remove_listener(FFTListener& listener){
+    SpinLockGuard lg(m_lock);
+    m_listeners.erase(&listener);
+}
+
+
+
+class AudioIODevice::SampleListener final : public AudioFloatStreamListener{
+public:
+    SampleListener(AudioIODevice& parent, size_t samples_per_frame)
+        : AudioFloatStreamListener(samples_per_frame)
+        , m_parent(parent)
+    {
+        parent.m_reader->add_listener(*this);
+    }
+    ~SampleListener(){
+        m_parent.m_reader->remove_listener(*this);
+    }
+    virtual void on_samples(const float* data, size_t frames) override{
+        AudioIODevice& parent = m_parent;
+        SpinLockGuard lg(parent.m_lock);
+        if (parent.m_writer){
+            parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
+        }
+        if (parent.m_fft_runner){
+            parent.m_fft_runner->on_samples(data, frames);
+        }
+
+    }
+
+private:
+    AudioIODevice& m_parent;
+};
+
+class AudioIODevice::InternalFFTListener final : public FFTListener{
+public:
+    InternalFFTListener(AudioIODevice& parent)
+        : m_parent(parent)
+    {
+        parent.m_fft_runner->add_listener(*this);
+    }
+    ~InternalFFTListener(){
+        m_parent.m_fft_runner->remove_listener(*this);
+    }
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override{
+        //  This is already inside the lock.
+//        SpinLockGuard lg(m_parent.m_lock);
+        for (FFTListener* listener : m_parent.m_listeners){
+            listener->on_fft(sample_rate, fft_output);
+        }
+    }
+
+private:
+    AudioIODevice& m_parent;
+};
+
+
+
+
 
 AudioIODevice::~AudioIODevice(){}
 
-AudioIODevice::AudioIODevice(Logger& logger, const std::string& file, AudioFormat our_format, AudioSampleFormat input_format)
-     : m_format(our_format)
-     , m_reader(new AudioSource(logger, file, our_format))
-{
-    make_FFT_runner();
+AudioIODevice::AudioIODevice(Logger& logger)
+    : m_logger(logger)
+{}
 
-    //  Register the FFT runner so that it receives data samples from the audio reader.
-    m_reader->add_listener(*m_fft_runner);
+void AudioIODevice::clear_audio_source(){
+    SpinLockGuard lg(m_lock);
+    if (m_reader){
+        m_fft_listener.reset();
+        m_fft_runner.reset();
+        m_sample_listener.reset();
+        m_reader.reset();
+        m_input_format = AudioChannelFormat::NONE;
+    }
 }
-AudioIODevice::AudioIODevice(Logger& logger, const AudioDeviceInfo& device, AudioFormat our_format, AudioSampleFormat input_format)
-     : m_format(our_format)
-     , m_reader(new AudioSource(logger, device, our_format))
-{
-    make_FFT_runner();
-
-    //  Register the FFT runner so that it receives data samples from the audio reader.
-    m_reader->add_listener(*m_fft_runner);
+void AudioIODevice::set_audio_source(const std::string& file){
+    SpinLockGuard lg(m_lock);
+    if (m_reader){
+        m_fft_listener.reset();
+        m_fft_runner.reset();
+        m_writer.reset();
+        m_sample_listener.reset();
+        m_reader.reset();
+        m_input_format = AudioChannelFormat::NONE;
+    }
+    m_input_format = AudioChannelFormat::DUAL_48000;
+    m_reader.reset(new AudioSource(m_logger, file, m_input_format));
+    m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
+    init_audio_sink();
+    m_fft_runner = make_FFT_streamer(m_input_format);
+    m_fft_listener.reset(new InternalFFTListener(*this));
+}
+void AudioIODevice::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
+    SpinLockGuard lg(m_lock);
+    if (m_reader){
+        m_fft_listener.reset();
+        m_fft_runner.reset();
+        m_writer.reset();
+        m_sample_listener.reset();
+        m_reader.reset();
+        m_input_format = AudioChannelFormat::NONE;
+    }
+    if (!device){
+        return;
+    }
+    m_input_format = format;
+    m_reader.reset(new AudioSource(m_logger, device, m_input_format));
+    m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
+    init_audio_sink();
+    m_fft_runner = make_FFT_streamer(m_input_format);
+    m_fft_listener.reset(new InternalFFTListener(*this));
 }
 
-void AudioIODevice::make_FFT_runner(){
-    switch (m_format){
-    case AudioFormat::MONO_48000:
-        m_fft_runner.reset(new FFTRunner(*this, 48000, 1, false));
+void AudioIODevice::clear_audio_sink(){
+    SpinLockGuard lg(m_lock);
+    m_writer.reset();
+    m_output_device = AudioDeviceInfo();
+}
+void AudioIODevice::set_audio_sink(const AudioDeviceInfo& device, float volume){
+    SpinLockGuard lg(m_lock);
+    m_writer.reset();
+    m_output_device = device;
+    m_volume = volume;
+    init_audio_sink();
+}
+void AudioIODevice::init_audio_sink(){
+    if (!m_output_device){
+        return;
+    }
+    AudioChannelFormat output_format = m_input_format;
+    switch (output_format){
+    case AudioChannelFormat::NONE:
+        return;
+    case AudioChannelFormat::MONO_48000:
+    case AudioChannelFormat::MONO_96000:
+    case AudioChannelFormat::DUAL_44100:
+    case AudioChannelFormat::DUAL_48000:
         break;
-    case AudioFormat::DUAL_44100:
-        m_fft_runner.reset(new FFTRunner(*this, 44100, 2, true));
-        break;
-    case AudioFormat::DUAL_48000:
-        m_fft_runner.reset(new FFTRunner(*this, 48000, 2, true));
-        break;
-    case AudioFormat::MONO_96000:
-        //  Treat mono-96000 as 2-sample frames.
-        //  The FFT will then average each pair to produce 48000Hz.
-        //  The output will push the same stream at the original 4 bytes * 96000Hz.
-        m_fft_runner.reset(new FFTRunner(*this, 48000, 2, true));
-        break;
-    case AudioFormat::INTERLEAVE_LR_96000:
-        m_fft_runner.reset(new FFTRunner(*this, 48000, 2, true));
-        break;
-    case AudioFormat::INTERLEAVE_RL_96000:
-        m_fft_runner.reset(new FFTRunner(*this, 48000, 2, true));
+    case AudioChannelFormat::INTERLEAVE_LR_96000:
+    case AudioChannelFormat::INTERLEAVE_RL_96000:
+        output_format = AudioChannelFormat::DUAL_48000;
         break;
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)m_format));
+        m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)output_format], COLOR_RED);
+        return;
     }
+    m_writer.reset(new AudioSink(m_logger, m_output_device, output_format, m_volume));
 }
 
 
-void AudioIODevice::setAudioSinkDevice(std::unique_ptr<AudioSink> writer){
-    if (m_writer){
-        m_reader->remove_listener(*m_writer);
-        m_writer.reset();
-    }
-    if (writer){
-        m_writer = std::move(writer);
-        m_reader->add_listener(*m_writer);
-    }
-}
-
-void AudioIODevice::set_volume(float volume){
+void AudioIODevice::set_sink_volume(float volume){
+    SpinLockGuard lg(m_lock);
     if (m_writer){
         m_writer->set_volume(volume);
     }

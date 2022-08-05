@@ -19,9 +19,9 @@
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
-#include "CameraInfo.h"
+#include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "CommonFramework/VideoPipeline/UI/VideoWidget.h"
 #include "CameraImplementations.h"
-#include "VideoWidget.h"
 
 class QCamera;
 class QVideoSink;
