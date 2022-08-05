@@ -38,7 +38,7 @@ public:
 
 
 public:
-    void push_spectrum(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput);
+    void push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output);
     void add_overlay(uint64_t startingStamp, uint64_t endStamp, Color color);
 
 

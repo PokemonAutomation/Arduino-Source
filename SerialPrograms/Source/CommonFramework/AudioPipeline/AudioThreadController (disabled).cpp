@@ -38,7 +38,7 @@ AudioThreadController::~AudioThreadController(){
 }
 
 void AudioThreadController::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output){
-    m_parent.state().push_spectrum(sample_rate, std::move(fft_output));
+    m_parent.spectrum().push_spectrum(sample_rate, std::move(fft_output));
 }
 
 

@@ -37,8 +37,8 @@ AudioPassthroughPairQtThread::AudioPassthroughPairQtThread(Logger& logger)
     }
 }
 AudioPassthroughPairQtThread::~AudioPassthroughPairQtThread(){
-    quit();
     m_body.store(nullptr, std::memory_order_relaxed);
+    quit();
     wait();
 }
 void AudioPassthroughPairQtThread::run(){

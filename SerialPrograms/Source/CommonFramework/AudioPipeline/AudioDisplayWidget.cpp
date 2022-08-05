@@ -8,7 +8,6 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include "Common/Qt/Redispatch.h"
-#include "AudioThreadController.h"
 #include "AudioDisplayWidget.h"
 
 //#include <iostream>
@@ -20,21 +19,21 @@ namespace PokemonAutomation{
 
 
 
-AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
+AudioDisplayWidget::AudioDisplayWidget(QWidget& parent, Logger& logger)
     : QWidget(&parent)
+    , m_devices(logger)
 {
     m_spectrum_holder.add_listener(*this);
+    m_devices.add_listener(*this);
 }
 
 AudioDisplayWidget::~AudioDisplayWidget(){
+    m_devices.remove_listener(*this);
     m_spectrum_holder.remove_listener(*this);
     clear();
 }
 
 void AudioDisplayWidget::clear(){
-    if (m_audioThreadController){
-        m_audioThreadController.reset();
-    }
     m_spectrum_holder.clear();
 }
 
@@ -54,14 +53,12 @@ void AudioDisplayWidget::set_audio(
 ){
     clear();
 
-    m_audioThreadController = std::make_unique<AudioThreadController>(
-        logger, this,
-        inputInfo,
-        inputFormat,
-        inputAbsoluteFilepath,
-        outputInfo,
-        outputVolume
-    );
+    if (!inputAbsoluteFilepath.empty()){
+        m_devices.set_audio_source(inputAbsoluteFilepath);
+    }else{
+        m_devices.set_audio_source(inputInfo, inputFormat);
+    }
+    m_devices.set_audio_sink(outputInfo, outputVolume);
 
     update_size();
     // Tell Qt to repaint the widget in the next drawing phase in the main loop.
@@ -92,6 +89,10 @@ void AudioDisplayWidget::on_new_overlay(){
             QWidget::update();
         }, Qt::QueuedConnection
     );
+}
+
+void AudioDisplayWidget::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output){
+    m_spectrum_holder.push_spectrum(sample_rate, std::move(fft_output));
 }
 
 

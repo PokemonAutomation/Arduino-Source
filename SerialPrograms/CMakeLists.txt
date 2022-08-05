@@ -202,8 +202,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioStream.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
-    Source/CommonFramework/AudioPipeline/AudioThreadController.cpp
-    Source/CommonFramework/AudioPipeline/AudioThreadController.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp

@@ -145,14 +145,14 @@ PA_FORCE_INLINE uint32_t jetColorMap(float v){
     }
 }
 
-void AudioSpectrumHolder::push_spectrum(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput){
+void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
     std::lock_guard<std::mutex> lg(m_state_lock);
 
-    const AlignedVector<float>& output = *fftOutput;
+    const AlignedVector<float>& output = *fft_output;
 
     {
         const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : m_spectrum_stamp_start;
-        m_spectrums.emplace_front(stamp, sampleRate, fftOutput);
+        m_spectrums.emplace_front(stamp, sample_rate, fft_output);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
         }

@@ -55,7 +55,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->addWidget(m_serial_widget);
 
         m_video_display = new VideoDisplayWidget(*this);
-        m_audio_display = new AudioDisplayWidget(*this);
+        m_audio_display = new AudioDisplayWidget(*this, m_logger);
 
         m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
         group_layout->addWidget(m_camera_widget);

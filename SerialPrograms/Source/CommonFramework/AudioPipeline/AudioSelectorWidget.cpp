@@ -215,7 +215,7 @@ AudioSelectorWidget::AudioSelectorWidget(
     if (PreloadSettings::instance().DEVELOPER_MODE){
         connect(m_record_button, &QPushButton::clicked, this, [=](bool){
             m_record_is_on = !m_record_is_on;
-            m_display.state().saveAudioFrequenciesToDisk(m_record_is_on);
+            m_display.spectrum().saveAudioFrequenciesToDisk(m_record_is_on);
             if (m_record_is_on){
                 m_record_button->setText("Stop recording");
             } else{
@@ -340,11 +340,11 @@ void AudioSelectorWidget::reset(){
 }
 
 std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(uint64_t startingStamp){
-    return m_display.state().spectrums_since(startingStamp);
+    return m_display.spectrum().spectrums_since(startingStamp);
 }
 
 std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums){
-    return m_display.state().spectrums_latest(numLatestSpectrums);
+    return m_display.spectrum().spectrums_latest(numLatestSpectrums);
 }
 
 void AudioSelectorWidget::add_overlay(uint64_t startingStamp, size_t endStamp, Color color){

@@ -14,10 +14,11 @@
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "AudioOption.h"
 #include "Spectrum/AudioSpectrumHolder.h"
+#include "Spectrum/FFTStreamer.h"
+#include "AudioPassthroughPairQtThread.h"
 
 namespace PokemonAutomation{
 
-class AudioThreadController;
 class AudioDeviceInfo;
 class LoggerQt;
 
@@ -33,7 +34,7 @@ class LoggerQt;
 // audio display mode to use, is made by AudioSelectorWidget.
 // AudioSelectorWidget owns a reference of this class, and control this class based
 // on the audio configuration the selector widget manages.
-class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener{
+class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener, public FFTListener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
@@ -41,10 +42,10 @@ class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener{
 public:
     using AudioDisplayType = AudioSelector::AudioDisplayType;
 
-    AudioDisplayWidget(QWidget& parent);
+    AudioDisplayWidget(QWidget& parent, Logger& logger);
     virtual ~AudioDisplayWidget();
 
-    AudioSpectrumHolder& state(){ return m_spectrum_holder; }
+    AudioSpectrumHolder& spectrum(){ return m_spectrum_holder; }
 
     // outputVolume: range [0.f, 1.f]
     void set_audio(
@@ -81,6 +82,8 @@ private:
     virtual void on_new_spectrum() override;
     virtual void on_new_overlay() override;
 
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
+
 private:
     void update_size();
     void clear();
@@ -91,7 +94,7 @@ private:
 private:
     AudioSpectrumHolder m_spectrum_holder;
 
-    std::unique_ptr<AudioThreadController> m_audioThreadController;
+    AudioPassthroughPairQtThread m_devices;
 
     std::deque<int> m_width_history;
     std::set<int> m_recent_widths;

@@ -32,6 +32,7 @@ bool is_black(
 ){
     double average = stats.average.sum();
     double stddev = stats.stddev.sum();
+//    cout << stats.average << stats.stddev << endl;
     return average <= max_rgb_sum && stddev <= max_stddev_sum;
 }
 bool is_grey(
