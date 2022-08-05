@@ -40,11 +40,11 @@ public:
 
     bool detect(const QImage& screen){
         ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
-        if (!is_black(stats0)){
+        if (!is_grey(stats0, 0, 200, 10)){
             return false;
         }
         ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
-        if (!is_black(stats1)){
+        if (!is_grey(stats1, 0, 200, 10)){
             return false;
         }
         return true;
