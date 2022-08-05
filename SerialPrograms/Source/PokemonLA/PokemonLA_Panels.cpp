@@ -87,7 +87,9 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
     add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
-    add_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>();
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        add_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>();
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
