@@ -28,7 +28,7 @@ public:
     virtual void remove_listener(FFTListener& listener) = 0;
 
 public:
-    virtual ~AudioPassthroughPair();
+    virtual ~AudioPassthroughPair() = default;
 
     virtual void clear_audio_source() = 0;
     virtual void set_audio_source(const std::string& file) = 0;

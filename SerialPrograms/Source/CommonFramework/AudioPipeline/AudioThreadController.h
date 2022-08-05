@@ -7,19 +7,18 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioThreadController_H
 #define PokemonAutomation_AudioPipeline_AudioThreadController_H
 
-#include <vector>
-#include <chrono>
 #include <string>
 #include <QObject>
-#include <QThread>
-#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
+#include "Spectrum/FFTStreamer.h"
+#include "AudioPassthroughPairQtThread.h"
 
 namespace PokemonAutomation{
 
 class AudioDeviceInfo;
 class AudioDisplayWidget;
 class AudioWorker;
+
 
 
 // The class is responsible for the audio loop.
@@ -32,14 +31,10 @@ class AudioWorker;
 // in a thread-safe way.
 // It also connects signals from the FFT thread to the audio display widget (passed
 // as `parent` in the constructor) to return the FFT results to the UI thread.
-class AudioThreadController: public QObject{
-    //  Need to define this Q_OBJECT to use Qt's extra features
-    //  like signals and slots on this class.
-    Q_OBJECT
-
+class AudioThreadController: public QObject, private FFTListener{
 public:
     AudioThreadController(
-        LoggerQt& logger,
+        Logger& logger,
         AudioDisplayWidget* parent,
         const AudioDeviceInfo& inputInfo,
         AudioChannelFormat inputFormat,
@@ -49,15 +44,12 @@ public:
     );
     virtual ~AudioThreadController();
 
-signals:
-    void operate();
+private:
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
 
 private:
-    QThread m_audioThread;
-
-    AudioWorker* m_AudioWorker = nullptr;
-
-    int m_sampleRate = 0;
+    AudioDisplayWidget& m_parent;
+    AudioPassthroughPairQtThread m_devices;
 
 };
 

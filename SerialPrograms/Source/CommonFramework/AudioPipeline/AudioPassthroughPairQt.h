@@ -1,0 +1,77 @@
+/*  Audio Passthrough Pair (Qt)
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_AudioPipeline_AudioPassthroughPairQt_H
+#define PokemonAutomation_AudioPipeline_AudioPassthroughPairQt_H
+
+#include <memory>
+#include <set>
+#include <QObject>
+#include "Common/Cpp/SpinLock.h"
+#include "AudioPassthroughPair.h"
+
+namespace PokemonAutomation{
+
+class Logger;
+class AudioSource;
+class AudioSink;
+class AudioFloatToFFT;
+
+
+class AudioPassthroughPairQt final : public QObject, public AudioPassthroughPair{
+public:
+    virtual void add_listener(FFTListener& listener) override;
+    virtual void remove_listener(FFTListener& listener) override;
+
+
+public:
+    virtual ~AudioPassthroughPairQt();
+    AudioPassthroughPairQt(Logger& logger);
+
+    virtual void clear_audio_source() override;
+    virtual void set_audio_source(const std::string& file) override;
+    virtual void set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format) override;
+
+    virtual void clear_audio_sink() override;
+    virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) override;
+
+    virtual void set_sink_volume(float volume) override;
+
+
+private:
+    class SampleListener;
+    class InternalFFTListener;
+
+    void init_audio_sink();
+
+
+private:
+    Logger& m_logger;
+
+    mutable SpinLock m_lock;
+
+    //  The order of these parameters is important due to destruction order.
+    //  Objects lower on this list attach to and hold references to those
+    //  higher on the list.
+
+    AudioChannelFormat m_input_format;
+    std::unique_ptr<AudioSource> m_reader;
+    std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
+
+    AudioDeviceInfo m_output_device;
+    float m_volume = 1.0;
+    std::unique_ptr<AudioSink> m_writer;
+
+    std::unique_ptr<AudioFloatToFFT> m_fft_runner;
+    std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_runner"".
+
+    std::set<FFTListener*> m_listeners;
+};
+
+
+
+}
+#endif

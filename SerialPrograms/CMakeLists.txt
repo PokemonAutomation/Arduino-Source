@@ -186,8 +186,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
-    Source/CommonFramework/AudioPipeline/AudioIODevice.cpp
-    Source/CommonFramework/AudioPipeline/AudioIODevice.h
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQt.cpp
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQt.h
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQtThread.cpp
+    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQtThread.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
@@ -202,8 +204,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp
     Source/CommonFramework/AudioPipeline/AudioThreadController.h
-    Source/CommonFramework/AudioPipeline/AudioWorker.cpp
-    Source/CommonFramework/AudioPipeline/AudioWorker.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp
