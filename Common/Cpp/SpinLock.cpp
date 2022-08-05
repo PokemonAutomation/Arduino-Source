@@ -21,30 +21,35 @@ namespace PokemonAutomation{
 
 
 void SpinLock::spin_acquire(){
-    while (true){
-        bool state = false;
-        if (!m_locked.load(std::memory_order_acquire) && m_locked.compare_exchange_weak(state, true)){
-            break;
-        }
-        pause();
+    bool state = false;
+    if (m_locked.compare_exchange_weak(state, true)){
+        return;
     }
+    do{
+        pause();
+        state = false;
+    }while (m_locked.load(std::memory_order_acquire) || !m_locked.compare_exchange_weak(state, true));
 }
 
 void SpinLock::spin_acquire(const char* label){
 #if _WIN32 && defined PA_ARCH_x86
+    bool state = false;
+    if (m_locked.compare_exchange_weak(state, true)){
+//        cout << "early" << endl;
+//        printf("early\n");
+        return;
+    }
     uint64_t start = __rdtsc();
-    while (true){
-        bool state = false;
-        if (!m_locked.load(std::memory_order_acquire) && m_locked.compare_exchange_weak(state, true)){
-            break;
-        }
+    do{
+//        cout << "late" << endl;
+//        printf("late\n");
         pause();
-
         if (__rdtsc() - start > 10000000000){
             cout << "Slow SpinLock: " << label << endl;
             start = __rdtsc();
         }
-    }
+        state = false;
+    }while (m_locked.load(std::memory_order_acquire) || !m_locked.compare_exchange_weak(state, true));
 #else
     spin_acquire();
 #endif
