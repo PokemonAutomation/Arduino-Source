@@ -33,7 +33,10 @@ public:
     SubObjectTemplateMatcher(const char* path, double max_rmsd);
     SubObjectTemplateMatcher(const char* path, Color background_replacement, double max_rmsd);
 
-    ImagePixelBox object_from_subobject(const ImagePixelBox& subobject_in_image) const;
+    ImagePixelBox object_from_subobject(
+        size_t width, size_t height,
+        const ImagePixelBox& subobject_in_image
+    ) const;
 
     //  Compute RMSD of current object against the template as-is.
     double rmsd(

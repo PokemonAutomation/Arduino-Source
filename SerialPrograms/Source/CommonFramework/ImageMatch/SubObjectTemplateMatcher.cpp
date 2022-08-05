@@ -31,15 +31,21 @@ SubObjectTemplateMatcher::SubObjectTemplateMatcher(const char* path, Color backg
     m_background_replacement = background_replacement;
 }
 
-ImagePixelBox SubObjectTemplateMatcher::object_from_subobject(const ImagePixelBox& subobject_in_image) const{
-    return extract_object_from_inner_feature(subobject_in_image, m_subobject_in_object_f);
+ImagePixelBox SubObjectTemplateMatcher::object_from_subobject(
+    size_t width, size_t height,
+    const ImagePixelBox& subobject_in_image
+) const{
+    return extract_object_from_inner_feature(
+        width, height,
+        subobject_in_image, m_subobject_in_object_f
+    );
 }
 
 double SubObjectTemplateMatcher::rmsd(
     ImagePixelBox& object_box,
     const ImageViewRGB32& image, const ImagePixelBox& subobject_in_image
 ) const{
-    object_box = object_from_subobject(subobject_in_image);
+    object_box = object_from_subobject(image.width(), image.height(), subobject_in_image);
 //    cout << object_box.min_x << ", "
 //         << object_box.min_y << ", "
 //         << object_box.max_x << ", "
@@ -60,11 +66,17 @@ double SubObjectTemplateMatcher::rmsd_with_background_replace(
     const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
     const ImagePixelBox& subobject_in_image
 ) const{
-    object_box = object_from_subobject(subobject_in_image);
+    object_box = object_from_subobject(image.width(), image.height(), subobject_in_image);
     ImageRGB32 object = extract_box_reference(image, object_box).copy();
     if (!object || !check_image(object)){
         return 99999.;
     }
+
+//    size_t width = binary_image.width();
+//    size_t height = binary_image.height();
+//    cout << width << " x " << height
+//         << ": " << object_box.min_x << "-" << object_box.width()
+//         << " " << object_box.min_y << "-" << object_box.height() << endl;
 
     filter_rgb32(
         binary_image.submatrix(

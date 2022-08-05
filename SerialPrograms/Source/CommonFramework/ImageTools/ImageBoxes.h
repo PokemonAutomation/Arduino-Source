@@ -140,7 +140,11 @@ ImageFloatBox pixelbox_to_floatbox(const ImageViewRGB32& image, const ImagePixel
 //  This used by detection methods that detect a sub-feature within a larger
 //  object. But then you need to expand out the object to match against a
 //  template to confirm the detection.
+//
+//  The width and height parameters will ensure that the returned box stays
+//  within the dimensions of the original image.
 ImagePixelBox extract_object_from_inner_feature(
+    size_t width, size_t height,
     const ImagePixelBox& inner_relative_to_image,
     const ImageFloatBox& inner_relative_to_object
 );

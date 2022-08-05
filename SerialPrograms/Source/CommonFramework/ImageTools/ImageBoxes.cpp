@@ -246,6 +246,7 @@ ImageFloatBox pixelbox_to_floatbox(const ImageViewRGB32& image, const ImagePixel
 
 
 ImagePixelBox extract_object_from_inner_feature(
+    size_t width, size_t height,
     const ImagePixelBox& inner_relative_to_image,
     const ImageFloatBox& inner_relative_to_object
 ){
@@ -257,11 +258,16 @@ ImagePixelBox extract_object_from_inner_feature(
     shift_x = std::max<double>(shift_x, 0);
     shift_y = std::max<double>(shift_y, 0);
 
+    size_t max_x = (size_t)(shift_x + scale_x + 0.5);
+    size_t max_y = (size_t)(shift_y + scale_y + 0.5);
+    max_x = std::min(max_x, width);
+    max_y = std::min(max_y, height);
+
     return ImagePixelBox(
         (size_t)(shift_x + 0.5),
         (size_t)(shift_y + 0.5),
-        (size_t)(shift_x + scale_x + 0.5),
-        (size_t)(shift_y + scale_y + 0.5)
+        max_x,
+        max_y
     );
 }
 
