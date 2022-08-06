@@ -90,7 +90,7 @@ void AudioPassthroughPairQtThread::set_audio_sink(const AudioDeviceInfo& device,
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->set_audio_sink(device, volume);
 }
-void AudioPassthroughPairQtThread::set_sink_volume(float volume){
+void AudioPassthroughPairQtThread::set_sink_volume(double volume){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->set_sink_volume(volume);
 }

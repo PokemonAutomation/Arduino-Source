@@ -25,9 +25,6 @@
 namespace PokemonAutomation{
 
 
-float convertAudioVolumeFromSlider(int volume);
-
-
 
 class AudioSession final : public AudioFeed, private FFTListener{
 public:
@@ -54,7 +51,7 @@ public:
 
     void clear_audio_output();
     void set_audio_output(AudioDeviceInfo info);
-    void set_volume(int volume);
+    void set_volume(double volume);
     void set_display(AudioOption::AudioDisplayType display);
 
 

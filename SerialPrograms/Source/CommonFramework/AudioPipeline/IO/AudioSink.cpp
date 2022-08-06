@@ -22,6 +22,22 @@ namespace PokemonAutomation{
 
 
 
+// Slider bar volume: [0, 100], in log scale
+// Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
+float convertAudioVolumeFromSlider(double volume){
+    volume = std::max(volume, 0.0);
+    volume = std::min(volume, 1.0);
+    // The slider bar value is in the log scale because log scale matches human sound
+    // perception.
+    float linearVolume = QAudio::convertVolume(
+        (float)volume,
+        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale
+    );
+    return linearVolume;
+}
+
+
+
 
 class AudioOutputDevice : public AudioFloatToStream, private StreamListener{
 public:
@@ -33,6 +49,7 @@ public:
     )
         : AudioFloatToStream(sample_format, samples_per_frame)
         , StreamListener(samples_per_frame * sample_size(sample_format))
+        , m_logger(logger)
         , m_sink(device, format)
     {
         m_io_device = m_sink.start();
@@ -43,8 +60,10 @@ public:
         remove_listener(*this);
     }
 
-    void set_volume(float volume){
-        m_sink.setVolume(volume);
+    void set_volume(double volume){
+        double absolute = convertAudioVolumeFromSlider(volume);
+        m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
+        m_sink.setVolume(absolute);
     }
 
     virtual void on_objects(const void* data, size_t objects) override{
@@ -52,6 +71,7 @@ public:
     }
 
 private:
+    Logger& m_logger;
     NativeAudioSink m_sink;
     QIODevice* m_io_device;
 };
@@ -121,11 +141,10 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
 AudioSink::operator AudioFloatStreamListener&(){
     return *m_writer;
 }
-void AudioSink::set_volume(float volume){
+void AudioSink::set_volume(double volume){
     if (!m_writer){
         return;
     }
-    m_logger.log("Volume set to: " + tostr_default(volume));
     m_writer->set_volume(volume);
 }
 

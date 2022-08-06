@@ -78,8 +78,10 @@ void AudioOption::load_json(const JsonValue& json){
     if (str != nullptr){
         m_display_type = stringToAudioDisplayType(*str);
     }
-    int volume;
-    if (obj->read_integer(volume, JSON_AUDIO_VOLUME, 0, 100)){
+    double volume;
+    if (obj->read_float(volume, JSON_AUDIO_VOLUME)){
+        volume = std::max(volume, 0.0);
+        volume = std::min(volume, 1.0);
         m_volume = volume;
     }
 }

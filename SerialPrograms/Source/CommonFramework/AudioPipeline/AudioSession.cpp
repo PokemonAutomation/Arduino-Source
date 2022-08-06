@@ -4,7 +4,6 @@
  *
  */
 
-#include <QAudio>
 #include "Backends/AudioPassthroughPairQtThread.h"
 #include "AudioSession.h"
 
@@ -15,20 +14,6 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-
-// Slider bar volume: [0, 100], in log scale
-// Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
-float convertAudioVolumeFromSlider(int volume){
-    volume = std::max(volume, 0);
-    volume = std::min(volume, 100);
-    // The slider bar value is in the log scale because log scale matches human sound
-    // perception.
-    float linearVolume = QAudio::convertVolume(
-        volume / float(100.0f),
-        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale
-    );
-    return linearVolume;
-}
 
 
 
@@ -110,9 +95,9 @@ void AudioSession::set_audio_output(AudioDeviceInfo info){
     m_devices->set_audio_sink(info, m_option.m_volume);
     m_option.m_output_device = std::move(info);
 }
-void AudioSession::set_volume(int volume){
+void AudioSession::set_volume(double volume){
     std::lock_guard<std::mutex> lg(m_lock);
-    m_devices->set_sink_volume(convertAudioVolumeFromSlider(volume));
+    m_devices->set_sink_volume(volume);
     m_option.m_volume = volume;
 }
 void AudioSession::set_display(AudioOption::AudioDisplayType display){
@@ -161,18 +146,17 @@ void AudioSession::reset(){
         m_devices->clear_audio_source();
         return;
     }
-    float volume = convertAudioVolumeFromSlider(m_option.m_volume);
     if (!m_option.m_input_file.empty()){
 //        cout << "AudioSession::reset() - file: " << m_option.m_input_file << " - " << m_option.m_input_file.size() << endl;
         m_devices->reset(
             m_option.m_input_file,
-            m_option.m_output_device, volume
+            m_option.m_output_device, m_option.m_volume
         );
     }else{
 //        cout << "AudioSession::reset() - device: " << m_option.m_inputDevice.display_name() << endl;
         m_devices->reset(
             m_option.m_input_device, m_option.m_input_format,
-            m_option.m_output_device, volume
+            m_option.m_output_device, m_option.m_volume
         );
     }
 }

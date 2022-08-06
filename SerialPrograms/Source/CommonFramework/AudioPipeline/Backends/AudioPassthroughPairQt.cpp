@@ -237,7 +237,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
 }
 
 
-void AudioPassthroughPairQt::set_sink_volume(float volume){
+void AudioPassthroughPairQt::set_sink_volume(double volume){
     QMetaObject::invokeMethod(this, [=]{
         SpinLockGuard lg(m_lock);
         m_volume = volume;

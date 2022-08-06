@@ -44,7 +44,7 @@ public:
     virtual void clear_audio_sink() override;
     virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) override;
 
-    virtual void set_sink_volume(float volume) override;
+    virtual void set_sink_volume(double volume) override;
 
 private:
     virtual void run() override;

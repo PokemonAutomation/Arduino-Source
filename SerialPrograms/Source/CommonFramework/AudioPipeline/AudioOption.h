@@ -52,7 +52,7 @@ public:
 
     const AudioDeviceInfo& output_device() const{ return m_output_device; }
     AudioDisplayType display_type() const{ return m_display_type; }
-    int volume() const{ return m_volume; }
+    double volume() const{ return m_volume; }
 
 public:
     void load_json(const JsonValue& json);
@@ -67,7 +67,7 @@ private:
     AudioChannelFormat m_input_format = AudioChannelFormat::NONE;
     AudioDeviceInfo m_output_device;
     AudioDisplayType m_display_type = AudioDisplayType::NO_DISPLAY;
-    int m_volume = 100; // volume range: [0, 100]
+    double m_volume = 1.0;  //  Volume Range: [0, 1.0]
 };
 
 

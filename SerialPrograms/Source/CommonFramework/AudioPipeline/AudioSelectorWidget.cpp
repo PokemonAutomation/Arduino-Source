@@ -158,7 +158,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
     connect(
         m_volume_slider, &QSlider::valueChanged, this, [=](){
-            m_session.set_volume(m_volume_slider->value());
+            m_session.set_volume(m_volume_slider->value() / 100.);
         }
     );
 
@@ -264,7 +264,7 @@ void AudioSelectorWidget::refresh(){
     }
 //    m_session.set_display(m_value.m_audioDisplayType);
 
-    m_volume_slider->setValue(m_session.option().volume());
+    m_volume_slider->setValue((int)(m_session.option().volume() * 100));
 }
 
 

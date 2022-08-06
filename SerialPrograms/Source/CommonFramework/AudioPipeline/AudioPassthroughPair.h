@@ -46,7 +46,7 @@ public:
     virtual void clear_audio_sink() = 0;
     virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) = 0;
 
-    virtual void set_sink_volume(float volume) = 0;
+    virtual void set_sink_volume(double volume) = 0;    //  Volume Range: [0, 1.0]
 };
 
 

@@ -32,7 +32,7 @@ public:
 
     operator AudioFloatStreamListener&();
 
-    void set_volume(float volume);
+    void set_volume(double volume);
 
 
 private:

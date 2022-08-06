@@ -47,7 +47,7 @@ public:
     virtual void clear_audio_sink() override;
     virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) override;
 
-    virtual void set_sink_volume(float volume) override;
+    virtual void set_sink_volume(double volume) override;
 
 
 private:
@@ -71,7 +71,7 @@ private:
     std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
 
     AudioDeviceInfo m_output_device;
-    float m_volume = 1.0;
+    double m_volume = 1.0;
     std::unique_ptr<AudioSink> m_writer;
 
     std::unique_ptr<AudioFloatToFFT> m_fft_runner;
