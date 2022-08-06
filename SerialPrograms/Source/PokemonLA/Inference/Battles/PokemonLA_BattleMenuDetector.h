@@ -14,6 +14,9 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{
+
+class Logger;
+
 namespace NintendoSwitch{
 namespace PokemonLA{
 

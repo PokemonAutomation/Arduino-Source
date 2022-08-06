@@ -43,8 +43,8 @@ public:
 //    //  Stop the currently running command.
 //    void stop_commands();
 
-//    //  Wait for currently running command to finish.
-//    void wait();
+   //  Wait for currently running command to finish.
+   void wait();
 
 
 private:

@@ -30,7 +30,13 @@ public:
 public:
     // Load a template image from disk, min_color and max_color denote the color range of the object
     // displayed in the image file while min_area is the minimum number of pixels required for the
-    // object in the template.
+    // object in the template to be loaded.
+    // 
+    // The portion of the image holding the found object will get cropped and saved as the actual template image.
+    // So if someone changes the template image by padding it to make it larger, as long as the padded color
+    // does not fall into [min_color and max_color] range, it will not affect the template matching outcome
+    // in any way.
+    //
     // Throw FileException when there is no object meeting the requirement in the template.
     // If there are more than one objects meeting the requirement in the template, pick the one
     // with the largest area (largest number of pixels).
@@ -47,7 +53,8 @@ public:
     double rmsd(const ImageViewRGB32& image) const;
 
     //  Compute RMSD of the object on the image against the template.
-    //  The cropped image is compared against the template as-is.
+    //  The input `cropped_image` is pre-cropped from a full image using the bounding box of the input waterfill `object`.
+    //  This cropped image is compared against the template as-is.
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.
     //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.

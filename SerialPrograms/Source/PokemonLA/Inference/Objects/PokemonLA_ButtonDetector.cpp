@@ -116,6 +116,8 @@ ButtonTracker::ButtonTracker(ButtonType type)
             Color(0xff909090),
             Color(0xffa0a0a0),
             Color(0xffb0b0b0),
+            Color(0xffc0c0c0),
+            Color(0xffd0d0d0),
         }
     )
     , m_matcher(getButtonMatcher(type))

@@ -7,7 +7,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "WaterfillTemplateMatcher.h"
 
 //#include <iostream>
@@ -34,7 +37,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     if (objects.empty()){
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
-            "Failed to find any objects in resource.",
+            "Failed to find any waterfill objects in resource template file.",
             std::move(full_path)
         );
     }
@@ -50,11 +53,11 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     m_area_ratio = best->area_ratio();
 }
 
-double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& object) const{
-    if (!object || !check_image(object)){
+double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& image) const{
+    if (!image || !check_image(image)){
         return 99999.;
     }
-    return m_matcher->rmsd(object);
+    return m_matcher->rmsd(image);
 }
 bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t candidate_height) const{
     ImageViewRGB32 image_template = m_matcher->image_template();
@@ -73,6 +76,10 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
 double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const{
+
+    // XXX
+    // dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_precropped_input", cropped_image);
+
     if (!check_aspect_ratio(object.width(), object.height())){
         // cout << "bad aspect ratio" << endl;
         return 99999.;
@@ -97,6 +104,10 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_i
     return rmsd;
 }
 double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const{
+
+    // XXX
+    // dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_original_input", extract_box_reference(original_image, object));
+
     if (!check_aspect_ratio(object.width(), object.height())){
         // cout << "bad aspect ratio" << endl;
         // double expected_aspect_ratio = (double)m_object.width() / m_object.height();

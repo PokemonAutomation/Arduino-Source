@@ -87,6 +87,7 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
 
     // Press A to clear the dialog box, and show the time menu
     pbf_press_button(context, BUTTON_A, 30, 100);
+    console.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time
     for(int i = 0; i < (int)target_time; i++){

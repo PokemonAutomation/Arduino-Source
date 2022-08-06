@@ -38,6 +38,9 @@ enum class TimeOfDay {
 // Map from int(TimeOfDay) to their char* names
 extern const char* TIME_OF_DAY_NAMES[];
 
+// Use one char to represent a time of day
+char timeOfDayOneLetter(TimeOfDay time);
+
 }
 }
 }

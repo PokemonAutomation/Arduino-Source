@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonLA_BattleMenuDetector.h"

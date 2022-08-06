@@ -12,16 +12,18 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
-    class VideoOverlay;
+
+class VideoOverlay;
+class Logger;
+
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 class BattleMoveSelectionDetector : public VisualInferenceCallback{
 public:
-    BattleMoveSelectionDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    BattleMoveSelectionDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);

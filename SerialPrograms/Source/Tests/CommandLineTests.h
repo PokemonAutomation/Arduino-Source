@@ -21,12 +21,12 @@
  *  ../CommandLineTests/                         <- root test folder
  *    - PokemonLA/                               <- test space, sub-folder to organize tests, e.g. by which games the inferences are used in
  *        - BattleMenuDetector/                    <- test object, name of the class/function/file to test
- *            - IngoBattleDayTime-True.png           <- test file for BattleMenuDetector
- *            - IngoBattleNightTime-True.png         <- test file for BattleMenuDetector
+ *            - IngoBattleDayTime_True.png           <- test file for BattleMenuDetector
+ *            - IngoBattleNightTime_True.png         <- test file for BattleMenuDetector
  *    - PokemonBDSP/                             <- another test space for inferences in another game
  *        - DialogDetector/                        <- test object, this time it's DialogDetector for BDSP
  *            - Win_Mirabox/                         <- can have more folders under test object to organize test files, e.g by OS and capture card
- *                - FetchEggDayTime-True.png           <- test file for DialogDetector
+ *                - FetchEggDayTime_True.png           <- test file for DialogDetector
  * 
  *  The test framework will go to each test object's folder and use its path to determine which test object to call.
  *  For example, if the path is CommandLineTest/PokemonLA/BattleMenuDetector/, the program will test the code in
@@ -38,7 +38,7 @@
  *  - "PokemonBDSP"
  *  - "PokemonBDSP/DialogDetector"
  *  - "PokemonBDSP/DialogDetector/Win_Mirabox"
- *  - "PokemonBDSP/DialogDetector/Win_Mirabox/FetchEggDayTime-True.png"
+ *  - "PokemonBDSP/DialogDetector/Win_Mirabox/FetchEggDayTime_True.png"
  *  This gives the flexibility to test the code for a game, a detector, a detector on a capture card or a detector on a particular image/audio/video.
  * 
  *  If you have put some test files for experimental code in a folder and later decide to not run that code for a while, you can use
@@ -51,7 +51,7 @@
  *  How to add new test code:
  * 
  *  The test framework calls TestMap.h: find_test_function(test_space, test_obj_name) to find the test function related to a test path.
- *  For example, given a path PokemonLA/BattleMenuDetector/IngoBattleDayTime-True.png, by extracting test_space as "PokemonLA" and test_obj_name as
+ *  For example, given a path PokemonLA/BattleMenuDetector/IngoBattleDayTime_True.png, by extracting test_space as "PokemonLA" and test_obj_name as
  *  "BattleMenuDetector" from the path, find_test_function() returns the code that runs
  *  Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h:BattleMenuDetector.
  *  
@@ -65,7 +65,7 @@
  *    the test failed.
  *  - While running the test code, we also need to know the target test code output (or the content in gold files) so that we can know whether the test is
  *    successful or not. For simple tasks like testing battle menu detector, the target of each test image is a single bool, indicating whether the current
- *    image represents a screenshot with battle menu. So we can embed the target output into the test file name: IngoBattleDayTime-True.png.
+ *    image represents a screenshot with battle menu. So we can embed the target output into the test file name: IngoBattleDayTime_True.png.
  *    For more complex outputs, like detecting how many or where some objects are on the screen, or where the shiny sound is in the audio file, it would
  *    need a very long filename to store them. So we chose to store those outputs in a gold file.
  *    TODO: currently we haven't implemented this complex-output testing yet.

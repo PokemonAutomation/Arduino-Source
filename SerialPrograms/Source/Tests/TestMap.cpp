@@ -63,17 +63,17 @@ int image_filename_detector_helper(ImageFilenameFunction test_func, const std::s
 
 // Helper for testing detector code that reads an image and returns true or false.
 // The target test result (whether this test file should be detected as true or false)
-// is stored as part of the filename. For example, IngoBattleDayTime-True.png.
+// is stored as part of the filename. For example, IngoBattleDayTime_True.png.
 int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::string& filename_base){
         const auto name_base = QString::fromStdString(filename_base);
         bool target_bool = false;
-        if (name_base.endsWith("-True")){
+        if (name_base.endsWith("_True")){
             target_bool = true;
-        } else if (name_base.endsWith("-False")){
+        } else if (name_base.endsWith("_False")){
             target_bool = false;
         } else{
-            cerr << "Error: image test file " << test_path << " has incorrect target detection result (-True/-False) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " has incorrect target detection result (_True/_False) set in the filename." << endl;
             return 1;
         }
 
@@ -85,7 +85,7 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
 
 // Helper for testing detector code that reads an image and returns some custom data that can be described
 // by words included in the test filename.
-// The helper will split the filename by "-" into words and send it in the same order to the test function.
+// The helper will split the filename by "_" into words and send it in the same order to the test function.
 int image_words_detector_helper(ImageWordsDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::string& filename_base){
         return test_func(image, parse_words(filename_base));
@@ -95,18 +95,18 @@ int image_words_detector_helper(ImageWordsDetectorFunction test_func, const std:
 }
 
 // Helper for testing detector code that reads an image and returns a non-negative float that can be described
-// in the filename for example <name_base>-0.4.png.
+// in the filename for example <name_base>_0.4.png.
 int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::vector<std::string>& words) -> int{
         if (words.size() < 2){
-            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image_0.4_0.001.png) set in the filename." << endl;
             return 1;
         }
 
         float target_number = 0.0f, threshold = 0.0f;
 
         if (parse_float(words[words.size()-2], target_number) == false || parse_float(words[words.size()-1], threshold) == false){
-            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image-0.4-0.001.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have two non-negative floats (e.g image_0.4_0.001.png) set in the filename." << endl;
             return 1;
         }
 
@@ -119,14 +119,14 @@ int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_fun
 int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::vector<std::string>& words) -> int{
         if (words.size() == 0){
-            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image_5.png) set in the filename." << endl;
             return 1;
         }
 
         int target_number = 0;
 
         if (parse_int(words[words.size()-1], target_number) == false){
-            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image-5.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image_5.png) set in the filename." << endl;
             return 1;
         }
 
@@ -169,12 +169,12 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
     const auto name_base = QString::fromStdString(filename_base);
     bool target_bool = false;
-    if (name_base.endsWith("-True")){
+    if (name_base.endsWith("_True")){
         target_bool = true;
-    } else if (name_base.endsWith("-False")){
+    } else if (name_base.endsWith("_False")){
         target_bool = false;
     } else{
-        cerr << "Error: audio test file " << test_path << " has incorrect target detection result (-True/-False) set in the filename." << endl;
+        cerr << "Error: audio test file " << test_path << " has incorrect target detection result (_True/_False) set in the filename." << endl;
         return 1;
     }
 
@@ -216,8 +216,10 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_MMOQuestionMarkDetector", std::bind(image_words_detector_helper, test_pokemonLA_MMOQuestionMarkDetector, _1)},
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
     {"PokemonLA_WildPokemonFocusDetector", std::bind(image_words_detector_helper, test_pokemonLA_WildPokemonFocusDetector, _1)},
+    {"PokemonLA_BattleSpriteWatcher", std::bind(image_words_detector_helper, test_pokemonLA_BattleSpriteWatcher, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
     {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
+    {"PokemonLA_BattleSpriteArrowDetector", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_BattleSpriteArrowDetector, _1)},
     {"PokemonLA_MapMissionTabReader", std::bind(image_bool_detector_helper, test_pokemonLA_MapMissionTabReader, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)},
     {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},

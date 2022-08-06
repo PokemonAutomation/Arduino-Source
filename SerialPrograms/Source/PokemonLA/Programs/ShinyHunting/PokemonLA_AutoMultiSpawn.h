@@ -12,6 +12,8 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/PokemonLA_WeatherAndTime.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -30,6 +32,12 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    // Advance one step (e.g. A1 or A2) in the multi-spawn path
+    void advance_one_path_step(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t num_to_despawn, TimeOfDay cur_time, TimeOfDay next_time);
+
+    // Go to the spawn point, start one battle to remove some pokemon
+    // Return how many pokemon removed in the battle
+    size_t one_battle_to_remove_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t num_to_despawn);
 
     EnumDropdownOption SPAWN;
 

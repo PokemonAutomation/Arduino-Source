@@ -39,9 +39,13 @@ int test_pokemonLA_StatusInfoScreenDetector(const ImageViewRGB32& image, const s
 
 int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
+int test_pokemonLA_BattleSpriteWatcher(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
+
 int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold);
 
 int test_pokemonLA_MapZoomLevelReader(const ImageViewRGB32& image, int target);
+
+int test_pokemonLA_BattleSpriteArrowDetector(const ImageViewRGB32& image, int target);
 
 int test_pokemonLA_MapMissionTabReader(const ImageViewRGB32& image, bool target);
 

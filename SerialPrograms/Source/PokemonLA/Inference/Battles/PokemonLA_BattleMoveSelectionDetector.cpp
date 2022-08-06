@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -18,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-BattleMoveSelectionDetector::BattleMoveSelectionDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+BattleMoveSelectionDetector::BattleMoveSelectionDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("BattleMoveSelectionDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)

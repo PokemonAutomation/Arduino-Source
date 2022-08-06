@@ -464,6 +464,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.cpp \
@@ -476,6 +477,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_BattleSpriteArrowDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.cpp \
@@ -1218,6 +1220,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h \
@@ -1230,6 +1233,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_BattleSpriteArrowDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h \

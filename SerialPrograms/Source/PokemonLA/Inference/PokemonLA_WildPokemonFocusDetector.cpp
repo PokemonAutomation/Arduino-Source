@@ -46,7 +46,10 @@ void WildPokemonFocusDetector::make_overlays(VideoOverlaySet& items) const{
 
 //  Return true if the inference session should stop.
 bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    const Color threshold(20, 20, 20);
+
+    // dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Received", frame);
+
+    const Color threshold(15, 15, 15);
     const ImageViewRGB32& upper_border = extract_box_reference(frame, m_pokemon_tab_upper_bound);
     const size_t upper_border_length = count_horizontal_translucent_border_pixels(
         upper_border, threshold, false);
@@ -77,8 +80,7 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
         return false;
     }
 
-
-    dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Detected", frame);
+    // dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Detected", frame);
 
     m_details = read_focused_wild_pokemon_info(m_logger, m_overlay, frame, Language::English);
     m_change_focus = can_change_focus(m_logger, m_overlay, frame);

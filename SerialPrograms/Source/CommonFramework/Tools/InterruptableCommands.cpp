@@ -152,7 +152,7 @@ void AsyncCommandSession::stop_commands(){
     }
 }
 #endif
-#if 0
+// #if 0
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
@@ -161,7 +161,7 @@ void AsyncCommandSession::wait(){
     });
 //    cout << "wait() - done" << endl;
 }
-#endif
+// #endif
 void AsyncCommandSession::stop_session_and_rethrow(){
     cancel(nullptr);
     m_thread->wait_and_rethrow_exceptions();

@@ -12,10 +12,12 @@
 #include "CommonFramework/Language.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_BattleSpriteArrowDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
@@ -369,6 +371,40 @@ int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, const s
 }
 
 
+int test_pokemonLA_BattleSpriteWatcher(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    std::vector<bool> target;
+    for(auto it = keywords.rbegin(); it != keywords.rend(); it++){
+        const auto& word = *it;
+        if (word == "0"){
+            target.push_back(false);
+        } else if (word == "1"){
+            target.push_back(true);
+        } else {
+            break;
+        }
+    }
+    target.resize(MAX_WILD_POKEMON_IN_MULTI_BATTLE, false);
+
+    BattleSpriteWatcher watcher(logger, overlay);
+
+    watcher.process_frame(image, current_time());
+
+    auto result = watcher.sprites_appeared();
+
+    for(size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
+        if (result[i] != target[i]){
+            cerr << "Error: in test_pokemonLA_BattleSpriteWatcher sprite " << i << " has " << result[i] << ", but should be " << target[i] << endl;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
 int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_angle, float threshold){
     float angle = get_orientation_on_map(image);
     TEST_RESULT_APPROXIMATE(angle, target_angle, threshold);
@@ -378,6 +414,27 @@ int test_pokemonLA_MapMarkerLocator(const ImageViewRGB32& image, float target_an
 int test_pokemonLA_MapZoomLevelReader(const ImageViewRGB32& image, int target){
     int zoom = read_map_zoom_level(image);
     TEST_RESULT_EQUAL(zoom, target);
+    return 0;
+}
+
+int test_pokemonLA_BattleSpriteArrowDetector(const ImageViewRGB32& image, int target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    const size_t target_index = target;
+    for(size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){
+        BattleSpriteArrowDetector detector(logger, overlay, sprite_index, std::chrono::milliseconds(0), true);
+        bool result = detector.process_frame(image, current_time());
+        if (sprite_index != target_index && result){
+            cerr << "Error: in test_pokemonLA_BattleSpriteArrowDetector detected arrow at sprite index " << sprite_index
+                 << " but should be at sprite index " << target << endl;
+            return 1;
+        } else if (sprite_index == target_index && result == false){
+            cerr << "Error: in test_pokemonLA_BattleSpriteArrowDetector failed to detect arrow at sprite index " << sprite_index << endl;
+            return 1;
+        }
+    }
+
     return 0;
 }
 
