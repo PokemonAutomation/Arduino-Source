@@ -116,7 +116,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     // change_time_of_day(TimeOfDay.MORNING);
 
     for(size_t i = 0; i < path_despawns.size(); i++){
-
+#if 1
         auto go_to_spawn_point_and_focus = [&]() -> PokemonDetails {
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -166,7 +166,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         // Try to go to spawn point and focus on one pokemon
         PokemonDetails focused_pokemon;
         const size_t num_tries = 5;
-        for(size_t i = 0; i < num_tries; i++){
+        for(size_t j = 0; j < num_tries; j++){
             focused_pokemon = go_to_spawn_point_and_focus();
             if (focused_pokemon.name_candidates.size() > 0){
                 // We found one
@@ -183,7 +183,8 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         // XXX
         cout << "End of one step in the path" << endl;
-        break;
+//        break;
+#endif
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
