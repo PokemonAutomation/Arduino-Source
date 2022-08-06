@@ -82,7 +82,7 @@ double read_hp_bar(const ImageViewRGB32& image){
     return read_hp_bar_internal(image);
 }
 
-double read_hp_bar(LoggerQt& logger, const ImageViewRGB32& image){
+double read_hp_bar(Logger& logger, const ImageViewRGB32& image){
     double hp = read_hp_bar(image);
 //    static int c = 0;
 //    image.save("test-" + std::to_string(c++) + ".png");
@@ -93,7 +93,7 @@ double read_hp_bar(LoggerQt& logger, const ImageViewRGB32& image){
     }
     return hp;
 }
-Health read_in_battle_hp_box(LoggerQt& logger, const ImageViewRGB32& sprite, const ImageViewRGB32& hp_bar){
+Health read_in_battle_hp_box(Logger& logger, const ImageViewRGB32& sprite, const ImageViewRGB32& hp_bar){
     ImageStats stats = image_stats(sprite);
 //    cout << stats.average << stats.stddev << endl;
     if (is_solid(stats, {0., 0.389943, 0.610057})){
@@ -191,7 +191,7 @@ int8_t parse_pp(const std::string& str){
     return -1;
 }
 
-int8_t read_pp_text(LoggerQt& logger, const ImageViewRGB32& image){
+int8_t read_pp_text(Logger& logger, const ImageViewRGB32& image){
     if (image.width() == 0 || image.height() == 0){
         return -1;
     }

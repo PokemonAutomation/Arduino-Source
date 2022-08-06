@@ -50,7 +50,7 @@ std::string extract_name(const std::string& filename){
 
 
 TrainingSession::TrainingSession(
-    LoggerQt& logger, CancellableScope& scope,
+    Logger& logger, CancellableScope& scope,
     const std::string& training_data_directory
 )
     : m_logger(logger)

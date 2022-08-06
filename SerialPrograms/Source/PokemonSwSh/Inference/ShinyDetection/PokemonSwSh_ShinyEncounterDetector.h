@@ -37,7 +37,7 @@ extern const ShinyDetectionBattle SHINY_BATTLE_RAID;
 class ShinyEncounterTracker : public VisualInferenceCallback{
 public:
     ShinyEncounterTracker(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         const ShinyDetectionBattle& battle_settings
     );
 
@@ -53,7 +53,7 @@ public:
 private:
     ShinyDetectionBattle m_battle_settings;
 
-    LoggerQt& m_logger;
+    Logger& m_logger;
 //    VideoOverlay& m_overlay;
 
     StandardBattleMenuWatcher m_battle_menu;
@@ -69,7 +69,7 @@ private:
 
 ShinyType determine_shiny_status(
     double& alpha,
-    LoggerQt& logger,
+    Logger& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles

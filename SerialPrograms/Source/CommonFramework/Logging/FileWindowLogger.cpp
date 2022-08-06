@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 
 
-LoggerQt& global_logger_raw(){
+Logger& global_logger_raw(){
     static FileWindowLogger logger((QCoreApplication::applicationName() + ".log").toStdString());
     return logger;
 }

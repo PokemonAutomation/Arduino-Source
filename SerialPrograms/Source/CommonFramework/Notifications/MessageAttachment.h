@@ -38,7 +38,7 @@ public:
     ~PendingFileSend();
 
     PendingFileSend(const std::string& file, bool keep_file);
-    PendingFileSend(LoggerQt& logger, const ImageAttachment& image);
+    PendingFileSend(Logger& logger, const ImageAttachment& image);
 
     const std::string& filename() const{ return m_filename; }
     const std::string& filepath() const{ return m_filepath; }

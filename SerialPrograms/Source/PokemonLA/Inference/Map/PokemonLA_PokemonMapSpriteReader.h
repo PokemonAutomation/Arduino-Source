@@ -49,7 +49,7 @@ struct MapSpriteMatchResult{
 };
 
 MapSpriteMatchResult match_sprite_on_map(
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& screen,
     const ImagePixelBox& box,
     MapRegion region,

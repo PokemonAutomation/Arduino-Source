@@ -52,7 +52,7 @@ public:
 
 public:
     OverworldTargetTracker(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         std::chrono::milliseconds window,
         double mark_offset,
         MarkPriority mark_priority,
@@ -95,7 +95,7 @@ private:
 
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_window;
     double m_mark_offset;

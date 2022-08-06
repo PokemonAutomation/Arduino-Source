@@ -8,7 +8,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "AudioOption.h"
-#include "UI/AudioSelectorWidget.h"
 
 namespace PokemonAutomation{
 
@@ -99,9 +98,6 @@ JsonValue AudioOption::to_json() const{
     return root;
 }
 
-AudioSelectorWidget* AudioOption::make_ui(QWidget& parent, LoggerQt& logger, AudioSession& session){
-    return new AudioSelectorWidget(parent, logger, session);
-}
 
 
 

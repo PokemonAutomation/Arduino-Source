@@ -143,7 +143,7 @@ void trade_current_pokemon(
 
 
 
-TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Language language)
+TradeNameReader::TradeNameReader(Logger& logger, VideoOverlay& overlay, Language language)
     : m_logger(logger)
     , m_language(language)
     , m_box(overlay, 0.80, 0.155, 0.18, 0.05)

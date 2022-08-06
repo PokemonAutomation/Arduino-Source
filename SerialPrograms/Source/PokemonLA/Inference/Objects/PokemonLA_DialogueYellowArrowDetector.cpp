@@ -41,7 +41,7 @@ const DialogueYellowArrowMatcher& DialogueYellowArrowMatcher::instance(){
 
 
 DialogueYellowArrowDetector::DialogueYellowArrowDetector(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     bool stop_on_detected
 )
     : VisualInferenceCallback("DialogueYellowArrowDetector")

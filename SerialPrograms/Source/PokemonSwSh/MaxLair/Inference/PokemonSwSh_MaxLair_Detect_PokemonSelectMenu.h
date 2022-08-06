@@ -61,7 +61,7 @@ struct PokemonSelectMenuState{
 class PokemonSelectMenuReader{
 public:
     PokemonSelectMenuReader(
-        LoggerQt& logger,
+        Logger& logger,
         VideoOverlay& overlay,
         Language language
     );
@@ -73,7 +73,7 @@ public:
 
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     Language m_language;
     InferenceBoxScope m_sprite0;
     InferenceBoxScope m_sprite1;

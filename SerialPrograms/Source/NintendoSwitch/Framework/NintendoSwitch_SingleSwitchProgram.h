@@ -27,7 +27,7 @@ private:
     SingleSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
-        LoggerQt& logger,
+        Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args

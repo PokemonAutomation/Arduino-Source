@@ -25,7 +25,7 @@ public:
     SerialPortWidget(
         QWidget& parent,
         SerialPortSession& session,
-        LoggerQt& logger
+        Logger& logger
     );
     ~SerialPortWidget();
 

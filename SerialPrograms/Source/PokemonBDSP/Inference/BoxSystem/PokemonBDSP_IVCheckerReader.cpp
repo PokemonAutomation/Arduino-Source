@@ -23,7 +23,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
-IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const ImageViewRGB32& frame, const InferenceBoxScope& box){
+IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const InferenceBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
         logger, m_language, image,
@@ -35,7 +35,7 @@ IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const ImageViewRGB32
     }
     return IVCheckerValue_string_to_enum(result.results.begin()->second.token);
 }
-IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const ImageViewRGB32& frame){
+IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame){
     IVCheckerReader::Results results;
     if (m_language != Language::None){
         results.hp      = read(logger, frame, m_box0);

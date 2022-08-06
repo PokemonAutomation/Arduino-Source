@@ -69,7 +69,7 @@ private:
 class ButtonDetector : public VisualInferenceCallback{
 public:
     ButtonDetector(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         ButtonType type,
         const ImageFloatBox& box,
         std::chrono::milliseconds min_streak,
@@ -85,7 +85,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     ImageFloatBox m_box;
     bool m_stop_on_detected;
 

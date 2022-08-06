@@ -12,13 +12,13 @@
 
 namespace PokemonAutomation{
 
-class LoggerQt;
+class Logger;
 
 
 class MultiConsoleErrorState{
 public:
-    void report_unrecoverable_error(LoggerQt& logger, const std::string& msg);
-    void check_unrecoverable_error(LoggerQt& logger);
+    void report_unrecoverable_error(Logger& logger, const std::string& msg);
+    void check_unrecoverable_error(Logger& logger);
 
 private:
     std::atomic<bool> m_unrecoverable_error;

@@ -44,8 +44,8 @@ private:
 
 
 public:
-    void send_json(LoggerQt& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file);
-    void send_file(LoggerQt& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
+    void send_json(Logger& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file);
+    void send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
 
     static DiscordWebhookSender& instance();
 
@@ -73,7 +73,7 @@ private:
 
 
 void send_message(
-    LoggerQt& logger,
+    Logger& logger,
     bool should_ping,
     const std::vector<std::string>& tags,
     const std::string& message,

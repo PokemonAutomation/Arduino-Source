@@ -38,7 +38,7 @@ const DetectionType YOUR_POKEMON{
 
 
 ShinyEncounterTracker::ShinyEncounterTracker(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     BattleType battle_type
 )
     : VisualInferenceCallback("ShinyEncounterTracker")

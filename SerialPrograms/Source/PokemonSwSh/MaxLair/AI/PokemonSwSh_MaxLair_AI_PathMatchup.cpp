@@ -245,7 +245,7 @@ double evaluate_path(const Boss& boss, const std::vector<PathNode>& path){
 
 
 std::vector<PathNode> select_path(
-    LoggerQt* logger,
+    Logger* logger,
     const std::string& boss,
     const PathMap& pathmap, uint8_t wins, int8_t path_side
 ){

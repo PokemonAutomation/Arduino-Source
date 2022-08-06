@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
-#include "Integrations/ProgramTracker.h"
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
+#include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
@@ -27,13 +27,11 @@ namespace NintendoSwitch{
 class CommandRow;
 
 class SwitchSystemWidget : public SwitchSetupWidget, public ConsoleSystem{
-    Q_OBJECT
-
 public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemFactory& factory,
-        LoggerQt& raw_logger,
+        Logger& raw_logger,
         uint64_t program_id
     );
     virtual ~SwitchSystemWidget();
@@ -46,7 +44,7 @@ public:
     virtual void reset_serial() override;
 
 public:
-    LoggerQt& logger();
+    Logger& logger();
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();

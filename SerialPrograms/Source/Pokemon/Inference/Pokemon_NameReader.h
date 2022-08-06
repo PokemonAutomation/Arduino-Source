@@ -27,7 +27,7 @@ public:
     static const PokemonNameReader& instance();
 
     OCR::StringMatchResult read_substring(
-        LoggerQt& logger,
+        Logger& logger,
         Language language,
         const ImageViewRGB32& image,
         const std::vector<OCR::TextColorRange>& text_color_ranges,

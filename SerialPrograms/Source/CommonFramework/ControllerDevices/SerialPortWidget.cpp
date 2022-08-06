@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 SerialPortWidget::SerialPortWidget(
     QWidget& parent,
     SerialPortSession& session,
-    LoggerQt& logger
+    Logger& logger
 )
     : QWidget(&parent)
     , m_session(session)

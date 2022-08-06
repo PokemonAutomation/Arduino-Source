@@ -32,7 +32,7 @@ std::vector<std::vector<PathNode>> generate_paths(
 
 
 std::vector<PathNode> select_path(
-    LoggerQt* logger,
+    Logger* logger,
     const std::string& boss,
     const PathMap& pathmap, uint8_t wins, int8_t path_side
 );

@@ -198,7 +198,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &image){
 
 
 
-MMOQuestionMarkDetector::MMOQuestionMarkDetector(LoggerQt& logger)
+MMOQuestionMarkDetector::MMOQuestionMarkDetector(Logger& logger)
     : m_logger(logger)
 {}
 

@@ -35,7 +35,7 @@ public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
-    virtual SwitchSetupWidget* make_ui(QWidget& parent, LoggerQt& logger, uint64_t program_id) = 0;
+    virtual SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) = 0;
 
 protected:
     const PABotBaseLevel m_min_pabotbase;

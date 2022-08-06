@@ -37,7 +37,7 @@ NotificationOCR::NotificationOCR()
 
 
 OCR::StringMatchResult NotificationOCR::read_substring(
-    LoggerQt& logger,
+    Logger& logger,
     Language language,
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -55,7 +55,7 @@ OCR::StringMatchResult NotificationOCR::read_substring(
 
 
 
-NotificationReader::NotificationReader(LoggerQt& logger, Language language)
+NotificationReader::NotificationReader(Logger& logger, Language language)
     : m_logger(logger)
     , m_language(language)
     , m_ocr_box(0.30, 0.138, 0.40, 0.036)
@@ -114,7 +114,7 @@ Notification NotificationReader::detect(const ImageViewRGB32& screen) const{
 
 
 
-NotificationDetector::NotificationDetector(LoggerQt& logger, Language language)
+NotificationDetector::NotificationDetector(Logger& logger, Language language)
     : VisualInferenceCallback("NotificationDetector")
     , m_reader(logger, language)
     , m_last(Notification::NOTHING)

@@ -35,7 +35,7 @@ struct StringMatchResult{
         exact_match = false;
         results.clear();
     }
-    void log(LoggerQt& logger, double max_log10p, const std::string& extra = std::string()) const;
+    void log(Logger& logger, double max_log10p, const std::string& extra = std::string()) const;
 
     void add(double log10p, StringMatchData data);
     void clear_beyond_spread(double log10p_spread);

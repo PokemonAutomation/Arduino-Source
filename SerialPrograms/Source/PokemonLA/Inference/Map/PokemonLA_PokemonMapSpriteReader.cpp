@@ -789,7 +789,7 @@ float compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, cons
 }
 
 
-MapSpriteMatchResult match_sprite_on_map(LoggerQt& logger, const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region, bool debug_mode){
+MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& screen, const ImagePixelBox& box, MapRegion region, bool debug_mode){
     const static auto& sprite_map = MMO_SPRITE_MATCHING_DATA();
 
     auto save_debug_image_if_required = [&](const MapSpriteMatchResult& result){

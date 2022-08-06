@@ -67,12 +67,12 @@ public:
     PathReader(VideoOverlay& overlay, size_t player_index);
 
     void read_sprites(
-        LoggerQt& logger,
+        Logger& logger,
         GlobalState& state,
         const ImageViewRGB32& screen
     ) const;
     void read_hp(
-        LoggerQt& logger,
+        Logger& logger,
         GlobalState& state,
         const ImageViewRGB32& screen
     ) const;
@@ -86,15 +86,15 @@ public:
     //      0   =   left
     //      1   =   right
     void read_side(
-        LoggerQt& logger,
+        Logger& logger,
         GlobalState& state,
         const ImageViewRGB32& screen
     );
 
 
 public:
-    void read_sprites(LoggerQt& logger, const ImageViewRGB32& screen, std::string slugs[4]) const;
-    void read_hp(LoggerQt& logger, const ImageViewRGB32& screen, double hp[4]) const;
+    void read_sprites(Logger& logger, const ImageViewRGB32& screen, std::string slugs[4]) const;
+    void read_hp(Logger& logger, const ImageViewRGB32& screen, double hp[4]) const;
 
     static int8_t read_side(const ImageViewRGB32& image, int p_min_rgb_sum);
 

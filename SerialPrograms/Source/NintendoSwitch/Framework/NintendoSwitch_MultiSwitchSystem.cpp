@@ -99,7 +99,7 @@ const QSerialPortInfo* MultiSwitchSystemFactory::port(size_t index) const{
 //    return m_switches[index]->camera();
 //}
 
-SwitchSetupWidget* MultiSwitchSystemFactory::make_ui(QWidget& parent, LoggerQt& logger, uint64_t program_id){
+SwitchSetupWidget* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
     return new MultiSwitchSystemWidget(parent, *this, logger, program_id);
 }
 

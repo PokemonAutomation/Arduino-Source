@@ -29,7 +29,7 @@ std::string StringMatchData::to_str() const{
     return str;
 }
 
-void StringMatchResult::log(LoggerQt& logger, double max_log10p, const std::string& extra) const{
+void StringMatchResult::log(Logger& logger, double max_log10p, const std::string& extra) const{
     std::string str = "String Match Result: ";
 
 #if 0

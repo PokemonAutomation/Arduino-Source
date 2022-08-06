@@ -58,7 +58,7 @@ private:
 
 class MountTracker : public VisualInferenceCallback{
 public:
-    MountTracker(LoggerQt& logger, MountDetectorLogging logging = MountDetectorLogging::NONE);
+    MountTracker(Logger& logger, MountDetectorLogging logging = MountDetectorLogging::NONE);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -73,7 +73,7 @@ private:
     };
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     std::atomic<MountState> m_state;
 
     SpinLock m_lock;

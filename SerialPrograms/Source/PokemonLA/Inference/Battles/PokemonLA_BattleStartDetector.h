@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 class BattleStartDetector : public VisualInferenceCallback{
 public:
-    BattleStartDetector(LoggerQt& logger, VideoOverlay& overlay);
+    BattleStartDetector(Logger& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

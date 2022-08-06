@@ -95,7 +95,7 @@ std::unordered_map<uint16_t, std::string> str_dpad = {
 };
 
 
-LoggerQt& sleepy_logger(){
+Logger& sleepy_logger(){
     static TaggedLogger logger(global_logger_raw(), "SleepyDiscord");
     return logger;
 }

@@ -29,7 +29,7 @@ namespace PokemonLA{
 
 class WildPokemonFocusDetector : public VisualInferenceCallback{
 public:
-    WildPokemonFocusDetector(LoggerQt& logger, VideoOverlay& overlay);
+    WildPokemonFocusDetector(Logger& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -39,7 +39,7 @@ public:
     std::pair<PokemonDetails, bool> get_focus_info() const { return std::make_pair(m_details, m_change_focus); }
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     VideoOverlay& m_overlay;
     // The upper bound of the transparent dark pokemon tab shown in lower left of the screen when focusing on
     // one pokemon. It should the pokemon name, lv, gender, whether caught before, alpha status and shiny status.
@@ -54,13 +54,13 @@ private:
 
 // Read the pokemon details: name, alpha, shiny, gender from the focused tab.
 PokemonDetails read_focused_wild_pokemon_info(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     const ImageViewRGB32& frame,
     Language language
 );
 
 // Detect the A button to know whether you can press A to change focus.
-bool can_change_focus(LoggerQt& logger, VideoOverlay& overlay, const ImageViewRGB32& frame);
+bool can_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame);
 
 
 }

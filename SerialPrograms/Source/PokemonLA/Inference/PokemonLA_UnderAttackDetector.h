@@ -32,7 +32,7 @@ class UnderAttackWatcher : public VisualInferenceCallback{
 public:
 
 public:
-    UnderAttackWatcher(LoggerQt& logger);
+    UnderAttackWatcher(Logger& logger);
 
     UnderAttackState state() const{
         return m_state.load(std::memory_order_acquire);
@@ -50,7 +50,7 @@ private:
         UnderAttackState state;
     };
 
-    LoggerQt& m_logger;
+    Logger& m_logger;
     ImageFloatBox m_box;
 
     std::atomic<UnderAttackState> m_state;

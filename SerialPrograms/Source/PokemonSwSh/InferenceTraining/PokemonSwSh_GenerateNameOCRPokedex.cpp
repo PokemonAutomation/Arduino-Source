@@ -71,7 +71,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
 
 void GenerateNameOCRDataPokedex::read(
     JsonArray& output,
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& image
 ) const{
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(

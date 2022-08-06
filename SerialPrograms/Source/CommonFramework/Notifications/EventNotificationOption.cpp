@@ -165,7 +165,7 @@ void EventNotificationOption::restore_defaults(){
 void EventNotificationOption::reset_rate_limit(){
     m_last_sent.store(WallClock::min(), std::memory_order_release);
 }
-bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
+bool EventNotificationOption::ok_to_send_now(Logger& logger){
     if (!m_enabled){
         logger.log("EventNotification(" + m_label + "): Notifications not enabled.", COLOR_PURPLE);
         return false;

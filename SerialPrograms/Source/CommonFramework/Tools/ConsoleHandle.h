@@ -33,7 +33,7 @@ public:
 public:
     ConsoleHandle(
         size_t index,
-        LoggerQt& logger,
+        Logger& logger,
         BotBase& botbase,
         VideoFeed& video,
         VideoOverlay& overlay,
@@ -49,13 +49,13 @@ public:
 
     size_t index() const{ return m_index; }
 
-    LoggerQt& logger(){ return m_logger; }
+    Logger& logger(){ return m_logger; }
     BotBase& botbase(){ return m_botbase; }
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
 
-    operator LoggerQt&(){ return m_logger; }
+    operator Logger&(){ return m_logger; }
     operator VideoFeed&(){ return m_video; }
     operator VideoOverlay&(){ return m_overlay; }
     operator AudioFeed&() { return m_audio; }
@@ -69,7 +69,7 @@ public:
 
 private:
     size_t m_index;
-    LoggerQt& m_logger;
+    Logger& m_logger;
     BotBase& m_botbase;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;

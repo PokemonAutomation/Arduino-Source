@@ -57,12 +57,12 @@ struct RaidLobbyState{
 
 class RaidLobbyReader{
 public:
-    RaidLobbyReader(LoggerQt& logger, VideoOverlay& overlay);
+    RaidLobbyReader(Logger& logger, VideoOverlay& overlay);
 
     RaidLobbyState read(const ImageViewRGB32& screen);
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     InferenceBoxScope m_checkbox0;
     InferenceBoxScope m_checkbox1;
     InferenceBoxScope m_checkbox2;

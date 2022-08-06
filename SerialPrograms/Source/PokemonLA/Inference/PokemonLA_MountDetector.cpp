@@ -582,7 +582,7 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-MountTracker::MountTracker(LoggerQt& logger, MountDetectorLogging logging)
+MountTracker::MountTracker(Logger& logger, MountDetectorLogging logging)
     : VisualInferenceCallback("MountTracker")
     , m_logger(logger)
     , m_state(MountState::NOTHING)

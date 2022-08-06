@@ -24,7 +24,7 @@ void create_debug_folder(const std::string& folder_path){
 }
 
 std::string dump_debug_image(
-    LoggerQt& logger,
+    Logger& logger,
     const std::string& path,
     const std::string& label,
     const ImageViewRGB32& image

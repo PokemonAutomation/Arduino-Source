@@ -59,17 +59,17 @@ public:
     BattleMenuReader(VideoOverlay& overlay, Language language);
 
     std::set<std::string> read_opponent(
-        LoggerQt& logger, CancellableScope& scope,
+        Logger& logger, CancellableScope& scope,
         VideoFeed& feed
     ) const;
-    std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const ImageViewRGB32& screen) const;
+    std::set<std::string> read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const;
 
-    std::string read_own_mon(LoggerQt& logger, const ImageViewRGB32& screen) const;
+    std::string read_own_mon(Logger& logger, const ImageViewRGB32& screen) const;
 
-    double read_opponent_hp(LoggerQt& logger, const ImageViewRGB32& screen) const;
-    double read_own_hp(LoggerQt& logger, const ImageViewRGB32& screen) const;
-    void read_hp(LoggerQt& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index);
-    void read_own_pp(LoggerQt& logger, const ImageViewRGB32& screen, int8_t pp[4]) const;
+    double read_opponent_hp(Logger& logger, const ImageViewRGB32& screen) const;
+    double read_own_hp(Logger& logger, const ImageViewRGB32& screen) const;
+    void read_hp(Logger& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index);
+    void read_own_pp(Logger& logger, const ImageViewRGB32& screen, int8_t pp[4]) const;
     bool can_dmax(const ImageViewRGB32& screen) const;
 
 private:

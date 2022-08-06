@@ -61,7 +61,7 @@ DiscordWebhookSender& DiscordWebhookSender::instance(){
     return sender;
 }
 
-void DiscordWebhookSender::send_json(LoggerQt& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file){
+void DiscordWebhookSender::send_json(Logger& logger, const QUrl& url, const JsonObject& obj, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(
         url,
@@ -72,7 +72,7 @@ void DiscordWebhookSender::send_json(LoggerQt& logger, const QUrl& url, const Js
     m_cv.notify_all();
 }
 
-void DiscordWebhookSender::send_file(LoggerQt& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
+void DiscordWebhookSender::send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(url, file);
     logger.log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
@@ -136,7 +136,7 @@ void DiscordWebhookSender::process_reply(QNetworkReply* reply){
         if (index >= 0){
             error_string.replace(index, url.size(), "****************");
         }
-        m_logger.log("Discord Request Response: " + error_string, COLOR_RED);
+        m_logger.log("Discord Request Response: " + error_string.toStdString(), COLOR_RED);
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }
@@ -217,7 +217,7 @@ void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByt
 }
 
 void send_message(
-    LoggerQt& logger,
+    Logger& logger,
     bool should_ping,
     const std::vector<std::string>& tags,
     const std::string& message,

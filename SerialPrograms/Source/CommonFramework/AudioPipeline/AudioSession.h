@@ -24,6 +24,7 @@
 
 namespace PokemonAutomation{
 
+class Logger;
 
 
 class AudioSession final : public AudioFeed, private FFTListener{

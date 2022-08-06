@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 //  1 for middle Pokemon
 //  2 for bottom Pokemon
 int8_t select_starter(
-    LoggerQt& logger,
+    Logger& logger,
     const GlobalState& state,
     size_t player_index,
     const std::string options[3]

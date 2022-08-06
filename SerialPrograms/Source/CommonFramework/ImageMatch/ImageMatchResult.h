@@ -21,7 +21,7 @@ struct ImageMatchResult{
 
     // Write to log the current matching results stored in `results`.
     // Use `max_alpha` to determine whether matches are found.
-    void log(LoggerQt& logger, double max_alpha) const;
+    void log(Logger& logger, double max_alpha) const;
 
     // Add to `results`.
     // alpha: the match score, the lower the closer the match.

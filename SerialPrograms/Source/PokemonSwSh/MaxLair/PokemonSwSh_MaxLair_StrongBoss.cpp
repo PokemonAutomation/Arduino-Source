@@ -146,7 +146,7 @@ void MaxLairStrongBoss::update_active_consoles(){
 class EndBattleDecider_StrongBoss : public EndBattleDecider{
 public:
     EndBattleDecider_StrongBoss(
-        LoggerQt& logger,
+        Logger& logger,
         const Consoles& consoles, size_t host_index,
         double min_win_ratio
     )
@@ -201,7 +201,7 @@ private:
         return static_cast<const MaxLairStrongBoss_ConsoleOptions&>(m_consoles[index]);
     }
 
-    LoggerQt& m_logger;
+    Logger& m_logger;
     const Consoles& m_consoles;
     size_t m_host_index;
     double m_min_win_ratio;

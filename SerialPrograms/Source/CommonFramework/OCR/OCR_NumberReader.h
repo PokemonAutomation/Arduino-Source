@@ -15,7 +15,7 @@ namespace OCR{
 
 
 //  Returns -1 if no number is found.
-int read_number(LoggerQt& logger, const ImageViewRGB32& image);
+int read_number(Logger& logger, const ImageViewRGB32& image);
 
 
 }

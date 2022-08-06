@@ -26,7 +26,7 @@ namespace PokemonLA{
 class TransparentDialogueDetector : public VisualInferenceCallback{
 public:
     TransparentDialogueDetector(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         bool stop_on_detected
     );
 

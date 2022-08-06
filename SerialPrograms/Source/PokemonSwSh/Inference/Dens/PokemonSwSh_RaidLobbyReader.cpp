@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-RaidLobbyReader::RaidLobbyReader(LoggerQt& logger, VideoOverlay& overlay)
+RaidLobbyReader::RaidLobbyReader(Logger& logger, VideoOverlay& overlay)
     : m_logger(logger)
     , m_checkbox0(overlay, 0.593, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_checkbox1(overlay, 0.593, 0.337 + 0.0775*1, 0.034, 0.06)

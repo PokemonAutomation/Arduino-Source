@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 
 PokemonDetails read_status_info(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     const ImageViewRGB32& frame,
     Language language
 );

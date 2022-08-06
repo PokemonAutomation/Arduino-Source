@@ -70,7 +70,7 @@ void ArcPhoneTracker::finish(const ImageViewRGB32& image){
 
 
 ArcPhoneDetector::ArcPhoneDetector(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     std::chrono::milliseconds min_streak,
     bool stop_on_detected
 )

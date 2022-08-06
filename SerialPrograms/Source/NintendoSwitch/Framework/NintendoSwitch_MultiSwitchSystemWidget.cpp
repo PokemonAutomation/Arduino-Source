@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     QWidget& parent,
     MultiSwitchSystemFactory& factory,
-    LoggerQt& logger,
+    Logger& logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent, factory)

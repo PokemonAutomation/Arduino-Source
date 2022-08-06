@@ -172,7 +172,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             correct_count++;
             remaining_skips--;
             stats.issued++;
-            env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd"));
+            env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd").toStdString());
 //            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
             env.update_stats(stats.to_str());
         }

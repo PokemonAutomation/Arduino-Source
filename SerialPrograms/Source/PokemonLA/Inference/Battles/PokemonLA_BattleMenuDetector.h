@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 class BattleMenuDetector : public VisualInferenceCallback{
 public:
-    BattleMenuDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    BattleMenuDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);

@@ -7,10 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioOption_H
 #define PokemonAutomation_AudioPipeline_AudioOption_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
-
-class QWidget;
 
 namespace PokemonAutomation{
 
@@ -19,10 +16,7 @@ class AudioSession;
 class AudioDisplayWidget;
 class AudioSelectorWidget;
 
-// Handles the state of audio: the audio source.
-// Call make_ui() to generate the UI friend class AudioSelectorWidget,
-// which directly modifies AudioSelector's internal state.
-// This separates state from UI.
+
 // TODO: if needed, can add state of FFT parameters (FFT length, sliding
 // window step, etc.) here.
 class AudioOption{
@@ -57,8 +51,6 @@ public:
 public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
-
-    AudioSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, AudioSession& session);
 
 private:
     friend class AudioSession;

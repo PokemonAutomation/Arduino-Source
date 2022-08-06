@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 
 
-OverworldDetector::OverworldDetector(LoggerQt& logger, VideoOverlay& overlay)
+OverworldDetector::OverworldDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("OverworldDetector")
     , m_arc_phone(logger, overlay, std::chrono::milliseconds(100), true)
 {}

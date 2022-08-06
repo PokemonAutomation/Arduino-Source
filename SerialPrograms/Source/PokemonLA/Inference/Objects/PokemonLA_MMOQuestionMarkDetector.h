@@ -27,7 +27,7 @@ namespace PokemonLA{
 
 class MMOQuestionMarkDetector {
 public:
-    MMOQuestionMarkDetector(LoggerQt& logger);
+    MMOQuestionMarkDetector(Logger& logger);
 
     void make_overlays(VideoOverlaySet& items) const;
 
@@ -40,7 +40,7 @@ public:
     std::vector<ImagePixelBox> detect_MMOs_on_region_map(const ImageViewRGB32& frame);
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
 };
 
 // Detect the presense of MM question mark on an image

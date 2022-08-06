@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-DialogSurpriseDetector::DialogSurpriseDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+DialogSurpriseDetector::DialogSurpriseDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("DialogSurpriseDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
@@ -96,7 +96,7 @@ bool DialogSurpriseDetector::process_frame(const ImageViewRGB32& frame, WallCloc
 
 
 
-NormalDialogDetector::NormalDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+NormalDialogDetector::NormalDialogDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("NormalDialogDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
@@ -156,7 +156,7 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
 
 
 
-EventDialogDetector::EventDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+EventDialogDetector::EventDialogDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("EventDialogDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)

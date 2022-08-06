@@ -25,7 +25,7 @@ PokemonNameReader::PokemonNameReader(const std::set<std::string>& subset)
 {}
 
 OCR::StringMatchResult PokemonNameReader::read_substring(
-    LoggerQt& logger,
+    Logger& logger,
     Language language,
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,

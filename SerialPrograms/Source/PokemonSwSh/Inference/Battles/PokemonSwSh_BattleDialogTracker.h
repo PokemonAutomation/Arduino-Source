@@ -28,7 +28,7 @@ enum class EncounterState{
 class EncounterDialogTracker : public VisualInferenceCallback{
 public:
     EncounterDialogTracker(
-        LoggerQt& logger,
+        Logger& logger,
         StaticScreenDetector& dialog_detector
     );
 
@@ -45,7 +45,7 @@ public:
     void push_end(WallClock timestamp = current_time());
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     StaticScreenDetector& m_dialog_detector;
     WallClock m_end_dialog;
 

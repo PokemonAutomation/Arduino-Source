@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 class BattlePokemonSwitchDetector : public VisualInferenceCallback{
 public:
-    BattlePokemonSwitchDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    BattlePokemonSwitchDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);

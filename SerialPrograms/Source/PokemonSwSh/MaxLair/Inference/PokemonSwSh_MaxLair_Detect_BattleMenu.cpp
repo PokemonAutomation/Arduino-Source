@@ -237,7 +237,7 @@ BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
 {}
 
 std::set<std::string> BattleMenuReader::read_opponent(
-    LoggerQt& logger, CancellableScope& scope,
+    Logger& logger, CancellableScope& scope,
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
@@ -255,7 +255,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", *screen);
     return result;
 }
-std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const ImageViewRGB32& screen) const{
+std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
     std::set<std::string> slugs = read_pokemon_name(logger, m_language, name);
 
@@ -320,7 +320,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logge
 
     return slugs;
 }
-std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const ImageViewRGB32& screen) const{
+std::string BattleMenuReader::read_own_mon(Logger& logger, const ImageViewRGB32& screen) const{
     return read_pokemon_name_sprite(
         logger,
         screen,
@@ -330,7 +330,7 @@ std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const ImageViewRGB3
     );
 }
 
-double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const ImageViewRGB32& screen) const{
+double BattleMenuReader::read_opponent_hp(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_opponent_hp);
 //    image.save("test.png");
 
@@ -347,7 +347,7 @@ double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const ImageViewRGB32
 #endif
     return read_hp_bar(logger, image);
 }
-double BattleMenuReader::read_own_hp(LoggerQt& logger, const ImageViewRGB32& screen) const{
+double BattleMenuReader::read_own_hp(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_own_hp);
 //    image.save("test.png");
 #if 0
@@ -362,7 +362,7 @@ double BattleMenuReader::read_own_hp(LoggerQt& logger, const ImageViewRGB32& scr
 #endif
     return read_hp_bar(logger, image);
 }
-void BattleMenuReader::read_hp(LoggerQt& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index){
+void BattleMenuReader::read_hp(Logger& logger, const ImageViewRGB32& screen, Health health[4], size_t player_index){
     Health tmp_hp[4];
     tmp_hp[0] = {read_own_hp(logger, screen), false};
     tmp_hp[1] = read_in_battle_hp_box(logger, extract_box_reference(screen, m_sprite0), extract_box_reference(screen, m_hp0));
@@ -378,7 +378,7 @@ void BattleMenuReader::read_hp(LoggerQt& logger, const ImageViewRGB32& screen, H
         dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
     }
 }
-void BattleMenuReader::read_own_pp(LoggerQt& logger, const ImageViewRGB32& screen, int8_t pp[4]) const{
+void BattleMenuReader::read_own_pp(Logger& logger, const ImageViewRGB32& screen, int8_t pp[4]) const{
     pp[0] = read_pp_text(logger, extract_box_reference(screen, m_pp0));
     pp[1] = read_pp_text(logger, extract_box_reference(screen, m_pp1));
     pp[2] = read_pp_text(logger, extract_box_reference(screen, m_pp2));

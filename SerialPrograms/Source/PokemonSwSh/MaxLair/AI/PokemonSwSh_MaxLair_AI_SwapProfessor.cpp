@@ -22,7 +22,7 @@ namespace MaxLairInternal{
 
 //  Professor offers to exchange a Pokemon.
 bool should_swap_with_professor(
-    LoggerQt& logger,
+    Logger& logger,
     const GlobalState& state,
     size_t player_index
 ){

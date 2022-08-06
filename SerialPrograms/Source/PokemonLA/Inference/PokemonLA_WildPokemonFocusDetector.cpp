@@ -27,7 +27,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-WildPokemonFocusDetector::WildPokemonFocusDetector(LoggerQt& logger, VideoOverlay& overlay)
+WildPokemonFocusDetector::WildPokemonFocusDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("WildPokemonFocusDetector")
     , m_logger(logger)
     , m_overlay(overlay)
@@ -87,7 +87,7 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
 
 
 PokemonDetails read_focused_wild_pokemon_info(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     const ImageViewRGB32& frame,
     Language language
 ){
@@ -151,7 +151,7 @@ PokemonDetails read_focused_wild_pokemon_info(
 }
 
 
-bool can_change_focus(LoggerQt& logger, VideoOverlay& overlay, const ImageViewRGB32& frame){
+bool can_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame){
     const bool stop_on_detect = true;
     ButtonDetector button(logger, overlay, ButtonType::ButtonA, {0.244, 0.815, 0.026, 0.047},
         std::chrono::milliseconds(0), stop_on_detect);

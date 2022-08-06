@@ -40,9 +40,9 @@ private:
     bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
-    void heal_at_center_and_return(LoggerQt& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    void heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Fly from the Ace Trainer pair to Hearthome Pokecenter, heal and return.
-    void fly_to_center_heal_and_return(LoggerQt& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    void fly_to_center_heal_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Move around to charge VS Seeker.
     void charge_vs_seeker(ConsoleHandle& console);
 

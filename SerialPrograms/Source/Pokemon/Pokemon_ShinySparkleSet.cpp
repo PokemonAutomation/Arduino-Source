@@ -13,7 +13,7 @@ namespace Pokemon{
 
 
 ShinySparkleTracker::ShinySparkleTracker(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     ShinySparkleSet& sparkle_set,
     const ImageFloatBox& box
 )

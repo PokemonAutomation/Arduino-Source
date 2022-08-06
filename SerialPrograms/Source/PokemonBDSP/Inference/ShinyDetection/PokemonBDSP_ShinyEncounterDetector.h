@@ -52,7 +52,7 @@ class ShinyEncounterTracker : public VisualInferenceCallback{
 
 public:
     ShinyEncounterTracker(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         BattleType battle_type
     );
 
@@ -72,7 +72,7 @@ public:
 
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
 //    VideoOverlay& m_overlay;
 
     BattleMenuWatcher m_battle_menu;

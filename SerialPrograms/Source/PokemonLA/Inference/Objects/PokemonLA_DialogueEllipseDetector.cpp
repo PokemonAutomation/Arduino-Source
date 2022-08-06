@@ -55,7 +55,7 @@ void DialogueEllipseTracker::finish(const ImageViewRGB32& image){
 
 
 DialogueEllipseDetector::DialogueEllipseDetector(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     std::chrono::milliseconds min_streak,
     bool stop_on_detected
 )

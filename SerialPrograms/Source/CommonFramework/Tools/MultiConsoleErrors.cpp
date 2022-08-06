@@ -13,12 +13,12 @@ namespace PokemonAutomation{
 
 
 
-void MultiConsoleErrorState::report_unrecoverable_error(LoggerQt& logger, const std::string& msg){
+void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, const std::string& msg){
     logger.log(msg, COLOR_RED);
     m_unrecoverable_error.store(true, std::memory_order_release);
     throw OperationFailedException(logger, msg);
 }
-void MultiConsoleErrorState::check_unrecoverable_error(LoggerQt& logger){
+void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){
         logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
         throw ProgramCancelledException();

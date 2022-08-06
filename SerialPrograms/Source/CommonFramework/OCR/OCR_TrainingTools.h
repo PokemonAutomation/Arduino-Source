@@ -31,7 +31,7 @@ class TrainingSession{
 
 public:
     TrainingSession(
-        LoggerQt& logger, CancellableScope& scope,
+        Logger& logger, CancellableScope& scope,
         const std::string& training_data_directory
     );
 
@@ -55,7 +55,7 @@ public:
     ) const;
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     CancellableScope& m_scope;
     std::string m_directory;
     size_t m_total_samples;

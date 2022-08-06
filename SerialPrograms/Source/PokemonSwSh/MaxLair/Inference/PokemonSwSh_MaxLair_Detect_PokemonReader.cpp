@@ -105,7 +105,7 @@ std::string read_boss_sprite(ConsoleHandle& console){
 
 
 std::set<std::string> read_pokemon_name(
-    LoggerQt& logger, Language language,
+    Logger& logger, Language language,
     const ImageViewRGB32& image
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
@@ -141,7 +141,7 @@ std::set<std::string> read_pokemon_name(
 
 
 ImageMatch::ImageMatchResult read_pokemon_sprite_set(
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& screen,
     const ImageFloatBox& box,
     bool allow_exact_match_fallback
@@ -203,7 +203,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
 
 
 ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
@@ -254,7 +254,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(
     return result;
 }
 std::string read_pokemon_sprite_with_item(
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ){
     ImageMatch::ImageMatchResult result = read_pokemon_sprite_set_with_item(logger, screen, box);
@@ -275,7 +275,7 @@ std::string read_pokemon_sprite_with_item(
 
 
 std::string read_pokemon_name_sprite(
-    LoggerQt& logger,
+    Logger& logger,
     const ImageViewRGB32& screen,
     const ImageFloatBox& sprite_box,
     const ImageFloatBox& name_box, Language language,

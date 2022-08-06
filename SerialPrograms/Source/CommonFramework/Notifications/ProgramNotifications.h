@@ -22,7 +22,7 @@ class ProgramEnvironment;
 
 
 void send_program_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     Color color,
     const ProgramInfo& info,
     const std::string& title,
@@ -31,7 +31,7 @@ void send_program_notification(
 );
 
 void send_program_telemetry(
-    LoggerQt& logger, bool is_error, Color color,
+    Logger& logger, bool is_error, Color color,
     const ProgramInfo& info,
     const std::string& title,
     const std::vector<std::pair<std::string, std::string>>& messages,
@@ -40,7 +40,7 @@ void send_program_telemetry(
 
 #if 0
 void send_program_status_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
     const StatsTracker* current_stats = nullptr,
@@ -55,7 +55,7 @@ void send_program_status_notification(
 );
 
 void send_program_finished_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
     const StatsTracker* current_stats,
@@ -75,7 +75,7 @@ void send_program_recoverable_error_notification(
 );
 
 void send_program_fatal_error_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
     const StatsTracker* current_stats,

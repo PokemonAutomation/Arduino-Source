@@ -43,7 +43,7 @@ private:
     MultiSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
-        LoggerQt& logger,
+        Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         FixedLimitVector<ConsoleHandle> p_switches

@@ -32,7 +32,7 @@ public:
     ~ProgramEnvironment();
     ProgramEnvironment(
         const ProgramInfo& program_info,
-        LoggerQt& logger,
+        Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     );
@@ -41,7 +41,7 @@ public:
 
     template <class... Args>
     void log(Args&&... args);
-    LoggerQt& logger(){ return m_logger; }
+    Logger& logger(){ return m_logger; }
 
     AsyncDispatcher& realtime_dispatcher();
     AsyncDispatcher& inference_dispatcher();
@@ -62,7 +62,7 @@ signals:
 
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
 
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;

@@ -12,12 +12,12 @@
 namespace PokemonAutomation{
 
 class ImageViewRGB32;
-class LoggerQt;
+class Logger;
 
 // Dump error image to ./ErrorDumps/ folder.
 // Return image path.
 std::string dump_image(
-    LoggerQt& logger,
+    Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
 );

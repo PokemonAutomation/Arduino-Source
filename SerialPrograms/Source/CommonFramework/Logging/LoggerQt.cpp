@@ -13,13 +13,13 @@
 namespace PokemonAutomation{
 
 
-LoggerQt& global_logger_tagged(){
+Logger& global_logger_tagged(){
     static TaggedLogger logger(global_logger_raw(), "Global");
     return logger;
 }
 
 
-TaggedLogger::TaggedLogger(LoggerQt& logger, std::string tag)
+TaggedLogger::TaggedLogger(Logger& logger, std::string tag)
     : m_logger(logger)
     , m_tag(std::move(tag))
 {}
@@ -34,37 +34,29 @@ void TaggedLogger::log(const std::string& msg, Color color){
         msg;
     m_logger.log(str, color);
 }
-void TaggedLogger::log(const QString& msg, Color color){
-    log(msg.toUtf8().toStdString(), color);
-}
 
 
 
-class CommandLineLogger : public LoggerQt{
+class CommandLineLogger : public Logger{
 public:
-    CommandLineLogger(LoggerQt& logger)
+    CommandLineLogger(Logger& logger)
     : m_logger(logger) {}
 
     virtual void log(const char* msg, Color color = Color()) override{
         m_logger.log(msg, color);
         std::cout << msg << std::endl;
     }
-
     virtual void log(const std::string& msg, Color color = Color()) override{
         log(msg.c_str(), color);
     }
 
-    virtual void log(const QString& msg, Color color = Color()) override{
-        log(msg.toStdString(), color);
-    }
-
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     std::string m_tag;
 };
 
 
-LoggerQt& global_logger_command_line(){
+Logger& global_logger_command_line(){
     static CommandLineLogger logger(global_logger_raw());
     return logger;
 }

@@ -92,7 +92,7 @@ bool PokemonSwapMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 
 PokemonSwapMenuReader::PokemonSwapMenuReader(
-    LoggerQt& logger,
+    Logger& logger,
     VideoOverlay& overlay,
     Language language
 )

@@ -59,7 +59,7 @@ const DenSpriteMatcher& DEN_SPRITE_MATCHER(){
 
 
 
-DenMonReader::DenMonReader(LoggerQt& logger, VideoOverlay& overlay)
+DenMonReader::DenMonReader(Logger& logger, VideoOverlay& overlay)
     : m_matcher(DEN_SPRITE_MATCHER())
     , m_logger(logger)
     , m_white(overlay, 0.800, 0.200, 0.150, 0.100)

@@ -21,13 +21,13 @@ namespace PokemonLA{
 
 class OutbreakReader{
 public:
-    OutbreakReader(LoggerQt& logger, Language language, VideoOverlay& overlay);
+    OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay);
 
     OCR::StringMatchResult read(const ImageViewRGB32& screen) const;
 
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     Language m_language;
     InferenceBoxScope m_dialog_box0;
     InferenceBoxScope m_dialog_box1;

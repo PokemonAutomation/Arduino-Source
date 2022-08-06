@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
 #include "AudioSession.h"
 

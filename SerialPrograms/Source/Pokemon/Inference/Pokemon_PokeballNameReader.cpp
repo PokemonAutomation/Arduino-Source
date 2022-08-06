@@ -22,7 +22,7 @@ PokeballNameReader::PokeballNameReader()
 {}
 
 OCR::StringMatchResult PokeballNameReader::read_substring(
-    LoggerQt& logger,
+    Logger& logger,
     Language language,
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,

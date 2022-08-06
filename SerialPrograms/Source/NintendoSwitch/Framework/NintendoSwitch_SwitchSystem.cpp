@@ -79,7 +79,7 @@ const QSerialPortInfo* SwitchSystemFactory::port() const{
     return m_serial.port();
 }
 
-SwitchSetupWidget* SwitchSystemFactory::make_ui(QWidget& parent, LoggerQt& raw_logger, uint64_t program_id){
+SwitchSetupWidget* SwitchSystemFactory::make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id){
     return new SwitchSystemWidget(parent, *this, raw_logger, program_id);
 }
 

@@ -25,28 +25,27 @@ public:
 
 
 //  Print as is. Use this to build other loggers.
-LoggerQt& global_logger_raw();
+Logger& global_logger_raw();
 
 //  Print with timestamp and a default tag. use this directly.
-LoggerQt& global_logger_tagged();
+Logger& global_logger_tagged();
 
 //  Print log also to command line. Useful for running command line tests.
-LoggerQt& global_logger_command_line();
+Logger& global_logger_command_line();
 
 
 
-class TaggedLogger : public LoggerQt{
+class TaggedLogger : public Logger{
 public:
-    TaggedLogger(LoggerQt& logger, std::string tag);
+    TaggedLogger(Logger& logger, std::string tag);
 
-    LoggerQt& base_logger(){ return m_logger; }
+    Logger& base_logger(){ return m_logger; }
 
     virtual void log(const char* msg, Color color = Color()) override;
     virtual void log(const std::string& msg, Color color = Color()) override;
-    virtual void log(const QString& msg, Color color = Color()) override;
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     std::string m_tag;
 };
 

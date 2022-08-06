@@ -29,7 +29,7 @@ struct ReadableQuantity999{
         int16_t max_quantity_differential = -1
     );
     void update_with_ocr(
-        LoggerQt& logger, const ImageViewRGB32& image,
+        Logger& logger, const ImageViewRGB32& image,
         int16_t max_quantity_differential = -1
     );
 };

@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-SummaryShinySymbolDetector::SummaryShinySymbolDetector(LoggerQt& logger, VideoOverlay& overlay)
+SummaryShinySymbolDetector::SummaryShinySymbolDetector(Logger& logger, VideoOverlay& overlay)
     : m_logger(logger)
     , m_state0_box(overlay, 0.02, 0.84, 0.1, 0.1)
     , m_state1_box(overlay, 0.02, 0.97, 0.5, 0.02)

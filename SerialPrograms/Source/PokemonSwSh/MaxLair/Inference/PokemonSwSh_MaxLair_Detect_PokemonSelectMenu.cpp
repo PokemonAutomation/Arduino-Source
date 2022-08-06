@@ -88,7 +88,7 @@ bool PokemonSelectMenuDetector::process_frame(const ImageViewRGB32& frame, WallC
 
 
 PokemonSelectMenuReader::PokemonSelectMenuReader(
-    LoggerQt& logger,
+    Logger& logger,
     VideoOverlay& overlay,
     Language language
 )

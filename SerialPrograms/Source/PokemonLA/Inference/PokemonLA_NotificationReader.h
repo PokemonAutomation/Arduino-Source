@@ -38,7 +38,7 @@ public:
     static const NotificationOCR& instance();
 
     OCR::StringMatchResult read_substring(
-        LoggerQt& logger,
+        Logger& logger,
         Language language,
         const ImageViewRGB32& image,
         const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -53,13 +53,13 @@ private:
 
 class NotificationReader{
 public:
-    NotificationReader(LoggerQt& logger, Language language);
+    NotificationReader(Logger& logger, Language language);
 
     void make_overlays(VideoOverlaySet& items) const;
     Notification detect(const ImageViewRGB32& screen) const;
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     Language m_language;
     ImageFloatBox m_ocr_box;
 };
@@ -67,7 +67,7 @@ private:
 
 class NotificationDetector : public VisualInferenceCallback{
 public:
-    NotificationDetector(LoggerQt& logger, Language language);
+    NotificationDetector(Logger& logger, Language language);
 
     Notification result() const{
         return m_last.load(std::memory_order_acquire);

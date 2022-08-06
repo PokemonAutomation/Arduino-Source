@@ -51,7 +51,7 @@ ProgramEnvironment::~ProgramEnvironment(){}
 
 ProgramEnvironment::ProgramEnvironment(
     const ProgramInfo& program_info,
-    LoggerQt& logger,
+    Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 )

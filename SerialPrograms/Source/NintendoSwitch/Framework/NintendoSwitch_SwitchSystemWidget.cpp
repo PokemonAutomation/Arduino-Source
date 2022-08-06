@@ -28,7 +28,7 @@ namespace NintendoSwitch{
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
     SwitchSystemFactory& factory,
-    LoggerQt& raw_logger,
+    Logger& raw_logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent, factory)
@@ -61,7 +61,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
         group_layout->addWidget(m_camera_widget);
 
-        m_audio_widget = factory.m_audio.make_ui(*widget, m_logger, m_audio);
+        m_audio_widget = new AudioSelectorWidget(*widget, m_logger, m_audio);
         group_layout->addWidget(m_audio_widget);
 
         m_command = new CommandRow(
@@ -136,7 +136,7 @@ void SwitchSystemWidget::wait_for_all_requests(){
     }
     botbase->wait_for_all_requests();
 }
-LoggerQt& SwitchSystemWidget::logger(){
+Logger& SwitchSystemWidget::logger(){
     return m_logger;
 }
 BotBase* SwitchSystemWidget::botbase(){

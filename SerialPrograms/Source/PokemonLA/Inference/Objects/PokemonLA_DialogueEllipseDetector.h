@@ -44,7 +44,7 @@ public:
 class DialogueEllipseDetector : public VisualInferenceCallback{
 public:
     DialogueEllipseDetector(
-        LoggerQt& logger, VideoOverlay& overlay,
+        Logger& logger, VideoOverlay& overlay,
         std::chrono::milliseconds min_streak,
         bool stop_on_detected
     );
@@ -58,7 +58,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     ImageFloatBox m_box;
     bool m_stop_on_detected;
 

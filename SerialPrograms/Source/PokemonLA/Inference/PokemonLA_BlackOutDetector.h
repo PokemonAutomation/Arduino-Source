@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 class BlackOutDetector : public VisualInferenceCallback{
 public:
-    BlackOutDetector(LoggerQt& logger, VideoOverlay& overlay);
+    BlackOutDetector(Logger& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 

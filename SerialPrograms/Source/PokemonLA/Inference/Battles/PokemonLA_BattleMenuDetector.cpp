@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-BattleMenuDetector::BattleMenuDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+BattleMenuDetector::BattleMenuDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("BattleMenuDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)

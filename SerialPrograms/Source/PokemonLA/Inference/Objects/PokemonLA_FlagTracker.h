@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 class FlagTracker : public VisualInferenceCallback{
 public:
-    FlagTracker(LoggerQt& logger, VideoOverlay& overlay);
+    FlagTracker(Logger& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 

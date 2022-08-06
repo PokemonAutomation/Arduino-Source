@@ -10,6 +10,7 @@
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch_SwitchSetup.h"
 
 namespace PokemonAutomation{
@@ -40,9 +41,10 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SwitchSetupWidget* make_ui(QWidget& parent, LoggerQt& raw_logger, uint64_t program_id) override;
+    SwitchSetupWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id) override;
 
 private:
+    friend class SwitchSystemSession;
     friend class SwitchSystemWidget;
 
     size_t m_console_id;

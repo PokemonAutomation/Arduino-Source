@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-BattleStartDetector::BattleStartDetector(LoggerQt& logger, VideoOverlay& overlay)
+BattleStartDetector::BattleStartDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("BattleStartDetector")
     , m_upper_boundary  (0.0, 0.113, 1.0, 0.15)
     , m_lower_boundary (0.2, 0.871, 0.63, 0.015)

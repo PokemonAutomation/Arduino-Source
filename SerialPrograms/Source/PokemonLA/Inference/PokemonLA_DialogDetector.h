@@ -19,7 +19,7 @@ namespace PokemonLA{
 // Detect surprise dialogue that is used in cases like the bandits stop you.
 class DialogSurpriseDetector : public VisualInferenceCallback{
 public:
-    DialogSurpriseDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    DialogSurpriseDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);
@@ -44,7 +44,7 @@ private:
 //   The Galaxy member at each camp that gives you access to the ranch and shop has no dialogue title.
 class NormalDialogDetector : public VisualInferenceCallback{
 public:
-    NormalDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    NormalDialogDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);
@@ -69,7 +69,7 @@ private:
 // Detect event dialogue that is used in cases like when you interact with the tent in a camp.
 class EventDialogDetector : public VisualInferenceCallback{
 public:
-    EventDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    EventDialogDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);

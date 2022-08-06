@@ -142,7 +142,7 @@ void send_raid_notification(
 
 void send_shiny_notification(
     ProgramEnvironment& env,
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,
     const PathStats& path_stats,

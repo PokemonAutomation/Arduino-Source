@@ -34,7 +34,7 @@ private:
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) override;
     virtual void load_panel(std::unique_ptr<PanelInstance> panel) override;
 public: //  Make private.
-    virtual LoggerQt& raw_logger() override{ return global_logger_raw(); }
+    virtual Logger& raw_logger() override{ return global_logger_raw(); }
 private:
     virtual void on_busy(PanelInstance& panel) override;
     virtual void on_idle(PanelInstance& panel) override;

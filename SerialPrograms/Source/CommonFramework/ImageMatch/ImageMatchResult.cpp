@@ -10,7 +10,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-void ImageMatchResult::log(LoggerQt& logger, double max_alpha) const{
+void ImageMatchResult::log(Logger& logger, double max_alpha) const{
     std::string str = "Image Match Result: ";
 
     if (results.empty()){

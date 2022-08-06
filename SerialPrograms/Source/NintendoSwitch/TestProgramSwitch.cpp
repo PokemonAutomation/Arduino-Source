@@ -29,6 +29,7 @@
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 
 #include <QVideoFrame>
 
@@ -87,31 +88,42 @@ using namespace Kernels::Waterfill;
 
 
 
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
+    using namespace PokemonLA;
 
-    [[maybe_unused]] LoggerQt& logger = env.logger();
+    [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    ImageRGB32 image("04_True_True_eng_hippowdon_NotShiny_NotAlpha_Female.png");
+
+//    GreyDialogDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
+//    std::shared_ptr<const ImageRGB32> image = feed.snapshot();
+
+    find_shiny_symbols(image);
+
+
+
+#if 0
     ImageRGB32 image("screenshot-20220725-170822724101.png");
 
     NintendoSwitch::PokemonLA::FlagTracker tracker(logger, overlay);
 
     tracker.process_frame(image, current_time());
+#endif
+
 
 #if 0
     BotBaseContext context(scope, console.botbase());

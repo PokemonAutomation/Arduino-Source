@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 class AudioDeviceInfo;
-class LoggerQt;
+class Logger;
 
 
 class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener, public AudioSession::Listener{

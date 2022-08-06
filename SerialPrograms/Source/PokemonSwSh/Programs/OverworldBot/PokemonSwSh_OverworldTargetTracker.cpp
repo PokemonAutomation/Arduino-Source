@@ -30,7 +30,7 @@ const double OverworldTargetTracker::OVERWORLD_CENTER_Y = 0.70;
 
 
 OverworldTargetTracker::OverworldTargetTracker(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     std::chrono::milliseconds window,
     double mark_offset,
     MarkPriority mark_priority,

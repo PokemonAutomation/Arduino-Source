@@ -45,7 +45,7 @@ namespace {
 }
 
 
-BlackOutDetector::BlackOutDetector(LoggerQt& logger, VideoOverlay& overlay)
+BlackOutDetector::BlackOutDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("BlackOutDetector")
     , m_black_screen(0.068, 0.088, 0.864, 0.581)
     , m_yellow_arrow_detector(logger, overlay, true)

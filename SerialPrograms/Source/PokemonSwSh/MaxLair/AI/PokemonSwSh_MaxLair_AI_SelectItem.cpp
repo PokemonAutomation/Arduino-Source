@@ -15,7 +15,7 @@ namespace MaxLairInternal{
 
 //  Return -1 if no selecting an item.
 int8_t select_item(
-    LoggerQt& logger,
+    Logger& logger,
     const GlobalState& state,
     size_t player_index
 ){

@@ -79,7 +79,7 @@ ShinyHuntLakeTrio::ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descrip
 
 
 std::set<std::string> read_name(
-    LoggerQt& logger,
+    Logger& logger,
     Language language,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ){

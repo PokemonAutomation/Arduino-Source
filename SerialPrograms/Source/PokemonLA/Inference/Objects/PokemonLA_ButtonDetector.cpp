@@ -142,7 +142,7 @@ void ButtonTracker::finish(const ImageViewRGB32& image){
 
 
 ButtonDetector::ButtonDetector(
-    LoggerQt& logger, VideoOverlay& overlay,
+    Logger& logger, VideoOverlay& overlay,
     ButtonType type,
     const ImageFloatBox& box,
     std::chrono::milliseconds min_streak,

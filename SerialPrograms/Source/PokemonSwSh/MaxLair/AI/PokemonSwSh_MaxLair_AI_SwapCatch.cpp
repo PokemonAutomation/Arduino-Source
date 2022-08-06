@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 //  Swap with newly caught Pokemon.
 bool should_swap_with_newly_caught(
-    LoggerQt& logger,
+    Logger& logger,
     const GlobalState& state,
     size_t player_index,
     const std::string options[2]

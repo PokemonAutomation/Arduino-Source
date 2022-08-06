@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    SummaryShinySymbolDetector(LoggerQt& logger, VideoOverlay& overlay);
+    SummaryShinySymbolDetector(Logger& logger, VideoOverlay& overlay);
 
     Detection detect(const ImageViewRGB32& screen);
     Detection wait_for_detection(
@@ -39,7 +39,7 @@ public:
     );
 
 private:
-    LoggerQt& m_logger;
+    Logger& m_logger;
     InferenceBoxScope m_state0_box;
     InferenceBoxScope m_state1_box;
     InferenceBoxScope m_symbol_box;

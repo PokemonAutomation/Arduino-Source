@@ -233,7 +233,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
     throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
 }
 
-void MoneyFarmerRoute210::heal_at_center_and_return(LoggerQt& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
@@ -271,7 +271,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(LoggerQt& logger, BotBaseCon
     pp1[2] = MON1_MOVE3_PP;
     pp1[3] = MON1_MOVE4_PP;
 }
-void MoneyFarmerRoute210::fly_to_center_heal_and_return(LoggerQt& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);

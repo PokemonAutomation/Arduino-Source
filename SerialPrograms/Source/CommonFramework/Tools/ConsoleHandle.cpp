@@ -17,7 +17,7 @@ ConsoleHandle::~ConsoleHandle(){}
 
 ConsoleHandle::ConsoleHandle(
     size_t index,
-    LoggerQt& logger,
+    Logger& logger,
     BotBase& botbase,
     VideoFeed& video,
     VideoOverlay& overlay,

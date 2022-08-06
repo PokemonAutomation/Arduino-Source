@@ -41,7 +41,7 @@ public:
 private:
     void read(
         JsonArray& output,
-        LoggerQt& logger,
+        Logger& logger,
         const ImageViewRGB32& image
     ) const;
     void dump_images(

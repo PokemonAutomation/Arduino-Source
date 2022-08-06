@@ -136,7 +136,7 @@ void DexRecFinder::read_line(
     bool& found,
     bool& excluded,
     bool& bad_read,
-    LoggerQt& logger,
+    Logger& logger,
     Language language,
     const ImageViewRGB32& frame,
     const ImageFloatBox& box,

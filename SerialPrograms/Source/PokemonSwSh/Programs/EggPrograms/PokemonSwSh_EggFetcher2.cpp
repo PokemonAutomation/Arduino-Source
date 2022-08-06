@@ -44,7 +44,7 @@ EggFetcher2::EggFetcher2(const EggFetcher2_Descriptor& descriptor)
 
 
 void EggFetcher2::run_eggfetcher(
-    LoggerQt& logger, BotBaseContext& context,
+    Logger& logger, BotBaseContext& context,
     bool deposit_automatically,
     uint16_t attempts
 ) const{

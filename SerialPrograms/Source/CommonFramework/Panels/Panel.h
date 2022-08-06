@@ -25,7 +25,7 @@ struct PanelHolder{
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) = 0;
 
     virtual void load_panel(std::unique_ptr<PanelInstance> panel) = 0;
-    virtual LoggerQt& raw_logger() = 0;
+    virtual Logger& raw_logger() = 0;
     virtual void on_busy(PanelInstance& panel) = 0;
     virtual void on_idle(PanelInstance& panel) = 0;
 };

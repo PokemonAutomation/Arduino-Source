@@ -45,7 +45,7 @@ void send_encounter_notification(
 );
 
 void send_catch_notification(
-    LoggerQt& logger,
+    Logger& logger,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
     const ProgramInfo& info,
