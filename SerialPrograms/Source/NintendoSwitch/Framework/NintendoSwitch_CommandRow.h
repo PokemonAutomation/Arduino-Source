@@ -36,7 +36,7 @@ signals:
     void set_inference_boxes(bool enabled);
     void screenshot_requested();
 
-public slots:
+public:
     void set_focus(bool focused);
     void update_ui();
     void on_state_changed(ProgramState state);
