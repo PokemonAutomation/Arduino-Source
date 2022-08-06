@@ -56,9 +56,11 @@ void AudioOption::load_json(const JsonValue& json){
     if (str != nullptr){
         m_input_file = *str;
     }
-    str = obj->get_string(JSON_INPUT_DEVICE);
-    if (str != nullptr){
-        m_input_device = AudioDeviceInfo(*str);
+    if (m_input_file.empty()){
+        str = obj->get_string(JSON_INPUT_DEVICE);
+        if (str != nullptr){
+            m_input_device = AudioDeviceInfo(*str);
+        }
     }
     str = obj->get_string(JSON_INPUT_FORMAT);
     if (str != nullptr){

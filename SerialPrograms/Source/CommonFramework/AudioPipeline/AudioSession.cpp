@@ -77,12 +77,14 @@ void AudioSession::clear_audio_input(){
     m_devices->clear_audio_source();
     m_option.m_input_file.clear();
     m_option.m_input_device = AudioDeviceInfo();
+    push_input_changed();
 }
 void AudioSession::set_audio_input(std::string file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_option.m_input_file = std::move(file);
     sanitize_format();
     m_devices->set_audio_source(m_option.m_input_file);
+    push_input_changed();
 }
 void AudioSession::set_audio_input(AudioDeviceInfo info){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -95,6 +97,7 @@ void AudioSession::set_audio_input(AudioDeviceInfo info){
     }else{
         m_devices->clear_audio_source();
     }
+    push_input_changed();
 }
 void AudioSession::set_format(AudioChannelFormat format){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -108,23 +111,29 @@ void AudioSession::set_format(AudioChannelFormat format){
     }else{
         m_devices->clear_audio_source();
     }
+    push_input_changed();
 }
 void AudioSession::clear_audio_output(){
     std::lock_guard<std::mutex> lg(m_lock);
     m_logger.log("Clearing audio output...");
     m_devices->clear_audio_sink();
     m_option.m_output_device = AudioDeviceInfo();
+    push_output_changed();
 }
 void AudioSession::set_audio_output(AudioDeviceInfo info){
     std::lock_guard<std::mutex> lg(m_lock);
     m_logger.log("Setting audio output to: " + info.display_name());
     m_devices->set_audio_sink(info, m_option.m_volume);
     m_option.m_output_device = std::move(info);
+    push_output_changed();
 }
 void AudioSession::set_volume(double volume){
     std::lock_guard<std::mutex> lg(m_lock);
     m_devices->set_sink_volume(volume);
     m_option.m_volume = volume;
+    for (Listener* listener : m_listeners){
+        listener->volume_changed(m_option.volume());
+    }
 }
 void AudioSession::set_display(AudioOption::AudioDisplayType display){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -162,16 +171,22 @@ bool AudioSession::sanitize_format(){
     m_option.m_input_format = supported_formats[preferred_index];
     return true;
 }
+void AudioSession::push_input_changed(){
+    for (Listener* listener : m_listeners){
+        listener->input_changed(m_option.input_file(), m_option.input_device(), m_option.input_format());
+    }
+}
+void AudioSession::push_output_changed(){
+    for (Listener* listener : m_listeners){
+        listener->output_changed(m_option.output_device());
+    }
+}
 
 
 
 void AudioSession::reset(){
     std::lock_guard<std::mutex> lg(m_lock);
     m_logger.log("AudioSession::reset()");
-//    if (!sanitize_format()){
-//        m_devices->clear_audio_source();
-//        return;
-//    }
     if (!m_option.m_input_file.empty()){
 //        cout << "AudioSession::reset() - file: " << m_option.m_input_file << " - " << m_option.m_input_file.size() << endl;
         m_devices->reset(

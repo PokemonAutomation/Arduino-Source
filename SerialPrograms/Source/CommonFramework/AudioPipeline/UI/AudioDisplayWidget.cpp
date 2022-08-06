@@ -34,10 +34,6 @@ AudioDisplayWidget::~AudioDisplayWidget(){
 }
 
 
-void AudioDisplayWidget::close_audio(){
-    update_size();
-}
-
 
 void AudioDisplayWidget::state_changed(){
 //    cout << "AudioDisplayWidget::state_changed()" << endl;
@@ -54,7 +50,7 @@ void AudioDisplayWidget::display_changed(AudioOption::AudioDisplayType display){
     QMetaObject::invokeMethod(
         this, [=]{
             m_sanitizer.check_usage();
-            m_display_type = m_session.display_type();
+            m_display_type = display;
             update_size();
             QWidget::update();
         }, Qt::QueuedConnection
@@ -172,10 +168,6 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
     update_size();
 }
 
-
-void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
-    m_session.add_overlay(startingStamp, endStamp, color);
-}
 
 
 

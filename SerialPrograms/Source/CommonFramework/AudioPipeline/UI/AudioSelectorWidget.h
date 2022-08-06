@@ -15,6 +15,7 @@
 #include <QSlider>
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
+#include "CommonFramework/AudioPipeline/AudioSession.h"
 
 class QComboBox;
 class QPushButton;
@@ -22,7 +23,7 @@ class QPushButton;
 namespace PokemonAutomation{
 
 
-class AudioSelectorWidget : public QWidget{
+class AudioSelectorWidget : public QWidget, private AudioSession::Listener{
 public:
     AudioSelectorWidget(
         QWidget& parent,
@@ -32,8 +33,20 @@ public:
     ~AudioSelectorWidget();
 
 private:
-    void update_formats(const AudioDeviceInfo& device);
-    void refresh();
+    void build_input_list(const std::string& file, const AudioDeviceInfo& device);
+    void build_output_list(const AudioDeviceInfo& device);
+
+    void refresh_all();
+    void refresh_formats(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format);
+    void refresh_input_device(const std::string& file, const AudioDeviceInfo& device);
+    void refresh_output_device(const AudioDeviceInfo& device);
+    void refresh_volume(double volume);
+    void refresh_display(AudioOption::AudioDisplayType display);
+
+    virtual void input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format) override;
+    virtual void output_changed(const AudioDeviceInfo& device) override;
+    virtual void volume_changed(double volume) override;
+    virtual void display_changed(AudioOption::AudioDisplayType display) override;
 
 private:
     AudioSession& m_session;

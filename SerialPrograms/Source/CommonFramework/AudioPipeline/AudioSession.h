@@ -29,6 +29,9 @@ namespace PokemonAutomation{
 class AudioSession final : public AudioFeed, private FFTListener{
 public:
     struct Listener{
+        virtual void input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){}
+        virtual void output_changed(const AudioDeviceInfo& device){}
+        virtual void volume_changed(double volume){}
         virtual void display_changed(AudioOption::AudioDisplayType display){}
     };
     void add_ui_listener(Listener& listener);
@@ -72,6 +75,8 @@ private:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
 
     bool sanitize_format();
+    void push_input_changed();
+    void push_output_changed();
 
 
 private:

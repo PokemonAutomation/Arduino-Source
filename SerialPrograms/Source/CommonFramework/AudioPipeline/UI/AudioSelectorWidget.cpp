@@ -24,7 +24,9 @@ namespace PokemonAutomation{
 
 
 
-AudioSelectorWidget::~AudioSelectorWidget(){}
+AudioSelectorWidget::~AudioSelectorWidget(){
+    m_session.remove_ui_listener(*this);
+}
 
 AudioSelectorWidget::AudioSelectorWidget(
     QWidget& parent,
@@ -103,15 +105,13 @@ AudioSelectorWidget::AudioSelectorWidget(
         row1->addWidget(m_audio_vis_box, 4);
     }
 
-    refresh();
+    refresh_all();
 
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
             if (index <= 0 || index >= (int)m_input_audios.size() + 2){
                 m_session.clear_audio_input();
-                m_audio_format_box->clear();
-                m_input_formats.clear();
             }else if (index == 1){
                 std::string path = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3").toStdString();
                 if (path.empty()){
@@ -119,13 +119,8 @@ AudioSelectorWidget::AudioSelectorWidget(
                 }else{
                     m_session.set_audio_input(std::move(path));
                 }
-                m_audio_format_box->clear();
-                m_input_formats.clear();
             }else{
-                const AudioDeviceInfo& info = m_input_audios[index - 2];
-                m_session.set_audio_input(info);
-                m_input_formats = info.supported_formats();
-                update_formats(info);
+                m_session.set_audio_input(m_input_audios[index - 2]);
             }
         }
     );
@@ -152,7 +147,7 @@ AudioSelectorWidget::AudioSelectorWidget(
         m_reset_button, &QPushButton::clicked,
         this, [=](bool){
             m_session.reset();
-            refresh();
+            refresh_all();
         }
     );
     connect(
@@ -184,96 +179,150 @@ AudioSelectorWidget::AudioSelectorWidget(
             }
         });
     }
+
+    session.add_ui_listener(*this);
 }
-void AudioSelectorWidget::update_formats(const AudioDeviceInfo& device){
+
+
+
+void AudioSelectorWidget::build_input_list(const std::string& file, const AudioDeviceInfo& device){
+    m_input_audios = AudioDeviceInfo::all_input_devices();
+    m_audio_input_box->clear();
+    m_audio_input_box->addItem("(none)");
+    m_audio_input_box->addItem("Play Audio File");
+    size_t index = file.empty() ? 0 : 1;
+    for (size_t c = 0; c < m_input_audios.size(); c++){
+        const AudioDeviceInfo& audio = m_input_audios[c];
+        m_audio_input_box->addItem(QString::fromStdString(audio.display_name()));
+        if (device == audio){
+            index = c + 2;
+        }
+    }
+    m_audio_input_box->setCurrentIndex((int)index);
+}
+void AudioSelectorWidget::build_output_list(const AudioDeviceInfo& device){
+    m_output_audios = AudioDeviceInfo::all_output_devices();
+    m_audio_output_box->clear();
+    m_audio_output_box->addItem("(none)");
+    size_t index = 0;
+    for (size_t c = 0; c < m_output_audios.size(); c++){
+        const AudioDeviceInfo& audio = m_output_audios[c];
+        m_audio_output_box->addItem(QString::fromStdString(audio.display_name()));
+        if (device == audio){
+            index = c + 1;
+        }
+    }
+    m_audio_output_box->setCurrentIndex((int)index);
+}
+
+
+void AudioSelectorWidget::refresh_all(){
+    auto input = m_session.input_device();
+    refresh_input_device(input.first, input.second);
+    refresh_formats(input.first, input.second, m_session.input_format());
+    refresh_output_device(m_session.output_device());
+    refresh_volume(m_session.output_volume());
+    refresh_display(m_session.display_type());
+}
+void AudioSelectorWidget::refresh_formats(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+//    cout << "AudioSelectorWidget::refresh_formats()" << endl;
+    if (!file.empty() || !device){
+        m_audio_format_box->clear();
+        return;
+    }
+//    cout << "AudioSelectorWidget::refresh_formats() - inside" << endl;
+
+    m_input_formats = device.supported_formats();
     m_audio_format_box->clear();
-
-    AudioChannelFormat current_format = m_session.input_format();
-
-    const std::vector<AudioChannelFormat>& supported_formats = device.supported_formats();
-
     int index = -1;
-    for (size_t c = 0; c < supported_formats.size(); c++){
-        m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)supported_formats[c]]);
-        if (current_format == supported_formats[c]){
+    for (size_t c = 0; c < m_input_formats.size(); c++){
+        m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)m_input_formats[c]]);
+        if (format == m_input_formats[c]){
             index = (int)c;
         }
     }
     m_audio_format_box->setCurrentIndex(index);
 }
-
-void AudioSelectorWidget::refresh(){
-    {
-        m_input_audios = AudioDeviceInfo::all_input_devices();
-        std::pair<std::string, AudioDeviceInfo> input = m_session.input_device();
-
-        m_audio_input_box->clear();
-        m_audio_input_box->addItem("(none)");
-        m_audio_input_box->addItem("Play Audio File");
-
-        size_t index = 0;
-        for (size_t c = 0; c < m_input_audios.size(); c++){
-            const AudioDeviceInfo& audio = m_input_audios[c];
-            m_audio_input_box->addItem(QString::fromStdString(audio.display_name()));
-
-            if (input.second == audio){
-                index = c + 2;
-            }
-        }
-        if (!input.first.empty()){
-            index = 1;
-        }
-        m_audio_input_box->setCurrentIndex((int)index);
-        if (index == 0){
-            m_session.clear_audio_input();
-        }
-        if (index < 2){
-            m_audio_format_box->clear();
-            m_input_formats.clear();
-        }else{
-            update_formats(input.second);
-        }
+void AudioSelectorWidget::refresh_input_device(const std::string& file, const AudioDeviceInfo& device){
+    if (m_input_audios.empty()){
+        build_input_list(file, device);
+        return;
     }
-    {
-        m_output_audios = AudioDeviceInfo::all_output_devices();
-        const AudioDeviceInfo& output = m_session.output_device();
 
-        m_audio_output_box->clear();
-        m_audio_output_box->addItem("(none)");
+    if (!file.empty()){
+        m_audio_input_box->setCurrentIndex(1);
+        return;
+    }
 
-        size_t index = 0;
-        for (size_t c = 0; c < m_output_audios.size(); c++){
-            const AudioDeviceInfo& audio = m_output_audios[c];
-            m_audio_output_box->addItem(QString::fromStdString(audio.display_name()));
-
-            if (output == audio){
-                index = c + 1;
-            }
-        }
-        m_audio_output_box->setCurrentIndex((int)index);
-        if (index == 0){
-            m_session.clear_audio_output();
+    //  See if it's in our cached list.
+    for (size_t c = 0; c < m_input_audios.size(); c++){
+        if (device == m_input_audios[c]){
+            m_audio_input_box->setCurrentIndex((int)c + 2);
+            return;
         }
     }
 
-    // std::cout << "Refresh: " << AudioSelector::audioDisplayTypeToString(m_value.m_audioDisplayType) << std::endl;
-    switch(m_session.display_type()){
-        case AudioOption::AudioDisplayType::NO_DISPLAY:
-            m_audio_vis_box->setCurrentIndex(0);
-            break;
-        case AudioOption::AudioDisplayType::FREQ_BARS:
-            m_audio_vis_box->setCurrentIndex(1);
-            break;
-        case AudioOption::AudioDisplayType::SPECTROGRAM:
-            m_audio_vis_box->setCurrentIndex(2);
-            break;
-        default:
-            m_audio_vis_box->setCurrentIndex(0);
-    }
-//    m_session.set_display(m_value.m_audioDisplayType);
-
-    m_volume_slider->setValue((int)(m_session.output_volume() * 100));
+    build_input_list(file, device);
 }
+void AudioSelectorWidget::refresh_output_device(const AudioDeviceInfo& device){
+    if (m_output_audios.empty()){
+        build_output_list(device);
+        return;
+    }
+
+    //  See if it's in our cached list.
+    for (size_t c = 0; c < m_output_audios.size(); c++){
+        if (device == m_output_audios[c]){
+            m_audio_output_box->setCurrentIndex((int)c + 1);
+            return;
+        }
+    }
+
+    build_output_list(device);
+}
+void AudioSelectorWidget::refresh_volume(double volume){
+    m_volume_slider->setValue((int)(volume * 100));
+}
+void AudioSelectorWidget::refresh_display(AudioOption::AudioDisplayType display){
+    switch(display){
+    case AudioOption::AudioDisplayType::NO_DISPLAY:
+        m_audio_vis_box->setCurrentIndex(0);
+        break;
+    case AudioOption::AudioDisplayType::FREQ_BARS:
+        m_audio_vis_box->setCurrentIndex(1);
+        break;
+    case AudioOption::AudioDisplayType::SPECTROGRAM:
+        m_audio_vis_box->setCurrentIndex(2);
+        break;
+    default:
+        m_audio_vis_box->setCurrentIndex(0);
+    }
+}
+
+
+void AudioSelectorWidget::input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+//    cout << "AudioSelectorWidget::input_changed()" << endl;
+    QMetaObject::invokeMethod(this, [=]{
+        refresh_input_device(file, device);
+        refresh_formats(file, device, format);
+    });
+}
+void AudioSelectorWidget::output_changed(const AudioDeviceInfo& device){
+    QMetaObject::invokeMethod(this, [=]{
+        refresh_output_device(device);
+    });
+}
+void AudioSelectorWidget::volume_changed(double volume){
+    QMetaObject::invokeMethod(this, [=]{
+        refresh_volume(volume);
+    });
+}
+void AudioSelectorWidget::display_changed(AudioOption::AudioDisplayType display){
+    QMetaObject::invokeMethod(this, [=]{
+        refresh_display(display);
+    });
+}
+
 
 
 

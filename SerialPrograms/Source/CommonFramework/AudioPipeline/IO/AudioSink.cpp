@@ -18,6 +18,10 @@ using NativeAudioSink = QAudioSink;
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -45,7 +49,7 @@ public:
         Logger& logger,
         const NativeAudioInfo& device, const QAudioFormat& format,
         AudioSampleFormat sample_format, size_t samples_per_frame,
-        float volume
+        double volume
     )
         : AudioFloatToStream(sample_format, samples_per_frame)
         , StreamListener(samples_per_frame * sample_size(sample_format))
@@ -53,7 +57,7 @@ public:
         , m_sink(device, format)
     {
         m_io_device = m_sink.start();
-        m_sink.setVolume(volume);
+        m_sink.setVolume(convertAudioVolumeFromSlider(volume));
         add_listener(*this);
     }
     ~AudioOutputDevice(){
