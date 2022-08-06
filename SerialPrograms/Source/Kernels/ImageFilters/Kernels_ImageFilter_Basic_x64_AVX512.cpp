@@ -55,8 +55,8 @@ private:
 #else
         __mmask64 cmp64A = _mm512_cmple_epu8_mask(m_mins, pixel);
         __mmask64 cmp64B = _mm512_mask_cmple_epu8_mask(cmp64A, pixel, m_maxs);
-        pixel = _mm512_movm_epi8(cmp64B);
-        __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(pixel, _mm512_set1_epi32(-1));
+        __m512i mask = _mm512_movm_epi8(cmp64B);
+        __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(mask, _mm512_set1_epi32(-1));
 #endif
         m_count = _mm512_mask_sub_epi32(m_count, cmp16, m_count, _mm512_set1_epi32(-1));
         cmp16 ^= m_invert;
@@ -136,8 +136,8 @@ private:
 #else
         __mmask64 cmp64A = _mm512_cmple_epu8_mask(m_mins, pixel);
         __mmask64 cmp64B = _mm512_mask_cmple_epu8_mask(cmp64A, pixel, m_maxs);
-        pixel = _mm512_movm_epi8(cmp64B);
-        __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(pixel, _mm512_set1_epi32(-1));
+        __m512i mask = _mm512_movm_epi8(cmp64B);
+        __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(mask, _mm512_set1_epi32(-1));
 #endif
         m_count = _mm512_mask_sub_epi32(m_count, cmp16, m_count, _mm512_set1_epi32(-1));
         cmp16 ^= m_in_range_black;
