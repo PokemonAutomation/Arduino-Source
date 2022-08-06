@@ -137,7 +137,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
     }
-    resize(scale_dpi_width(800), scale_dpi_height(600));
+    resize(scale_dpi_width(1200), scale_dpi_height(600));
     m_text = new QTextEdit(this);
     m_text->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(m_text);
