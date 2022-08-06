@@ -186,10 +186,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
-    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQt.cpp
-    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQt.h
-    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQtThread.cpp
-    Source/CommonFramework/AudioPipeline/AudioPassthroughPairQtThread.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
@@ -198,10 +194,16 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
+    Source/CommonFramework/AudioPipeline/AudioSession.cpp
+    Source/CommonFramework/AudioPipeline/AudioSession.h
     Source/CommonFramework/AudioPipeline/AudioStream.cpp
     Source/CommonFramework/AudioPipeline/AudioStream.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
+    Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
+    Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
+    Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
+    Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioSink.cpp

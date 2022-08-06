@@ -111,11 +111,11 @@ public:
     DummyAudioFeed() {}
     virtual void reset() override {}
 
-    virtual std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp) override { return std::vector<AudioSpectrum>(); }
+    virtual std::vector<AudioSpectrum> spectrums_since(uint64_t starting_seqnum) override { return std::vector<AudioSpectrum>(); }
 
-    virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) override { return std::vector<AudioSpectrum>(); }
+    virtual std::vector<AudioSpectrum> spectrums_latest(size_t num_last_spectrums) override { return std::vector<AudioSpectrum>(); }
 
-    void add_overlay(uint64_t startingStamp, size_t endStamp, Color color) override {}
+    void add_overlay(uint64_t starting_seqnum, size_t end_seqnum, Color color) override {}
 };
 
 

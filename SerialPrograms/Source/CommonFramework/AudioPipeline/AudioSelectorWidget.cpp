@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "AudioSession.h"
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -22,28 +23,17 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-// Slider bar volume: [0, 100], in log scale
-// Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
-float convertAudioVolumeFromSlider(int volume){
-    // The slider bar value is in the log scale because log scale matches human sound
-    // perception.
-    float linearVolume = QAudio::convertVolume(volume / float(100.0f),
-        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
-    return linearVolume;
-}
 
 AudioSelectorWidget::~AudioSelectorWidget(){}
 
 AudioSelectorWidget::AudioSelectorWidget(
     QWidget& parent,
     LoggerQt& logger,
-    AudioSelector& value,
-    AudioDisplayWidget& holder
+    AudioSession& session
 )
     : QWidget(&parent)
     , m_logger(logger)
-    , m_value(value)
-    , m_display(holder)
+    , m_session(session)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
     vbox->setContentsMargins(0, 0, 0, 0);
@@ -117,96 +107,58 @@ AudioSelectorWidget::AudioSelectorWidget(
     refresh();
 
     connect(
-        m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            AudioDeviceInfo& current = m_value.m_inputDevice;
             if (index <= 0 || index > (int)m_input_audios.size()){
-                current = AudioDeviceInfo();
+                m_session.clear_audio_input();
             }else{
-                // The user selects an audio source. If previously the user was playing an
-                // audio file, then we shouldn't play the file any more.
-                // Clear m_absoluteFilepath here so that m_display will be initialized to load
-                // from audio source instead of a file.
-                m_absoluteFilepath = "";
-                const AudioDeviceInfo& audio = m_input_audios[index - 1];
-                if (current == audio){
-                    return;
-                }
-                current = audio;
+                m_session.set_audio_input(m_input_audios[index - 1]);
             }
-            m_value.m_inputFormat = AudioChannelFormat::NONE;
             update_formats();
-            reset_audio();
         }
     );
     connect(
-        m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            AudioChannelFormat& current = m_value.m_inputFormat;
-            const std::vector<AudioChannelFormat>& supported_formats = m_value.m_inputDevice.supported_formats();
-            if (supported_formats.empty()){
-                current = AudioChannelFormat::NONE;
-            }else{
-                index = std::max(index, 0);
-                index = std::min(index, (int)supported_formats.size() - 1);
-                current = supported_formats[index];
+            const std::vector<AudioChannelFormat>& supported_formats = m_session.option().input_device().supported_formats();
+            if (index < 0 || index >= (int)supported_formats.size()){
+                return;
             }
-            reset_audio();
+            m_session.set_format(supported_formats[index]);
         }
     );
     connect(
-        m_audio_output_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_audio_output_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            AudioDeviceInfo& current = m_value.m_outputDevice;
             if (index <= 0 || index > (int)m_output_audios.size()){
-                current = AudioDeviceInfo();
+                m_session.clear_audio_output();
             }else{
-                const AudioDeviceInfo& audio = m_output_audios[index - 1];
-                if (current == audio){
-                    return;
-                }
-                current = audio;
+                m_session.set_audio_output(m_output_audios[index - 1]);
             }
-            reset_audio();
         }
     );
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [=](bool){
-            reset_audio();
-        }
-    );
-    connect(
-        this, &AudioSelectorWidget::internal_async_reset_audio,
-        this, [=]{
-            reset_audio();
+            refresh();
+            m_session.reset();
+            update_formats();
+
         }
     );
     connect(
         m_audio_vis_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            switch(index){
-                case 0:
-                    m_value.m_audioDisplayType = AudioSelector::AudioDisplayType::NO_DISPLAY;
-                    break;
-                case 1:
-                    m_value.m_audioDisplayType = AudioSelector::AudioDisplayType::FREQ_BARS;
-                    break;
-                case 2:
-                    m_value.m_audioDisplayType = AudioSelector::AudioDisplayType::SPECTROGRAM;
-                    break;
-                default:
-                    m_value.m_audioDisplayType = AudioSelector::AudioDisplayType::NO_DISPLAY;
+            if (index < 0 || index > 2){
+                index = 0;
             }
-            m_display.setAudioDisplayType(m_value.m_audioDisplayType);
+            m_session.set_display((AudioOption::AudioDisplayType)index);
         }
     );
 
     connect(
         m_volume_slider, &QSlider::valueChanged, this, [=](){
-            m_value.m_volume = m_volume_slider->value();
-            m_value.m_volume = std::max(std::min(m_value.m_volume, 100), 0);
-            emit m_display.volumeChanged(convertAudioVolumeFromSlider(m_value.m_volume));
+            m_session.set_volume(m_volume_slider->value());
         }
     );
 
@@ -215,7 +167,7 @@ AudioSelectorWidget::AudioSelectorWidget(
     if (PreloadSettings::instance().DEVELOPER_MODE){
         connect(m_record_button, &QPushButton::clicked, this, [=](bool){
             m_record_is_on = !m_record_is_on;
-            m_display.spectrum().saveAudioFrequenciesToDisk(m_record_is_on);
+            m_session.spectrums().saveAudioFrequenciesToDisk(m_record_is_on);
             if (m_record_is_on){
                 m_record_button->setText("Stop recording");
             } else{
@@ -224,51 +176,43 @@ AudioSelectorWidget::AudioSelectorWidget(
         });
 
         connect(m_load_file_button,  &QPushButton::clicked, this, [=](bool){
-            m_absoluteFilepath = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3").toStdString();
-            std::cout << "Select file " << m_absoluteFilepath << std::endl;
-            if (m_absoluteFilepath.size() > 0){
-                if (m_audio_input_box->currentIndex() != 0) {
-                    m_audio_input_box->setCurrentIndex(0);
-                    // We connect index changed signal to a lambda function which calls reset_audio().
-                    // So we don't call reset_audio() here. 
-                } else{
-                    reset_audio();
-                }
+            std::string path = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3").toStdString();
+            if (path.empty()){
+                return;
             }
+            m_session.set_audio_input(std::move(path));
+            m_audio_input_box->setCurrentIndex(0);
         });
     }
 }
 void AudioSelectorWidget::update_formats(){
-    const AudioDeviceInfo& device = m_value.m_inputDevice;
-    AudioChannelFormat current_format = m_value.m_inputFormat;
-
     m_audio_format_box->clear();
-    const std::vector<AudioChannelFormat>& supported_formats = device.supported_formats();
 
-    if (supported_formats.empty()){
-        m_value.m_inputFormat = AudioChannelFormat::NONE;
+    if (!m_session.option().input_file().empty()){
         return;
     }
 
-    int index = device.preferred_format_index();
+    const AudioDeviceInfo& device = m_session.option().input_device();
+    AudioChannelFormat current_format = m_session.option().input_format();
+
+    const std::vector<AudioChannelFormat>& supported_formats = device.supported_formats();
+
+    int index = -1;
     for (size_t c = 0; c < supported_formats.size(); c++){
         m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)supported_formats[c]]);
         if (current_format == supported_formats[c]){
             index = (int)c;
         }
     }
-
-    index = std::max(index, 0);
-
-    m_value.m_inputFormat = supported_formats[index];
     m_audio_format_box->setCurrentIndex(index);
 }
+
 void AudioSelectorWidget::refresh(){
 
     auto build_device_menu = [](
         QComboBox* box,
         const std::vector<AudioDeviceInfo>& list,
-        AudioDeviceInfo& current_device
+        const AudioDeviceInfo& current_device
     ){
         
         box->clear();
@@ -285,74 +229,46 @@ void AudioSelectorWidget::refresh(){
         }
         if (index != 0){
             box->setCurrentIndex((int)index);
+            return true;
         }else{
-            current_device = AudioDeviceInfo();
             box->setCurrentIndex(0);
+            return false;
         }
     };
 
 
     m_input_audios = AudioDeviceInfo::all_input_devices();
     m_output_audios = AudioDeviceInfo::all_output_devices();
-    build_device_menu(m_audio_input_box, m_input_audios, m_value.m_inputDevice);
-    build_device_menu(m_audio_output_box, m_output_audios, m_value.m_outputDevice);
+    if (!build_device_menu(m_audio_input_box, m_input_audios, m_session.option().input_device())){
+        m_session.clear_audio_input();
+    }
+    if (!build_device_menu(m_audio_output_box, m_output_audios, m_session.option().output_device())){
+        m_session.clear_audio_output();
+    }
 
     update_formats();
 
     // std::cout << "Refresh: " << AudioSelector::audioDisplayTypeToString(m_value.m_audioDisplayType) << std::endl;
-    switch(m_value.m_audioDisplayType){
-        case AudioSelector::AudioDisplayType::NO_DISPLAY:
+    switch(m_session.option().display_type()){
+        case AudioOption::AudioDisplayType::NO_DISPLAY:
             m_audio_vis_box->setCurrentIndex(0);
             break;
-        case AudioSelector::AudioDisplayType::FREQ_BARS:
+        case AudioOption::AudioDisplayType::FREQ_BARS:
             m_audio_vis_box->setCurrentIndex(1);
             break;
-        case AudioSelector::AudioDisplayType::SPECTROGRAM:
+        case AudioOption::AudioDisplayType::SPECTROGRAM:
             m_audio_vis_box->setCurrentIndex(2);
             break;
         default:
             m_audio_vis_box->setCurrentIndex(0);
     }
-    m_display.setAudioDisplayType(m_value.m_audioDisplayType);
+//    m_session.set_display(m_value.m_audioDisplayType);
 
-    m_volume_slider->setValue(m_value.m_volume);
+    m_volume_slider->setValue(m_session.option().volume());
 }
 
-void AudioSelectorWidget::reset_audio(){
-    m_logger.log("reset audio: " + m_absoluteFilepath);
-    std::lock_guard<std::mutex> lg(m_audio_lock);
-    m_display.close_audio();
 
-    const AudioDeviceInfo& info = m_value.m_inputDevice;
-    if ((info && m_value.m_inputFormat != AudioChannelFormat::NONE) || m_absoluteFilepath.size() > 0){
-        m_display.set_audio(
-            m_logger,
-            info,
-            m_value.m_inputFormat,
-            m_absoluteFilepath,
-            m_value.m_outputDevice,
-            convertAudioVolumeFromSlider(m_value.m_volume)
-        );
-    }
-}
-void AudioSelectorWidget::reset(){
-    emit internal_async_reset_audio();
-}
 
-std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(uint64_t startingStamp){
-    return m_display.spectrum().spectrums_since(startingStamp);
-}
 
-std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums){
-    return m_display.spectrum().spectrums_latest(numLatestSpectrums);
-}
-
-void AudioSelectorWidget::add_overlay(uint64_t startingStamp, size_t endStamp, Color color){
-    m_display.add_overlay(startingStamp, endStamp, color);
-}
-
-void AudioSelectorWidget::set_audio_enabled(bool enabled){
-    m_audio_input_box->setEnabled(enabled);
-}
 
 }

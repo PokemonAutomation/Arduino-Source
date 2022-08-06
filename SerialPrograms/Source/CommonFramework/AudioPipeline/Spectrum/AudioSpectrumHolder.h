@@ -21,9 +21,7 @@ namespace PokemonAutomation{
 class AudioSpectrumHolder{
 public:
     struct Listener{
-        virtual void audio_cleared() = 0;
-        virtual void on_new_spectrum() = 0;
-        virtual void on_new_overlay() = 0;
+        virtual void state_changed() = 0;
     };
 
     void add_listener(Listener& listener);

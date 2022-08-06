@@ -111,7 +111,7 @@ void AudioSpectrumHolder::clear(){
     m_overlay.clear();
 
     for (Listener* listener : m_listeners){
-        listener->audio_cleared();
+        listener->state_changed();
     }
 }
 
@@ -218,7 +218,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
     }
 
     for (Listener* listener : m_listeners){
-        listener->on_new_spectrum();
+        listener->state_changed();
     }
 }
 void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp, Color color){
@@ -240,7 +240,7 @@ void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp,
     }
 
     for (Listener* listener : m_listeners){
-        listener->on_new_spectrum();
+        listener->state_changed();
     }
 }
 

@@ -11,7 +11,7 @@
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 
 #include <QThread>
-#include "AudioPassthroughPair.h"
+#include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
 namespace PokemonAutomation{
 
@@ -27,6 +27,15 @@ public:
 public:
     AudioPassthroughPairQtThread(Logger& logger);
     ~AudioPassthroughPairQtThread();
+
+    virtual void reset(
+        const std::string& file,
+        const AudioDeviceInfo& output, float volume
+    ) override;
+    virtual void reset(
+        const AudioDeviceInfo& input, AudioChannelFormat format,
+        const AudioDeviceInfo& output, float volume
+    ) override;
 
     virtual void clear_audio_source() override;
     virtual void set_audio_source(const std::string& file) override;

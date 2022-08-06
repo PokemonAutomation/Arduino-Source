@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/SpinPause.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioPassthroughPairQt.h"
 #include "AudioPassthroughPairQtThread.h"
 
@@ -42,6 +43,8 @@ AudioPassthroughPairQtThread::~AudioPassthroughPairQtThread(){
     wait();
 }
 void AudioPassthroughPairQtThread::run(){
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+
     AudioPassthroughPairQt body(m_logger);
     m_body.store(&body, std::memory_order_relaxed);
     exec();
@@ -52,6 +55,21 @@ void AudioPassthroughPairQtThread::run(){
     }
 }
 
+
+void AudioPassthroughPairQtThread::reset(
+    const std::string& file,
+    const AudioDeviceInfo& output, float volume
+){
+    AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
+    body->reset(file, output, volume);
+}
+void AudioPassthroughPairQtThread::reset(
+    const AudioDeviceInfo& input, AudioChannelFormat format,
+    const AudioDeviceInfo& output, float volume
+){
+    AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
+    body->reset(input, format, output, volume);
+}
 void AudioPassthroughPairQtThread::clear_audio_source(){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->clear_audio_source();

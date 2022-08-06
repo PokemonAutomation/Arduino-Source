@@ -47,7 +47,7 @@ private:
     SpinLock m_lock;
     std::map<AudioInferenceCallback*, PeriodicCallback> m_map;
 
-    uint64_t m_last_timestamp = ~(uint64_t)0;
+    uint64_t m_last_seqnum = ~(uint64_t)0;
 };
 
 

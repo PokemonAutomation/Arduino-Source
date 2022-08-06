@@ -68,7 +68,7 @@ public:
 
 public:
     AudioDeviceInfo();
-    AudioDeviceInfo(const std::string& device_name);
+    explicit AudioDeviceInfo(const std::string& device_name);
 
     operator bool() const;
 

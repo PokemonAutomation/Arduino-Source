@@ -10,90 +10,55 @@
 #include "Common/Qt/Redispatch.h"
 #include "AudioDisplayWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
 
 
 
-AudioDisplayWidget::AudioDisplayWidget(QWidget& parent, Logger& logger)
+AudioDisplayWidget::AudioDisplayWidget(QWidget& parent, Logger& logger, AudioSession& session)
     : QWidget(&parent)
-    , m_devices(logger)
+    , m_session(session)
 {
-    m_spectrum_holder.add_listener(*this);
-    m_devices.add_listener(*this);
+    m_session.add_ui_listener(*this);
+    m_session.add_spectrum_listener(*this);
 }
 
 AudioDisplayWidget::~AudioDisplayWidget(){
-    m_devices.remove_listener(*this);
-    m_spectrum_holder.remove_listener(*this);
-    clear();
+    m_session.remove_spectrum_listener(*this);
+    m_session.remove_ui_listener(*this);
 }
 
-void AudioDisplayWidget::clear(){
-    m_spectrum_holder.clear();
-}
 
 void AudioDisplayWidget::close_audio(){
-    clear();
-
     update_size();
 }
 
-void AudioDisplayWidget::set_audio(
-    LoggerQt& logger,
-    const AudioDeviceInfo& inputInfo,
-    AudioChannelFormat inputFormat,
-    const std::string& inputAbsoluteFilepath,
-    const AudioDeviceInfo& outputInfo,
-    float outputVolume
-){
-    clear();
 
-    if (!inputAbsoluteFilepath.empty()){
-        m_devices.set_audio_source(inputAbsoluteFilepath);
-    }else{
-        m_devices.set_audio_source(inputInfo, inputFormat);
-    }
-    m_devices.set_audio_sink(outputInfo, outputVolume);
-
-    update_size();
-    // Tell Qt to repaint the widget in the next drawing phase in the main loop.
-    QWidget::update();
-}
-
-
-void AudioDisplayWidget::audio_cleared(){
+void AudioDisplayWidget::state_changed(){
+//    cout << "AudioDisplayWidget::state_changed()" << endl;
     QMetaObject::invokeMethod(
         this, [=]{
             m_sanitizer.check_usage();
+            update_size();
             QWidget::update();
         }, Qt::QueuedConnection
     );
 }
-void AudioDisplayWidget::on_new_spectrum(){
+void AudioDisplayWidget::display_changed(AudioOption::AudioDisplayType display){
+//    cout << "AudioDisplayWidget::display_changed()" << endl;
     QMetaObject::invokeMethod(
         this, [=]{
             m_sanitizer.check_usage();
-            QWidget::update();
-        }, Qt::QueuedConnection
-    );
-}
-void AudioDisplayWidget::on_new_overlay(){
-    QMetaObject::invokeMethod(
-        this, [=]{
-            m_sanitizer.check_usage();
+            update_size();
             QWidget::update();
         }, Qt::QueuedConnection
     );
 }
 
-void AudioDisplayWidget::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output){
-    m_spectrum_holder.push_spectrum(sample_rate, std::move(fft_output));
-}
 
 
 void AudioDisplayWidget::render_bars(){
@@ -103,7 +68,7 @@ void AudioDisplayWidget::render_bars(){
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
 
-    AudioSpectrumHolder::SpectrumSnapshot last_spectrum = m_spectrum_holder.get_last_spectrum();
+    AudioSpectrumHolder::SpectrumSnapshot last_spectrum = m_session.spectrums().get_last_spectrum();
     size_t num_buckets = last_spectrum.values.size();
 
     const size_t barPlusGapWidth = widgetWidth / num_buckets;
@@ -134,7 +99,7 @@ void AudioDisplayWidget::render_spectrograph(){
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
 
-    AudioSpectrumHolder::SpectrographSnapshot snapshot = m_spectrum_holder.get_spectrograph();
+    AudioSpectrumHolder::SpectrographSnapshot snapshot = m_session.spectrums().get_spectrograph();
     {
         QImage graph_image = snapshot.image.to_QImage_ref();
         graph_image = graph_image.scaled(
@@ -159,9 +124,10 @@ void AudioDisplayWidget::render_spectrograph(){
     }
 }
 void AudioDisplayWidget::paintEvent(QPaintEvent* event){
+//    cout << "AudioDisplayWidget::paintEvent()" << endl;
     QWidget::paintEvent(event);
 
-    switch (m_audioDisplayType){
+    switch (m_session.option().display_type()){
     case AudioDisplayType::FREQ_BARS:
         render_bars();
         break;
@@ -173,18 +139,9 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
     }
 }
 
-void AudioDisplayWidget::setAudioDisplayType(AudioDisplayType type){
-    if (m_audioDisplayType != type){
-        m_audioDisplayType = type;
-        update_size();
-
-        // Tell Qt to repaint the widget in the next drawing phase in the main loop.
-        QWidget::update();
-    }
-}
 
 void AudioDisplayWidget::update_size(){
-    int height = m_audioDisplayType == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
+    int height = m_session.option().display_type() == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
 //    cout << "height = " << height << endl;
     this->setFixedHeight(height);
 }
@@ -215,7 +172,7 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
-    m_spectrum_holder.add_overlay(startingStamp, endStamp, color);
+    m_session.add_overlay(startingStamp, endStamp, color);
 }
 
 

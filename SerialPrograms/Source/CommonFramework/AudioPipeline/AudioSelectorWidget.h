@@ -21,46 +21,15 @@ class QPushButton;
 
 namespace PokemonAutomation{
 
-class AudioDisplayWidget;
 
-//  Widget to handle UI that selects audio source.
-//  The audio state is managed by a class AudioSelector object passed in
-//  the constructor.
-//  AudioSelectorWidget is also responsible for updating AudioDisplayWidget,
-//  the UI that visualizes audio, when the audio source is changed. The
-//  AudioDisplayWidget is passed in the constructor too.
-class AudioSelectorWidget : public QWidget, public AudioFeed{
-    //  Need to define this Q_OBJECT to use Qt's extra features
-    //  like signals and slots on this class.
-    Q_OBJECT
+class AudioSelectorWidget : public QWidget{
 public:
     AudioSelectorWidget(
         QWidget& parent,
         LoggerQt& logger,
-        AudioSelector& value,
-        AudioDisplayWidget& holder
+        AudioSession& session
     );
     ~AudioSelectorWidget();
-
-    void set_audio_enabled(bool enabled);
-
-    void reset_audio();
-
-    // Functions below are implementations of the interfaces in `AudioFeed`.
-    // See class `AudioFeed` for the comments of those functions.
-
-    virtual void reset() override;
-
-    virtual std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp) override;
-
-    virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) override;
-
-    virtual void add_overlay(uint64_t startingStamp, size_t endStamp, Color color) override;
-
-signals:
-    // Need to define this version of async_reset_audio()
-    // because it will be used as a signal.
-    void internal_async_reset_audio();
 
 private:
     void update_formats();
@@ -68,9 +37,7 @@ private:
 
 private:
     LoggerQt& m_logger;
-    AudioSelector& m_value;
-
-    AudioDisplayWidget& m_display;
+    AudioSession& m_session;
 
     QComboBox* m_audio_input_box = nullptr;
     QComboBox* m_audio_format_box = nullptr;

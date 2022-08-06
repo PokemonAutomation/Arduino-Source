@@ -86,18 +86,18 @@ void AudioInferencePivot::run(void* event, bool is_back_to_back) noexcept{
     try{
         std::vector<AudioSpectrum> spectrums;
 
-        if (m_last_timestamp == ~(uint64_t)0){
+        if (m_last_seqnum == ~(uint64_t)0){
 //            cout << "m_last_timestamp == SIZE_MAX" << endl;
             spectrums = m_feed.spectrums_latest(1);
         } else{
 //            cout << "(m_last_timestamp != SIZE_MAX" << endl;
             //  Note: in this file we never consider the case that stamp may overflow.
             //  It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
-            spectrums = m_feed.spectrums_since(m_last_timestamp + 1);
+            spectrums = m_feed.spectrums_since(m_last_seqnum + 1);
         }
         if (spectrums.size() > 0){
             //  spectrums[0] has the newest spectrum with the largest stamp:
-            m_last_timestamp = spectrums[0].stamp;
+            m_last_seqnum = spectrums[0].stamp;
         }
 
         WallClock time0 = current_time();

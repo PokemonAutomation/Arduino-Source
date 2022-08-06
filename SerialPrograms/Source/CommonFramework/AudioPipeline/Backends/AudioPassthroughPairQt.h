@@ -11,7 +11,7 @@
 #include <set>
 #include <QObject>
 #include "Common/Cpp/SpinLock.h"
-#include "AudioPassthroughPair.h"
+#include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
 namespace PokemonAutomation{
 
@@ -30,6 +30,15 @@ public:
 public:
     virtual ~AudioPassthroughPairQt();
     AudioPassthroughPairQt(Logger& logger);
+
+    virtual void reset(
+        const std::string& file,
+        const AudioDeviceInfo& output, float volume
+    ) override;
+    virtual void reset(
+        const AudioDeviceInfo& input, AudioChannelFormat format,
+        const AudioDeviceInfo& output, float volume
+    ) override;
 
     virtual void clear_audio_source() override;
     virtual void set_audio_source(const std::string& file) override;

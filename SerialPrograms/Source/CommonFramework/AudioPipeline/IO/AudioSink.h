@@ -15,8 +15,6 @@
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 
-class QObject;
-
 namespace PokemonAutomation{
 
 class Logger;

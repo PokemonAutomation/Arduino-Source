@@ -30,6 +30,15 @@ public:
 public:
     virtual ~AudioPassthroughPair() = default;
 
+    virtual void reset(
+        const std::string& file,
+        const AudioDeviceInfo& output, float volume
+    ) = 0;
+    virtual void reset(
+        const AudioDeviceInfo& input, AudioChannelFormat format,
+        const AudioDeviceInfo& output, float volume
+    ) = 0;
+
     virtual void clear_audio_source() = 0;
     virtual void set_audio_source(const std::string& file) = 0;
     virtual void set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format) = 0;

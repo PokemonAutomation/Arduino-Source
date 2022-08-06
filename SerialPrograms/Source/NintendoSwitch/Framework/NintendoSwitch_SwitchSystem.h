@@ -51,7 +51,7 @@ private:
 //    bool m_settings_visible;
     SerialPortOption m_serial;
     CameraOption m_camera;
-    AudioSelector m_audio;
+    AudioOption m_audio;
 };
 
 

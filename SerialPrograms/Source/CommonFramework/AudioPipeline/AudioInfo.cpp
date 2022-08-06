@@ -116,13 +116,20 @@ AudioSampleFormat get_sample_format(QAudioFormat& native_format){
 //  If no preferred format matches our formats, -1 is returned.
 std::vector<AudioChannelFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const std::string& display_name){
     QAudioFormat preferred_format = info.preferredFormat();
+
+//    preferred_format.setSampleSize(16);
+//    preferred_format.setSampleType(QAudioFormat::SampleType::SignedInt);
+
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
-//    cout << "display_name = " << display_name.toStdString() << endl;
-//    cout << "bytesPerSample = " << preferred_format.sampleSize() << endl;
+//    cout << "display_name = " << display_name << endl;
+//    cout << "channelCount = " << preferred_format.channelCount() << endl;
+//    cout << "sampleRate = " << preferred_format.sampleRate() << endl;
+//    cout << "sampleSize = " << preferred_format.sampleSize() << endl;
 //    cout << "sampleFormat = " << preferred_format.sampleType() << endl;
+//    cout << "preferred_format = " << info.isFormatSupported(preferred_format) << endl;
 
-#if QT_VERSION_MAJOR == 6
+#if QT_VERSION_MAJOR == 6 || (QT_VERSION_MAJOR == 5 && __GNUC__)
     //  On Qt6, "QAudioFormat::preferredFormat()" always returns stereo 44.1 kHz.
     //  Unlike Qt5, it does not return the native format of the device
     //  This actually makes it kind of impossible to figure out what the correct
@@ -189,6 +196,7 @@ std::vector<AudioChannelFormat> supported_input_formats(int& preferred_index, co
         }
     }
 
+//    cout << "supported formats = " << ret.size() << endl;
     return ret;
 }
 std::vector<AudioChannelFormat> supported_output_formats(int& preferred_index, const NativeAudioInfo& info){
@@ -282,13 +290,14 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.info = std::move(device);
 
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
+//        cout << "data.supported_formats = " << data.supported_formats.size() << endl;
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioInputs()){
         list.emplace_back();
         Data& data = *list.back().m_body;
 
-        data.device_name = device.id().data();
+        data.device_name = device.id().toStdString();
         data.display_name = device.description().toStdString();
         data.info = std::move(device);
 
@@ -361,7 +370,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         list.emplace_back();
         Data& data = *list.back().m_body;
 
-        data.device_name = device.id().data();
+        data.device_name = device.id().toStdString();
         data.display_name = device.description().toStdString();
         data.info = std::move(device);
 

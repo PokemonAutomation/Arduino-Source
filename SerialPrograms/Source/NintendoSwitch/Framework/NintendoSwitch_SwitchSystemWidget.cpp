@@ -36,6 +36,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     , m_logger(raw_logger, factory.m_logger_tag)
     , m_serial(factory.m_serial, m_logger)
     , m_camera(factory.m_camera, m_logger)
+    , m_audio(m_logger, factory.m_audio)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -55,12 +56,12 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->addWidget(m_serial_widget);
 
         m_video_display = new VideoDisplayWidget(*this);
-        m_audio_display = new AudioDisplayWidget(*this, m_logger);
+        m_audio_display = new AudioDisplayWidget(*this, m_logger, m_audio);
 
         m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
         group_layout->addWidget(m_camera_widget);
 
-        m_audio_widget = factory.m_audio.make_ui(*widget, m_logger, *m_audio_display);
+        m_audio_widget = factory.m_audio.make_ui(*widget, m_logger, m_audio);
         group_layout->addWidget(m_audio_widget);
 
         m_command = new CommandRow(
@@ -73,8 +74,6 @@ SwitchSystemWidget::SwitchSystemWidget(
 
     layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
-//    m_camera->reset_video();
-    m_audio_widget->reset_audio();
 
     setFocusPolicy(Qt::StrongFocus);
 
@@ -119,6 +118,8 @@ SwitchSystemWidget::~SwitchSystemWidget(){
     m_serial_widget->stop();
 
     //  Force delete this early so it detaches from "m_serial" before that is destructed.
+    delete m_audio_widget;
+    delete m_audio_display;
     delete m_serial_widget;
     delete m_camera_widget;
 }
@@ -148,7 +149,7 @@ VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
 }
 AudioFeed& SwitchSystemWidget::audio(){
-    return *m_audio_widget;
+    return m_audio;
 }
 void SwitchSystemWidget::stop_serial(){
     m_serial_widget->stop();

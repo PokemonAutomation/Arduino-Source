@@ -10,6 +10,7 @@
 #include "Integrations/ProgramTracker.h"
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
+#include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
@@ -68,6 +69,7 @@ private:
 
     SerialPortSession m_serial;
     CameraSession m_camera;
+    AudioSession m_audio;
 
     CollapsibleGroupBox* m_group_box;
 
