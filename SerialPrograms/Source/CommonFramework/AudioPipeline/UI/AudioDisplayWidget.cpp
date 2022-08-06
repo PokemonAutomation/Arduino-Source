@@ -22,6 +22,7 @@ namespace PokemonAutomation{
 AudioDisplayWidget::AudioDisplayWidget(QWidget& parent, Logger& logger, AudioSession& session)
     : QWidget(&parent)
     , m_session(session)
+    , m_display_type(session.display_type())
 {
     m_session.add_ui_listener(*this);
     m_session.add_spectrum_listener(*this);
@@ -53,6 +54,7 @@ void AudioDisplayWidget::display_changed(AudioOption::AudioDisplayType display){
     QMetaObject::invokeMethod(
         this, [=]{
             m_sanitizer.check_usage();
+            m_display_type = m_session.display_type();
             update_size();
             QWidget::update();
         }, Qt::QueuedConnection
@@ -127,7 +129,7 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 //    cout << "AudioDisplayWidget::paintEvent()" << endl;
     QWidget::paintEvent(event);
 
-    switch (m_session.option().display_type()){
+    switch (m_display_type){
     case AudioDisplayType::FREQ_BARS:
         render_bars();
         break;
@@ -141,7 +143,7 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 
 
 void AudioDisplayWidget::update_size(){
-    int height = m_session.option().display_type() == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
+    int height = m_display_type == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
 //    cout << "height = " << height << endl;
     this->setFixedHeight(height);
 }

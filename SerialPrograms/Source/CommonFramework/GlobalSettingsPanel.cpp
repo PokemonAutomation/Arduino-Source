@@ -139,6 +139,11 @@ GlobalSettings::GlobalSettings()
         "Show all audio devices - including duplicates.",
         false
     )
+    , SHOW_RECORD_FREQUENCIES(
+        "<b>Show Record Frequencies:</b><br>"
+        "Show option to record audio frequencies.",
+        false
+    )
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
@@ -169,6 +174,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(COMPUTE_PRIORITY0);
 
     PA_ADD_OPTION(SHOW_ALL_AUDIO_DEVICES);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
+    }
     PA_ADD_OPTION(VIDEO_BACKEND);
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);

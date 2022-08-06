@@ -41,7 +41,13 @@ public:
     ~AudioSession();
     AudioSession(Logger& logger, AudioOption& option);
 
-    const AudioOption& option() const{ return m_option; }
+    std::pair<std::string, AudioDeviceInfo> input_device() const;
+    AudioChannelFormat input_format() const;
+
+    AudioDeviceInfo output_device() const;
+    double output_volume() const;
+
+    AudioOption::AudioDisplayType display_type() const;
     AudioSpectrumHolder& spectrums(){ return m_spectrum_holder; }
 
     void clear_audio_input();
@@ -74,7 +80,7 @@ private:
     AudioSpectrumHolder m_spectrum_holder;
     std::unique_ptr<AudioPassthroughPair> m_devices;
 
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     std::set<Listener*> m_listeners;
 };
 

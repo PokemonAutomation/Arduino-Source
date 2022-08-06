@@ -87,6 +87,7 @@ public:
     ThreadPriorityOption COMPUTE_PRIORITY0;
 
     BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
+    BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     VideoBackendOption VIDEO_BACKEND;
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
 

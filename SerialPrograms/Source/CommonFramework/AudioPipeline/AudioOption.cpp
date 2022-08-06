@@ -8,7 +8,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "AudioOption.h"
-#include "AudioSelectorWidget.h"
+#include "UI/AudioSelectorWidget.h"
 
 namespace PokemonAutomation{
 

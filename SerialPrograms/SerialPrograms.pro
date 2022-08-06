@@ -119,10 +119,8 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
-    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioOption.cpp \
-    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
     Source/CommonFramework/AudioPipeline/AudioSession.cpp \
     Source/CommonFramework/AudioPipeline/AudioStream.cpp \
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp \
@@ -137,6 +135,8 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.cpp \
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp \
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortOption.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortSession.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp \
@@ -815,12 +815,10 @@ HEADERS += \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
-    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
     Source/CommonFramework/AudioPipeline/AudioOption.h \
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h \
-    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h \
     Source/CommonFramework/AudioPipeline/AudioSession.h \
     Source/CommonFramework/AudioPipeline/AudioStream.h \
     Source/CommonFramework/AudioPipeline/AudioTemplate.h \
@@ -837,6 +835,8 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBuffer.h \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h \
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h \
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h \
     Source/CommonFramework/ControllerDevices/SerialPortOption.h \
     Source/CommonFramework/ControllerDevices/SerialPortSession.h \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h \

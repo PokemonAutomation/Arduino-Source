@@ -183,8 +183,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
-    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
-    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
@@ -192,8 +190,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
-    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
-    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
     Source/CommonFramework/AudioPipeline/AudioSession.cpp
     Source/CommonFramework/AudioPipeline/AudioSession.h
     Source/CommonFramework/AudioPipeline/AudioStream.cpp
@@ -210,6 +206,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioSink.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp

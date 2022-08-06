@@ -47,8 +47,32 @@ AudioSession::~AudioSession(){
     m_devices->remove_listener(*this);
 }
 
+
+std::pair<std::string, AudioDeviceInfo> AudioSession::input_device() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return {m_option.input_file(), m_option.m_input_device};
+}
+AudioChannelFormat AudioSession::input_format() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_option.m_input_format;
+}
+AudioDeviceInfo AudioSession::output_device() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_option.m_output_device;
+}
+double AudioSession::output_volume() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_option.m_volume;
+}
+AudioOption::AudioDisplayType AudioSession::display_type() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_option.m_display_type;
+}
+
+
 void AudioSession::clear_audio_input(){
     std::lock_guard<std::mutex> lg(m_lock);
+    m_logger.log("Clearing audio input...");
     m_spectrum_holder.clear();
     m_devices->clear_audio_source();
     m_option.m_input_file.clear();
@@ -87,11 +111,13 @@ void AudioSession::set_format(AudioChannelFormat format){
 }
 void AudioSession::clear_audio_output(){
     std::lock_guard<std::mutex> lg(m_lock);
+    m_logger.log("Clearing audio output...");
     m_devices->clear_audio_sink();
     m_option.m_output_device = AudioDeviceInfo();
 }
 void AudioSession::set_audio_output(AudioDeviceInfo info){
     std::lock_guard<std::mutex> lg(m_lock);
+    m_logger.log("Setting audio output to: " + info.display_name());
     m_devices->set_audio_sink(info, m_option.m_volume);
     m_option.m_output_device = std::move(info);
 }
@@ -140,12 +166,12 @@ bool AudioSession::sanitize_format(){
 
 
 void AudioSession::reset(){
-    m_logger.log("AudioSession::reset()");
     std::lock_guard<std::mutex> lg(m_lock);
-    if (!sanitize_format()){
-        m_devices->clear_audio_source();
-        return;
-    }
+    m_logger.log("AudioSession::reset()");
+//    if (!sanitize_format()){
+//        m_devices->clear_audio_source();
+//        return;
+//    }
     if (!m_option.m_input_file.empty()){
 //        cout << "AudioSession::reset() - file: " << m_option.m_input_file << " - " << m_option.m_input_file.size() << endl;
         m_devices->reset(

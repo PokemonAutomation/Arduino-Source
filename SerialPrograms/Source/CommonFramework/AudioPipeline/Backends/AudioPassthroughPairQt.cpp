@@ -118,6 +118,7 @@ void AudioPassthroughPairQt::reset(
     const AudioDeviceInfo& input, AudioChannelFormat format,
     const AudioDeviceInfo& output, float volume
 ){
+//    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
     QMetaObject::invokeMethod(this, [=]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
@@ -128,12 +129,12 @@ void AudioPassthroughPairQt::reset(
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
+        m_input_format = format;
+        m_output_device = output;
+        m_volume = volume;
         if (input){
-            m_input_format = format;
             m_reader.reset(new AudioSource(m_logger, input, m_input_format));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
-            m_output_device = output;
-            m_volume = volume;
             init_audio_sink();
             m_fft_runner = make_FFT_streamer(m_input_format);
             m_fft_listener.reset(new InternalFFTListener(*this));
@@ -182,15 +183,14 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
             m_reader.reset();
             m_input_format = AudioChannelFormat::NONE;
         }
-        if (!device){
-            return;
-        }
         m_input_format = format;
-        m_reader.reset(new AudioSource(m_logger, device, m_input_format));
-        m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
-        init_audio_sink();
-        m_fft_runner = make_FFT_streamer(m_input_format);
-        m_fft_listener.reset(new InternalFFTListener(*this));
+        if (device){
+            m_reader.reset(new AudioSource(m_logger, device, m_input_format));
+            m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
+            init_audio_sink();
+            m_fft_runner = make_FFT_streamer(m_input_format);
+            m_fft_listener.reset(new InternalFFTListener(*this));
+        }
     });
 }
 
@@ -211,8 +211,10 @@ void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, float
     });
 }
 void AudioPassthroughPairQt::init_audio_sink(){
+//    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
     QMetaObject::invokeMethod(this, [=]{
         if (!m_output_device){
+//            cout << "AudioPassthroughPairQt::init_audio_sink() - early out" << endl;
             return;
         }
         AudioChannelFormat output_format = m_input_format;
@@ -232,6 +234,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
             m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)output_format], COLOR_RED);
             return;
         }
+//        cout << "AudioPassthroughPairQt::init_audio_sink() - end" << endl;
         m_writer.reset(new AudioSink(m_logger, m_output_device, output_format, m_volume));
     });
 }

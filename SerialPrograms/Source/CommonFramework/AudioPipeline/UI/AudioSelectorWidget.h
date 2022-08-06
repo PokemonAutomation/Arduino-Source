@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QSlider>
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "AudioOption.h"
+#include "CommonFramework/AudioPipeline/AudioOption.h"
 
 class QComboBox;
 class QPushButton;
@@ -32,7 +32,7 @@ public:
     ~AudioSelectorWidget();
 
 private:
-    void update_formats();
+    void update_formats(const AudioDeviceInfo& device);
     void refresh();
 
 private:
@@ -47,12 +47,14 @@ private:
     QSlider* m_volume_slider = nullptr;
     
     QPushButton* m_reset_button = nullptr;
-    QPushButton* m_load_file_button = nullptr;
+//    QPushButton* m_load_file_button = nullptr;
     std::string m_absoluteFilepath;
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 
     std::vector<AudioDeviceInfo> m_input_audios;
+    std::vector<AudioChannelFormat> m_input_formats;
+
     std::vector<AudioDeviceInfo> m_output_audios;
 
     std::mutex m_audio_lock;

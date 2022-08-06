@@ -11,8 +11,8 @@
 #include <set>
 #include <QWidget>
 #include "Common/Cpp/LifetimeSanitizer.h"
-#include "AudioOption.h"
-#include "AudioSession.h"
+#include "CommonFramework/AudioPipeline/AudioOption.h"
+#include "CommonFramework/AudioPipeline/AudioSession.h"
 
 namespace PokemonAutomation{
 
@@ -54,6 +54,7 @@ private:
 
 private:
     AudioSession& m_session;
+    AudioOption::AudioDisplayType m_display_type;
 
     std::deque<int> m_width_history;
     std::set<int> m_recent_widths;
