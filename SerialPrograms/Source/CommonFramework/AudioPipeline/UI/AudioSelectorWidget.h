@@ -26,7 +26,7 @@ class AudioSelectorWidget : public QWidget{
 public:
     AudioSelectorWidget(
         QWidget& parent,
-        LoggerQt& logger,
+        Logger& logger,
         AudioSession& session
     );
     ~AudioSelectorWidget();
@@ -36,7 +36,6 @@ private:
     void refresh();
 
 private:
-    LoggerQt& m_logger;
     AudioSession& m_session;
 
     QComboBox* m_audio_input_box = nullptr;

@@ -28,11 +28,10 @@ AudioSelectorWidget::~AudioSelectorWidget(){}
 
 AudioSelectorWidget::AudioSelectorWidget(
     QWidget& parent,
-    LoggerQt& logger,
+    Logger& logger,
     AudioSession& session
 )
     : QWidget(&parent)
-    , m_logger(logger)
     , m_session(session)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);

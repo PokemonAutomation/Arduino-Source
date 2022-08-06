@@ -79,9 +79,7 @@ private:
 
 AudioSink::~AudioSink(){}
 
-AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume)
-    : m_logger(logger)
-{
+AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
 

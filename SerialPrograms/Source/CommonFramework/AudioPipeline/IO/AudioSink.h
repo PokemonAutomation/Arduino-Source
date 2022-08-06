@@ -36,8 +36,6 @@ public:
 
 
 private:
-    Logger& m_logger;
-
     size_t m_sample_rate;
     size_t m_channels;
     size_t m_multiplier;
