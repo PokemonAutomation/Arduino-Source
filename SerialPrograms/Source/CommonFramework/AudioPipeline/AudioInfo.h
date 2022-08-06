@@ -70,7 +70,7 @@ public:
     AudioDeviceInfo();
     explicit AudioDeviceInfo(const std::string& device_name);
 
-    operator bool() const;
+    explicit operator bool() const;
 
     const std::string& display_name() const;
     const std::string& device_name() const;
@@ -81,7 +81,7 @@ public:
 
     const NativeAudioInfo& native_info() const;
 
-    bool operator==(const AudioDeviceInfo& info);
+    bool operator==(const AudioDeviceInfo& info) const;
 
     static std::vector<AudioDeviceInfo> all_input_devices();
     static std::vector<AudioDeviceInfo> all_output_devices();

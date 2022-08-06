@@ -221,7 +221,7 @@ void AudioSelectorWidget::refresh(){
         size_t index = 0;
         for (size_t c = 0; c < list.size(); c++){
             const AudioDeviceInfo& audio = list[c];
-            box->addItem(QString::fromStdString(list[c].display_name()));
+            box->addItem(QString::fromStdString(audio.display_name()));
 
             if (current_device == audio){
                 index = c + 1;

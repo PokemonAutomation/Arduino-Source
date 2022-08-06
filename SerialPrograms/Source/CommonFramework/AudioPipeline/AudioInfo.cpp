@@ -450,7 +450,7 @@ QAudioFormat AudioDeviceInfo::preferred_format() const{
 const NativeAudioInfo& AudioDeviceInfo::native_info() const{
     return m_body->info;
 }
-bool AudioDeviceInfo::operator==(const AudioDeviceInfo& info){
+bool AudioDeviceInfo::operator==(const AudioDeviceInfo& info) const{
     return device_name() == info.device_name();
 }
 
