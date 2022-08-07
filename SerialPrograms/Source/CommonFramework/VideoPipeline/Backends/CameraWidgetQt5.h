@@ -28,6 +28,8 @@
 namespace PokemonAutomation{
 namespace CameraQt5QCameraViewfinder{
 
+class VideoWidget;
+
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
@@ -62,7 +64,7 @@ public:
 
     QVideoFrame latest_frame();
 
-    virtual VideoWidget* make_QWidget(QWidget* parent) override;
+    virtual PokemonAutomation::VideoWidget* make_QWidget(QWidget* parent) override;
 
 
 private:
