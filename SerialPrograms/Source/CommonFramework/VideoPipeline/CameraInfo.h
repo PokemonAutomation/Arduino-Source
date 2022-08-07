@@ -19,7 +19,9 @@ public:
         : m_device_name(std::move(device_name))
     {}
 
-    operator bool() const{ return !m_device_name.empty(); }
+    void clear(){ m_device_name.clear(); }
+
+    explicit operator bool() const{ return !m_device_name.empty(); }
     const std::string& device_name() const{ return m_device_name; }
 
     bool operator==(const CameraInfo& info){

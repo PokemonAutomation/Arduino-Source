@@ -30,6 +30,14 @@ struct Resolution{
     bool operator!=(const Resolution& x) const{
         return width != x.width || height != x.height;
     }
+    bool operator<(const Resolution& x) const{
+        if (width != x.width){
+            return width < x.width;
+        }
+        return height < x.height;
+    }
+
+    std::string to_string() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Resolution& resolution);
 };

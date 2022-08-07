@@ -35,10 +35,7 @@ public:
 
 
 public:
-    SerialPortSession(
-        SerialPortOption& option,
-        Logger& logger
-    );
+    SerialPortSession(Logger& logger, SerialPortOption& option);
     ~SerialPortSession();
 
 

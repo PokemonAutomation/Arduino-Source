@@ -10,6 +10,10 @@
 namespace PokemonAutomation{
 
 
+std::string Resolution::to_string() const{
+    return std::to_string(width) + " x " + std::to_string(height);
+}
+
 std::ostream& operator<<(std::ostream& os, const Resolution& resolution){
     os << resolution.width << " x " << resolution.height;
     return os;

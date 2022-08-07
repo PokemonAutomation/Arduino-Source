@@ -66,7 +66,7 @@ private:
     TaggedLogger m_logger;
 
     SerialPortSession m_serial;
-    CameraSession m_camera;
+    std::unique_ptr<CameraSession> m_camera;
     AudioSession m_audio;
 
     CollapsibleGroupBox* m_group_box;

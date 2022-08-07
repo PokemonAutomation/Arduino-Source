@@ -14,58 +14,15 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-VideoDisplayWidget::VideoDisplayWidget(QWidget& parent)
+VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& session)
     : QWidget(&parent)
+    , m_video(session.make_QWidget(this))
     , m_overlay(new VideoOverlayWidget(*this))
-{}
-
-void VideoDisplayWidget::close_video(){
-    if (m_video != nullptr){
-        delete m_video;
-        m_video = nullptr;
-    }
-    update_size();
-}
-void VideoDisplayWidget::set_video(VideoWidget* video){
-    if (m_video != nullptr){
-        delete m_video;
-        m_video = nullptr;
-    }
-    m_video = video;
-    video->setParent(this);
-    video->setVisible(true);
+{
     m_overlay->setVisible(true);
     m_overlay->setHidden(false);
     m_overlay->raise();
-    Resolution resolution = video->camera().current_resolution();
-    update_size(resolution);
-//    cout << "res = " << resolution << endl;
-}
-
-Resolution VideoDisplayWidget::resolution() const{
-    if (m_video == nullptr){
-        return Resolution();
-    }
-    return m_video->camera().current_resolution();
-}
-std::vector<Resolution> VideoDisplayWidget::resolutions() const{
-    if (m_video == nullptr){
-        return {};
-    }
-    return m_video->camera().supported_resolutions();
-}
-void VideoDisplayWidget::set_resolution(const Resolution& resolution){
-    if (m_video == nullptr){
-        return;
-    }
-    m_video->camera().set_resolution(resolution);
-    update_size(resolution);
-}
-VideoSnapshot VideoDisplayWidget::snapshot(){
-    if (m_video == nullptr){
-        return VideoSnapshot();
-    }
-    return m_video->camera().snapshot();
+    update_size(session.current_resolution());
 }
 
 
@@ -87,7 +44,7 @@ void VideoDisplayWidget::update_size(Resolution resolution){
     int width = this->width();
     double aspect_ratio = 16. / 9;
     if (!resolution){
-        Camera* camera = &m_video->camera();
+        CameraSession* camera = &m_video->camera();
         resolution = camera->current_resolution();
     }
 //    cout << "resolution: " << resolution.width() << " x " << resolution.height() << endl;

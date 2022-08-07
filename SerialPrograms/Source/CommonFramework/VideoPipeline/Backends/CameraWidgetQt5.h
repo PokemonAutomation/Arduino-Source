@@ -17,6 +17,7 @@
 #include <QCameraImageCapture>
 #include <QVideoProbe>
 #include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -33,40 +34,43 @@ public:
     virtual std::vector<CameraInfo> get_all_cameras() const override;
     virtual std::string get_camera_name(const CameraInfo& info) const override;
 
-    virtual std::unique_ptr<Camera> make_camera(
-        Logger& logger,
-        const CameraInfo& info,
-        const Resolution& desired_resolution
-    ) const override;
-
-    virtual VideoWidget* make_video_widget(QWidget* parent, Camera& camera) const override;
+    virtual std::unique_ptr<PokemonAutomation::CameraSession> make_camera(Logger& logger, Resolution default_resolution) const override;
 };
 
 
-class Camera : public QObject, public PokemonAutomation::Camera{
-//public:
-//    struct Listener{
-//        virtual void new_frame_available() = 0;
-//    };
 
-//    void add_listener(Listener& listener);
-//    void remove_listener(Listener& listener);
+
+class CameraSession : public QObject, public PokemonAutomation::CameraSession{
+public:
+    virtual void add_listener(Listener& listener) override;
+    virtual void remove_listener(Listener& listener) override;
+
 
 public:
-    Camera(
-        Logger& logger,
-        const CameraInfo& info, const Resolution& desired_resolution
-    );
-    virtual ~Camera();
+    virtual ~CameraSession();
+    CameraSession(Logger& logger, Resolution default_resolution);
 
-public:
-    //  These are all thread-safe.
+    virtual void reset() override;
+    virtual void set_source(CameraInfo device) override;
+    virtual void set_resolution(Resolution resolution) override;
 
+    virtual CameraInfo current_device() const override;
     virtual Resolution current_resolution() const override;
     virtual std::vector<Resolution> supported_resolutions() const override;
-    virtual void set_resolution(const Resolution& size) override;
 
+    virtual void set_allow_snapshots(bool allow) override;
     virtual VideoSnapshot snapshot() override;
+
+    QVideoFrame latest_frame();
+
+    virtual VideoWidget* make_QWidget(QWidget* parent) override;
+
+
+private:
+    //  These must be run on the UI thread.
+    void shutdown();
+    void startup();
+
 
 private:
     //  All of these must be called under the lock.
@@ -78,19 +82,26 @@ private:
 
     bool determine_frame_orientation();
 
+
 private:
-    friend class VideoWidget2;
+    friend class VideoWidget;
 
     Logger& m_logger;
+    Resolution m_default_resolution;
+
+    //  If you need both locks, acquire "m_lock" first.
+    mutable std::mutex m_lock;
+    SpinLock m_frame_lock;
+
+    CameraInfo m_device;
+    Resolution m_resolution;
+
     QCamera* m_camera = nullptr;
-    CameraScreenshotter m_screenshotter;
+    std::unique_ptr<CameraScreenshotter> m_screenshotter;
 
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
     std::vector<Resolution> m_resolutions;
-
-    mutable std::mutex m_lock;
-    Resolution m_resolution;
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;
@@ -99,7 +110,7 @@ private:
 //    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
 
-    SpinLock m_frame_lock;
+    std::atomic<bool> m_allow_snapshots;
 
     //  Last Frame
     QVideoFrame m_last_frame;
@@ -113,25 +124,29 @@ private:
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 
-//    std::set<Listener*> m_listeners;
+    std::set<Listener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 
 
-
-class VideoWidget2 : public PokemonAutomation::VideoWidget{
+class VideoWidget : public PokemonAutomation::VideoWidget, private CameraSession::Listener{
 public:
-    VideoWidget2(QWidget* parent, Camera& camera);
-    virtual ~VideoWidget2();
+    VideoWidget(QWidget* parent, CameraSession& session);
+    virtual ~VideoWidget();
 
-    virtual Camera& camera() override{ return m_camera; }
+    virtual PokemonAutomation::CameraSession& camera() override{ return m_session; }
 
 private:
-    Camera& m_camera;
+    virtual void shutdown() override;
+    virtual void new_source(const CameraInfo& device, Resolution resolution) override;
+    virtual void resolution_change(Resolution resolution) override;
+
+private:
+    CameraSession& m_session;
     QCameraViewfinder* m_camera_view = nullptr;
 };
-
-
 
 
 

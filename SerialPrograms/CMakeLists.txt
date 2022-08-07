@@ -471,17 +471,13 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.cpp
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
-    Source/CommonFramework/VideoPipeline/CameraBase.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
-    Source/CommonFramework/VideoPipeline/CameraSession.cpp
     Source/CommonFramework/VideoPipeline/CameraSession.h
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h

@@ -16,77 +16,58 @@
 #ifndef PokemonAutomation_VideoPipeline_CameraSession_H
 #define PokemonAutomation_VideoPipeline_CameraSession_H
 
-#include <set>
-#include "Common/Cpp/SpinLock.h"
+#include <vector>
+#include "Common/Cpp/ImageResolution.h"
+#include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CameraOption.h"
+
+class QWidget;
 
 namespace PokemonAutomation{
 
-class Logger;
-class Camera;
+class VideoWidget;
+
 
 class CameraSession : public VideoFeed{
 public:
     struct Listener{
-        virtual void camera_startup(Camera& camera) = 0;
-        virtual void camera_shutdown() = 0;
+        //  Sent before the camera shuts down. Listeners should drop their
+        //  references to the internal camera implementation before returning.
+        virtual void shutdown() = 0;
+
+        virtual void new_source(const CameraInfo& device, Resolution resolution) = 0;  //  Send after a new camera goes up.
+        virtual void resolution_change(Resolution resolution) = 0;
     };
-
-    void add_listener(Listener& listener);
-    void remove_listener(Listener& listener);
-
-
-public:
-    CameraSession(
-        CameraOption& option,
-        Logger& logger
-    );
-    ~CameraSession();
+    virtual void add_listener(Listener& listener) = 0;
+    virtual void remove_listener(Listener& listener) = 0;
 
 
 public:
-    CameraInfo info() const;
-    Resolution resolution() const;
+    virtual ~CameraSession() = default;
 
-    virtual void reset() override;
-    virtual VideoSnapshot snapshot() override;
+    virtual void reset() = 0;
+    virtual void set_source(CameraInfo device) = 0;
+    virtual void set_resolution(Resolution resolution) = 0;
 
-    //  Not thread-safe with camera changing.
-    Camera* camera(){ return m_camera.get(); }
+    virtual CameraInfo current_device() const = 0;
+    virtual Resolution current_resolution() const = 0;
+    virtual std::vector<Resolution> supported_resolutions() const = 0;
+
+    virtual void set_allow_snapshots(bool allow) = 0;
+
+    //  This snapshot function will be called asynchronously from many threads
+    //  at a very high rate. It is advised to cache snapshots if the video frame
+    //  has not changed from the last call.
+    //
+    //  If "timestamp" is not "WallClock::min()", it will be set to the best
+    //  known timestamp of the screenshot that is returned.
+    virtual VideoSnapshot snapshot() = 0;
 
 
 public:
-    void set_info(const CameraInfo& info);
-    void set_resolution(const Resolution& resolution);
-
-    void start_camera();
-    void stop_camera();
-
-
-public:
-    bool allow_snapshots() const;
-    void set_allow_snapshots(bool allow);
-
-
-private:
-    //  Nothing here is thread-safe.
-    void push_camera_startup();
-    void push_camera_shutdown();
-
-
-private:
-    CameraOption& m_option;
-    Logger& m_logger;
-
-    std::atomic<bool> m_allow_snapshots;
-
-    mutable SpinLock m_lock;
-
-    std::unique_ptr<Camera> m_camera;
-
-    std::set<Listener*> m_listeners;
+    virtual VideoWidget* make_QWidget(QWidget* parent){ return nullptr; };
 };
+
 
 
 

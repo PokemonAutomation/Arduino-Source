@@ -30,159 +30,105 @@ std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
 std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
     return qt5_get_camera_name(info);
 }
-std::unique_ptr<PokemonAutomation::Camera> CameraBackend::make_camera(
-    Logger& logger,
-    const CameraInfo& info,
-    const Resolution& desired_resolution
-) const{
-    return std::make_unique<Camera>(logger, info, desired_resolution);
-}
-VideoWidget* CameraBackend::make_video_widget(QWidget* parent, PokemonAutomation::Camera& camera) const{
-    Camera* casted = dynamic_cast<Camera*>(&camera);
-    if (casted == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching camera session/widget types.");
-    }
-    return new VideoWidget2(parent, *casted);
+std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Logger& logger, Resolution default_resolution) const{
+    return std::make_unique<CameraSession>(logger, default_resolution);
 }
 
 
 
-Camera::Camera(
-    Logger& logger,
-    const CameraInfo& info, const Resolution& desired_resolution
-)
-    : m_logger(logger)
-    , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
-    , m_screenshotter(logger, *m_camera)
-    , m_last_orientation_attempt(WallClock::min())
-//    , m_use_probe_frames(true)
-//    , m_flip_vertical(true)
-    , m_last_frame_seqnum(0)
-//    , m_last_image_timestamp(WallClock::min())
-    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
-{
-    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinder");
-    if (!info){
-        return;
-    }
 
-
-    //  Setup the screenshot capture.
-    m_probe = new QVideoProbe(this);
-    if (!m_probe->setSource(m_camera)){
-//        m_use_probe_frames = false;
-        logger.log("Unable to initialize QVideoProbe() capture.", COLOR_RED);
-        delete m_probe;
-        m_probe = nullptr;
-    }
-
-
-    m_camera->start();
-
-    for (const auto& size : m_camera->supportedViewfinderResolutions()){
-        m_resolutions.emplace_back(Resolution(size.width(), size.height()));
-    }
-
-    QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    m_max_frame_rate = settings.maximumFrameRate();
-    m_frame_period = std::chrono::milliseconds(25);
-    if (0 < m_max_frame_rate){
-        m_frame_period = std::chrono::milliseconds((uint64_t)(1.0 / m_max_frame_rate * 1000));
-    }
-    {
-        QSize resolution = settings.resolution();
-        m_resolution = Resolution(resolution.width(), resolution.height());
-//        cout << "Start Resolution = " << m_resolution << endl;
-    }
-
-//    cout << "min = " << settings.minimumFrameRate() << endl;
-//    cout << "max = " << settings.maximumFrameRate() << endl;
-
-
-    //  Check if we can apply the recommended resolution.
-    Resolution new_resolution = m_resolution;
-    for (const Resolution& size : m_resolutions){
-        if (size == desired_resolution){
-            new_resolution = desired_resolution;
-            break;
-        }
-    }
-    if (m_resolution != new_resolution){
-        settings.setResolution(QSize((int)new_resolution.width, (int)new_resolution.height));
-        m_camera->setViewfinderSettings(settings);
-        m_resolution = new_resolution;
-    }
-
-    if (m_probe){
-        connect(
-            m_probe, &QVideoProbe::videoFrameProbed,
-            this, [=](const QVideoFrame& frame){
-                WallClock now = current_time();
-                SpinLockGuard lg(m_frame_lock);
-                if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
-                    m_last_frame = frame;
-                }
-                m_last_frame_timestamp = now;
-                m_last_frame_seqnum++;
-            },
-            Qt::DirectConnection
-        );
-    }
-}
-Camera::~Camera(){}
-
-#if 0
-void Camera::add_listener(Listener& listener){
+void CameraSession::add_listener(Listener& listener){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.insert(&listener);
 }
-void Camera::remove_listener(Listener& listener){
+void CameraSession::remove_listener(Listener& listener){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.erase(&listener);
 }
-#endif
 
-Resolution Camera::current_resolution() const{
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_camera == nullptr){
-        return Resolution();
-    }
-    QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    QSize resolution = settings.resolution();
-//    cout << "QCameraViewfinderSettings::resolution() = " << resolution.width() << " x " << resolution.height() << endl;
-
-    //  If we can invalid resolution, return what we think it is. There is a bug in Qt5
-    //  where the camera will temporarily return 0x0 immediately after setting a
-    //  view finder for it.
-    if (resolution.isValid()){
-        return Resolution(resolution.width(), resolution.height());
-    }else{
-        return m_resolution;
-    }
+CameraSession::~CameraSession(){
+    shutdown();
 }
-std::vector<Resolution> Camera::supported_resolutions() const{
+CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
+    : m_logger(logger)
+    , m_default_resolution(default_resolution)
+    , m_last_orientation_attempt(WallClock::min())
+    , m_allow_snapshots(true)
+    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
+{}
+
+void CameraSession::reset(){
+    QMetaObject::invokeMethod(this, [=]{
+        std::lock_guard<std::mutex> lg(m_lock);
+        shutdown();
+        startup();
+    });
+}
+void CameraSession::set_source(CameraInfo device){
+//    cout << "CameraSession::set_source()" << endl;
+    QMetaObject::invokeMethod(this, [=]{
+        std::lock_guard<std::mutex> lg(m_lock);
+        shutdown();
+        m_device = std::move(device);
+        startup();
+    });
+}
+void CameraSession::set_resolution(Resolution resolution){
+    QMetaObject::invokeMethod(this, [=]{
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (!m_camera){
+            m_resolution = resolution;
+            return;
+        }
+        m_logger.log("Setting resolution to: " + resolution.to_string());
+        bool found = false;
+        for (const Resolution& res : m_resolutions){
+            if (res == resolution){
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            m_logger.log("Resolution not supported.", COLOR_RED);
+            return;
+        }
+        m_resolution = resolution;
+        QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
+        settings.setResolution(QSize((int)resolution.width, (int)resolution.height));
+        m_camera->setViewfinderSettings(settings);
+        for (Listener* listener : m_listeners){
+            listener->resolution_change(resolution);
+        }
+    });
+}
+CameraInfo CameraSession::current_device() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_device;
+}
+Resolution CameraSession::current_resolution() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_resolution;
+}
+std::vector<Resolution> CameraSession::supported_resolutions() const{
+    std::lock_guard<std::mutex> lg(m_lock);
     return m_resolutions;
 }
-void Camera::set_resolution(const Resolution& size){
-    std::lock_guard<std::mutex> lg(m_lock);
-    QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    QSize resolution = settings.resolution();
-    if (Resolution(resolution.width(), resolution.height()) == size){
-        return;
-    }
-    settings.setResolution(QSize((int)size.width, (int)size.height));
-    m_camera->setViewfinderSettings(settings);
-    m_resolution = size;
+void CameraSession::set_allow_snapshots(bool allow){
+    m_allow_snapshots.store(allow, std::memory_order_relaxed);
 }
 
-VideoSnapshot Camera::direct_snapshot_image(){
+
+
+VideoSnapshot CameraSession::direct_snapshot_image(){
 //    std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return VideoSnapshot();
     }
-    return m_screenshotter.snapshot();
+    return m_screenshotter->snapshot();
 }
-QImage Camera::direct_snapshot_probe(bool flip_vertical){
+QImage CameraSession::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
@@ -196,7 +142,7 @@ QImage Camera::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-VideoSnapshot Camera::snapshot_image(){
+VideoSnapshot CameraSession::snapshot_image(){
 //    cout << "snapshot_image()" << endl;
 //    std::unique_lock<std::mutex> lg(m_lock);
 
@@ -230,15 +176,11 @@ VideoSnapshot Camera::snapshot_image(){
         }
     }
 
-    WallClock time0 = current_time();
-
-    m_last_snapshot = m_screenshotter.snapshot();
+    m_last_snapshot = m_screenshotter->snapshot();
     m_last_image_seqnum = frame_seqnum;
-    WallClock time1 = current_time();
-    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
     return m_last_snapshot;
 }
-VideoSnapshot Camera::snapshot_probe(){
+VideoSnapshot CameraSession::snapshot_probe(){
 //    cout << "snapshot_probe()" << endl;
 //    std::lock_guard<std::mutex> lg(m_lock);
 
@@ -273,7 +215,7 @@ VideoSnapshot Camera::snapshot_probe(){
 
     return m_last_snapshot;
 }
-bool Camera::determine_frame_orientation(){
+bool CameraSession::determine_frame_orientation(){
     //  Qt 5.12 is really shitty in that there's no way to figure out the
     //  orientation of a QVideoFrame. So here we'll try to figure it out
     //  the poor man's way. Snapshot using both QCameraImageCapture and
@@ -287,7 +229,7 @@ bool Camera::determine_frame_orientation(){
     m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, *reference, frame, m_flip_vertical);
     return m_orientation_known;
 }
-VideoSnapshot Camera::snapshot(){
+VideoSnapshot CameraSession::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
 
     //  Frame screenshots are disabled.
@@ -320,42 +262,163 @@ VideoSnapshot Camera::snapshot(){
 
 
 
-
-
-
-
-VideoWidget2::VideoWidget2(QWidget* parent, Camera& camera)
-    : PokemonAutomation::VideoWidget(parent)
-    , m_camera(camera)
-{
-    if (m_camera.m_camera == nullptr){
+void CameraSession::shutdown(){
+    if (m_camera == nullptr){
         return;
     }
+
+    m_logger.log("Stopping Camera...");
+
+    m_camera->stop();
+    for (Listener* listener : m_listeners){
+        listener->shutdown();
+    }
+
+    m_screenshotter.reset();
+
+    delete m_camera;
+    m_camera = nullptr;
+    m_probe = nullptr;
+
+    m_last_frame = QVideoFrame();
+    m_last_frame_timestamp = current_time();
+    m_last_frame_seqnum++;
+
+    SpinLockGuard lg(m_frame_lock);
+
+    m_last_frame = QVideoFrame();
+    m_last_frame_timestamp = current_time();
+    m_last_frame_seqnum++;
+
+    m_last_image_seqnum = m_last_frame_seqnum;
+}
+void CameraSession::startup(){
+    if (!m_device){
+        return;
+    }
+    m_logger.log("Starting Camera: Backend = CameraQt5QCameraViewfinder");
+
+    {
+        QByteArray data = QByteArray::fromStdString(m_device.device_name());
+        m_camera = new QCamera(QCameraInfo(data), this);
+    }
+
+    //  Setup the screenshot capture.
+    m_probe = new QVideoProbe(m_camera);
+#if 1
+    if (!m_probe->setSource(m_camera)){
+//        m_use_probe_frames = false;
+        m_logger.log("Unable to initialize QVideoProbe() capture.", COLOR_RED);
+        delete m_probe;
+        m_probe = nullptr;
+    }
+#endif
+
+    m_camera->start();
+
+    QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
+    m_max_frame_rate = settings.maximumFrameRate();
+    m_frame_period = std::chrono::milliseconds(25);
+    if (0 < m_max_frame_rate){
+        m_frame_period = std::chrono::milliseconds((uint64_t)(1.0 / m_max_frame_rate * 1000));
+    }
+
+    bool default_found = false;
+    bool desired_found = false;
+    for (const auto& size : m_camera->supportedViewfinderResolutions()){
+        Resolution resolution = Resolution(size.width(), size.height());
+        m_resolutions.emplace_back(resolution);
+        default_found |= resolution == m_default_resolution;
+        desired_found |= resolution == m_resolution;
+    }
+
+    if (desired_found){
+        settings.setResolution(QSize((int)m_resolution.width, (int)m_resolution.height));
+        m_camera->setViewfinderSettings(settings);
+    }else if (default_found){
+        settings.setResolution(QSize((int)m_default_resolution.width, (int)m_default_resolution.height));
+        m_camera->setViewfinderSettings(settings);
+        m_resolution = m_default_resolution;
+    }else{
+        QSize resolution = settings.resolution();
+        m_resolution = Resolution(resolution.width(), resolution.height());
+    }
+
+    m_screenshotter.reset(new CameraScreenshotter(m_logger, *m_camera));
+
+    if (m_probe){
+        connect(
+            m_probe, &QVideoProbe::videoFrameProbed,
+            this, [=](const QVideoFrame& frame){
+                WallClock now = current_time();
+                SpinLockGuard lg(m_frame_lock);
+                if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+                    m_last_frame = frame;
+                }
+                m_last_frame_timestamp = now;
+                m_last_frame_seqnum++;
+            },
+            Qt::DirectConnection
+        );
+    }
+
+    for (Listener* listener : m_listeners){
+        listener->new_source(m_device, m_resolution);
+    }
+}
+
+PokemonAutomation::VideoWidget* CameraSession::make_QWidget(QWidget* parent){
+    return new VideoWidget(parent, *this);
+}
+
+
+
+
+
+
+VideoWidget::VideoWidget(QWidget* parent, CameraSession& session)
+    : PokemonAutomation::VideoWidget(parent)
+    , m_session(session)
+{
+    this->setMinimumSize(80, 45);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
 
-
     //  Setup the video display.
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);
     m_camera_view->setMinimumSize(80, 45);
-    m_camera.m_camera->setViewfinder(m_camera_view);
+
+    if (session.m_camera){
+        session.m_camera->setViewfinder(m_camera_view);
+    }
+
+    session.add_listener(*this);
 }
-VideoWidget2::~VideoWidget2(){
-//    m_camera.remove_listener(*this);
+VideoWidget::~VideoWidget(){
+    m_session.remove_listener(*this);
+    if (m_session.m_camera){
+        m_session.m_camera->setViewfinder((QCameraViewfinder*)nullptr);
+    }
 }
 
 
+void VideoWidget::shutdown(){
+//    cout << "VideoWidget::shutdown() - start" << endl;
+    if (m_session.m_camera){
+        m_session.m_camera->setViewfinder((QCameraViewfinder*)nullptr);
+    }
+//    cout << "VideoWidget::shutdown() - end" << endl;
+}
+void VideoWidget::new_source(const CameraInfo& device, Resolution resolution){
+//    cout << "VideoWidget::new_source" << endl;
+    m_session.m_camera->setViewfinder(m_camera_view);
+}
+void VideoWidget::resolution_change(Resolution resolution){
 
-
-
-
-
-
-
-
+}
 
 
 

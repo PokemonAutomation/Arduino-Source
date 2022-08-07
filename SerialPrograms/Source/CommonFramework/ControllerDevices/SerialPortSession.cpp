@@ -11,10 +11,7 @@ namespace PokemonAutomation{
 
 
 
-SerialPortSession::SerialPortSession(
-    SerialPortOption& option,
-    Logger& logger
-)
+SerialPortSession::SerialPortSession(Logger& logger, SerialPortOption& option)
     : m_option(option)
     , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
     , m_connection(m_logger, option.port(), option.minimum_pabotbase())

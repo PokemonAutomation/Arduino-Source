@@ -251,11 +251,9 @@ SOURCES += \
     Source/CommonFramework/Tools/SuperControlSession.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp \
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp \
     Source/CommonFramework/VideoPipeline/CameraOption.cpp \
-    Source/CommonFramework/VideoPipeline/CameraSession.cpp \
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp \
@@ -968,7 +966,6 @@ HEADERS += \
     Source/CommonFramework/Tools/SuperControlSession.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h \
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5v2.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \

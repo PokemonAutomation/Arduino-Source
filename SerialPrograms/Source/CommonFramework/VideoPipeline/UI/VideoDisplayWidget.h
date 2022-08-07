@@ -26,22 +26,10 @@ namespace PokemonAutomation{
 //  This function is called by CameraSelectorWidget.
 class VideoDisplayWidget : public QWidget, public VideoOverlay{
 public:
-    VideoDisplayWidget(QWidget& parent);
-
+    VideoDisplayWidget(QWidget& parent, CameraSession& session);
 
     operator bool(){ return m_video != nullptr; }
     VideoOverlayWidget& overlay(){ return *m_overlay; }
-
-    void close_video();
-
-    //  Set video using an already constructed video. This takes ownership of the video.
-    void set_video(VideoWidget* video);
-
-    Resolution resolution() const;
-    std::vector<Resolution> resolutions() const;
-    void set_resolution(const Resolution& resolution);
-
-    VideoSnapshot snapshot();
 
     void update_size(Resolution resolution = Resolution());
 

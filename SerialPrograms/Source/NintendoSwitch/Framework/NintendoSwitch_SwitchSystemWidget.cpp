@@ -17,6 +17,8 @@
 #include "CommonFramework/ControllerDevices/SerialPortWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -34,8 +36,8 @@ SwitchSystemWidget::SwitchSystemWidget(
     : SwitchSetupWidget(parent, factory)
     , m_factory(factory)
     , m_logger(raw_logger, factory.m_logger_tag)
-    , m_serial(factory.m_serial, m_logger)
-    , m_camera(factory.m_camera, m_logger)
+    , m_serial(m_logger, factory.m_serial)
+    , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, factory.m_audio)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -55,10 +57,11 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_serial_widget = new SerialPortWidget(parent, m_serial, m_logger);
         group_layout->addWidget(m_serial_widget);
 
-        m_video_display = new VideoDisplayWidget(*this);
+        m_video_display = new VideoDisplayWidget(*this, *m_camera);
         m_audio_display = new AudioDisplayWidget(*this, m_logger, m_audio);
 
-        m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
+//        m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
+        m_camera_widget = new CameraSelectorWidget(*m_camera, m_logger, *m_video_display);
         group_layout->addWidget(m_camera_widget);
 
         m_audio_widget = new AudioSelectorWidget(*widget, m_logger, m_audio);
@@ -100,7 +103,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [=](){
             global_dispatcher.dispatch([=]{
-                std::shared_ptr<const ImageRGB32> image = m_video_display->snapshot();
+                std::shared_ptr<const ImageRGB32> image = m_camera->snapshot();
                 if (!*image){
                     return;
                 }
@@ -111,17 +114,24 @@ SwitchSystemWidget::SwitchSystemWidget(
         }
     );
 
+    m_camera->set_resolution(factory.m_camera.current_resolution);
+    m_camera->set_source(factory.m_camera.info);
+
     m_instance_id = ProgramTracker::instance().add_console(program_id, *this);
 }
 SwitchSystemWidget::~SwitchSystemWidget(){
     ProgramTracker::instance().remove_console(m_instance_id);
     m_serial_widget->stop();
 
-    //  Force delete this early so it detaches from "m_serial" before that is destructed.
-    delete m_audio_widget;
+    //  Delete all the UI elements first since they reference the states.
     delete m_audio_display;
-    delete m_serial_widget;
+    delete m_audio_widget;
+    delete m_video_display;
     delete m_camera_widget;
+    delete m_serial_widget;
+
+    m_factory.m_camera.info = m_camera->current_device();
+    m_factory.m_camera.current_resolution = m_camera->current_resolution();
 }
 ProgramState SwitchSystemWidget::last_known_state() const{
     return m_command->last_known_state();
@@ -143,7 +153,7 @@ BotBase* SwitchSystemWidget::botbase(){
     return m_serial.botbase().botbase();
 }
 VideoFeed& SwitchSystemWidget::camera(){
-    return m_camera;
+    return *m_camera;
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
@@ -159,7 +169,7 @@ void SwitchSystemWidget::reset_serial(){
 }
 
 VideoFeed& SwitchSystemWidget::video(){
-    return m_camera;
+    return *m_camera;
 }
 BotBaseHandle& SwitchSystemWidget::sender(){
     return m_serial.botbase();

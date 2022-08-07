@@ -10,8 +10,8 @@
 #include <QPushButton>
 #include "Common/Qt/Redispatch.h"
 #include "Common/Qt/NoWheelComboBox.h"
-#include "VideoDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+#include "VideoDisplayWidget.h"
 #include "CameraSelectorWidget.h"
 
 #include <iostream>
@@ -24,7 +24,6 @@ namespace PokemonAutomation{
 
 CameraSelectorWidget::~CameraSelectorWidget(){
 //    cout << "~CameraSelectorUI()" << endl;
-    m_display.close_video();
     m_session.remove_listener(*this);
 }
 CameraSelectorWidget::CameraSelectorWidget(
@@ -56,27 +55,23 @@ CameraSelectorWidget::CameraSelectorWidget(
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
-    Camera* camera = m_session.camera();
-    if (camera){
-        m_display.set_video(get_camera_backend().make_video_widget(nullptr, *camera));
-        update_resolution_list();
-    }
+//    Camera* camera = m_session.camera();
+//    if (camera){
+//        m_display.set_video(get_camera_backend().make_video_widget(nullptr, *camera));
+//        update_resolution_list();
+//    }
+    update_camera_list();
+    update_resolution_list();
 
     connect(
-        m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
 //            cout << "m_camera_box" << endl;
-            CameraInfo info = m_session.info();
             if (index <= 0 || index > (int)m_cameras.size()){
-                info = CameraInfo();
+                m_session.set_source(CameraInfo());
             }else{
-                const CameraInfo& camera = m_cameras[index - 1];
-                if (info == camera){
-                    return;
-                }
-                info = camera;
+                m_session.set_source(m_cameras[index - 1]);
             }
-            m_session.set_info(info);
         }
     );
     connect(
@@ -108,7 +103,7 @@ void CameraSelectorWidget::update_camera_list(){
     m_camera_box->addItem("(none)");
 
     m_cameras = get_all_cameras();
-    CameraInfo info = m_session.info();
+    CameraInfo info = m_session.current_device();
 
     size_t index = 0;
     for (size_t c = 0; c < m_cameras.size(); c++){
@@ -127,18 +122,17 @@ void CameraSelectorWidget::update_camera_list(){
     }
 }
 void CameraSelectorWidget::update_resolution_list(){
-    Resolution camera_resolution = m_session.resolution();
+    Resolution camera_resolution = m_session.current_resolution();
 //    cout << "camera_resolution = " << camera_resolution << endl;
 
     m_resolution_box->clear();
     m_resolutions.clear();
 
-    Camera* camera = m_session.camera();
-    if (camera == nullptr){
+    m_resolutions = m_session.supported_resolutions();
+//    cout << "CameraSelectorWidget::resolutions = " << m_resolutions.size() << endl;
+    if (m_resolutions.empty()){
         return;
     }
-
-    m_resolutions = camera->supported_resolutions();
 
     int camera_index = -1;
 //    int current_index = -1;
@@ -166,6 +160,7 @@ void CameraSelectorWidget::update_resolution_list(){
     }
 }
 
+#if 0
 void CameraSelectorWidget::camera_startup(Camera& camera){
     QMetaObject::invokeMethod(
         this, [&]{
@@ -178,6 +173,41 @@ void CameraSelectorWidget::camera_shutdown(){
     m_display.close_video();
     m_resolution_box->clear();
     m_resolutions.clear();
+}
+#endif
+void CameraSelectorWidget::shutdown(){
+//    cout << "CameraSelectorWidget::shutdown()" << endl;
+    QMetaObject::invokeMethod(this, [&]{
+        m_resolution_box->clear();
+        m_resolutions.clear();
+    }, Qt::QueuedConnection);
+}
+void CameraSelectorWidget::new_source(const CameraInfo& device, Resolution resolution){
+//    cout << "CameraSelectorWidget::new_source()" << endl;
+    QMetaObject::invokeMethod(this, [&]{
+        //  See if it's in the cached list.
+        for (size_t c = 0; c < m_cameras.size(); c++){
+            if (m_cameras[c] == device){
+                m_camera_box->setCurrentIndex((int)c + 1);
+                update_resolution_list();
+                return;
+            }
+        }
+        update_camera_list();
+        update_resolution_list();
+    }, Qt::QueuedConnection);
+}
+void CameraSelectorWidget::resolution_change(Resolution resolution){
+    //  See if it's in the cached list.
+    for (size_t c = 0; c < m_resolutions.size(); c++){
+        if (m_resolutions[c] == resolution){
+            m_resolution_box->setCurrentIndex((int)c);
+            return;
+        }
+    }
+    QMetaObject::invokeMethod(this, [&]{
+        update_resolution_list();
+    }, Qt::QueuedConnection);
 }
 
 

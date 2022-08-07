@@ -8,7 +8,7 @@
 #define PokemonAutomation_VideoPipeline_VideoWidget_H
 
 #include <QWidget>
-#include "CommonFramework/VideoPipeline/CameraBase.h"
+#include "CommonFramework/VideoPipeline/CameraSession.h"
 
 namespace PokemonAutomation{
 
@@ -20,7 +20,7 @@ public:
     virtual ~VideoWidget() = default;
 
     //  Get the camera associated with this VideoWidget.
-    virtual Camera& camera() = 0;
+    virtual CameraSession& camera() = 0;
 };
 
 
