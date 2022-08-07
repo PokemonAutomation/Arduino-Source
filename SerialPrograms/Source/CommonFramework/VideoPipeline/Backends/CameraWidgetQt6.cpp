@@ -80,7 +80,6 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     : m_logger(logger)
     , m_default_resolution(default_resolution)
     , m_resolution(default_resolution)
-    , m_allow_snapshots(true)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
@@ -144,14 +143,7 @@ QVideoFrame CameraSession::latest_frame(){
     SpinLockGuard lg(m_frame_lock);
     return m_last_frame;
 }
-void CameraSession::set_allow_snapshots(bool allow){
-    m_allow_snapshots.store(allow, std::memory_order_relaxed);
-}
 VideoSnapshot CameraSession::snapshot(){
-    if (!m_allow_snapshots.load(std::memory_order_relaxed)){
-        return VideoSnapshot();
-    }
-
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_lock);
 

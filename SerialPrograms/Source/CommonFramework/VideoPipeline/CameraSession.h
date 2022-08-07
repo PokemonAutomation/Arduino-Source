@@ -53,8 +53,6 @@ public:
     virtual Resolution current_resolution() const = 0;
     virtual std::vector<Resolution> supported_resolutions() const = 0;
 
-    virtual void set_allow_snapshots(bool allow) = 0;
-
     //  This snapshot function will be called asynchronously from many threads
     //  at a very high rate. It is advised to cache snapshots if the video frame
     //  has not changed from the last call.

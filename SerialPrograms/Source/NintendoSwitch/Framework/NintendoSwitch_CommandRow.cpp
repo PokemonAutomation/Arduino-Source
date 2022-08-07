@@ -30,37 +30,27 @@ CommandRow::CommandRow(
     command_row->addSpacing(5);
 
     m_status = new QLabel(this);
-    command_row->addWidget(m_status, 10);
-    command_row->addSpacing(5);
-
-    m_inference_box = new QCheckBox("Enable Feedback", this);
-    m_inference_box->setChecked(true);
-    command_row->addWidget(m_inference_box, 3);
+    command_row->addWidget(m_status, 12);
     command_row->addSpacing(5);
 
     m_overlay_box = new QCheckBox("Inference Boxes", this);
     m_overlay_box->setChecked(true);
-    command_row->addWidget(m_overlay_box, 3);
+    command_row->addWidget(m_overlay_box, 4);
+    command_row->addSpacing(5);
 
     m_screenshot_button = new QPushButton("Screenshot", this);
     command_row->addWidget(m_screenshot_button, 2);
 
     switch (feedback){
     case FeedbackType::NONE:
-        m_inference_box->setChecked(false);
-        m_inference_box->setEnabled(false);
         m_overlay_box->setChecked(false);
         m_overlay_box->setEnabled(false);
         break;
     case FeedbackType::OPTIONAL_:
-        m_inference_box->setChecked(true);
-        m_inference_box->setEnabled(true);
         m_overlay_box->setChecked(true);
         m_overlay_box->setEnabled(true);
         break;
     case FeedbackType::REQUIRED:
-        m_inference_box->setChecked(true);
-        m_inference_box->setEnabled(false);
         m_overlay_box->setChecked(true);
         m_overlay_box->setEnabled(true);
         break;
@@ -72,13 +62,6 @@ CommandRow::CommandRow(
 
     update_ui();
 
-    connect(
-        m_inference_box, &QCheckBox::stateChanged,
-        this, [=](int){
-//            m_overlay_box->setEnabled(m_inference_box->isChecked());
-            emit set_feedback_enabled(m_inference_box->isChecked());
-        }
-    );
     connect(
         m_overlay_box, &QCheckBox::stateChanged,
         this, [=](int){ emit set_inference_boxes(m_overlay_box->isChecked()); }

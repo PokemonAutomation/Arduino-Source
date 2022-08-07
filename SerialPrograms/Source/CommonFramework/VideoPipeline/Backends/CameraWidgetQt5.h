@@ -58,7 +58,6 @@ public:
     virtual Resolution current_resolution() const override;
     virtual std::vector<Resolution> supported_resolutions() const override;
 
-    virtual void set_allow_snapshots(bool allow) override;
     virtual VideoSnapshot snapshot() override;
 
     QVideoFrame latest_frame();
@@ -109,8 +108,6 @@ private:
     bool m_orientation_known = false;
 //    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
-
-    std::atomic<bool> m_allow_snapshots;
 
     //  Last Frame
     QVideoFrame m_last_frame;

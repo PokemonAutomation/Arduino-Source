@@ -53,8 +53,6 @@ private:
     void update_camera_list();
     void update_resolution_list();
 
-//    virtual void camera_startup(Camera& camera) override;
-//    virtual void camera_shutdown() override;
     virtual void shutdown() override;
     virtual void new_source(const CameraInfo& device, Resolution resolution) override;
     virtual void resolution_change(Resolution resolution) override;

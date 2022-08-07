@@ -32,7 +32,6 @@ public:
     void on_key_release(Qt::Key key);
 
 signals:
-    void set_feedback_enabled(bool enabled);
     void set_inference_boxes(bool enabled);
     void screenshot_requested();
 
@@ -46,7 +45,6 @@ private:
     bool m_allow_commands_while_running;
     QComboBox* m_command_box;
     QLabel* m_status;
-    QCheckBox* m_inference_box;
     QCheckBox* m_overlay_box;
     QPushButton* m_screenshot_button;
     bool m_last_known_focus;

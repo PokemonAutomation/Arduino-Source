@@ -87,12 +87,14 @@ SwitchSystemWidget::SwitchSystemWidget(
             m_command->update_ui();
         }
     );
+#if 0
     connect(
         m_command, &CommandRow::set_feedback_enabled,
         m_camera_widget, [=](bool enabled){
             m_camera_widget->set_snapshots_allowed(enabled);
         }
     );
+#endif
     connect(
         m_command, &CommandRow::set_inference_boxes,
         m_camera_widget, [=](bool enabled){

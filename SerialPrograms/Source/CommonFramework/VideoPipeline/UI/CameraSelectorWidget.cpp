@@ -55,11 +55,6 @@ CameraSelectorWidget::CameraSelectorWidget(
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
-//    Camera* camera = m_session.camera();
-//    if (camera){
-//        m_display.set_video(get_camera_backend().make_video_widget(nullptr, *camera));
-//        update_resolution_list();
-//    }
     update_camera_list();
     update_resolution_list();
 
@@ -160,21 +155,6 @@ void CameraSelectorWidget::update_resolution_list(){
     }
 }
 
-#if 0
-void CameraSelectorWidget::camera_startup(Camera& camera){
-    QMetaObject::invokeMethod(
-        this, [&]{
-            m_display.set_video(get_camera_backend().make_video_widget(nullptr, camera));
-            update_resolution_list();
-        }, Qt::QueuedConnection
-    );
-}
-void CameraSelectorWidget::camera_shutdown(){
-    m_display.close_video();
-    m_resolution_box->clear();
-    m_resolutions.clear();
-}
-#endif
 void CameraSelectorWidget::shutdown(){
 //    cout << "CameraSelectorWidget::shutdown()" << endl;
     QMetaObject::invokeMethod(this, [&]{
@@ -219,9 +199,6 @@ void CameraSelectorWidget::set_camera_enabled(bool enabled){
 }
 void CameraSelectorWidget::set_resolution_enabled(bool enabled){
     m_resolution_box->setEnabled(enabled);
-}
-void CameraSelectorWidget::set_snapshots_allowed(bool enabled){
-    m_session.set_allow_snapshots(enabled);
 }
 void CameraSelectorWidget::set_overlay_enabled(bool enabled){
     m_display.overlay().setHidden(!enabled);

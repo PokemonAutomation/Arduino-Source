@@ -55,7 +55,6 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     : m_logger(logger)
     , m_default_resolution(default_resolution)
     , m_last_orientation_attempt(WallClock::min())
-    , m_allow_snapshots(true)
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {}
 
@@ -114,9 +113,6 @@ Resolution CameraSession::current_resolution() const{
 std::vector<Resolution> CameraSession::supported_resolutions() const{
     std::lock_guard<std::mutex> lg(m_lock);
     return m_resolutions;
-}
-void CameraSession::set_allow_snapshots(bool allow){
-    m_allow_snapshots.store(allow, std::memory_order_relaxed);
 }
 
 
