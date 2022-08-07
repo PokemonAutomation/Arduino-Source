@@ -488,6 +488,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
+    Source/CommonFramework/VideoPipeline/VideoOverlaySession.cpp
+    Source/CommonFramework/VideoPipeline/VideoOverlaySession.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp
@@ -682,6 +684,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetupWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp

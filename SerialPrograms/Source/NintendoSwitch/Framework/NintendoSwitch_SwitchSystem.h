@@ -50,7 +50,6 @@ private:
     size_t m_console_id;
     std::string m_logger_tag;
 
-//    bool m_settings_visible;
     SerialPortOption m_serial;
     CameraOption m_camera;
     AudioOption m_audio;

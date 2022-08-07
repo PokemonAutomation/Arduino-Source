@@ -15,19 +15,21 @@
 #include <mutex>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 
 namespace PokemonAutomation{
 
 class ImageRGB32;
+class VideoFeed;
+class AudioFeed;
 class RunnablePanelWidget;
 
 
 class ConsoleSystem{
 public:
-    virtual VideoFeed& video() = 0;
     virtual BotBaseHandle& sender() = 0;
+    virtual VideoFeed& video() = 0;
+    virtual AudioFeed& audio() = 0;
 };
 
 

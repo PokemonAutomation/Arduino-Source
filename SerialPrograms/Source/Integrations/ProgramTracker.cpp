@@ -5,6 +5,8 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"

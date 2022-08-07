@@ -11,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "Integrations/ProgramTracker.h"
+#include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
@@ -26,15 +27,21 @@ namespace NintendoSwitch{
 
 class CommandRow;
 
-class SwitchSystemWidget : public SwitchSetupWidget, public ConsoleSystem{
+class SwitchSystemWidget : public SwitchSetupWidget{
 public:
+    virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemFactory& factory,
         Logger& raw_logger,
         uint64_t program_id
     );
-    virtual ~SwitchSystemWidget();
+    SwitchSystemWidget(
+        QWidget& parent,
+        SwitchSystemFactory& factory,
+        SwitchSystemSession& session,
+        uint64_t program_id
+    );
 
     ProgramState last_known_state() const;
 
@@ -51,10 +58,9 @@ public:
     AudioFeed& audio();
     virtual void update_ui(ProgramState state) override;
 
-    virtual VideoFeed& video() override;
-    virtual BotBaseHandle& sender() override;
-
 private:
+    void init();
+
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
@@ -63,11 +69,9 @@ private:
 private:
     uint64_t m_instance_id = 0;
     SwitchSystemFactory& m_factory;
-    TaggedLogger m_logger;
 
-    SerialPortSession m_serial;
-    std::unique_ptr<CameraSession> m_camera;
-    AudioSession m_audio;
+    std::unique_ptr<SwitchSystemSession> m_session_owner;
+    SwitchSystemSession& m_session;
 
     CollapsibleGroupBox* m_group_box;
 

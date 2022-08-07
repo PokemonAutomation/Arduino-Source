@@ -12,12 +12,14 @@
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
 namespace PokemonAutomation{
 
 
-class VideoOverlayWidget : public QWidget{
+class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener{
 public:
+    ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent);
 
     //  Add/remove inference boxes.
@@ -27,16 +29,19 @@ public:
     void update_size(const QSize& widget_size, const QSize& video_size);
 
 private:
-    void paintEvent(QPaintEvent*) override;
+    virtual void box_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
+    virtual void paintEvent(QPaintEvent*) override;
 
 private:
+    VideoOverlaySession m_session;
+
     QSize m_video_size;
     QSize m_display_size;
     int m_offset_x;
     double m_scale;
 
     SpinLock m_lock;
-    std::map<const ImageFloatBox*, Color> m_boxes;
+    std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;
 };
 
 

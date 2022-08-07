@@ -27,6 +27,17 @@ namespace NintendoSwitch{
 
 
 
+SwitchSystemWidget::~SwitchSystemWidget(){
+    m_serial_widget->stop();
+
+    //  Delete all the UI elements first since they reference the states.
+    delete m_audio_display;
+    delete m_audio_widget;
+    delete m_video_display;
+    delete m_camera_widget;
+    delete m_serial_widget;
+}
+
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
     SwitchSystemFactory& factory,
@@ -35,16 +46,29 @@ SwitchSystemWidget::SwitchSystemWidget(
 )
     : SwitchSetupWidget(parent, factory)
     , m_factory(factory)
-    , m_logger(raw_logger, factory.m_logger_tag)
-    , m_serial(m_logger, factory.m_serial)
-    , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
-    , m_audio(m_logger, factory.m_audio)
+    , m_session_owner(new SwitchSystemSession(factory, raw_logger, program_id))
+    , m_session(*m_session_owner)
 {
+    init();
+}
+SwitchSystemWidget::SwitchSystemWidget(
+    QWidget& parent,
+    SwitchSystemFactory& factory,
+    SwitchSystemSession& session,
+    uint64_t program_id
+)
+    : SwitchSetupWidget(parent, factory)
+    , m_factory(factory)
+    , m_session(session)
+{
+    init();
+}
+void SwitchSystemWidget::init(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
 
-    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(factory.m_console_id) + " Settings");
+    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_factory.m_console_id) + " Settings");
     layout->addWidget(m_group_box);
 
     QWidget* widget = new QWidget(m_group_box);
@@ -54,23 +78,22 @@ SwitchSystemWidget::SwitchSystemWidget(
     group_layout->setContentsMargins(0, 0, 0, 0);
 
     {
-        m_serial_widget = new SerialPortWidget(parent, m_serial, m_logger);
+        m_serial_widget = new SerialPortWidget(*this, m_session.serial_session(), m_session.logger());
         group_layout->addWidget(m_serial_widget);
 
-        m_video_display = new VideoDisplayWidget(*this, *m_camera);
-        m_audio_display = new AudioDisplayWidget(*this, m_logger, m_audio);
+        m_video_display = new VideoDisplayWidget(*this, m_session.camera_session());
+        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
 
-//        m_camera_widget = new CameraSelectorWidget(m_camera, m_logger, *m_video_display);
-        m_camera_widget = new CameraSelectorWidget(*m_camera, m_logger, *m_video_display);
+        m_camera_widget = new CameraSelectorWidget(m_session.camera_session(), m_session.logger(), *m_video_display);
         group_layout->addWidget(m_camera_widget);
 
-        m_audio_widget = new AudioSelectorWidget(*widget, m_logger, m_audio);
+        m_audio_widget = new AudioSelectorWidget(*widget, m_session.logger(), m_session.audio_session());
         group_layout->addWidget(m_audio_widget);
 
         m_command = new CommandRow(
             *widget,
             m_serial_widget->botbase(),
-            factory.m_feedback, factory.m_allow_commands_while_running
+            m_factory.m_feedback, m_factory.m_allow_commands_while_running
         );
         group_layout->addWidget(m_command);
     }
@@ -87,14 +110,6 @@ SwitchSystemWidget::SwitchSystemWidget(
             m_command->update_ui();
         }
     );
-#if 0
-    connect(
-        m_command, &CommandRow::set_feedback_enabled,
-        m_camera_widget, [=](bool enabled){
-            m_camera_widget->set_snapshots_allowed(enabled);
-        }
-    );
-#endif
     connect(
         m_command, &CommandRow::set_inference_boxes,
         m_camera_widget, [=](bool enabled){
@@ -105,36 +120,18 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [=](){
             global_dispatcher.dispatch([=]{
-                std::shared_ptr<const ImageRGB32> image = m_camera->snapshot();
+                std::shared_ptr<const ImageRGB32> image = m_session.camera_session().snapshot();
                 if (!*image){
                     return;
                 }
                 std::string filename = "screenshot-" + now_to_filestring() + ".png";
-                m_logger.log("Saving screenshot to: " + filename, COLOR_PURPLE);
+                m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
                 image->save(filename);
             });
         }
     );
-
-    m_camera->set_resolution(factory.m_camera.current_resolution);
-    m_camera->set_source(factory.m_camera.info);
-
-    m_instance_id = ProgramTracker::instance().add_console(program_id, *this);
 }
-SwitchSystemWidget::~SwitchSystemWidget(){
-    ProgramTracker::instance().remove_console(m_instance_id);
-    m_serial_widget->stop();
 
-    //  Delete all the UI elements first since they reference the states.
-    delete m_audio_display;
-    delete m_audio_widget;
-    delete m_video_display;
-    delete m_camera_widget;
-    delete m_serial_widget;
-
-    m_factory.m_camera.info = m_camera->current_device();
-    m_factory.m_camera.current_resolution = m_camera->current_resolution();
-}
 ProgramState SwitchSystemWidget::last_known_state() const{
     return m_command->last_known_state();
 }
@@ -149,32 +146,25 @@ void SwitchSystemWidget::wait_for_all_requests(){
     botbase->wait_for_all_requests();
 }
 Logger& SwitchSystemWidget::logger(){
-    return m_logger;
+    return m_session.logger();
 }
 BotBase* SwitchSystemWidget::botbase(){
-    return m_serial.botbase().botbase();
+    return m_session.serial_session().botbase().botbase();
 }
 VideoFeed& SwitchSystemWidget::camera(){
-    return *m_camera;
+    return m_session.camera_session();
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
 }
 AudioFeed& SwitchSystemWidget::audio(){
-    return m_audio;
+    return m_session.audio_session();
 }
 void SwitchSystemWidget::stop_serial(){
     m_serial_widget->stop();
 }
 void SwitchSystemWidget::reset_serial(){
     m_serial_widget->reset();
-}
-
-VideoFeed& SwitchSystemWidget::video(){
-    return *m_camera;
-}
-BotBaseHandle& SwitchSystemWidget::sender(){
-    return m_serial.botbase();
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){
@@ -196,14 +186,6 @@ void SwitchSystemWidget::update_ui(ProgramState state){
 //    case ProgramState::FINISHED:
     case ProgramState::STOPPING:
         m_serial_widget->set_options_enabled(false);
-#if 0
-        if (m_factory.m_lock_camera_when_running){
-            m_camera->set_camera_enabled(false);
-        }
-        if (m_factory.m_lock_resolution_when_running){
-            m_camera->set_resolution_enabled(false);
-        }
-#endif
         break;
     }
     m_command->on_state_changed(state);
