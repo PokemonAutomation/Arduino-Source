@@ -39,10 +39,10 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
-    ../3rdParty/nlohmann/json.hpp
-    ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
+    ../3rdParty/nlohmann/json.hpp
+    ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp
@@ -206,10 +206,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioSink.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
-    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp
-    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
-    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
-    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
@@ -224,6 +220,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.cpp
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.h
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp
+    Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
+    Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h
     Source/CommonFramework/ControllerDevices/SerialPortOption.cpp
     Source/CommonFramework/ControllerDevices/SerialPortOption.h
     Source/CommonFramework/ControllerDevices/SerialPortSession.cpp
