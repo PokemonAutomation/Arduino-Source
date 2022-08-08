@@ -7,10 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
-#include "CommonFramework/ControllerDevices/SerialPortSession.h"
-#include "CommonFramework/VideoPipeline/CameraSession.h"
-#include "CommonFramework/AudioPipeline/AudioSession.h"
-#include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystem.h"

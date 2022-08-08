@@ -11,6 +11,7 @@
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "NintendoSwitch_SwitchSystem.h"
 
 namespace PokemonAutomation{
@@ -30,16 +31,18 @@ public:
         uint64_t program_id
     );
 
+public:
     Logger& logger(){ return m_logger; }
+    virtual BotBaseHandle& sender() override{ return m_serial.botbase(); }
+    virtual VideoFeed& video() override{ return *m_camera; }
+    virtual AudioFeed& audio() override{ return m_audio; }
+    VideoOverlay& overlay(){ return m_overlay; }
 
+public:
     SerialPortSession& serial_session(){ return m_serial; }
     CameraSession& camera_session(){ return *m_camera; }
     AudioSession& audio_session(){ return m_audio; }
-
-private:
-    virtual BotBaseHandle& sender() override;
-    virtual VideoFeed& video() override;
-    virtual AudioFeed& audio() override;
+    VideoOverlaySession& overlay_session(){ return m_overlay; }
 
 private:
     uint64_t m_instance_id = 0;
@@ -49,6 +52,7 @@ private:
     SerialPortSession m_serial;
     std::unique_ptr<CameraSession> m_camera;
     AudioSession m_audio;
+    VideoOverlaySession m_overlay;
 };
 
 

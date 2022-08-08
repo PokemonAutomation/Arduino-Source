@@ -14,15 +14,15 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& session)
+VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& camera, VideoOverlaySession& overlay)
     : QWidget(&parent)
-    , m_video(session.make_QWidget(this))
-    , m_overlay(new VideoOverlayWidget(*this))
+    , m_video(camera.make_QWidget(this))
+    , m_overlay(new VideoOverlayWidget(*this, overlay))
 {
     m_overlay->setVisible(true);
     m_overlay->setHidden(false);
     m_overlay->raise();
-    update_size(session.current_resolution());
+    update_size(camera.current_resolution());
 }
 
 

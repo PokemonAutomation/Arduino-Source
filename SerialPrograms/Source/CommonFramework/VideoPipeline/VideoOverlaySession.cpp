@@ -20,7 +20,14 @@ void VideoOverlaySession::remove_listener(Listener& listener){
 }
 
 
-
+std::vector<VideoOverlaySession::Box> VideoOverlaySession::boxes() const{
+    SpinLockGuard lg(m_lock);
+    std::vector<Box> ret;
+    for (const auto& item : m_boxes){
+        ret.emplace_back(Box{*item.first, item.second});
+    }
+    return ret;
+}
 void VideoOverlaySession::add_box(const ImageFloatBox& box, Color color){
     SpinLockGuard lg(m_lock, "VideoOverlay::add_box()");
     m_boxes[&box] = color;
@@ -32,6 +39,7 @@ void VideoOverlaySession::remove_box(const ImageFloatBox& box){
     push_box_update();
 }
 
+
 void VideoOverlaySession::push_box_update(){
     if (m_listeners.empty()){
         return;
@@ -39,7 +47,7 @@ void VideoOverlaySession::push_box_update(){
     std::vector<Box>* boxes = new std::vector<Box>();
     std::shared_ptr<std::vector<Box>> ptr(boxes);
     for (const auto& item : m_boxes){
-        boxes->emplace_back(Box{item.first, item.second});
+        boxes->emplace_back(Box{*item.first, item.second});
     }
     for (Listener* listeners : m_listeners){
         listeners->box_update(ptr);

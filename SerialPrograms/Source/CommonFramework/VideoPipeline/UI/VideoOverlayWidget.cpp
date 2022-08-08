@@ -22,9 +22,11 @@ const ImageFloatBox ENTIRE_VIDEO(0.0, 0.0, 1.0, 1.0);
 VideoOverlayWidget::~VideoOverlayWidget(){
     m_session.remove_listener(*this);
 }
-VideoOverlayWidget::VideoOverlayWidget(QWidget& parent)
+VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session)
     : QWidget(&parent)
+    , m_session(session)
     , m_offset_x(0)
+    , m_boxes(new std::vector<VideoOverlaySession::Box>(session.boxes()))
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -68,9 +70,9 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     double height = m_scale * m_video_size.height();
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
-    if (m_boxes == nullptr){
-        return;
-    }
+//    if (m_boxes == nullptr){
+//        return;
+//    }
 
 //    cout << "paint: " << m_boxes.size() << endl;
     for (const auto& item : *m_boxes){
@@ -83,12 +85,12 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 //        cout << painter.pen().width() << endl;
 
         //  Compute coordinates. Clip so that it stays in-bounds.
-        int xmin = std::max((int)(width * item.box->x + 0.5), 1) + m_offset_x;
-        int ymin = std::max((int)(height * item.box->y + 0.5), 1);
+        int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
+        int ymin = std::max((int)(height * item.box.y + 0.5), 1);
 //        int xmax = std::min(xmin + (int)(width * box->width + 0.5), m_display_size.width() - painter.pen().width());
 //        int ymax = std::min(ymin + (int)(height * box->height + 0.5), m_display_size.height() - painter.pen().width());
-        int xmax = std::min(xmin + (int)(width * item.box->width + 0.5), m_display_size.width() - 1);
-        int ymax = std::min(ymin + (int)(height * item.box->height + 0.5), m_display_size.height() - 1);
+        int xmax = std::min(xmin + (int)(width * item.box.width + 0.5), m_display_size.width() - 1);
+        int ymax = std::min(ymin + (int)(height * item.box.height + 0.5), m_display_size.height() - 1);
 
 //        cout << "m_video_size.width() = " << m_widget_size.width() << ", xmax = " << xmax << endl;
 

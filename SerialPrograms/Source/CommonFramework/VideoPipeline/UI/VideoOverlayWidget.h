@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener{
 public:
     ~VideoOverlayWidget();
-    VideoOverlayWidget(QWidget& parent);
+    VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
     //  Add/remove inference boxes.
     void add_box(const ImageFloatBox& box, Color color);
@@ -33,7 +33,7 @@ private:
     virtual void paintEvent(QPaintEvent*) override;
 
 private:
-    VideoOverlaySession m_session;
+    VideoOverlaySession& m_session;
 
     QSize m_video_size;
     QSize m_display_size;

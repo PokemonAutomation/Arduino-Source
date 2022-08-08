@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 class VideoOverlaySession : public VideoOverlay{
 public:
     struct Box{
-        const ImageFloatBox* box;
+        ImageFloatBox box;
         Color color;
     };
 
@@ -35,6 +35,7 @@ public:
     void remove_listener(Listener& listener);
 
 public:
+    std::vector<Box> boxes() const;
     virtual void add_box(const ImageFloatBox& box, Color color) override;
     virtual void remove_box(const ImageFloatBox& box) override;
 
@@ -42,7 +43,7 @@ private:
     void push_box_update();
 
 private:
-    SpinLock m_lock;
+    mutable SpinLock m_lock;
     std::map<const ImageFloatBox*, Color> m_boxes;
 
     std::set<Listener*> m_listeners;

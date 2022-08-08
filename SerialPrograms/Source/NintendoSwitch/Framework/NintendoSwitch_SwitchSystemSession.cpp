@@ -35,15 +35,6 @@ SwitchSystemSession::SwitchSystemSession(
     m_instance_id = ProgramTracker::instance().add_console(program_id, *this);
 }
 
-BotBaseHandle& SwitchSystemSession::sender(){
-    return m_serial.botbase();
-}
-VideoFeed& SwitchSystemSession::video(){
-    return *m_camera;
-}
-AudioFeed& SwitchSystemSession::audio(){
-    return m_audio;
-}
 
 
 

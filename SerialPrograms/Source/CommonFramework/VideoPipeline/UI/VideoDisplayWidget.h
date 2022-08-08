@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 //  This function is called by CameraSelectorWidget.
 class VideoDisplayWidget : public QWidget, public VideoOverlay{
 public:
-    VideoDisplayWidget(QWidget& parent, CameraSession& session);
+    VideoDisplayWidget(QWidget& parent, CameraSession& camera, VideoOverlaySession& overlay);
 
     operator bool(){ return m_video != nullptr; }
     VideoOverlayWidget& overlay(){ return *m_overlay; }
