@@ -1034,8 +1034,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
     Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.h
+    Source/PokemonLA/Programs/General/PokemonLA_BraviaryHeightGlitch.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_BraviaryHeightGlitch.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
+    Source/PokemonLA/Programs/General/PokemonLA_DistortionWaiter.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_DistortionWaiter.h
+    Source/PokemonLA/Programs/General/PokemonLA_OutbreakFinder.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h
     Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.cpp
@@ -1044,10 +1050,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h
-    Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
-    Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h
-    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp
-    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp
@@ -1058,8 +1060,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.h
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp
     Source/PokemonLA/Programs/PokemonLA_MountChange.h
-    Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp
-    Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.cpp

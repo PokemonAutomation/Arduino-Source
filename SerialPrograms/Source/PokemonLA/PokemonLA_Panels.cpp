@@ -9,9 +9,9 @@
 
 #include "PokemonLA_Settings.h"
 
-#include "Programs/PokemonLA_BraviaryHeightGlitch.h"
-#include "Programs/PokemonLA_DistortionWaiter.h"
-#include "Programs/PokemonLA_OutbreakFinder.h"
+#include "Programs/General/PokemonLA_BraviaryHeightGlitch.h"
+#include "Programs/General/PokemonLA_DistortionWaiter.h"
+#include "Programs/General/PokemonLA_OutbreakFinder.h"
 #include "Programs/General/PokemonLA_ClothingBuyer.h"
 #include "Programs/General/PokemonLA_SkipToFullMoon.h"
 #include "Programs/General/PokemonLA_PokedexTasksReader.h"
