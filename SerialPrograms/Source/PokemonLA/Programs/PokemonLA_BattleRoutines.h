@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLA_BattleRoutines_H
 #define PokemonAutomation_PokemonLA_BattleRoutines_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
@@ -15,6 +14,7 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

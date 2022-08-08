@@ -510,6 +510,7 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_Panels.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
+    Source/PokemonLA/PokemonLA_WeatherAndTime.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp \
@@ -531,6 +532,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.cpp \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/PokemonLA_TimeOfDayChange.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
@@ -1264,6 +1266,7 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_Panels.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
+    Source/PokemonLA/PokemonLA_WeatherAndTime.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h \
@@ -1285,6 +1288,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.h \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/PokemonLA_TimeOfDayChange.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_AutoMultiSpawn.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \

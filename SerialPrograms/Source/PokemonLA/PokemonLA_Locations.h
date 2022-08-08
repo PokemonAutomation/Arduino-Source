@@ -7,13 +7,9 @@
 #ifndef PokemonAutomation_PokemonLA_Locations_H
 #define PokemonAutomation_PokemonLA_Locations_H
 
-#include <string>
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-
-
 
 enum class MapRegion{
     NONE,
