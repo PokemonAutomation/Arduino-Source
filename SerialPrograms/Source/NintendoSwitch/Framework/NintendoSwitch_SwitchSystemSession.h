@@ -21,7 +21,7 @@ class SwitchSystemFactory;
 
 
 
-class SwitchSystemSession : public ConsoleSystem{
+class SwitchSystemSession final : public ConsoleSystem{
 public:
     ~SwitchSystemSession();
     SwitchSystemSession(

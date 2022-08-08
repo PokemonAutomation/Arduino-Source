@@ -67,7 +67,6 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    uint64_t m_instance_id = 0;
     SwitchSystemFactory& m_factory;
 
     std::unique_ptr<SwitchSystemSession> m_session_owner;
