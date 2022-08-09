@@ -37,6 +37,7 @@ public:
     AudioStreamToFloat(
         AudioSampleFormat input_format,
         size_t samples_per_frame,   //  Typically the # of channels. Can be higher if you want to group more into each frame.
+        float volume_multiplier,    //  Multiply every sample by this constant.
         bool reverse_channels       //  Only valid if "samples_per_frame == 2".
     );
     virtual ~AudioStreamToFloat();
@@ -50,6 +51,7 @@ private:
 private:
     AudioSampleFormat m_format;
     size_t m_samples_per_frame;
+    float m_volume_multiplier;
     bool m_reverse_channels;
     size_t m_sample_size;
     size_t m_frame_size;

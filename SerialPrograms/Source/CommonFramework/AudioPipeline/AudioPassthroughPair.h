@@ -32,11 +32,11 @@ public:
 
     virtual void reset(
         const std::string& file,
-        const AudioDeviceInfo& output, float volume
+        const AudioDeviceInfo& output, double output_volume
     ) = 0;
     virtual void reset(
         const AudioDeviceInfo& input, AudioChannelFormat format,
-        const AudioDeviceInfo& output, float volume
+        const AudioDeviceInfo& output, double output_volume
     ) = 0;
 
     virtual void clear_audio_source() = 0;
@@ -44,7 +44,7 @@ public:
     virtual void set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format) = 0;
 
     virtual void clear_audio_sink() = 0;
-    virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) = 0;
+    virtual void set_audio_sink(const AudioDeviceInfo& device, double volume) = 0;
 
     virtual void set_sink_volume(double volume) = 0;    //  Volume Range: [0, 1.0]
 };

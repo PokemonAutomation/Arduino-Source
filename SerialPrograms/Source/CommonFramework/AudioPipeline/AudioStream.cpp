@@ -56,6 +56,7 @@ AudioStreamToFloat::~AudioStreamToFloat(){
 AudioStreamToFloat::AudioStreamToFloat(
     AudioSampleFormat input_format,
     size_t samples_per_frame,
+    float volume_multiplier,
     bool reverse_channels
 )
     : MisalignedStreamConverter(
@@ -66,6 +67,7 @@ AudioStreamToFloat::AudioStreamToFloat(
     , StreamListener(sizeof(float) * samples_per_frame)
     , m_format(input_format)
     , m_samples_per_frame(samples_per_frame)
+    , m_volume_multiplier(volume_multiplier)
     , m_reverse_channels(reverse_channels)
     , m_sample_size(sample_size(input_format))
     , m_frame_size(m_sample_size * samples_per_frame)
@@ -86,16 +88,32 @@ void AudioStreamToFloat::on_objects(const void* data, size_t objects){
 void AudioStreamToFloat::convert(void* out, const void* in, size_t count){
     switch (m_format){
     case AudioSampleFormat::UINT8:
-        Kernels::AudioStreamConversion::convert_audio_uint8_to_float((float*)out, (const uint8_t*)in, count * m_samples_per_frame);
+        Kernels::AudioStreamConversion::convert_audio_uint8_to_float(
+            (float*)out, (const uint8_t*)in, count * m_samples_per_frame, m_volume_multiplier
+        );
         break;
     case AudioSampleFormat::SINT16:
-        Kernels::AudioStreamConversion::convert_audio_sint16_to_float((float*)out, (const int16_t*)in, count * m_samples_per_frame);
+        Kernels::AudioStreamConversion::convert_audio_sint16_to_float(
+            (float*)out, (const int16_t*)in, count * m_samples_per_frame, m_volume_multiplier
+        );
         break;
     case AudioSampleFormat::SINT32:
-        Kernels::AudioStreamConversion::convert_audio_sint32_to_float((float*)out, (const int32_t*)in, count * m_samples_per_frame);
+        Kernels::AudioStreamConversion::convert_audio_sint32_to_float(
+            (float*)out, (const int32_t*)in, count * m_samples_per_frame, m_volume_multiplier
+        );
         break;
     case AudioSampleFormat::FLOAT32:
-        memcpy(out, in, count * m_frame_size);
+        if (m_volume_multiplier == 1.0){
+            memcpy(out, in, count * m_frame_size);
+        }else{
+            float volume_multiplier = m_volume_multiplier;
+            float* o = (float*)out;
+            const float* i = (float*)in;
+            size_t stop = count * m_samples_per_frame;
+            for (size_t c = 0; c < stop; c++){
+                o[c] = i[c] * volume_multiplier;
+            }
+        }
         break;
     case AudioSampleFormat::INVALID:
         break;

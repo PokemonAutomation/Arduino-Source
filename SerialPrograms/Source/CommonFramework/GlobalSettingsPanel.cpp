@@ -134,6 +134,11 @@ GlobalSettings::GlobalSettings()
         "Thread priority of computation threads.",
         -1
     )
+    , AUDIO_INPUT_VOLUME_SCALE(
+        "<b>Audio Input Volume Scale:</b><br>"
+        "Multiply audio input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
+        1.0, -10000, 10000
+    )
     , SHOW_ALL_AUDIO_DEVICES(
         "<b>Show all Audio Devices:</b><br>"
         "Show all audio devices - including duplicates.",
@@ -173,6 +178,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(INFERENCE_PRIORITY0);
     PA_ADD_OPTION(COMPUTE_PRIORITY0);
 
+    PA_ADD_OPTION(AUDIO_INPUT_VOLUME_SCALE);
     PA_ADD_OPTION(SHOW_ALL_AUDIO_DEVICES);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);

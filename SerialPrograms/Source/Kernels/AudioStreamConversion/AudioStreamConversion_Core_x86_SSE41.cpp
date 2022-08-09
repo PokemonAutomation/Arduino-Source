@@ -16,8 +16,9 @@ namespace AudioStreamConversion{
 
 
 
-void convert_audio_uint8_to_float_x86_SSE41(float* f, const uint8_t* i, size_t length){
-    const __m128 RCP = _mm_set1_ps(1 / 127.f);
+void convert_audio_uint8_to_float_x86_SSE41(float* f, const uint8_t* i, size_t length, float output_multiplier){
+    const __m128 SCALE = _mm_set1_ps(output_multiplier / 127.f);
+    const __m128 SUB = _mm_set1_ps(output_multiplier);
     size_t lc = length / 4;
     while (lc--){
 #if __GNUC__
@@ -26,8 +27,10 @@ void convert_audio_uint8_to_float_x86_SSE41(float* f, const uint8_t* i, size_t l
         __m128i i0 = _mm_cvtepu8_epi32(_mm_loadu_si32(i));
 #endif
         __m128 f0 = _mm_cvtepi32_ps(i0);
-        f0 = _mm_mul_ps(f0, RCP);
-        f0 = _mm_sub_ps(f0, _mm_set1_ps(1.0f));
+        f0 = _mm_mul_ps(f0, SCALE);
+        f0 = _mm_sub_ps(f0, SUB);
+        f0 = _mm_max_ps(f0, _mm_set1_ps(-1.0f));
+        f0 = _mm_min_ps(f0, _mm_set1_ps(1.0f));
         _mm_storeu_ps(f, f0);
         f += 4;
         i += 4;
@@ -36,8 +39,10 @@ void convert_audio_uint8_to_float_x86_SSE41(float* f, const uint8_t* i, size_t l
     length %= 4;
     while (length--){
         __m128 f0 = _mm_cvtsi32_ss(_mm_setzero_ps(), i[0]);
-        f0 = _mm_mul_ss(f0, RCP);
-        f0 = _mm_sub_ss(f0, _mm_set1_ps(1.0f));
+        f0 = _mm_mul_ss(f0, SCALE);
+        f0 = _mm_sub_ss(f0, SUB);
+        f0 = _mm_max_ss(f0, _mm_set1_ps(-1.0f));
+        f0 = _mm_min_ss(f0, _mm_set1_ps(1.0f));
         _mm_store_ss(f, f0);
         f += 1;
         i += 1;
@@ -75,13 +80,15 @@ void convert_audio_float_to_uint8_x86_SSE41(uint8_t* i, const float* f, size_t l
     }
 }
 
-void convert_audio_sint16_to_float_x86_SSE41(float* f, const int16_t* i, size_t length){
-    const __m128 RCP = _mm_set1_ps(1 / 32767.f);
+void convert_audio_sint16_to_float_x86_SSE41(float* f, const int16_t* i, size_t length, float output_multiplier){
+    const __m128 SCALE = _mm_set1_ps(output_multiplier / 32767.f);
     size_t lc = length / 4;
     while (lc--){
         __m128i i0 = _mm_cvtepi16_epi32(_mm_loadl_epi64((const __m128i*)i));
         __m128 f0 = _mm_cvtepi32_ps(i0);
-        f0 = _mm_mul_ps(f0, RCP);
+        f0 = _mm_mul_ps(f0, SCALE);
+        f0 = _mm_max_ps(f0, _mm_set1_ps(-1.0f));
+        f0 = _mm_min_ps(f0, _mm_set1_ps(1.0f));
         _mm_storeu_ps(f, f0);
         f += 4;
         i += 4;
@@ -90,7 +97,9 @@ void convert_audio_sint16_to_float_x86_SSE41(float* f, const int16_t* i, size_t 
     length %= 4;
     while (length--){
         __m128 f0 = _mm_cvtsi32_ss(_mm_setzero_ps(), i[0]);
-        f0 = _mm_mul_ss(f0, RCP);
+        f0 = _mm_mul_ss(f0, SCALE);
+        f0 = _mm_max_ss(f0, _mm_set1_ps(-1.0f));
+        f0 = _mm_min_ss(f0, _mm_set1_ps(1.0f));
         _mm_store_ss(f, f0);
         f += 1;
         i += 1;
@@ -122,13 +131,15 @@ void convert_audio_float_to_sint16_x86_SSE41(int16_t* i, const float* f, size_t 
     }
 }
 
-void convert_audio_sint32_to_float_x86_SSE2(float* f, const int32_t* i, size_t length){
-    const __m128 RCP = _mm_set1_ps(1 / 2147483647.f);
+void convert_audio_sint32_to_float_x86_SSE2(float* f, const int32_t* i, size_t length, float output_multiplier){
+    const __m128 SCALE = _mm_set1_ps(output_multiplier / 2147483647.f);
     size_t lc = length / 4;
     while (lc--){
         __m128i i0 = _mm_loadu_si128((const __m128i*)i);
         __m128 f0 = _mm_cvtepi32_ps(i0);
-        f0 = _mm_mul_ps(f0, RCP);
+        f0 = _mm_mul_ps(f0, SCALE);
+        f0 = _mm_max_ps(f0, _mm_set1_ps(-1.0f));
+        f0 = _mm_min_ps(f0, _mm_set1_ps(1.0f));
         _mm_storeu_ps(f, f0);
         f += 4;
         i += 4;
@@ -137,7 +148,9 @@ void convert_audio_sint32_to_float_x86_SSE2(float* f, const int32_t* i, size_t l
     length %= 4;
     while (length--){
         __m128 f0 = _mm_cvtsi32_ss(_mm_setzero_ps(), i[0]);
-        f0 = _mm_mul_ss(f0, RCP);
+        f0 = _mm_mul_ss(f0, SCALE);
+        f0 = _mm_min_ss(f0, _mm_set1_ps(32767.f));
+        f0 = _mm_max_ss(f0, _mm_set1_ps(-32768.f));
         _mm_store_ss(f, f0);
         f += 1;
         i += 1;

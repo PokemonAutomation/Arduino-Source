@@ -33,11 +33,11 @@ public:
 
     virtual void reset(
         const std::string& file,
-        const AudioDeviceInfo& output, float volume
+        const AudioDeviceInfo& output, double output_volume
     ) override;
     virtual void reset(
         const AudioDeviceInfo& input, AudioChannelFormat format,
-        const AudioDeviceInfo& output, float volume
+        const AudioDeviceInfo& output, double output_volume
     ) override;
 
     virtual void clear_audio_source() override;
@@ -45,7 +45,7 @@ public:
     virtual void set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format) override;
 
     virtual void clear_audio_sink() override;
-    virtual void set_audio_sink(const AudioDeviceInfo& device, float volume) override;
+    virtual void set_audio_sink(const AudioDeviceInfo& device, double volume) override;
 
     virtual void set_sink_volume(double volume) override;
 
@@ -71,7 +71,8 @@ private:
     std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
 
     AudioDeviceInfo m_output_device;
-    double m_volume = 1.0;
+    float m_input_multiplier = 1.0;
+    double m_output_volume = 1.0;
     std::unique_ptr<AudioSink> m_writer;
 
     std::unique_ptr<AudioFloatToFFT> m_fft_runner;

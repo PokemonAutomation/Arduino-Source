@@ -13,10 +13,13 @@ namespace AudioStreamConversion{
 
 
 
-void convert_audio_uint8_to_float_Default(float* f, const uint8_t* i, size_t length){
-    const float RCP = 1 / 127.f;
+void convert_audio_uint8_to_float_Default(float* f, const uint8_t* i, size_t length, float output_multiplier){
+    const float SCALE = output_multiplier / 127.f;
     for (size_t c = 0; c < length; c++){
-        f[c] = (float)i[c] * RCP - 1.0f;
+        float x = (float)i[c] * SCALE - output_multiplier;
+        x = std::max(x, -1.0f);
+        x = std::min(x, 1.0f);
+        f[c] = x;
     }
 }
 void convert_audio_float_to_uint8_Default(uint8_t* i, const float* f, size_t length){
@@ -29,10 +32,13 @@ void convert_audio_float_to_uint8_Default(uint8_t* i, const float* f, size_t len
     }
 }
 
-void convert_audio_sint16_to_float_Default(float* f, const int16_t* i, size_t length){
-    const float RCP = 1 / 32767.f;
+void convert_audio_sint16_to_float_Default(float* f, const int16_t* i, size_t length, float output_multiplier){
+    const float SCALE = output_multiplier / 32767.f;
     for (size_t c = 0; c < length; c++){
-        f[c] = (float)i[c] * RCP;
+        float x = (float)i[c] * SCALE;
+        x = std::max(x, -1.0f);
+        x = std::min(x, 1.0f);
+        f[c] = x;
     }
 }
 void convert_audio_float_to_sint16_Default(int16_t* i, const float* f, size_t length){
@@ -45,10 +51,13 @@ void convert_audio_float_to_sint16_Default(int16_t* i, const float* f, size_t le
     }
 }
 
-void convert_audio_sint32_to_float_Default(float* f, const int32_t* i, size_t length){
-    const float RCP = 1 / 2147483647.f;
+void convert_audio_sint32_to_float_Default(float* f, const int32_t* i, size_t length, float output_multiplier){
+    const float SCALE = output_multiplier / 2147483647.f;
     for (size_t c = 0; c < length; c++){
-        f[c] = (float)i[c] * RCP;
+        float x = (float)i[c] * SCALE;
+        x = std::max(x, -1.0f);
+        x = std::min(x, 1.0f);
+        f[c] = x;
     }
 }
 void convert_audio_float_to_sint32_Default(int32_t* i, const float* f, size_t length){

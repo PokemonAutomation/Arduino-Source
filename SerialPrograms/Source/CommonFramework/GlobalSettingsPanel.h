@@ -10,6 +10,7 @@
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
@@ -86,6 +87,7 @@ public:
     ThreadPriorityOption INFERENCE_PRIORITY0;
     ThreadPriorityOption COMPUTE_PRIORITY0;
 
+    FloatingPointOption AUDIO_INPUT_VOLUME_SCALE;
     BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     VideoBackendOption VIDEO_BACKEND;

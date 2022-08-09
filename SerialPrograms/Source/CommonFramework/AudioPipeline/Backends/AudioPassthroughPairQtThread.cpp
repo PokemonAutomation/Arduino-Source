@@ -58,17 +58,17 @@ void AudioPassthroughPairQtThread::run(){
 
 void AudioPassthroughPairQtThread::reset(
     const std::string& file,
-    const AudioDeviceInfo& output, float volume
+    const AudioDeviceInfo& output, double output_volume
 ){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
-    body->reset(file, output, volume);
+    body->reset(file, output, output_volume);
 }
 void AudioPassthroughPairQtThread::reset(
     const AudioDeviceInfo& input, AudioChannelFormat format,
-    const AudioDeviceInfo& output, float volume
+    const AudioDeviceInfo& output, double output_volume
 ){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
-    body->reset(input, format, output, volume);
+    body->reset(input, format, output, output_volume);
 }
 void AudioPassthroughPairQtThread::clear_audio_source(){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
@@ -86,7 +86,7 @@ void AudioPassthroughPairQtThread::clear_audio_sink(){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->clear_audio_sink();
 }
-void AudioPassthroughPairQtThread::set_audio_sink(const AudioDeviceInfo& device, float volume){
+void AudioPassthroughPairQtThread::set_audio_sink(const AudioDeviceInfo& device, double volume){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->set_audio_sink(device, volume);
 }
