@@ -10,6 +10,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "PanelElements.h"
 #include "PanelWidget.h"
 
 namespace PokemonAutomation{
@@ -26,34 +27,12 @@ PanelWidget::PanelWidget(
 {}
 
 CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
-    CollapsibleGroupBox* description_box = new CollapsibleGroupBox(parent, "Current Program");
-
-    QWidget* body = new QWidget(description_box);
-    QVBoxLayout* vbox = new QVBoxLayout(body);
-    vbox->setContentsMargins(0, 0, 0, 0);
-
-    std::string name_text = "<b>Name:</b> " + m_instance.descriptor().display_name();
-    if (m_instance.descriptor().doc_link().size() > 0){
-        std::string path = ONLINE_DOC_URL + m_instance.descriptor().doc_link();
-        name_text += " (" + make_text_url(path, "online documentation") + ")";
-    }
-    QLabel* name = new QLabel(QString::fromStdString(name_text), description_box);
-    name->setWordWrap(true);
-    name->setTextFormat(Qt::RichText);
-    name->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    name->setOpenExternalLinks(true);
-    vbox->addWidget(name);
-
-    std::string description = "<b>Description:</b> ";
-    description += m_instance.descriptor().description();
-    QLabel* text = new QLabel(QString::fromStdString(description), description_box);
-    text->setWordWrap(true);
-    vbox->addWidget(text);
-
-//    description_box->setContentLayout(*vbox);
-    description_box->set_widget(body);
-
-    return description_box;
+    return make_panel_header(
+        *this,
+        m_instance.descriptor().display_name(),
+        m_instance.descriptor().doc_link(),
+        m_instance.descriptor().description()
+    );
 }
 
 

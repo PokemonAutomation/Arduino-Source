@@ -10,6 +10,11 @@
  *
  *  The UI that allows a user to control this class is in SerialPortWidget.
  *
+ *
+ *
+ *  This class isn't fully thread-safe like the rest of the session classes.
+ *  TODO: This will be fixed in the future and will require a rewrite of BotBaseHandle.
+ *
  */
 
 #ifndef PokemonAutomation_SerialPortSession_H

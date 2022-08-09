@@ -1,4 +1,4 @@
-/*  Video Overlay
+/*  Video Overlay Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

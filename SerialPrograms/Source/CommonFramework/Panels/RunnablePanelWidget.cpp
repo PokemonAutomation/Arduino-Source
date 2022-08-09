@@ -18,6 +18,7 @@
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "Integrations/ProgramTracker.h"
+#include "PanelElements.h"
 #include "RunnablePanelWidget.h"
 
 namespace PokemonAutomation{
@@ -105,10 +106,10 @@ bool RunnablePanelWidget::request_program_stop(){
     }
     m_logger.log("Received Stop Request");
     m_state.store(ProgramState::STOPPING, std::memory_order_release);
-    if (m_start_button == nullptr){
+    if (m_actions == nullptr){
         return true;
     }
-    m_start_button->setText("Stopping Program...");
+    m_actions->set_state(ProgramState::STOPPING);
     m_holder.on_busy(m_instance);
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -128,8 +129,6 @@ RunnablePanelWidget::RunnablePanelWidget(
 )
     : PanelWidget(parent, instance, holder)
     , m_logger(holder.raw_logger(), "Program")
-    , m_status_bar(nullptr)
-    , m_start_button(nullptr)
     , m_timestamp(current_time())
     , m_state(ProgramState::NOT_READY)
 {
@@ -177,6 +176,20 @@ RunnablePanelWidget::RunnablePanelWidget(
         this, &RunnablePanelWidget::async_set_status,
         this, &RunnablePanelWidget::status_update
     );
+
+
+
+    connect(
+        this, &RunnablePanelWidget::signal_reset,
+        this, [=]{ update_ui_after_program_state_change(); }
+    );
+    connect(
+        this, &RunnablePanelWidget::signal_error,
+        this, [](std::string message){
+            QMessageBox box;
+            box.critical(nullptr, "Error", QString::fromStdString(message));
+        }
+    );
 }
 void RunnablePanelWidget::construct(){
     m_header_holder->addWidget(m_header = make_header(*this));
@@ -197,63 +210,24 @@ BatchWidget* RunnablePanelWidget::make_options(QWidget& parent){
     options->update_visibility();
     return options;
 }
-QLabel* RunnablePanelWidget::make_status_bar(QWidget& parent){
-    QLabel* status_bar = new QLabel(&parent);
-    status_bar->setWordWrap(true);
-    status_bar->setVisible(false);
-    status_bar->setAlignment(Qt::AlignCenter);
-//    status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
-    QFont font = status_bar->font();
-    font.setPointSize(10);
-    status_bar->setFont(font);
-    return status_bar;
+StatsBar* RunnablePanelWidget::make_status_bar(QWidget& parent){
+    return new StatsBar(parent);
 }
-QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
-    QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
-//    actions_widget->setContentsMargins(50, 50, 50, 50);
-//    actions_widget->
+RunnablePanelActionBar* RunnablePanelWidget::make_actions(QWidget& parent){
+    ProgramState state = m_state.load(std::memory_order_acquire);
 
-    QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
-//    action_layout->setContentsMargins(0, 0, 0, 0);
+    RunnablePanelActionBar* ret = new RunnablePanelActionBar(parent, state);
 
-    {
-        m_start_button = new QPushButton("Start Program!", &parent);
-        action_layout->addWidget(m_start_button, 2);
-        QFont font = m_start_button->font();
-        font.setPointSize(16);
-        m_start_button->setFont(font);
-    }
-    {
-        m_default_button = new QPushButton("Restore Defaults", &parent);
-        action_layout->addWidget(m_default_button, 1);
-        QFont font = m_default_button->font();
-        font.setPointSize(16);
-        m_default_button->setFont(font);
-    }
-
-    update_ui_after_program_state_change();
     connect(
-        this, &RunnablePanelWidget::signal_reset,
-        this, [=]{ update_ui_after_program_state_change(); }
-    );
-    connect(
-        this, &RunnablePanelWidget::signal_error,
-        this, [](std::string message){
-            QMessageBox box;
-            box.critical(nullptr, "Error", QString::fromStdString(message));
-        }
-    );
-    connect(
-        m_start_button, &QPushButton::clicked,
-        this, [=](bool){
-            switch (state()){
+        ret, &RunnablePanelActionBar::start_clicked,
+        this, [=](){
+            switch (this->state()){
             case ProgramState::NOT_READY:
                 break;
             case ProgramState::STOPPED:
                 start();
                 break;
             case ProgramState::RUNNING:
-//            case ProgramState::FINISHED:
                 request_program_stop();
                 break;
             case ProgramState::STOPPING:
@@ -263,21 +237,15 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
         }
     );
     connect(
-        m_default_button, &QPushButton::clicked,
-        this, [=](bool){
-            QMessageBox::StandardButton button = QMessageBox::question(
-                nullptr,
-                "Restore Defaults",
-                "Are you sure you wish to restore settings back to defaults? This will wipe the current settings.",
-                QMessageBox::Ok | QMessageBox::Cancel
-            );
-            if (button == QMessageBox::Ok){
-                restore_defaults();
-            }
+        ret, &RunnablePanelActionBar::defaults_clicked,
+        this, [=](){
+            restore_defaults();
         }
     );
 
-    return actions_widget;
+
+
+    return ret;
 }
 
 
@@ -355,25 +323,22 @@ void RunnablePanelWidget::update_historical_stats(){
 void RunnablePanelWidget::update_ui_after_program_state_change(){
     m_logger.log("Updating UI after program state change...");
     ProgramState state = m_state.load(std::memory_order_acquire);
-    if (m_start_button == nullptr){
+    if (m_actions == nullptr){
         return;
     }
-    m_start_button->setEnabled(state != ProgramState::STOPPING);
+    m_actions->set_state(state);
     switch (state){
     case ProgramState::NOT_READY:
         m_logger.log("Updating UI after program state change... Program not ready.");
-        m_start_button->setText("Loading...");
         m_holder.on_busy(m_instance);
         break;
     case ProgramState::STOPPED:
         m_logger.log("Updating UI after program state change... Program stopped.");
-        m_start_button->setText("Start Program...");
 //        m_start_button->setEnabled(settings_valid());
         m_holder.on_idle(m_instance);
         break;
     case ProgramState::RUNNING:
         m_logger.log("Updating UI after program state change... Program running.");
-        m_start_button->setText("Stop Program...");
         m_holder.on_busy(m_instance);
         break;
 //    case ProgramState::FINISHED:
@@ -383,13 +348,11 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
 //        break;
     case ProgramState::STOPPING:
         m_logger.log("Updating UI after program state change... Program stopping.");
-        m_start_button->setText("Stopping Program...");
         m_holder.on_busy(m_instance);
         break;
     }
 
     bool enabled = state == ProgramState::STOPPED;
-    m_default_button->setEnabled(enabled);
     m_options->setEnabled(enabled);
 }
 

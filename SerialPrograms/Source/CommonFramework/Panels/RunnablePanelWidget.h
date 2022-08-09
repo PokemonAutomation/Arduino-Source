@@ -21,6 +21,8 @@ namespace PokemonAutomation{
 
 class BatchWidget;
 class CancellableScope;
+class StatsBar;
+class RunnablePanelActionBar;
 
 
 class RunnablePanelWidget : public PanelWidget{
@@ -64,9 +66,9 @@ protected:
     //  Child classes can override these with their own customizations.
     virtual QWidget* make_body(QWidget& parent);
     virtual BatchWidget* make_options(QWidget& parent);
-    virtual QLabel* make_status_bar(QWidget& parent);
+    StatsBar* make_status_bar(QWidget& parent);
     //  Make action widget, which is a UI area with button "Start Program!" and "Restore Defaults".
-    virtual QWidget* make_actions(QWidget& parent);
+    RunnablePanelActionBar* make_actions(QWidget& parent);
 
 //    void redraw_options();
 
@@ -109,11 +111,11 @@ protected:
     QWidget* m_header = nullptr;
     QWidget* m_body = nullptr;
     BatchWidget* m_options = nullptr;
-    QLabel* m_status_bar = nullptr;
-    QWidget* m_actions = nullptr;
+    StatsBar* m_status_bar = nullptr;
+    RunnablePanelActionBar* m_actions = nullptr;
 
-    QPushButton* m_start_button;
-    QPushButton* m_default_button;
+//    QPushButton* m_start_button;
+//    QPushButton* m_default_button;
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;

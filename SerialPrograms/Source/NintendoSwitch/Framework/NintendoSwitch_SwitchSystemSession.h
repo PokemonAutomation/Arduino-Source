@@ -2,6 +2,13 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This class holds the real-time state of an entire Switch system.
+ *
+ *    - Serial Port
+ *    - Camera
+ *    - Audio
+ *    - Video Overlay
+ *
  */
 
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H

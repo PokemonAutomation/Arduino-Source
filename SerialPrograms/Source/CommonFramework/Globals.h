@@ -32,7 +32,6 @@ enum class ProgramState{
     NOT_READY,
     STOPPED,
     RUNNING,
-//    FINISHED,
     STOPPING,
 };
 

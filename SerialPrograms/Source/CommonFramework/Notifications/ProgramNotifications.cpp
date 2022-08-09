@@ -257,18 +257,18 @@ void send_program_finished_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    const StatsTracker* current_stats,
-    const StatsTracker* historical_stats,
+    std::string current_stats,
+    std::string historical_stats,
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
     };
-    if (current_stats){
-        messages.emplace_back("Session Stats", current_stats->to_str());
+    if (!current_stats.empty()){
+        messages.emplace_back("Session Stats", std::move(current_stats));
     }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", historical_stats->to_str());
+    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
+        messages.emplace_back("Historical Stats", std::move(historical_stats));
     }
     send_program_notification(
         logger, settings,
@@ -330,18 +330,18 @@ void send_program_fatal_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    const StatsTracker* current_stats,
-    const StatsTracker* historical_stats,
+    std::string current_stats,
+    std::string historical_stats,
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message", message},
     };
-    if (current_stats){
-        messages.emplace_back("Session Stats", current_stats->to_str());
+    if (!current_stats.empty()){
+        messages.emplace_back("Session Stats", std::move(current_stats));
     }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", historical_stats->to_str());
+    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
+        messages.emplace_back("Historical Stats", std::move(historical_stats));
     }
     send_program_notification(
         logger, settings,

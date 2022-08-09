@@ -234,7 +234,7 @@ public:
                 m_active_list.erase(iter);
             }else{
                 msg = "Unknown sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
-                color = COLOR_RED;
+//                color = COLOR_RED;
             }
             m_active_list.erase(message);
 #else

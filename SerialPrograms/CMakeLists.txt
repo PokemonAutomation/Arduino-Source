@@ -425,6 +425,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/TextEditOption.h
     Source/CommonFramework/Panels/Panel.cpp
     Source/CommonFramework/Panels/Panel.h
+    Source/CommonFramework/Panels/PanelElements.cpp
+    Source/CommonFramework/Panels/PanelElements.h
     Source/CommonFramework/Panels/PanelList.cpp
     Source/CommonFramework/Panels/PanelList.h
     Source/CommonFramework/Panels/PanelWidget.cpp

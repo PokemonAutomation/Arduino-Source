@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
@@ -44,66 +45,18 @@ void RunnableSwitchProgramWidget::construct(){
 }
 CollapsibleGroupBox* RunnableSwitchProgramWidget::make_header(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    CollapsibleGroupBox* header = PanelWidget::make_header(parent);
-    QLayout* layout = header->widget()->layout();
-
-    QLabel* text = nullptr;
-    switch (instance.descriptor().feedback()){
-    case FeedbackType::NONE:
-        text = new QLabel(
-            "<font color=\"purple\">(This program does not use feedback. It can run without video input.</font>)",
-            header
-        );
-        break;
-    case FeedbackType::OPTIONAL_:
-        text = new QLabel(
-            "<font color=\"purple\">(This program will use video feedback if it is available. Video input is not required.</font>)",
-            header
-        );
-        break;
-    case FeedbackType::REQUIRED:
-        text = new QLabel(
-            "<font color=\"green\">(This program requires video feedback. Please make sure you choose the correct capture device.)</font>",
-            header
-        );
-        break;
-    }
-    text->setWordWrap(true);
-    layout->addWidget(text);
-
-    switch (instance.descriptor().min_pabotbase_level()){
-    case PABotBaseLevel::NOT_PABOTBASE:
-        break;
-    case PABotBaseLevel::PABOTBASE_12KB:{
-#if 0
-        QLabel* text = new QLabel(
-            "<font color=\"blue\">(This program will run on both Arduino Uno R3 and Teensy 2.0.</font>)",
-            header
-        );
-        text->setWordWrap(true);
-        layout->addWidget(text);
-#endif
-        break;
-    }case PABotBaseLevel::PABOTBASE_31KB:{
-        QLabel* label = new QLabel(
-            "<font color=\"red\">(This program requires a Teensy or higher. PABotBase for Arduino Uno R3 does not have all the features required by this program.)</font>",
-            header
-        );
-        label->setWordWrap(true);
-        layout->addWidget(label);
-        break;
-    }
-    }
-
-    return header;
+    return make_panel_header(
+        *this,
+        instance.descriptor().display_name(),
+        instance.descriptor().doc_link(),
+        instance.descriptor().description(),
+        instance.descriptor().feedback(),
+        instance.descriptor().min_pabotbase_level()
+    );
 }
 QWidget* RunnableSwitchProgramWidget::make_body(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
     m_setup = instance.m_setup->make_ui(parent, m_holder.raw_logger(), m_instance_id);
-    return m_setup;
-}
-QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
-    QWidget* actions_widget = RunnablePanelWidget::make_actions(parent);
     connect(
         this, &RunnableSwitchProgramWidget::signal_reset,
         this, [=]{
@@ -112,7 +65,7 @@ QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
             }
         }
     );
-    return actions_widget;
+    return m_setup;
 }
 
 
@@ -188,8 +141,8 @@ void RunnableSwitchProgramWidget::run_program(){
             m_logger, instance.NOTIFICATION_PROGRAM_FINISH,
             program_info,
             "",
-            m_current_stats.get(),
-            m_historical_stats.get()
+            m_current_stats ? m_current_stats->to_str() : "",
+            m_historical_stats ? m_historical_stats->to_str() : ""
         );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
@@ -208,8 +161,8 @@ void RunnableSwitchProgramWidget::run_program(){
                 timestamp()
             ),
             std::move(message),
-            m_current_stats.get(),
-            m_historical_stats.get()
+            m_current_stats ? m_current_stats->to_str() : "",
+            m_historical_stats ? m_historical_stats->to_str() : ""
         );
     }catch (std::exception& e){
         m_logger.log("Program stopped with an exception!", COLOR_RED);
@@ -227,8 +180,8 @@ void RunnableSwitchProgramWidget::run_program(){
                 timestamp()
             ),
             std::move(message),
-            m_current_stats.get(),
-            m_historical_stats.get()
+            m_current_stats ? m_current_stats->to_str() : "",
+            m_historical_stats ? m_historical_stats->to_str() : ""
         );
     }catch (...){
         m_logger.log("Program stopped with an exception!", COLOR_RED);
@@ -242,8 +195,8 @@ void RunnableSwitchProgramWidget::run_program(){
                 timestamp()
             ),
             "Unknown error.",
-            m_current_stats.get(),
-            m_historical_stats.get()
+            m_current_stats ? m_current_stats->to_str() : "",
+            m_historical_stats ? m_historical_stats->to_str() : ""
         );
     }
 
