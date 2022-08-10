@@ -35,6 +35,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 )
     : QWidget(&parent)
     , m_session(session)
+    , m_slider_active(false)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
     vbox->setContentsMargins(0, 0, 0, 0);
@@ -161,8 +162,18 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
 
     connect(
-        m_volume_slider, &QSlider::valueChanged, this, [=](){
+        m_volume_slider, &QSlider::sliderMoved, this, [=](){
             m_session.set_volume(m_volume_slider->value() / 100.);
+        }
+    );
+    connect(
+        m_volume_slider, &QSlider::sliderPressed, this, [=](){
+            m_slider_active.store(true, std::memory_order_release);
+        }
+    );
+    connect(
+        m_volume_slider, &QSlider::sliderReleased, this, [=](){
+            m_slider_active.store(false, std::memory_order_release);
         }
     );
 
@@ -313,9 +324,12 @@ void AudioSelectorWidget::output_changed(const AudioDeviceInfo& device){
     });
 }
 void AudioSelectorWidget::volume_changed(double volume){
+    if (m_slider_active.load(std::memory_order_acquire)){
+        return;
+    }
     QMetaObject::invokeMethod(this, [=]{
         refresh_volume(volume);
-    });
+    }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::display_changed(AudioOption::AudioDisplayType display){
     QMetaObject::invokeMethod(this, [=]{
