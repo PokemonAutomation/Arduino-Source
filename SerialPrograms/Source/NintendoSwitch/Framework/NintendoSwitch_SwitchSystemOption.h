@@ -41,10 +41,12 @@ public:
         bool allow_commands_while_running,
         const JsonValue& json
     );
-    virtual void load_json(const JsonValue& json);
-    virtual JsonValue to_json() const;
+    void load_json(const JsonValue& json);
+    JsonValue to_json() const;
 
-    SwitchSetupWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id);
+
+public:
+    SwitchSystemWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id);
 
 
 private:
