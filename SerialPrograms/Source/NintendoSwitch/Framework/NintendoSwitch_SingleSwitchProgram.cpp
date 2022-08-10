@@ -14,27 +14,6 @@ namespace NintendoSwitch{
 
 
 
-
-SingleSwitchProgramInstance::SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor)
-    : RunnableSwitchProgramInstance(descriptor)
-    , m_switch(
-        0,
-        descriptor.min_pabotbase_level(),
-        descriptor.feedback(),
-        descriptor.allow_commands_while_running()
-    )
-{
-    m_setup = &m_switch;
-}
-QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return SingleSwitchProgramWidget::make(parent, *this, holder);
-}
-
-
-
-
-#if 1
-
 SingleSwitchProgramInstance2::SingleSwitchProgramInstance2()
     : NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
@@ -65,8 +44,6 @@ std::string SingleSwitchProgramInstance2::check_validity() const{
 void SingleSwitchProgramInstance2::restore_defaults(){
     return m_options.restore_defaults();
 }
-
-#endif
 
 
 

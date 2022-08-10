@@ -69,6 +69,12 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
         m_system.overlay(),
         m_system.audio()
     );
+    env.connect(
+        &env, &ProgramEnvironment::set_status,
+        &env, [=](std::string status){
+            report_stats_changed();
+        }
+    );
 
     {
         SpinLockGuard lg(m_lock);

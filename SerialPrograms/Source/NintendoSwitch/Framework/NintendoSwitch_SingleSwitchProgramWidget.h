@@ -7,39 +7,13 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 
-#include "NintendoSwitch_RunnableProgramWidget.h"
+#include "CommonFramework/Panels/PanelElements.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-class SingleSwitchProgramWidget final : public RunnableSwitchProgramWidget{
-public:
-    static SingleSwitchProgramWidget* make(
-        QWidget& parent,
-        SingleSwitchProgramInstance& instance,
-        PanelHolder& holder
-    );
-
-    SwitchSystemWidget& system(){
-        return *static_cast<SwitchSystemWidget*>(m_setup);
-    }
-
-private:
-    using RunnableSwitchProgramWidget::RunnableSwitchProgramWidget;
-    virtual ~SingleSwitchProgramWidget();
-
-private:
-    virtual void run_switch_program(const ProgramInfo& info) override;
-
-private:
-    friend class SingleSwitchProgramInstance;
-};
-
-
 
 
 
