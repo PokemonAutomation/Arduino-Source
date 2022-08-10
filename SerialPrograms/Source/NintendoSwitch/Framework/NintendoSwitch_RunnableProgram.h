@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_RunnableProgram_H
 #define PokemonAutomation_NintendoSwitch_RunnableProgram_H
 
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Panels/RunnablePanel.h"
 
 namespace PokemonAutomation{

@@ -1,4 +1,4 @@
-/*  Switch System (4 Switches)
+/*  Multi-Switch System Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -7,14 +7,14 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch_MultiSwitchSystem.h"
+#include "NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-MultiSwitchSystemFactory::MultiSwitchSystemFactory(
+MultiSwitchSystemOption::MultiSwitchSystemOption(
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
@@ -30,7 +30,7 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     switches = std::min(switches, m_max_switches);
     resize(switches);
 }
-MultiSwitchSystemFactory::MultiSwitchSystemFactory(
+MultiSwitchSystemOption::MultiSwitchSystemOption(
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
@@ -42,12 +42,12 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
 {
-    MultiSwitchSystemFactory::load_json(json);
+    MultiSwitchSystemOption::load_json(json);
     if (m_switches.size() < m_min_switches){
         resize(m_min_switches);
     }
 }
-void MultiSwitchSystemFactory::load_json(const JsonValue& json){
+void MultiSwitchSystemOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
@@ -69,7 +69,7 @@ void MultiSwitchSystemFactory::load_json(const JsonValue& json){
     }
     obj->read_integer(m_active_switches, "ActiveDevices", m_min_switches, m_max_switches);
 }
-JsonValue MultiSwitchSystemFactory::to_json() const{
+JsonValue MultiSwitchSystemOption::to_json() const{
     JsonObject obj;
     obj["ActiveDevices"] = m_active_switches;
     JsonArray array;
@@ -79,7 +79,7 @@ JsonValue MultiSwitchSystemFactory::to_json() const{
     obj["DeviceList"] = std::move(array);
     return obj;
 }
-void MultiSwitchSystemFactory::resize(size_t count){
+void MultiSwitchSystemOption::resize(size_t count){
     while (m_switches.size() < count){
         m_switches.emplace_back(
             new SwitchSystemOption(
@@ -92,7 +92,7 @@ void MultiSwitchSystemFactory::resize(size_t count){
     m_active_switches = count;
 }
 
-SwitchSetupWidget* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
+SwitchSetupWidget* MultiSwitchSystemOption::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
     return new MultiSwitchSystemWidget(parent, *this, logger, program_id);
 }
 

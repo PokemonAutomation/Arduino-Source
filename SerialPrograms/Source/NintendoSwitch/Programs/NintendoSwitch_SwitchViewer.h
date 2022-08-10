@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/PanelWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystem.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +35,7 @@ public:
 private:
     friend class SwitchViewer_Widget;
 
-    MultiSwitchSystemFactory m_switches;
+    MultiSwitchSystemOption m_switches;
 };
 
 

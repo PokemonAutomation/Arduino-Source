@@ -1,11 +1,11 @@
-/*  Switch System (4 Switches)
+/*  Multi-Switch System Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomationn_NintendoSwitch_SwitchSystem4_H
-#define PokemonAutomationn_NintendoSwitch_SwitchSystem4_H
+#ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
+#define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H
 
 #include <memory>
 #include <vector>
@@ -17,19 +17,19 @@ namespace NintendoSwitch{
 
 class MultiSwitchSystemWidget;
 
-class MultiSwitchSystemFactory : public SwitchSetupFactory{
+class MultiSwitchSystemOption : public SwitchSetupFactory{
 public:
     static const size_t MAX_SWITCHES = 4;
 
 public:
-    MultiSwitchSystemFactory(
+    MultiSwitchSystemOption(
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t switches
     );
-    MultiSwitchSystemFactory(
+    MultiSwitchSystemOption(
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running,
         size_t min_switches,
@@ -42,7 +42,11 @@ public:
     size_t count() const{ return m_active_switches; }
     void resize(size_t count);
 
+    SwitchSystemOption& operator[](size_t index){ return *m_switches[index]; }
+
+public:
     SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
+
 
 private:
     friend class MultiSwitchSystemWidget;

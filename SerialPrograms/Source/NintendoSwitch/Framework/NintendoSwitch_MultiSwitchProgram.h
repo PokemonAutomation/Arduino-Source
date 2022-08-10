@@ -11,7 +11,7 @@
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch_MultiSwitchSystem.h"
+#include "NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
@@ -93,7 +93,7 @@ public:
 private:
     friend class MultiSwitchProgramWidget;
 
-    MultiSwitchSystemFactory m_switches;
+    MultiSwitchSystemOption m_switches;
 };
 
 

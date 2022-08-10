@@ -26,13 +26,13 @@ class SerialConnection : public StreamConnection{
 public:
     //  UTF-8
     SerialConnection(const std::string& name, uint32_t baud_rate)
-        : SerialConnection(utf8_to_wstr(name), baud_rate)
+        : SerialConnection(name, utf8_to_wstr(name), baud_rate)
     {}
-    SerialConnection(const std::wstring& name, uint32_t baud_rate)
+    SerialConnection(const std::string& name, const std::wstring& wname, uint32_t baud_rate)
         : m_exit(false)
     {
         m_handle = CreateFileW(
-            (L"\\\\.\\" + name).c_str(),
+            (L"\\\\.\\" + wname).c_str(),
             GENERIC_READ | GENERIC_WRITE,
             0, 0,
             OPEN_EXISTING,
@@ -41,7 +41,7 @@ public:
         );
         if (m_handle == INVALID_HANDLE_VALUE){
             DWORD error = GetLastError();
-            throw ConnectionException(nullptr, "Unable to open serial connection. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "Unable to open serial connection (" + name + "). Error = " + std::to_string(error));
         }
 
         DCB serial_params{0};

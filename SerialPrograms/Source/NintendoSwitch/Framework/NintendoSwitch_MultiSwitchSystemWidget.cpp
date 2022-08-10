@@ -10,20 +10,38 @@
 #include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+MultiSwitchSystemWidget::~MultiSwitchSystemWidget(){
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        for (SwitchSystemWidget* console : m_switches){
+            delete console;
+        }
+        m_switches.clear();
+        delete m_videos;
+        m_videos = nullptr;
+        m_shutting_down = true;
+    }
+    m_session.remove_listener(*this);
+}
 MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     QWidget& parent,
-    MultiSwitchSystemFactory& factory,
+    MultiSwitchSystemOption& option,
     Logger& logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent)
     , m_program_id(program_id)
-    , m_factory(factory)
+    , m_option(option)
     , m_logger(logger)
+    , m_session(option, logger, program_id)
     , m_videos(nullptr)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -37,25 +55,54 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     m_console_count_box = new NoWheelComboBox(this);
     row->addWidget(m_console_count_box, 1);
     row->addStretch(2);
-    for (size_t c = factory.m_min_switches; c <= factory.m_max_switches; c++){
+    for (size_t c = option.m_min_switches; c <= option.m_max_switches; c++){
         m_console_count_box->addItem(QString::number(c));
     }
-    m_console_count_box->setCurrentIndex((int)(m_factory.m_active_switches - factory.m_min_switches));
+    m_console_count_box->setCurrentIndex((int)(m_option.m_active_switches - option.m_min_switches));
 
     connect(
         m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            if (index < 0 || index > (int)(m_factory.m_max_switches - m_factory.m_min_switches)){
+            if (index < 0 || index > (int)(m_option.m_max_switches - m_option.m_min_switches)){
                 return;
             }
-            redraw_videos(index + m_factory.m_min_switches);
+            m_session.set_switch_count(index + m_option.m_min_switches);
+//            redraw_videos(index + m_option.m_min_switches);
         }
     );
 
-    redraw_videos(factory.m_active_switches);
+//    redraw_videos(option.m_active_switches);
+
+
+
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_session.add_listener(*this);
+    redraw_videos(option.count());
 }
+
+void MultiSwitchSystemWidget::shutdown(){
+//    cout << "MultiSwitchSystemWidget::shutdown()" << endl;
+    std::lock_guard<std::mutex> lg(m_lock);
+    for (SwitchSystemWidget* console : m_switches){
+        delete console;
+    }
+    m_switches.clear();
+    delete m_videos;
+    m_videos = nullptr;
+}
+void MultiSwitchSystemWidget::startup(size_t switch_count){
+//    cout << "MultiSwitchSystemWidget::startup()" << endl;
+    std::lock_guard<std::mutex> lg(m_lock);
+    redraw_videos(switch_count);
+}
+
 void MultiSwitchSystemWidget::redraw_videos(size_t count){
-    if (count == m_switches.size()){
+//    cout << "MultiSwitchSystemWidget::redraw_videos()" << endl;
+//    std::lock_guard<std::mutex> lg(m_lock);
+//    if (count == m_switches.size()){
+//        return;
+//    }
+    if (m_shutting_down){
         return;
     }
 
@@ -67,16 +114,17 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
         m_videos = nullptr;
     }
 
-    m_factory.resize(count);
-    for (size_t c = 0; c < m_factory.m_active_switches; c++){
-        const auto& item = m_factory.m_switches[c];
-        m_switches.emplace_back((SwitchSystemWidget*)item->make_ui(*this, m_logger, m_program_id));
-    }
-
     m_videos = new QWidget(this);
     this->layout()->addWidget(m_videos);
     QVBoxLayout* vbox = new QVBoxLayout(m_videos);
     vbox->setContentsMargins(0, 0, 0, 0);
+
+    m_option.resize(count);
+    for (size_t c = 0; c < m_option.m_active_switches; c++){
+//        const auto& item = m_option.m_switches[c];
+//        m_switches.emplace_back(item->make_ui(*this, m_logger, m_program_id));
+        m_switches.emplace_back(new SwitchSystemWidget(*m_videos, m_session[c], m_program_id));
+    }
 
     QHBoxLayout* vrow0 = new QHBoxLayout();
     vbox->addLayout(vrow0, 1);
@@ -91,13 +139,13 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
         vbox->addLayout(vrow1, 1);
         vrow1->setContentsMargins(0, 0, 0, 0);
         vrow1->addWidget(m_switches[2], 1);
-        if (m_switches.size() >= MultiSwitchSystemFactory::MAX_SWITCHES){
+        if (m_switches.size() >= MultiSwitchSystemOption::MAX_SWITCHES){
             vrow1->addWidget(m_switches[3], 1);
         }else{
             vrow1->addWidget(new QWidget(), 1);
         }
     }
-    static_assert(MultiSwitchSystemFactory::MAX_SWITCHES <= 4, "Can't display more than 4 Switches.");
+    static_assert(MultiSwitchSystemOption::MAX_SWITCHES <= 4, "Can't display more than 4 Switches.");
 
     for (const auto& item : m_switches){
         connect(
