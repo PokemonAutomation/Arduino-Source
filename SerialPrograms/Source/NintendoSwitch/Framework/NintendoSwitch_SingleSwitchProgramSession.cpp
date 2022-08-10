@@ -10,6 +10,7 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
@@ -69,6 +70,8 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
         m_system.overlay(),
         m_system.audio()
     );
+    start_program_video_check(env.console, m_option.descriptor().feedback());
+
     env.connect(
         &env, &ProgramEnvironment::set_status,
         &env, [=](std::string status){

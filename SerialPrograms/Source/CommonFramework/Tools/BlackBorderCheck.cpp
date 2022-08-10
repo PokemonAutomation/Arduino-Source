@@ -22,7 +22,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
 
     std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
 
-    if (!screen){
+    if (!screen || !*screen){
         if (feedback == FeedbackType::REQUIRED){
             throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
         }
