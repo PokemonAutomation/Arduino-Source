@@ -71,7 +71,8 @@ private:
     std::unique_ptr<SampleListener> m_sample_listener;      //  Attaches to "m_reader".
 
     AudioDeviceInfo m_output_device;
-    float m_input_multiplier = 1.0;
+    float m_file_input_multiplier = 1.0;
+    float m_device_input_multiplier = 1.0;
     double m_output_volume = 1.0;
     std::unique_ptr<AudioSink> m_writer;
 

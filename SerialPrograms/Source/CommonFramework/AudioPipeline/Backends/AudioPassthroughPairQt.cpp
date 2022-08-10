@@ -89,7 +89,8 @@ AudioPassthroughPairQt::~AudioPassthroughPairQt(){}
 
 AudioPassthroughPairQt::AudioPassthroughPairQt(Logger& logger)
     : m_logger(logger)
-    , m_input_multiplier((float)GlobalSettings::instance().AUDIO_INPUT_VOLUME_SCALE)
+    , m_file_input_multiplier((float)GlobalSettings::instance().AUDIO_FILE_VOLUME_SCALE)
+    , m_device_input_multiplier((float)GlobalSettings::instance().AUDIO_DEVICE_VOLUME_SCALE)
 {}
 
 void AudioPassthroughPairQt::reset(
@@ -107,7 +108,7 @@ void AudioPassthroughPairQt::reset(
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
-        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_input_multiplier));
+        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_file_input_multiplier));
         m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
         m_output_device = output;
         m_output_volume = output_volume;
@@ -135,7 +136,7 @@ void AudioPassthroughPairQt::reset(
         m_output_device = output;
         m_output_volume = output_volume;
         if (input){
-            m_reader.reset(new AudioSource(m_logger, input, m_input_format, m_input_multiplier));
+            m_reader.reset(new AudioSource(m_logger, input, m_input_format, m_device_input_multiplier));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             m_fft_runner = make_FFT_streamer(m_input_format);
@@ -167,7 +168,7 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
             m_input_format = AudioChannelFormat::NONE;
         }
         m_input_format = AudioChannelFormat::DUAL_48000;
-        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_input_multiplier));
+        m_reader.reset(new AudioSource(m_logger, file, m_input_format, m_file_input_multiplier));
         m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
         init_audio_sink();
         m_fft_runner = make_FFT_streamer(m_input_format);
@@ -187,7 +188,7 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
         }
         m_input_format = format;
         if (device){
-            m_reader.reset(new AudioSource(m_logger, device, m_input_format, m_input_multiplier));
+            m_reader.reset(new AudioSource(m_logger, device, m_input_format, m_device_input_multiplier));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
             m_fft_runner = make_FFT_streamer(m_input_format);

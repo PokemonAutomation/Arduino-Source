@@ -23,7 +23,7 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
     QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
-    m_box = new QLineEdit(QString::number(m_value, 'f', 2), this);
+    m_box = new QLineEdit(QString::number(m_value, 'f'), this);
 //    box->setInputMask("999999999");
 //    QDoubleValidator* validator = new QDoubleValidator(value.min_value(), value.max_value(), 2, this);
 //    m_box->setValidator(validator);
@@ -45,7 +45,7 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
     connect(
         m_box, &QLineEdit::editingFinished,
         this, [=](){
-            m_box->setText(QString::number(m_value, 'f', 2));
+            m_box->setText(QString::number(m_value, 'f'));
         }
     );
 }
@@ -54,7 +54,7 @@ void FloatingPointBaseWidget::restore_defaults(){
     update_ui();
 }
 void FloatingPointBaseWidget::update_ui(){
-    m_box->setText(QString::number(m_value, 'f', 2));
+    m_box->setText(QString::number(m_value, 'f'));
 }
 
 

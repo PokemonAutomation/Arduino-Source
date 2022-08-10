@@ -87,7 +87,8 @@ public:
     ThreadPriorityOption INFERENCE_PRIORITY0;
     ThreadPriorityOption COMPUTE_PRIORITY0;
 
-    FloatingPointOption AUDIO_INPUT_VOLUME_SCALE;
+    FloatingPointOption AUDIO_FILE_VOLUME_SCALE;
+    FloatingPointOption AUDIO_DEVICE_VOLUME_SCALE;
     BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     VideoBackendOption VIDEO_BACKEND;
