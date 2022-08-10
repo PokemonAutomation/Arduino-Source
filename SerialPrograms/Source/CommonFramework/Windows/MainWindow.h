@@ -36,8 +36,8 @@ private:
 public: //  Make private.
     virtual Logger& raw_logger() override{ return global_logger_raw(); }
 private:
-    virtual void on_busy(PanelInstance& panel) override;
-    virtual void on_idle(PanelInstance& panel) override;
+    virtual void on_busy() override;
+    virtual void on_idle() override;
 
 private:
     QWidget* centralwidget;

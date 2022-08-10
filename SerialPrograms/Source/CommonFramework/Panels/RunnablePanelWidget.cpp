@@ -110,7 +110,7 @@ bool RunnablePanelWidget::request_program_stop(){
         return true;
     }
     m_actions->set_state(ProgramState::STOPPING);
-    m_holder.on_busy(m_instance);
+    m_holder.on_busy();
     {
         std::lock_guard<std::mutex> lg(m_lock);
         if (m_scope){
@@ -332,25 +332,25 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
     switch (state){
     case ProgramState::NOT_READY:
         m_logger.log("Updating UI after program state change... Program not ready.");
-        m_holder.on_busy(m_instance);
+        m_holder.on_busy();
         break;
     case ProgramState::STOPPED:
         m_logger.log("Updating UI after program state change... Program stopped.");
 //        m_start_button->setEnabled(settings_valid());
-        m_holder.on_idle(m_instance);
+        m_holder.on_idle();
         break;
     case ProgramState::RUNNING:
         m_logger.log("Updating UI after program state change... Program running.");
-        m_holder.on_busy(m_instance);
+        m_holder.on_busy();
         break;
 //    case ProgramState::FINISHED:
 //        m_logger.log("Updating UI after program state change... Program finished.");
 //        m_start_button->setText("Program Finished! Click to stop.");
-//        m_listener.on_busy(m_instance);
+//        m_listener.on_busy();
 //        break;
     case ProgramState::STOPPING:
         m_logger.log("Updating UI after program state change... Program stopping.");
-        m_holder.on_busy(m_instance);
+        m_holder.on_busy();
         break;
     }
 

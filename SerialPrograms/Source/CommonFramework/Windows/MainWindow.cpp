@@ -236,13 +236,13 @@ void MainWindow::load_panel(std::unique_ptr<PanelInstance> panel){
     m_current_panel = std::move(panel);
     m_right_panel_layout->addWidget(m_current_panel_widget);
 }
-void MainWindow::on_busy(PanelInstance& panel){
+void MainWindow::on_busy(){
     if (m_program_list){
         m_program_list->setEnabled(false);
         m_settings->setEnabled(false);
     }
 }
-void MainWindow::on_idle(PanelInstance& panel){
+void MainWindow::on_idle(){
     if (m_program_list){
         m_program_list->setEnabled(true);
         m_settings->setEnabled(true);

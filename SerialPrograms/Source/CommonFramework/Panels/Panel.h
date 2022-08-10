@@ -26,8 +26,8 @@ struct PanelHolder{
 
     virtual void load_panel(std::unique_ptr<PanelInstance> panel) = 0;
     virtual Logger& raw_logger() = 0;
-    virtual void on_busy(PanelInstance& panel) = 0;
-    virtual void on_idle(PanelInstance& panel) = 0;
+    virtual void on_busy() = 0;
+    virtual void on_idle() = 0;
 };
 
 

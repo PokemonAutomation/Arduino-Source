@@ -166,6 +166,11 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
         m_system->update_ui(state);
         m_options->widget().setEnabled(state == ProgramState::STOPPED);
         m_actions_bar->set_state(state);
+        if (state == ProgramState::STOPPED){
+            m_holder.on_idle();
+        }else{
+            m_holder.on_busy();
+        }
     });
 }
 void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
