@@ -9,10 +9,7 @@
 
 #include <QObject>
 #include "Common/Cpp/Pimpl.h"
-#include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/Logging/LoggerQt.h"
-
-
+#include "Common/Cpp/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

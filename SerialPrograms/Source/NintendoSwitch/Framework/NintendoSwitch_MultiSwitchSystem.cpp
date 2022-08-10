@@ -61,7 +61,7 @@ void MultiSwitchSystemFactory::load_json(const JsonValue& json){
                 new SwitchSystemOption(
                     c,
                     m_min_pabotbase,
-                    m_feedback, m_allow_commands_while_running,
+                    m_allow_commands_while_running,
                     (*array)[c]
                 )
             );
@@ -85,7 +85,7 @@ void MultiSwitchSystemFactory::resize(size_t count){
             new SwitchSystemOption(
                 m_switches.size(),
                 m_min_pabotbase,
-                m_feedback, m_allow_commands_while_running
+                m_allow_commands_while_running
             )
         );
     }

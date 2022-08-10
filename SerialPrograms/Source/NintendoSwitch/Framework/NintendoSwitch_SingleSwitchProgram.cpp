@@ -6,11 +6,35 @@
 
 #include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch_SingleSwitchProgramWidget.h"
+#include "NintendoSwitch_SingleSwitchProgramOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+
+
+SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
+    std::string identifier,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
+    FeedbackType feedback, bool allow_commands_while_running,
+    PABotBaseLevel min_pabotbase_level
+)
+    : RunnablePanelDescriptor(
+        pick_color(feedback, min_pabotbase_level),
+        std::move(identifier),
+        std::move(category), std::move(display_name),
+        std::move(doc_link),
+        std::move(description)
+    )
+    , m_feedback(feedback)
+    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_allow_commands_while_running(allow_commands_while_running)
+{}
+std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
+    return std::unique_ptr<PanelInstance>(new SingleSwitchProgramOption(*this));
+}
 
 
 

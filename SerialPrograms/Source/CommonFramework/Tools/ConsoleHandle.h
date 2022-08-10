@@ -8,7 +8,7 @@
 #define PokemonAutomation_ConsoleHandle_H
 
 #include <memory>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "Common/Cpp/AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -41,7 +41,7 @@ public:
     );
 
     // log(string-like msg, Color color = Color())
-    // string-like can be const char*, std::string or QString
+    // string-like can be const char* or std::string
     template <class... Args>
     void log(Args&&... args){
         m_logger.log(std::forward<Args>(args)...);

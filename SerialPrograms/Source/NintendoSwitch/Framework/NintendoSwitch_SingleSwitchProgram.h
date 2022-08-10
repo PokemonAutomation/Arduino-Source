@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch_SwitchSystemOption.h"
-#include "NintendoSwitch_RunnableProgram.h"
-#include "NintendoSwitch_SingleSwitchProgramOption.h"
+#include "CommonFramework/Panels/RunnablePanel.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
@@ -45,11 +45,28 @@ private:
 };
 
 
-class SingleSwitchProgramDescriptor : public RunnableSwitchProgramDescriptor{
+class SingleSwitchProgramDescriptor : public RunnablePanelDescriptor{
 public:
-    using RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor;
+    SingleSwitchProgramDescriptor(
+        std::string identifier,
+        std::string category, std::string display_name,
+        std::string doc_link,
+        std::string description,
+        FeedbackType feedback, bool allow_commands_while_running,
+        PABotBaseLevel min_pabotbase_level
+    );
 
-    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const{ return nullptr; }
+    FeedbackType feedback() const{ return m_feedback; }
+    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
+
+    virtual std::unique_ptr<PanelInstance> make_panel() const override;
+    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const = 0;
+
+protected:
+    const FeedbackType m_feedback;
+    const PABotBaseLevel m_min_pabotbase_level;
+    const bool m_allow_commands_while_running;
 };
 
 
@@ -98,9 +115,6 @@ public:
 template <typename Descriptor, typename Instance>
 class SingleSwitchProgramWrapper : public Descriptor{
 public:
-    virtual std::unique_ptr<PanelInstance> make_panel() const override{
-        return std::unique_ptr<PanelInstance>(new SingleSwitchProgramOption(*this));
-    }
     virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const override{
         return std::unique_ptr<SingleSwitchProgramInstance2>(new Instance());
     }

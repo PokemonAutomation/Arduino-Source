@@ -9,8 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/Pimpl.h"
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 
 class QSerialPortInfo;
 

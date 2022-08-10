@@ -13,7 +13,7 @@
 #include <thread>
 #include <QObject>
 #include <QSerialPortInfo>
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/MessageLogger.h"
 

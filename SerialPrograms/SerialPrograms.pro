@@ -841,6 +841,7 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h \
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h \
+    Source/CommonFramework/ControllerDevices/SerialPortGlobals.h \
     Source/CommonFramework/ControllerDevices/SerialPortOption.h \
     Source/CommonFramework/ControllerDevices/SerialPortSession.h \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h \

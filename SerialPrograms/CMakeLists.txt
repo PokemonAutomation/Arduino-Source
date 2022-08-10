@@ -224,6 +224,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h
+    Source/CommonFramework/ControllerDevices/SerialPortGlobals.h
     Source/CommonFramework/ControllerDevices/SerialPortOption.cpp
     Source/CommonFramework/ControllerDevices/SerialPortOption.h
     Source/CommonFramework/ControllerDevices/SerialPortSession.cpp

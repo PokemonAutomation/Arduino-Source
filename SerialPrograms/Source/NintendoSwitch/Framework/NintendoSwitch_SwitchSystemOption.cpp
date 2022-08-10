@@ -14,6 +14,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+Color pick_color(FeedbackType feedback, PABotBaseLevel size){
+    switch (size){
+    case PABotBaseLevel::NOT_PABOTBASE:
+        return Color();
+    case PABotBaseLevel::PABOTBASE_12KB:
+        return feedback == FeedbackType::REQUIRED ? COLOR_DARKGREEN : COLOR_BLUE;
+    case PABotBaseLevel::PABOTBASE_31KB:
+        return feedback == FeedbackType::REQUIRED ? COLOR_PURPLE : COLOR_RED;
+    }
+    return Color();
+}
+
+
+
 const std::string SwitchSystemOption::JSON_SERIAL  = "Serial";
 const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
 const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
@@ -22,9 +36,9 @@ const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
 SwitchSystemOption::SwitchSystemOption(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
-    FeedbackType feedback, bool allow_commands_while_running
+    bool allow_commands_while_running
 )
-    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
+    : m_allow_commands_while_running(allow_commands_while_running)
     , m_console_id(console_id)
     , m_logger_tag("Console " + std::to_string(console_id))
     , m_serial(min_pabotbase)
@@ -34,13 +48,13 @@ SwitchSystemOption::SwitchSystemOption(
 SwitchSystemOption::SwitchSystemOption(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
-    FeedbackType feedback, bool allow_commands_while_running,
+    bool allow_commands_while_running,
     const JsonValue& json
 )
     : SwitchSystemOption(
           console_id,
           min_pabotbase,
-          feedback, allow_commands_while_running
+          allow_commands_while_running
      )
 {
     load_json(json);

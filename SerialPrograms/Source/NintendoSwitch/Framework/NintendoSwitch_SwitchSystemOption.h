@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 
+#include "Common/Cpp/Color.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
@@ -18,7 +19,12 @@ namespace NintendoSwitch{
 
 class SwitchSystemWidget;
 
-class SwitchSystemOption : public SwitchSetupFactory{
+
+
+Color pick_color(FeedbackType feedback, PABotBaseLevel size);
+
+
+class SwitchSystemOption{
     static const std::string JSON_SERIAL;
     static const std::string JSON_CAMERA;
     static const std::string JSON_AUDIO;
@@ -27,22 +33,25 @@ public:
     SwitchSystemOption(
         size_t console_id,
         PABotBaseLevel min_pabotbase,
-        FeedbackType feedback, bool allow_commands_while_running
+        bool allow_commands_while_running
     );
     SwitchSystemOption(
         size_t console_id,
         PABotBaseLevel min_pabotbase,
-        FeedbackType feedback, bool allow_commands_while_running,
+        bool allow_commands_while_running,
         const JsonValue& json
     );
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonValue& json);
+    virtual JsonValue to_json() const;
 
-    SwitchSetupWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id) override;
+    SwitchSetupWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id);
+
 
 private:
     friend class SwitchSystemSession;
     friend class SwitchSystemWidget;
+
+    const bool m_allow_commands_while_running;
 
     size_t m_console_id;
     std::string m_logger_tag;

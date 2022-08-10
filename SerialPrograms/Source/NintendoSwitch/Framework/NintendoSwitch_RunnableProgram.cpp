@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "NintendoSwitch_SwitchSetup.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 #include <iostream>
@@ -22,17 +23,6 @@ namespace NintendoSwitch{
 
 
 
-Color pick_color(FeedbackType feedback, PABotBaseLevel size){
-    switch (size){
-    case PABotBaseLevel::NOT_PABOTBASE:
-        return Color();
-    case PABotBaseLevel::PABOTBASE_12KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_DARKGREEN : COLOR_BLUE;
-    case PABotBaseLevel::PABOTBASE_31KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_PURPLE : COLOR_RED;
-    }
-    return Color();
-}
 RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     std::string identifier,
     std::string category, std::string display_name,

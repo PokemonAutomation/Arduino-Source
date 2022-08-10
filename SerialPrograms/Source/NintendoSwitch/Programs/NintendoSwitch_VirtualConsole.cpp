@@ -26,7 +26,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch(0, PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE, false)
+    , m_switch(0, PABotBaseLevel::NOT_PABOTBASE, false)
 {}
 void VirtualConsole::from_json(const JsonValue& json){
     m_switch.load_json(json);

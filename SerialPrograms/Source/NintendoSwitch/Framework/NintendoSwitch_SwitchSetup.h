@@ -7,13 +7,13 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSetup_H
 #define PokemonAutomation_NintendoSwitch_SwitchSetup_H
 
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 
 class QWidget;
 
 namespace PokemonAutomation{
+    class Logger;
     class JsonValue;
 namespace NintendoSwitch{
 
