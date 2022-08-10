@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class AmitySquarePickUpFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class AmitySquarePickUpFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AmitySquarePickUpFarmer_Descriptor();
 
@@ -27,9 +27,9 @@ public:
 };
 
 
-class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance{
+class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance2{
 public:
-    AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_Descriptor& descriptor);
+    AmitySquarePickUpFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

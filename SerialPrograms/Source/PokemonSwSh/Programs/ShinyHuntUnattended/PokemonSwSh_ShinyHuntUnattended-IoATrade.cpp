@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedIoATrade",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.md",
@@ -34,9 +34,8 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
 
 
 
-ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade(const ShinyHuntUnattendedIoATrade_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , START_TO_RUN_DELAY(
+ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
+    : START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1260"
     )

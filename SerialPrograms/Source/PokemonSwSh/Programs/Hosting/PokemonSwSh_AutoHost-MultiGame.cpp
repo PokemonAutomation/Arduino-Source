@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostMultiGame",
         STRING_POKEMON + " SwSh", "Auto-Host Multi-Game",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
@@ -41,9 +41,8 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{
 
 
 
-AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , HOST_ONLINE("<b>Host Online:</b>", true)
+AutoHostMultiGame::AutoHostMultiGame()
+    : HOST_ONLINE("<b>Host Online:</b>", true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         "60 * TICKS_PER_SECOND"

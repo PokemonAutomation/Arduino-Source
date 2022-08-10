@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustice_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousSwordsOfJustice",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-SwordsOfJustice.md",
@@ -45,9 +45,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice_Descriptor::mak
 
 
 
-ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const ShinyHuntAutonomousSwordsOfJustice_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
+    : GO_HOME_WHEN_DONE(false)
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
         false

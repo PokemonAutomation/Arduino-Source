@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class TenacityCandyFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class TenacityCandyFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TenacityCandyFarmer_Descriptor();
 
@@ -27,9 +27,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class TenacityCandyFarmer : public SingleSwitchProgramInstance{
+class TenacityCandyFarmer : public SingleSwitchProgramInstance2{
 public:
-    TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor);
+    TenacityCandyFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

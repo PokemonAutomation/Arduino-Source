@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class ShinyHuntFishing_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntFishing_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntFishing_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 };
 
 
-class ShinyHuntFishing : public SingleSwitchProgramInstance{
+class ShinyHuntFishing : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor);
+    ShinyHuntFishing();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

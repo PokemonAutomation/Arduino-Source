@@ -16,16 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class DailyHighlightFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class DailyHighlightFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DailyHighlightFarmer_Descriptor();
 };
 
 
 
-class DailyHighlightFarmer : public SingleSwitchProgramInstance{
+class DailyHighlightFarmer : public SingleSwitchProgramInstance2{
 public:
-    DailyHighlightFarmer(const DailyHighlightFarmer_Descriptor& descriptor);
+    DailyHighlightFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

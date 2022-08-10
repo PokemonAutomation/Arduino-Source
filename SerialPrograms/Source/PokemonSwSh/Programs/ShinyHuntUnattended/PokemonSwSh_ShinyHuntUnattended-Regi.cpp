@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegi",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regi.md",
@@ -35,9 +35,8 @@ ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
 
 
 
-ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , START_TO_RUN_DELAY(
+ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
+    : START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1990"
     )

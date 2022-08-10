@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class MassRelease_Descriptor : public RunnableSwitchProgramDescriptor{
+class MassRelease_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     MassRelease_Descriptor();
 
@@ -26,9 +26,9 @@ public:
 };
 
 
-class MassRelease : public SingleSwitchProgramInstance{
+class MassRelease : public SingleSwitchProgramInstance2{
 public:
-    MassRelease(const MassRelease_Descriptor& descriptor);
+    MassRelease();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

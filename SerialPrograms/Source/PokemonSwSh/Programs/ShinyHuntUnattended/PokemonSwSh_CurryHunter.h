@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CurryHunter_Descriptor : public RunnableSwitchProgramDescriptor{
+class CurryHunter_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     CurryHunter_Descriptor();
 
@@ -28,9 +28,9 @@ public:
 
 
 
-class CurryHunter : public SingleSwitchProgramInstance{
+class CurryHunter : public SingleSwitchProgramInstance2{
 public:
-    CurryHunter(const CurryHunter_Descriptor& descriptor);
+    CurryHunter();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

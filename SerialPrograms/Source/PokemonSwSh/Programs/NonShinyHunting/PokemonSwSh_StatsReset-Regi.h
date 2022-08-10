@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class StatsResetRegi_Descriptor : public RunnableSwitchProgramDescriptor{
+class StatsResetRegi_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StatsResetRegi_Descriptor();
 
@@ -33,9 +33,9 @@ public:
 
 
 
-class StatsResetRegi : public SingleSwitchProgramInstance{
+class StatsResetRegi : public SingleSwitchProgramInstance2{
 public:
-    StatsResetRegi(const StatsResetRegi_Descriptor& descriptor);
+    StatsResetRegi();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

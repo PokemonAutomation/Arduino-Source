@@ -23,7 +23,7 @@ namespace PokemonBDSP{
 
 
 ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntFishing",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Fishing.md",
@@ -49,9 +49,8 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing_Descriptor::make_stats() const{
 }
 
 
-ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntFishing::ShinyHuntFishing()
+    : GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Fishing Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(true, true)
     , NOTIFICATIONS({

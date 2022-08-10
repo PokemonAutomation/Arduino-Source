@@ -23,7 +23,7 @@ namespace PokemonLA{
 
 
 DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:DistortionWaiter",
         STRING_POKEMON + " LA", "Distortion Waiter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/DistortionWaiter.md",
@@ -56,9 +56,8 @@ std::unique_ptr<StatsTracker> DistortionWaiter_Descriptor::make_stats() const{
 }
 
 
-DistortionWaiter::DistortionWaiter(const DistortionWaiter_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+DistortionWaiter::DistortionWaiter()
+    : LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , NOTIFICATION_DISTORTION(
         "Distortion Appeared",
         true, true, ImageAttachmentMode::JPG,

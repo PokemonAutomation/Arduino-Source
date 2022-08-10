@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 
 LeapGrinder_Descriptor::LeapGrinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:Leap Grinder",
         STRING_POKEMON + " LA", "Leap Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
@@ -70,9 +70,8 @@ std::unique_ptr<StatsTracker> LeapGrinder_Descriptor::make_stats() const{
 }
 
 
-LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+LeapGrinder::LeapGrinder()
+    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , POKEMON(
         "<b>Pokemon Species</b>",
         {

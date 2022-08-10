@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousIoATrade",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.md",
@@ -41,9 +41,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade_Descriptor::make_stats
 
 
 
-ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomousIoATrade_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
+    : GO_HOME_WHEN_DONE(false)
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
         true

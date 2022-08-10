@@ -14,15 +14,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class BraviaryHeightGlitch_Descriptor : public RunnableSwitchProgramDescriptor{
+class BraviaryHeightGlitch_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BraviaryHeightGlitch_Descriptor();
 };
 
 
-class BraviaryHeightGlitch : public SingleSwitchProgramInstance{
+class BraviaryHeightGlitch : public SingleSwitchProgramInstance2{
 public:
-    BraviaryHeightGlitch(const BraviaryHeightGlitch_Descriptor& descriptor);
+    BraviaryHeightGlitch();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 };

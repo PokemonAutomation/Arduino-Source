@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousRegigigas2",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regigigas2.md",
@@ -46,9 +46,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2_Descriptor::make_sta
 
 
 
-ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
+    : GO_HOME_WHEN_DONE(false)
     , REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
         24

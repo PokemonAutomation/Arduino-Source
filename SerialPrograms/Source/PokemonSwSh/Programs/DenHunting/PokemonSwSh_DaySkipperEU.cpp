@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 DaySkipperEU_Descriptor::DaySkipperEU_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperEU",
         STRING_POKEMON + " SwSh", "Day Skipper (EU)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperEU.md",
@@ -36,9 +36,8 @@ std::unique_ptr<StatsTracker> DaySkipperEU_Descriptor::make_stats() const{
 
 
 
-DaySkipperEU::DaySkipperEU(const DaySkipperEU_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+DaySkipperEU::DaySkipperEU()
+    : SKIPS(
         "<b>Number of Frame Skips:</b>",
         10
     )

@@ -14,15 +14,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class PokedexTasksReader_Descriptor : public RunnableSwitchProgramDescriptor{
+class PokedexTasksReader_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     PokedexTasksReader_Descriptor();
 };
 
 
-class PokedexTasksReader : public SingleSwitchProgramInstance{
+class PokedexTasksReader : public SingleSwitchProgramInstance2{
 public:
-    PokedexTasksReader(const PokedexTasksReader_Descriptor& descriptor);
+    PokedexTasksReader();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 };

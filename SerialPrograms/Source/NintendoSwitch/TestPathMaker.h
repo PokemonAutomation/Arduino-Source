@@ -14,15 +14,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class TestPathMaker_Descriptor : public RunnableSwitchProgramDescriptor{
+class TestPathMaker_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TestPathMaker_Descriptor();
 };
 
 
-class TestPathMaker : public SingleSwitchProgramInstance{
+class TestPathMaker : public SingleSwitchProgramInstance2{
 public:
-    TestPathMaker(const TestPathMaker_Descriptor& descriptor);
+    TestPathMaker();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetRegi",
         STRING_POKEMON + " SwSh", "Stats Reset - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Regi.md",
@@ -68,9 +68,8 @@ std::unique_ptr<StatsTracker> StatsResetRegi_Descriptor::make_stats() const{
 
 
 
-StatsResetRegi::StatsResetRegi(const StatsResetRegi_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+StatsResetRegi::StatsResetRegi()
+    : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",

@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousBerryTree_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousBerryTree_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousBerryTree_Descriptor();
 
@@ -30,9 +30,9 @@ public:
 
 
 
-class ShinyHuntAutonomousBerryTree : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousBerryTree : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousBerryTree(const ShinyHuntAutonomousBerryTree_Descriptor& descriptor);
+    ShinyHuntAutonomousBerryTree();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

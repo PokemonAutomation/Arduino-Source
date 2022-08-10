@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class PostMMOSpawnReset_Descriptor : public RunnableSwitchProgramDescriptor{
+class PostMMOSpawnReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     PostMMOSpawnReset_Descriptor();
 
@@ -26,9 +26,9 @@ public:
 };
 
 
-class PostMMOSpawnReset : public SingleSwitchProgramInstance{
+class PostMMOSpawnReset : public SingleSwitchProgramInstance2{
 public:
-    PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descriptor);
+    PostMMOSpawnReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

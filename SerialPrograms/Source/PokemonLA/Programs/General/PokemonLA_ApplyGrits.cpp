@@ -26,7 +26,7 @@ const size_t grit_level_increase[4] = {3, 3, 3, 1};
 
 
 ApplyGrits_Descriptor::ApplyGrits_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:ApplyGrits",
         STRING_POKEMON + " LA", "Apply Grits",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ApplyGrits.md",
@@ -37,9 +37,8 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
 {}
 
 
-ApplyGrits::ApplyGrits(const ApplyGrits_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , NUM_POKEMON(
+ApplyGrits::ApplyGrits()
+    : NUM_POKEMON(
         "<b>Num " + STRING_POKEMON + " to Apply Grits</b>:",
         {"1", "2", "3", "4", "5", "6"}, 0
     )

@@ -15,15 +15,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
-class PageSwap_Descriptor : public RunnableSwitchProgramDescriptor{
+class PageSwap_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     PageSwap_Descriptor();
 };
 
 
-class PageSwap : public SingleSwitchProgramInstance{
+class PageSwap : public SingleSwitchProgramInstance2{
 public:
-    PageSwap(const PageSwap_Descriptor& descriptor);
+    PageSwap();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

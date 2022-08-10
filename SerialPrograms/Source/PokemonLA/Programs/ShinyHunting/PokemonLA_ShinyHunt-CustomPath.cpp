@@ -28,7 +28,7 @@ namespace PokemonLA{
 
 
 ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-CustomPath",
         STRING_POKEMON + " LA", "Shiny Hunt - Custom Path",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-CustomPath.md",
@@ -61,9 +61,8 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath_Descriptor::make_stats() const
 }
 
 
-ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , RESET_METHOD(
+ShinyHuntCustomPath::ShinyHuntCustomPath()
+    : RESET_METHOD(
           "<b>Reset Method:</b>",
           {
               "Soft Reset",

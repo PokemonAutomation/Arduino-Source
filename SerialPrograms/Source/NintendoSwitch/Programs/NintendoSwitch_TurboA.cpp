@@ -26,30 +26,10 @@ TurboA_Descriptor::TurboA_Descriptor()
 
 
 
-TurboA::TurboA(const TurboA_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
+TurboA::TurboA(){
     PA_ADD_OPTION(START_IN_GRIP_MENU);
 }
-
 void TurboA::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(context);
-        PokemonSwSh::resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
-    }
-
-    while (true){
-        pbf_press_button(context, BUTTON_A, 5, 5);
-    }
-}
-
-
-
-
-TurboA2::TurboA2(){
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
-}
-void TurboA2::run(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
         PokemonSwSh::resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);

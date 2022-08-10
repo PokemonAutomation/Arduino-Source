@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 
 
 MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:MoneyFarmerRoute210",
         STRING_POKEMON + " BDSP", "Money Farmer (Route 210)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute210.md",
@@ -57,9 +57,8 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute210_Descriptor::make_stats() const
 
 
 
-MoneyFarmerRoute210::MoneyFarmerRoute210(const MoneyFarmerRoute210_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHORTCUT("<b>VS Seeker Shortcut:</b>")
+MoneyFarmerRoute210::MoneyFarmerRoute210()
+    : SHORTCUT("<b>VS Seeker Shortcut:</b>")
     , START_LOCATION(
         "<b>Start Location:</b>",
         {

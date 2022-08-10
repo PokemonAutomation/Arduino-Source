@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 
 
 ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ClothingBuyer",
         STRING_POKEMON + " SwSh", "Clothing Buyer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
@@ -29,9 +29,8 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
 
 
 
-ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , CATEGORY_ROTATION(
+ClothingBuyer::ClothingBuyer()
+    : CATEGORY_ROTATION(
         "<b>Rotate Categories:</b><br>This slows down the program, but ensures it will cover all categories.",
         true
     )

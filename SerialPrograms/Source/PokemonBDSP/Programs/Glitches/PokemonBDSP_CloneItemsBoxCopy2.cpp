@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 
 
 CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:CloneItemsBoxCopy2",
         STRING_POKEMON + " BDSP", "Clone Items (Box Copy 2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy2.md",
@@ -54,9 +54,8 @@ std::unique_ptr<StatsTracker> CloneItemsBoxCopy2_Descriptor::make_stats() const{
 }
 
 
-CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+CloneItemsBoxCopy2::CloneItemsBoxCopy2()
+    : GO_HOME_WHEN_DONE(false)
     , BOXES(
         "<b>Boxes to Clone:</b>",
         999, 0, 999

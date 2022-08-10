@@ -33,7 +33,7 @@ namespace PokemonBDSP{
 
 
 SoundListener_Descriptor::SoundListener_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:SoundListener",
         STRING_POKEMON + " LA", "Sound Listener",
         "",
@@ -44,9 +44,8 @@ SoundListener_Descriptor::SoundListener_Descriptor()
 {}
 
 
-SoundListener::SoundListener(const SoundListener_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SOUND_TYPE("<b>Which Sound to Detect</b>",
+SoundListener::SoundListener()
+    : SOUND_TYPE("<b>Which Sound to Detect</b>",
     {
         "Shiny Sound",
     }, 0

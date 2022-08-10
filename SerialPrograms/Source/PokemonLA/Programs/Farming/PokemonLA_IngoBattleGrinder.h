@@ -46,7 +46,7 @@ extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[];
 
 
 
-class IngoBattleGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class IngoBattleGrinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     IngoBattleGrinder_Descriptor();
 
@@ -54,9 +54,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class IngoBattleGrinder : public SingleSwitchProgramInstance{
+class IngoBattleGrinder : public SingleSwitchProgramInstance2{
 public:
-    IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor);
+    IngoBattleGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

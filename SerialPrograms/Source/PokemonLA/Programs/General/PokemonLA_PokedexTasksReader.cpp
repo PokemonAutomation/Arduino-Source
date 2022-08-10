@@ -57,7 +57,7 @@ private:
 };
 
 PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:PokedexTasksReader",
         STRING_POKEMON + " LA", STRING_POKEDEX + " Tasks Reader",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokedexTasksReader.md",
@@ -68,10 +68,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
 {}
 
 
-PokedexTasksReader::PokedexTasksReader(const PokedexTasksReader_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
-}
+PokedexTasksReader::PokedexTasksReader(){}
 
 
 void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

@@ -21,7 +21,7 @@ namespace PokemonBDSP{
 
 
 ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntOverworld",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
@@ -46,9 +46,8 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
 
 
 
-ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntOverworld::ShinyHuntOverworld()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

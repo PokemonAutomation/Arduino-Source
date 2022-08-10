@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 
 TestPathMaker_Descriptor::TestPathMaker_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "Path Maker Test",
         "Test", "Path Maker Test",
         "",
@@ -23,9 +23,7 @@ TestPathMaker_Descriptor::TestPathMaker_Descriptor()
     )
 {}
 
-TestPathMaker::TestPathMaker(const TestPathMaker_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
+TestPathMaker::TestPathMaker(){
     PA_ADD_OPTION(PATH);
 }
 

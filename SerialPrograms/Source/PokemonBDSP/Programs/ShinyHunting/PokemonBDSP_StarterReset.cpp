@@ -27,7 +27,7 @@ namespace PokemonBDSP{
 
 
 StarterReset_Descriptor::StarterReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:StarterReset",
         STRING_POKEMON + " BDSP", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/StarterReset.md",
@@ -50,9 +50,8 @@ std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
 }
 
 
-StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+StarterReset::StarterReset()
+    : GO_HOME_WHEN_DONE(false)
     , STARTER(
         "<b>Starter:</b>",
         {"turtwig", "chimchar", "piplup"},

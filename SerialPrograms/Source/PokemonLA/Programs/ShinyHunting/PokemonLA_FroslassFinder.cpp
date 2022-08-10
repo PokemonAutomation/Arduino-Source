@@ -33,7 +33,7 @@ namespace PokemonLA{
 
 
 FroslassFinder_Descriptor::FroslassFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:AlphaFroslassFinder",
         STRING_POKEMON + " LA", "Alpha Froslass Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaFroslassHunter.md",
@@ -67,9 +67,8 @@ std::unique_ptr<StatsTracker> FroslassFinder_Descriptor::make_stats() const{
 
 
 
-FroslassFinder::FroslassFinder(const FroslassFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , DASH_DURATION(
+FroslassFinder::FroslassFinder()
+    : DASH_DURATION(
         "<b>Braviary dash duration:</b><br>"
         "How many ticks for Braviary to dash to reach the hole.",
         "986"

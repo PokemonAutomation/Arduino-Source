@@ -26,7 +26,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousOverworld_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousOverworld_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousOverworld_Descriptor();
 
@@ -36,9 +36,9 @@ public:
 
 
 
-class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousOverworld(const ShinyHuntAutonomousOverworld_Descriptor& descriptor);
+    ShinyHuntAutonomousOverworld();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

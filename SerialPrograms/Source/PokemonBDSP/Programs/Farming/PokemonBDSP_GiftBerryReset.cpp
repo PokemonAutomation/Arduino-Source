@@ -51,7 +51,7 @@ const std::set<std::string> Pastoria_berry_list = {
 
 
 GiftBerryReset_Descriptor::GiftBerryReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:GiftBerryReset",
         STRING_POKEMON + " BDSP", "Gift Berry Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/GiftBerryReset.md",
@@ -73,9 +73,8 @@ std::unique_ptr<StatsTracker> GiftBerryReset_Descriptor::make_stats() const{
 }
 
 
-GiftBerryReset::GiftBerryReset(const GiftBerryReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+GiftBerryReset::GiftBerryReset()
+    : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b><br>This is needed to read the berry name.",
             Pokemon::BerryNameReader::instance().languages(), true

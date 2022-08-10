@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EventBeamFinder",
         STRING_POKEMON + " SwSh", "Event Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EventBeamFinder.md",
@@ -31,9 +31,8 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
 
 
 
-EventBeamFinder::EventBeamFinder(const EventBeamFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , WAIT_TIME_IN_DEN(
+EventBeamFinder::EventBeamFinder()
+    : WAIT_TIME_IN_DEN(
         "<b>Wait time in Den:</b>",
         "5 * TICKS_PER_SECOND"
     )

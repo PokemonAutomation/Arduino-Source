@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 
 
 BallThrower_Descriptor::BallThrower_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BallThrower",
         STRING_POKEMON + " SwSh", "Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BallThrower.md",
@@ -29,9 +29,7 @@ BallThrower_Descriptor::BallThrower_Descriptor()
 
 
 
-BallThrower::BallThrower(const BallThrower_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
+BallThrower::BallThrower(){
     PA_ADD_OPTION(START_IN_GRIP_MENU);
 }
 

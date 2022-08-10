@@ -16,16 +16,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendDelete_Descriptor : public RunnableSwitchProgramDescriptor{
+class FriendDelete_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FriendDelete_Descriptor();
 };
 
 
 
-class FriendDelete : public SingleSwitchProgramInstance{
+class FriendDelete : public SingleSwitchProgramInstance2{
 public:
-    FriendDelete(const FriendDelete_Descriptor& descriptor);
+    FriendDelete();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

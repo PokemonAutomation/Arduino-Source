@@ -26,7 +26,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class AutoHostMultiGame_Descriptor : public RunnableSwitchProgramDescriptor{
+class AutoHostMultiGame_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoHostMultiGame_Descriptor();
 
@@ -35,9 +35,9 @@ public:
 
 
 
-class AutoHostMultiGame : public SingleSwitchProgramInstance{
+class AutoHostMultiGame : public SingleSwitchProgramInstance2{
 public:
-    AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descriptor);
+    AutoHostMultiGame();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

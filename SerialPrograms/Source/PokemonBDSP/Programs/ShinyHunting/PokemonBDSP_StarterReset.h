@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class StarterReset_Descriptor : public RunnableSwitchProgramDescriptor{
+class StarterReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StarterReset_Descriptor();
 
@@ -27,9 +27,9 @@ public:
 };
 
 
-class StarterReset : public SingleSwitchProgramInstance{
+class StarterReset : public SingleSwitchProgramInstance2{
 public:
-    StarterReset(const StarterReset_Descriptor& descriptor);
+    StarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

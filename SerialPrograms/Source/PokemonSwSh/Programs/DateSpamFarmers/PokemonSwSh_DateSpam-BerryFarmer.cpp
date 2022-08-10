@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 BerryFarmer_Descriptor::BerryFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BerryFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
@@ -31,9 +31,8 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
 
 
 
-BerryFarmer::BerryFarmer(const BerryFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+BerryFarmer::BerryFarmer()
+    : SKIPS(
         "<b>Number of Fetch Attempts:</b>",
         100000
     )

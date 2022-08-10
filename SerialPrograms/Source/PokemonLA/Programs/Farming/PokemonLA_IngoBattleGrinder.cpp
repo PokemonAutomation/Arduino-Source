@@ -81,7 +81,7 @@ const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[] = {
 
 
 IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:IngoBattleGrinder",
         STRING_POKEMON + " LA", "Ingo Battle Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoBattleGrinder.md",
@@ -117,9 +117,8 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder_Descriptor::make_stats() const{
 }
 
 
-IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , OPPONENT(
+IngoBattleGrinder::IngoBattleGrinder()
+    : OPPONENT(
         "<b>Opponent:</b>",
         std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
         0

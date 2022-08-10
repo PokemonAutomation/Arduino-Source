@@ -18,15 +18,15 @@ namespace PokemonLA{
 
 
 
-class FlagNavigationTest_Descriptor : public RunnableSwitchProgramDescriptor{
+class FlagNavigationTest_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FlagNavigationTest_Descriptor();
 };
 
 
-class FlagNavigationTest : public SingleSwitchProgramInstance{
+class FlagNavigationTest : public SingleSwitchProgramInstance2{
 public:
-    FlagNavigationTest(const FlagNavigationTest_Descriptor& descriptor);
+    FlagNavigationTest();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

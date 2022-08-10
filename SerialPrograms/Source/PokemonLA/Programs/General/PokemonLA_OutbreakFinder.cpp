@@ -94,7 +94,7 @@ const Pokemon::ExtraNames& MMO_NAMES(){
 
 
 OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:OutbreakFinder",
         STRING_POKEMON + " LA", "Outbreak Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/OutbreakFinder.md",
@@ -139,9 +139,8 @@ std::unique_ptr<StatsTracker> OutbreakFinder_Descriptor::make_stats() const{
 
 
 
-OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+OutbreakFinder::OutbreakFinder()
+    : GO_HOME_WHEN_DONE(false)
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , DESIRED_MO_SLUGS(
         "<b>Desired Outbreak " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",

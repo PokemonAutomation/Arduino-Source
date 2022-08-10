@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousBerryTree",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Berry Tree",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.md",
@@ -41,9 +41,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree_Descriptor::make_stat
 
 
 
-ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutonomousBerryTree_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(false, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

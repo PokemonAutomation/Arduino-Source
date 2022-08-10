@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 DenRoller_Descriptor::DenRoller_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DenRoller",
         STRING_POKEMON + " SwSh", "Den Roller",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
@@ -58,9 +58,8 @@ std::unique_ptr<StatsTracker> DenRoller_Descriptor::make_stats() const{
 
 
 
-DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+DenRoller::DenRoller()
+    : SKIPS(
         "<b>Number of Skips:</b>",
         3, 0, 60
     )

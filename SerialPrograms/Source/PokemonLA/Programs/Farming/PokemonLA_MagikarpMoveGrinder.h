@@ -11,13 +11,14 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class MagikarpMoveGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class MagikarpMoveGrinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     MagikarpMoveGrinder_Descriptor();
 
@@ -25,9 +26,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class MagikarpMoveGrinder : public SingleSwitchProgramInstance{
+class MagikarpMoveGrinder : public SingleSwitchProgramInstance2{
 public:
-    MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor);
+    MagikarpMoveGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

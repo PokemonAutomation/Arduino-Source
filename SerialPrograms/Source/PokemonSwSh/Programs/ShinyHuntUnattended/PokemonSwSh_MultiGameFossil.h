@@ -16,16 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class MultiGameFossil_Descriptor : public RunnableSwitchProgramDescriptor{
+class MultiGameFossil_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     MultiGameFossil_Descriptor();
 };
 
 
 
-class MultiGameFossil : public SingleSwitchProgramInstance{
+class MultiGameFossil : public SingleSwitchProgramInstance2{
 public:
-    MultiGameFossil(const MultiGameFossil_Descriptor& descriptor);
+    MultiGameFossil();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

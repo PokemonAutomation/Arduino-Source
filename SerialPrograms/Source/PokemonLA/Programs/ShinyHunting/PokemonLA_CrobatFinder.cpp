@@ -29,7 +29,7 @@ namespace PokemonLA{
 
 
 CrobatFinder_Descriptor::CrobatFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:CrobatFinder",
         STRING_POKEMON + " LA", "Alpha Crobat Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaCrobatHunter.md",
@@ -62,9 +62,8 @@ std::unique_ptr<StatsTracker> CrobatFinder_Descriptor::make_stats() const{
 }
 
 
-CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED_ENROUTE(
+CrobatFinder::CrobatFinder()
+    : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if you are still traveling to the Crobat.",
         "2 * TICKS_PER_SECOND"

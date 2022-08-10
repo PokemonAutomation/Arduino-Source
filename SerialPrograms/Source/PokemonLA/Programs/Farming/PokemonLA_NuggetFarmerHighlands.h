@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class NuggetFarmerHighlands_Descriptor : public RunnableSwitchProgramDescriptor{
+class NuggetFarmerHighlands_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     NuggetFarmerHighlands_Descriptor();
 
@@ -25,9 +25,9 @@ public:
 };
 
 
-class NuggetFarmerHighlands : public SingleSwitchProgramInstance{
+class NuggetFarmerHighlands : public SingleSwitchProgramInstance2{
 public:
-    NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor);
+    NuggetFarmerHighlands();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

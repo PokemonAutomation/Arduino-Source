@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetCalyrex",
         STRING_POKEMON + " SwSh", "Stats Reset - Calyrex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Calyrex.md",
@@ -68,9 +68,8 @@ std::unique_ptr<StatsTracker> StatsResetCalyrex_Descriptor::make_stats() const{
 
 
 
-StatsResetCalyrex::StatsResetCalyrex(const StatsResetCalyrex_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+StatsResetCalyrex::StatsResetCalyrex()
+    : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",

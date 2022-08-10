@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousIoATrade_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousIoATrade_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousIoATrade_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 
 
 
-class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomousIoATrade_Descriptor& descriptor);
+    ShinyHuntAutonomousIoATrade();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

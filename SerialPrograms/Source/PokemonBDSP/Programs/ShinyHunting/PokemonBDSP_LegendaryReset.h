@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class LegendaryReset_Descriptor : public RunnableSwitchProgramDescriptor{
+class LegendaryReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     LegendaryReset_Descriptor();
 
@@ -27,9 +27,9 @@ public:
 };
 
 
-class LegendaryReset : public SingleSwitchProgramInstance{
+class LegendaryReset : public SingleSwitchProgramInstance2{
 public:
-    LegendaryReset(const LegendaryReset_Descriptor& descriptor);
+    LegendaryReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

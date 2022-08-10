@@ -56,47 +56,47 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();
 
     add_divider("---- General ----");
-    add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
-    add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
-    add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
-    add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
-    add_program<SkipToFullMoon_Descriptor, SkipToFullMoon>();
-    add_program<ApplyGrits_Descriptor, ApplyGrits>();
-    add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
-    add_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>();
+    add_panel(make_single_switch_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>());
+    add_panel(make_single_switch_program<DistortionWaiter_Descriptor, DistortionWaiter>());
+    add_panel(make_single_switch_program<OutbreakFinder_Descriptor, OutbreakFinder>());
+    add_panel(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
+    add_panel(make_single_switch_program<SkipToFullMoon_Descriptor, SkipToFullMoon>());
+    add_panel(make_single_switch_program<ApplyGrits_Descriptor, ApplyGrits>());
+    add_panel(make_single_switch_program<PokedexTasksReader_Descriptor, PokedexTasksReader>());
+    add_panel(make_single_switch_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>());
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
     add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 
     add_divider("---- Farming ----");
-    add_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>();
-    add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
-    add_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>();
-    add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
-    add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
-    add_program<LeapGrinder_Descriptor, LeapGrinder>();
+    add_panel(make_single_switch_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>());
+    add_panel(make_single_switch_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>());
+    add_panel(make_single_switch_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>());
+    add_panel(make_single_switch_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>());
+    add_panel(make_single_switch_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>());
+    add_panel(make_single_switch_program<LeapGrinder_Descriptor, LeapGrinder>());
 
     add_divider("---- Shiny Hunting ----");
-//    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
-    add_program<CrobatFinder_Descriptor, CrobatFinder>();
-    add_program<GalladeFinder_Descriptor, GalladeFinder>();
-    add_program<FroslassFinder_Descriptor, FroslassFinder>();
-    add_program<BurmyFinder_Descriptor, BurmyFinder>();
-    add_program<UnownFinder_Descriptor, UnownFinder>();
-    add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
-    add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
-    add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
+//    add_panel(make_single_switch_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>());
+    add_panel(make_single_switch_program<CrobatFinder_Descriptor, CrobatFinder>());
+    add_panel(make_single_switch_program<GalladeFinder_Descriptor, GalladeFinder>());
+    add_panel(make_single_switch_program<FroslassFinder_Descriptor, FroslassFinder>());
+    add_panel(make_single_switch_program<BurmyFinder_Descriptor, BurmyFinder>());
+    add_panel(make_single_switch_program<UnownFinder_Descriptor, UnownFinder>());
+    add_panel(make_single_switch_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>());
+    add_panel(make_single_switch_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>());
+    add_panel(make_single_switch_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        add_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>();
+        add_panel(make_single_switch_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
-        add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
-        add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
-        add_program<SoundListener_Descriptor, SoundListener>();
-        add_program<FlagNavigationTest_Descriptor, FlagNavigationTest>();
+        add_panel(make_single_switch_program<MountDetectionTest_Descriptor, MountDetectionTest>());
+        add_panel(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
+        add_panel(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        add_panel(make_single_switch_program<FlagNavigationTest_Descriptor, FlagNavigationTest>());
     }
 
     finish_panel_setup();

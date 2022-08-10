@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class MoneyFarmerRoute212_Descriptor : public RunnableSwitchProgramDescriptor{
+class MoneyFarmerRoute212_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     MoneyFarmerRoute212_Descriptor();
 
@@ -28,9 +28,9 @@ public:
 };
 
 
-class MoneyFarmerRoute212 : public SingleSwitchProgramInstance{
+class MoneyFarmerRoute212 : public SingleSwitchProgramInstance2{
 public:
-    MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& descriptor);
+    MoneyFarmerRoute212();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

@@ -18,16 +18,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class SurpriseTrade_Descriptor : public RunnableSwitchProgramDescriptor{
+class SurpriseTrade_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SurpriseTrade_Descriptor();
 };
 
 
 
-class SurpriseTrade : public SingleSwitchProgramInstance{
+class SurpriseTrade : public SingleSwitchProgramInstance2{
 public:
-    SurpriseTrade(const SurpriseTrade_Descriptor& descriptor);
+    SurpriseTrade();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

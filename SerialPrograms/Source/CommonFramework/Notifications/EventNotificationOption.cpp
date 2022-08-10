@@ -101,14 +101,6 @@ JsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
 
 
 
-EventNotificationOption::EventNotificationOption()
-    : screenshot_supported(false)
-    , m_default({false, false, ImageAttachmentMode::NO_SCREENSHOT, {}, std::chrono::seconds(0)})
-    , m_current(m_default)
-    , m_last_sent(WallClock::min())
-{
-    reset_rate_limit();
-}
 EventNotificationOption::EventNotificationOption(
     std::string label,
     bool enabled, bool ping,

@@ -29,7 +29,7 @@ namespace PokemonLA{
 
 
 ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-LakeTrio",
         STRING_POKEMON + " LA", "Shiny Hunt - Lake Trio",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-LakeTrio.md",
@@ -43,10 +43,8 @@ std::unique_ptr<StatsTracker> ShinyHuntLakeTrio_Descriptor::make_stats() const{
 }
 
 
-ShinyHuntLakeTrio::ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-//    , GO_HOME_WHEN_DONE(false)
-    , VIDEO_ON_SHINY(
+ShinyHuntLakeTrio::ShinyHuntLakeTrio()
+    : VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
         true
     )

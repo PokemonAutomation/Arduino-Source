@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 
 
 FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:FastCodeEntry",
         STRING_POKEMON + " SwSh", "Fast Code Entry (FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FastCodeEntry.md",
@@ -29,9 +29,8 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
 
 
 
-FastCodeEntry::FastCodeEntry(const FastCodeEntry_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , RAID_CODE(
+FastCodeEntry::FastCodeEntry()
+    : RAID_CODE(
         "<b>Raid Code:</b>",
         8,
         "9107 3091"

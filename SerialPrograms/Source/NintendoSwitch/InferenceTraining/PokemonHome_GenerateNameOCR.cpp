@@ -25,7 +25,7 @@ using namespace Pokemon;
 
 
 GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonHome:GenerateNameOCR",
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Generate Name OCR",
         "",
@@ -37,9 +37,8 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
 
 
 
-GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE(
+GenerateNameOCRData::GenerateNameOCRData()
+    : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages()
     )

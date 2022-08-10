@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 
 
 FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "NintendoSwitch:FriendCodeAdder",
         "Nintendo Switch", "Friend Code Adder",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendCodeAdder.md",
@@ -27,9 +27,8 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
 {}
 
 
-FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , USER_SLOT(
+FriendCodeAdder::FriendCodeAdder()
+    : USER_SLOT(
         "<b>User Slot:</b><br>Send friend requests for this profile.",
         1, 1, 8
     )

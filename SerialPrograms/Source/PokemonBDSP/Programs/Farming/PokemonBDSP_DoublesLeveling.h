@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class DoublesLeveling_Descriptor : public RunnableSwitchProgramDescriptor{
+class DoublesLeveling_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DoublesLeveling_Descriptor();
 
@@ -29,9 +29,9 @@ public:
 };
 
 
-class DoublesLeveling : public SingleSwitchProgramInstance{
+class DoublesLeveling : public SingleSwitchProgramInstance2{
 public:
-    DoublesLeveling(const DoublesLeveling_Descriptor& descriptor);
+    DoublesLeveling();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

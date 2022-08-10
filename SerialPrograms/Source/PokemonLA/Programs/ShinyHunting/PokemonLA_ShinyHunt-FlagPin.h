@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ShinyHuntFlagPin_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntFlagPin_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntFlagPin_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 };
 
 
-class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
+class ShinyHuntFlagPin : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor);
+    ShinyHuntFlagPin();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

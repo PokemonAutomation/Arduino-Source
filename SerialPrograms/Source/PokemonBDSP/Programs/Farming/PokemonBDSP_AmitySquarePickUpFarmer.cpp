@@ -18,7 +18,7 @@ namespace PokemonBDSP{
 
 
 AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:AmitySquarePickUpFarmer",
         STRING_POKEMON + " BDSP", "Amity Square Pick Up Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/AmitySquarePickUpFarmer.md",
@@ -40,9 +40,8 @@ std::unique_ptr<StatsTracker> AmitySquarePickUpFarmer_Descriptor::make_stats() c
 }
 
 
-AmitySquarePickUpFarmer::AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
+    : GO_HOME_WHEN_DONE(false)
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many items you can get.",
         100

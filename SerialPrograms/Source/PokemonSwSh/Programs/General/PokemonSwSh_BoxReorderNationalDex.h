@@ -18,16 +18,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class BoxReorderNationalDex_Descriptor : public RunnableSwitchProgramDescriptor{
+class BoxReorderNationalDex_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BoxReorderNationalDex_Descriptor();
 };
 
 
 
-class BoxReorderNationalDex : public SingleSwitchProgramInstance{
+class BoxReorderNationalDex : public SingleSwitchProgramInstance2{
 public:
-    BoxReorderNationalDex(const BoxReorderNationalDex_Descriptor& descriptor);
+    BoxReorderNationalDex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ShinyHuntLakeTrio_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntLakeTrio_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntLakeTrio_Descriptor();
 
@@ -26,9 +26,9 @@ public:
 };
 
 
-class ShinyHuntLakeTrio : public SingleSwitchProgramInstance{
+class ShinyHuntLakeTrio : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntLakeTrio(const ShinyHuntLakeTrio_Descriptor& descriptor);
+    ShinyHuntLakeTrio();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

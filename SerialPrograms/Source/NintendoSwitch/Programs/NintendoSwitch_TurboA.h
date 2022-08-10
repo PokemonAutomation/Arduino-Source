@@ -21,23 +21,11 @@ public:
 
 
 
-class TurboA : public SingleSwitchProgramInstance{
+class TurboA : public SingleSwitchProgramInstance2{
 public:
-    TurboA(const TurboA_Descriptor& descriptor);
+    TurboA();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
-
-private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
-};
-
-
-
-class TurboA2 : public SingleSwitchProgramInstance2{
-public:
-    TurboA2();
-
-    virtual void run(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

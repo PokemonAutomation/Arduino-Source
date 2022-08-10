@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousStrongSpawn",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.md",
@@ -43,9 +43,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn_Descriptor::make_st
 
 
 
-ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAutonomousStrongSpawn_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

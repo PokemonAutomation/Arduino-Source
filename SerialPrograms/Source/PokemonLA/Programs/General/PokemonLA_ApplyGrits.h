@@ -15,15 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ApplyGrits_Descriptor : public RunnableSwitchProgramDescriptor{
+class ApplyGrits_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ApplyGrits_Descriptor();
 };
 
 
-class ApplyGrits : public SingleSwitchProgramInstance{
+class ApplyGrits : public SingleSwitchProgramInstance2{
 public:
-    ApplyGrits(const ApplyGrits_Descriptor& descriptor);
+    ApplyGrits();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

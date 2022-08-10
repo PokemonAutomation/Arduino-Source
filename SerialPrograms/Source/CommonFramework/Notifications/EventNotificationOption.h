@@ -36,7 +36,6 @@ struct EventNotificationSettings{
 
 class EventNotificationOption{
 public:
-    EventNotificationOption();
     EventNotificationOption(
         std::string label,
         bool enabled, bool ping,

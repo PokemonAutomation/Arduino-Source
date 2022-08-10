@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 BeamReset_Descriptor::BeamReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BeamReset",
         STRING_POKEMON + " SwSh", "Beam Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
@@ -30,9 +30,8 @@ BeamReset_Descriptor::BeamReset_Descriptor()
 
 
 
-BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , DELAY_BEFORE_RESET(
+BeamReset::BeamReset()
+    : DELAY_BEFORE_RESET(
         "<b>Delay before Reset:</b>",
         "5 * TICKS_PER_SECOND"
     )

@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class BurmyFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class BurmyFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BurmyFinder_Descriptor();
 
@@ -26,9 +26,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class BurmyFinder : public SingleSwitchProgramInstance{
+class BurmyFinder : public SingleSwitchProgramInstance2{
 public:
-    BurmyFinder(const BurmyFinder_Descriptor& descriptor);
+    BurmyFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

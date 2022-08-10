@@ -15,15 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ClothingBuyer_Descriptor : public RunnableSwitchProgramDescriptor{
+class ClothingBuyer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ClothingBuyer_Descriptor();
 };
 
 
-class ClothingBuyer : public SingleSwitchProgramInstance{
+class ClothingBuyer : public SingleSwitchProgramInstance2{
 public:
-    ClothingBuyer(const ClothingBuyer_Descriptor& descriptor);
+    ClothingBuyer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

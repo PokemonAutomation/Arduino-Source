@@ -16,16 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class FastCodeEntry_Descriptor : public RunnableSwitchProgramDescriptor{
+class FastCodeEntry_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FastCodeEntry_Descriptor();
 };
 
 
 
-class FastCodeEntry : public SingleSwitchProgramInstance{
+class FastCodeEntry : public SingleSwitchProgramInstance2{
 public:
-    FastCodeEntry(const FastCodeEntry_Descriptor& descriptor);
+    FastCodeEntry();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

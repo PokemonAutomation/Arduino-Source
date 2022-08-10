@@ -26,7 +26,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class AutoHostRolling_Descriptor : public RunnableSwitchProgramDescriptor{
+class AutoHostRolling_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoHostRolling_Descriptor();
 
@@ -35,9 +35,9 @@ public:
 
 
 
-class AutoHostRolling : public SingleSwitchProgramInstance{
+class AutoHostRolling : public SingleSwitchProgramInstance2{
 public:
-    AutoHostRolling(const AutoHostRolling_Descriptor& descriptor);
+    AutoHostRolling();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

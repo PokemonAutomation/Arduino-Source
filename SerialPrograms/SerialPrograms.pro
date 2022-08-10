@@ -996,6 +996,7 @@ HEADERS += \
     Source/Integrations/DiscordWebhookSettings.h \
     Source/Integrations/IntegrationsAPI.h \
     Source/Integrations/ProgramTracker.h \
+    Source/Integrations/ProgramTrackerInterfaces.h \
     Source/Integrations/SleepyDiscordRunner.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h \

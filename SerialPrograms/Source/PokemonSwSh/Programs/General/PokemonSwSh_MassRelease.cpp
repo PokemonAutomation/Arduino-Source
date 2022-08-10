@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 MassRelease_Descriptor::MassRelease_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:MassRelease",
         STRING_POKEMON + " SwSh", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
@@ -30,9 +30,8 @@ MassRelease_Descriptor::MassRelease_Descriptor()
 
 
 
-MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BOXES_TO_RELEASE(
+MassRelease::MassRelease()
+    : BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
         2, 0, 32
     )

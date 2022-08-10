@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StowOnSideFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
@@ -31,9 +31,8 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
 
 
 
-StowOnSideFarmer::StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+StowOnSideFarmer::StowOnSideFarmer()
+    : SKIPS(
         "<b>Number of Purchase Attempts:</b>",
         100000
     )

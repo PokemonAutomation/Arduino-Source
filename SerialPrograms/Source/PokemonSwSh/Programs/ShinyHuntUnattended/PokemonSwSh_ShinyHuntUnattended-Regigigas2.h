@@ -19,16 +19,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntUnattendedRegigigas2_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntUnattendedRegigigas2_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntUnattendedRegigigas2_Descriptor();
 };
 
 
 
-class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance{
+class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntUnattendedRegigigas2(const ShinyHuntUnattendedRegigigas2_Descriptor& descriptor);
+    ShinyHuntUnattendedRegigigas2();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

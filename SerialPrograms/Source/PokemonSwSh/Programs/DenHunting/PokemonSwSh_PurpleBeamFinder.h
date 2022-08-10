@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class PurpleBeamFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class PurpleBeamFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     PurpleBeamFinder_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 
 
 
-class PurpleBeamFinder : public SingleSwitchProgramInstance{
+class PurpleBeamFinder : public SingleSwitchProgramInstance2{
 public:
-    PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor);
+    PurpleBeamFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

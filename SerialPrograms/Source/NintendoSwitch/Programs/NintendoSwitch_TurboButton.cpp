@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 
 TurboButton_Descriptor::TurboButton_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "NintendoSwitch:TurboButton",
         "Nintendo Switch", "Turbo Button",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboButton.md",
@@ -25,9 +25,8 @@ TurboButton_Descriptor::TurboButton_Descriptor()
 
 
 
-TurboButton::TurboButton(const TurboButton_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BUTTON(
+TurboButton::TurboButton()
+    : BUTTON(
         "<b>Button to Mash:</b>",
         {
             "Y",

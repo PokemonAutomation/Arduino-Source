@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 LotoFarmer_Descriptor::LotoFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:LotoFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Loto Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-LotoFarmer.md",
@@ -31,9 +31,8 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
 
 
 
-LotoFarmer::LotoFarmer(const LotoFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+LotoFarmer::LotoFarmer()
+    : SKIPS(
         "<b>Number of Loto Attempts:</b>",
         100000
     )

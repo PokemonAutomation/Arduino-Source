@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousRegigigas2_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousRegigigas2_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousRegigigas2_Descriptor();
 
@@ -32,9 +32,9 @@ public:
 
 
 
-class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor);
+    ShinyHuntAutonomousRegigigas2();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

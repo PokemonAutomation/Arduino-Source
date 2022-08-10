@@ -33,7 +33,7 @@ namespace PokemonLA{
 
 
 NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:NuggetFarmerHighlands",
         STRING_POKEMON + " LA", "Nugget Farmer (Highlands)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/NuggetFarmerHighlands.md",
@@ -72,9 +72,8 @@ std::unique_ptr<StatsTracker> NuggetFarmerHighlands_Descriptor::make_stats() con
 }
 
 
-NuggetFarmerHighlands::NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
+NuggetFarmerHighlands::NuggetFarmerHighlands()
+    : SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

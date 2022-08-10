@@ -15,7 +15,7 @@ namespace PokemonLA{
 
 
 BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:BraviaryHeightGlitch",
         STRING_POKEMON + " LA", "Braviary Height Glitch",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BraviaryHeightGlitch.md",
@@ -26,9 +26,7 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
 {}
 
 
-BraviaryHeightGlitch::BraviaryHeightGlitch(const BraviaryHeightGlitch_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{}
+BraviaryHeightGlitch::BraviaryHeightGlitch(){}
 
 
 void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

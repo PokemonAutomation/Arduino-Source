@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class DistortionWaiter_Descriptor : public RunnableSwitchProgramDescriptor{
+class DistortionWaiter_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DistortionWaiter_Descriptor();
 
@@ -26,9 +26,9 @@ public:
 };
 
 
-class DistortionWaiter : public SingleSwitchProgramInstance{
+class DistortionWaiter : public SingleSwitchProgramInstance2{
 public:
-    DistortionWaiter(const DistortionWaiter_Descriptor& descriptor);
+    DistortionWaiter();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

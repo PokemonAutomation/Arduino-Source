@@ -20,16 +20,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class TradeBot_Descriptor : public RunnableSwitchProgramDescriptor{
+class TradeBot_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TradeBot_Descriptor();
 };
 
 
 
-class TradeBot : public SingleSwitchProgramInstance{
+class TradeBot : public SingleSwitchProgramInstance2{
 public:
-    TradeBot(const TradeBot_Descriptor& descriptor);
+    TradeBot();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

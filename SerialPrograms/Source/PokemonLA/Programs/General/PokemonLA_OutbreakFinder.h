@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class OutbreakFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class OutbreakFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     OutbreakFinder_Descriptor();
 
@@ -28,9 +28,9 @@ public:
 };
 
 
-class OutbreakFinder : public SingleSwitchProgramInstance{
+class OutbreakFinder : public SingleSwitchProgramInstance2{
 public:
-    OutbreakFinder(const OutbreakFinder_Descriptor& descriptor);
+    OutbreakFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 

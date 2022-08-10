@@ -95,76 +95,76 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();
 
     add_divider("---- QoL Macros ----");
-    add_program<FastCodeEntry_Descriptor, FastCodeEntry>();
-    add_program<FriendSearchDisconnect_Descriptor, FriendSearchDisconnect>();
+    add_panel(make_single_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
+    add_panel(make_single_switch_program<FriendSearchDisconnect_Descriptor, FriendSearchDisconnect>());
 
     add_divider("---- General ----");
-    add_program<MassRelease_Descriptor, MassRelease>();
-    add_program<SurpriseTrade_Descriptor, SurpriseTrade>();
-    add_program<TradeBot_Descriptor, TradeBot>();
-    add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
-    add_program<BallThrower_Descriptor, BallThrower>();
-    add_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>();
-    add_program<DexRecFinder_Descriptor, DexRecFinder>();
-    add_program<BoxReorderNationalDex_Descriptor, BoxReorderNationalDex>();
+    add_panel(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    add_panel(make_single_switch_program<SurpriseTrade_Descriptor, SurpriseTrade>());
+    add_panel(make_single_switch_program<TradeBot_Descriptor, TradeBot>());
+    add_panel(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
+    add_panel(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
+    add_panel(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
+    add_panel(make_single_switch_program<DexRecFinder_Descriptor, DexRecFinder>());
+    add_panel(make_single_switch_program<BoxReorderNationalDex_Descriptor, BoxReorderNationalDex>());
 
     add_divider("---- Date-Spam Farmers ----");
-    add_program<WattFarmer_Descriptor, WattFarmer>();
-    add_program<BerryFarmer_Descriptor, BerryFarmer>();
-    add_program<LotoFarmer_Descriptor, LotoFarmer>();
-    add_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>();
-    add_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>();
-    add_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>();
+    add_panel(make_single_switch_program<WattFarmer_Descriptor, WattFarmer>());
+    add_panel(make_single_switch_program<BerryFarmer_Descriptor, BerryFarmer>());
+    add_panel(make_single_switch_program<LotoFarmer_Descriptor, LotoFarmer>());
+    add_panel(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
+    add_panel(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
+    add_panel(make_single_switch_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>());
 
     add_divider("---- Den Hunting ----");
-    add_program<BeamReset_Descriptor, BeamReset>();
-    add_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>();
-    add_program<EventBeamFinder_Descriptor, EventBeamFinder>();
-    add_program<DaySkipperJPN_Descriptor, DaySkipperJPN>();
-    add_program<DaySkipperEU_Descriptor, DaySkipperEU>();
-    add_program<DaySkipperUS_Descriptor, DaySkipperUS>();
-    add_program<DaySkipperJPN7p8k_Descriptor, DaySkipperJPN7p8k>();
+    add_panel(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
+    add_panel(make_single_switch_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>());
+    add_panel(make_single_switch_program<EventBeamFinder_Descriptor, EventBeamFinder>());
+    add_panel(make_single_switch_program<DaySkipperJPN_Descriptor, DaySkipperJPN>());
+    add_panel(make_single_switch_program<DaySkipperEU_Descriptor, DaySkipperEU>());
+    add_panel(make_single_switch_program<DaySkipperUS_Descriptor, DaySkipperUS>());
+    add_panel(make_single_switch_program<DaySkipperJPN7p8k_Descriptor, DaySkipperJPN7p8k>());
 
     add_divider("---- Hosting ----");
-    add_program<DenRoller_Descriptor, DenRoller>();
-    add_program<AutoHostRolling_Descriptor, AutoHostRolling>();
-    add_program<AutoHostMultiGame_Descriptor, AutoHostMultiGame>();
+    add_panel(make_single_switch_program<DenRoller_Descriptor, DenRoller>());
+    add_panel(make_single_switch_program<AutoHostRolling_Descriptor, AutoHostRolling>());
+    add_panel(make_single_switch_program<AutoHostMultiGame_Descriptor, AutoHostMultiGame>());
 
     add_divider("---- Non-Shiny Hunting ----");
-    add_program<StatsReset_Descriptor, StatsReset>();
-    add_program<StatsResetCalyrex_Descriptor, StatsResetCalyrex>();
-    add_program<StatsResetMoltres_Descriptor, StatsResetMoltres>();
-    add_program<StatsResetRegi_Descriptor, StatsResetRegi>();
+    add_panel(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    add_panel(make_single_switch_program<StatsResetCalyrex_Descriptor, StatsResetCalyrex>());
+    add_panel(make_single_switch_program<StatsResetMoltres_Descriptor, StatsResetMoltres>());
+    add_panel(make_single_switch_program<StatsResetRegi_Descriptor, StatsResetRegi>());
 
     add_divider("---- Unattended Shiny Hunting ----");
-    add_program<MultiGameFossil_Descriptor, MultiGameFossil>();
-    add_program<ShinyHuntUnattendedRegi_Descriptor, ShinyHuntUnattendedRegi>();
-    add_program<ShinyHuntUnattendedSwordsOfJustice_Descriptor, ShinyHuntUnattendedSwordsOfJustice>();
-    add_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>();
-    add_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>();
-    add_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>();
-    add_program<CurryHunter_Descriptor, CurryHunter>();
+    add_panel(make_single_switch_program<MultiGameFossil_Descriptor, MultiGameFossil>());
+    add_panel(make_single_switch_program<ShinyHuntUnattendedRegi_Descriptor, ShinyHuntUnattendedRegi>());
+    add_panel(make_single_switch_program<ShinyHuntUnattendedSwordsOfJustice_Descriptor, ShinyHuntUnattendedSwordsOfJustice>());
+    add_panel(make_single_switch_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>());
+    add_panel(make_single_switch_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>());
+    add_panel(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
+    add_panel(make_single_switch_program<CurryHunter_Descriptor, CurryHunter>());
 
     add_divider("---- Autonomous Shiny Hunting ----");
-    add_program<ShinyHuntAutonomousRegi_Descriptor, ShinyHuntAutonomousRegi>();
-    add_program<ShinyHuntAutonomousSwordsOfJustice_Descriptor, ShinyHuntAutonomousSwordsOfJustice>();
-    add_program<ShinyHuntAutonomousStrongSpawn_Descriptor, ShinyHuntAutonomousStrongSpawn>();
-    add_program<ShinyHuntAutonomousRegigigas2_Descriptor, ShinyHuntAutonomousRegigigas2>();
-    add_program<ShinyHuntAutonomousIoATrade_Descriptor, ShinyHuntAutonomousIoATrade>();
-    add_program<ShinyHuntAutonomousBerryTree_Descriptor, ShinyHuntAutonomousBerryTree>();
-    add_program<ShinyHuntAutonomousWhistling_Descriptor, ShinyHuntAutonomousWhistling>();
-    add_program<ShinyHuntAutonomousFishing_Descriptor, ShinyHuntAutonomousFishing>();
-    add_program<ShinyHuntAutonomousOverworld_Descriptor, ShinyHuntAutonomousOverworld>();
+    add_panel(make_single_switch_program<ShinyHuntAutonomousRegi_Descriptor, ShinyHuntAutonomousRegi>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousSwordsOfJustice_Descriptor, ShinyHuntAutonomousSwordsOfJustice>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousStrongSpawn_Descriptor, ShinyHuntAutonomousStrongSpawn>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousRegigigas2_Descriptor, ShinyHuntAutonomousRegigigas2>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousIoATrade_Descriptor, ShinyHuntAutonomousIoATrade>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousBerryTree_Descriptor, ShinyHuntAutonomousBerryTree>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousWhistling_Descriptor, ShinyHuntAutonomousWhistling>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousFishing_Descriptor, ShinyHuntAutonomousFishing>());
+    add_panel(make_single_switch_program<ShinyHuntAutonomousOverworld_Descriptor, ShinyHuntAutonomousOverworld>());
 
     add_divider("---- Eggs ----");
-    add_program<EggFetcher2_Descriptor, EggFetcher2>();
-    add_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>();
-    add_program<EggHatcher_Descriptor, EggHatcher>();
-    add_program<EggCombined2_Descriptor, EggCombined2>();
-    add_program<EggSuperCombined2_Descriptor, EggSuperCombined2>();
-    add_program<GodEggItemDupe_Descriptor, GodEggItemDupe>();
+    add_panel(make_single_switch_program<EggFetcher2_Descriptor, EggFetcher2>());
+    add_panel(make_single_switch_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>());
+    add_panel(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
+    add_panel(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
+    add_panel(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
+    add_panel(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
     if (PreloadSettings::instance().NAUGHTY_MODE){
-        add_program<GodEggDuplication_Descriptor, GodEggDuplication>();
+        add_panel(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
     }
 
     add_divider("---- Multi-Switch Programs ----");
@@ -178,9 +178,9 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
-        add_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>();
-        add_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>();
-        add_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>();
+        add_panel(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
+        add_panel(make_single_switch_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>());
+        add_panel(make_single_switch_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>());
     }
 
 

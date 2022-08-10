@@ -33,7 +33,7 @@ namespace PokemonLA{
 
 
 BurmyFinder_Descriptor::BurmyFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:Burmy Hunter",
         STRING_POKEMON + " LA", "Burmy Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BurmyHunter.md",
@@ -81,9 +81,8 @@ std::unique_ptr<StatsTracker> BurmyFinder_Descriptor::make_stats() const{
 }
 
 
-BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+BurmyFinder::BurmyFinder()
+    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , STOP_ON(
         "<b>Stop On:</b>",
         {

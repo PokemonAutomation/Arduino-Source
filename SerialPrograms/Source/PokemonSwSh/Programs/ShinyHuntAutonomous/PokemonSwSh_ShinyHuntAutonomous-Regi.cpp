@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousRegi",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.md",
@@ -43,9 +43,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() c
 
 
 
-ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

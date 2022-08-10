@@ -26,7 +26,7 @@ using namespace Pokemon;
 
 
 EggAutonomous_Descriptor::EggAutonomous_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggAutonomous",
         STRING_POKEMON + " BDSP", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggAutonomous.md",
@@ -40,9 +40,8 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 }
 
 
-EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+EggAutonomous::EggAutonomous()
+    : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IVCheckerReader::instance().languages(),

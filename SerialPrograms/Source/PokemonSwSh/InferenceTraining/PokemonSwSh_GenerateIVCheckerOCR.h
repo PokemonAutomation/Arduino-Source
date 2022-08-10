@@ -41,14 +41,14 @@ public:
 
 
 
-class GenerateIVCheckerOCR_Descriptor : public RunnableSwitchProgramDescriptor{
+class GenerateIVCheckerOCR_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GenerateIVCheckerOCR_Descriptor();
 };
 
 
 
-class GenerateIVCheckerOCR : public SingleSwitchProgramInstance{
+class GenerateIVCheckerOCR : public SingleSwitchProgramInstance2{
 public:
     enum Mode{
         READ_AND_SAVE,
@@ -56,7 +56,7 @@ public:
     };
 
 public:
-    GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor& descriptor);
+    GenerateIVCheckerOCR();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

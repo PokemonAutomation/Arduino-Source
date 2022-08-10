@@ -25,7 +25,7 @@ namespace PokemonLA{
 
 
 ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-FlagPin",
         STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FlagPin.md",
@@ -58,9 +58,8 @@ std::unique_ptr<StatsTracker> ShinyHuntFlagPin_Descriptor::make_stats() const{
 }
 
 
-ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , ENROUTE_DISTANCE(
+ShinyHuntFlagPin::ShinyHuntFlagPin()
+    : ENROUTE_DISTANCE(
         "<b>Enroute Distance:</b><br>"
         "You are considered \"enroute\" if you are further than this distance from the flag.<br><br>"
         "<font color=\"red\">If you wish to ignore enroute shinies, scroll down to "

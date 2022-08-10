@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegigigas2",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
@@ -33,9 +33,8 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
 
 
 
-ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnattendedRegigigas2_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , REVERSAL_PP(
+ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
+    : REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
         24
     )

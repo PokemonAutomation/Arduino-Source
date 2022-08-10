@@ -24,16 +24,16 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class EggAutonomous_Descriptor : public RunnableSwitchProgramDescriptor{
+class EggAutonomous_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EggAutonomous_Descriptor();
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
-class EggAutonomous : public SingleSwitchProgramInstance{
+class EggAutonomous : public SingleSwitchProgramInstance2{
 public:
-    EggAutonomous(const EggAutonomous_Descriptor& descriptor);
+    EggAutonomous();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

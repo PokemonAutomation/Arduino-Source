@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DailyHighlightFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Daily Highlight Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-DailyHighlightFarmer.md",
@@ -31,9 +31,8 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
 
 
 
-DailyHighlightFarmer::DailyHighlightFarmer(const DailyHighlightFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS(
+DailyHighlightFarmer::DailyHighlightFarmer()
+    : SKIPS(
         "<b>Number of Purchase Attempts:</b>",
         100000
     )

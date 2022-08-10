@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostRolling",
         STRING_POKEMON + " SwSh", "Auto-Host Rolling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
@@ -41,9 +41,8 @@ std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
 
 
 
-AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SKIPS("<b>Day Skips:</b>", 3)
+AutoHostRolling::AutoHostRolling()
+    : SKIPS("<b>Day Skips:</b>", 3)
     , BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
     , HOST_ONLINE("<b>Host Online:</b>", true)
     , LOBBY_WAIT_DELAY(

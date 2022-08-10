@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 
 
 AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:AutonomousBallThrower",
         STRING_POKEMON + " SwSh", "Autonomous Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutonomousBallThrower.md",
@@ -64,9 +64,8 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower_Descriptor::make_stats() con
 
 
 
-AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+AutonomousBallThrower::AutonomousBallThrower()
+    : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",

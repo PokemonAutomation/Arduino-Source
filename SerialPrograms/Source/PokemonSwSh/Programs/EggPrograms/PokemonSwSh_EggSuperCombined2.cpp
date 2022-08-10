@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggSuperCombined2",
         STRING_POKEMON + " SwSh", "Egg Super-Combined 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
@@ -30,9 +30,8 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
 
 
 
-EggSuperCombined2::EggSuperCombined2(const EggSuperCombined2_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BOXES_TO_RELEASE(
+EggSuperCombined2::EggSuperCombined2()
+    : BOXES_TO_RELEASE(
         "<b>Boxes to Release:</b><br>Start by releasing this many boxes.",
         2, 0, 32
     )

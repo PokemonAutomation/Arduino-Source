@@ -38,7 +38,7 @@ namespace {
 }
 
 TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:TenacityCandyFarmer",
         STRING_POKEMON + " LA", "Tenacity Candy Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/TenacityCandyFarmer.md",
@@ -71,9 +71,8 @@ std::unique_ptr<StatsTracker> TenacityCandyFarmer_Descriptor::make_stats() const
 }
 
 
-TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , FOURTH_MOVE_ON(
+TenacityCandyFarmer::TenacityCandyFarmer()
+    : FOURTH_MOVE_ON(
         "<b>Fourth Move On:</b><br>Use Arceus' fourth move to grind research tasks",
         {
             "None",

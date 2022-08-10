@@ -17,15 +17,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class AutoMultiSpawn_Descriptor : public RunnableSwitchProgramDescriptor{
+class AutoMultiSpawn_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoMultiSpawn_Descriptor();
 };
 
 
-class AutoMultiSpawn : public SingleSwitchProgramInstance{
+class AutoMultiSpawn : public SingleSwitchProgramInstance2{
 public:
-    AutoMultiSpawn(const AutoMultiSpawn_Descriptor& descriptor);
+    AutoMultiSpawn();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

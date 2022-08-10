@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousFishing",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Fishing.md",
@@ -52,9 +52,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing_Descriptor::make_stats(
 
 
 
-ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomousFishing_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

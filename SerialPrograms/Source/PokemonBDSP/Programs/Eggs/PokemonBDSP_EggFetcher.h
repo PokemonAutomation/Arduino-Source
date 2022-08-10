@@ -20,7 +20,7 @@ namespace PokemonBDSP{
 
 
 
-class EggFetcher_Descriptor : public RunnableSwitchProgramDescriptor{
+class EggFetcher_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EggFetcher_Descriptor();
 
@@ -32,9 +32,9 @@ public:
 
 
 
-class EggFetcher : public SingleSwitchProgramInstance{
+class EggFetcher : public SingleSwitchProgramInstance2{
 public:
-    EggFetcher(const EggFetcher_Descriptor& descriptor);
+    EggFetcher();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:MultiGameFossil",
         STRING_POKEMON + " SwSh", "Multi-Game Fossil Revive",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MultiGameFossil.md",
@@ -33,9 +33,7 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
 
 
 
-MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
+MultiGameFossil::MultiGameFossil(){
     PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GAME_LIST);
 }

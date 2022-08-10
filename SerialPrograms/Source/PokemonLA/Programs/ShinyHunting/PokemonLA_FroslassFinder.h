@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class FroslassFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class FroslassFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FroslassFinder_Descriptor();
 
@@ -25,9 +25,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class FroslassFinder : public SingleSwitchProgramInstance{
+class FroslassFinder : public SingleSwitchProgramInstance2{
 public:
-    FroslassFinder(const FroslassFinder_Descriptor& descriptor);
+    FroslassFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

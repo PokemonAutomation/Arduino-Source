@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-class DexRecFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class DexRecFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DexRecFinder_Descriptor();
 
@@ -47,9 +47,9 @@ public:
 };
 
 
-class DexRecFinder : public SingleSwitchProgramInstance{
+class DexRecFinder : public SingleSwitchProgramInstance2{
 public:
-    DexRecFinder(const DexRecFinder_Descriptor& descriptor);
+    DexRecFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

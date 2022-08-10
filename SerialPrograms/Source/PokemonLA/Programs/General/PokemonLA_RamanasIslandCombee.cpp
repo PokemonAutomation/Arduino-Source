@@ -33,7 +33,7 @@ namespace PokemonLA{
 
 
 RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:Ramanas Island Combee Finder",
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
@@ -73,9 +73,8 @@ std::unique_ptr<StatsTracker> RamanasCombeeFinder_Descriptor::make_stats() const
 }
 
 
-RamanasCombeeFinder:: RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+RamanasCombeeFinder:: RamanasCombeeFinder()
+    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",

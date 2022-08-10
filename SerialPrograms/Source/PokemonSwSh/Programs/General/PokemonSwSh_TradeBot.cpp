@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 TradeBot_Descriptor::TradeBot_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:TradeBot",
         STRING_POKEMON + " SwSh", "Trade Bot",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
@@ -33,9 +33,8 @@ TradeBot_Descriptor::TradeBot_Descriptor()
 
 
 
-TradeBot::TradeBot(const TradeBot_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , TRADE_CODE(
+TradeBot::TradeBot()
+    : TRADE_CODE(
         "<b>Trade Code:</b>",
         8,
         "1280 0000"

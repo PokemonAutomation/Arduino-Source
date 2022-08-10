@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class DenRoller_Descriptor : public RunnableSwitchProgramDescriptor{
+class DenRoller_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DenRoller_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 
 
 
-class DenRoller : public SingleSwitchProgramInstance{
+class DenRoller : public SingleSwitchProgramInstance2{
 public:
-    DenRoller(const DenRoller_Descriptor& descriptor);
+    DenRoller();
 
     void ring_bell(BotBaseContext& context, int count) const;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

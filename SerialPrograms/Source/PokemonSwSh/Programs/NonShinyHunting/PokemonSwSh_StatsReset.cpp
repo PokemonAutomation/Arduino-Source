@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 
 
 StatsReset_Descriptor::StatsReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsReset",
         STRING_POKEMON + " SwSh", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset.md",
@@ -55,9 +55,8 @@ std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const{
 
 
 
-StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+StatsReset::StatsReset()
+    : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages()

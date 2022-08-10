@@ -30,7 +30,7 @@ std::tuple<uint16_t, uint16_t, uint16_t> get_location(uint16_t index){
 }
 
 EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggFetcherMultiple",
         STRING_POKEMON + " SwSh", "Egg Fetcher Multiple",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcherMultiple.md",
@@ -42,9 +42,8 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
 
 
 
-EggFetcherMultiple::EggFetcherMultiple(const EggFetcherMultiple_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , POKEMON_SPECIES_COUNT(
+EggFetcherMultiple::EggFetcherMultiple()
+    : POKEMON_SPECIES_COUNT(
         "<b>Breed this many species:</b>",
         30
     )

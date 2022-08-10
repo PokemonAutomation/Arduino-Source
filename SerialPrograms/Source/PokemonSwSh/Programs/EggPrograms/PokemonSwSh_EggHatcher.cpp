@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 EggHatcher_Descriptor::EggHatcher_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggHatcher",
         STRING_POKEMON + " SwSh", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggHatcher.md",
@@ -81,9 +81,8 @@ uint8_t swap_party(BotBaseContext& context, uint8_t column){
 }
 
 
-EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BOXES_TO_HATCH(
+EggHatcher::EggHatcher()
+    : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
         3
     )

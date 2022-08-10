@@ -19,7 +19,7 @@ namespace PokemonLA{
 
 
 
-class IngoMoveGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class IngoMoveGrinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     IngoMoveGrinder_Descriptor();
 
@@ -27,9 +27,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class IngoMoveGrinder : public SingleSwitchProgramInstance{
+class IngoMoveGrinder : public SingleSwitchProgramInstance2{
 public:
-    IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor);
+    IngoMoveGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:PurpleBeamFinder",
         STRING_POKEMON + " SwSh", "Purple Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
@@ -66,9 +66,8 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder_Descriptor::make_stats() const{
 
 
 
-PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , EXTRA_LINE(
+PurpleBeamFinder::PurpleBeamFinder()
+    : EXTRA_LINE(
         "<b>Extra Line:</b><br>(German has an extra line of text.)",
         false
     )

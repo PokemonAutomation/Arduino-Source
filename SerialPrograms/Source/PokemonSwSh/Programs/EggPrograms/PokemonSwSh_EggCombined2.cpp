@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 EggCombined2_Descriptor::EggCombined2_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggCombined2",
         STRING_POKEMON + " SwSh", "Egg Combined 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggCombined2.md",
@@ -30,9 +30,8 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
 
 
 
-EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BOXES_TO_HATCH(
+EggCombined2::EggCombined2()
+    : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
         32, 0, 32
     )

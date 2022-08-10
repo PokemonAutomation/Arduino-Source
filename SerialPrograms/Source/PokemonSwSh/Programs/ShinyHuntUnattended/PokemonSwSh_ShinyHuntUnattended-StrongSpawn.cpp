@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedStrongSpawn",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
@@ -32,9 +32,8 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
 
 
 
-ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn(const ShinyHuntUnattendedStrongSpawn_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , ENTER_GAME_TO_RUN_DELAY(
+ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
+    : ENTER_GAME_TO_RUN_DELAY(
         "<b>Enter Game to Run Delay:</b><br>This needs to be carefully calibrated.",
         "2280"
     )

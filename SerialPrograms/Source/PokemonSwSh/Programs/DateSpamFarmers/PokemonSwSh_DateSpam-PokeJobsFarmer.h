@@ -18,15 +18,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class PokeJobsFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class PokeJobsFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     PokeJobsFarmer_Descriptor();
 };
 
-class PokeJobsFarmer : public SingleSwitchProgramInstance
-{
+class PokeJobsFarmer : public SingleSwitchProgramInstance2{
 public:
-    PokeJobsFarmer(const PokeJobsFarmer_Descriptor& descriptor);
+    PokeJobsFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

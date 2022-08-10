@@ -16,15 +16,15 @@ namespace PokemonLA{
 
 
 
-class MountDetectionTest_Descriptor : public RunnableSwitchProgramDescriptor{
+class MountDetectionTest_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     MountDetectionTest_Descriptor();
 };
 
 
-class MountDetectionTest : public SingleSwitchProgramInstance{
+class MountDetectionTest : public SingleSwitchProgramInstance2{
 public:
-    MountDetectionTest(const MountDetectionTest_Descriptor& descriptor);
+    MountDetectionTest();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

@@ -18,7 +18,7 @@ namespace PokemonHome{
 
 
 PageSwap_Descriptor::PageSwap_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonHome:PageSwap",
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Page Swap",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PokemonHome-PageSwap.md",
@@ -30,9 +30,8 @@ PageSwap_Descriptor::PageSwap_Descriptor()
 
 
 
-PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , DODGE_SYSTEM_UPDATE_WINDOW(
+PageSwap::PageSwap()
+    : DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
         false
     )

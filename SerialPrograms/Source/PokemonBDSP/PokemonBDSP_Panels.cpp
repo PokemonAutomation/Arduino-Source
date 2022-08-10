@@ -52,47 +52,43 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();
 
     add_divider("---- General ----");
-    add_settings<MassRelease_Descriptor, MassRelease>();
-    add_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>();
+    add_panel(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    add_panel(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
     add_divider("---- Trading ----");
-    add_settings<SelfBoxTrade_Descriptor, SelfBoxTrade>();
-    add_settings<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
+    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 
     add_divider("---- Farming ----");
-    add_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>();
-    add_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>();
-    add_program<DoublesLeveling_Descriptor, DoublesLeveling>();
-    add_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>();
-    add_program<GiftBerryReset_Descriptor, GiftBerryReset>();
+    add_panel(make_single_switch_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>());
+    add_panel(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
+    add_panel(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
+    add_panel(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
+    add_panel(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
 
     add_divider("---- Shiny Hunting ----");
-    add_program<StarterReset_Descriptor, StarterReset>();
-    add_program<LegendaryReset_Descriptor, LegendaryReset>();
-    add_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>();
-    add_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>();
-    add_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>();
+    add_panel(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
+    add_panel(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    add_panel(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
+    add_panel(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
+    add_panel(make_single_switch_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>());
 
     add_divider("---- Eggs ----");
-    add_program<EggFetcher_Descriptor, EggFetcher>();
-    add_program<EggHatcher_Descriptor, EggHatcher>();
-    add_program<EggAutonomous_Descriptor, EggAutonomous>();
+    add_panel(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
+    add_panel(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
+    add_panel(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
 
     add_divider("---- Glitches (v1.1.3) ----");
-    add_program<ActivateMenuGlitch113_Descriptor, ActivateMenuGlitch113>();
-    add_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>();
+    add_panel(make_single_switch_program<ActivateMenuGlitch113_Descriptor, ActivateMenuGlitch113>());
+    add_panel(make_single_switch_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>());
 
     add_divider("---- Glitches (v1.1.2) ----");
-    add_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>();
-
-//    add_divider("---- Glitches (v1.1.1) ----");
-//    add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
-//    add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
+    add_panel(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
-        add_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>();
-        add_program<SoundListener_Descriptor, SoundListener>();
+        add_panel(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
+        add_panel(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
     }
 
 

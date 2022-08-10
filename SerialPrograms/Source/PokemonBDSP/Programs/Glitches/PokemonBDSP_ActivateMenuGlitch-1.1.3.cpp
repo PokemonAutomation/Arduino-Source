@@ -20,7 +20,7 @@ namespace PokemonBDSP{
 
 
 ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ActivateMenuGlitch113",
         STRING_POKEMON + " BDSP", "Activate Menu Glitch (1.1.3)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-113.md",
@@ -31,9 +31,8 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
     )
 {}
 
-ActivateMenuGlitch113::ActivateMenuGlitch113(const ActivateMenuGlitch113_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , FLY_A_TO_X_DELAY(
+ActivateMenuGlitch113::ActivateMenuGlitch113()
+    : FLY_A_TO_X_DELAY(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.<br>"
         "(German players may need to increase this to 90.)",
         "50", 20

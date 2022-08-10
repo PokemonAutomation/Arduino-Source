@@ -30,7 +30,7 @@ namespace PokemonLA{
 
 
 IngoMoveGrinder_Descriptor::IngoMoveGrinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:IngoMoveGrinder",
         STRING_POKEMON + " LA", "Ingo Move Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoMoveGrinder.md",
@@ -66,9 +66,8 @@ std::unique_ptr<StatsTracker> IngoMoveGrinder_Descriptor::make_stats() const{
 }
 
 
-IngoMoveGrinder::IngoMoveGrinder(const IngoMoveGrinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , OPPONENT(
+IngoMoveGrinder::IngoMoveGrinder()
+    : OPPONENT(
         "<b>Opponent:</b>",
         std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
         0

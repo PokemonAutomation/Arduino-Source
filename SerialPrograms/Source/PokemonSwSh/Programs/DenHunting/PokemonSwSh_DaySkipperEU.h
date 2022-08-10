@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class DaySkipperEU_Descriptor : public RunnableSwitchProgramDescriptor{
+class DaySkipperEU_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     DaySkipperEU_Descriptor();
 
@@ -26,9 +26,9 @@ public:
 
 
 
-class DaySkipperEU : public SingleSwitchProgramInstance{
+class DaySkipperEU : public SingleSwitchProgramInstance2{
 public:
-    DaySkipperEU(const DaySkipperEU_Descriptor& descriptor);
+    DaySkipperEU();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

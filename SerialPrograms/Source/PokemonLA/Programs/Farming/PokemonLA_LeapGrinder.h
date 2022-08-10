@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class LeapGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class LeapGrinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     LeapGrinder_Descriptor();
 
@@ -29,9 +29,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class LeapGrinder : public SingleSwitchProgramInstance{
+class LeapGrinder : public SingleSwitchProgramInstance2{
 public:
-    LeapGrinder(const LeapGrinder_Descriptor& descriptor);
+    LeapGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

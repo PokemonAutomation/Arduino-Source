@@ -21,7 +21,7 @@ namespace PokemonLA{
 
 
 OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:OverworldWatcher",
         STRING_POKEMON + " LA", "Overworld Watcher",
         "",
@@ -33,10 +33,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
 {}
 
 
-OverworldWatcher::OverworldWatcher(const OverworldWatcher_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{
-}
+OverworldWatcher::OverworldWatcher(){}
 
 
 void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

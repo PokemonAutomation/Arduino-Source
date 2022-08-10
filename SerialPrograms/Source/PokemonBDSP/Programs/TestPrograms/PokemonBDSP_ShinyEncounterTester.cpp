@@ -14,7 +14,7 @@ namespace PokemonBDSP{
 
 
 ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyEncounterTester",
         STRING_POKEMON + " BDSP", "Shiny Encounter Tester",
         "",
@@ -26,9 +26,8 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
 
 
 
-ShinyEncounterTester::ShinyEncounterTester(const ShinyEncounterTester_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , ENCOUNTER_TYPE(
+ShinyEncounterTester::ShinyEncounterTester()
+    : ENCOUNTER_TYPE(
         "<b>Encounter Type:</b>",
         {
             "Starter Battle",

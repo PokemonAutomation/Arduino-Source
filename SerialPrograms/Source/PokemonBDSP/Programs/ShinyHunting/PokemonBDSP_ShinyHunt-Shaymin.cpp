@@ -22,7 +22,7 @@ namespace PokemonBDSP{
 
 
 ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntShaymin",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Shaymin.md",
@@ -36,9 +36,8 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{
 }
 
 
-ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntShaymin::ShinyHuntShaymin()
+    : GO_HOME_WHEN_DONE(false)
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATIONS({

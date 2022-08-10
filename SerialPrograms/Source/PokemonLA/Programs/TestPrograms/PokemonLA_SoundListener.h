@@ -18,15 +18,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class SoundListener_Descriptor : public RunnableSwitchProgramDescriptor{
+class SoundListener_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SoundListener_Descriptor();
 };
 
 
-class SoundListener : public SingleSwitchProgramInstance{
+class SoundListener : public SingleSwitchProgramInstance2{
 public:
-    SoundListener(const SoundListener_Descriptor& descriptor);
+    SoundListener();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

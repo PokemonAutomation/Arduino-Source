@@ -28,7 +28,7 @@ namespace PokemonLA{
 
 
 PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:PostMMOSpawnReset",
         STRING_POKEMON + " LA", "Post-MMO Spawn Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PostMMOSpawnReset.md",
@@ -61,9 +61,8 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset_Descriptor::make_stats() const{
 }
 
 
-PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , TURN_DURATION(
+PostMMOSpawnReset::PostMMOSpawnReset()
+    : TURN_DURATION(
         "<b>Camera Turn:</b><br>How many ticks to turn the camera. <br>Positive values for right turns. Negative values for left turns.",
         "0"
     )

@@ -38,7 +38,7 @@ const std::vector<std::string>& DEX_SLUGS_COMBIMED(){
 
 
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DexRecFinder",
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
@@ -95,9 +95,8 @@ DexRecFilters::DexRecFilters()
 
 
 
-DexRecFinder::DexRecFinder(const DexRecFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+DexRecFinder::DexRecFinder()
+    : GO_HOME_WHEN_DONE(false)
     , VIEW_TIME(
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
         "2 * TICKS_PER_SECOND"

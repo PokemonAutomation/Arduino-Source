@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousFishing_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousFishing_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousFishing_Descriptor();
 
@@ -33,9 +33,9 @@ public:
 
 
 
-class ShinyHuntAutonomousFishing : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousFishing : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousFishing(const ShinyHuntAutonomousFishing_Descriptor& descriptor);
+    ShinyHuntAutonomousFishing();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

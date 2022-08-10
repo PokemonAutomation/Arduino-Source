@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousStrongSpawn_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousStrongSpawn_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousStrongSpawn_Descriptor();
 
@@ -32,9 +32,9 @@ public:
 
 
 
-class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousStrongSpawn(const ShinyHuntAutonomousStrongSpawn_Descriptor& descriptor);
+    ShinyHuntAutonomousStrongSpawn();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

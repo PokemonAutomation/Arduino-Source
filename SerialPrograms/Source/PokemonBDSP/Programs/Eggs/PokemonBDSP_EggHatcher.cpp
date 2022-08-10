@@ -22,7 +22,7 @@ namespace PokemonBDSP{
 
 
 EggHatcher_Descriptor::EggHatcher_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggHatcher",
         STRING_POKEMON + " BDSP", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggHatcher.md",
@@ -44,9 +44,8 @@ std::unique_ptr<StatsTracker> EggHatcher_Descriptor::make_stats() const{
 }
 
 
-EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+EggHatcher::EggHatcher()
+    : GO_HOME_WHEN_DONE(false)
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
     , BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",

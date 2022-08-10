@@ -33,7 +33,7 @@ namespace PokemonLA{
 
 
 UnownFinder_Descriptor::UnownFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:UnownFinder",
         STRING_POKEMON + " LA", "Unown Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/UnownHunter.md",
@@ -68,9 +68,8 @@ std::unique_ptr<StatsTracker> UnownFinder_Descriptor::make_stats() const{
 
 
 
-UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED_ENROUTE(
+UnownFinder::UnownFinder()
+    : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the ruins.",
         "0 * TICKS_PER_SECOND"

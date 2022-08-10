@@ -16,15 +16,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class TurboButton_Descriptor : public RunnableSwitchProgramDescriptor{
+class TurboButton_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TurboButton_Descriptor();
 };
 
 
-class TurboButton : public SingleSwitchProgramInstance{
+class TurboButton : public SingleSwitchProgramInstance2{
 public:
-    TurboButton(const TurboButton_Descriptor& descriptor);
+    TurboButton();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

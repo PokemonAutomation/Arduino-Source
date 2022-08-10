@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class UnownFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class UnownFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     UnownFinder_Descriptor();
 
@@ -24,9 +24,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class UnownFinder : public SingleSwitchProgramInstance{
+class UnownFinder : public SingleSwitchProgramInstance2{
 public:
-    UnownFinder(const UnownFinder_Descriptor& descriptor);
+    UnownFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

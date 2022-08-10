@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class GiftBerryReset_Descriptor : public RunnableSwitchProgramDescriptor{
+class GiftBerryReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GiftBerryReset_Descriptor();
 
@@ -27,9 +27,9 @@ public:
 };
 
 
-class GiftBerryReset : public SingleSwitchProgramInstance{
+class GiftBerryReset : public SingleSwitchProgramInstance2{
 public:
-    GiftBerryReset(const GiftBerryReset_Descriptor& descriptor);
+    GiftBerryReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

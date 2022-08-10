@@ -16,17 +16,17 @@ namespace NintendoSwitch{
 namespace PokemonHome{
 
 
-class GenerateNameOCRData_Descriptor : public RunnableSwitchProgramDescriptor{
+class GenerateNameOCRData_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GenerateNameOCRData_Descriptor();
 };
 
 
 
-class GenerateNameOCRData : public SingleSwitchProgramInstance{
+class GenerateNameOCRData : public SingleSwitchProgramInstance2{
 
 public:
-    GenerateNameOCRData(const GenerateNameOCRData_Descriptor& descriptor);
+    GenerateNameOCRData();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

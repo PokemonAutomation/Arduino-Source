@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustice_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
@@ -33,9 +33,8 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
 {}
 
 
-ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const ShinyHuntUnattendedSwordsOfJustice_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , EXIT_CAMP_TO_RUN_DELAY(
+ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
+    : EXIT_CAMP_TO_RUN_DELAY(
         "<b>Exit Camp to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1890"
     )

@@ -93,7 +93,7 @@ private:
 
 
 
-EventNotificationOption EggAutonomousState::m_notification_noop;
+EventNotificationOption EggAutonomousState::m_notification_noop("", false, false);
 
 
 EggAutonomousState::EggAutonomousState(

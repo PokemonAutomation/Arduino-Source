@@ -17,16 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class WattFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class WattFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     WattFarmer_Descriptor();
 };
 
 
 
-class WattFarmer : public SingleSwitchProgramInstance{
+class WattFarmer : public SingleSwitchProgramInstance2{
 public:
-    WattFarmer(const WattFarmer_Descriptor& descriptor);
+    WattFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

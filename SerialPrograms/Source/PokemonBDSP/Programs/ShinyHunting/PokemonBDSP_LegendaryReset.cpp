@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 LegendaryReset_Descriptor::LegendaryReset_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:LegendaryReset",
         STRING_POKEMON + " BDSP", "Legendary Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/LegendaryReset.md",
@@ -38,9 +38,8 @@ std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
 }
 
 
-LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+LegendaryReset::LegendaryReset()
+    : GO_HOME_WHEN_DONE(false)
     , WALK_UP("<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.", false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATIONS({

@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-class AutonomousBallThrower_Descriptor : public RunnableSwitchProgramDescriptor{
+class AutonomousBallThrower_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutonomousBallThrower_Descriptor();
 
@@ -30,9 +30,9 @@ public:
 
 
 
-class AutonomousBallThrower : public SingleSwitchProgramInstance{
+class AutonomousBallThrower : public SingleSwitchProgramInstance2{
 public:
-    AutonomousBallThrower(const AutonomousBallThrower_Descriptor& descriptor);
+    AutonomousBallThrower();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

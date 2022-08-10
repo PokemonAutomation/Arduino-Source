@@ -17,16 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class EggFetcherMultiple_Descriptor : public RunnableSwitchProgramDescriptor{
+class EggFetcherMultiple_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EggFetcherMultiple_Descriptor();
 };
 
 
 
-class EggFetcherMultiple : public SingleSwitchProgramInstance{
+class EggFetcherMultiple : public SingleSwitchProgramInstance2{
 public:
-    EggFetcherMultiple(const EggFetcherMultiple_Descriptor& descriptor);
+    EggFetcherMultiple();
 
     void run_eggfetcher(Logger& logger, BotBaseContext& context, bool deposit_automatically, uint16_t attempts) const;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

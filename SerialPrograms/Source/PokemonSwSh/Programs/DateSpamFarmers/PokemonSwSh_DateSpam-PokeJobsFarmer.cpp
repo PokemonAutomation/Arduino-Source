@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 
 
 PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
           "PokemonSwSh:PokeJobsFarmer",
           STRING_POKEMON + " SwSh",
           "Date Spam - " + STRING_POKEJOB + "s Farmer",
@@ -31,9 +31,8 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
 {
 }
 
-PokeJobsFarmer::PokeJobsFarmer(const PokeJobsFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor),
-      SKIPS(
+PokeJobsFarmer::PokeJobsFarmer()
+    : SKIPS(
           "<b>Number of days:</b>",
           200),
       CONCURRENCY(

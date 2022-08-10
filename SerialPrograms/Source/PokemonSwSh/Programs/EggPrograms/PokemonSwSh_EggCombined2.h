@@ -22,16 +22,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class EggCombined2_Descriptor : public RunnableSwitchProgramDescriptor{
+class EggCombined2_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EggCombined2_Descriptor();
 };
 
 
 
-class EggCombined2 : public SingleSwitchProgramInstance{
+class EggCombined2 : public SingleSwitchProgramInstance2{
 public:
-    EggCombined2(const EggCombined2_Descriptor& descriptor);
+    EggCombined2();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

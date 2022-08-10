@@ -20,16 +20,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntUnattendedStrongSpawn_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntUnattendedStrongSpawn_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntUnattendedStrongSpawn_Descriptor();
 };
 
 
 
-class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance{
+class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntUnattendedStrongSpawn(const ShinyHuntUnattendedStrongSpawn_Descriptor& descriptor);
+    ShinyHuntUnattendedStrongSpawn();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

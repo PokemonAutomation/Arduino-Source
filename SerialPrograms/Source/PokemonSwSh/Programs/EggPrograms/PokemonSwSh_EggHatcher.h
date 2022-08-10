@@ -20,16 +20,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class EggHatcher_Descriptor : public RunnableSwitchProgramDescriptor{
+class EggHatcher_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EggHatcher_Descriptor();
 };
 
 
 
-class EggHatcher : public SingleSwitchProgramInstance{
+class EggHatcher : public SingleSwitchProgramInstance2{
 public:
-    EggHatcher(const EggHatcher_Descriptor& descriptor);
+    EggHatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

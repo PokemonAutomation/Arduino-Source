@@ -19,7 +19,7 @@ namespace PokemonBDSP{
 
 
 MassRelease_Descriptor::MassRelease_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:MassRelease",
         STRING_POKEMON + " BDSP", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MassRelease.md",
@@ -42,9 +42,8 @@ std::unique_ptr<StatsTracker> MassRelease_Descriptor::make_stats() const{
 
 
 
-MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+MassRelease::MassRelease()
+    : GO_HOME_WHEN_DONE(false)
     , BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
         2, 0, 40

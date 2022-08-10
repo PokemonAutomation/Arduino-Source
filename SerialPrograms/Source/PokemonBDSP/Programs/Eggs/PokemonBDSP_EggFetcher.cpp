@@ -20,7 +20,7 @@ namespace PokemonBDSP{
 
 
 EggFetcher_Descriptor::EggFetcher_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggFetcher",
         STRING_POKEMON + " BDSP", "Egg Fetcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggFetcher.md",
@@ -43,9 +43,8 @@ std::unique_ptr<StatsTracker> EggFetcher_Descriptor::make_stats() const{
 
 
 
-EggFetcher::EggFetcher(const EggFetcher_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+EggFetcher::EggFetcher()
+    : GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Bike Shortcut:</b>")
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",

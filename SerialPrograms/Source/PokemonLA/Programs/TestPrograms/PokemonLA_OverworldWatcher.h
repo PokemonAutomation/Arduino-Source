@@ -15,15 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class OverworldWatcher_Descriptor : public RunnableSwitchProgramDescriptor{
+class OverworldWatcher_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     OverworldWatcher_Descriptor();
 };
 
 
-class OverworldWatcher : public SingleSwitchProgramInstance{
+class OverworldWatcher : public SingleSwitchProgramInstance2{
 public:
-    OverworldWatcher(const OverworldWatcher_Descriptor& descriptor);
+    OverworldWatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

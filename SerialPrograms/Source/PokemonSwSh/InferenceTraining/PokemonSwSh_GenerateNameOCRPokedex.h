@@ -19,14 +19,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class GenerateNameOCRDataPokedex_Descriptor : public RunnableSwitchProgramDescriptor{
+class GenerateNameOCRDataPokedex_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GenerateNameOCRDataPokedex_Descriptor();
 };
 
 
 
-class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
+class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance2{
 public:
     enum Mode{
         READ_AND_SAVE,
@@ -34,7 +34,7 @@ public:
     };
 
 public:
-    GenerateNameOCRDataPokedex(const GenerateNameOCRDataPokedex_Descriptor& descriptor);
+    GenerateNameOCRDataPokedex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

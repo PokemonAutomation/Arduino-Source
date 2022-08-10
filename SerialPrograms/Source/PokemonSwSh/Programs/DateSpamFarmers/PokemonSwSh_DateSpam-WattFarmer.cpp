@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 WattFarmer_Descriptor::WattFarmer_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:WattFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-WattFarmer.md",
@@ -31,9 +31,8 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
 
 
 
-WattFarmer::WattFarmer(const WattFarmer_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GRIP_MENU_WAIT(
+WattFarmer::WattFarmer()
+    : GRIP_MENU_WAIT(
         "<b>Exit Grip Menu Delay:</b> Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
         "5 * TICKS_PER_SECOND"
     )

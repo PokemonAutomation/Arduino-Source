@@ -44,23 +44,23 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 
     add_divider("---- Programs ----");
 //    add_program<TurboA_Descriptor, TurboA>();
-    add_panel(make_single_switch_program<TurboA_Descriptor, TurboA2>());
-    add_program<TurboButton_Descriptor, TurboButton>();
-    add_program<PreventSleep_Descriptor, PreventSleep>();
-    add_program<FriendCodeAdder_Descriptor, FriendCodeAdder>();
-    add_program<FriendDelete_Descriptor, FriendDelete>();
+    add_panel(make_single_switch_program<TurboA_Descriptor, TurboA>());
+    add_panel(make_single_switch_program<TurboButton_Descriptor, TurboButton>());
+    add_panel(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
+    add_panel(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
+    add_panel(make_single_switch_program<FriendDelete_Descriptor, FriendDelete>());
 
 //    add_divider("---- " + STRING_POKEMON + " Home ----");
-    add_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>();
+    add_panel(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<TestProgramComputer_Descriptor, TestProgramComputer>();
         add_program<TestProgram_Descriptor, TestProgram>();
-        add_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>();
+        add_panel(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
         add_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>();
         add_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>();
-        add_program<TestPathMaker_Descriptor, TestPathMaker>();
+        add_panel(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
     }
 
 

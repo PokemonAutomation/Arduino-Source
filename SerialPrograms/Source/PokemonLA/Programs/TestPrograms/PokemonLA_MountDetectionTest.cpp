@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 
 MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:MountDetectionTest",
         STRING_POKEMON + " LA", "Mount Detection Test",
         "",
@@ -28,9 +28,8 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
 {}
 
 
-MountDetectionTest::MountDetectionTest(const MountDetectionTest_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , FAILED_ACTION(
+MountDetectionTest::MountDetectionTest()
+    : FAILED_ACTION(
         "<b>Detection Failed Action</b>",
         {
             "Do Nothing",

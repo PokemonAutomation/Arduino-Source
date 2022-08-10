@@ -24,7 +24,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousSwordsOfJustice_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousSwordsOfJustice_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousSwordsOfJustice_Descriptor();
 
@@ -33,9 +33,9 @@ public:
 
 
 
-class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousSwordsOfJustice(const ShinyHuntAutonomousSwordsOfJustice_Descriptor& descriptor);
+    ShinyHuntAutonomousSwordsOfJustice();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

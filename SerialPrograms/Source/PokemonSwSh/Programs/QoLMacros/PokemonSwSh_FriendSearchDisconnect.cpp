@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:FriendSearchDisconnect",
         STRING_POKEMON + " SwSh", "Friend Search Disconnect",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FriendSearchDisconnect.md",
@@ -30,9 +30,8 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
 
 
 
-FriendSearchDisconnect::FriendSearchDisconnect(const FriendSearchDisconnect_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , USER_SLOT(
+FriendSearchDisconnect::FriendSearchDisconnect()
+    : USER_SLOT(
         "<b>User Slot:</b><br>Use this profile to disconnect.",
         1, 1, 8
     )

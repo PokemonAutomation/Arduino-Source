@@ -13,16 +13,16 @@ namespace PokemonSwSh{
 
 
 
-class ShinyEncounterTester_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyEncounterTester_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyEncounterTester_Descriptor();
 };
 
 
 
-class ShinyEncounterTester : public SingleSwitchProgramInstance{
+class ShinyEncounterTester : public SingleSwitchProgramInstance2{
 public:
-    ShinyEncounterTester(const ShinyEncounterTester_Descriptor& descriptor);
+    ShinyEncounterTester();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

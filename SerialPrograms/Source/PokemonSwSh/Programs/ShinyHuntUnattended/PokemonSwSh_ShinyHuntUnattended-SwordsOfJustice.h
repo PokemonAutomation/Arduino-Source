@@ -20,16 +20,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntUnattendedSwordsOfJustice_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntUnattendedSwordsOfJustice_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntUnattendedSwordsOfJustice_Descriptor();
 };
 
 
 
-class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance{
+class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntUnattendedSwordsOfJustice(const ShinyHuntUnattendedSwordsOfJustice_Descriptor& descriptor);
+    ShinyHuntUnattendedSwordsOfJustice();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

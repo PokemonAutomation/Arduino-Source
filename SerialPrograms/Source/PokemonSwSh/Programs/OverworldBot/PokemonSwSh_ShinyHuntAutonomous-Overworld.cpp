@@ -31,7 +31,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousOverworld",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
@@ -56,9 +56,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld_Descriptor::make_stat
 
 
 
-ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutonomousOverworld_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
+    : GO_HOME_WHEN_DONE(false)
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
         1, 0, 11

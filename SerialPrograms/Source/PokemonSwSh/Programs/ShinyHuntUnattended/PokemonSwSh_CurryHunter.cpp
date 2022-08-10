@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 CurryHunter_Descriptor::CurryHunter_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:CurryHunter",
         STRING_POKEMON + " SwSh", "Curry Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
@@ -49,9 +49,8 @@ std::unique_ptr<StatsTracker> CurryHunter_Descriptor::make_stats() const{
 }
 
 
-CurryHunter::CurryHunter(const CurryHunter_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , WALK_UP_DELAY(
+CurryHunter::CurryHunter()
+    : WALK_UP_DELAY(
         "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
         "2 * TICKS_PER_SECOND"
     )

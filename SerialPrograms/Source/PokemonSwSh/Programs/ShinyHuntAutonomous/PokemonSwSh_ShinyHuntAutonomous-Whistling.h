@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntAutonomousWhistling_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntAutonomousWhistling_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntAutonomousWhistling_Descriptor();
 
@@ -33,9 +33,9 @@ public:
 
 
 
-class ShinyHuntAutonomousWhistling : public SingleSwitchProgramInstance{
+class ShinyHuntAutonomousWhistling : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntAutonomousWhistling(const ShinyHuntAutonomousWhistling_Descriptor& descriptor);
+    ShinyHuntAutonomousWhistling();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

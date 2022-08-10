@@ -15,15 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class SkipToFullMoon_Descriptor : public RunnableSwitchProgramDescriptor{
+class SkipToFullMoon_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SkipToFullMoon_Descriptor();
 };
 
 
-class SkipToFullMoon : public SingleSwitchProgramInstance{
+class SkipToFullMoon : public SingleSwitchProgramInstance2{
 public:
-    SkipToFullMoon(const SkipToFullMoon_Descriptor& descriptor);
+    SkipToFullMoon();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

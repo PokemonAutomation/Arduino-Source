@@ -16,16 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class StowOnSideFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+class StowOnSideFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StowOnSideFarmer_Descriptor();
 };
 
 
 
-class StowOnSideFarmer : public SingleSwitchProgramInstance{
+class StowOnSideFarmer : public SingleSwitchProgramInstance2{
 public:
-    StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor);
+    StowOnSideFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

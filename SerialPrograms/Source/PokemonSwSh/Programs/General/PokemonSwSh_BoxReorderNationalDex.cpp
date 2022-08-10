@@ -109,7 +109,7 @@ namespace{
 }
 
 BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BoxReorderNationalDex",
         STRING_POKEMON + " SwSh", "Box Reorder National Dex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BoxReorderNationalDex.md",
@@ -121,9 +121,8 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
 
 
 
-BoxReorderNationalDex::BoxReorderNationalDex(const BoxReorderNationalDex_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , LANGUAGE(
+BoxReorderNationalDex::BoxReorderNationalDex()
+    : LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for " + STRING_POKEMON + " to be identified correctly.",
         PokemonNameReader::instance().languages(), true
     )

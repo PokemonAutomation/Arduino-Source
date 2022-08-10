@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 
 PreventSleep_Descriptor::PreventSleep_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "NintendoSwitch:PreventSleep",
         "Nintendo Switch", "Prevent Sleep",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PreventSleep.md",
@@ -25,9 +25,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
 
 
 
-PreventSleep::PreventSleep(const PreventSleep_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-{}
+PreventSleep::PreventSleep(){}
 
 void PreventSleep::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     while (true){

@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:SurpriseTrade",
         STRING_POKEMON + " SwSh", "Surprise Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
@@ -31,9 +31,8 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
 
 
 
-SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , BOXES_TO_TRADE(
+SurpriseTrade::SurpriseTrade()
+    : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
         2
     )

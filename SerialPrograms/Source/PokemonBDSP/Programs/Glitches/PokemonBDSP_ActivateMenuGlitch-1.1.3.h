@@ -15,16 +15,16 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class ActivateMenuGlitch113_Descriptor : public RunnableSwitchProgramDescriptor{
+class ActivateMenuGlitch113_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ActivateMenuGlitch113_Descriptor();
 };
 
 
 
-class ActivateMenuGlitch113 : public SingleSwitchProgramInstance{
+class ActivateMenuGlitch113 : public SingleSwitchProgramInstance2{
 public:
-    ActivateMenuGlitch113(const ActivateMenuGlitch113_Descriptor& descriptor);
+    ActivateMenuGlitch113();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

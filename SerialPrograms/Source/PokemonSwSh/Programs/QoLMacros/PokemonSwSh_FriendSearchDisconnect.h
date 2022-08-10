@@ -15,16 +15,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class FriendSearchDisconnect_Descriptor : public RunnableSwitchProgramDescriptor{
+class FriendSearchDisconnect_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FriendSearchDisconnect_Descriptor();
 };
 
 
 
-class FriendSearchDisconnect : public SingleSwitchProgramInstance{
+class FriendSearchDisconnect : public SingleSwitchProgramInstance2{
 public:
-    FriendSearchDisconnect(const FriendSearchDisconnect_Descriptor& descriptor);
+    FriendSearchDisconnect();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

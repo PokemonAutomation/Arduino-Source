@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSPh:AutonomousBallThrower",
         STRING_POKEMON + " BDSP", "Autonomous Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/AutonomousBallThrower.md",
@@ -63,9 +63,8 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower_Descriptor::make_stats() con
 
 
 
-AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+AutonomousBallThrower::AutonomousBallThrower()
+    : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",

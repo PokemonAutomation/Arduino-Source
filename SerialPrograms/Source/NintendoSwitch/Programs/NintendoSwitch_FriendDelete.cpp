@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 
 FriendDelete_Descriptor::FriendDelete_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "NintendoSwitch:FriendDelete",
         "Nintendo Switch", "Friend Delete",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendDelete.md",
@@ -24,9 +24,8 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
 {}
 
 
-FriendDelete::FriendDelete(const FriendDelete_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , FRIENDS_TO_DELETE(
+FriendDelete::FriendDelete()
+    : FRIENDS_TO_DELETE(
         "<b>Number of Friends to Delete:</b>",
         3, 0, 300
     )

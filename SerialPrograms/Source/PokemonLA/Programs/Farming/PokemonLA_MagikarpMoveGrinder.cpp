@@ -34,7 +34,7 @@ namespace PokemonLA{
 
 
 MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:MagikarpMoveGrinder",
         STRING_POKEMON + " LA", "Magikarp Move Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/MagikarpMoveGrinder.md",
@@ -65,9 +65,8 @@ std::unique_ptr<StatsTracker> MagikarpMoveGrinder_Descriptor::make_stats() const
 
 
 
-MagikarpMoveGrinder::MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SPECIAL_CASE_MIMIC(
+MagikarpMoveGrinder::MagikarpMoveGrinder()
+    : SPECIAL_CASE_MIMIC(
         "<b>Special Case, Mimic:</b><br>Grind Mimic move usages by switching between first two " + STRING_POKEMON + ". Set the first move as Mimic on the first two " + STRING_POKEMON + ".<br>"
         "After switching, the retreated " + STRING_POKEMON + " will forget the move learned by Mimic, allowing efficient Mimic grinding.<br>"
         "Choosing this will ignore the content in " + STRING_POKEMON + " Action Table.",

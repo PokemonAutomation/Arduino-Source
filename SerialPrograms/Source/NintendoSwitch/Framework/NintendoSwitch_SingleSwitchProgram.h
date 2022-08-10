@@ -74,8 +74,12 @@ private:
 class SingleSwitchProgramInstance2{
 public:
     virtual ~SingleSwitchProgramInstance2() = default;
+    SingleSwitchProgramInstance2(const SingleSwitchProgramInstance2&) = delete;
+    void operator=(const SingleSwitchProgramInstance2&) = delete;
 
-    virtual void run(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
+    SingleSwitchProgramInstance2();
+
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
 
 
 public:

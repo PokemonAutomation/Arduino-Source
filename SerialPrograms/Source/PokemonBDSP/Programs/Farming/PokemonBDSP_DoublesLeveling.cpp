@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonBDSP:DoublesLeveling",
         STRING_POKEMON + " BDSP", "Double Battle Leveling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
@@ -48,9 +48,8 @@ std::unique_ptr<StatsTracker> DoublesLeveling_Descriptor::make_stats() const{
 }
 
 
-DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+DoublesLeveling::DoublesLeveling()
+    : GO_HOME_WHEN_DONE(false)
     , ON_LEARN_MOVE(
         "<b>On Learn Move:</b>",
         {

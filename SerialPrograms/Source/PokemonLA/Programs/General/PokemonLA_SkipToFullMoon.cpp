@@ -23,7 +23,7 @@ using namespace Pokemon;
 
 
 SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:SkipToFullMoon",
         STRING_POKEMON + " LA", "Skip to Full Moon",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SkipToFullMoon.md",
@@ -34,9 +34,8 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
 {}
 
 
-SkipToFullMoon::SkipToFullMoon(const SkipToFullMoon_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , NOTIFICATIONS({
+SkipToFullMoon::SkipToFullMoon()
+    : NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })

@@ -29,7 +29,7 @@ namespace PokemonSwSh{
 
 
 StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetMoltres",
         STRING_POKEMON + " SwSh", "Stats Reset - Moltres",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Moltres.md",
@@ -60,9 +60,8 @@ std::unique_ptr<StatsTracker> StatsResetMoltres_Descriptor::make_stats() const{
 
 
 
-StatsResetMoltres::StatsResetMoltres(const StatsResetMoltres_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+StatsResetMoltres::StatsResetMoltres()
+    : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages(),

@@ -41,7 +41,7 @@ enum class TimeOfDay{
 
 
 AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:AutoMultiSpawn",
         STRING_POKEMON + " LA", "Auto Multi-Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AutoMultiSpawn.md",
@@ -52,9 +52,8 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
 {}
 
 
-AutoMultiSpawn::AutoMultiSpawn(const AutoMultiSpawn_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SPAWN("<b>Spawn Point</b>:", 
+AutoMultiSpawn::AutoMultiSpawn()
+    : SPAWN("<b>Spawn Point</b>:",
     {
         "Mirelands - Hippopotas"
     }, 0)

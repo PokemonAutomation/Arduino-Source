@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class ShinyHuntShaymin_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntShaymin_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntShaymin_Descriptor();
 
@@ -29,9 +29,9 @@ public:
 };
 
 
-class ShinyHuntShaymin : public SingleSwitchProgramInstance{
+class ShinyHuntShaymin : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor);
+    ShinyHuntShaymin();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

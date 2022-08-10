@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:GodEggItemDupe",
         STRING_POKEMON + " SwSh", "God Egg Item Duplication",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggItemDuplication.md",
@@ -33,9 +33,8 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
 
 
 
-GodEggItemDupe::GodEggItemDupe(const GodEggItemDupe_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , MAX_FETCH_ATTEMPTS(
+GodEggItemDupe::GodEggItemDupe()
+    : MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
         2000
     )

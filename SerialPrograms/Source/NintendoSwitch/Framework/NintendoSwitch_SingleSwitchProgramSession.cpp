@@ -77,12 +77,14 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
 
     try{
         BotBaseContext context(scope, env.console.botbase());
-        m_option.instance().run(env, context);
+        m_option.instance().program(env, context);
     }catch (...){
         SpinLockGuard lg(m_lock);
         m_scope = nullptr;
         throw;
     }
+    SpinLockGuard lg(m_lock);
+    m_scope = nullptr;
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     SpinLockGuard lg(m_lock);

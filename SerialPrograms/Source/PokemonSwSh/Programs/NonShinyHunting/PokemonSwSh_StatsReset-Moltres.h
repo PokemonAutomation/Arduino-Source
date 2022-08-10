@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class StatsResetMoltres_Descriptor : public RunnableSwitchProgramDescriptor{
+class StatsResetMoltres_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StatsResetMoltres_Descriptor();
 
@@ -31,9 +31,9 @@ public:
 
 
 
-class StatsResetMoltres : public SingleSwitchProgramInstance{
+class StatsResetMoltres : public SingleSwitchProgramInstance2{
 public:
-    StatsResetMoltres(const StatsResetMoltres_Descriptor& descriptor);
+    StatsResetMoltres();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

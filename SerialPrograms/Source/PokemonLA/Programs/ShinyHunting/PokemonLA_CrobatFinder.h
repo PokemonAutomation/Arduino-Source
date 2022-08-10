@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class CrobatFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class CrobatFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     CrobatFinder_Descriptor();
 
@@ -25,9 +25,9 @@ public:
 };
 
 
-class CrobatFinder : public SingleSwitchProgramInstance{
+class CrobatFinder : public SingleSwitchProgramInstance2{
 public:
-    CrobatFinder(const CrobatFinder_Descriptor& descriptor);
+    CrobatFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

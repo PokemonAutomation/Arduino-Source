@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class CloneItemsBoxCopy2_Descriptor : public RunnableSwitchProgramDescriptor{
+class CloneItemsBoxCopy2_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     CloneItemsBoxCopy2_Descriptor();
     struct Stats;
@@ -28,9 +28,9 @@ public:
 
 
 
-class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
+class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance2{
 public:
-    CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor);
+    CloneItemsBoxCopy2();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

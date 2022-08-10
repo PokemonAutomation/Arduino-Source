@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class GalladeFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class GalladeFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GalladeFinder_Descriptor();
 
@@ -25,9 +25,9 @@ public:
 };
 
 
-class GalladeFinder : public SingleSwitchProgramInstance{
+class GalladeFinder : public SingleSwitchProgramInstance2{
 public:
-    GalladeFinder(const GalladeFinder_Descriptor& descriptor);
+    GalladeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

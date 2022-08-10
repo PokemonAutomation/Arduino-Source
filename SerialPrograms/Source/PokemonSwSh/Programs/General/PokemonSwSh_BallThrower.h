@@ -15,16 +15,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class BallThrower_Descriptor : public RunnableSwitchProgramDescriptor{
+class BallThrower_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BallThrower_Descriptor();
 };
 
 
 
-class BallThrower : public SingleSwitchProgramInstance{
+class BallThrower : public SingleSwitchProgramInstance2{
 public:
-    BallThrower(const BallThrower_Descriptor& descriptor);
+    BallThrower();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

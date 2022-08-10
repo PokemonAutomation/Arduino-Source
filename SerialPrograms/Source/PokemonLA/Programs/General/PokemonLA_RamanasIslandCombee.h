@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class RamanasCombeeFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class RamanasCombeeFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     RamanasCombeeFinder_Descriptor();
 
@@ -27,9 +27,9 @@ public:
 };
 
 
-class RamanasCombeeFinder: public SingleSwitchProgramInstance{
+class RamanasCombeeFinder: public SingleSwitchProgramInstance2{
 public:
-    RamanasCombeeFinder(const RamanasCombeeFinder_Descriptor& descriptor);
+    RamanasCombeeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

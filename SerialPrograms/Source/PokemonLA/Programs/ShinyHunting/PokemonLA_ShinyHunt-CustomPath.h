@@ -25,7 +25,7 @@ namespace PokemonLA{
 
 
 
-class ShinyHuntCustomPath_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntCustomPath_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntCustomPath_Descriptor();
 
@@ -34,9 +34,9 @@ public:
 };
 
 
-class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
+class ShinyHuntCustomPath : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor);
+    ShinyHuntCustomPath();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

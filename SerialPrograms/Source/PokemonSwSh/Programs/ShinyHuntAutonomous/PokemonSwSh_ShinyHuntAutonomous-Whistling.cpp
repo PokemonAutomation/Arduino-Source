@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousWhistling",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Whistling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Whistling.md",
@@ -51,9 +51,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling_Descriptor::make_stat
 
 
 
-ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutonomousWhistling_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
+    : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,

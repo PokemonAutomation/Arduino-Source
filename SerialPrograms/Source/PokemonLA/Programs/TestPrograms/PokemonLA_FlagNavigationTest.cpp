@@ -16,7 +16,7 @@ namespace PokemonLA{
 
 
 FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:FlagNavigationTest",
         STRING_POKEMON + " LA", "Flag Navigation Test",
         "",
@@ -27,9 +27,8 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
 {}
 
 
-FlagNavigationTest::FlagNavigationTest(const FlagNavigationTest_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , STOP_DISTANCE(
+FlagNavigationTest::FlagNavigationTest()
+    : STOP_DISTANCE(
         "<b>Stop Distance:</b><br>"
         "You have reached the flag when you come within this distance of it. "
         "Don't set this too small. The navigation is not precise enough to land directly on the flag.",

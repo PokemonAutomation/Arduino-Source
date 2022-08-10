@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-class StatsResetCalyrex_Descriptor : public RunnableSwitchProgramDescriptor{
+class StatsResetCalyrex_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StatsResetCalyrex_Descriptor();
 
@@ -33,9 +33,9 @@ public:
 
 
 
-class StatsResetCalyrex : public SingleSwitchProgramInstance{
+class StatsResetCalyrex : public SingleSwitchProgramInstance2{
 public:
-    StatsResetCalyrex(const StatsResetCalyrex_Descriptor& descriptor);
+    StatsResetCalyrex();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

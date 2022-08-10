@@ -18,16 +18,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ShinyHuntUnattendedIoATrade_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntUnattendedIoATrade_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ShinyHuntUnattendedIoATrade_Descriptor();
 };
 
 
 
-class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance{
+class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance2{
 public:
-    ShinyHuntUnattendedIoATrade(const ShinyHuntUnattendedIoATrade_Descriptor& descriptor);
+    ShinyHuntUnattendedIoATrade();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

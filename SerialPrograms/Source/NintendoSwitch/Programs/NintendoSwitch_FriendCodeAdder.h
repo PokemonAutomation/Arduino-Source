@@ -17,15 +17,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendCodeAdder_Descriptor : public RunnableSwitchProgramDescriptor{
+class FriendCodeAdder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     FriendCodeAdder_Descriptor();
 };
 
 
-class FriendCodeAdder : public SingleSwitchProgramInstance{
+class FriendCodeAdder : public SingleSwitchProgramInstance2{
 public:
-    FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor);
+    FriendCodeAdder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

@@ -17,16 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class BeamReset_Descriptor : public RunnableSwitchProgramDescriptor{
+class BeamReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BeamReset_Descriptor();
 };
 
 
 
-class BeamReset : public SingleSwitchProgramInstance{
+class BeamReset : public SingleSwitchProgramInstance2{
 public:
-    BeamReset(const BeamReset_Descriptor& descriptor);
+    BeamReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

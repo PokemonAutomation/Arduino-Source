@@ -16,16 +16,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class EventBeamFinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class EventBeamFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     EventBeamFinder_Descriptor();
 };
 
 
 
-class EventBeamFinder : public SingleSwitchProgramInstance{
+class EventBeamFinder : public SingleSwitchProgramInstance2{
 public:
-    EventBeamFinder(const EventBeamFinder_Descriptor& descriptor);
+    EventBeamFinder();
 
 
     void goto_near_den(BotBaseContext& context) const;

@@ -27,7 +27,7 @@ namespace PokemonLA{
 
 
 GalladeFinder_Descriptor::GalladeFinder_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : SingleSwitchProgramDescriptor(
         "PokemonLA:GalladeFinder",
         STRING_POKEMON + " LA", "Alpha Gallade Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaGalladeHunter.md",
@@ -60,9 +60,8 @@ std::unique_ptr<StatsTracker> GalladeFinder_Descriptor::make_stats() const{
 }
 
 
-GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED_ENROUTE(
+GalladeFinder::GalladeFinder()
+    : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if you are still traveling to the Gallade.",
         "0 * TICKS_PER_SECOND"
