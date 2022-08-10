@@ -20,7 +20,7 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     Logger& logger,
     uint64_t program_id
 )
-    : SwitchSetupWidget(parent, factory)
+    : SwitchSetupWidget(parent)
     , m_program_id(program_id)
     , m_factory(factory)
     , m_logger(logger)

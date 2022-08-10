@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <vector>
-#include "NintendoSwitch_SwitchSystem.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,9 +42,6 @@ public:
     size_t count() const{ return m_active_switches; }
     void resize(size_t count);
 
-    const QSerialPortInfo* port(size_t index) const;
-//    const QCameraInfo* camera(size_t index) const;
-
     SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
 
 private:
@@ -52,7 +49,7 @@ private:
     const size_t m_min_switches;
     const size_t m_max_switches;
     size_t m_active_switches;
-    std::vector<std::unique_ptr<SwitchSystemFactory>> m_switches;
+    std::vector<std::unique_ptr<SwitchSystemOption>> m_switches;
 };
 
 

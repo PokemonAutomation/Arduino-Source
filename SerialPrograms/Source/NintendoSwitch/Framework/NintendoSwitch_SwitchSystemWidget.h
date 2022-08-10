@@ -9,7 +9,7 @@
 
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
-#include "NintendoSwitch_SwitchSystem.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
@@ -28,18 +28,15 @@ public:
     virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
         QWidget& parent,
-        SwitchSystemFactory& factory,
+        SwitchSystemOption& option,
         Logger& raw_logger,
         uint64_t program_id
     );
     SwitchSystemWidget(
         QWidget& parent,
-        SwitchSystemFactory& factory,
         SwitchSystemSession& session,
         uint64_t program_id
     );
-
-    ProgramState last_known_state() const;
 
     virtual bool serial_ok() const override;
     virtual void wait_for_all_requests() override;
@@ -63,8 +60,6 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    SwitchSystemFactory& m_factory;
-
     std::unique_ptr<SwitchSystemSession> m_session_owner;
     SwitchSystemSession& m_session;
 

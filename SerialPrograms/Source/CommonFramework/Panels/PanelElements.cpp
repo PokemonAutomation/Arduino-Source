@@ -65,13 +65,13 @@ CollapsibleGroupBox* make_panel_header(
     switch (feedback){
     case FeedbackType::NONE:
         text = new QLabel(
-            "<font color=\"purple\">(This program does not use feedback. It can run without video input.</font>)",
+            QString::fromStdString(html_color_text("(This program does not use feedback. It can run without video input.)", COLOR_PURPLE)),
             header
         );
         break;
     case FeedbackType::OPTIONAL_:
         text = new QLabel(
-            "<font color=\"purple\">(This program will use video feedback if it is available. Video input is not required.</font>)",
+            QString::fromStdString(html_color_text("(This program will use video feedback if it is available. Video input is not required.)", COLOR_PURPLE)),
             header
         );
         break;
@@ -157,7 +157,21 @@ void StatsBar::set_stats(std::string current_stats, std::string historical_stats
 RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState initial_state)
     : QGroupBox("Actions", &parent)
 {
+#if 0
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    QHBoxLayout* action_layout = new QHBoxLayout();
+    layout->addLayout(action_layout);
+
+    {
+        QPushButton* button = new QPushButton("Still can't find any shinies? Click here to DM Elvis for FREE SHINIES!!!");
+        QFont font = button->font();
+        font.setPointSize(32);
+        button->setFont(font);
+        layout->addWidget(button);
+    }
+#else
     QHBoxLayout* action_layout = new QHBoxLayout(this);
+#endif
 //    action_layout->setContentsMargins(0, 0, 0, 0);
 
     {
@@ -179,7 +193,7 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
 
     connect(
         m_start_button, &QPushButton::clicked,
-        this, [=](bool){ emit start_clicked(); }
+        this, [=](bool){ emit start_clicked(m_last_known_state); }
     );
     connect(
         m_default_button, &QPushButton::clicked,
@@ -197,6 +211,7 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
     );
 }
 void RunnablePanelActionBar::set_state(ProgramState state){
+    m_last_known_state = state;
     switch (state){
     case ProgramState::NOT_READY:
         m_start_button->setText("Loading...");

@@ -4,11 +4,14 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
 
 
 
@@ -29,6 +32,26 @@ QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& 
 
 
 
+
+#if 1
+
+void SingleSwitchProgramInstance2::add_option(ConfigOption& option, std::string serialization_string){
+    m_options.add_option(option, std::move(serialization_string));
+}
+void SingleSwitchProgramInstance2::from_json(const JsonValue& json){
+    m_options.load_json(json);
+}
+JsonValue SingleSwitchProgramInstance2::to_json() const{
+    return m_options.to_json();
+}
+std::string SingleSwitchProgramInstance2::check_validity() const{
+    return m_options.check_validity();
+}
+void SingleSwitchProgramInstance2::restore_defaults(){
+    return m_options.restore_defaults();
+}
+
+#endif
 
 
 

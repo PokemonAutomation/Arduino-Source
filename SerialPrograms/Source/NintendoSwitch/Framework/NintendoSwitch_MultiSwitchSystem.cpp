@@ -58,7 +58,7 @@ void MultiSwitchSystemFactory::load_json(const JsonValue& json){
         size_t items = array->size();
         for (size_t c = 0; c < items; c++){
             m_switches.emplace_back(
-                new SwitchSystemFactory(
+                new SwitchSystemOption(
                     c,
                     m_min_pabotbase,
                     m_feedback, m_allow_commands_while_running,
@@ -82,7 +82,7 @@ JsonValue MultiSwitchSystemFactory::to_json() const{
 void MultiSwitchSystemFactory::resize(size_t count){
     while (m_switches.size() < count){
         m_switches.emplace_back(
-            new SwitchSystemFactory(
+            new SwitchSystemOption(
                 m_switches.size(),
                 m_min_pabotbase,
                 m_feedback, m_allow_commands_while_running
@@ -91,13 +91,6 @@ void MultiSwitchSystemFactory::resize(size_t count){
     }
     m_active_switches = count;
 }
-
-const QSerialPortInfo* MultiSwitchSystemFactory::port(size_t index) const{
-    return m_switches[index]->port();
-}
-//const QCameraInfo* MultiSwitchSystemFactory::camera(size_t index) const{
-//    return m_switches[index]->camera();
-//}
 
 SwitchSetupWidget* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
     return new MultiSwitchSystemWidget(parent, *this, logger, program_id);

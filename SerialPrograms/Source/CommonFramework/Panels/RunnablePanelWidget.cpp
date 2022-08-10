@@ -41,7 +41,7 @@ RunnablePanelWidget::~RunnablePanelWidget(){
     join_program_thread();
 }
 
-std::string RunnablePanelWidget::stats(){
+std::string RunnablePanelWidget::current_stats() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current_stats){
         return m_current_stats->to_str();
@@ -55,7 +55,7 @@ WallClock RunnablePanelWidget::timestamp() const{
 
 bool RunnablePanelWidget::start(){
     bool ret = false;
-    switch (state()){
+    switch (current_state()){
     case ProgramState::NOT_READY:
         m_logger.log("Recevied Start Request: Program is not ready.", COLOR_RED);
         break;
@@ -101,7 +101,7 @@ bool RunnablePanelWidget::start(){
     return ret;
 }
 bool RunnablePanelWidget::request_program_stop(){
-    if (state() != ProgramState::RUNNING){
+    if (current_state() != ProgramState::RUNNING){
         return false;
     }
     m_logger.log("Received Stop Request");
@@ -164,6 +164,7 @@ RunnablePanelWidget::RunnablePanelWidget(
 
 
     m_instance_id = ProgramTracker::instance().add_program(*this);
+#if 0
     connect(
         this, &RunnablePanelWidget::async_start,
         this, &RunnablePanelWidget::start
@@ -172,6 +173,7 @@ RunnablePanelWidget::RunnablePanelWidget(
         this, &RunnablePanelWidget::async_stop,
         this, &RunnablePanelWidget::request_program_stop
     );
+#endif
     connect(
         this, &RunnablePanelWidget::async_set_status,
         this, &RunnablePanelWidget::status_update
@@ -221,7 +223,7 @@ RunnablePanelActionBar* RunnablePanelWidget::make_actions(QWidget& parent){
     connect(
         ret, &RunnablePanelActionBar::start_clicked,
         this, [=](){
-            switch (this->state()){
+            switch (this->current_state()){
             case ProgramState::NOT_READY:
                 break;
             case ProgramState::STOPPED:
@@ -357,6 +359,16 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
 }
 
 
+void RunnablePanelWidget::async_start(){
+    QMetaObject::invokeMethod(this, [=]{
+        start();
+    });
+}
+void RunnablePanelWidget::async_stop(){
+    QMetaObject::invokeMethod(this, [=]{
+        request_program_stop();
+    });
+}
 void RunnablePanelWidget::status_update(std::string status){
     if (status.empty()){
         m_status_bar->setVisible(false);

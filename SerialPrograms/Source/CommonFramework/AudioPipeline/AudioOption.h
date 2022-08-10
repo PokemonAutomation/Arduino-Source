@@ -38,7 +38,6 @@ public:
 
 public:
     AudioOption();
-    AudioOption(const JsonValue& json);
 
     const std::string& input_file() const{ return m_input_file; }
     const AudioDeviceInfo& input_device() const{ return m_input_device; }

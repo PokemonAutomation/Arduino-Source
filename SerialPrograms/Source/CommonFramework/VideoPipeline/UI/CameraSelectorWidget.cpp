@@ -194,12 +194,6 @@ void CameraSelectorWidget::resolution_change(Resolution resolution){
 
 
 
-void CameraSelectorWidget::set_camera_enabled(bool enabled){
-    m_camera_box->setEnabled(enabled);
-}
-void CameraSelectorWidget::set_resolution_enabled(bool enabled){
-    m_resolution_box->setEnabled(enabled);
-}
 void CameraSelectorWidget::set_overlay_enabled(bool enabled){
     m_display.overlay().setHidden(!enabled);
 }

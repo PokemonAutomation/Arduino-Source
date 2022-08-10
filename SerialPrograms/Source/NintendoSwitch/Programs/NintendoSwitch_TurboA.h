@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class TurboA_Descriptor : public RunnableSwitchProgramDescriptor{
+class TurboA_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TurboA_Descriptor();
 };
@@ -30,6 +30,20 @@ public:
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
 };
+
+
+
+class TurboA2 : public SingleSwitchProgramInstance2{
+public:
+    TurboA2();
+
+    virtual void run(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+
+private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+};
+
+
 
 
 }

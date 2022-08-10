@@ -56,10 +56,11 @@ public slots:
     void set_state(PokemonAutomation::ProgramState state);
 
 signals:
-    void start_clicked();
+    void start_clicked(ProgramState state);
     void defaults_clicked();
 
 private:
+    PokemonAutomation::ProgramState m_last_known_state;
     QPushButton* m_start_button;
     QPushButton* m_default_button;
 };

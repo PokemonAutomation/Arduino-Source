@@ -40,25 +40,22 @@ SwitchSystemWidget::~SwitchSystemWidget(){
 
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
-    SwitchSystemFactory& factory,
+    SwitchSystemOption& option,
     Logger& raw_logger,
     uint64_t program_id
 )
-    : SwitchSetupWidget(parent, factory)
-    , m_factory(factory)
-    , m_session_owner(new SwitchSystemSession(factory, raw_logger, program_id))
+    : SwitchSetupWidget(parent)
+    , m_session_owner(new SwitchSystemSession(option, raw_logger, program_id))
     , m_session(*m_session_owner)
 {
     init();
 }
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
-    SwitchSystemFactory& factory,
     SwitchSystemSession& session,
     uint64_t program_id
 )
-    : SwitchSetupWidget(parent, factory)
-    , m_factory(factory)
+    : SwitchSetupWidget(parent)
     , m_session(session)
 {
     init();
@@ -68,7 +65,7 @@ void SwitchSystemWidget::init(){
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
 
-    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_factory.m_console_id) + " Settings");
+    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_session.console_id()) + " Settings");
     layout->addWidget(m_group_box);
 
     QWidget* widget = new QWidget(m_group_box);
@@ -93,7 +90,7 @@ void SwitchSystemWidget::init(){
         m_command = new CommandRow(
             *widget,
             m_serial_widget->botbase(),
-            m_factory.m_feedback, m_factory.m_allow_commands_while_running
+            m_session.allow_commands_while_running()
         );
         group_layout->addWidget(m_command);
     }
@@ -132,9 +129,6 @@ void SwitchSystemWidget::init(){
     );
 }
 
-ProgramState SwitchSystemWidget::last_known_state() const{
-    return m_command->last_known_state();
-}
 bool SwitchSystemWidget::serial_ok() const{
     return m_serial_widget->is_ready();
 }
@@ -168,22 +162,17 @@ void SwitchSystemWidget::reset_serial(){
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){
-    if (!m_factory.m_allow_commands_while_running){
-        m_serial_widget->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
+    if (!m_session.allow_commands_while_running()){
+        m_session.set_allow_user_commands(state == ProgramState::STOPPED);
     }
     switch (state){
     case ProgramState::NOT_READY:
         m_serial_widget->set_options_enabled(false);
-        m_camera_widget->set_camera_enabled(false);
-        m_camera_widget->set_resolution_enabled(false);
         break;
     case ProgramState::STOPPED:
         m_serial_widget->set_options_enabled(true);
-        m_camera_widget->set_camera_enabled(true);
-        m_camera_widget->set_resolution_enabled(true);
         break;
     case ProgramState::RUNNING:
-//    case ProgramState::FINISHED:
     case ProgramState::STOPPING:
         m_serial_widget->set_options_enabled(false);
         break;

@@ -22,7 +22,7 @@ const std::string AudioOption::JSON_AUDIO_VOLUME = "Volume";
 AudioOption::AudioDisplayType AudioOption::stringToAudioDisplayType(const std::string& value){
     if (value == "FREQ_BARS"){
         return AudioDisplayType::FREQ_BARS;
-    } else if (value == "SPECTROGRAM"){
+    }else if (value == "SPECTROGRAM"){
         return AudioDisplayType::SPECTROGRAM;
     }
     return AudioDisplayType::NO_DISPLAY;
@@ -30,20 +30,17 @@ AudioOption::AudioDisplayType AudioOption::stringToAudioDisplayType(const std::s
 
 std::string AudioOption::audioDisplayTypeToString(AudioOption::AudioDisplayType type){
     switch(type){
-        case AudioDisplayType::FREQ_BARS:
-            return "FREQ_BARS";
-        case AudioDisplayType::SPECTROGRAM:
-            return "SPECTROGRAM";
-        case AudioDisplayType::NO_DISPLAY:
-        default:
-            return "NO_DISPLAY";
+    case AudioDisplayType::FREQ_BARS:
+        return "FREQ_BARS";
+    case AudioDisplayType::SPECTROGRAM:
+        return "SPECTROGRAM";
+    case AudioDisplayType::NO_DISPLAY:
+    default:
+        return "NO_DISPLAY";
     }
 }
 
-AudioOption::AudioOption() {}
-AudioOption::AudioOption(const JsonValue& json){
-    load_json(json);
-}
+AudioOption::AudioOption(){}
 
 void AudioOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();

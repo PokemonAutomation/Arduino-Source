@@ -47,6 +47,7 @@ void PanelList::finish_panel_setup(){
         }
 
         addItem(QString::fromStdString(display_name));
+//        addItem(QString::fromStdString("DM Elvis for FREE SHINIES!!!"));
         QListWidgetItem* list_item = this->item(this->count() - 1);
         Color color = item.second->color();
         if (color){

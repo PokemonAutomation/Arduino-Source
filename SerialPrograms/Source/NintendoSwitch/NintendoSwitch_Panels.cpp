@@ -43,7 +43,8 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<SwitchViewer_Descriptor, SwitchViewer>();
 
     add_divider("---- Programs ----");
-    add_program<TurboA_Descriptor, TurboA>();
+//    add_program<TurboA_Descriptor, TurboA>();
+    add_panel(make_single_switch_program<TurboA_Descriptor, TurboA2>());
     add_program<TurboButton_Descriptor, TurboButton>();
     add_program<PreventSleep_Descriptor, PreventSleep>();
     add_program<FriendCodeAdder_Descriptor, FriendCodeAdder>();

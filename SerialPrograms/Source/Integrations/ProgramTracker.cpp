@@ -4,10 +4,10 @@
  *
  */
 
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "CommonFramework/Panels/RunnablePanelWidget.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "ProgramTracker.h"
@@ -28,10 +28,10 @@ ProgramTracker& ProgramTracker::instance(){
 
 struct ProgramTracker::ProgramData{
     size_t system_count;
-    RunnablePanelWidget& program;
+    TrackableProgram& program;
     std::vector<uint64_t> console_ids;
 
-    ProgramData(size_t p_system_count, RunnablePanelWidget& p_program)
+    ProgramData(size_t p_system_count, TrackableProgram& p_program)
         : system_count(p_system_count)
         , program(p_program)
     {}
@@ -43,11 +43,11 @@ std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
     std::map<uint64_t, ProgramTrackingState> info;
     for (const auto& item : m_programs){
         info[item.first] = ProgramTrackingState{
-            item.second->program.instance().descriptor().identifier(),
+            item.second->program.identifier(),
             item.second->console_ids,
             item.second->program.timestamp(),
-            item.second->program.state(),
-            item.second->program.stats()
+            item.second->program.current_state(),
+            item.second->program.current_stats()
         };
     }
     return info;
@@ -193,7 +193,7 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
 
 
 
-uint64_t ProgramTracker::add_program(RunnablePanelWidget& program){
+uint64_t ProgramTracker::add_program(TrackableProgram& program){
     std::lock_guard<std::mutex> lg(m_lock);
     m_program_instance_counter++;
     m_programs.emplace(
@@ -206,7 +206,7 @@ void ProgramTracker::remove_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);
     m_programs.erase(program_id);
 }
-uint64_t ProgramTracker::add_console(uint64_t program_id, ConsoleSystem& console){
+uint64_t ProgramTracker::add_console(uint64_t program_id, TrackableConsole& console){
     std::lock_guard<std::mutex> lg(m_lock);
     m_console_instance_counter++;
     m_consoles.emplace(

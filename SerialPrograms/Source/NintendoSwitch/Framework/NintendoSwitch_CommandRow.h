@@ -25,7 +25,7 @@ public:
     CommandRow(
         QWidget& parent,
         BotBaseHandle& botbase,
-        FeedbackType feedback, bool allow_commands_while_running
+        bool allow_commands_while_running
     );
 
     void on_key_press(Qt::Key key);

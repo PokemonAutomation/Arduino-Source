@@ -16,29 +16,33 @@
 
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
-#include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
+#include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "NintendoSwitch_SwitchSystem.h"
+#include "Integrations/ProgramTrackerInterfaces.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-class SwitchSystemFactory;
+class SwitchSystemOption;
 
 
 
 
-class SwitchSystemSession final : public ConsoleSystem{
+class SwitchSystemSession final : public TrackableConsole{
 public:
     ~SwitchSystemSession();
     SwitchSystemSession(
-        SwitchSystemFactory& factory,
+        SwitchSystemOption& option,
         Logger& raw_logger,
         uint64_t program_id
     );
 
 public:
+    size_t console_id() const{ return m_option.m_console_id; }
+    bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
+
     Logger& logger(){ return m_logger; }
     virtual BotBaseHandle& sender() override{ return m_serial.botbase(); }
     virtual VideoFeed& video() override{ return *m_camera; }
@@ -51,10 +55,13 @@ public:
     AudioSession& audio_session(){ return m_audio; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
 
+public:
+    void set_allow_user_commands(bool allow);
+
 private:
     uint64_t m_instance_id = 0;
     TaggedLogger m_logger;
-    SwitchSystemFactory& m_factory;
+    SwitchSystemOption& m_option;
 
     SerialPortSession m_serial;
     std::unique_ptr<CameraSession> m_camera;

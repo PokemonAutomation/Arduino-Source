@@ -7,19 +7,19 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_SwitchSystem.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-const std::string SwitchSystemFactory::JSON_SERIAL  = "Serial";
-const std::string SwitchSystemFactory::JSON_CAMERA  = "Camera";
-const std::string SwitchSystemFactory::JSON_AUDIO   = "Audio";
+const std::string SwitchSystemOption::JSON_SERIAL  = "Serial";
+const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
+const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
 
 
-SwitchSystemFactory::SwitchSystemFactory(
+SwitchSystemOption::SwitchSystemOption(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running
@@ -27,18 +27,17 @@ SwitchSystemFactory::SwitchSystemFactory(
     : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_console_id(console_id)
     , m_logger_tag("Console " + std::to_string(console_id))
-//    , m_settings_visible(true)
     , m_serial(min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
     , m_audio()
 {}
-SwitchSystemFactory::SwitchSystemFactory(
+SwitchSystemOption::SwitchSystemOption(
     size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
     const JsonValue& json
 )
-    : SwitchSystemFactory(
+    : SwitchSystemOption(
           console_id,
           min_pabotbase,
           feedback, allow_commands_while_running
@@ -46,7 +45,7 @@ SwitchSystemFactory::SwitchSystemFactory(
 {
     load_json(json);
 }
-void SwitchSystemFactory::load_json(const JsonValue& json){
+void SwitchSystemOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
@@ -66,7 +65,7 @@ void SwitchSystemFactory::load_json(const JsonValue& json){
         m_audio.load_json(*value);
     }
 }
-JsonValue SwitchSystemFactory::to_json() const{
+JsonValue SwitchSystemOption::to_json() const{
     JsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
     root[JSON_SERIAL] = m_serial.to_json();
@@ -75,11 +74,8 @@ JsonValue SwitchSystemFactory::to_json() const{
     return root;
 }
 
-const QSerialPortInfo* SwitchSystemFactory::port() const{
-    return m_serial.port();
-}
 
-SwitchSetupWidget* SwitchSystemFactory::make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id){
+SwitchSetupWidget* SwitchSystemOption::make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id){
     return new SwitchSystemWidget(parent, *this, raw_logger, program_id);
 }
 

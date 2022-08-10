@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 #include "CommonFramework/Globals.h"
+#include "Integrations/ProgramTrackerInterfaces.h"
 #include "PanelWidget.h"
 #include "RunnablePanel.h"
 
@@ -25,15 +26,16 @@ class StatsBar;
 class RunnablePanelActionBar;
 
 
-class RunnablePanelWidget : public PanelWidget{
+class RunnablePanelWidget : public PanelWidget, public TrackableProgram{
     Q_OBJECT
 
 public:
     virtual ~RunnablePanelWidget();
 
-    ProgramState state() const{ return m_state.load(std::memory_order_acquire); }
-    std::string stats();
-    WallClock timestamp() const;
+    virtual const std::string& identifier() const override final{ return m_instance.descriptor().identifier(); }
+    virtual ProgramState current_state() const override final{ return m_state.load(std::memory_order_acquire); }
+    virtual std::string current_stats() const override final;
+    virtual WallClock timestamp() const override final;
 
 //    //  Reset serial if possible.
 //    bool reset_serial();    //  Must call on main thread.
@@ -45,9 +47,8 @@ public:
 //    bool stop();            //  Must call on main thread.
     virtual bool request_program_stop();    //  Must call on main thread.
 
-signals:    //  Public Signals
-    void async_start();
-    void async_stop();
+    virtual void async_start() override final;
+    virtual void async_stop() override final;
 
 
 protected:
@@ -123,7 +124,7 @@ protected:
 
 //    bool m_destructing = false;
 
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
 //    std::string m_historical_stats_str;
     std::unique_ptr<StatsTracker> m_historical_stats;
     std::unique_ptr<StatsTracker> m_current_stats;

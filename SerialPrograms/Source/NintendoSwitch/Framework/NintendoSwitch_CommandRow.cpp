@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 CommandRow::CommandRow(
     QWidget& parent,
     BotBaseHandle& botbase,
-    FeedbackType feedback, bool allow_commands_while_running
+    bool allow_commands_while_running
 )
     : QWidget(&parent)
     , VirtualController(botbase, allow_commands_while_running)
@@ -40,21 +40,6 @@ CommandRow::CommandRow(
 
     m_screenshot_button = new QPushButton("Screenshot", this);
     command_row->addWidget(m_screenshot_button, 2);
-
-    switch (feedback){
-    case FeedbackType::NONE:
-        m_overlay_box->setChecked(false);
-        m_overlay_box->setEnabled(false);
-        break;
-    case FeedbackType::OPTIONAL_:
-        m_overlay_box->setChecked(true);
-        m_overlay_box->setEnabled(true);
-        break;
-    case FeedbackType::REQUIRED:
-        m_overlay_box->setChecked(true);
-        m_overlay_box->setEnabled(true);
-        break;
-    }
 
 
 //    m_test_button = new QPushButton("Test Button", this);

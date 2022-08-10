@@ -9,12 +9,16 @@
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch_SwitchSystem.h"
+#include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_RunnableProgram.h"
+#include "NintendoSwitch_SingleSwitchProgramOption.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
 namespace NintendoSwitch{
+
+
+class SingleSwitchProgramInstance2;
 
 
 class SingleSwitchProgramEnvironment : public ProgramEnvironment{
@@ -22,6 +26,7 @@ public:
     ConsoleHandle console;
 
 private:
+    friend class SingleSwitchProgramSession;
     friend class SingleSwitchProgramWidget;
     template <class... Args>
     SingleSwitchProgramEnvironment(
@@ -40,6 +45,14 @@ private:
 };
 
 
+class SingleSwitchProgramDescriptor : public RunnableSwitchProgramDescriptor{
+public:
+    using RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor;
+
+    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const{ return nullptr; }
+};
+
+
 
 class SingleSwitchProgramInstance : public RunnableSwitchProgramInstance{
 public:
@@ -50,8 +63,66 @@ public:
 private:
     friend class SingleSwitchProgramWidget;
 
-    SwitchSystemFactory m_switch;
+    SwitchSystemOption m_switch;
 };
+
+
+
+
+
+
+class SingleSwitchProgramInstance2{
+public:
+    virtual ~SingleSwitchProgramInstance2() = default;
+
+    virtual void run(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
+
+
+public:
+    //  Settings
+
+    virtual void from_json(const JsonValue& json);
+    virtual JsonValue to_json() const;
+
+    virtual std::string check_validity() const;
+    virtual void restore_defaults();
+
+
+protected:
+    friend class SingleSwitchProgramOption;
+
+    BatchOption m_options;
+    void add_option(ConfigOption& option, std::string serialization_string);
+
+
+public:
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
+    EventNotificationOption NOTIFICATION_ERROR_FATAL;
+};
+
+
+
+
+template <typename Descriptor, typename Instance>
+class SingleSwitchProgramWrapper : public Descriptor{
+public:
+    virtual std::unique_ptr<PanelInstance> make_panel() const override{
+        return std::unique_ptr<PanelInstance>(new SingleSwitchProgramOption(*this));
+    }
+    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const override{
+        return std::unique_ptr<SingleSwitchProgramInstance2>(new Instance());
+    }
+};
+
+template <typename Descriptor, typename Instance>
+std::unique_ptr<PanelDescriptor> make_single_switch_program(){
+    return std::make_unique<SingleSwitchProgramWrapper<Descriptor, Instance>>();
+}
+
+
+
+
 
 
 

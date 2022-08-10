@@ -23,12 +23,8 @@ public:
     void operator=(const SwitchSetupWidget&) = delete;
 
 public:
-    SwitchSetupWidget(
-        QWidget& parent,
-        SwitchSetupFactory& factory
-    )
+    SwitchSetupWidget(QWidget& parent)
         : QWidget(&parent)
-        , m_factory(factory)
     {}
 
     virtual bool serial_ok() const = 0;
@@ -42,8 +38,6 @@ signals:
     void on_setup_changed();
     void on_program_state_changed();
 
-protected:
-    SwitchSetupFactory& m_factory;
 };
 
 

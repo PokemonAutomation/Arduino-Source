@@ -85,7 +85,7 @@ void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
 }
 
 bool RunnableSwitchProgramWidget::request_program_stop(){
-    if (state() != ProgramState::RUNNING){
+    if (current_state() != ProgramState::RUNNING){
         return false;
     }
 //    if (!RunnablePanelWidget::request_program_stop()){

@@ -238,6 +238,7 @@ SOURCES += \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
+    Source/CommonFramework/ProgramSession.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
@@ -340,8 +341,10 @@ SOURCES += \
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp \
@@ -956,6 +959,7 @@ HEADERS += \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
+    Source/CommonFramework/ProgramSession.h \
     Source/CommonFramework/Resources/SpriteDatabase.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
@@ -1082,10 +1086,12 @@ HEADERS += \
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetup.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetupWidget.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h \

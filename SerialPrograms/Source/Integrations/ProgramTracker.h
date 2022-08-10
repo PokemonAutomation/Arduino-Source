@@ -16,21 +16,13 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
+#include "ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{
 
 class ImageRGB32;
 class VideoFeed;
 class AudioFeed;
-class RunnablePanelWidget;
-
-
-class ConsoleSystem{
-public:
-    virtual BotBaseHandle& sender() = 0;
-    virtual VideoFeed& video() = 0;
-    virtual AudioFeed& audio() = 0;
-};
 
 
 
@@ -72,10 +64,10 @@ private:
     void operator=(const ProgramTracker&) = delete;
 
 public:
-    uint64_t add_program(RunnablePanelWidget& program);
+    uint64_t add_program(TrackableProgram& program);
     void remove_program(uint64_t program_id);
 
-    uint64_t add_console(uint64_t program_id, ConsoleSystem& console);
+    uint64_t add_console(uint64_t program_id, TrackableConsole& console);
     void remove_console(uint64_t console_id);
 
 
@@ -86,7 +78,7 @@ private:
     uint64_t m_program_instance_counter = 0;
     uint64_t m_console_instance_counter = 0;
     std::map<uint64_t, std::unique_ptr<ProgramData>> m_programs;
-    std::map<uint64_t, std::pair<ConsoleSystem*, uint64_t>> m_consoles;
+    std::map<uint64_t, std::pair<TrackableConsole*, uint64_t>> m_consoles;
 };
 
 

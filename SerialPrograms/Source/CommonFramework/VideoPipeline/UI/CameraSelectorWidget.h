@@ -44,9 +44,6 @@ public:
     );
     ~CameraSelectorWidget();
 
-    void set_camera_enabled(bool enabled);
-    void set_resolution_enabled(bool enabled);
-    void set_snapshots_allowed(bool enabled);
     void set_overlay_enabled(bool enabled);
 
 private:
