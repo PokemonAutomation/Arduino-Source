@@ -25,17 +25,15 @@ void MultiSwitchSystemSession::remove_listener(Listener& listener){
 MultiSwitchSystemSession::~MultiSwitchSystemSession() = default;
 MultiSwitchSystemSession::MultiSwitchSystemSession(
     MultiSwitchSystemOption& option,
-    Logger& raw_logger,
     uint64_t program_id
 )
     : m_option(option)
-    , m_raw_logger(raw_logger)
     , m_program_id(program_id)
     , m_consoles(option.count())
 {
     size_t count = option.count();
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(option[c], raw_logger, program_id);
+        m_consoles.emplace_back(option[c], program_id);
     }
 }
 
@@ -47,7 +45,7 @@ void MultiSwitchSystemSession::set_switch_count(size_t count){
     m_consoles.reset(count);
     m_option.resize(count);
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(m_option[c], m_raw_logger, m_program_id);
+        m_consoles.emplace_back(m_option[c], m_program_id);
     }
     for (Listener* listener : m_listeners){
         listener->startup(count);

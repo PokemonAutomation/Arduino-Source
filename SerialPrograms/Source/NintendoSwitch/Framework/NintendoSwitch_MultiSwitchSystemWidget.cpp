@@ -34,14 +34,12 @@ MultiSwitchSystemWidget::~MultiSwitchSystemWidget(){
 MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     QWidget& parent,
     MultiSwitchSystemOption& option,
-    Logger& logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent)
     , m_program_id(program_id)
-    , m_option(option)
-    , m_logger(logger)
-    , m_session(option, logger, program_id)
+    , m_session_owner(new MultiSwitchSystemSession(option, program_id))
+    , m_session(*m_session_owner)
     , m_videos(nullptr)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -55,29 +53,72 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     m_console_count_box = new NoWheelComboBox(this);
     row->addWidget(m_console_count_box, 1);
     row->addStretch(2);
-    for (size_t c = option.m_min_switches; c <= option.m_max_switches; c++){
+
+    //  Acquire the lock now and attach listener. This will block the session
+    //  from changing the # of switches while we draw everything.
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_session.add_listener(*this);
+
+    for (size_t c = m_session.min_switches(); c <= m_session.max_switches(); c++){
         m_console_count_box->addItem(QString::number(c));
     }
-    m_console_count_box->setCurrentIndex((int)(m_option.m_active_switches - option.m_min_switches));
+    m_console_count_box->setCurrentIndex((int)(m_session.count() - m_session.min_switches()));
 
     connect(
         m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            if (index < 0 || index > (int)(m_option.m_max_switches - m_option.m_min_switches)){
+            if (index < 0 || index > (int)(m_session.max_switches() - m_session.min_switches())){
                 return;
             }
-            m_session.set_switch_count(index + m_option.m_min_switches);
-//            redraw_videos(index + m_option.m_min_switches);
+            m_session.set_switch_count(index + m_session.min_switches());
         }
     );
 
-//    redraw_videos(option.m_active_switches);
+    redraw_videos(m_session.count());
+}
+MultiSwitchSystemWidget::MultiSwitchSystemWidget(
+    QWidget& parent,
+    MultiSwitchSystemSession& session,
+    uint64_t program_id
+)
+    : SwitchSetupWidget(parent)
+    , m_program_id(program_id)
+    , m_session(session)
+    , m_videos(nullptr)
+{
+    QVBoxLayout* vbox = new QVBoxLayout(this);
+    vbox->setContentsMargins(0, 0, 0, 0);
 
+    QHBoxLayout* row = new QHBoxLayout();
+    vbox->addLayout(row, 0);
+    row->setContentsMargins(0, 0, 0, 0);
+    row->addStretch(2);
+    row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
+    m_console_count_box = new NoWheelComboBox(this);
+    row->addWidget(m_console_count_box, 1);
+    row->addStretch(2);
 
-
+    //  Acquire the lock now and attach listener. This will block the session
+    //  from changing the # of switches while we draw everything.
     std::lock_guard<std::mutex> lg(m_lock);
     m_session.add_listener(*this);
-    redraw_videos(option.count());
+
+    for (size_t c = session.min_switches(); c <= session.max_switches(); c++){
+        m_console_count_box->addItem(QString::number(c));
+    }
+    m_console_count_box->setCurrentIndex((int)(m_session.count() - m_session.min_switches()));
+
+    connect(
+        m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this, [=](int index){
+            if (index < 0 || index > (int)(m_session.max_switches() - m_session.min_switches())){
+                return;
+            }
+            m_session.set_switch_count(index + m_session.min_switches());
+        }
+    );
+
+    redraw_videos(m_session.count());
 }
 
 void MultiSwitchSystemWidget::shutdown(){
@@ -119,8 +160,8 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
     QVBoxLayout* vbox = new QVBoxLayout(m_videos);
     vbox->setContentsMargins(0, 0, 0, 0);
 
-    m_option.resize(count);
-    for (size_t c = 0; c < m_option.m_active_switches; c++){
+//    m_option.resize(count);
+    for (size_t c = 0; c < m_session.count(); c++){
 //        const auto& item = m_option.m_switches[c];
 //        m_switches.emplace_back(item->make_ui(*this, m_logger, m_program_id));
         m_switches.emplace_back(new SwitchSystemWidget(*m_videos, m_session[c], m_program_id));

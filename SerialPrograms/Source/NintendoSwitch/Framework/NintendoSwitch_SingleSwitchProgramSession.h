@@ -9,13 +9,13 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
-#include "CommonFramework/Panels/Panel.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
-#include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+class SingleSwitchProgramOption;
 
 
 class SingleSwitchProgramSession final : public ProgramSession{
@@ -32,7 +32,7 @@ private:
     virtual std::string check_validity() const override;
 
     virtual void internal_run_program() override;
-    virtual void internal_stop_program() override final;
+    virtual void internal_stop_program() override;
 
 
 private:

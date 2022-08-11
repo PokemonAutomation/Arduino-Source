@@ -1,4 +1,4 @@
-/*  Single Switch Program Template
+/*  Single Switch Program Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -9,10 +9,10 @@
 #include <QMessageBox>
 #include <QScrollArea>
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/BlackBorderCheck.h"
+#include "NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 

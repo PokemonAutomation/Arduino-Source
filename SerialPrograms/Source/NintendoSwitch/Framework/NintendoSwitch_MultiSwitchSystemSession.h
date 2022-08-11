@@ -29,22 +29,27 @@ public:
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
 
+
 public:
     ~MultiSwitchSystemSession();
     MultiSwitchSystemSession(
         MultiSwitchSystemOption& option,
-        Logger& raw_logger,
         uint64_t program_id
     );
 
     void set_switch_count(size_t count);
 
+    size_t min_switches() const{ return m_option.min_switches(); }
+    size_t max_switches() const{ return m_option.max_switches(); }
+
+public:
+    //  Note that these are not thread-safe with changing the # of switches.
+    size_t count() const{ return m_consoles.size(); }
     SwitchSystemSession& operator[](size_t index){ return m_consoles[index]; }
 
 
 private:
     MultiSwitchSystemOption& m_option;
-    Logger& m_raw_logger;
     const uint64_t m_program_id;
 
     std::mutex m_lock;

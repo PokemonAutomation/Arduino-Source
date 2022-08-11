@@ -8,17 +8,13 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
-#include "NintendoSwitch_SwitchSetup.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-class SwitchSystemWidget;
-
 
 
 Color pick_color(FeedbackType feedback, PABotBaseLevel size);
@@ -43,10 +39,6 @@ public:
     );
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
-
-
-public:
-    SwitchSystemWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id);
 
 
 private:

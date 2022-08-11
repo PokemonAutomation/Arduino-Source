@@ -93,7 +93,7 @@ void MultiSwitchSystemOption::resize(size_t count){
 }
 
 SwitchSetupWidget* MultiSwitchSystemOption::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
-    return new MultiSwitchSystemWidget(parent, *this, logger, program_id);
+    return new MultiSwitchSystemWidget(parent, *this, program_id);
 }
 
 

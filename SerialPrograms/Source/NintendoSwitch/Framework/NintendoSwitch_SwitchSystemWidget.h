@@ -28,12 +28,6 @@ public:
     virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
         QWidget& parent,
-        SwitchSystemOption& option,
-        Logger& raw_logger,
-        uint64_t program_id
-    );
-    SwitchSystemWidget(
-        QWidget& parent,
         SwitchSystemSession& session,
         uint64_t program_id
     );
@@ -52,15 +46,12 @@ public:
     virtual void update_ui(ProgramState state) override;
 
 private:
-    void init();
-
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    std::unique_ptr<SwitchSystemSession> m_session_owner;
     SwitchSystemSession& m_session;
 
     CollapsibleGroupBox* m_group_box;

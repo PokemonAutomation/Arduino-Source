@@ -27,9 +27,7 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
 
 
 
-SynchronizedSpinning::SynchronizedSpinning(const SynchronizedSpinning_Descriptor& description)
-    : MultiSwitchProgramInstance(description)
-{}
+SynchronizedSpinning::SynchronizedSpinning(){}
 
 void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     env.run_in_parallel(

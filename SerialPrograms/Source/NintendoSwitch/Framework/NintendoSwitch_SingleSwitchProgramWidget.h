@@ -1,4 +1,4 @@
-/*  Single Switch Program Template
+/*  Single Switch Program Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -27,13 +27,10 @@ public:
         PanelHolder& holder
     );
 
-
 private:
     virtual void state_change(ProgramState state) override;
     virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) override;
     virtual void error(const std::string& message) override;
-
-
 
 private:
     PanelHolder& m_holder;

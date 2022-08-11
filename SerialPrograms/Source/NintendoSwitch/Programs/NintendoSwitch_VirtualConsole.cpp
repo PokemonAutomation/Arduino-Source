@@ -49,20 +49,25 @@ VirtualConsole_Widget* VirtualConsole_Widget::make(
     widget->construct();
     return widget;
 }
+VirtualConsole_Widget::~VirtualConsole_Widget(){
+    delete m_switch;
+}
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
     VirtualConsole& instance,
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
+    , m_session(instance.m_switch, 0)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
-    VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
-    m_switch = (SwitchSystemWidget*)instance.m_switch.make_ui(*this, m_holder.raw_logger(), 0);
+//    VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
+//    m_switch = instance.m_switch.make_ui(*this, m_holder.raw_logger(), 0);
+    m_switch = new SwitchSystemWidget(*this, m_session, 0);
     layout->addWidget(m_switch);
 }
 

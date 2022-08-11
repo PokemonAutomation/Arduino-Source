@@ -4,9 +4,11 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
@@ -75,6 +77,9 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)
 {}
+std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
+    return std::unique_ptr<PanelInstance>(new MultiSwitchProgramOption(*this));
+}
 
 
 
@@ -94,6 +99,42 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(const MultiSwitchProgramD
 QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& holder){
     return MultiSwitchProgramWidget::make(parent, *this, holder);
 }
+
+
+
+
+MultiSwitchProgramInstance2::MultiSwitchProgramInstance2()
+    : NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATION_ERROR_RECOVERABLE(
+        "Program Error (Recoverable)",
+        true, false,
+        ImageAttachmentMode::PNG,
+        {"Notifs"}
+    )
+    , NOTIFICATION_ERROR_FATAL(
+        "Program Error (Fatal)",
+        true, true,
+//        ImageAttachmentMode::PNG,
+        {"Notifs"}
+    )
+{}
+void MultiSwitchProgramInstance2::add_option(ConfigOption& option, std::string serialization_string){
+    m_options.add_option(option, std::move(serialization_string));
+}
+void MultiSwitchProgramInstance2::from_json(const JsonValue& json){
+    m_options.load_json(json);
+}
+JsonValue MultiSwitchProgramInstance2::to_json() const{
+    return m_options.to_json();
+}
+std::string MultiSwitchProgramInstance2::check_validity() const{
+    return m_options.check_validity();
+}
+void MultiSwitchProgramInstance2::restore_defaults(){
+    return m_options.restore_defaults();
+}
+
+
 
 
 

@@ -1,4 +1,4 @@
-/*  Multi-Switch Program Template
+/*  Multi-Switch Program Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,8 +8,9 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramWidget_H
 
 #include "NintendoSwitch_RunnableProgramWidget.h"
-#include "NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
+#include "NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,6 +41,31 @@ private:
 
 private:
     friend class MultiSwitchProgramInstance;
+};
+
+
+
+class MultiSwitchProgramWidget2 : public QWidget, private ProgramSession::Listener{
+public:
+    ~MultiSwitchProgramWidget2();
+    MultiSwitchProgramWidget2(
+        QWidget& parent,
+        MultiSwitchProgramOption& option,
+        PanelHolder& holder
+    );
+
+private:
+    virtual void state_change(ProgramState state) override;
+    virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) override;
+    virtual void error(const std::string& message) override;
+
+private:
+    PanelHolder& m_holder;
+    MultiSwitchProgramSession m_session;
+    MultiSwitchSystemWidget* m_system;
+    ConfigWidget* m_options;
+    StatsBar* m_stats_bar;
+    RunnablePanelActionBar* m_actions_bar;
 };
 
 

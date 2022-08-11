@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include "NintendoSwitch_SwitchSetup.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -39,10 +40,15 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    size_t count() const{ return m_active_switches; }
     void resize(size_t count);
 
+public:
+    size_t min_switches() const{ return m_min_switches; }
+    size_t max_switches() const{ return m_max_switches; }
+
+    size_t count() const{ return m_active_switches; }
     SwitchSystemOption& operator[](size_t index){ return *m_switches[index]; }
+
 
 public:
     SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;

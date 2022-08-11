@@ -35,7 +35,6 @@ public:
     ~SwitchSystemSession();
     SwitchSystemSession(
         SwitchSystemOption& option,
-        Logger& raw_logger,
         uint64_t program_id
     );
 

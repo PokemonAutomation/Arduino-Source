@@ -22,10 +22,9 @@ SwitchSystemSession::~SwitchSystemSession(){
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
-    Logger& raw_logger,
     uint64_t program_id
 )
-    : m_logger(raw_logger, option.m_logger_tag)
+    : m_logger(global_logger_raw(), option.m_logger_tag)
     , m_option(option)
     , m_serial(m_logger, option.m_serial)
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))

@@ -40,27 +40,12 @@ SwitchSystemWidget::~SwitchSystemWidget(){
 
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
-    SwitchSystemOption& option,
-    Logger& raw_logger,
-    uint64_t program_id
-)
-    : SwitchSetupWidget(parent)
-    , m_session_owner(new SwitchSystemSession(option, raw_logger, program_id))
-    , m_session(*m_session_owner)
-{
-    init();
-}
-SwitchSystemWidget::SwitchSystemWidget(
-    QWidget& parent,
     SwitchSystemSession& session,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent)
     , m_session(session)
 {
-    init();
-}
-void SwitchSystemWidget::init(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);

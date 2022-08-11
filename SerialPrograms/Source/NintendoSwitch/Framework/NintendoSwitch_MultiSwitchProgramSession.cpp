@@ -1,35 +1,39 @@
-/*  Single Switch Program Session
+/*  Multi-Switch Program Session
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
-#include "NintendoSwitch_SingleSwitchProgramOption.h"
-#include "NintendoSwitch_SingleSwitchProgramSession.h"
+#include "NintendoSwitch_MultiSwitchProgramOption.h"
+#include "NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-
-SingleSwitchProgramSession::SingleSwitchProgramSession(SingleSwitchProgramOption& option)
+MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& option)
     : ProgramSession(option.descriptor())
     , m_option(option)
     , m_system(option.system(), instance_id())
-{}
+{
+    m_system.add_listener(*this);
+}
 
-SingleSwitchProgramSession::~SingleSwitchProgramSession(){
-    SingleSwitchProgramSession::internal_stop_program();
+MultiSwitchProgramSession::~MultiSwitchProgramSession(){
+    MultiSwitchProgramSession::internal_stop_program();
+    m_system.remove_listener(*this);
     join_program_thread();
 }
 
 
-void SingleSwitchProgramSession::restore_defaults(){
+
+void MultiSwitchProgramSession::restore_defaults(){
     std::lock_guard<std::mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
         logger().log("Cannot change settings while program is running.", COLOR_RED);
@@ -38,13 +42,13 @@ void SingleSwitchProgramSession::restore_defaults(){
     logger().log("Restoring settings to defaults...");
     m_option.restore_defaults();
 }
-std::string SingleSwitchProgramSession::check_validity() const{
+std::string MultiSwitchProgramSession::check_validity() const{
     return m_option.check_validity();
 }
 
 
 
-void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
+void MultiSwitchProgramSession::run_program_instance(const ProgramInfo& info){
     {
         std::lock_guard<std::mutex> lg(program_lock());
         std::string error = check_validity();
@@ -53,54 +57,76 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
         }
     }
 
-    if (!m_system.serial_session().is_ready()){
-        throw UserSetupError(m_system.logger(), "Cannot Start: Serial connection not ready.");
+    //  Acquire lock here to block the session from changing the # of consoles.
+    std::unique_lock<std::mutex> lg(m_lock);
+
+    size_t consoles = m_system.count();
+    for (size_t c = 0; c < consoles; c++){
+        if (!m_system[c].serial_session().is_ready()){
+            throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
+        }
     }
 
+    FixedLimitVector<ConsoleHandle> handles(consoles);
+    for (size_t c = 0; c < consoles; c++){
+        SwitchSystemSession& session = m_system[c];
+        handles.emplace_back(
+            c,
+            session.logger(),
+            *session.sender().botbase(),
+            session.video(),
+            session.overlay(),
+            session.audio()
+        );
+        start_program_video_check(handles.back(), m_option.descriptor().feedback());
+    }
+
+
     CancellableHolder<CancellableScope> scope;
-    SingleSwitchProgramEnvironment env(
+    std::unique_ptr<MultiSwitchProgramEnvironment> env(new MultiSwitchProgramEnvironment(
         info,
         scope,
         logger(),
         current_stats_tracker(), historical_stats_tracker(),
-        m_system.logger(),
-        *m_system.sender().botbase(),
-        m_system.video(),
-        m_system.overlay(),
-        m_system.audio()
-    );
-    start_program_video_check(env.console, m_option.descriptor().feedback());
+        std::move(handles)
+    ));
 
-    env.connect(
-        &env, &ProgramEnvironment::set_status,
-        &env, [=](std::string status){
+    env->connect(
+        env.get(), &ProgramEnvironment::set_status,
+        env.get(), [=](std::string status){
             report_stats_changed();
         }
     );
 
-    {
-        SpinLockGuard lg(m_lock);
-        m_scope = &scope;
-    }
+    m_scope = &scope;
+
+    //  Now we can safely unlock.
+    //  If the session changes the # of switches here, it will safely fall
+    //  through the regular cancellation path.
+    lg.unlock();
+
 
     try{
-        BotBaseContext context(scope, env.console.botbase());
-        m_option.instance().program(env, context);
+        m_option.instance().program(*env, scope);
     }catch (...){
-        SpinLockGuard lg(m_lock);
+        lg.lock();
         m_scope = nullptr;
+        m_cv.notify_all();
         throw;
     }
-    SpinLockGuard lg(m_lock);
+    lg.lock();
     m_scope = nullptr;
+    m_cv.notify_all();
 }
-void SingleSwitchProgramSession::internal_stop_program(){
-    SpinLockGuard lg(m_lock);
-    if (m_scope != nullptr){
-        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+void MultiSwitchProgramSession::internal_stop_program(){
+    std::unique_lock<std::mutex> lg(m_lock);
+    if (m_scope == nullptr){
+        return;
     }
+    m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+    m_cv.wait(lg, [=]{ return m_scope == nullptr; });
 }
-void SingleSwitchProgramSession::internal_run_program(){
+void MultiSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
 
     ProgramInfo program_info(
@@ -167,6 +193,17 @@ void SingleSwitchProgramSession::internal_run_program(){
         );
     }
 }
+
+
+void MultiSwitchProgramSession::shutdown(){
+    internal_stop_program();
+}
+void MultiSwitchProgramSession::startup(size_t switch_count){
+
+}
+
+
+
 
 
 

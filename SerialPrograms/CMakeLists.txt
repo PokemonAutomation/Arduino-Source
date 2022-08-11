@@ -671,6 +671,10 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp

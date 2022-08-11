@@ -11,9 +11,13 @@
 #include "CommonFramework/Panels/PanelWidget.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+class SwitchSystemWidget;
+
 
 
 class VirtualConsole_Descriptor : public PanelDescriptor{
@@ -50,6 +54,7 @@ public:
     );
 
 private:
+    ~VirtualConsole_Widget();
     VirtualConsole_Widget(
         QWidget& parent,
         VirtualConsole& instance,
@@ -58,6 +63,7 @@ private:
     void construct();
 
 private:
+    SwitchSystemSession m_session;
     SwitchSystemWidget* m_switch;
 };
 

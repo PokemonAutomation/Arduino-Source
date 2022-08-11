@@ -19,9 +19,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+class MultiSwitchProgramInstance2;
+
+
 class MultiSwitchProgramEnvironment : public ProgramEnvironment{
 public:
     ~MultiSwitchProgramEnvironment();
+    MultiSwitchProgramEnvironment(
+        const ProgramInfo& program_info,
+        CancellableScope& scope,
+        Logger& logger,
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats,
+        FixedLimitVector<ConsoleHandle> p_switches
+    );
 
     FixedLimitVector<ConsoleHandle> consoles;
 
@@ -37,17 +48,6 @@ public:
         const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
     );
 
-private:
-    friend class MultiSwitchProgramWidget;
-    friend class MultiSwitchProgramUI;
-    MultiSwitchProgramEnvironment(
-        const ProgramInfo& program_info,
-        CancellableScope& scope,
-        Logger& logger,
-        StatsTracker* current_stats,
-        const StatsTracker* historical_stats,
-        FixedLimitVector<ConsoleHandle> p_switches
-    );
 };
 
 
@@ -69,6 +69,9 @@ public:
     size_t min_switches() const{ return m_min_switches; }
     size_t max_switches() const{ return m_max_switches; }
     size_t default_switches() const{ return m_default_switches; }
+
+    virtual std::unique_ptr<PanelInstance> make_panel() const override;
+    virtual std::unique_ptr<MultiSwitchProgramInstance2> make_instance() const{ return nullptr; }
 
 private:
     const size_t m_min_switches;
@@ -95,6 +98,65 @@ private:
 
     MultiSwitchSystemOption m_switches;
 };
+
+
+
+
+
+
+class MultiSwitchProgramInstance2{
+public:
+    virtual ~MultiSwitchProgramInstance2() = default;
+    MultiSwitchProgramInstance2(const MultiSwitchProgramInstance2&) = delete;
+    void operator=(const MultiSwitchProgramInstance2&) = delete;
+
+    MultiSwitchProgramInstance2();
+
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
+
+
+public:
+    //  Settings
+
+    virtual void from_json(const JsonValue& json);
+    virtual JsonValue to_json() const;
+
+    virtual std::string check_validity() const;
+    virtual void restore_defaults();
+
+
+protected:
+    friend class MultiSwitchProgramOption;
+
+    BatchOption m_options;
+    void add_option(ConfigOption& option, std::string serialization_string);
+
+
+public:
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
+    EventNotificationOption NOTIFICATION_ERROR_FATAL;
+};
+
+
+
+
+template <typename Descriptor, typename Instance>
+class MultiSwitchProgramWrapper : public Descriptor{
+public:
+    virtual std::unique_ptr<MultiSwitchProgramInstance2> make_instance() const override{
+        return std::unique_ptr<MultiSwitchProgramInstance2>(new Instance());
+    }
+};
+
+template <typename Descriptor, typename Instance>
+std::unique_ptr<PanelDescriptor> make_multi_switch_program(){
+    return std::make_unique<MultiSwitchProgramWrapper<Descriptor, Instance>>();
+}
+
+
+
+
 
 
 

@@ -30,7 +30,8 @@ void ProgramSession::remove_listener(Listener& listener){
 ProgramSession::ProgramSession(const RunnablePanelDescriptor& descriptor)
     : m_descriptor(descriptor)
     , m_instance_id(ProgramTracker::instance().add_program(*this))
-    , m_logger(global_logger_raw(), "Program:" + std::to_string(m_instance_id))
+//    , m_logger(global_logger_raw(), "Program:" + std::to_string(m_instance_id))
+    , m_logger(global_logger_raw(), "Program")
     , m_timestamp(current_time())
     , m_state(ProgramState::STOPPED)
 {

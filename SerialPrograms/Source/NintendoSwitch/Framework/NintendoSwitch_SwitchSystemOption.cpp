@@ -89,10 +89,6 @@ JsonValue SwitchSystemOption::to_json() const{
 }
 
 
-SwitchSystemWidget* SwitchSystemOption::make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id){
-    return new SwitchSystemWidget(parent, *this, raw_logger, program_id);
-}
-
 
 
 
