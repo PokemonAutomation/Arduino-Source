@@ -240,6 +240,7 @@ void ProgramSession::run_program(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
         push_stats();
+        update_historical_stats_with_current();
         set_state(ProgramState::STOPPED);
     }
 }
