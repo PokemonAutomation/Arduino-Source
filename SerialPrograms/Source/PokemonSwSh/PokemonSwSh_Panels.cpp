@@ -173,8 +173,8 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 
     add_divider("---- Auto Max Lair 2.0 ----");
     add_panel(make_multi_switch_program<MaxLairStandard_Descriptor, MaxLairStandard>());
-    add_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>();
-    add_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>();
+    add_panel(make_multi_switch_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>());
+    add_panel(make_multi_switch_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");

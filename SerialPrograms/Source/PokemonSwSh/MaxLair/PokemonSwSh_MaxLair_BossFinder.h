@@ -31,12 +31,12 @@ public:
 };
 
 
-class MaxLairBossFinder : public MultiSwitchProgramInstance{
+class MaxLairBossFinder : public MultiSwitchProgramInstance2{
 public:
-    MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descriptor);
+    MaxLairBossFinder();
 
     virtual std::string check_validity() const override;
-    virtual void update_active_consoles() override;
+    virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 

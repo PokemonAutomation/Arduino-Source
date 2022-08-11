@@ -58,9 +58,8 @@ public:
 };
 
 
-MaxLairBossFinder::MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+MaxLairBossFinder::MaxLairBossFinder()
+    : GO_HOME_WHEN_DONE(false)
     , CONSOLES(MaxLairBossFinder_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
@@ -84,23 +83,24 @@ MaxLairBossFinder::MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descrip
 }
 
 std::string MaxLairBossFinder::check_validity() const{
-    std::string error = RunnablePanelInstance::check_validity();
+    std::string error = MultiSwitchProgramInstance2::check_validity();
     if (!error.empty()){
         return error;
     }
-    error = CONSOLES.HOST.check_validity(system_count());
+
+    size_t active_consoles = CONSOLES.active_consoles();
+    error = CONSOLES.HOST.check_validity(active_consoles);
     if (!error.empty()){
         return error;
     }
-    error = HOSTING.check_validity(system_count());
+    error = HOSTING.check_validity(active_consoles);
     if (!error.empty()){
         return error;
     }
     return std::string();
 }
-void MaxLairBossFinder::update_active_consoles(){
-    size_t consoles = system_count();
-    CONSOLES.set_active_consoles(consoles);
+void MaxLairBossFinder::update_active_consoles(size_t switch_count){
+    CONSOLES.set_active_consoles(switch_count);
 }
 
 

@@ -87,9 +87,8 @@ public:
 };
 
 
-MaxLairStrongBoss::MaxLairStrongBoss(const MaxLairStrongBoss_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(false)
+MaxLairStrongBoss::MaxLairStrongBoss()
+    : GO_HOME_WHEN_DONE(false)
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
@@ -120,23 +119,24 @@ MaxLairStrongBoss::MaxLairStrongBoss(const MaxLairStrongBoss_Descriptor& descrip
 }
 
 std::string MaxLairStrongBoss::check_validity() const{
-    std::string error = RunnablePanelInstance::check_validity();
+    std::string error = MultiSwitchProgramInstance2::check_validity();
     if (!error.empty()){
         return error;
     }
-    error = CONSOLES.HOST.check_validity(system_count());
+
+    size_t active_consoles = CONSOLES.active_consoles();
+    error = CONSOLES.HOST.check_validity(active_consoles);
     if (!error.empty()){
         return error;
     }
-    error = HOSTING.check_validity(system_count());
+    error = HOSTING.check_validity(active_consoles);
     if (!error.empty()){
         return error;
     }
     return std::string();
 }
-void MaxLairStrongBoss::update_active_consoles(){
-    size_t consoles = system_count();
-    CONSOLES.set_active_consoles(consoles);
+void MaxLairStrongBoss::update_active_consoles(size_t switch_count){
+    CONSOLES.set_active_consoles(switch_count);
 }
 
 
