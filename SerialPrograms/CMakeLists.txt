@@ -1512,7 +1512,7 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 
 if (MSVC)
-    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
+    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib opencv_world460.lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)

@@ -74,6 +74,9 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "Common/Cpp/StringTools.h"
 
+#include "CommonFramework/ImageTools/ImageFilter.h"
+
+#include <opencv2/core.hpp>
 
 
 #include <iostream>
@@ -131,10 +134,25 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    cv::Mat image;
+
+
 //    env.log(QString(QChar(0x2728)));
 //    env.log("\u2728\u2733");
 
-    cout << StringTools::replace("asdf asdf adsf", "123", "---") << endl;
+
+//    throw UserSetupError(env.logger(), "Can't find any shinies? Join our Discord server and DM Elvis for FREE SHINIES!");
+
+
+
+//    ImageRGB32 image("20220806-151454864146-rmsd_precropped_input.png");
+
+//    image = filter_rgb32_range(image, 0xffb0b0b0, 0xffffffff, Color(0xffff0000), true);
+
+//    image.save("test.png");
+
+
+//    cout << StringTools::replace("asdf asdf adsf", "123", "---") << endl;
 
 
 

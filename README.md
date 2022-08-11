@@ -16,6 +16,7 @@ This is the source code for all the main Arduino programs.
 - [nlohmann json (MIT License)](https://github.com/nlohmann/json)
 - [Tesseract (Apache 2.0 License)](https://github.com/tesseract-ocr/tesseract)
 - [Tesseract for Windows (Apache 2.0 License)](https://github.com/peirick/Tesseract-OCR_for_Windows)
+- [OpenCV (Apache 2.0 License)](https://github.com/opencv/opencv)
 - [QDarkStyleSheet (MIT License)](https://github.com/ColinDuquesnoy/QDarkStyleSheet)
 - [Sleepy Discord (MIT License)](https://github.com/yourWaifu/sleepy-discord)
 - [Qt Wav Reader (BSD License)](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15)
