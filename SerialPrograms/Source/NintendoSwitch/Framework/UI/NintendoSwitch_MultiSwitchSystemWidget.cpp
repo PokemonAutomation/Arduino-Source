@@ -1,4 +1,4 @@
-/*  Switch System (4 Switches)
+/*  Multi-Switch System Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

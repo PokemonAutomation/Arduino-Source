@@ -16,15 +16,17 @@ namespace NintendoSwitch{
 
 
 SwitchSystemSession::~SwitchSystemSession(){
-    ProgramTracker::instance().remove_console(m_instance_id);
+    ProgramTracker::instance().remove_console(m_console_id);
     m_option.m_camera.info = m_camera->current_device();
     m_option.m_camera.current_resolution = m_camera->current_resolution();
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
-    uint64_t program_id
+    uint64_t program_id,
+    size_t console_number
 )
-    : m_logger(global_logger_raw(), option.m_logger_tag)
+    : m_console_number(console_number)
+    , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
     , m_serial(m_logger, option.m_serial)
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
@@ -32,7 +34,7 @@ SwitchSystemSession::SwitchSystemSession(
 {
     m_camera->set_resolution(option.m_camera.current_resolution);
     m_camera->set_source(option.m_camera.info);
-    m_instance_id = ProgramTracker::instance().add_console(program_id, *this);
+    m_console_id = ProgramTracker::instance().add_console(program_id, *this);
 }
 
 void SwitchSystemSession::set_allow_user_commands(bool allow){

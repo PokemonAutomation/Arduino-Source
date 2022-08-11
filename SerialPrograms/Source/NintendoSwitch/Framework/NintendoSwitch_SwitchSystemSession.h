@@ -2,12 +2,18 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  This class holds the real-time state of an entire Switch system.
+ *  This class holds the run-time state of an entire Switch system.
  *
  *    - Serial Port
  *    - Camera
  *    - Audio
  *    - Video Overlay
+ *
+ *  This class is fully thread-safe. You can call any functions from anywhere at
+ *  anytime.
+ *
+ *  Warning: Constructing this class requires an "option" parameter. It is not
+ *  safe to modify this "option" parameter during the lifetime of this class.
  *
  */
 
@@ -35,11 +41,12 @@ public:
     ~SwitchSystemSession();
     SwitchSystemSession(
         SwitchSystemOption& option,
-        uint64_t program_id
+        uint64_t program_id,
+        size_t console_number
     );
 
 public:
-    size_t console_id() const{ return m_option.m_console_id; }
+    size_t console_number() const{ return m_console_number; }
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 
     Logger& logger(){ return m_logger; }
@@ -58,7 +65,12 @@ public:
     void set_allow_user_commands(bool allow);
 
 private:
-    uint64_t m_instance_id = 0;
+    //  The console # within a program.
+    const size_t m_console_number;
+
+    //  Globally unique ID.
+    uint64_t m_console_id = 0;
+
     TaggedLogger m_logger;
     SwitchSystemOption& m_option;
 

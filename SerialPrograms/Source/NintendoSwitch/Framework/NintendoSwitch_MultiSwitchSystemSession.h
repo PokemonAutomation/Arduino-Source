@@ -2,6 +2,14 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This class holds the run-time state for multiple Switch systems.
+ *
+ *  This class is fully thread-safe. You can call any functions from anywhere at
+ *  anytime.
+ *
+ *  Warning: Constructing this class requires an "option" parameter. It is not
+ *  safe to modify this "option" parameter during the lifetime of this class.
+ *
  */
 
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H

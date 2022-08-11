@@ -68,15 +68,19 @@ bool AsyncCommandSession::command_is_running(){
 
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
     m_sanitizer.check_usage();
-    std::unique_lock<std::mutex> lg(m_lock);
-    if (cancelled()){
-        return;
-    }
 
+    //  Construct the CommandSet outside the lock.
+    //  If a cancellation comes from above while we are holding the lock,
+    //  it will deadlock.
     std::unique_ptr<CommandSet> pending(new CommandSet(
         *this->scope(),
         m_botbase, std::move(lambda)
     ));
+
+    std::unique_lock<std::mutex> lg(m_lock);
+    if (cancelled()){
+        return;
+    }
 
     if (m_current){
         //  Already a task running. Cancel it.
@@ -120,6 +124,9 @@ void AsyncCommandSession::thread_loop(){
 //            cout << "stop" << endl;
         }catch (OperationCancelledException&){}
 
+        //  Destroy the CommandSet outside the lock.
+        //  If a cancellation comes from above while we are holding the lock,
+        //  it will deadlock.
         std::unique_ptr<CommandSet> done;
         {
             std::lock_guard<std::mutex> lg(m_lock);

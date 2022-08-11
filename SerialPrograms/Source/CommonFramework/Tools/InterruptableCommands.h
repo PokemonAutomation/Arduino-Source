@@ -19,7 +19,7 @@ class ProgramEnvironment;
 
 
 
-class AsyncCommandSession final : public Cancellable{
+class AsyncCommandSession final : private Cancellable{
 public:
     AsyncCommandSession(
         CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
@@ -29,8 +29,17 @@ public:
 
     bool command_is_running();
 
-    //  Stop the entire session. This will rethrow exceptions in the command thread.
-    //  You must call this prior to destruction unless it's during a stack-unwind.
+    //  Stop the entire session. If an exception was thrown from the command
+    //  thread, it will be rethrown here.
+    //
+    //  It is important that exceptions in the command thread be passed up
+    //  since it is how cancellations are implemented. Therefore you MUST
+    //  call this prior to all natural* destruction points.
+    //
+    //  *Do not call this during a stack-unwind as it's UB to throw while
+    //  unwinding. In such cases, the exception from the command thread will be
+    //  silently dropped in favor of the exception that's causing the current
+    //  unwind.
     void stop_session_and_rethrow();
 
 

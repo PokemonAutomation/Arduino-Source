@@ -26,7 +26,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch(0, PABotBaseLevel::NOT_PABOTBASE, false)
+    , m_switch(PABotBaseLevel::NOT_PABOTBASE, false)
 {}
 void VirtualConsole::from_json(const JsonValue& json){
     m_switch.load_json(json);
@@ -58,7 +58,7 @@ VirtualConsole_Widget::VirtualConsole_Widget(
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
-    , m_session(instance.m_switch, 0)
+    , m_session(instance.m_switch, 0, 0)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);

@@ -34,25 +34,20 @@ const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
 
 
 SwitchSystemOption::SwitchSystemOption(
-    size_t console_id,
     PABotBaseLevel min_pabotbase,
     bool allow_commands_while_running
 )
     : m_allow_commands_while_running(allow_commands_while_running)
-    , m_console_id(console_id)
-    , m_logger_tag("Console " + std::to_string(console_id))
     , m_serial(min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
     , m_audio()
 {}
 SwitchSystemOption::SwitchSystemOption(
-    size_t console_id,
     PABotBaseLevel min_pabotbase,
     bool allow_commands_while_running,
     const JsonValue& json
 )
     : SwitchSystemOption(
-          console_id,
           min_pabotbase,
           allow_commands_while_running
      )

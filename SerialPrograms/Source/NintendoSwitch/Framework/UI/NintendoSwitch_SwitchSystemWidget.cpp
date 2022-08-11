@@ -50,7 +50,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
 
-    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_session.console_id()) + " Settings");
+    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(m_session.console_number()) + " Settings");
     layout->addWidget(m_group_box);
 
     QWidget* widget = new QWidget(m_group_box);

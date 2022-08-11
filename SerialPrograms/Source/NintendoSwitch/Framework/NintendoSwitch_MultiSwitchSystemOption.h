@@ -2,6 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This class represents the serializable state of a set of Switch.
+ *  consoles. Specifically, it holds a SwitchSystemOption for each of the
+ *  consoles it represents.
+ *
+ *  This class maintains no runtime state or UI and is not thread-safe.
+ *
  */
 
 #ifndef PokemonAutomationn_NintendoSwitch_MultiSwitchSystemOption_H

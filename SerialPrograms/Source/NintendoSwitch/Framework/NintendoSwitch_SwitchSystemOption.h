@@ -2,6 +2,14 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This class represents the serializable state of a Switch console.
+ *  Specifially, holds the settings of:
+ *      -   Serial Port
+ *      -   Camera
+ *      -   Audio
+ *
+ *  This class maintains no runtime state or UI and is not thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
@@ -27,12 +35,10 @@ class SwitchSystemOption{
 
 public:
     SwitchSystemOption(
-        size_t console_id,
         PABotBaseLevel min_pabotbase,
         bool allow_commands_while_running
     );
     SwitchSystemOption(
-        size_t console_id,
         PABotBaseLevel min_pabotbase,
         bool allow_commands_while_running,
         const JsonValue& json
@@ -41,14 +47,8 @@ public:
     JsonValue to_json() const;
 
 
-private:
-    friend class SwitchSystemSession;
-    friend class SwitchSystemWidget;
-
+public:
     const bool m_allow_commands_while_running;
-
-    size_t m_console_id;
-    std::string m_logger_tag;
 
     SerialPortOption m_serial;
     CameraOption m_camera;

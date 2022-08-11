@@ -33,7 +33,7 @@ MultiSwitchSystemSession::MultiSwitchSystemSession(
 {
     size_t count = option.count();
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(option[c], program_id);
+        m_consoles.emplace_back(option[c], program_id, c);
     }
 }
 
@@ -45,7 +45,7 @@ void MultiSwitchSystemSession::set_switch_count(size_t count){
     m_consoles.reset(count);
     m_option.resize(count);
     for (size_t c = 0; c < count; c++){
-        m_consoles.emplace_back(m_option[c], m_program_id);
+        m_consoles.emplace_back(m_option[c], m_program_id, c);
     }
     for (Listener* listener : m_listeners){
         listener->startup(count);

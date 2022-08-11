@@ -61,7 +61,6 @@ void MultiSwitchSystemOption::load_json(const JsonValue& json){
         for (size_t c = 0; c < items; c++){
             m_switches.emplace_back(
                 new SwitchSystemOption(
-                    c,
                     m_min_pabotbase,
                     m_allow_commands_while_running,
                     (*array)[c]
@@ -85,7 +84,6 @@ void MultiSwitchSystemOption::resize(size_t count){
     while (m_switches.size() < count){
         m_switches.emplace_back(
             new SwitchSystemOption(
-                m_switches.size(),
                 m_min_pabotbase,
                 m_allow_commands_while_running
             )

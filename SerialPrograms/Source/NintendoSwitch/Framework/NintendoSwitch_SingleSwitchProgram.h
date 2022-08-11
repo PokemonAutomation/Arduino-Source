@@ -1,4 +1,4 @@
-/*  Single Switch Program Template
+/*  Single Switch Program
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -63,7 +63,7 @@ public:
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
     virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const = 0;
 
-protected:
+private:
     const FeedbackType m_feedback;
     const PABotBaseLevel m_min_pabotbase_level;
     const bool m_allow_commands_while_running;
@@ -91,7 +91,7 @@ protected:
 //  Called from both UI and program threads:
 //    - check_validity()
 //
-//  Calls to this class will never be concurrently from different threads.
+//  Calls to this class will never be concurrent from different threads.
 //
 class SingleSwitchProgramInstance2{
 public:

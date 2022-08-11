@@ -38,7 +38,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 )
     : QWidget(&parent)
     , m_holder(holder)
-    , m_session(option)
+    , m_session(option, 0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

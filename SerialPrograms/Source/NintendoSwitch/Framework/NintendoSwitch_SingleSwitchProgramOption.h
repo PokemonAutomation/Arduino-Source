@@ -2,6 +2,13 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This class represents the serializable state of a Switch program.
+ *  This class maintains no UI and is not thread-safe.
+ *
+ *  Note that this class does own the "SingleSwitchProgramInstance", object
+ *  which is controlled by the individual program itself. There the running
+ *  program can do whatever it wants - including keeping run-time state.
+ *
  */
 
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramOption_H
