@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
+#include <QWidget>
 #include "NintendoSwitch_SwitchSystemSession.h"
-#include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 
 class CommandRow;
 
-class SwitchSystemWidget : public SwitchSetupWidget{
+class SwitchSystemWidget final : public QWidget{
 public:
     virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
@@ -32,18 +32,13 @@ public:
         uint64_t program_id
     );
 
-    virtual bool serial_ok() const override;
-    virtual void wait_for_all_requests() override;
-    virtual void stop_serial() override;
-    virtual void reset_serial() override;
-
 public:
     Logger& logger();
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();
     AudioFeed& audio();
-    virtual void update_ui(ProgramState state) override;
+    void update_ui(ProgramState state);
 
 private:
     virtual void keyPressEvent(QKeyEvent* event) override;

@@ -683,10 +683,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp
@@ -695,8 +691,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetup.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetupWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp

@@ -33,9 +33,8 @@ std::unique_ptr<StatsTracker> SelfTouchTrade_Descriptor::make_stats() const{
 }
 
 
-SelfTouchTrade::SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , HOSTING_SWITCH(
+SelfTouchTrade::SelfTouchTrade()
+    : HOSTING_SWITCH(
         "<b>Host Switch:</b><br>This is the Switch hosting the " + STRING_POKEMON + " to be touch-traded to the other.",
         {
             "Switch 0 (Left)",

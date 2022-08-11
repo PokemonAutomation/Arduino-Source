@@ -33,55 +33,10 @@ MultiSwitchSystemWidget::~MultiSwitchSystemWidget(){
 }
 MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     QWidget& parent,
-    MultiSwitchSystemOption& option,
-    uint64_t program_id
-)
-    : SwitchSetupWidget(parent)
-    , m_program_id(program_id)
-    , m_session_owner(new MultiSwitchSystemSession(option, program_id))
-    , m_session(*m_session_owner)
-    , m_videos(nullptr)
-{
-    QVBoxLayout* vbox = new QVBoxLayout(this);
-    vbox->setContentsMargins(0, 0, 0, 0);
-
-    QHBoxLayout* row = new QHBoxLayout();
-    vbox->addLayout(row, 0);
-    row->setContentsMargins(0, 0, 0, 0);
-    row->addStretch(2);
-    row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
-    m_console_count_box = new NoWheelComboBox(this);
-    row->addWidget(m_console_count_box, 1);
-    row->addStretch(2);
-
-    //  Acquire the lock now and attach listener. This will block the session
-    //  from changing the # of switches while we draw everything.
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_session.add_listener(*this);
-
-    for (size_t c = m_session.min_switches(); c <= m_session.max_switches(); c++){
-        m_console_count_box->addItem(QString::number(c));
-    }
-    m_console_count_box->setCurrentIndex((int)(m_session.count() - m_session.min_switches()));
-
-    connect(
-        m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this, [=](int index){
-            if (index < 0 || index > (int)(m_session.max_switches() - m_session.min_switches())){
-                return;
-            }
-            m_session.set_switch_count(index + m_session.min_switches());
-        }
-    );
-
-    redraw_videos(m_session.count());
-}
-MultiSwitchSystemWidget::MultiSwitchSystemWidget(
-    QWidget& parent,
     MultiSwitchSystemSession& session,
     uint64_t program_id
 )
-    : SwitchSetupWidget(parent)
+    : QWidget(&parent)
     , m_program_id(program_id)
     , m_session(session)
     , m_videos(nullptr)
@@ -187,62 +142,14 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
         }
     }
     static_assert(MultiSwitchSystemOption::MAX_SWITCHES <= 4, "Can't display more than 4 Switches.");
-
-    for (const auto& item : m_switches){
-        connect(
-            item, &SwitchSystemWidget::on_program_state_changed,
-            this, [=]{ on_program_state_changed(); }
-        );
-    }
-    on_setup_changed();
 }
 
-bool MultiSwitchSystemWidget::serial_ok() const{
-    for (const auto& item : m_switches){
-        if (!item->serial_ok()){
-            return false;
-        }
-    }
-    return true;
-}
-void MultiSwitchSystemWidget::wait_for_all_requests(){
-    for (const auto& item : m_switches){
-        item->wait_for_all_requests();
-    }
-}
-void MultiSwitchSystemWidget::stop_serial(){
-    for (const auto& item : m_switches){
-        item->stop_serial();
-    }
-}
-void MultiSwitchSystemWidget::reset_serial(){
-    for (const auto& item : m_switches){
-        item->reset_serial();
-    }
-}
 void MultiSwitchSystemWidget::update_ui(ProgramState state){
     m_console_count_box->setEnabled(state == ProgramState::STOPPED);
     for (const auto& item : m_switches){
         item->update_ui(state);
     }
 }
-
-#if 0
-void SwitchSystem4::change_serial(size_t old_index, size_t new_index, SwitchSystem& system){
-    {
-        auto iter = m_active_ports.find(old_index);
-        if (iter != m_active_ports.end()){
-            iter->second->clear_serial();
-        }
-    }
-    {
-        auto iter = m_active_ports.find(new_index);
-        if (iter != m_active_ports.end()){
-            iter->second = &system;
-        }
-    }
-}
-#endif
 
 
 

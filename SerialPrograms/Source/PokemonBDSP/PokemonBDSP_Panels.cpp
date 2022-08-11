@@ -56,8 +56,8 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_panel(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
     add_divider("---- Trading ----");
-    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
-    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+    add_panel(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    add_panel(make_multi_switch_program<SelfTouchTrade_Descriptor, SelfTouchTrade>());
 
     add_divider("---- Farming ----");
     add_panel(make_single_switch_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>());

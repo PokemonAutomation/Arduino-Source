@@ -56,7 +56,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<TestProgramComputer_Descriptor, TestProgramComputer>();
-        add_program<TestProgram_Descriptor, TestProgram>();
+        add_panel(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         add_panel(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
         add_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>();
         add_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>();

@@ -66,8 +66,8 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_panel(make_single_switch_program<RamanasCombeeFinder_Descriptor, RamanasCombeeFinder>());
 
     add_divider("---- Trading ----");
-    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
-    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+    add_panel(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    add_panel(make_multi_switch_program<SelfTouchTrade_Descriptor, SelfTouchTrade>());
 
     add_divider("---- Farming ----");
     add_panel(make_single_switch_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>());

@@ -7,10 +7,11 @@
 #ifndef PokemonAutomationn_NintendoSwitch_SwitchSystem4Widget_H
 #define PokemonAutomationn_NintendoSwitch_SwitchSystem4Widget_H
 
-#include <QComboBox>
-#include "NintendoSwitch_SwitchSetupWidget.h"
+#include <QWidget>
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch_MultiSwitchSystemSession.h"
+
+class QComboBox;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,16 +19,11 @@ namespace NintendoSwitch{
 class SwitchSystemWidget;
 
 
-class MultiSwitchSystemWidget final : public SwitchSetupWidget, private MultiSwitchSystemSession::Listener{
+class MultiSwitchSystemWidget final : public QWidget, private MultiSwitchSystemSession::Listener{
     Q_OBJECT
 
 public:
     ~MultiSwitchSystemWidget();
-    MultiSwitchSystemWidget(
-        QWidget& parent,
-        MultiSwitchSystemOption& option,
-        uint64_t program_id
-    );
     MultiSwitchSystemWidget(
         QWidget& parent,
         MultiSwitchSystemSession& session,
@@ -37,13 +33,8 @@ public:
     size_t switch_count() const{ return m_switches.size(); }
     SwitchSystemWidget& operator[](size_t index){ return *m_switches[index]; }
 
-    virtual bool serial_ok() const override;
-    virtual void wait_for_all_requests() override;
-    virtual void stop_serial() override;
-    virtual void reset_serial() override;
-
 public:
-    virtual void update_ui(ProgramState state) override;
+    void update_ui(ProgramState state);
 
 private:
     virtual void shutdown() override;
@@ -53,7 +44,6 @@ private:
 
 private:
     uint64_t m_program_id;
-    std::unique_ptr<MultiSwitchSystemSession> m_session_owner;
     MultiSwitchSystemSession& m_session;
 
     std::mutex m_lock;

@@ -21,7 +21,8 @@ MultiSwitchSystemOption::MultiSwitchSystemOption(
     size_t max_switches,
     size_t switches
 )
-    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
+    : m_min_pabotbase(min_pabotbase)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
@@ -37,7 +38,8 @@ MultiSwitchSystemOption::MultiSwitchSystemOption(
     size_t max_switches,
     const JsonValue& json
 )
-    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
+    : m_min_pabotbase(min_pabotbase)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
@@ -92,9 +94,6 @@ void MultiSwitchSystemOption::resize(size_t count){
     m_active_switches = count;
 }
 
-SwitchSetupWidget* MultiSwitchSystemOption::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
-    return new MultiSwitchSystemWidget(parent, *this, program_id);
-}
 
 
 

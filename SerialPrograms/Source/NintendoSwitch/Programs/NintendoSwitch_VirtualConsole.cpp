@@ -65,8 +65,6 @@ void VirtualConsole_Widget::construct(){
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
-//    VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
-//    m_switch = instance.m_switch.make_ui(*this, m_holder.raw_logger(), 0);
     m_switch = new SwitchSystemWidget(*this, m_session, 0);
     layout->addWidget(m_switch);
 }

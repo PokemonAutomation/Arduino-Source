@@ -54,20 +54,23 @@ SwitchViewer_Widget* SwitchViewer_Widget::make(
     widget->construct();
     return widget;
 }
+SwitchViewer_Widget::~SwitchViewer_Widget(){
+    delete m_switches;
+}
 SwitchViewer_Widget::SwitchViewer_Widget(
     QWidget& parent,
     SwitchViewer& instance,
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
+    , m_session(instance.m_switches, 0)
 {}
 void SwitchViewer_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
-    SwitchViewer& instance = static_cast<SwitchViewer&>(m_instance);
-    m_switches = (MultiSwitchSystemWidget*)instance.m_switches.make_ui(*this, m_holder.raw_logger(), 0);
+    m_switches = new MultiSwitchSystemWidget(*this, m_session, 0);
     layout->addWidget(m_switches);
 }
 

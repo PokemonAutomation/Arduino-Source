@@ -35,9 +35,9 @@ public:
 };
 
 
-class TestProgram : public MultiSwitchProgramInstance{
+class TestProgram : public MultiSwitchProgramInstance2{
 public:
-    TestProgram(const TestProgram_Descriptor& descriptor);
+    TestProgram();
 
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());

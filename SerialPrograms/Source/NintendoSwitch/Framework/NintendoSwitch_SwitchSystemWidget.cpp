@@ -43,7 +43,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     SwitchSystemSession& session,
     uint64_t program_id
 )
-    : SwitchSetupWidget(parent)
+    : QWidget(&parent)
     , m_session(session)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -114,16 +114,6 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
 }
 
-bool SwitchSystemWidget::serial_ok() const{
-    return m_serial_widget->is_ready();
-}
-void SwitchSystemWidget::wait_for_all_requests(){
-    BotBase* botbase = this->botbase();
-    if (botbase == nullptr){
-        return;
-    }
-    botbase->wait_for_all_requests();
-}
 Logger& SwitchSystemWidget::logger(){
     return m_session.logger();
 }
@@ -138,12 +128,6 @@ VideoOverlay& SwitchSystemWidget::overlay(){
 }
 AudioFeed& SwitchSystemWidget::audio(){
     return m_session.audio_session();
-}
-void SwitchSystemWidget::stop_serial(){
-    m_serial_widget->stop();
-}
-void SwitchSystemWidget::reset_serial(){
-    m_serial_widget->reset();
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){

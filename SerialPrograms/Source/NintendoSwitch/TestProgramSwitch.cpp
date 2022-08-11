@@ -30,6 +30,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 
 #include <QVideoFrame>
 
@@ -62,9 +63,8 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 {}
 
 
-TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , LANGUAGE(
+TestProgram::TestProgram()
+    : LANGUAGE(
         "<b>OCR Language:</b>",
         { Language::English }
     )
@@ -104,7 +104,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    ImageRGB32 image("04_True_True_eng_hippowdon_NotShiny_NotAlpha_Female.png");
+    ImageRGB32 image("screenshot-20220807-171750797516.png");
+
+
+    BattleMenuDetector detector(logger, overlay, true);
+    cout << detector.process_frame(image, current_time()) << endl;
+
+
+//    ImageRGB32 image("04_True_True_eng_hippowdon_NotShiny_NotAlpha_Female.png");
 
 //    GreyDialogDetector detector;
 //    cout << detector.detect(image) << endl;
@@ -112,7 +119,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::shared_ptr<const ImageRGB32> image = feed.snapshot();
 
-    find_shiny_symbols(image);
+//    find_shiny_symbols(image);
 
 
 

@@ -34,9 +34,8 @@ std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
 
 
 
-SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , BOXES_TO_TRADE(
+SelfBoxTrade::SelfBoxTrade()
+    : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
         2, 0, 40
     )

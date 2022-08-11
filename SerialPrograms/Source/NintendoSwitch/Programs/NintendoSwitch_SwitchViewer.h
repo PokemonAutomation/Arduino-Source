@@ -10,6 +10,7 @@
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/PanelWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -49,6 +50,7 @@ public:
     );
 
 private:
+    ~SwitchViewer_Widget();
     SwitchViewer_Widget(
         QWidget& parent,
         SwitchViewer& instance,
@@ -57,6 +59,7 @@ private:
     void construct();
 
 private:
+    MultiSwitchSystemSession m_session;
     MultiSwitchSystemWidget* m_switches;
 };
 

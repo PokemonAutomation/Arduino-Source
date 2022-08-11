@@ -7,9 +7,9 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Common/Cpp/AsyncDispatcher.h"
+#include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
-#include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -65,14 +65,16 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t max_switches,
     size_t default_switches
 )
-    : RunnableSwitchProgramDescriptor(
+    : RunnablePanelDescriptor(
+        pick_color(feedback, min_pabotbase_level),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
-        std::move(description),
-        feedback, allow_commands_while_running,
-        min_pabotbase_level
+        std::move(description)
     )
+    , m_feedback(feedback)
+    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)
@@ -81,24 +83,6 @@ std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
     return std::unique_ptr<PanelInstance>(new MultiSwitchProgramOption(*this));
 }
 
-
-
-MultiSwitchProgramInstance::MultiSwitchProgramInstance(const MultiSwitchProgramDescriptor& descriptor)
-    : RunnableSwitchProgramInstance(descriptor)
-    , m_switches(
-        descriptor.min_pabotbase_level(),
-        descriptor.feedback(),
-        descriptor.allow_commands_while_running(),
-        descriptor.min_switches(),
-        descriptor.max_switches(),
-        descriptor.default_switches()
-    )
-{
-    m_setup = &m_switches;
-}
-QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return MultiSwitchProgramWidget::make(parent, *this, holder);
-}
 
 
 

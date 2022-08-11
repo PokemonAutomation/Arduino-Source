@@ -169,7 +169,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 
     add_divider("---- Multi-Switch Programs ----");
     add_panel(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
-    add_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>();
+    add_panel(make_multi_switch_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>());
 
     add_divider("---- Auto Max Lair 2.0 ----");
     add_panel(make_multi_switch_program<MaxLairStandard_Descriptor, MaxLairStandard>());

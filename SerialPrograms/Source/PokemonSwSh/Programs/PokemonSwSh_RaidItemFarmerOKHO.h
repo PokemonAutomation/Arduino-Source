@@ -24,9 +24,9 @@ public:
 
 
 
-class RaidItemFarmerOHKO : public MultiSwitchProgramInstance{
+class RaidItemFarmerOHKO : public MultiSwitchProgramInstance2{
 public:
-    RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& descriptor);
+    RaidItemFarmerOHKO();
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 

@@ -35,9 +35,8 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
 
 
 
-RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
+RaidItemFarmerOHKO::RaidItemFarmerOHKO()
+    : BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
 //    , m_advanced_options(
 //        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
 //    )

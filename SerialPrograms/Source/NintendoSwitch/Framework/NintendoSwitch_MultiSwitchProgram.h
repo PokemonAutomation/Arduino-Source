@@ -9,10 +9,11 @@
 
 #include <functional>
 #include "Common/Cpp/FixedLimitVector.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch_MultiSwitchSystemOption.h"
-#include "NintendoSwitch_RunnableProgram.h"
+#include "CommonFramework/Panels/RunnablePanel.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
@@ -52,7 +53,7 @@ public:
 
 
 
-class MultiSwitchProgramDescriptor : public RunnableSwitchProgramDescriptor{
+class MultiSwitchProgramDescriptor : public RunnablePanelDescriptor{
 public:
     MultiSwitchProgramDescriptor(
         std::string identifier,
@@ -66,6 +67,10 @@ public:
         size_t default_switches
     );
 
+    FeedbackType feedback() const{ return m_feedback; }
+    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
+
     size_t min_switches() const{ return m_min_switches; }
     size_t max_switches() const{ return m_max_switches; }
     size_t default_switches() const{ return m_default_switches; }
@@ -73,33 +78,15 @@ public:
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
     virtual std::unique_ptr<MultiSwitchProgramInstance2> make_instance() const{ return nullptr; }
 
-private:
+protected:
+    const FeedbackType m_feedback;
+    const PABotBaseLevel m_min_pabotbase_level;
+    const bool m_allow_commands_while_running;
+
     const size_t m_min_switches;
     const size_t m_max_switches;
     const size_t m_default_switches;
 };
-
-
-
-class MultiSwitchProgramInstance : public RunnableSwitchProgramInstance{
-public:
-    MultiSwitchProgramInstance(const MultiSwitchProgramDescriptor& descriptor);
-
-    //  Called when the user changes the # of Switches.
-    virtual void update_active_consoles(){}
-
-    size_t system_count() const{ return m_switches.count(); }
-
-    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
-    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
-
-private:
-    friend class MultiSwitchProgramWidget;
-
-    MultiSwitchSystemOption m_switches;
-};
-
-
 
 
 

@@ -39,9 +39,8 @@ std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
 
 
 
-SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
-    : MultiSwitchProgramInstance(descriptor)
-    , LANGUAGE_LEFT("<b>Game Language of Left Switch:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+SelfBoxTrade::SelfBoxTrade()
+    : LANGUAGE_LEFT("<b>Game Language of Left Switch:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , LANGUAGE_RIGHT("<b>Game Language of Right Switch:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
