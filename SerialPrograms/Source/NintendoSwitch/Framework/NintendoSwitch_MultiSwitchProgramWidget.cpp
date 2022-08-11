@@ -156,6 +156,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     }
 
     m_stats_bar = new StatsBar(*this);
+    m_stats_bar->set_stats("", m_session.historical_stats());
     layout->addWidget(m_stats_bar);
 
     m_actions_bar = new RunnablePanelActionBar(*this, m_session.current_state());
