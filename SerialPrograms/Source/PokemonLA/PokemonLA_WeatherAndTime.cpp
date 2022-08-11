@@ -34,6 +34,7 @@ char timeOfDayOneLetter(TimeOfDay time){
     case TimeOfDay::MIDNIGHT:
         return 'N';
     }
+    return '\0';
 }
 
 
