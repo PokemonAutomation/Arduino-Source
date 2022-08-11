@@ -7,6 +7,7 @@ del SerialPrograms.pro.user*
 del *Settings.json
 del *.png
 del *.jpg
+del *.dll
 del CMakeLists.txt.user
 
 copy CMakeLists.txt CMakeLists.txt.tmp

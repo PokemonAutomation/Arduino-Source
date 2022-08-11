@@ -36,11 +36,11 @@ win32-g++{
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
     DEFINES += PA_AutoDispatch_x64_08_Nehalem
-    LIBS += ../SerialPrograms/tesseractPA.lib
+    LIBS += ../3rdPartyBinaries/tesseractPA.lib
 
     DEFINES += WIN32
     DEFINES += PA_SLEEPY
-    LIBS += ../SerialPrograms/Sleepy.lib
+    LIBS += ../3rdPartyBinaries/Sleepy.lib
 }
 win32-msvc{
     QMAKE_CXXFLAGS += /std:c++latest
@@ -51,10 +51,10 @@ win32-msvc{
     DEFINES += PA_AutoDispatch_x64_08_Nehalem
 
     DEFINES += PA_TESSERACT
-    LIBS += ../SerialPrograms/tesseractPA.lib
+    LIBS += ../3rdPartyBinaries/tesseractPA.lib
 
     DEFINES += PA_SLEEPY
-    LIBS += ../SerialPrograms/Sleepy.lib
+    LIBS += ../3rdPartyBinaries/Sleepy.lib
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14
@@ -67,6 +67,7 @@ macx{
 
 SOURCES += \
     ../3rdParty/QtWavFile/WavFile.cpp \
+    ../3rdParty/TesseractPA/TesseractPA.cpp \
     ../ClientSource/Connection/MessageLogger.cpp \
     ../ClientSource/Connection/PABotBase.cpp \
     ../ClientSource/Connection/PABotBaseConnection.cpp \
@@ -739,6 +740,7 @@ SOURCES += \
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
     ../3rdParty/nlohmann/json.hpp \
+    ../3rdParty/TesseractPA/TesseractPA.h \
     ../ClientSource/Connection/BotBase.h \
     ../ClientSource/Connection/BotBaseMessage.h \
     ../ClientSource/Connection/MessageLogger.h \
@@ -932,7 +934,6 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \
     Source/CommonFramework/OCR/OCR_TextMatcher.h \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
-    Source/CommonFramework/OCR/TesseractPA.h \
     Source/CommonFramework/Options/BatchOption/BatchOption.h \
     Source/CommonFramework/Options/BatchOption/BatchWidget.h \
     Source/CommonFramework/Options/BatchOption/GroupOption.h \

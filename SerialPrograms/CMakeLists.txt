@@ -43,6 +43,8 @@ file(GLOB MAIN_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/nlohmann/json.hpp
     ../3rdParty/qdarkstyle/dark/darkstyle.qrc
+    ../3rdParty/TesseractPA/TesseractPA.cpp
+    ../3rdParty/TesseractPA/TesseractPA.h
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp
@@ -381,8 +383,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
-    Source/CommonFramework/OCR/TesseractPA.cpp
-    Source/CommonFramework/OCR/TesseractPA.h
     Source/CommonFramework/Options/BatchOption/BatchOption.cpp
     Source/CommonFramework/Options/BatchOption/BatchOption.h
     Source/CommonFramework/Options/BatchOption/BatchWidget.h
@@ -1504,7 +1504,9 @@ if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
 endif()
 
 #add include directory
+target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/)
 target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
+target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 
 
@@ -1630,6 +1632,6 @@ endif()
 #copy needed dlls
 #file(COPY *.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB MY_DLLS
-  "*.dll"
+  "../3rdPartyBinaries/*.dll"
 )
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -8,11 +8,11 @@
 #include <deque>
 #include <QFile>
 #include <QDir>
+#include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "TesseractPA.h"
 #include "OCR_RawOCR.h"
 
 #include <iostream>
