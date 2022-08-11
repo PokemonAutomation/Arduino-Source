@@ -63,7 +63,7 @@ public:
     QWidget& widget(){ return m_widget; }
 
     virtual void restore_defaults() = 0;
-    virtual void update_ui() = 0;
+    virtual void update_ui();
     virtual void update_visibility();
 
 private:

@@ -74,7 +74,25 @@ protected:
 
 
 
-
+//
+//  As of this writing, this class will never be called in a manner where
+//  thread-safety is of concern. However, this may change in the future.
+//
+//  Here is the curent status:
+//
+//  Called from UI thread:
+//    - Construction/destruction
+//    - from/to_json()
+//    - restore_defaults()
+//
+//  Called from program thread:
+//    - program()
+//
+//  Called from both UI and program threads:
+//    - check_validity()
+//
+//  Calls to this class will never be concurrently from different threads.
+//
 class SingleSwitchProgramInstance2{
 public:
     virtual ~SingleSwitchProgramInstance2() = default;

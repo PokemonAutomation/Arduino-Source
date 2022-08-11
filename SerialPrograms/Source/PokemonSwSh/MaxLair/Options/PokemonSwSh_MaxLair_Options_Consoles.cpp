@@ -11,6 +11,10 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_MaxLair_Options_Consoles.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -108,8 +112,14 @@ Consoles::Consoles(const ConsoleSpecificOptionsFactory& factory)
     add_option(*PLAYERS[1], "Console1");
     add_option(*PLAYERS[2], "Console2");
     add_option(*PLAYERS[3], "Console3");
+
+    set_active_consoles(1);
+}
+size_t Consoles::active_consoles() const{
+    return m_active_consoles;
 }
 void Consoles::set_active_consoles(size_t consoles){
+//    cout << "Consoles::set_active_consoles() = " << consoles << endl;
     size_t c = 0;
     for (; c < consoles; c++){
         PLAYERS[c]->visibility = ConfigOptionState::ENABLED;
@@ -117,6 +127,7 @@ void Consoles::set_active_consoles(size_t consoles){
     for (; c < 4; c++){
         PLAYERS[c]->visibility = ConfigOptionState::HIDDEN;
     }
+    m_active_consoles = consoles;
 }
 ConfigWidget* Consoles::make_ui(QWidget& parent){
     return new ConsolesUI(parent, *this);
@@ -124,21 +135,23 @@ ConfigWidget* Consoles::make_ui(QWidget& parent){
 ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
     : BatchWidget(parent, value)
 {
+    ConsolesUI::update_ui();
     EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
     connect(
         host, &EnumDropdownWidget::on_changed,
-        this, [=]{ update_visibility(); }
+        this, [=]{ update_ui(); }
     );
 }
-void ConsolesUI::update_visibility(){
+void ConsolesUI::update_ui(){
     EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
     size_t host_index = static_cast<EnumDropdownOption&>(host->option());
+//    cout << "ConsolesUI::update_ui()" << endl;
     for (size_t c = 0; c < 4; c++){
         ConfigWidget* console_widget = m_options[c + 1];
         ConsoleSpecificOptions& console = static_cast<ConsoleSpecificOptions&>(console_widget->option());
         console.set_host(c == host_index);
     }
-    BatchWidget::update_visibility();
+    BatchWidget::update_ui();
 }
 
 

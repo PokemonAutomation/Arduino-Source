@@ -85,14 +85,18 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
         this, [&](ProgramState state){
+            std::string error;
             switch (state){
             case ProgramState::STOPPED:
-                m_session.start_program();
+                error = m_session.start_program();
                 break;
             case ProgramState::RUNNING:
-                m_session.stop_program();
+                error = m_session.stop_program();
                 break;
             default:;
+            }
+            if (!error.empty()){
+                this->error(error);
             }
         }
     );

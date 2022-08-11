@@ -72,6 +72,7 @@ class Consoles : public BatchOption{
 public:
     Consoles(const ConsoleSpecificOptionsFactory& factory);
 
+    size_t active_consoles() const;
     void set_active_consoles(size_t consoles);
 
     const ConsoleSpecificOptions& operator[](size_t index) const{
@@ -82,6 +83,7 @@ public:
 
 private:
     LanguageSet m_languages;
+    size_t m_active_consoles;
 public:
     HostingSwitch HOST;
     std::unique_ptr<ConsoleSpecificOptions> PLAYERS[4];
@@ -89,7 +91,7 @@ public:
 class ConsolesUI : public BatchWidget{
 public:
     ConsolesUI(QWidget& parent, Consoles& value);
-    virtual void update_visibility() override;
+    virtual void update_ui() override;
 };
 
 

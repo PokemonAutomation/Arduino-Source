@@ -19,6 +19,14 @@ class MultiSwitchProgramOption;
 
 class MultiSwitchProgramSession final : public ProgramSession, private MultiSwitchSystemSession::Listener{
 public:
+    //  This is temporary. Remove once configs have push notifications.
+    struct Listener{
+        virtual void redraw_options() = 0;
+    };
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
+public:
     virtual ~MultiSwitchProgramSession();
     MultiSwitchProgramSession(MultiSwitchProgramOption& option);
 
@@ -46,6 +54,8 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
     CancellableScope* m_scope = nullptr;
+
+    std::set<Listener*> m_listeners;
 };
 
 

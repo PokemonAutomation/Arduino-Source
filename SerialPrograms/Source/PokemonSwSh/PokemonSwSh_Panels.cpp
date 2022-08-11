@@ -172,7 +172,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>();
 
     add_divider("---- Auto Max Lair 2.0 ----");
-    add_program<MaxLairStandard_Descriptor, MaxLairStandard>();
+    add_panel(make_multi_switch_program<MaxLairStandard_Descriptor, MaxLairStandard>());
     add_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>();
     add_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>();
 

@@ -45,7 +45,7 @@ private:
 
 
 
-class MultiSwitchProgramWidget2 : public QWidget, private ProgramSession::Listener{
+class MultiSwitchProgramWidget2 : public QWidget, private ProgramSession::Listener, private MultiSwitchProgramSession::Listener{
 public:
     ~MultiSwitchProgramWidget2();
     MultiSwitchProgramWidget2(
@@ -58,6 +58,8 @@ private:
     virtual void state_change(ProgramState state) override;
     virtual void stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats) override;
     virtual void error(const std::string& message) override;
+
+    virtual void redraw_options() override;
 
 private:
     PanelHolder& m_holder;

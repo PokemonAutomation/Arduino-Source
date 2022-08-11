@@ -29,7 +29,7 @@ public:
 };
 
 
-class MaxLairStandard : public MultiSwitchProgramInstance{
+class MaxLairStandard : public MultiSwitchProgramInstance2{
 public:
     enum class StopCondition{
         STOP_ON_SHINY_LEGENDARY,
@@ -37,10 +37,10 @@ public:
     };
 
 public:
-    MaxLairStandard(const MaxLairStandard_Descriptor& descriptor);
+    MaxLairStandard();
 
     virtual std::string check_validity() const override;
-    virtual void update_active_consoles() override;
+    virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 

@@ -19,6 +19,10 @@
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -98,6 +102,7 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
 
 
 MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
+    m_session.ProgramSession::remove_listener(*this);
     m_session.remove_listener(*this);
     delete m_actions_bar;
     delete m_stats_bar;
@@ -159,14 +164,18 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
         this, [&](ProgramState state){
+            std::string error;
             switch (state){
             case ProgramState::STOPPED:
-                m_session.start_program();
+                error = m_session.start_program();
                 break;
             case ProgramState::RUNNING:
-                m_session.stop_program();
+                error = m_session.stop_program();
                 break;
             default:;
+            }
+            if (!error.empty()){
+                this->error(error);
             }
         }
     );
@@ -180,6 +189,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     );
 
     m_session.add_listener(*this);
+    m_session.ProgramSession::add_listener(*this);
 }
 
 
@@ -211,6 +221,14 @@ void MultiSwitchProgramWidget2::error(const std::string& message){
         box.critical(nullptr, "Error", QString::fromStdString(message));
     });
 }
+
+void MultiSwitchProgramWidget2::redraw_options(){
+    QMetaObject::invokeMethod(this, [=]{
+        m_options->update_ui();
+    });
+}
+
+
 
 
 

@@ -21,6 +21,9 @@ ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)
 {
     ConfigWidget::update_visibility();
 }
+void ConfigWidget::update_ui(){
+    update_visibility();
+}
 void ConfigWidget::update_visibility(){
     switch (m_value.visibility){
     case ConfigOptionState::ENABLED:

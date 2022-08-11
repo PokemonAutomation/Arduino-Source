@@ -17,12 +17,27 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+void MultiSwitchProgramSession::add_listener(Listener& listener){
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_listeners.insert(&listener);
+}
+void MultiSwitchProgramSession::remove_listener(Listener& listener){
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_listeners.erase(&listener);
+}
+
+
+
+
 MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& option)
     : ProgramSession(option.descriptor())
     , m_option(option)
     , m_system(option.system(), instance_id())
 {
+    std::unique_lock<std::mutex> lg(m_lock);
     m_system.add_listener(*this);
+    m_option.instance().update_active_consoles(option.system().count());
 }
 
 MultiSwitchProgramSession::~MultiSwitchProgramSession(){
@@ -199,7 +214,11 @@ void MultiSwitchProgramSession::shutdown(){
     internal_stop_program();
 }
 void MultiSwitchProgramSession::startup(size_t switch_count){
-
+    std::unique_lock<std::mutex> lg(m_lock);
+    m_option.instance().update_active_consoles(switch_count);
+    for (Listener* listener : m_listeners){
+        listener->redraw_options();
+    }
 }
 
 
