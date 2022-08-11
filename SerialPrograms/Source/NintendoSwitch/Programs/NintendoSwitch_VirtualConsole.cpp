@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h"
+#include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
 namespace PokemonAutomation{

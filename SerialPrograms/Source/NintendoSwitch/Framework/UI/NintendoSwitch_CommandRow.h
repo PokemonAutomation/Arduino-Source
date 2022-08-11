@@ -12,7 +12,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
-#include "NintendoSwitch_VirtualController.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_VirtualController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

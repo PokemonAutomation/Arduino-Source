@@ -7,7 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
-#include "NintendoSwitch_MultiSwitchProgramWidget.h"
+#include "UI/NintendoSwitch_MultiSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

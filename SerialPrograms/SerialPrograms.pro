@@ -333,24 +333,24 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.cpp \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -1083,24 +1083,24 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
     Source/NintendoSwitch/FixedInterval.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h \
+    Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \

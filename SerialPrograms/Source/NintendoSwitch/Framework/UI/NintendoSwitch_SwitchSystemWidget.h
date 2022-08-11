@@ -8,8 +8,8 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include <QWidget>
-#include "NintendoSwitch_SwitchSystemSession.h"
-#include "NintendoSwitch_SwitchSystemOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;

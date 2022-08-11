@@ -14,8 +14,8 @@
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch_MultiSwitchProgramOption.h"
-#include "NintendoSwitch_MultiSwitchProgramSession.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
 #include <iostream>

@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h"
+#include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
 
 namespace PokemonAutomation{

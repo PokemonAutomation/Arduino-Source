@@ -8,9 +8,9 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramWidget_H
 
 #include "CommonFramework/Panels/PanelElements.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
-#include "NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch_MultiSwitchProgramSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

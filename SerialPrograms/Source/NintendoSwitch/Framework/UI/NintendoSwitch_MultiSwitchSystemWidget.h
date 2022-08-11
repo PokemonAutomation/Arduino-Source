@@ -8,8 +8,8 @@
 #define PokemonAutomationn_NintendoSwitch_SwitchSystem4Widget_H
 
 #include <QWidget>
-#include "NintendoSwitch_MultiSwitchSystemOption.h"
-#include "NintendoSwitch_MultiSwitchSystemSession.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h"
 
 class QComboBox;
 
