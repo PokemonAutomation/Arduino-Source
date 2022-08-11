@@ -7,9 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "InterruptableCommands.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -73,8 +73,7 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
         return;
     }
 
-    //  Set the new task.
-    m_pending.reset(new CommandSet(
+    std::unique_ptr<CommandSet> pending(new CommandSet(
         *this->scope(),
         m_botbase, std::move(lambda)
     ));
@@ -82,10 +81,11 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
     if (m_current){
         //  Already a task running. Cancel it.
         m_current->context.cancel_lazy();
-    }else{
-        //  Otherwise, wake up the thread.
-        m_cv.notify_all();
+        m_cv.wait(lg, [=]{ return m_current == nullptr; });
     }
+
+    m_current = std::move(pending);
+    m_cv.notify_all();
 }
 
 
@@ -101,18 +101,16 @@ bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
     return false;
 }
 void AsyncCommandSession::thread_loop(){
-//    CommandSet* current = nullptr;
     while (true){
-        CommandSet* current = nullptr;
+        CommandSet* current;
         {
             std::unique_lock<std::mutex> lg(m_lock);
             m_cv.wait(lg, [=]{
-                return cancelled() || m_pending != nullptr;
+                return cancelled() || m_current != nullptr;
             });
             if (cancelled()){
                 break;
             }
-            m_current = std::move(m_pending);
             current = m_current.get();
         }
         try{
@@ -122,22 +120,13 @@ void AsyncCommandSession::thread_loop(){
 //            cout << "stop" << endl;
         }catch (OperationCancelledException&){}
 
-        //  Transfer finished task to the finished queue under both locks.
+        std::unique_ptr<CommandSet> done;
         {
-            std::unique_lock<std::mutex> lg(m_lock);
-            SpinLockGuard lg1(m_finished_lock);
-            m_finished_tasks.emplace_back(std::move(m_current));
-        }
-
-        //  Now it's safe to remove the finished task under just the finished lock.
-        {
-            SpinLockGuard lg(m_finished_lock);
-            m_finished_tasks.clear();
+            std::lock_guard<std::mutex> lg(m_lock);
+            done = std::move(m_current);
+            m_cv.notify_all();
         }
     }
-
-    SpinLockGuard lg(m_finished_lock);
-    m_finished_tasks.clear();
 
     m_sanitizer.check_usage();
 }
@@ -152,7 +141,6 @@ void AsyncCommandSession::stop_commands(){
     }
 }
 #endif
-// #if 0
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
@@ -161,7 +149,6 @@ void AsyncCommandSession::wait(){
     });
 //    cout << "wait() - done" << endl;
 }
-// #endif
 void AsyncCommandSession::stop_session_and_rethrow(){
     cancel(nullptr);
     m_thread->wait_and_rethrow_exceptions();

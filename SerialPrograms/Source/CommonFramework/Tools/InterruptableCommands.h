@@ -9,7 +9,6 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 
@@ -43,8 +42,8 @@ public:
 //    //  Stop the currently running command.
 //    void stop_commands();
 
-   //  Wait for currently running command to finish.
-   void wait();
+    //  Wait for currently running command to finish.
+    void wait();
 
 
 private:
@@ -57,13 +56,7 @@ private:
 
     Logger& m_logger;
     BotBase& m_botbase;
-    std::unique_ptr<CommandSet> m_pending;
     std::unique_ptr<CommandSet> m_current;
-
-    //  Finished tasks need to be moved here first and then deleted outside
-    //  of "m_lock" due to a deadlock possibiliy.
-    SpinLock m_finished_lock;
-    std::vector<std::unique_ptr<CommandSet>> m_finished_tasks;
 
     std::mutex m_lock;
     std::condition_variable m_cv;
