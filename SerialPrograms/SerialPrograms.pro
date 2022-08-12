@@ -739,8 +739,8 @@ SOURCES += \
 
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
-    ../3rdParty/nlohmann/json.hpp \
     ../3rdParty/TesseractPA/TesseractPA.h \
+    ../3rdParty/nlohmann/json.hpp \
     ../ClientSource/Connection/BotBase.h \
     ../ClientSource/Connection/BotBaseMessage.h \
     ../ClientSource/Connection/MessageLogger.h \
