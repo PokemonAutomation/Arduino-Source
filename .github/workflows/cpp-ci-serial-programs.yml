@@ -86,7 +86,11 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt update
-        sudo apt install mesa-common-dev libglu1-mesa-dev libegl1 libpulse-dev libgstreamer-gl1.0-0 libgstreamer-plugins-base1.0-0
+        sudo apt install mesa-common-dev libglu1-mesa-dev libegl1 libpulse-dev libgstreamer-gl1.0-0 libgstreamer-plugins-base1.0-0 libopencv-dev
+    - name: Install dependencies
+      if: startsWith(matrix.os, 'mac')
+      run: |
+        brew install opencv
     - name: Install Qt
       run: |
         python3 -m pip install aqtinstall

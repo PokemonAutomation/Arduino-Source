@@ -32,7 +32,7 @@ public:
 private:
     StringOption DIRECTORY;
     EnumDropdownOption MODE;
-    SimpleIntegerOption<size_t> THREADS;
+    SimpleIntegerOption<unsigned int> THREADS;
 
 };
 

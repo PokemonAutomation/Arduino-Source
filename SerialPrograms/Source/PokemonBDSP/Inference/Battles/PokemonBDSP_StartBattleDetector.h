@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_StartBattleDetector_H
 
 #include <functional>
+#include <atomic>
 #include <chrono>
 #include <thread>
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

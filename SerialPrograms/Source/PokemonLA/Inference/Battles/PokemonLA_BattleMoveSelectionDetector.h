@@ -10,6 +10,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattleMoveSelectionDetector_H
 #define PokemonAutomation_PokemonLA_BattleMoveSelectionDetector_H
 
+#include <atomic>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
