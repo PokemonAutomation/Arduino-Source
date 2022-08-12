@@ -27,8 +27,8 @@ class Color{
 public:
     constexpr Color() : m_argb(0) {}
     constexpr explicit Color(uint32_t argb) : m_argb(argb) {}
-    constexpr Color(uint8_t r, uint8_t g, uint8_t b) : m_argb(combine_rgb(r, g, b)) {}
-    constexpr Color(uint8_t a, uint8_t r, uint8_t g, uint8_t b) : m_argb(combine_argb(a, r, g, b)) {}
+    constexpr Color(uint8_t red, uint8_t green, uint8_t blue) : m_argb(combine_rgb(red, green, blue)) {}
+    constexpr Color(uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue) : m_argb(combine_argb(alpha, red, green, blue)) {}
 
     constexpr explicit operator bool() const{
         return m_argb != 0;
@@ -40,10 +40,10 @@ public:
         return m_argb < color.m_argb;
     }
 
-    uint8_t a() const { return (uint8_t)(m_argb >> 24); }
-    uint8_t r() const { return (uint8_t)(m_argb >> 16); }
-    uint8_t g() const { return (uint8_t)(m_argb >>  8); }
-    uint8_t b() const { return (uint8_t)(m_argb >>  0); }
+    uint8_t alpha   () const { return (uint8_t)(m_argb >> 24); }
+    uint8_t red     () const { return (uint8_t)(m_argb >> 16); }
+    uint8_t green   () const { return (uint8_t)(m_argb >>  8); }
+    uint8_t blue    () const { return (uint8_t)(m_argb >>  0); }
 
 private:
     uint32_t m_argb;

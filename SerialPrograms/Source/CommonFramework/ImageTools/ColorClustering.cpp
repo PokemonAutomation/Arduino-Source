@@ -49,8 +49,8 @@ double PixelEuclideanStatAccumulator::deviation() const{
 
 double cluster_fit_2(
     const ImageViewRGB32& image,
-    QRgb color0, PixelEuclideanStatAccumulator& cluster0,
-    QRgb color1, PixelEuclideanStatAccumulator& cluster1
+    Color color0, PixelEuclideanStatAccumulator& cluster0,
+    Color color1, PixelEuclideanStatAccumulator& cluster1
 ){
     size_t width = image.width();
     size_t height = image.height();
@@ -66,7 +66,7 @@ double cluster_fit_2(
 
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
-            QRgb pixel = image.pixel(c, r);
+            Color pixel(image.pixel(c, r));
 //            ss << "{" << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << "}," << endl;
             FloatPixel p0 = f0 - pixel;
             FloatPixel p1 = f1 - pixel;
@@ -95,8 +95,8 @@ double cluster_fit_2(
 
 bool cluster_fit_2(
     const ImageViewRGB32& image,
-    QRgb color0, double ratio0,
-    QRgb color1, double ratio1,
+    Color color0, double ratio0,
+    Color color1, double ratio1,
     double ratio_threshold,
     double deviation_threshold,
     double distance_threshold

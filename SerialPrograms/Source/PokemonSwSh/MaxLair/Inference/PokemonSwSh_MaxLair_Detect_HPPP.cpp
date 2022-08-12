@@ -51,18 +51,18 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
         }
     }
 
-    QRgb color = stats.average.round();
-    int bar_R = qRed(color);
-    int bar_G = qGreen(color);
-    int bar_B = qBlue(color);
+    Color color = stats.average.round();
+    int bar_R = color.red();
+    int bar_G = color.green();
+    int bar_B = color.blue();
 
     int bar_area = 0;
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
-            QRgb pixel = image.pixel(c, r);
-            int R = qRed(pixel) - bar_R;
-            int G = qGreen(pixel) - bar_G;
-            int B = qBlue(pixel) - bar_B;
+            Color pixel(image.pixel(c, r));
+            int R = pixel.red() - bar_R;
+            int G = pixel.green() - bar_G;
+            int B = pixel.blue() - bar_B;
             if (R*R + G*G + B*B < 100*100){
                 bar_area++;
             }

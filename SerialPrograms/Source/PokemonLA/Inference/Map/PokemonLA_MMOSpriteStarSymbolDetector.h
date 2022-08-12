@@ -35,7 +35,7 @@ public:
     // If the value is larger than a threshold, then it is considered the sprite has an animating symbol.
     // This is for debugging purposes.
     // Not thread safe: must call after inference session ends.
-    float animation_value(size_t index) const { return m_rmsd[index]; }
+    double animation_value(size_t index) const { return m_rmsd[index]; }
     
     // Get the color used to determine if `index`-th sprite has a star symbol.
     // Not thread safe: must call after inference session ends.

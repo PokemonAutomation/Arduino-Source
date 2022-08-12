@@ -34,14 +34,14 @@ private:
 
 double cluster_fit_2(
     const ImageViewRGB32& image,
-    QRgb color0, PixelEuclideanStatAccumulator& cluster0,
-    QRgb color1, PixelEuclideanStatAccumulator& cluster1
+    Color color0, PixelEuclideanStatAccumulator& cluster0,
+    Color color1, PixelEuclideanStatAccumulator& cluster1
 );
 
 bool cluster_fit_2(
     const ImageViewRGB32& image,
-    QRgb color0, double ratio0,
-    QRgb color1, double ratio1,
+    Color color0, double ratio0,
+    Color color1, double ratio1,
     double ratio_threshold = 0.2,
     double deviation_threshold = 50,
     double distance_threshold = 0.2

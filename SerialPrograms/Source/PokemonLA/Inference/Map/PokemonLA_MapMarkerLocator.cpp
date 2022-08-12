@@ -24,7 +24,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area){
+double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area){
     // The map region of the entire screen
     const ImageFloatBox box(0.271, 0.059, 0.458, 0.833);
 
@@ -94,11 +94,11 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     }
 
     // The angle of each marker end relative to the marker center
-    float end_angles[3] = {0.0f, 0.0f, 0.0f};
+    double end_angles[3] = {0.0, 0.0, 0.0};
     for(int i = 0; i < 3; i++){
         ptrdiff_t x = (ptrdiff_t)marker_ends[i].center_x() - (ptrdiff_t)local_marker_center_x;
         ptrdiff_t y = (ptrdiff_t)marker_ends[i].center_y() - (ptrdiff_t)local_marker_center_y;
-        float angle = std::atan2(y, x) * 57.29577951308232;
+        double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;
         }
@@ -106,7 +106,7 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     }
 
     // end_angle_distance[i], the angular distance between end_angles[i] and end_angles[(i+1)%3]
-    float end_angle_distances[3] = {0.0f, 0.0f, 0.0f};
+    double end_angle_distances[3] = {0.0, 0.0, 0.0};
     // Find out which two ends form the smallest angular distance between them
     int min_angle_distance_index = 0;
     for(int i = 0; i < 3; i++){
@@ -123,7 +123,7 @@ float get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area)
     // so now the marker end with the index: min_angle_distance_index and (min_angle_distance_index+1)%3 form
     // the smallest anglular distance between two ends. The other one, min_angle_distance_index+2)%3 must be
     // the end where the red marker points to!
-    float red_marker_direction = end_angles[(min_angle_distance_index+2)%3];
+    double red_marker_direction = end_angles[(min_angle_distance_index+2)%3];
     cout << "Found red marker direction " << red_marker_direction << endl;
 
     output.pixel(red_marker_obj.center_x(), red_marker_obj.center_y()) = (uint32_t)Color(255, 0, 0);

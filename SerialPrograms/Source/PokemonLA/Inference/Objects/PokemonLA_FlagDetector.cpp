@@ -32,9 +32,10 @@ void FlagMatcher_make_template(){
     for (size_t r = 0; r < image.height(); r++){
         for (size_t c = 0; c < image.width(); c++){
             uint32_t& pixel = ptr[r * words + c];
-            uint32_t red = qRed(pixel);
-            uint32_t green = qGreen(pixel);
-            uint32_t blue = qBlue(pixel);
+            Color color(pixel);
+            uint32_t red = color.red();
+            uint32_t green = color.green();
+            uint32_t blue = color.blue();
 //            if (red < 128 && green < 128 && blue < 128){
 //                pixel = 0x00000000;
 //            }

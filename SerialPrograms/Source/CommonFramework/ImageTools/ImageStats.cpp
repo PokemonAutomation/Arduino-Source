@@ -26,9 +26,9 @@ FloatPixel image_average(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row()
     );
 
-    FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
+    FloatPixel sum((double)sums.sumR, (double)sums.sumG, (double)sums.sumB);
 
-    return sum / sums.count;
+    return sum / (double)sums.count;
 }
 FloatPixel image_stddev(const ImageViewRGB32& image){
     Kernels::PixelSums sums;
@@ -38,10 +38,10 @@ FloatPixel image_stddev(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row()
     );
 
-    FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
-    FloatPixel sqr(sums.sqrR, sums.sqrG, sums.sqrB);
+    FloatPixel sum((double)sums.sumR, (double)sums.sumG, (double)sums.sumB);
+    FloatPixel sqr((double)sums.sqrR, (double)sums.sqrG, (double)sums.sqrB);
 
-    FloatPixel variance = (sqr - sum*sum / sums.count) / (sums.count - 1);
+    FloatPixel variance = (sqr - sum*sum / (double)sums.count) / ((double)sums.count - 1);
 
     return FloatPixel(
         std::sqrt(variance.r),
@@ -57,12 +57,12 @@ ImageStats image_stats(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row()
     );
 
-    FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
-    FloatPixel sqr(sums.sqrR, sums.sqrG, sums.sqrB);
+    FloatPixel sum((double)sums.sumR, (double)sums.sumG, (double)sums.sumB);
+    FloatPixel sqr((double)sums.sqrR, (double)sums.sqrG, (double)sums.sqrB);
 
-    FloatPixel average = sum / sums.count;
+    FloatPixel average = sum / (double)sums.count;
 
-    FloatPixel variance = (sqr - sum*sum / sums.count) / (sums.count - 1);
+    FloatPixel variance = (sqr - sum*sum / (double)sums.count) / ((double)sums.count - 1);
     FloatPixel stddev = FloatPixel(
         std::sqrt(variance.r),
         std::sqrt(variance.g),
@@ -110,9 +110,10 @@ ImageStats image_border_stats(const ImageViewRGB32& image){
     }
 
     size_t total = 2 * (w + h);
-    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
+    double totalf = (double)total;
+    FloatPixel variance = (sqr_sum - sum*sum / totalf) / (totalf - 1);
     return ImageStats{
-        sum / total,
+        sum / totalf,
         FloatPixel(
             std::sqrt(variance.r),
             std::sqrt(variance.g),

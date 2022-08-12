@@ -42,16 +42,16 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const I
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
     if (cluster_fit_2(
         symbol,
-        qRgb(255, 255, 255), 0.84,
-        qRgb(156, 33, 80), 0.16,
+        Color(255, 255, 255), 0.84,
+        Color(156, 33, 80), 0.16,
         0.1
     )){
         return Detection::SHINY;
     }
     if (cluster_fit_2(
         symbol,
-        qRgb(255, 255, 255), 0.92,
-        qRgb(0, 0, 0), 0.08,
+        Color(255, 255, 255), 0.92,
+        Color(0, 0, 0), 0.08,
         0.1
     )){
 //        screen.save("test.png");

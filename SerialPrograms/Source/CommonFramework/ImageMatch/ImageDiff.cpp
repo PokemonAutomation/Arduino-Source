@@ -37,8 +37,8 @@ FloatPixel pixel_average(const ImageViewRGB32& image, const ImageViewRGB32& alph
         alpha_mask.data(), alpha_mask.bytes_per_row()
     );
 
-    FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
-    sum /= sums.count;
+    FloatPixel sum((double)sums.sumR, (double)sums.sumG, (double)sums.sumB);
+    sum /= (double)sums.count;
     return sum;
 }
 
@@ -72,7 +72,7 @@ double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image){
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }
-double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, QRgb background){
+double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, Color background){
     if (!image){
 //        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
         return 765; //  Max possible deviation.
@@ -87,7 +87,7 @@ double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, 
         reference.width(), reference.height(),
         reference.data(), reference.bytes_per_row(),
         image.data(), image.bytes_per_row(),
-        background
+        (uint32_t)background
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }

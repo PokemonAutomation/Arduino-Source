@@ -658,8 +658,8 @@ void make_mount_template(){
             if (plus_min_x < c && c < plus_max_x && plus_min_y < r && r < plus_max_y){
                 continue;
             }
-            QRgb pixel = image.pixel(c, r);
-            if (qRed(pixel) < 128 || qGreen(pixel) < 128){
+            Color pixel(image.pixel(c, r));
+            if (pixel.red() < 128 || pixel.green() < 128){
                 image.pixel(c, r) = 0;
             }
         }

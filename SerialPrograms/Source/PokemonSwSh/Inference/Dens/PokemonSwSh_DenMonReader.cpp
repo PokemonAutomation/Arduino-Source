@@ -29,14 +29,14 @@ public:
     DenSpriteMatcher& operator=(DenSpriteMatcher&&) = default;
 public:
     DenSpriteMatcher() = default;
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, QRgb& background) const override{
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override{
         ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
             image,
             [](Color pixel){
-                return (uint32_t)pixel.r() + pixel.g() + pixel.b() < 100;
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 100;
             }
         );
-        background = 0;
+        background = Color();
         ImageRGB32 ret = extract_box_reference(image, box).copy();
         ImageMatch::set_alpha_black(ret);
         return ret;

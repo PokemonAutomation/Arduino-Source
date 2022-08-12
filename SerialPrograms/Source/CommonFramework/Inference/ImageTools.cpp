@@ -30,9 +30,9 @@ ImageRGB32 image_diff_greyscale(const ImageViewRGB32& x, const ImageViewRGB32& y
     size_t height = x.height();
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
-            uint32_t px = x.pixel(c, r);
-            uint32_t py = y.pixel(c, r);
-            if (qAlpha(px) == 0 || qAlpha(py) == 0){
+            Color px(x.pixel(c, r));
+            Color py(y.pixel(c, r));
+            if (px.alpha() == 0 || py.alpha() == 0){
                 image.pixel(c, r) = 0xff000000;
             }else{
                 double distance = euclidean_distance(px, py);

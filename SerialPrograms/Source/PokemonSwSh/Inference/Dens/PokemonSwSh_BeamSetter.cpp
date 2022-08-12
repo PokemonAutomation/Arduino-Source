@@ -159,7 +159,7 @@ BeamSetter::Detection BeamSetter::run(
             }
         }
 
-        std::string str = "BeamReader: column = " + tostr_default(best_index);
+        std::string str = "BeamReader: column = " + std::to_string(best_index);
 
         str += ", stddev = " + tostr_default(best_stddev);
         str += ", brightness = " + tostr_default(best_brightness);

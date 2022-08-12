@@ -24,14 +24,14 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
 }
 
 
-ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, QRgb& background) const{
+ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
     ImageStats border = image_border_stats(image);
     ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
         [&](Color pixel){
-            double r = (double)pixel.r() - border.average.r;
-            double g = (double)pixel.g() - border.average.g;
-            double b = (double)pixel.b() - border.average.b;
+            double r = (double)pixel.red() - border.average.r;
+            double g = (double)pixel.green() - border.average.g;
+            double b = (double)pixel.blue() - border.average.b;
             bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
             return stop;
         }

@@ -46,7 +46,7 @@ ImageMatchResult SilhouetteDictionaryMatcher::match(
         return results;
     }
 
-    QRgb background;
+    Color background;
     ImageRGB32 processed = process_image(image, background);
 
     for (const auto& item : m_database){

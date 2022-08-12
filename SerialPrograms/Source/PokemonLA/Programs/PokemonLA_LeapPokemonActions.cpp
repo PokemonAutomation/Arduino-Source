@@ -25,130 +25,130 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
         pbf_move_left_joystick(context, 240, 255, 30, 30);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, (21 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-        pbf_move_left_joystick(context, 255, 160, 30, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 255, 160, 30, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (3 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Burmy:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Heights);
         pbf_move_left_joystick(context, 170, 255, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_B, (uint16_t)(6.35 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-        pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(1.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 255, 127, 30, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.10 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Cherrim:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
         pbf_move_left_joystick(context, 255, 35, 30, 30);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (3.35 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(3.35 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(1.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 0, 127, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.20 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.20 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Cherubi:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Arena);
         pbf_move_left_joystick(context, 255, 152, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (25.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(25.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Combee:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Arena);
-        pbf_move_left_joystick(context, 57, 255, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 57, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (2.75 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(2.75 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Heracross:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
         pbf_move_left_joystick(context, 0, 220, 30, 30);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_left_joystick(context, 127, 0, (4 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.17 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 127, 0, (4 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.17 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Pachirisu:
     case LeapPokemon::Vespiquen:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Mirelands_Bogbound);
         pbf_move_left_joystick(context, 0, 170, 30, 30);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (10.2 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_B, (uint16_t)(10.2 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Wormadam:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Fieldlands);
         pbf_move_left_joystick(context, 110, 255, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (6.25 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_B, (uint16_t)(6.25 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 255, 100, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Geodude:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Heights);
         pbf_move_left_joystick(context, 200, 255, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (3.75 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_B, (uint16_t)(3.75 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 255, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Graveler:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Highlands);
         pbf_move_left_joystick(context, 255, 145, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_left_joystick(context, 127, 0, (5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 127, 0, (5 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bonsly:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Mirelands_DiamondSettlement);
-        pbf_move_left_joystick(context, 0, 150, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 0, 150, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_move_left_joystick(context, 127, 0, (10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 127, 0, (10 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bronzor:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
-        pbf_move_left_joystick(context, 55, 255, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 55, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::WYRDEER_ON);
-        pbf_press_button(context, BUTTON_B, (6.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(6.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Nosepass:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Summit);
-        pbf_move_left_joystick(context, 255, 175, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 255, 175, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::WYRDEER_ON);
-        pbf_press_button(context, BUTTON_B, (2.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(2.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bergimite:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Icelands_Snowfields);
-        pbf_move_left_joystick(context, 115, 255, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 115, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::WYRDEER_ON);
-        pbf_press_button(context, BUTTON_B, (3.2 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (uint16_t)(3.2 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     }
     context.wait_for_all_requests();
@@ -188,8 +188,8 @@ void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 }
 
 bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 20); //throw pokemon
-    pbf_wait(context, (4.5 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), 20); //throw pokemon
+    pbf_wait(context, (uint16_t)(4.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
 
     MountDetector mount_detector;
@@ -203,7 +203,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
             break;
         }else{
             console.log("Attempt " + std::to_string(i) + ". Found: " + MOUNT_STATE_STRINGS[(int)mount]);
-            pbf_wait(context, 0.5 * TICKS_PER_SECOND);
+            pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
             snapshot = console.video().snapshot();
         }
@@ -238,7 +238,7 @@ void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to
     if (!mash_A_to_kill){
         console.log("Running from battle...");
         pbf_press_button(context, BUTTON_B, 20, 225);
-        pbf_press_button(context, BUTTON_A, 20, 100 + 3.5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 20, 100 + (uint16_t)(3.5 * TICKS_PER_SECOND));
         context.wait_for_all_requests();
         return;
     }

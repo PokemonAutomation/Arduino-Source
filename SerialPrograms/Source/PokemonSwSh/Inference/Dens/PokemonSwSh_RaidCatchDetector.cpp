@@ -59,16 +59,16 @@ bool RaidCatchDetector::detect(const ImageViewRGB32& screen){
 //    cout << "==================" << endl;
     if (!cluster_fit_2(
         extract_box_reference(screen, m_text0),
-        qRgb(0, 0, 0), 0.90,
-        qRgb(255, 255, 255), 0.10
+        Color(0, 0, 0), 0.90,
+        Color(255, 255, 255), 0.10
     )){
         return false;
     }
 //    cout << "------------------" << endl;
     if (!cluster_fit_2(
         extract_box_reference(screen, m_text1),
-        qRgb(255, 255, 255), 0.90,
-        qRgb(0, 0, 0), 0.10
+        Color(255, 255, 255), 0.90,
+        Color(0, 0, 0), 0.10
     )){
         return false;
     }

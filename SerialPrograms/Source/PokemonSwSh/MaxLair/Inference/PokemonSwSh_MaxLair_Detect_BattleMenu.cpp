@@ -71,14 +71,14 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight = false;
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
-        qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
+        Color(0, 0, 0), 0.9,
+        Color(255, 255, 255), 0.1,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
-        qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
+        Color(0, 0, 0), 0.1,
+        Color(255, 255, 255), 0.9,
         0.2, 50, 0.1
     );
     if (!fight){
@@ -89,14 +89,14 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight = false;
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
-        qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
+        Color(0, 0, 0), 0.1,
+        Color(255, 255, 255), 0.9,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
-        qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
+        Color(0, 0, 0), 0.9,
+        Color(255, 255, 255), 0.1,
         0.2, 50, 0.1
     );
     if (!fight){
@@ -107,14 +107,14 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight = false;
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
-        qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
+        Color(0, 0, 0), 0.1,
+        Color(255, 255, 255), 0.9,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
-        qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
+        Color(0, 0, 0), 0.9,
+        Color(255, 255, 255), 0.1,
         0.2, 50, 0.1
     );
     if (!fight){
@@ -126,25 +126,25 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight = false;
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_icon_fight),
-        qRgb(255, 255, 255), 1.7,
-        qRgb(153, 75, 112), 1.0
+        Color(255, 255, 255), 1.7,
+        Color(153, 75, 112), 1.0
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_icon_fight),
-        qRgb(0, 0, 0), 1.4,
-        qRgb(185, 6, 40), 1.0
+        Color(0, 0, 0), 1.4,
+        Color(185, 6, 40), 1.0
     );
     fight |= !fight && cluster_fit_2(   //  Max raid Fight button is a bit different.
         extract_box_reference(screen, m_icon_fight),
-        qRgb(0, 0, 0), 1.7,
-        qRgb(182, 33, 82), 1.0
+        Color(0, 0, 0), 1.7,
+        Color(182, 33, 82), 1.0
     );
 //    cout << "===============" << endl;
     if (!fight){
         fight = cluster_fit_2(   //  Cheer
             extract_box_reference(screen, m_icon_cheer),
-            qRgb(0, 0, 0), 1.0,
-            qRgb(9, 162, 218), 1.0
+            Color(0, 0, 0), 1.0,
+            Color(9, 162, 218), 1.0
         );
 //        cout << "fight = " << fight << endl;
         m_cheer = fight;
@@ -157,13 +157,13 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     bool pokemon = false;
     pokemon |= !pokemon && cluster_fit_2(
         extract_box_reference(screen, m_icon_pokemon),
-        qRgb(255, 255, 255), 3.1,
-        qRgb(126, 224, 142), 1.0
+        Color(255, 255, 255), 3.1,
+        Color(126, 224, 142), 1.0
     );
     pokemon |= !pokemon && cluster_fit_2(
         extract_box_reference(screen, m_icon_pokemon),
-        qRgb(0, 0, 0), 2.7,
-        qRgb(8, 158, 18), 1.0
+        Color(0, 0, 0), 2.7,
+        Color(8, 158, 18), 1.0
     );
     if (!pokemon){
 //        cout << "Failed: m_icon_pokemon" << endl;
@@ -173,13 +173,13 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     bool run = false;
     run |= !run && cluster_fit_2(
         extract_box_reference(screen, m_icon_run),
-        qRgb(255, 255, 255), 2.3,
-        qRgb(216, 150, 230), 1.0
+        Color(255, 255, 255), 2.3,
+        Color(216, 150, 230), 1.0
     );
     run |= !run && cluster_fit_2(
         extract_box_reference(screen, m_icon_run),
-        qRgb(0, 0, 0), 1.9,
-        qRgb(179, 15, 195), 1.0
+        Color(0, 0, 0), 1.9,
+        Color(179, 15, 195), 1.0
     );
     if (!run){
 //        cout << "Failed: m_icon_run" << endl;
@@ -437,7 +437,7 @@ bool dmax_circle_ready(const ImageViewRGB32& image){
 //                processed.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
-            FloatPixel p(processed.pixel((int)c, (int)r));
+            FloatPixel p(processed.pixel(c, r));
             total++;
             sum += p;
             sqr_sum += p * p;
@@ -446,9 +446,10 @@ bool dmax_circle_ready(const ImageViewRGB32& image){
 //    processed.save("test.png");
 
 //    size_t total = (size_t)w * (size_t)h;
-    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
+    double totalf = (double)total;
+    FloatPixel variance = (sqr_sum - sum*sum / totalf) / (totalf - 1);
     ImageStats stats{
-        sum / total,
+        sum / totalf,
         FloatPixel(
             std::sqrt(variance.r),
             std::sqrt(variance.g),

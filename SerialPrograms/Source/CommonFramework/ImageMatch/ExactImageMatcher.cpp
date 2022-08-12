@@ -65,7 +65,7 @@ double ExactImageMatcher::rmsd(const ImageViewRGB32& image) const{
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd;
 }
-double ExactImageMatcher::rmsd(const ImageViewRGB32& image, QRgb background) const{
+double ExactImageMatcher::rmsd(const ImageViewRGB32& image, Color background) const{
     if (!image){
         return 1000.;
     }
@@ -97,7 +97,7 @@ double WeightedExactImageMatcher::diff(const ImageViewRGB32& image) const{
     }
     return rmsd(image) * m_multiplier;
 }
-double WeightedExactImageMatcher::diff(const ImageViewRGB32& image, QRgb background) const{
+double WeightedExactImageMatcher::diff(const ImageViewRGB32& image, Color background) const{
     if (!image){
         return 1000.;
     }

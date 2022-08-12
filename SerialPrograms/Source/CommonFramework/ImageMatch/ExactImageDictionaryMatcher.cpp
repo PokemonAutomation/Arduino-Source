@@ -33,7 +33,7 @@ std::vector<ImageRGB32> make_image_set(
     size_t width, size_t height,
     size_t tolerance
 ){
-    double num_template_pixels = width * height;
+    double num_template_pixels = (double)width * height;
     double num_image_pixels = screen.width() * box.width * screen.height() * box.height;
 //    cout << std::sqrt(image / num_template_pixels) << endl;
     // scale: roughly the relative size between the input image and the template.

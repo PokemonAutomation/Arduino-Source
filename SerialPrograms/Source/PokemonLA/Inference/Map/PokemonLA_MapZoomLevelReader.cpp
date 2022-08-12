@@ -29,7 +29,7 @@ int read_map_zoom_level(const ImageViewRGB32& screen){
         {0.807, 0.081, 0.014, 0.022},
     };
 
-    float max_yellow = 0;
+    double max_yellow = 0;
     int max_yellow_index = -1;
 
     for (int i = 0; i < 3; i++){
@@ -53,7 +53,7 @@ int read_map_zoom_level(const ImageViewRGB32& screen){
         const auto stats = image_stats(region);
 
         if (std::isnan(stats.average.r) == false && std::isnan(stats.average.g) == false){
-            const float yellow = (stats.average.r + stats.average.g) / 2.0;
+            const double yellow = (stats.average.r + stats.average.g) / 2.0;
             if (yellow > max_yellow){
                 max_yellow_index = i;
                 max_yellow = yellow;

@@ -34,7 +34,7 @@ public:
 
 
 protected:
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, QRgb& background) const = 0;
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const = 0;
 
 
 private:

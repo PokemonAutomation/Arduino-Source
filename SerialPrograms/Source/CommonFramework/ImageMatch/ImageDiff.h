@@ -43,7 +43,7 @@ double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image);
 //      If (reference.alpha == 255)  Count the pixel.
 //      If (reference.alpha ==   0)  Replace reference pixel with "background".
 //
-double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, QRgb background);
+double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, Color background);
 
 
 //  Compute root-mean-square deviation of the two images.

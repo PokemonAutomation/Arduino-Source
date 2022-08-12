@@ -9,7 +9,7 @@
 
 #include <ostream>
 #include <string>
-#include <QColor>
+#include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
 
@@ -23,12 +23,15 @@ struct FloatPixel{
     FloatPixel(double red, double green, double blue)
         : r(red), g(green), b(blue)
     {}
-    FloatPixel(QRgb pixel)
-        : r(qRed(pixel)), g(qGreen(pixel)), b(qBlue(pixel))
+    FloatPixel(uint32_t pixel)
+        : FloatPixel(Color(pixel))
+    {}
+    FloatPixel(Color pixel)
+        : r(pixel.alpha()), g(pixel.green()), b(pixel.blue())
     {}
 
-    QRgb round() const{
-        return qRgb((uint8_t)(r + 0.5), (uint8_t)(g + 0.5), (uint8_t)(b + 0.5));
+    Color round() const{
+        return Color((uint8_t)(r + 0.5), (uint8_t)(g + 0.5), (uint8_t)(b + 0.5));
     }
     void bound(double low, double high){
         r = std::max(r, low);

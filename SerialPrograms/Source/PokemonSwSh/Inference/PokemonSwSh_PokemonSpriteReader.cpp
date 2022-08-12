@@ -60,7 +60,7 @@ PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::str
     }
 }
 
-ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& image, QRgb& background) const{
+ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& image, Color& background) const{
     ImageStats border = image_border_stats(image);
 //    cout << border.average << border.stddev << endl;
 //    image.save("image1.png");
@@ -72,9 +72,9 @@ ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& imag
 //            }
 //            FloatPixel p(pixel);
 //            cout << p << endl;
-            double r = (double)pixel.r() - border.average.r;
-            double g = (double)pixel.g() - border.average.g;
-            double b = (double)pixel.b() - border.average.b;
+            double r = (double)pixel.red() - border.average.r;
+            double g = (double)pixel.green() - border.average.g;
+            double b = (double)pixel.blue() - border.average.b;
             bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
             if (stop){
 //                FloatPixel p(pixel);

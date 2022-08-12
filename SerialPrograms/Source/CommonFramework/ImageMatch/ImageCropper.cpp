@@ -42,7 +42,7 @@ ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image){
     size_t cs = 0;
     size_t ce = image.width();
     auto filter = [](Color pixel){
-        return (pixel.a()) != 0;
+        return (pixel.alpha()) != 0;
     };
     while (rs < re && scan_row(image, rs    , filter)) rs++;
     while (re > rs && scan_row(image, re - 1, filter)) re--;

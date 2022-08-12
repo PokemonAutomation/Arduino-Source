@@ -37,7 +37,7 @@ PokemonDetails read_status_info(
         const ImageStats shiny_box_stats = image_stats(extract_box_reference(frame, shiny_box));
         // std::cout << "ImageStats " << shiny_box_stats.average << "  " << shiny_box_stats.stddev << std::endl;
         const auto& stddev = shiny_box_stats.stddev;
-        const float max_stddev = std::max(std::max(stddev.r, stddev.g), stddev.b);
+        const double max_stddev = std::max(std::max(stddev.r, stddev.g), stddev.b);
         if(!is_solid(shiny_box_stats, {0.333333, 0.333333, 0.333333}, 0.2, 15) || max_stddev > 8.){
             ret.is_shiny = true;
             logger.log("Detected Shiny!", COLOR_BLUE);

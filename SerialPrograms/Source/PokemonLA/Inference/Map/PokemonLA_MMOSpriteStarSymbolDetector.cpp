@@ -67,8 +67,8 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
     // 
     for(size_t i = 0; i < m_boxes.size(); i++){
         // Compute average values:
-        m_rmsd[i] = m_rmsd[i] / m_num_frames;
-        m_symbol_colors[i] = m_symbol_colors[i] / m_num_frames;
+        m_rmsd[i] = m_rmsd[i] / (double)m_num_frames;
+        m_symbol_colors[i] = m_symbol_colors[i] / (double)m_num_frames;
 
         if (m_rmsd[i] <= 20){
             continue;

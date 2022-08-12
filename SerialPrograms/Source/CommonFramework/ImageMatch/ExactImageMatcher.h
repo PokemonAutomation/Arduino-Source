@@ -39,7 +39,7 @@ public:
     // the input image, then compute their RMSD (root mean square deviation).
     // The part of the image template where alpha is 0 is replace with `background` color when comparing
     // against the corresponding part in the input image.
-    double rmsd(const ImageViewRGB32& image, QRgb background) const;
+    double rmsd(const ImageViewRGB32& image, Color background) const;
     // Resize image to match the shape of the image template, scale the template brightness to match
     // the input image, then compute their RMSD (root mean square deviation).
     // Alpha channels from both the template and the input image are considered when computing RMSD.
@@ -84,7 +84,7 @@ public:
     // Like ExactImageMatcher::rmsd(image) but scale based on template stddev.
     double diff(const ImageViewRGB32& image) const;
     // Like ExactImageMatcher::rmsd(image, background) but scale based on template stddev.
-    double diff(const ImageViewRGB32& image, QRgb background) const;
+    double diff(const ImageViewRGB32& image, Color background) const;
     // Like ExactImageMatcher::rmsd_masked(image) but scale based on template stddev.
     double diff_masked(const ImageViewRGB32& image) const;
 
