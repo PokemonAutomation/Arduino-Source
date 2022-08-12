@@ -13,6 +13,7 @@
 #include "CommonFramework/Options/StringOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_WeatherAndTime.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,6 +39,8 @@ private:
     // Go to the spawn point, start one battle to remove some pokemon
     // Return how many pokemon removed in the battle
     size_t one_battle_to_remove_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t num_to_despawn);
+
+    OCR::LanguageOCR LANGUAGE;
 
     EnumDropdownOption SPAWN;
 

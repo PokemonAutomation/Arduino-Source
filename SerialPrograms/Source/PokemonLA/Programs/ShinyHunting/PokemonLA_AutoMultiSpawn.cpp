@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -64,7 +65,8 @@ PokemonDetails control_focus_to_throw(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context, 
     const std::set<std::string>& target_pokemon,
-    const std::set<std::string>& nearby_pokemon
+    const std::set<std::string>& nearby_pokemon,
+    Language language
 ){
     // A session that creates a new thread to send button commands to controller
     AsyncCommandSession session(context, env.console.logger(), env.realtime_dispatcher(), env.console.botbase());
@@ -91,9 +93,9 @@ PokemonDetails control_focus_to_throw(
 
         // We have successfully focused on one pokemon.
         // Read its details and detect whether we can change focus.
-        PokemonDetails details;
-        bool can_change_focus = false;
-        std::tie(details, can_change_focus) = focus_detector.get_focus_info();
+        auto focused_frame = env.console.video().snapshot();
+        PokemonDetails details = read_focused_wild_pokemon_info(env.console, env.console, focused_frame, language);
+        bool can_change_focus = detect_change_focus(env.console, env.console, focused_frame);
 
         if (details.name_candidates.size() == 0){
             // Somehow the program detects a pokemon focus, but cannot read any names
@@ -192,7 +194,8 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
 
 
 AutoMultiSpawn::AutoMultiSpawn()
-    : SPAWN("<b>Spawn Point</b>:",
+    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    ,SPAWN("<b>Spawn Point</b>:",
     {
         "Mirelands - Hippopotas"
     }, 0)
@@ -202,6 +205,7 @@ AutoMultiSpawn::AutoMultiSpawn()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SPAWN);
     PA_ADD_OPTION(PATH);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -349,7 +353,7 @@ size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironme
 
         context.wait_for_all_requests();
         
-        return control_focus_to_throw(env, context, TARGET_POKEMON[SPAWN], WILD_NEARBY_POKEMON[SPAWN]);
+        return control_focus_to_throw(env, context, TARGET_POKEMON[SPAWN], WILD_NEARBY_POKEMON[SPAWN], LANGUAGE);
     };
 
     // Try to go to spawn point and focus on one pokemon

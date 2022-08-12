@@ -29,12 +29,10 @@ namespace PokemonLA{
 
 WildPokemonFocusDetector::WildPokemonFocusDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("WildPokemonFocusDetector")
-    , m_logger(logger)
-    , m_overlay(overlay)
-    , m_pokemon_tab_upper_bound(0.109, 0.853, 0.24, 0.012)
-    , m_pokemon_tab_lower_bound(0.109, 0.952, 0.24, 0.012)
-    , m_pokemon_tab_left_bound(0.100, 0.875, 0.007, 0.045)
-    , m_pokemon_tab_right_bound(0.3495, 0.873, 0.007, 0.073)
+    , m_pokemon_tab_upper_bound(0.109, 0.857, 0.24, 0.012)
+    , m_pokemon_tab_lower_bound(0.109, 0.949, 0.24, 0.012)
+    , m_pokemon_tab_left_bound(0.102, 0.875, 0.007, 0.073)
+    , m_pokemon_tab_right_bound(0.348, 0.873, 0.007, 0.073)
 {}
 
 void WildPokemonFocusDetector::make_overlays(VideoOverlaySet& items) const{
@@ -49,8 +47,10 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
 
     // dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Received", frame);
 
-    const Color threshold(15, 15, 15);
+    // float threshold = 10.0;
+    const Color threshold(10, 10, 10);
     const ImageViewRGB32& upper_border = extract_box_reference(frame, m_pokemon_tab_upper_bound);
+
     const size_t upper_border_length = count_horizontal_translucent_border_pixels(
         upper_border, threshold, false);
     
@@ -59,6 +59,7 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
     }
 
     const ImageViewRGB32& lower_border = extract_box_reference(frame, m_pokemon_tab_lower_bound);
+    
     const size_t lower_border_length = count_horizontal_translucent_border_pixels(
         lower_border, threshold, true);
     
@@ -81,9 +82,6 @@ bool WildPokemonFocusDetector::process_frame(const ImageViewRGB32& frame, WallCl
     }
 
     // dump_debug_image(m_logger, "PokemonLA/WildPokemonFocusDetector", "Detected", frame);
-
-    m_details = read_focused_wild_pokemon_info(m_logger, m_overlay, frame, Language::English);
-    m_change_focus = can_change_focus(m_logger, m_overlay, frame);
     return true;
 }
 
@@ -153,7 +151,7 @@ PokemonDetails read_focused_wild_pokemon_info(
 }
 
 
-bool can_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame){
+bool detect_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame){
     const bool stop_on_detect = true;
     ButtonDetector button(logger, overlay, ButtonType::ButtonA, {0.244, 0.815, 0.026, 0.047},
         std::chrono::milliseconds(0), stop_on_detect);

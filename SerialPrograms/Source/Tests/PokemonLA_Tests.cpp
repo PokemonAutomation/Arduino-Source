@@ -318,7 +318,7 @@ int test_pokemonLA_WildPokemonFocusDetector(const ImageViewRGB32& image, const s
     bool result_has_focus = detector.process_frame(image, current_time());
 
     auto check_can_change_focus = [&](const std::string& word) -> int {
-        bool result_can_change = can_change_focus(logger, overlay, image);
+        bool result_can_change = detect_change_focus(logger, overlay, image);
         bool target_can_change = false;
         if (parse_bool(word, target_can_change) == false){
             cerr << "Error: True/False keyword " << word << " is wrong. Must be \"True\" or \"False\"." << endl;
