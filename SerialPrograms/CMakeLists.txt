@@ -434,8 +434,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/PanelWidget.h
     Source/CommonFramework/Panels/RunnablePanel.cpp
     Source/CommonFramework/Panels/RunnablePanel.h
-    Source/CommonFramework/Panels/RunnablePanelWidget.cpp
-    Source/CommonFramework/Panels/RunnablePanelWidget.h
     Source/CommonFramework/Panels/SettingsPanel.cpp
     Source/CommonFramework/Panels/SettingsPanel.h
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp

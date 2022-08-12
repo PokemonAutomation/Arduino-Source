@@ -10,6 +10,8 @@
 #include <functional>
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"

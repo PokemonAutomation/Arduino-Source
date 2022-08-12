@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_GroupOption_H
 #define PokemonAutomation_GroupOption_H
 
+#include <atomic>
 #include "BatchOption.h"
 
 namespace PokemonAutomation{

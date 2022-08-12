@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Panel.h"
 #include "PanelWidget.h"
 

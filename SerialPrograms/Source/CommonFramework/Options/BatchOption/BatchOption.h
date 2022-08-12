@@ -9,7 +9,6 @@
 #ifndef PokemonAutomation_BatchOption_H
 #define PokemonAutomation_BatchOption_H
 
-#include <atomic>
 #include <string>
 #include <vector>
 #include "CommonFramework/Options/ConfigOption.h"

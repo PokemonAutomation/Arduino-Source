@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_RunnableComputerProgram_H
 #define PokemonAutomation_RunnableComputerProgram_H
 
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/RunnablePanel.h"
 

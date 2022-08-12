@@ -236,7 +236,6 @@ SOURCES += \
     Source/CommonFramework/Panels/PanelList.cpp \
     Source/CommonFramework/Panels/PanelWidget.cpp \
     Source/CommonFramework/Panels/RunnablePanel.cpp \
-    Source/CommonFramework/Panels/RunnablePanelWidget.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
@@ -965,7 +964,6 @@ HEADERS += \
     Source/CommonFramework/Panels/PanelList.h \
     Source/CommonFramework/Panels/PanelWidget.h \
     Source/CommonFramework/Panels/RunnablePanel.h \
-    Source/CommonFramework/Panels/RunnablePanelWidget.h \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \

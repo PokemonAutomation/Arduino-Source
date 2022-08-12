@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "Common/Compiler.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "Common/Cpp/AbstractLogger.h"
 
 class QWidget;
 
