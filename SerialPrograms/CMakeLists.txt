@@ -1534,11 +1534,21 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
+    # Find OpenCV
+    
+    # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
+    find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
+    # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/opencv/lib/pkgconfig")
+    # pkg_search_module(OPENCV REQUIRED opencv)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    link_directories(${OpenCV_LIBRARY_DIRS})
+    target_link_libraries(SerialPrograms ${OpenCV_LIBS})
+
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     if (UNIX_LINK_TESSERACT)
-        target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         find_package(PkgConfig REQUIRED)
+        target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         pkg_search_module(TESSERACT REQUIRED tesseract)
         pkg_search_module(LEPTONICA REQUIRED lept)
         include_directories(${TESSERACT_INCLUDE_DIRS})
@@ -1549,7 +1559,10 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    # Add -Wno-c11-extensions to avoid clang gives 
+    # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
+    # when compiling OpenCV
+    target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
 
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
