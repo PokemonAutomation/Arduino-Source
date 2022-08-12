@@ -8,6 +8,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 INCLUDEPATH += ../
 INCLUDEPATH += ../../Internal/
 INCLUDEPATH += Source/
+INCLUDEPATH += ../3rdParty/
 RESOURCES += ../3rdParty/qdarkstyle/dark/darkstyle.qrc
 
 CONFIG += force_debug_info
@@ -43,7 +44,7 @@ win32-g++{
     LIBS += ../3rdPartyBinaries/Sleepy.lib
 }
 win32-msvc{
-    QMAKE_CXXFLAGS += /std:c++latest
+    QMAKE_CXXFLAGS += /std:c++latest /utf-8
     QMAKE_CXXFLAGS += -MP
 
     DEFINES += WIN32
@@ -55,6 +56,8 @@ win32-msvc{
 
     DEFINES += PA_SLEEPY
     LIBS += ../3rdPartyBinaries/Sleepy.lib
+
+    LIBS += ../3rdPartyBinaries/opencv_world460.lib
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14

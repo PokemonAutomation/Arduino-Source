@@ -135,7 +135,7 @@ void AudioPassthroughPairQt::reset(
         m_input_format = format;
         m_output_device = output;
         m_output_volume = output_volume;
-        if (input){
+        if (input && format != AudioChannelFormat::NONE){
             m_reader.reset(new AudioSource(m_logger, input, m_input_format, m_device_input_multiplier));
             m_sample_listener.reset(new SampleListener(*this, m_reader->samples_per_frame()));
             init_audio_sink();
