@@ -17,7 +17,7 @@ namespace Pokemon{
 
 
 TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
-    : RunnableComputerProgramDescriptor(
+    : ComputerProgramDescriptor(
         "PokemonSwSh:TrainPokemonNameOCR",
         STRING_POKEMON, "Train " + STRING_POKEMON + " Name OCR",
         "",
@@ -27,9 +27,8 @@ TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
 
 
 
-TrainPokemonOCR::TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor)
-    : RunnableComputerProgramInstance(descriptor)
-    , DIRECTORY(
+TrainPokemonOCR::TrainPokemonOCR()
+    : DIRECTORY(
         false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
         "PokemonNameOCR/",

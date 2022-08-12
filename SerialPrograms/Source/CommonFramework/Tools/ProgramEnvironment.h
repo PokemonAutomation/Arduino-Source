@@ -36,12 +36,19 @@ public:
 
     const ProgramInfo& program_info() const;
 
-    template <class... Args>
-    void log(Args&&... args);
+public:
+    //  Logging
     Logger& logger(){ return m_logger; }
+    void log(const char* msg, Color color = Color()){ m_logger.log(msg, color); }
+    void log(const std::string& msg, Color color = Color()){ m_logger.log(msg, color); }
 
+public:
+    //  Thread Pools
     AsyncDispatcher& realtime_dispatcher();
     AsyncDispatcher& inference_dispatcher();
+
+public:
+    //  Stats Management
 
     void update_stats(const std::string& override_current = "");
 
@@ -71,12 +78,6 @@ private:
 
 
 //  Templates
-
-
-template <class... Args>
-void ProgramEnvironment::log(Args&&... args){
-    m_logger.log(std::forward<Args>(args)...);
-}
 
 template <typename StatsType>
 StatsType& ProgramEnvironment::current_stats(){

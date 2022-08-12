@@ -49,7 +49,6 @@ SingleSwitchProgramInstance2::SingleSwitchProgramInstance2()
     , NOTIFICATION_ERROR_FATAL(
         "Program Error (Fatal)",
         true, true,
-//        ImageAttachmentMode::PNG,
         {"Notifs"}
     )
 {}

@@ -98,7 +98,6 @@ MultiSwitchProgramInstance2::MultiSwitchProgramInstance2()
     , NOTIFICATION_ERROR_FATAL(
         "Program Error (Fatal)",
         true, true,
-//        ImageAttachmentMode::PNG,
         {"Notifs"}
     )
 {}

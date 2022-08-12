@@ -432,10 +432,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/PanelList.h
     Source/CommonFramework/Panels/PanelWidget.cpp
     Source/CommonFramework/Panels/PanelWidget.h
-    Source/CommonFramework/Panels/RunnableComputerProgram.cpp
-    Source/CommonFramework/Panels/RunnableComputerProgram.h
-    Source/CommonFramework/Panels/RunnableComputerProgramWidget.cpp
-    Source/CommonFramework/Panels/RunnableComputerProgramWidget.h
     Source/CommonFramework/Panels/RunnablePanel.cpp
     Source/CommonFramework/Panels/RunnablePanel.h
     Source/CommonFramework/Panels/RunnablePanelWidget.cpp
@@ -501,6 +497,14 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonFramework/Windows/MainWindow.cpp
     Source/CommonFramework/Windows/MainWindow.h
+    Source/ComputerPrograms/Framework/ComputerProgram.cpp
+    Source/ComputerPrograms/Framework/ComputerProgram.h
+    Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
+    Source/ComputerPrograms/Framework/ComputerProgramOption.h
+    Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
+    Source/ComputerPrograms/Framework/ComputerProgramSession.h
+    Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
+    Source/ComputerPrograms/Framework/ComputerProgramWidget.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

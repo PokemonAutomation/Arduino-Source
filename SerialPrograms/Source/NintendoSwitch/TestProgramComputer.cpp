@@ -91,17 +91,14 @@ using namespace Pokemon;
 
 
 TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
-    : RunnableComputerProgramDescriptor(
+    : ComputerProgramDescriptor(
         "Computer:TestProgram",
         "Computer", "Test Program (Computer)",
         "",
         "Test Program"
     )
 {}
-TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& descriptor)
-    : RunnableComputerProgramInstance(descriptor)
-{
-}
+TestProgramComputer::TestProgramComputer(){}
 
 WallClock REFERENCE = current_time();
 

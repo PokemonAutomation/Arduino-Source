@@ -1,4 +1,4 @@
-/*  Single Switch Program Widget
+/*  Computer Program Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -11,46 +11,38 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
-#include "NintendoSwitch_SingleSwitchProgramWidget.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include "ComputerPrograms/Framework/ComputerProgram.h"
+#include "ComputerPrograms/Framework/ComputerProgramOption.h"
+#include "ComputerProgramWidget.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
 
 
-
-SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
+ComputerProgramWidget::~ComputerProgramWidget(){
     m_session.remove_listener(*this);
     delete m_actions_bar;
     delete m_stats_bar;
     delete m_options;
-    delete m_system;
 }
-SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
+ComputerProgramWidget::ComputerProgramWidget(
     QWidget& parent,
-    SingleSwitchProgramOption& option,
+    ComputerProgramOption& option,
     PanelHolder& holder
 )
     : QWidget(&parent)
     , m_holder(holder)
-    , m_session(option, 0)
+    , m_session(option)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    const SingleSwitchProgramDescriptor& descriptor = option.descriptor();
+    const ComputerProgramDescriptor& descriptor = option.descriptor();
 
     CollapsibleGroupBox* header = make_panel_header(
         *this,
         descriptor.display_name(),
         descriptor.doc_link(),
-        descriptor.description(),
-        descriptor.feedback(),
-        descriptor.min_pabotbase_level()
+        descriptor.description()
     );
     layout->addWidget(header);
 
@@ -64,9 +56,6 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         scroll_outer->setWidget(scroll_inner);
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
-
-        m_system = new SwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
-        scroll_layout->addWidget(m_system);
 
         m_options = option.options().make_ui(*this);
         scroll_layout->addWidget(&m_options->widget());
@@ -111,9 +100,8 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     m_session.add_listener(*this);
 }
 
-void SingleSwitchProgramWidget2::state_change(ProgramState state){
+void ComputerProgramWidget::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [=]{
-        m_system->update_ui(state);
         m_options->widget().setEnabled(state == ProgramState::STOPPED);
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
@@ -123,7 +111,7 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
         }
     });
 }
-void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
+void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [=]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(),
@@ -131,7 +119,7 @@ void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats,
         );
     });
 }
-void SingleSwitchProgramWidget2::error(const std::string& message){
+void ComputerProgramWidget::error(const std::string& message){
     QMetaObject::invokeMethod(this, [=]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
@@ -143,7 +131,4 @@ void SingleSwitchProgramWidget2::error(const std::string& message){
 
 
 
-
-
-}
 }

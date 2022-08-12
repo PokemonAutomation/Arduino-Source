@@ -10,22 +10,22 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Panels/RunnableComputerProgram.h"
+#include "ComputerPrograms/Framework/ComputerProgram.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 
-class TrainIVCheckerOCR_Descriptor : public RunnableComputerProgramDescriptor{
+class TrainIVCheckerOCR_Descriptor : public ComputerProgramDescriptor{
 public:
     TrainIVCheckerOCR_Descriptor();
 };
 
 
 
-class TrainIVCheckerOCR : public RunnableComputerProgramInstance{
+class TrainIVCheckerOCR : public ComputerProgramInstance{
 public:
-    TrainIVCheckerOCR(const TrainIVCheckerOCR_Descriptor& descriptor);
+    TrainIVCheckerOCR();
 
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 

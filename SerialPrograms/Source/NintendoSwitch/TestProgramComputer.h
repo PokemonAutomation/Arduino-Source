@@ -7,21 +7,21 @@
 #ifndef PokemonAutomation_Computer_TestProgram_H
 #define PokemonAutomation_Computer_TestProgram_H
 
-#include "CommonFramework/Panels/RunnableComputerProgram.h"
+#include "ComputerPrograms/Framework/ComputerProgram.h"
 
 namespace PokemonAutomation{
 
 
-class TestProgramComputer_Descriptor : public RunnableComputerProgramDescriptor{
+class TestProgramComputer_Descriptor : public ComputerProgramDescriptor{
 public:
     TestProgramComputer_Descriptor();
 };
 
 
 
-class TestProgramComputer : public RunnableComputerProgramInstance{
+class TestProgramComputer : public ComputerProgramInstance{
 public:
-    TestProgramComputer(const TestProgramComputer_Descriptor& descriptor);
+    TestProgramComputer();
 
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 
