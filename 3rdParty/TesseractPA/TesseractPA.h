@@ -32,6 +32,14 @@
 #endif // TESSERACT_STATIC
 
 
+#ifdef PA_TESSERACT
+#elif _MSC_VER
+#pragma warning(disable:4100)   //  Unreferenced Formal Parameter
+#elif __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
+
 
 #ifdef __cplusplus
 extern "C" {
