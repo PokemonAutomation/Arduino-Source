@@ -107,11 +107,11 @@ std::pair<uint8_t, bool> select_move_ai(
 
     if (rank.empty()){
         logger.log("Unable to calculate moves. Picking a random move...", COLOR_RED);
-        return {random(0, 3), false};
+        return {(uint8_t)random(0, 3), false};
     }
     if (rank.begin()->first < 0){
         logger.log("No viable moves found. Picking a random move...", COLOR_RED);
-        return {random(0, 3), false};
+        return {(uint8_t)random(0, 3), false};
     }
 
     return rank.begin()->second;
@@ -135,20 +135,20 @@ std::pair<uint8_t, bool> select_move(
 
     if (state.opponent.empty()){
         logger.log("Don't know the opponent is. Picking a random move...", COLOR_RED);
-        return {random(0, 3), false};
+        return {(uint8_t)random(0, 3), false};
     }
 
     const PlayerState& player = state.players[player_index];
     const MaxLairMon* self = get_maxlair_mon_nothrow(player.pokemon);
     if (self == nullptr){
         logger.log("Don't know what you are. Picking a random move...", COLOR_RED);
-        return {random(0, 3), false};
+        return {(uint8_t)random(0, 3), false};
     }
 
     std::pair<uint8_t, bool> result = select_move_ai(logger, state, player_index);
     if (player.move_blocked[result.first]){
         logger.log("AI picked an unusable move. Picking random move to avoid hanging...", COLOR_RED);
-        return {random(0, 3), false};
+        return {(uint8_t)random(0, 3), false};
     }
 
     return result;

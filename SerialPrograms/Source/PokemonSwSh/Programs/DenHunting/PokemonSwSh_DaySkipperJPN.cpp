@@ -91,7 +91,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             remaining_skips--;
             stats.issued++;
 //            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
-            env.update_stats(stats.to_str());
+            env.update_stats();
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;

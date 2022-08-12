@@ -34,12 +34,12 @@ private:
     SingleSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
-        Logger& logger,
+        ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args
     )
-        : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
+        : ProgramEnvironment(program_info, session, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {
         console.initialize_inference_threads(scope, inference_dispatcher());

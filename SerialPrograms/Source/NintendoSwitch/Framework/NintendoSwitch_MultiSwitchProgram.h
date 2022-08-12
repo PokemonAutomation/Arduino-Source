@@ -31,7 +31,7 @@ public:
     MultiSwitchProgramEnvironment(
         const ProgramInfo& program_info,
         CancellableScope& scope,
-        Logger& logger,
+        ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         FixedLimitVector<ConsoleHandle> p_switches

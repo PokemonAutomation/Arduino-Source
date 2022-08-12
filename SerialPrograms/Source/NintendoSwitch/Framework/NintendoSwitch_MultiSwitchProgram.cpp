@@ -19,12 +19,12 @@ MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     const ProgramInfo& program_info,
     CancellableScope& scope,
-    Logger& logger,
+    ProgramSession& session,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
     FixedLimitVector<ConsoleHandle> p_switches
 )
-    : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
+    : ProgramEnvironment(program_info, session, current_stats, historical_stats)
     , consoles(std::move(p_switches))
 {
     for (ConsoleHandle& console : consoles){

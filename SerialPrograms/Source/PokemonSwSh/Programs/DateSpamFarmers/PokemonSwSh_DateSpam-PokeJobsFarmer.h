@@ -34,7 +34,7 @@ private:
 
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint32_t> CONCURRENCY;
-    SimpleIntegerOption<uint32_t> MENU_INDEX;
+    SimpleIntegerOption<uint16_t> MENU_INDEX;
 
     SectionDividerOption m_advanced_options;
 

@@ -61,7 +61,7 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
     SingleSwitchProgramEnvironment env(
         info,
         scope,
-        logger(),
+        *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
         *m_system.sender().botbase(),
@@ -70,13 +70,6 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
         m_system.audio()
     );
     start_program_video_check(env.console, m_option.descriptor().feedback());
-
-    env.connect(
-        &env, &ProgramEnvironment::set_status,
-        &env, [=](std::string status){
-            report_stats_changed();
-        }
-    );
 
     {
         SpinLockGuard lg(m_lock);

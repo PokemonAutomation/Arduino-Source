@@ -96,9 +96,9 @@ protected:
 
 //    virtual void restore_defaults(){ return; }
 
+public:
     void report_stats_changed();
     void report_error(const std::string& message);
-
 
 
 protected:

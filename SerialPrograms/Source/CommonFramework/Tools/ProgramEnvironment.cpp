@@ -12,6 +12,7 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/ProgramSession.h"
 #include "StatsTracking.h"
 #include "ProgramEnvironment.h"
 
@@ -51,11 +52,12 @@ ProgramEnvironment::~ProgramEnvironment(){}
 
 ProgramEnvironment::ProgramEnvironment(
     const ProgramInfo& program_info,
-    Logger& logger,
+    ProgramSession& session,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 )
-    : m_logger(logger)
+    : m_session(session)
+    , m_logger(session.logger())
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)
     , m_data(CONSTRUCT_TOKEN, program_info)
@@ -72,9 +74,8 @@ AsyncDispatcher& ProgramEnvironment::inference_dispatcher(){
 }
 
 
-void ProgramEnvironment::update_stats(const std::string& override_current){
-    std::string str = stats_to_bar(m_logger, m_historical_stats, m_current_stats, override_current);
-    emit set_status(str);
+void ProgramEnvironment::update_stats(){
+    m_session.report_stats_changed();
 }
 
 

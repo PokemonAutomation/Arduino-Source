@@ -101,17 +101,10 @@ void MultiSwitchProgramSession::run_program_instance(const ProgramInfo& info){
     std::unique_ptr<MultiSwitchProgramEnvironment> env(new MultiSwitchProgramEnvironment(
         info,
         scope,
-        logger(),
+        *this,
         current_stats_tracker(), historical_stats_tracker(),
         std::move(handles)
     ));
-
-    env->connect(
-        env.get(), &ProgramEnvironment::set_status,
-        env.get(), [=](std::string status){
-            report_stats_changed();
-        }
-    );
 
     m_scope = &scope;
 

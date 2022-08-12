@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_ProgramEnvironment_H
 #define PokemonAutomation_ProgramEnvironment_H
 
-#include <QObject>
 #include "Common/Cpp/Pimpl.h"
 #include "Common/Cpp/AbstractLogger.h"
 
@@ -15,21 +14,19 @@ namespace PokemonAutomation{
 
 class AsyncDispatcher;
 class StatsTracker;
+class ProgramSession;
 struct ProgramInfo;
-
 
 
 
 struct ProgramEnvironmentData;
 
-class ProgramEnvironment : public QObject{
-    Q_OBJECT
-
+class ProgramEnvironment{
 public:
     ~ProgramEnvironment();
     ProgramEnvironment(
         const ProgramInfo& program_info,
-        Logger& logger,
+        ProgramSession& session,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     );
@@ -50,7 +47,7 @@ public:
 public:
     //  Stats Management
 
-    void update_stats(const std::string& override_current = "");
+    void update_stats();
 
     template <typename StatsType>
     StatsType& current_stats();
@@ -60,12 +57,8 @@ public:
     std::string historical_stats_str() const;
 
 
-signals:
-    //  Called internally. You can connect to this.
-    void set_status(std::string status);
-
-
 private:
+    ProgramSession& m_session;
     Logger& m_logger;
 
     StatsTracker* m_current_stats;

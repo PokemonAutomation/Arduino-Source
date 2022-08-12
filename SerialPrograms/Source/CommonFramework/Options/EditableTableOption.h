@@ -42,11 +42,13 @@ QWidget* make_boolean_table_cell(QWidget& parent, bool& value);
 // Pass the member var of EditableTableRow as `value` so that user editing this UI widget in a table
 // row changes the value of the EditableTableRow automatically.
 // T can be uint16_t or int16_t. Add more template instantiations in the cpp file for more numerical types.
-template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value);
+template<typename T>
+QWidget* make_integer_table_cell(QWidget& parent, T& value);
 
 QWidget* make_double_table_cell(QWidget& parent, double& value, double min, double max);
 
-QWidget* make_limited_integer_table_cell(QWidget& parent, int32_t& value, int32_t min, int32_t max);
+template<typename T>
+QWidget* make_limited_integer_table_cell(QWidget& parent, T& value, T min, T max);
 
 // See EditableTableOption-EnumTableCell.h for template<typename T> QWidget* make_enum_table_cell(QWidget& parent, T& value);
 

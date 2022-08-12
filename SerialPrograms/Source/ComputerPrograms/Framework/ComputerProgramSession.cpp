@@ -55,15 +55,8 @@ void ComputerProgramSession::run_program_instance(const ProgramInfo& info){
     CancellableHolder<CancellableScope> scope;
     ProgramEnvironment env(
         info,
-        logger(),
+        *this,
         current_stats_tracker(), historical_stats_tracker()
-    );
-
-    env.connect(
-        &env, &ProgramEnvironment::set_status,
-        &env, [=](std::string status){
-            report_stats_changed();
-        }
     );
 
     {

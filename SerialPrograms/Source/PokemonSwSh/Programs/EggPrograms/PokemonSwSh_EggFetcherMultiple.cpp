@@ -102,8 +102,8 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         fly_home_collect_egg(context, true);
 
         //remove the second pokemon from the daycare
-        pbf_press_button(context, BUTTON_A , 10, 1.5 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A , 10, 1.5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A , 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_A , 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
         pbf_press_dpad  (context, DPAD_DOWN, 10, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
@@ -112,7 +112,7 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         //add a new second pokemon from the daycare
         pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 1.5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
         auto [box, row, column] = get_location(s);
         if (row == 0 && column == 0 && box != 0){

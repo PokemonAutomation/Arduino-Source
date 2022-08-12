@@ -58,7 +58,7 @@ struct EggCombinedSession{
         if (block.total_duration >= FETCH_TRAVEL_TIME){
             block.spin_duration = block.total_duration - FETCH_TRAVEL_TIME;
         }else{
-            block.fetches = duration / FETCH_TRAVEL_TIME;
+            block.fetches = (uint8_t)(duration / FETCH_TRAVEL_TIME);
             block.spin_duration = 0;
             block.total_duration = block.fetches == 0
                 ? TRAVEL_RIGHT_DURATION

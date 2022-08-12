@@ -191,11 +191,11 @@ ActionParameterWidget::ActionParameterWidget(QWidget& parent, TestPathMakerTable
     m_release_duration = make_integer_table_cell(*this, m_row.button_release_ticks);
 
     m_axis_x_label = new QLabel("X:", this);
-    m_axis_x_value = make_limited_integer_table_cell(*this, m_row.x_axis, 0, 255);
+    m_axis_x_value = make_integer_table_cell(*this, m_row.x_axis);
     m_axis_x_value->setMaximumWidth(80);
 
     m_axis_y_label = new QLabel("Y:", this);
-    m_axis_y_value = make_limited_integer_table_cell(*this, m_row.y_axis, 0, 255);
+    m_axis_y_value = make_integer_table_cell(*this, m_row.y_axis);
     m_axis_y_value->setMaximumWidth(80);
 
     m_wait_start_label = new QLabel("Wait for:");

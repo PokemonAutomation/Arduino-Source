@@ -100,7 +100,7 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         remaining_skips--;
         stats.issued++;
 //        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
-        env.update_stats(stats.to_str());
+        env.update_stats();
 
         if (year >= 60){
             if (real_life_year <= 36){
