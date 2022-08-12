@@ -10,7 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{

@@ -11,7 +11,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"

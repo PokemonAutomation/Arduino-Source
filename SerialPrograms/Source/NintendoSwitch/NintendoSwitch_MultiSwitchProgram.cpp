@@ -9,7 +9,7 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch_MultiSwitchProgramOption.h"
+#include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

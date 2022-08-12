@@ -16,8 +16,8 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramSession_H
 
 #include "CommonFramework/ProgramSession.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch_MultiSwitchSystemSession.h"
-#include "NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -13,7 +13,7 @@
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"

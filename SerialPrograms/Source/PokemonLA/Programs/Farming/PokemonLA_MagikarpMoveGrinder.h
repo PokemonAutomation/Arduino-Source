@@ -10,7 +10,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{

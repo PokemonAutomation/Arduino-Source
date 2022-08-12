@@ -18,7 +18,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
-#include "NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

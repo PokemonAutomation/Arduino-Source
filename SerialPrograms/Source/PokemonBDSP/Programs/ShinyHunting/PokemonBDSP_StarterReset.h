@@ -10,7 +10,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 
 namespace PokemonAutomation{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_IngoMoveGrinder_H
 #define PokemonAutomation_PokemonLA_IngoMoveGrinder_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 #include "PokemonLA_IngoBattleGrinder.h"
 

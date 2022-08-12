@@ -10,7 +10,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -19,7 +19,7 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramWidget_H
 
 #include "CommonFramework/Panels/PanelElements.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 

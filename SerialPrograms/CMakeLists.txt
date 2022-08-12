@@ -495,8 +495,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonFramework/Windows/MainWindow.cpp
     Source/CommonFramework/Windows/MainWindow.h
-    Source/ComputerPrograms/Framework/ComputerProgram.cpp
-    Source/ComputerPrograms/Framework/ComputerProgram.h
+    Source/ComputerPrograms/ComputerProgram.cpp
+    Source/ComputerPrograms/ComputerProgram.h
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp
     Source/ComputerPrograms/Framework/ComputerProgramOption.h
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp
@@ -669,8 +669,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
     Source/NintendoSwitch/FixedInterval.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
@@ -679,8 +677,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp
@@ -707,10 +703,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h
+    Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
+    Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp
     Source/NintendoSwitch/NintendoSwitch_Panels.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp
     Source/NintendoSwitch/NintendoSwitch_Settings.h
+    Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp
+    Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp

@@ -9,7 +9,7 @@
 #define PokemonAutomation_PokemonLA_SoundListener_H
 
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 

@@ -10,7 +10,7 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh_MaxLair_Stats.h"
 #include "PokemonSwSh_MaxLair_StateMachine.h"

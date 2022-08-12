@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_PostMMOSpawnReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/FixedCodeOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

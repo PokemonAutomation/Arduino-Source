@@ -12,7 +12,7 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{

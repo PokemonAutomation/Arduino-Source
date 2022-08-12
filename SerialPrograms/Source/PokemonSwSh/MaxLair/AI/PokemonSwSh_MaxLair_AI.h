@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_AI_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_AI_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{

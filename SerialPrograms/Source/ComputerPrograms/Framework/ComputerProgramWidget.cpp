@@ -11,7 +11,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "ComputerPrograms/Framework/ComputerProgram.h"
+#include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramOption.h"
 #include "ComputerProgramWidget.h"
 

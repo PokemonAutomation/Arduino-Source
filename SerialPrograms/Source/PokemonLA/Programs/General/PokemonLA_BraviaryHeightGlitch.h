@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_BraviaryHeightGlitch_H
 #define PokemonAutomation_PokemonLA_BraviaryHeightGlitch_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Computer_TestProgram_H
 #define PokemonAutomation_Computer_TestProgram_H
 
-#include "ComputerPrograms/Framework/ComputerProgram.h"
+#include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{
 

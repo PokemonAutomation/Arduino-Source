@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_GiftBerryReset_H
 #define PokemonAutomation_PokemonBDSP_GiftBerryReset_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"

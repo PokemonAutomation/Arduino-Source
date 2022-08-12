@@ -10,7 +10,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "ComputerPrograms/Framework/ComputerProgram.h"
+#include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

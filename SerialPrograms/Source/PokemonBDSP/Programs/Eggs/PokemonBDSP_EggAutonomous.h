@@ -14,7 +14,7 @@
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
 #include "PokemonBDSP_EggAutonomousState.h"

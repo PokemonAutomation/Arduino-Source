@@ -17,7 +17,7 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
-#include "ComputerProgram.h"
+#include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{
 

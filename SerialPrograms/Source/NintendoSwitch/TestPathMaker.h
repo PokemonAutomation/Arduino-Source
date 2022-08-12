@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Computer_TestPathMaker_H
 #define PokemonAutomation_Computer_TestPathMaker_H
 
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
 
 namespace PokemonAutomation{

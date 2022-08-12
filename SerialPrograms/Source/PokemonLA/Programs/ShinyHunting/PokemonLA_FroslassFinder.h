@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_FroslassFinder_H
 #define PokemonAutomation_PokemonLA_FroslassFinder_H
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"

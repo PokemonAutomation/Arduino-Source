@@ -264,7 +264,7 @@ SOURCES += \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/DpiScaler.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
-    Source/ComputerPrograms/Framework/ComputerProgram.cpp \
+    Source/ComputerPrograms/ComputerProgram.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
@@ -338,12 +338,10 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
@@ -357,8 +355,10 @@ SOURCES += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
+    Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
+    Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Options/SwitchDateOption.cpp \
@@ -997,7 +997,7 @@ HEADERS += \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \
-    Source/ComputerPrograms/Framework/ComputerProgram.h \
+    Source/ComputerPrograms/ComputerProgram.h \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
@@ -1091,12 +1091,10 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
     Source/NintendoSwitch/FixedInterval.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
@@ -1110,8 +1108,10 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
+    Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
+    Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/StartInGripMenuOption.h \

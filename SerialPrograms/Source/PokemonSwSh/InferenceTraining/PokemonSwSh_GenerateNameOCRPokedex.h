@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 
 namespace PokemonAutomation{

@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 //#include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 

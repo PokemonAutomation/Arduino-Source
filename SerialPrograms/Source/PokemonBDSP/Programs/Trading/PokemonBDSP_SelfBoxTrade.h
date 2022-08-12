@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
