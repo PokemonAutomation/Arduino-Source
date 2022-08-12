@@ -22,7 +22,7 @@ public:
 };
 
 
-class MountDetectionTest : public SingleSwitchProgramInstance2{
+class MountDetectionTest : public SingleSwitchProgramInstance{
 public:
     MountDetectionTest();
 

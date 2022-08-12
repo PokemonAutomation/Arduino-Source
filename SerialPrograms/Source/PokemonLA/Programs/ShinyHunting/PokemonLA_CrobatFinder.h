@@ -25,7 +25,7 @@ public:
 };
 
 
-class CrobatFinder : public SingleSwitchProgramInstance2{
+class CrobatFinder : public SingleSwitchProgramInstance{
 public:
     CrobatFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -30,7 +30,7 @@ public:
 
 
 
-class ShinyHuntAutonomousBerryTree : public SingleSwitchProgramInstance2{
+class ShinyHuntAutonomousBerryTree : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousBerryTree();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

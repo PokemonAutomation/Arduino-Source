@@ -35,7 +35,7 @@ public:
 };
 
 
-class TestProgram : public MultiSwitchProgramInstance2{
+class TestProgram : public MultiSwitchProgramInstance{
 public:
     TestProgram();
 

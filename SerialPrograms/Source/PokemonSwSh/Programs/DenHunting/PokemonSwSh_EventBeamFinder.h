@@ -23,7 +23,7 @@ public:
 
 
 
-class EventBeamFinder : public SingleSwitchProgramInstance2{
+class EventBeamFinder : public SingleSwitchProgramInstance{
 public:
     EventBeamFinder();
 

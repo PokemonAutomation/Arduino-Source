@@ -27,7 +27,7 @@ public:
 
 
 
-class TradeBot : public SingleSwitchProgramInstance2{
+class TradeBot : public SingleSwitchProgramInstance{
 public:
     TradeBot();
 

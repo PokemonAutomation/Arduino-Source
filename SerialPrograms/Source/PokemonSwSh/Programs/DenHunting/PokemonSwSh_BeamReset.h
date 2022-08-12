@@ -24,7 +24,7 @@ public:
 
 
 
-class BeamReset : public SingleSwitchProgramInstance2{
+class BeamReset : public SingleSwitchProgramInstance{
 public:
     BeamReset();
 

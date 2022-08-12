@@ -26,7 +26,7 @@ public:
 
 
 
-class DaySkipperEU : public SingleSwitchProgramInstance2{
+class DaySkipperEU : public SingleSwitchProgramInstance{
 public:
     DaySkipperEU();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

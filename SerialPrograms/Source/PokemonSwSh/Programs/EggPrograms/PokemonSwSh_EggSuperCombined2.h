@@ -29,7 +29,7 @@ public:
 
 
 
-class EggSuperCombined2 : public SingleSwitchProgramInstance2{
+class EggSuperCombined2 : public SingleSwitchProgramInstance{
 public:
     EggSuperCombined2();
 

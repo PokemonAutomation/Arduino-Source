@@ -32,7 +32,7 @@ public:
 
 
 
-class EggHatcher : public SingleSwitchProgramInstance2{
+class EggHatcher : public SingleSwitchProgramInstance{
 public:
     EggHatcher();
 

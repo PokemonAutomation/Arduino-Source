@@ -24,7 +24,7 @@ public:
 
 
 
-class EggFetcherMultiple : public SingleSwitchProgramInstance2{
+class EggFetcherMultiple : public SingleSwitchProgramInstance{
 public:
     EggFetcherMultiple();
 

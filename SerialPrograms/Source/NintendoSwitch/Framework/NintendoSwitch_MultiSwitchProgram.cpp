@@ -87,7 +87,7 @@ std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 
-MultiSwitchProgramInstance2::MultiSwitchProgramInstance2()
+MultiSwitchProgramInstance::MultiSwitchProgramInstance()
     : NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
@@ -101,19 +101,19 @@ MultiSwitchProgramInstance2::MultiSwitchProgramInstance2()
         {"Notifs"}
     )
 {}
-void MultiSwitchProgramInstance2::add_option(ConfigOption& option, std::string serialization_string){
+void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
-void MultiSwitchProgramInstance2::from_json(const JsonValue& json){
+void MultiSwitchProgramInstance::from_json(const JsonValue& json){
     m_options.load_json(json);
 }
-JsonValue MultiSwitchProgramInstance2::to_json() const{
+JsonValue MultiSwitchProgramInstance::to_json() const{
     return m_options.to_json();
 }
-std::string MultiSwitchProgramInstance2::check_validity() const{
+std::string MultiSwitchProgramInstance::check_validity() const{
     return m_options.check_validity();
 }
-void MultiSwitchProgramInstance2::restore_defaults(){
+void MultiSwitchProgramInstance::restore_defaults(){
     return m_options.restore_defaults();
 }
 

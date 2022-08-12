@@ -24,7 +24,7 @@ public:
 };
 
 
-class FlagNavigationTest : public SingleSwitchProgramInstance2{
+class FlagNavigationTest : public SingleSwitchProgramInstance{
 public:
     FlagNavigationTest();
 

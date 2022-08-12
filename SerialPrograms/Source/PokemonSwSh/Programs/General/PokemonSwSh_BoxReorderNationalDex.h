@@ -25,7 +25,7 @@ public:
 
 
 
-class BoxReorderNationalDex : public SingleSwitchProgramInstance2{
+class BoxReorderNationalDex : public SingleSwitchProgramInstance{
 public:
     BoxReorderNationalDex();
 

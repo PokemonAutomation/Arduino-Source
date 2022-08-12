@@ -35,7 +35,7 @@ public:
 
 
 
-class AutoHostMultiGame : public SingleSwitchProgramInstance2{
+class AutoHostMultiGame : public SingleSwitchProgramInstance{
 public:
     AutoHostMultiGame();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

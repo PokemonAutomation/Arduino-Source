@@ -34,7 +34,7 @@ public:
 };
 
 
-class ShinyHuntCustomPath : public SingleSwitchProgramInstance2{
+class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
     ShinyHuntCustomPath();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

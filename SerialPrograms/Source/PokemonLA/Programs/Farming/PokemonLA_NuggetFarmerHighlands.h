@@ -25,7 +25,7 @@ public:
 };
 
 
-class NuggetFarmerHighlands : public SingleSwitchProgramInstance2{
+class NuggetFarmerHighlands : public SingleSwitchProgramInstance{
 public:
     NuggetFarmerHighlands();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

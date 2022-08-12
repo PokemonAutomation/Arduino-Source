@@ -20,7 +20,7 @@ public:
 };
 
 
-class TestPathMaker : public SingleSwitchProgramInstance2{
+class TestPathMaker : public SingleSwitchProgramInstance{
 public:
     TestPathMaker();
 

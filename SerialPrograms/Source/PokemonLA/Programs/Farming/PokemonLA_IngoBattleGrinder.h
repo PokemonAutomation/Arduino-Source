@@ -54,7 +54,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class IngoBattleGrinder : public SingleSwitchProgramInstance2{
+class IngoBattleGrinder : public SingleSwitchProgramInstance{
 public:
     IngoBattleGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -27,7 +27,7 @@ public:
 };
 
 
-class LegendaryReset : public SingleSwitchProgramInstance2{
+class LegendaryReset : public SingleSwitchProgramInstance{
 public:
     LegendaryReset();
 

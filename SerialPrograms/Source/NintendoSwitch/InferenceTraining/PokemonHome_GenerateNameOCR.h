@@ -23,7 +23,7 @@ public:
 
 
 
-class GenerateNameOCRData : public SingleSwitchProgramInstance2{
+class GenerateNameOCRData : public SingleSwitchProgramInstance{
 
 public:
     GenerateNameOCRData();

@@ -25,7 +25,7 @@ public:
 
 
 
-class SurpriseTrade : public SingleSwitchProgramInstance2{
+class SurpriseTrade : public SingleSwitchProgramInstance{
 public:
     SurpriseTrade();
 

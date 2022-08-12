@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 class MultiSwitchProgramDescriptor;
-class MultiSwitchProgramInstance2;
+class MultiSwitchProgramInstance;
 
 
 class MultiSwitchProgramOption final : public PanelInstance{
@@ -35,7 +35,7 @@ public:
 public:
     const MultiSwitchProgramDescriptor& descriptor() const{ return m_descriptor; }
     MultiSwitchSystemOption& system(){ return m_system; }
-    MultiSwitchProgramInstance2& instance(){ return *m_instance; }
+    MultiSwitchProgramInstance& instance(){ return *m_instance; }
     ConfigOption& options();
 
     std::string check_validity() const;
@@ -47,7 +47,7 @@ private:
 private:
     const MultiSwitchProgramDescriptor& m_descriptor;
     MultiSwitchSystemOption m_system;
-    std::unique_ptr<MultiSwitchProgramInstance2> m_instance;
+    std::unique_ptr<MultiSwitchProgramInstance> m_instance;
 };
 
 

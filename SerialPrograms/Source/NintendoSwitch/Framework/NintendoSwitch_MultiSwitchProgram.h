@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class MultiSwitchProgramInstance2;
+class MultiSwitchProgramInstance;
 
 
 class MultiSwitchProgramEnvironment : public ProgramEnvironment{
@@ -78,7 +78,7 @@ public:
     size_t default_switches() const{ return m_default_switches; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
-    virtual std::unique_ptr<MultiSwitchProgramInstance2> make_instance() const{ return nullptr; }
+    virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const{ return nullptr; }
 
 private:
     const FeedbackType m_feedback;
@@ -113,13 +113,13 @@ private:
 //
 //  Calls to this class will never be concurrent from different threads.
 //
-class MultiSwitchProgramInstance2{
+class MultiSwitchProgramInstance{
 public:
-    virtual ~MultiSwitchProgramInstance2() = default;
-    MultiSwitchProgramInstance2(const MultiSwitchProgramInstance2&) = delete;
-    void operator=(const MultiSwitchProgramInstance2&) = delete;
+    virtual ~MultiSwitchProgramInstance() = default;
+    MultiSwitchProgramInstance(const MultiSwitchProgramInstance&) = delete;
+    void operator=(const MultiSwitchProgramInstance&) = delete;
 
-    MultiSwitchProgramInstance2();
+    MultiSwitchProgramInstance();
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
@@ -156,8 +156,8 @@ public:
 template <typename Descriptor, typename Instance>
 class MultiSwitchProgramWrapper : public Descriptor{
 public:
-    virtual std::unique_ptr<MultiSwitchProgramInstance2> make_instance() const override{
-        return std::unique_ptr<MultiSwitchProgramInstance2>(new Instance());
+    virtual std::unique_ptr<MultiSwitchProgramInstance> make_instance() const override{
+        return std::unique_ptr<MultiSwitchProgramInstance>(new Instance());
     }
 };
 

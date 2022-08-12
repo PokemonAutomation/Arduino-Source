@@ -31,7 +31,7 @@ public:
 };
 
 
-class MaxLairBossFinder : public MultiSwitchProgramInstance2{
+class MaxLairBossFinder : public MultiSwitchProgramInstance{
 public:
     MaxLairBossFinder();
 

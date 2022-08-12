@@ -21,7 +21,7 @@ public:
 };
 
 
-class OverworldWatcher : public SingleSwitchProgramInstance2{
+class OverworldWatcher : public SingleSwitchProgramInstance{
 public:
     OverworldWatcher();
 

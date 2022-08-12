@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Windows/MainWindow.h"
 #include "NintendoSwitch_Panels.h"
 
 #include "NintendoSwitch_Settings.h"

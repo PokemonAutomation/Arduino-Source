@@ -24,7 +24,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class UnownFinder : public SingleSwitchProgramInstance2{
+class UnownFinder : public SingleSwitchProgramInstance{
 public:
     UnownFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

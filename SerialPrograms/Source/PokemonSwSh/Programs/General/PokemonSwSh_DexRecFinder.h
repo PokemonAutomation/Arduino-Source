@@ -47,7 +47,7 @@ public:
 };
 
 
-class DexRecFinder : public SingleSwitchProgramInstance2{
+class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

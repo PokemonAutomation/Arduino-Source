@@ -36,7 +36,7 @@ public:
 
 
 
-class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance2{
+class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousOverworld();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

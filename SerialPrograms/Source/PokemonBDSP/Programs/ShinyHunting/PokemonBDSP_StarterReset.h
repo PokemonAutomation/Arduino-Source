@@ -27,7 +27,7 @@ public:
 };
 
 
-class StarterReset : public SingleSwitchProgramInstance2{
+class StarterReset : public SingleSwitchProgramInstance{
 public:
     StarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

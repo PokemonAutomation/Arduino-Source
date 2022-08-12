@@ -23,7 +23,7 @@ public:
     PokeJobsFarmer_Descriptor();
 };
 
-class PokeJobsFarmer : public SingleSwitchProgramInstance2{
+class PokeJobsFarmer : public SingleSwitchProgramInstance{
 public:
     PokeJobsFarmer();
 

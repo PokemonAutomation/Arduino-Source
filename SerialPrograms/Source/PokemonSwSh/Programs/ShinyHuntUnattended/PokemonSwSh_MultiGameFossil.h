@@ -23,7 +23,7 @@ public:
 
 
 
-class MultiGameFossil : public SingleSwitchProgramInstance2{
+class MultiGameFossil : public SingleSwitchProgramInstance{
 public:
     MultiGameFossil();
 

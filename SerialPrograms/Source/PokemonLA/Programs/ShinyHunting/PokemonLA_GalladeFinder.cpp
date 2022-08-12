@@ -128,7 +128,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
                 // basic map layout is walk forward for a while, move right, run back, then align camera, then walk left then forward to Gallade
 
                 // right portion
-                pbf_move_left_joystick(context, 255, 128, 0.5 * TICKS_PER_SECOND, 0); // right alone
+                pbf_move_left_joystick(context, 255, 128, (uint16_t)(0.5 * TICKS_PER_SECOND), 0); // right alone
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, (uint16_t)(2.4 * TICKS_PER_SECOND)); // forward while running until stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(1.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
                 pbf_move_left_joystick(context, 255, 128, (uint16_t)(1.8 * TICKS_PER_SECOND), 20); // right alone
@@ -144,7 +144,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
                 context.wait_for_all_requests();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
-                pbf_move_left_joystick(context, 0, 128, 2.0 * TICKS_PER_SECOND, 0); // left
+                pbf_move_left_joystick(context, 0, 128, 2 * TICKS_PER_SECOND, 0); // left
 
                 // then forward left
                 pbf_move_left_joystick(context, 0, 0, (uint16_t)(1.1 * TICKS_PER_SECOND), 0);

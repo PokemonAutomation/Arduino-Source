@@ -25,7 +25,7 @@ public:
 
 
 
-class GodEggItemDupe : public SingleSwitchProgramInstance2{
+class GodEggItemDupe : public SingleSwitchProgramInstance{
 public:
     GodEggItemDupe();
 

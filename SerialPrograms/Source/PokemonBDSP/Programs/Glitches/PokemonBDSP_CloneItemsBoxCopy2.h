@@ -28,7 +28,7 @@ public:
 
 
 
-class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance2{
+class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
     CloneItemsBoxCopy2();
 

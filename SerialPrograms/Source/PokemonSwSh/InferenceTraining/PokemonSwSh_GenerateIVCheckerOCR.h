@@ -48,7 +48,7 @@ public:
 
 
 
-class GenerateIVCheckerOCR : public SingleSwitchProgramInstance2{
+class GenerateIVCheckerOCR : public SingleSwitchProgramInstance{
 public:
     enum Mode{
         READ_AND_SAVE,

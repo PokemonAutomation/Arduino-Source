@@ -30,7 +30,7 @@ public:
 
 
 
-class AutonomousBallThrower : public SingleSwitchProgramInstance2{
+class AutonomousBallThrower : public SingleSwitchProgramInstance{
 public:
     AutonomousBallThrower();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

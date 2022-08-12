@@ -24,7 +24,7 @@ public:
 
 
 
-class LotoFarmer : public SingleSwitchProgramInstance2{
+class LotoFarmer : public SingleSwitchProgramInstance{
 public:
     LotoFarmer();
 

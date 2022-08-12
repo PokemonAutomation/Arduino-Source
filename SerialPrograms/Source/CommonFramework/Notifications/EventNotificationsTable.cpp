@@ -15,6 +15,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Common/Qt/AutoHeightTable.h"
 #include "ProgramNotifications.h"
 #include "EventNotificationsTable.h"
 
@@ -24,6 +25,30 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+
+
+
+
+class EventNotificationsTableWidget : public QWidget, public ConfigWidget{
+public:
+    EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value);
+
+    virtual void restore_defaults();
+    virtual void update_ui();
+
+private:
+    void redraw_table();
+    QWidget* make_enabled_box   (EventNotificationOption& entry);
+    QWidget* make_ping_box      (EventNotificationOption& entry);
+    QWidget* make_screenshot_box(EventNotificationOption& entry);
+    QWidget* make_tags_box      (EventNotificationOption& entry);
+    QWidget* make_rate_limit_box(EventNotificationOption& entry);
+    QWidget* make_test_box      (EventNotificationOption& entry);
+
+private:
+    EventNotificationsTable& m_value;
+    AutoHeightTableWidget* m_table;
+};
 
 
 

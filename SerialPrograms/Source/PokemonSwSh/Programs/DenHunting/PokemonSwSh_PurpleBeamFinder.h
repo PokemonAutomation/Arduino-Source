@@ -31,7 +31,7 @@ public:
 
 
 
-class PurpleBeamFinder : public SingleSwitchProgramInstance2{
+class PurpleBeamFinder : public SingleSwitchProgramInstance{
 public:
     PurpleBeamFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

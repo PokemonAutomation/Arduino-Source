@@ -31,7 +31,7 @@ public:
 };
 
 
-class EggAutonomous : public SingleSwitchProgramInstance2{
+class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
 

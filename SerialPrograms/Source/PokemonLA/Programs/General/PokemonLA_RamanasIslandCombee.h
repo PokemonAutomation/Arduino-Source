@@ -27,7 +27,7 @@ public:
 };
 
 
-class RamanasCombeeFinder: public SingleSwitchProgramInstance2{
+class RamanasCombeeFinder: public SingleSwitchProgramInstance{
 public:
     RamanasCombeeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

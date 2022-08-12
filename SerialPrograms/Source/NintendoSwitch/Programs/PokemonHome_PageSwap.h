@@ -21,7 +21,7 @@ public:
 };
 
 
-class PageSwap : public SingleSwitchProgramInstance2{
+class PageSwap : public SingleSwitchProgramInstance{
 public:
     PageSwap();
 

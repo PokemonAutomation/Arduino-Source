@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SingleSwitchProgramInstance2;
+class SingleSwitchProgramInstance;
 
 
 class SingleSwitchProgramEnvironment : public ProgramEnvironment{
@@ -63,7 +63,7 @@ public:
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
-    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const = 0;
+    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const = 0;
 
 private:
     const FeedbackType m_feedback;
@@ -95,13 +95,13 @@ private:
 //
 //  Calls to this class will never be concurrent from different threads.
 //
-class SingleSwitchProgramInstance2{
+class SingleSwitchProgramInstance{
 public:
-    virtual ~SingleSwitchProgramInstance2() = default;
-    SingleSwitchProgramInstance2(const SingleSwitchProgramInstance2&) = delete;
-    void operator=(const SingleSwitchProgramInstance2&) = delete;
+    virtual ~SingleSwitchProgramInstance() = default;
+    SingleSwitchProgramInstance(const SingleSwitchProgramInstance&) = delete;
+    void operator=(const SingleSwitchProgramInstance&) = delete;
 
-    SingleSwitchProgramInstance2();
+    SingleSwitchProgramInstance();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
 
@@ -135,8 +135,8 @@ public:
 template <typename Descriptor, typename Instance>
 class SingleSwitchProgramWrapper : public Descriptor{
 public:
-    virtual std::unique_ptr<SingleSwitchProgramInstance2> make_instance() const override{
-        return std::unique_ptr<SingleSwitchProgramInstance2>(new Instance());
+    virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const override{
+        return std::unique_ptr<SingleSwitchProgramInstance>(new Instance());
     }
 };
 

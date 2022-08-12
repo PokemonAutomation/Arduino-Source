@@ -28,7 +28,7 @@ public:
 
 
 
-class DaySkipperJPN7p8k : public SingleSwitchProgramInstance2{
+class DaySkipperJPN7p8k : public SingleSwitchProgramInstance{
 public:
     DaySkipperJPN7p8k();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -24,7 +24,7 @@ public:
 
 
 
-class RaidItemFarmerOHKO : public MultiSwitchProgramInstance2{
+class RaidItemFarmerOHKO : public MultiSwitchProgramInstance{
 public:
     RaidItemFarmerOHKO();
 

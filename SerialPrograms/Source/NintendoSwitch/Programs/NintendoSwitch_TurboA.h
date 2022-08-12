@@ -21,7 +21,7 @@ public:
 
 
 
-class TurboA : public SingleSwitchProgramInstance2{
+class TurboA : public SingleSwitchProgramInstance{
 public:
     TurboA();
 

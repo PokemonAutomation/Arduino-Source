@@ -26,7 +26,7 @@ public:
 };
 
 
-class MassRelease : public SingleSwitchProgramInstance2{
+class MassRelease : public SingleSwitchProgramInstance{
 public:
     MassRelease();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -38,7 +38,7 @@ std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const
 
 
 
-SingleSwitchProgramInstance2::SingleSwitchProgramInstance2()
+SingleSwitchProgramInstance::SingleSwitchProgramInstance()
     : NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
@@ -52,19 +52,19 @@ SingleSwitchProgramInstance2::SingleSwitchProgramInstance2()
         {"Notifs"}
     )
 {}
-void SingleSwitchProgramInstance2::add_option(ConfigOption& option, std::string serialization_string){
+void SingleSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
-void SingleSwitchProgramInstance2::from_json(const JsonValue& json){
+void SingleSwitchProgramInstance::from_json(const JsonValue& json){
     m_options.load_json(json);
 }
-JsonValue SingleSwitchProgramInstance2::to_json() const{
+JsonValue SingleSwitchProgramInstance::to_json() const{
     return m_options.to_json();
 }
-std::string SingleSwitchProgramInstance2::check_validity() const{
+std::string SingleSwitchProgramInstance::check_validity() const{
     return m_options.check_validity();
 }
-void SingleSwitchProgramInstance2::restore_defaults(){
+void SingleSwitchProgramInstance::restore_defaults(){
     return m_options.restore_defaults();
 }
 

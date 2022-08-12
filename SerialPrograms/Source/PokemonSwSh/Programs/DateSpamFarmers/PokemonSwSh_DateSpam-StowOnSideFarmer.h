@@ -23,7 +23,7 @@ public:
 
 
 
-class StowOnSideFarmer : public SingleSwitchProgramInstance2{
+class StowOnSideFarmer : public SingleSwitchProgramInstance{
 public:
     StowOnSideFarmer();
 

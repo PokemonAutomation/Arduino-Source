@@ -28,7 +28,7 @@ public:
 };
 
 
-class OutbreakFinder : public SingleSwitchProgramInstance2{
+class OutbreakFinder : public SingleSwitchProgramInstance{
 public:
     OutbreakFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

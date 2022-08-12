@@ -29,7 +29,7 @@ public:
 };
 
 
-class DoublesLeveling : public SingleSwitchProgramInstance2{
+class DoublesLeveling : public SingleSwitchProgramInstance{
 public:
     DoublesLeveling();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

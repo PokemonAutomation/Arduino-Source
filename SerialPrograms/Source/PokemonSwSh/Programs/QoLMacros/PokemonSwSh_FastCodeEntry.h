@@ -23,7 +23,7 @@ public:
 
 
 
-class FastCodeEntry : public SingleSwitchProgramInstance2{
+class FastCodeEntry : public SingleSwitchProgramInstance{
 public:
     FastCodeEntry();
 

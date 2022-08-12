@@ -29,7 +29,7 @@ public:
 };
 
 
-class MaxLairStandard : public MultiSwitchProgramInstance2{
+class MaxLairStandard : public MultiSwitchProgramInstance{
 public:
     enum class StopCondition{
         STOP_ON_SHINY_LEGENDARY,

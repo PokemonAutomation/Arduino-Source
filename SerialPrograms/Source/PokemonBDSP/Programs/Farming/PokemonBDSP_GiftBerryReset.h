@@ -27,7 +27,7 @@ public:
 };
 
 
-class GiftBerryReset : public SingleSwitchProgramInstance2{
+class GiftBerryReset : public SingleSwitchProgramInstance{
 public:
     GiftBerryReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

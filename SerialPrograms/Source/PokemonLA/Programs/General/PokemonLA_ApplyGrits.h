@@ -21,7 +21,7 @@ public:
 };
 
 
-class ApplyGrits : public SingleSwitchProgramInstance2{
+class ApplyGrits : public SingleSwitchProgramInstance{
 public:
     ApplyGrits();
 

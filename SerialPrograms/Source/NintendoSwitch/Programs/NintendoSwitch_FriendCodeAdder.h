@@ -23,7 +23,7 @@ public:
 };
 
 
-class FriendCodeAdder : public SingleSwitchProgramInstance2{
+class FriendCodeAdder : public SingleSwitchProgramInstance{
 public:
     FriendCodeAdder();
 

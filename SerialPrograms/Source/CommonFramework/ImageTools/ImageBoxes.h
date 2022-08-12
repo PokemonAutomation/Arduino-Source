@@ -10,8 +10,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-class QImage;
-
 namespace PokemonAutomation{
     class ImageViewRGB32;
     class ImageRGB32;

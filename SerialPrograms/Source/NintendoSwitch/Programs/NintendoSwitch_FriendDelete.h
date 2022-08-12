@@ -23,7 +23,7 @@ public:
 
 
 
-class FriendDelete : public SingleSwitchProgramInstance2{
+class FriendDelete : public SingleSwitchProgramInstance{
 public:
     FriendDelete();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

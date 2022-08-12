@@ -27,7 +27,7 @@ public:
 };
 
 
-class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance2{
+class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance{
 public:
     AmitySquarePickUpFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

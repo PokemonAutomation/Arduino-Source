@@ -32,7 +32,7 @@ public:
 
 
 
-class EggFetcher : public SingleSwitchProgramInstance2{
+class EggFetcher : public SingleSwitchProgramInstance{
 public:
     EggFetcher();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

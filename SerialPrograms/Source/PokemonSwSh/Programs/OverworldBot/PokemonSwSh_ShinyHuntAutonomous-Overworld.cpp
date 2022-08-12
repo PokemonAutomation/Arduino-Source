@@ -350,7 +350,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    srand(time(nullptr));
+    srand((unsigned)time(nullptr));
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);

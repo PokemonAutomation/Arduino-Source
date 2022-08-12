@@ -22,7 +22,7 @@ public:
 
 
 
-class BallThrower : public SingleSwitchProgramInstance2{
+class BallThrower : public SingleSwitchProgramInstance{
 public:
     BallThrower();
 

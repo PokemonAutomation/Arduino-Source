@@ -22,7 +22,7 @@ public:
 };
 
 
-class TurboButton : public SingleSwitchProgramInstance2{
+class TurboButton : public SingleSwitchProgramInstance{
 public:
     TurboButton();
 

@@ -33,7 +33,7 @@ public:
 
 
 
-class StatsResetCalyrex : public SingleSwitchProgramInstance2{
+class StatsResetCalyrex : public SingleSwitchProgramInstance{
 public:
     StatsResetCalyrex();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

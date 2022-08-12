@@ -8,7 +8,6 @@
 #define PokemonAutomation_EventNotificationsTable_H
 
 #include <map>
-#include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "EventNotificationOption.h"
@@ -34,27 +33,6 @@ private:
     friend class EventNotificationsTableWidget;
     std::vector<EventNotificationOption*> m_options;
     std::map<std::string, EventNotificationOption*> m_name_map;
-};
-
-class EventNotificationsTableWidget : public QWidget, public ConfigWidget{
-public:
-    EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value);
-
-    virtual void restore_defaults();
-    virtual void update_ui();
-
-private:
-    void redraw_table();
-    QWidget* make_enabled_box   (EventNotificationOption& entry);
-    QWidget* make_ping_box      (EventNotificationOption& entry);
-    QWidget* make_screenshot_box(EventNotificationOption& entry);
-    QWidget* make_tags_box      (EventNotificationOption& entry);
-    QWidget* make_rate_limit_box(EventNotificationOption& entry);
-    QWidget* make_test_box      (EventNotificationOption& entry);
-
-private:
-    EventNotificationsTable& m_value;
-    AutoHeightTableWidget* m_table;
 };
 
 

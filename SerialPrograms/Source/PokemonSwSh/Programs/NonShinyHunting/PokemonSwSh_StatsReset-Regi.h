@@ -33,7 +33,7 @@ public:
 
 
 
-class StatsResetRegi : public SingleSwitchProgramInstance2{
+class StatsResetRegi : public SingleSwitchProgramInstance{
 public:
     StatsResetRegi();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -26,7 +26,7 @@ public:
 
 
 
-class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance2{
+class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
     enum Mode{
         READ_AND_SAVE,

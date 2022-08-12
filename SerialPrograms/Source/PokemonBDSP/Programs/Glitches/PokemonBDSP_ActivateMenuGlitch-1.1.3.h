@@ -22,7 +22,7 @@ public:
 
 
 
-class ActivateMenuGlitch113 : public SingleSwitchProgramInstance2{
+class ActivateMenuGlitch113 : public SingleSwitchProgramInstance{
 public:
     ActivateMenuGlitch113();
 

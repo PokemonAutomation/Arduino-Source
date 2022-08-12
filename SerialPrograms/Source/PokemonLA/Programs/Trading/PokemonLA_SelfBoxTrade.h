@@ -26,7 +26,7 @@ public:
 };
 
 
-class SelfBoxTrade : public MultiSwitchProgramInstance2{
+class SelfBoxTrade : public MultiSwitchProgramInstance{
 public:
     SelfBoxTrade();
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;

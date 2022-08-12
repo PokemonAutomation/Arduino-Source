@@ -26,7 +26,7 @@ public:
 };
 
 
-class AutoMultiSpawn : public SingleSwitchProgramInstance2{
+class AutoMultiSpawn : public SingleSwitchProgramInstance{
 public:
     AutoMultiSpawn();
 

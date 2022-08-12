@@ -26,7 +26,7 @@ public:
 };
 
 
-class PostMMOSpawnReset : public SingleSwitchProgramInstance2{
+class PostMMOSpawnReset : public SingleSwitchProgramInstance{
 public:
     PostMMOSpawnReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

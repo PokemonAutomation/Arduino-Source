@@ -31,7 +31,7 @@ public:
 
 
 
-class DenRoller : public SingleSwitchProgramInstance2{
+class DenRoller : public SingleSwitchProgramInstance{
 public:
     DenRoller();
 

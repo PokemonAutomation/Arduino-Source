@@ -32,7 +32,7 @@ public:
 
 
 
-class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance2{
+class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousRegigigas2();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

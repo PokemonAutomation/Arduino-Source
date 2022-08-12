@@ -25,7 +25,7 @@ public:
 
 
 
-class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance2{
+class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedIoATrade();
 

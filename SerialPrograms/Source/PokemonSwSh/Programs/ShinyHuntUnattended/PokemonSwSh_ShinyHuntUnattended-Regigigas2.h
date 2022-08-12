@@ -26,7 +26,7 @@ public:
 
 
 
-class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance2{
+class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedRegigigas2();
 

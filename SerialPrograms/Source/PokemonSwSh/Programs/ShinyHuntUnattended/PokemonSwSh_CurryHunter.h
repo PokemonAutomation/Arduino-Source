@@ -28,7 +28,7 @@ public:
 
 
 
-class CurryHunter : public SingleSwitchProgramInstance2{
+class CurryHunter : public SingleSwitchProgramInstance{
 public:
     CurryHunter();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -25,7 +25,7 @@ public:
 };
 
 
-class GalladeFinder : public SingleSwitchProgramInstance2{
+class GalladeFinder : public SingleSwitchProgramInstance{
 public:
     GalladeFinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

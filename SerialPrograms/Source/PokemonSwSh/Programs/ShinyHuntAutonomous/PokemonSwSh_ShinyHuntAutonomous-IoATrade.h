@@ -31,7 +31,7 @@ public:
 
 
 
-class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance2{
+class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousIoATrade();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -23,7 +23,7 @@ public:
 
 
 
-class BerryFarmer : public SingleSwitchProgramInstance2{
+class BerryFarmer : public SingleSwitchProgramInstance{
 public:
     BerryFarmer();
 

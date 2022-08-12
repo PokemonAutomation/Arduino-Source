@@ -20,7 +20,7 @@ public:
 };
 
 
-class BraviaryHeightGlitch : public SingleSwitchProgramInstance2{
+class BraviaryHeightGlitch : public SingleSwitchProgramInstance{
 public:
     BraviaryHeightGlitch();
 

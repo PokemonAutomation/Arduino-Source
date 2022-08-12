@@ -32,7 +32,7 @@ public:
 
 
 
-class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance2{
+class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousStrongSpawn();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -19,7 +19,7 @@ public:
 };
 
 
-class PreventSleep : public SingleSwitchProgramInstance2{
+class PreventSleep : public SingleSwitchProgramInstance{
 public:
     PreventSleep();
 

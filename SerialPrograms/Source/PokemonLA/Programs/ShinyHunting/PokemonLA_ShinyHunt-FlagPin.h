@@ -31,7 +31,7 @@ public:
 };
 
 
-class ShinyHuntFlagPin : public SingleSwitchProgramInstance2{
+class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
 public:
     ShinyHuntFlagPin();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

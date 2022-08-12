@@ -25,7 +25,7 @@ public:
 
 
 
-class GodEggDuplication : public SingleSwitchProgramInstance2{
+class GodEggDuplication : public SingleSwitchProgramInstance{
 public:
     GodEggDuplication();
 

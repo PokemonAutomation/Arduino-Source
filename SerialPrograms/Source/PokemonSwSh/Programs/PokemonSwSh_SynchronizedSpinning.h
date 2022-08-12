@@ -21,7 +21,7 @@ public:
 
 
 
-class SynchronizedSpinning : public MultiSwitchProgramInstance2{
+class SynchronizedSpinning : public MultiSwitchProgramInstance{
 public:
     SynchronizedSpinning();
 

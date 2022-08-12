@@ -31,7 +31,7 @@ public:
 };
 
 
-class ShinyHuntFishing : public SingleSwitchProgramInstance2{
+class ShinyHuntFishing : public SingleSwitchProgramInstance{
 public:
     ShinyHuntFishing();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

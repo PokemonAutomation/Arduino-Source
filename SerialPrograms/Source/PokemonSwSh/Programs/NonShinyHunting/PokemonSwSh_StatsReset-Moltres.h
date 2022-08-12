@@ -31,7 +31,7 @@ public:
 
 
 
-class StatsResetMoltres : public SingleSwitchProgramInstance2{
+class StatsResetMoltres : public SingleSwitchProgramInstance{
 public:
     StatsResetMoltres();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

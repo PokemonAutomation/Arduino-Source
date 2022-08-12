@@ -76,7 +76,7 @@
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
 
-#include <opencv2/core.hpp>
+//#include <opencv2/core.hpp>
 
 
 #include <iostream>
@@ -131,7 +131,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-    cv::Mat image;
+//    cv::Mat image;
 
 
 //    env.log(QString(QChar(0x2728)));

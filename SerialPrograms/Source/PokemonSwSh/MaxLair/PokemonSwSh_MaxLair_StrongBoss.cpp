@@ -119,7 +119,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
 }
 
 std::string MaxLairStrongBoss::check_validity() const{
-    std::string error = MultiSwitchProgramInstance2::check_validity();
+    std::string error = MultiSwitchProgramInstance::check_validity();
     if (!error.empty()){
         return error;
     }

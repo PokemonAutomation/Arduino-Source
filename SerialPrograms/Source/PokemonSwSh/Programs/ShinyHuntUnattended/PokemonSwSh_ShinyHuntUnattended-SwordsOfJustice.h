@@ -27,7 +27,7 @@ public:
 
 
 
-class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance2{
+class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedSwordsOfJustice();
 

@@ -24,7 +24,7 @@ public:
 };
 
 
-class SoundListener : public SingleSwitchProgramInstance2{
+class SoundListener : public SingleSwitchProgramInstance{
 public:
     SoundListener();
 

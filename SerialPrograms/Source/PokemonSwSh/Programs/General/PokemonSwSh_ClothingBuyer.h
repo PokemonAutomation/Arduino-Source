@@ -23,7 +23,7 @@ public:
 
 
 
-class ClothingBuyer : public SingleSwitchProgramInstance2{
+class ClothingBuyer : public SingleSwitchProgramInstance{
 public:
     ClothingBuyer();
 

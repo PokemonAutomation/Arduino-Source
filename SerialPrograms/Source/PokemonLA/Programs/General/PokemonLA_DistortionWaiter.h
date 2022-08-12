@@ -26,7 +26,7 @@ public:
 };
 
 
-class DistortionWaiter : public SingleSwitchProgramInstance2{
+class DistortionWaiter : public SingleSwitchProgramInstance{
 public:
     DistortionWaiter();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

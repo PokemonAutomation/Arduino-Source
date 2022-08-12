@@ -35,7 +35,7 @@ public:
 
 
 
-class AutoHostRolling : public SingleSwitchProgramInstance2{
+class AutoHostRolling : public SingleSwitchProgramInstance{
 public:
     AutoHostRolling();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

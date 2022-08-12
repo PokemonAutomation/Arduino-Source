@@ -26,7 +26,7 @@ public:
 };
 
 
-class ShinyHuntLakeTrio : public SingleSwitchProgramInstance2{
+class ShinyHuntLakeTrio : public SingleSwitchProgramInstance{
 public:
     ShinyHuntLakeTrio();
 

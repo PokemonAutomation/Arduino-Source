@@ -27,7 +27,7 @@ public:
 
 
 
-class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance2{
+class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedStrongSpawn();
 

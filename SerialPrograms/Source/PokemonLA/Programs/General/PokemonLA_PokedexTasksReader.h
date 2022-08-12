@@ -20,7 +20,7 @@ public:
 };
 
 
-class PokedexTasksReader : public SingleSwitchProgramInstance2{
+class PokedexTasksReader : public SingleSwitchProgramInstance{
 public:
     PokedexTasksReader();
 

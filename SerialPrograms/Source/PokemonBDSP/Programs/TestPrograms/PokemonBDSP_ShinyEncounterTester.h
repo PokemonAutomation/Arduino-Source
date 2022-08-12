@@ -22,7 +22,7 @@ public:
 
 
 
-class ShinyEncounterTester : public SingleSwitchProgramInstance2{
+class ShinyEncounterTester : public SingleSwitchProgramInstance{
 public:
     ShinyEncounterTester();
 

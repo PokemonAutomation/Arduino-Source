@@ -21,7 +21,7 @@ public:
 };
 
 
-class SkipToFullMoon : public SingleSwitchProgramInstance2{
+class SkipToFullMoon : public SingleSwitchProgramInstance{
 public:
     SkipToFullMoon();
 

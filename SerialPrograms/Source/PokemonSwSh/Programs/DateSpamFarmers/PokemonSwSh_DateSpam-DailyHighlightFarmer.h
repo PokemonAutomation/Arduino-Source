@@ -23,7 +23,7 @@ public:
 
 
 
-class DailyHighlightFarmer : public SingleSwitchProgramInstance2{
+class DailyHighlightFarmer : public SingleSwitchProgramInstance{
 public:
     DailyHighlightFarmer();
 

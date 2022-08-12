@@ -29,7 +29,7 @@ public:
 };
 
 
-class ShinyHuntShaymin : public SingleSwitchProgramInstance2{
+class ShinyHuntShaymin : public SingleSwitchProgramInstance{
 public:
     ShinyHuntShaymin();
 

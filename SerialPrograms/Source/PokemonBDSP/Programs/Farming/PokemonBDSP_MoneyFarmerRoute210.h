@@ -27,7 +27,7 @@ public:
 };
 
 
-class MoneyFarmerRoute210 : public SingleSwitchProgramInstance2{
+class MoneyFarmerRoute210 : public SingleSwitchProgramInstance{
 public:
     MoneyFarmerRoute210();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

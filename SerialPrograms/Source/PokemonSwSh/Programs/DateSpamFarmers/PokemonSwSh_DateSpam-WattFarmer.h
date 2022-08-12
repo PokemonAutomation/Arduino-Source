@@ -24,7 +24,7 @@ public:
 
 
 
-class WattFarmer : public SingleSwitchProgramInstance2{
+class WattFarmer : public SingleSwitchProgramInstance{
 public:
     WattFarmer();
 

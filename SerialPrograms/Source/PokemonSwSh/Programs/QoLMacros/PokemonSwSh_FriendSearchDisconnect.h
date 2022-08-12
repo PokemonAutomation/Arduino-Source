@@ -22,7 +22,7 @@ public:
 
 
 
-class FriendSearchDisconnect : public SingleSwitchProgramInstance2{
+class FriendSearchDisconnect : public SingleSwitchProgramInstance{
 public:
     FriendSearchDisconnect();
 

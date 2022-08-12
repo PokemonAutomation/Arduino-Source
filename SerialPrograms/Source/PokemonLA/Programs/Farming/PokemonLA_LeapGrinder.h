@@ -29,7 +29,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class LeapGrinder : public SingleSwitchProgramInstance2{
+class LeapGrinder : public SingleSwitchProgramInstance{
 public:
     LeapGrinder();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
