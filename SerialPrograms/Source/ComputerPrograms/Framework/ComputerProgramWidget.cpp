@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QScrollArea>
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "ComputerPrograms/ComputerProgram.h"

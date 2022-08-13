@@ -29,7 +29,7 @@ namespace PokemonAutomation{
 
 class StatsTracker;
 class CancellableScope;
-class RunnablePanelDescriptor;
+class ProgramDescriptor;
 
 
 
@@ -48,14 +48,14 @@ public:
 public:
     //  Setup
 
-    ProgramSession(const RunnablePanelDescriptor& descriptor);
+    ProgramSession(const ProgramDescriptor& descriptor);
 
     //  Before the child-most class begins destruction, you must first:
     //      1.  Stop the program.
     //      2.  Join the program thread.
     virtual ~ProgramSession();
 
-    const RunnablePanelDescriptor& descriptor() const{ return m_descriptor; }
+    const ProgramDescriptor& descriptor() const{ return m_descriptor; }
     uint64_t instance_id() const{ return m_instance_id; }
     Logger& logger(){ return m_logger; }
 
@@ -122,7 +122,7 @@ private:
 
 
 private:
-    const RunnablePanelDescriptor& m_descriptor;
+    const ProgramDescriptor& m_descriptor;
 
     uint64_t m_instance_id = 0;
     TaggedLogger m_logger;

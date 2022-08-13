@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramOption_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramOption_H
 
-#include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{

@@ -11,6 +11,7 @@
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -18,9 +19,9 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

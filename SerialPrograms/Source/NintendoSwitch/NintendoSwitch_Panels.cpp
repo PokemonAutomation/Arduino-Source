@@ -31,41 +31,38 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-Panels::Panels(QTabWidget& parent, PanelHolder& holder)
-    : PanelList(parent, "Switch", holder)
-{
-    add_divider("---- Settings ----");
-    add_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>();
+std::vector<PanelEntry> make_panels(){
+    std::vector<PanelEntry> ret;
 
-    add_divider("---- Virtual Consoles ----");
-    add_program<VirtualConsole_Descriptor, VirtualConsole>();
-    add_program<SwitchViewer_Descriptor, SwitchViewer>();
+    ret.emplace_back("---- Settings ----");
+    ret.emplace_back(make_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>());
 
-    add_divider("---- Programs ----");
-//    add_program<TurboA_Descriptor, TurboA>();
-    add_panel(make_single_switch_program<TurboA_Descriptor, TurboA>());
-    add_panel(make_single_switch_program<TurboButton_Descriptor, TurboButton>());
-    add_panel(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
-    add_panel(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
-    add_panel(make_single_switch_program<FriendDelete_Descriptor, FriendDelete>());
+    ret.emplace_back("---- Virtual Consoles ----");
+    ret.emplace_back(make_panel<VirtualConsole_Descriptor, VirtualConsole>());
+    ret.emplace_back(make_panel<SwitchViewer_Descriptor, SwitchViewer>());
 
-//    add_divider("---- " + STRING_POKEMON + " Home ----");
-    add_panel(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
+    ret.emplace_back("---- Programs ----");
+    ret.emplace_back(make_single_switch_program<TurboA_Descriptor, TurboA>());
+    ret.emplace_back(make_single_switch_program<TurboButton_Descriptor, TurboButton>());
+    ret.emplace_back(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
+    ret.emplace_back(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
+    ret.emplace_back(make_single_switch_program<FriendDelete_Descriptor, FriendDelete>());
+
+//    ret.emplace_back("---- " + STRING_POKEMON + " Home ----");
+    ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        add_divider("---- Developer Tools ----");
-        add_panel(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
-        add_panel(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
-        add_panel(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
-        add_panel(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
-        add_panel(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
-        add_panel(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
+        ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
+        ret.emplace_back(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
+        ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
+        ret.emplace_back(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
+        ret.emplace_back(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
     }
 
-
-    finish_panel_setup();
+    return ret;
 }
-
 
 
 

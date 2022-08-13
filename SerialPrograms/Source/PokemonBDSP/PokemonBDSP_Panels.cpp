@@ -45,54 +45,53 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-Panels::Panels(QTabWidget& parent, PanelHolder& holder)
-    : PanelList(parent, "BD/SP", holder)
-{
-    add_divider("---- Settings ----");
-    add_settings<GameSettings_Descriptor, GameSettingsPanel>();
+std::vector<PanelEntry> make_panels(){
+    std::vector<PanelEntry> ret;
 
-    add_divider("---- General ----");
-    add_panel(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
-    add_panel(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
+    ret.emplace_back("---- Settings ----");
+    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
-    add_divider("---- Trading ----");
-    add_panel(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
-    add_panel(make_multi_switch_program<SelfTouchTrade_Descriptor, SelfTouchTrade>());
+    ret.emplace_back("---- General ----");
+    ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
-    add_divider("---- Farming ----");
-    add_panel(make_single_switch_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>());
-    add_panel(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
-    add_panel(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
-    add_panel(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
-    add_panel(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
+    ret.emplace_back("---- Trading ----");
+    ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    ret.emplace_back(make_multi_switch_program<SelfTouchTrade_Descriptor, SelfTouchTrade>());
 
-    add_divider("---- Shiny Hunting ----");
-    add_panel(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
-    add_panel(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    add_panel(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
-    add_panel(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
-    add_panel(make_single_switch_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>());
+    ret.emplace_back("---- Farming ----");
+    ret.emplace_back(make_single_switch_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>());
+    ret.emplace_back(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
+    ret.emplace_back(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
+    ret.emplace_back(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
+    ret.emplace_back(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
 
-    add_divider("---- Eggs ----");
-    add_panel(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
-    add_panel(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    add_panel(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    ret.emplace_back("---- Shiny Hunting ----");
+    ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
+    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>());
 
-    add_divider("---- Glitches (v1.1.3) ----");
-    add_panel(make_single_switch_program<ActivateMenuGlitch113_Descriptor, ActivateMenuGlitch113>());
-    add_panel(make_single_switch_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>());
+    ret.emplace_back("---- Eggs ----");
+    ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
+    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
+    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
 
-    add_divider("---- Glitches (v1.1.2) ----");
-    add_panel(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
+    ret.emplace_back("---- Glitches (v1.1.3) ----");
+    ret.emplace_back(make_single_switch_program<ActivateMenuGlitch113_Descriptor, ActivateMenuGlitch113>());
+    ret.emplace_back(make_single_switch_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>());
+
+    ret.emplace_back("---- Glitches (v1.1.2) ----");
+    ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        add_divider("---- Developer Tools ----");
-        add_panel(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
-        add_panel(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
+        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
     }
 
-
-    finish_panel_setup();
+    return ret;
 }
 
 

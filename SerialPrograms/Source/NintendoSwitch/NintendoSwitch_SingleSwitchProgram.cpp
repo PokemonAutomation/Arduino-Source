@@ -21,7 +21,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     FeedbackType feedback, bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level
 )
-    : RunnablePanelDescriptor(
+    : ProgramDescriptor(
         pick_color(feedback, min_pabotbase_level),
         std::move(identifier),
         std::move(category), std::move(display_name),

@@ -1,20 +1,20 @@
-/*  Runnable Panel
+/*  Program Descriptor
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_RunnablePanel_H
-#define PokemonAutomation_CommonFramework_RunnablePanel_H
+#ifndef PokemonAutomation_CommonFramework_ProgramDescriptor_H
+#define PokemonAutomation_CommonFramework_ProgramDescriptor_H
 
-#include "Panel.h"
+#include "PanelDescriptor.h"
 
 namespace PokemonAutomation{
 
 class StatsTracker;
 
 
-class RunnablePanelDescriptor : public PanelDescriptor{
+class ProgramDescriptor : public PanelDescriptor{
 public:
     using PanelDescriptor::PanelDescriptor;
 

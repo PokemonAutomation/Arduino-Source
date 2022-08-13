@@ -8,7 +8,7 @@
 #define PokemonAutomation_PanelWidget_H
 
 #include <QWidget>
-#include "Panel.h"
+#include "PanelTools.h"
 
 namespace PokemonAutomation{
 

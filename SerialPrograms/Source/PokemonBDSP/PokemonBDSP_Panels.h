@@ -14,11 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class Panels : public PanelList{
-public:
-    Panels(QTabWidget& parent, PanelHolder& holder);
-};
-
+std::vector<PanelEntry> make_panels();
 
 
 }

@@ -34,10 +34,10 @@ const std::array<std::string, 4> JSON_TAB_NAMES = {
 ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     : QTabWidget(&parent)
 {
-    add(new NintendoSwitch::Panels(*this, holder));
-    add(new NintendoSwitch::PokemonSwSh::Panels(*this, holder));
-    add(new NintendoSwitch::PokemonBDSP::Panels(*this, holder));
-    add(new NintendoSwitch::PokemonLA::Panels(*this, holder));
+    add(new PanelList(*this, holder, "Switch",  NintendoSwitch::make_panels()));
+    add(new PanelList(*this, holder, "Sw/Sh",   NintendoSwitch::PokemonSwSh::make_panels()));
+    add(new PanelList(*this, holder, "BD/SP",   NintendoSwitch::PokemonBDSP::make_panels()));
+    add(new PanelList(*this, holder, "LA",      NintendoSwitch::PokemonLA::make_panels()));
 
     connect(this, &ProgramTabs::currentChanged, this, [&](int index){
         if (index >= 0 && (size_t)index < JSON_TAB_NAMES.size()){

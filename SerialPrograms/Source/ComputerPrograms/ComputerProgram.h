@@ -10,7 +10,7 @@
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Panels/RunnablePanel.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 
 namespace PokemonAutomation{
 
@@ -18,7 +18,7 @@ class CancellableScope;
 class ComputerProgramInstance;
 
 
-class ComputerProgramDescriptor : public RunnablePanelDescriptor{
+class ComputerProgramDescriptor : public ProgramDescriptor{
 public:
     ComputerProgramDescriptor(
         std::string identifier,

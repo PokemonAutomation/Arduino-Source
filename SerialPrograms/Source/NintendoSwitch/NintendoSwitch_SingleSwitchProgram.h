@@ -7,13 +7,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
+#include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Panels/RunnablePanel.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
@@ -47,7 +48,7 @@ private:
 };
 
 
-class SingleSwitchProgramDescriptor : public RunnablePanelDescriptor{
+class SingleSwitchProgramDescriptor : public ProgramDescriptor{
 public:
     SingleSwitchProgramDescriptor(
         std::string identifier,

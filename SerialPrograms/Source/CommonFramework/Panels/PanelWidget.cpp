@@ -10,6 +10,8 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "PanelDescriptor.h"
+#include "PanelInstance.h"
 #include "PanelElements.h"
 #include "PanelWidget.h"
 

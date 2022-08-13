@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "Panel.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 
 namespace PokemonAutomation{
 

@@ -65,7 +65,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t max_switches,
     size_t default_switches
 )
-    : RunnablePanelDescriptor(
+    : ProgramDescriptor(
         pick_color(feedback, min_pabotbase_level),
         std::move(identifier),
         std::move(category), std::move(display_name),

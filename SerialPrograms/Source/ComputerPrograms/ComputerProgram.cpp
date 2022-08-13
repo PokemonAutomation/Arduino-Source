@@ -17,7 +17,7 @@ ComputerProgramDescriptor::ComputerProgramDescriptor(
     std::string doc_link,
     std::string description
 )
-    : RunnablePanelDescriptor(
+    : ProgramDescriptor(
         COLOR_DARKCYAN,
         std::move(identifier),
         std::move(category), std::move(display_name),

@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 
 #include <functional>
+#include "Common/Compiler.h"
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
@@ -15,7 +16,7 @@
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Panels/RunnablePanel.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
@@ -55,7 +56,7 @@ public:
 
 
 
-class MultiSwitchProgramDescriptor : public RunnablePanelDescriptor{
+class MultiSwitchProgramDescriptor : public ProgramDescriptor{
 public:
     MultiSwitchProgramDescriptor(
         std::string identifier,

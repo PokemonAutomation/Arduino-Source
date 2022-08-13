@@ -17,6 +17,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
+#include "CommonFramework/Panels/PanelTools.h"
 #include "Integrations/DiscordSettingsOption.h"
 
 #include <iostream>

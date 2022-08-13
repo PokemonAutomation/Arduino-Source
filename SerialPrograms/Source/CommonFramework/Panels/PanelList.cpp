@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "PanelInstance.h"
 #include "PanelList.h"
 
 //#include <iostream>
@@ -18,20 +19,19 @@ namespace PokemonAutomation{
 
 const std::string PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
-PanelList::PanelList(QTabWidget& parent, std::string label, PanelHolder& holder)
+PanelList::PanelList(QTabWidget& parent, PanelHolder& holder, std::string label, std::vector<PanelEntry> list)
     : QListWidget(&parent)
     , m_label(label)
     , m_panel_holder(holder)
-{}
-void PanelList::add_divider(std::string label){
-    m_panels.emplace_back(std::move(label), nullptr);
-}
-void PanelList::finish_panel_setup(){
+{
 //    QFontMetrics fm(this->font());
-    for (const auto& item : m_panels){
+    for (PanelEntry& item : list){
+        const std::string& display_name = item.display_name;
+        PanelDescriptor* descriptor = item.descriptor.get();
+
         //  Label/divider
-        if (item.second == nullptr){
-            addItem(QString::fromStdString(item.first));
+        if (descriptor == nullptr){
+            addItem(QString::fromStdString(display_name));
             QListWidgetItem* list_item = this->item(this->count() - 1);
             QFont font = list_item->font();
             font.setBold(true);
@@ -41,20 +41,19 @@ void PanelList::finish_panel_setup(){
         }
 
         //  Program
-        const std::string& display_name = item.second->display_name();
-        if (!m_panel_map.emplace(display_name, item.second.get()).second){
+        if (!m_panel_map.emplace(display_name, std::move(item.descriptor)).second){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate program name: " + display_name);
         }
 
         addItem(QString::fromStdString(display_name));
 //        addItem(QString::fromStdString("DM Elvis for FREE SHINIES!!!"));
         QListWidgetItem* list_item = this->item(this->count() - 1);
-        Color color = item.second->color();
+        Color color = descriptor->color();
         if (color){
             QColor qcolor = QColor((uint32_t)color);
             list_item->setForeground(qcolor);
         }
-        list_item->setToolTip(QString::fromStdString(item.second->description()));
+        list_item->setToolTip(QString::fromStdString(descriptor->description()));
     }
     connect(
         this, &QListWidget::itemClicked,
@@ -64,13 +63,15 @@ void PanelList::finish_panel_setup(){
     );
 }
 
+
 void PanelList::handle_panel_clicked(const std::string& text){
     auto iter = m_panel_map.find(text);
     if (iter == m_panel_map.end()){
         PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = "";
         return;
     }
-    const PanelDescriptor* descriptor = iter->second;
+    const PanelDescriptor* descriptor = iter->second.get();
+//    cout << descriptor->display_name() << endl;
     if (!m_panel_holder.report_new_panel_intent(*descriptor)){
         return;
     }

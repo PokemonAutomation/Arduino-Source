@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramOption_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramOption_H
 
-#include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{

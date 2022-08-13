@@ -14,7 +14,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgramOption_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgramOption_H
 
-#include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 
 namespace PokemonAutomation{

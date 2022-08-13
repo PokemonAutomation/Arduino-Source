@@ -424,16 +424,19 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/TextEditOption.cpp
     Source/CommonFramework/Options/TextEditOption.h
-    Source/CommonFramework/Panels/Panel.cpp
-    Source/CommonFramework/Panels/Panel.h
+    Source/CommonFramework/Panels/PanelDescriptor.cpp
+    Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelElements.cpp
     Source/CommonFramework/Panels/PanelElements.h
+    Source/CommonFramework/Panels/PanelInstance.cpp
+    Source/CommonFramework/Panels/PanelInstance.h
     Source/CommonFramework/Panels/PanelList.cpp
     Source/CommonFramework/Panels/PanelList.h
+    Source/CommonFramework/Panels/PanelTools.h
     Source/CommonFramework/Panels/PanelWidget.cpp
     Source/CommonFramework/Panels/PanelWidget.h
-    Source/CommonFramework/Panels/RunnablePanel.cpp
-    Source/CommonFramework/Panels/RunnablePanel.h
+    Source/CommonFramework/Panels/ProgramDescriptor.cpp
+    Source/CommonFramework/Panels/ProgramDescriptor.h
     Source/CommonFramework/Panels/SettingsPanel.cpp
     Source/CommonFramework/Panels/SettingsPanel.h
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp

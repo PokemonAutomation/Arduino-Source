@@ -8,7 +8,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
-#include "CommonFramework/Panels/RunnablePanel.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
 #include "Integrations/ProgramTracker.h"
 
@@ -27,7 +27,7 @@ void ProgramSession::remove_listener(Listener& listener){
 
 
 
-ProgramSession::ProgramSession(const RunnablePanelDescriptor& descriptor)
+ProgramSession::ProgramSession(const ProgramDescriptor& descriptor)
     : m_descriptor(descriptor)
     , m_instance_id(ProgramTracker::instance().add_program(*this))
 //    , m_logger(global_logger_raw(), "Program:" + std::to_string(m_instance_id))
