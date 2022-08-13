@@ -30,7 +30,7 @@ BooleanCheckBoxBaseWidget::BooleanCheckBoxBaseWidget(QWidget& parent, BooleanChe
     connect(
         m_box, &QCheckBox::stateChanged,
         this, [=](int){
-            m_value.set(m_box->isChecked());
+            m_value = m_box->isChecked();
 //            cout << "m_value.m_current = " << m_value.m_current << endl;
 //            cout << "&m_value.m_current = " << &m_value.m_current << endl;
         }

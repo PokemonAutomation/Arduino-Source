@@ -9,8 +9,8 @@
 #ifndef PokemonAutomation_BooleanCheckBoxBaseOption_H
 #define PokemonAutomation_BooleanCheckBoxBaseOption_H
 
-#include <atomic>
 #include <string>
+#include <atomic>
 
 class QCheckBox;
 
@@ -29,15 +29,16 @@ public:
     const std::string& label() const{ return m_label; }
 
     operator bool() const{ return m_current.load(std::memory_order_relaxed); }
-    bool get() const{ return m_current.load(std::memory_order_relaxed); }
-    void set(bool x){ m_current.store(x, std::memory_order_relaxed); }
+    void operator=(bool x){ m_current.store(x, std::memory_order_relaxed); }
 
     void load_default(const JsonValue& json);
     void load_current(const JsonValue& json);
     JsonValue write_default() const;
     JsonValue write_current() const;
 
-    void restore_defaults();
+    void restore_defaults(){
+        m_current.store(m_default, std::memory_order_relaxed);
+    }
 
 private:
     const std::string m_label;

@@ -9,25 +9,22 @@
 #ifndef PokemonAutomation_BooleanCheckBoxOption_H
 #define PokemonAutomation_BooleanCheckBoxOption_H
 
-#include "Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h"
+#include <atomic>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class BooleanCheckBoxOption : public ConfigOption, private BooleanCheckBoxBaseOption{
+class BooleanCheckBoxOption : public ConfigOption{
 public:
     BooleanCheckBoxOption(
         std::string label,
         bool default_value
-    )
-        : BooleanCheckBoxBaseOption(std::move(label), default_value)
-    {}
+    );
 
-    using BooleanCheckBoxBaseOption::label;
-    using BooleanCheckBoxBaseOption::operator bool;
-    using BooleanCheckBoxBaseOption::get;
-    using BooleanCheckBoxBaseOption::set;
+    const std::string& label() const{ return m_label; }
+    operator bool() const{ return m_current.load(std::memory_order_relaxed); }
+    void operator=(bool x);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -37,7 +34,9 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class BooleanCheckBoxWidget;
+    const std::string m_label;
+    const bool m_default;
+    std::atomic<bool> m_current;
 };
 
 

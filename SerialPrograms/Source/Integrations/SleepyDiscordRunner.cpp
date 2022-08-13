@@ -526,7 +526,7 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
                 continue;
             }
 
-            if (std::atoll(settings.message.user_id.get().c_str()) == 0){
+            if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
                 should_ping = false;
             }
 
@@ -587,15 +587,15 @@ bool initialize_sleepy_settings() {
 
     bool suffix = settings.integration.use_suffix;
     std::string param_string;
-    param_string += StringTools::replace(settings.integration.token.get(), " ", "") + "|";
-    param_string += settings.integration.command_prefix.get() + "|";
-    param_string += StringTools::replace(settings.integration.owner.get(), " ", "") + "|";
-    param_string += settings.integration.game_status.get() + "|";
-    param_string += StringTools::replace(settings.integration.hello_message.get(), "@", "") + "|";
+    param_string += StringTools::replace(settings.integration.token, " ", "") + "|";
+    param_string += (std::string)settings.integration.command_prefix + "|";
+    param_string += StringTools::replace(settings.integration.owner, " ", "") + "|";
+    param_string += (std::string)settings.integration.game_status + "|";
+    param_string += StringTools::replace(settings.integration.hello_message, "@", "") + "|";
     param_string += PROGRAM_VERSION + "|";
     param_string += PROJECT_SOURCE_URL;
 
-    std::string sudo = StringTools::replace(settings.integration.sudo.get(), " ", "");
+    std::string sudo = StringTools::replace(settings.integration.sudo, " ", "");
 
 //    std::string w_channels = StringTools::replace(settings.integration.channels_whitelist.get(), " ", "");
     std::string w_channels;
@@ -616,18 +616,18 @@ bool check_if_empty(const DiscordSettingsOption& settings) {
     if (!settings.integration.enabled()){
         return false;
     }
-    if (settings.integration.token.get().empty()) {
+    if (((std::string)settings.integration.token).empty()) {
         return false;
     }
-    else if (settings.integration.token.get().find(",") != std::string::npos) {
+    else if (((std::string)settings.integration.token).find(",") != std::string::npos) {
         sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
     }
-    else if (settings.integration.owner.get().find(",") != std::string::npos) {
+    else if (((std::string)settings.integration.owner).find(",") != std::string::npos) {
         sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
     }
-    else if (settings.integration.command_prefix.get().empty()) {
+    else if (((std::string)settings.integration.command_prefix).empty()) {
         sleepy_logger().log("Please enter a Discord command prefix. Stopping...", COLOR_RED);
         return false;
     }

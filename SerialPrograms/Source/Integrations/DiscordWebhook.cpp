@@ -263,7 +263,7 @@ void send_message(
         }
 
         //  Sanitize user ID.
-        if (std::atoll(settings.message.user_id.get().c_str()) == 0){
+        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
             should_ping = false;
         }
 

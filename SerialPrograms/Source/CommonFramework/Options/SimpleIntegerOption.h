@@ -10,7 +10,7 @@
 #define PokemonAutomation_SimpleIntegerOption_H
 
 #include <limits>
-#include "Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h"
+#include <atomic>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -21,7 +21,7 @@ class SimpleIntegerWidget;
 
 
 template <typename Type>
-class SimpleIntegerOption : public ConfigOption, private SimpleIntegerBaseOption<Type>{
+class SimpleIntegerOption : public ConfigOption{
 public:
     SimpleIntegerOption(
         std::string label,
@@ -30,21 +30,26 @@ public:
         Type max_value = std::numeric_limits<Type>::max()
     );
 
-    using SimpleIntegerBaseOption<Type>::label;
-    using SimpleIntegerBaseOption<Type>::operator Type;
-    using SimpleIntegerBaseOption<Type>::get;
-    using SimpleIntegerBaseOption<Type>::set;
+    const std::string& label() const{ return m_label; }
+    operator Type() const{ return m_current.load(std::memory_order_relaxed); }
+    std::string set(Type x);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    std::string check_validity(Type x) const;
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
+public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SimpleIntegerWidget<Type>;
+    const std::string m_label;
+    const Type m_min_value;
+    const Type m_max_value;
+    const Type m_default;
+    std::atomic<Type> m_current;
 };
 
 

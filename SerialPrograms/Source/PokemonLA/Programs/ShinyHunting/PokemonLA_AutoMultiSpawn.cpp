@@ -242,7 +242,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     const int max_num_despawn = MAX_DESPAWN_COUNT[SPAWN];
 
     // Parse input path string:
-    std::vector<int> path_despawns = parse_multispawn_path(env, PATH.get(), max_num_despawn);
+    std::vector<int> path_despawns = parse_multispawn_path(env, PATH, max_num_despawn);
     std::vector<TimeOfDay> path_times;
     // We + 1 here because we need one more time change to read the desired target pokemon at the end (usually a shiny alpha)
     for(size_t i = 0; i < path_despawns.size() + 1; i++){

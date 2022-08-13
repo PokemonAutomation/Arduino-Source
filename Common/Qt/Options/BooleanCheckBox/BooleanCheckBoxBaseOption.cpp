@@ -20,6 +20,7 @@ BooleanCheckBoxBaseOption::BooleanCheckBoxBaseOption(
 {}
 
 
+
 void BooleanCheckBoxBaseOption::load_default(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
@@ -29,7 +30,7 @@ void BooleanCheckBoxBaseOption::load_default(const JsonValue& json){
 void BooleanCheckBoxBaseOption::load_current(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
-        m_current.store(value, std::memory_order_relaxed);
+        m_current = value;
     }
 }
 JsonValue BooleanCheckBoxBaseOption::write_default() const{
@@ -39,9 +40,6 @@ JsonValue BooleanCheckBoxBaseOption::write_current() const{
     return m_current.load(std::memory_order_relaxed);
 }
 
-void BooleanCheckBoxBaseOption::restore_defaults(){
-    m_current.store(m_default, std::memory_order_relaxed);
-}
 
 
 

@@ -9,13 +9,13 @@
 #ifndef PokemonAutomation_StringOption_H
 #define PokemonAutomation_StringOption_H
 
-#include "Common/Qt/Options/String/StringBaseOption.h"
+#include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class StringOption : public ConfigOption, private StringBaseOption{
+class StringOption : public ConfigOption{
 public:
     StringOption(
         bool is_password,
@@ -24,10 +24,12 @@ public:
         std::string placeholder_text
     );
 
-    using StringBaseOption::label;
-    using StringBaseOption::operator std::string;
-    using StringBaseOption::get;
-    using StringBaseOption::set;
+    bool is_password() const{ return m_is_password; }
+    const std::string& label() const{ return m_label; }
+    const std::string& placeholder_text() const{ return m_placeholder_text; }
+
+    operator std::string() const;
+    void set(std::string x);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -37,7 +39,13 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class StringWidget;
+    const std::string m_label;
+    const bool m_is_password;
+    const std::string m_default;
+    const std::string m_placeholder_text;
+
+    mutable SpinLock m_lock;
+    std::string m_current;
 };
 
 
