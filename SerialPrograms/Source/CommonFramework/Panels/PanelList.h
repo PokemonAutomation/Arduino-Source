@@ -21,9 +21,14 @@ public:
     static const std::string JSON_PROGRAM_PANEL;
 
 public:
-    PanelList(QTabWidget& parent, PanelHolder& holder, std::string label, std::vector<PanelEntry> list);
+    PanelList(
+        QTabWidget& parent, PanelHolder& holder,
+        std::string label, std::string description,
+        std::vector<PanelEntry> list
+    );
 
     const std::string& label() const{ return m_label; }
+    const std::string& description() const{ return m_description; }
     size_t items() const{ return m_panel_map.size(); }
 
     void set_panel(const std::string& panel_name);
@@ -33,6 +38,7 @@ protected:
 
 protected:
     std::string m_label;
+    std::string m_description;
     PanelHolder& m_panel_holder;
 private:
     std::map<std::string, std::unique_ptr<PanelDescriptor>> m_panel_map;

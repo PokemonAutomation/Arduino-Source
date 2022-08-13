@@ -1483,6 +1483,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/PokemonSV/PokemonSV_Panels.cpp
+    Source/PokemonSV/PokemonSV_Panels.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/PokemonLA_Tests.cpp

@@ -19,9 +19,14 @@ namespace PokemonAutomation{
 
 const std::string PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
-PanelList::PanelList(QTabWidget& parent, PanelHolder& holder, std::string label, std::vector<PanelEntry> list)
+PanelList::PanelList(
+    QTabWidget& parent, PanelHolder& holder,
+    std::string label, std::string description,
+    std::vector<PanelEntry> list
+)
     : QListWidget(&parent)
     , m_label(label)
+    , m_description(std::move(description))
     , m_panel_holder(holder)
 {
 //    QFontMetrics fm(this->font());

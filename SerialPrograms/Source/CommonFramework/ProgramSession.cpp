@@ -174,7 +174,7 @@ std::string ProgramSession::start_program(){
         set_state(ProgramState::RUNNING);
         m_thread = std::thread(
             run_with_catch,
-            "RunnablePanelWidget::run_program()",
+            "ProgramSession::start_program()",
             [=]{ run_program(); }
         );
 

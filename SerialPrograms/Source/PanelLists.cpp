@@ -10,9 +10,11 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "PokemonLA/PokemonLA_Panels.h"
+#include "PokemonSV/PokemonSV_Panels.h"
 #include "PanelLists.h"
 
 #include <iostream>
@@ -34,10 +36,26 @@ const std::array<std::string, 4> JSON_TAB_NAMES = {
 ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     : QTabWidget(&parent)
 {
-    add(new PanelList(*this, holder, "Switch",  NintendoSwitch::make_panels()));
-    add(new PanelList(*this, holder, "Sw/Sh",   NintendoSwitch::PokemonSwSh::make_panels()));
-    add(new PanelList(*this, holder, "BD/SP",   NintendoSwitch::PokemonBDSP::make_panels()));
-    add(new PanelList(*this, holder, "LA",      NintendoSwitch::PokemonLA::make_panels()));
+    add(new PanelList(*this, holder,
+        "Switch",  "Nintendo Switch",
+        NintendoSwitch::make_panels()
+    ));
+    add(new PanelList(*this, holder,
+        "SwSh", Pokemon::STRING_POKEMON + " Sword and Shield",
+        NintendoSwitch::PokemonSwSh::make_panels()
+    ));
+    add(new PanelList(*this, holder,
+        "BDSP", Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl",
+        NintendoSwitch::PokemonBDSP::make_panels()
+    ));
+    add(new PanelList(*this, holder,
+        "LA", Pokemon::STRING_POKEMON + " Legends Arceus",
+        NintendoSwitch::PokemonLA::make_panels()
+    ));
+    add(new PanelList(*this, holder,
+        "SV", Pokemon::STRING_POKEMON + " Scarlet and Violet",
+        NintendoSwitch::PokemonSV::make_panels()
+    ));
 
     connect(this, &ProgramTabs::currentChanged, this, [&](int index){
         if (index >= 0 && (size_t)index < JSON_TAB_NAMES.size()){
@@ -65,6 +83,7 @@ void ProgramTabs::load_persistent_panel(){
 
 void ProgramTabs::add(PanelList* list){
     addTab(list, QString::fromStdString(list->label()));
+    setTabToolTip(count() - 1, QString::fromStdString(list->description()));
     if (list->items() == 0){
         setTabEnabled((int)m_lists.size(), false);
     }
