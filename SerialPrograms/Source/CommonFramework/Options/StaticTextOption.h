@@ -34,6 +34,9 @@ private:
 class SectionDividerOption : public ConfigOption{
 public:
     SectionDividerOption(std::string label);
+
+    void set_label(std::string label);
+
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 

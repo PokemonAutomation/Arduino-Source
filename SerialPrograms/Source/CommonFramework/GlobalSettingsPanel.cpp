@@ -211,7 +211,7 @@ void GlobalSettings::load_json(const JsonValue& json){
     BatchOption::load_json(json);
 
     //  Remake this to update the color.
-    m_discord_settings = SectionDividerOption(
+    m_discord_settings.set_label(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
         make_text_url(
             ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",

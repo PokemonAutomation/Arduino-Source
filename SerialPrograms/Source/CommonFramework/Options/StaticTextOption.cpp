@@ -49,6 +49,9 @@ ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
 SectionDividerOption::SectionDividerOption(std::string label)
     : m_label(std::move(label))
 {}
+void SectionDividerOption::set_label(std::string label){
+    m_label = std::move(label);
+}
 void SectionDividerOption::load_json(const JsonValue&){
 }
 JsonValue SectionDividerOption::to_json() const{

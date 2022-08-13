@@ -8,6 +8,7 @@
 #define PokemonAutomation_ConfigOption_H
 
 #include <string>
+#include "Common/Cpp/Pimpl.h"
 
 class QWidget;
 
@@ -31,7 +32,19 @@ enum class ConfigOptionState{
 // a json file, so that the program can remember what user has selected.
 class ConfigOption{
 public:
-    virtual ~ConfigOption() = default;
+    ConfigOption(ConfigOption&&) = delete;
+    void operator=(ConfigOption&&) = delete;
+    virtual ~ConfigOption();
+
+public:
+    struct Listener{
+        virtual void value_changed() = 0;
+    };
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
+public:
+    ConfigOption();
 
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
@@ -45,30 +58,40 @@ public:
     //  transient state that the option object may have.
     virtual void reset_state(){};
 
+
+public:
     virtual ConfigWidget* make_ui(QWidget& parent) = 0;
 
 public:
     ConfigOptionState visibility = ConfigOptionState::ENABLED;
+
+protected:
+    void push_update();
+
+private:
+    struct Listeners;
+    Pimpl<Listeners> m_listeners;
 };
 
 
 class ConfigWidget{
 public:
     virtual ~ConfigWidget() = default;
+    ConfigWidget(ConfigOption& m_value);
     ConfigWidget(ConfigOption& m_value, QWidget& widget);
 
     const ConfigOption& option() const{ return m_value; }
     ConfigOption& option(){ return m_value; }
 
-    QWidget& widget(){ return m_widget; }
+    QWidget& widget(){ return *m_widget; }
 
     virtual void restore_defaults() = 0;
     virtual void update_ui();
     virtual void update_visibility();
 
-private:
+protected:
     ConfigOption& m_value;
-    QWidget& m_widget;
+    QWidget* m_widget = nullptr;
 };
 
 
