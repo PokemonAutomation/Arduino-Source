@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_MassRelease_H
 #define PokemonAutomation_PokemonBDSP_MassRelease_H
 
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

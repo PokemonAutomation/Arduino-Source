@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonBDSP_EggAutonomous_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

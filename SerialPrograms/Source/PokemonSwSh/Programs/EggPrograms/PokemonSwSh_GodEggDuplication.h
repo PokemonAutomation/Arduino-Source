@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_GodEggDuplication_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh_EggHelpers.h"

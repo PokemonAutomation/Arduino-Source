@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_SimpleInteger_H
 #define PokemonAutomation_SimpleInteger_H
 
-#include "Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h"
-#include "Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
 
 
-class SimpleInteger : public SingleStatementOption, private SimpleIntegerBaseOption<uint32_t>{
+class SimpleInteger : public SingleStatementOption{
 public:
     static const std::string OPTION_TYPE;
     static const std::string JSON_MIN_VALUE;
@@ -34,12 +33,7 @@ public:
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SimpleIntegerUI;
-};
-
-class SimpleIntegerUI : public SimpleIntegerBaseWidget<uint32_t>{
-public:
-    SimpleIntegerUI(QWidget& parent, SimpleInteger& value);
+    SimpleIntegerOption<uint32_t> m_option;
 };
 
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_SelfBoxTrade_H
 #define PokemonAutomation_PokemonBDSP_SelfBoxTrade_H
 
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 

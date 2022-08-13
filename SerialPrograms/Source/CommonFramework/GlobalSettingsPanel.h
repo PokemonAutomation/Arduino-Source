@@ -8,8 +8,8 @@
 #define PokemonAutomation_GlobalSettingsPanel_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"

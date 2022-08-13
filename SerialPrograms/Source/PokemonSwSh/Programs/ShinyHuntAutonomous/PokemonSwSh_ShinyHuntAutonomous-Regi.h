@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegi_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegi_H
 
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

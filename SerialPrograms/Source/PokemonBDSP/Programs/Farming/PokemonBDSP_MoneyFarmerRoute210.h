@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_MoneyFarmerRoute210_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"

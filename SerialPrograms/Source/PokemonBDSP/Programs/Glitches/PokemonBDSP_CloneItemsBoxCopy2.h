@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
 #define PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
 
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 //#include "NintendoSwitch/Options/TimeExpressionOption.h"

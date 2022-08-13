@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousOverworld_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

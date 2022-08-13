@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_FriendCodeAdder_H
 
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

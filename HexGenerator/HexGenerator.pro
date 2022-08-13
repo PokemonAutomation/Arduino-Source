@@ -41,8 +41,7 @@ SOURCES += \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.cpp \
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.cpp \
+    ../Common/Qt/Options/SimpleIntegerOption.cpp \
     ../Common/Qt/Options/String/StringBaseOption.cpp \
     ../Common/Qt/Options/String/StringBaseWidget.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
@@ -59,7 +58,7 @@ SOURCES += \
     Source/Options/FossilTableOption.cpp \
     Source/Options/MultiHostTableOption.cpp \
     Source/Options/RandomCodeOption.cpp \
-    Source/Options/SimpleIntegerOption.cpp \
+    Source/Options/SimpleInteger.cpp \
     Source/Options/SingleStatementOption.cpp \
     Source/Options/SwitchDateOption.cpp \
     Source/Options/TimeExpressionOption.cpp \
@@ -96,8 +95,7 @@ HEADERS += \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h \
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h \
+    ../Common/Qt/Options/SimpleIntegerOption.h \
     ../Common/Qt/Options/String/StringBaseOption.h \
     ../Common/Qt/Options/String/StringBaseWidget.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
@@ -113,7 +111,7 @@ HEADERS += \
     Source/Options/FossilTableOption.h \
     Source/Options/MultiHostTableOption.h \
     Source/Options/RandomCodeOption.h \
-    Source/Options/SimpleIntegerOption.h \
+    Source/Options/SimpleInteger.h \
     Source/Options/SingleStatementOption.h \
     Source/Options/SwitchDateOption.h \
     Source/Options/TimeExpressionOption.h \

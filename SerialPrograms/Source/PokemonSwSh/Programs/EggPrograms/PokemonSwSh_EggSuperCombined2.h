@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggSuperCombined2_H
 #define PokemonAutomation_PokemonSwSh_EggSuperCombined2_H
 
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"

@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedSwordsOfJustice_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

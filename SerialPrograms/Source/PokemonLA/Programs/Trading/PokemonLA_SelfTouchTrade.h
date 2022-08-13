@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_SelfTouchTrade_H
 #define PokemonAutomation_PokemonLA_SelfTouchTrade_H
 
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"

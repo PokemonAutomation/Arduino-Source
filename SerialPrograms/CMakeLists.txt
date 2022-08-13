@@ -164,10 +164,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FossilTableBaseOption.h
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp
     ../Common/Qt/Options/MultiHostTableBaseOption.h
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.cpp
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.cpp
-    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h
+    ../Common/Qt/Options/SimpleIntegerOption.cpp
+    ../Common/Qt/Options/SimpleIntegerOption.h
     ../Common/Qt/Options/String/StringBaseOption.cpp
     ../Common/Qt/Options/String/StringBaseOption.h
     ../Common/Qt/Options/String/StringBaseWidget.cpp
@@ -410,8 +408,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
-    Source/CommonFramework/Options/SimpleIntegerOption.cpp
-    Source/CommonFramework/Options/SimpleIntegerOption.h
     Source/CommonFramework/Options/StaticTextOption.cpp
     Source/CommonFramework/Options/StaticTextOption.h
     Source/CommonFramework/Options/StringOption.cpp

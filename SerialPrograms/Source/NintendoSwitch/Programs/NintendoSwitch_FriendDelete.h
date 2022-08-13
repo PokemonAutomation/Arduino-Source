@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_FriendDelete_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

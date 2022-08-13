@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_TurboButton_H
 #define PokemonAutomation_NintendoSwitch_TurboButton_H
 
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"

@@ -31,6 +31,10 @@ public:
     );
 
     const std::string& label() const{ return m_label; }
+    Type min_value() const{ return m_min_value; }
+    Type max_value() const{ return m_max_value; }
+    Type default_value() const{ return m_default; }
+
     operator Type() const{ return m_current.load(std::memory_order_relaxed); }
     std::string set(Type x);
 

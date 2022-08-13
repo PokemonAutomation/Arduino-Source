@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_Ordering_H
 
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

@@ -12,7 +12,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Tools/Tools.h"
-#include "SimpleIntegerOption.h"
+#include "SimpleInteger.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
@@ -34,44 +34,41 @@ int SimpleInteger_init = register_option(
 
 SimpleInteger::SimpleInteger(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , SimpleIntegerBaseOption<uint32_t>(
+    , m_option(
         SingleStatementOption::m_label,
+        obj.get_integer_throw(JSON_DEFAULT),
         obj.get_integer_throw(JSON_MIN_VALUE),
-        obj.get_integer_throw(JSON_MAX_VALUE),
-        obj.get_integer_throw(JSON_DEFAULT)
+        obj.get_integer_throw(JSON_MAX_VALUE)
     )
 {
-    m_current = obj.get_integer_throw(JSON_CURRENT);
+    m_option.set((uint32_t)obj.get_integer_throw(JSON_CURRENT));
 }
 std::string SimpleInteger::check_validity() const{
-    return SimpleIntegerBaseOption<uint32_t>::check_validity();
+    return m_option.check_validity();
 }
 void SimpleInteger::restore_defaults(){
-    SimpleIntegerBaseOption<uint32_t>::restore_defaults();
+    m_option.restore_defaults();
 }
 JsonObject SimpleInteger::to_json() const{
     JsonObject root = SingleStatementOption::to_json();
-    root[JSON_MIN_VALUE] = m_min_value;
-    root[JSON_MAX_VALUE] = m_max_value;
-    root[JSON_DEFAULT] = write_default();
-    root[JSON_CURRENT] = write_current();
+    root[JSON_MIN_VALUE] = m_option.min_value();
+    root[JSON_MAX_VALUE] = m_option.max_value();
+    root[JSON_DEFAULT] = m_option.default_value();
+    root[JSON_CURRENT] = (uint32_t)m_option;
     return root;
 }
 std::string SimpleInteger::to_cpp() const{
     std::string str;
     str += m_declaration;
     str += " = ";
-    str += std::to_string(m_current);
+    str += std::to_string(m_option);
     str += ";\r\n";
     return str;
 }
 QWidget* SimpleInteger::make_ui(QWidget& parent){
-    return new SimpleIntegerUI(parent, *this);
+    return &m_option.make_ui(parent)->widget();
 }
 
-SimpleIntegerUI::SimpleIntegerUI(QWidget& parent, SimpleInteger& value)
-    : SimpleIntegerBaseWidget<uint32_t>(parent, value)
-{}
 
 
 
