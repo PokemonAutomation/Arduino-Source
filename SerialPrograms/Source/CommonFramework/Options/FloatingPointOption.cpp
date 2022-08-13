@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <sstream>
 #include <QHBoxLayout>
 #include <QLabel>
