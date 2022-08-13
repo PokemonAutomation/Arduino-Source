@@ -10,6 +10,7 @@
 #include "Program.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class Program_JsonFile : public Program{
@@ -30,4 +31,6 @@ private:
 };
 
 
+
+}
 }

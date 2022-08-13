@@ -12,6 +12,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class SimpleInteger : public SingleStatementOption, private SimpleIntegerBaseOption<uint32_t>{
@@ -42,6 +43,8 @@ public:
 };
 
 
+
+}
 }
 #endif
 

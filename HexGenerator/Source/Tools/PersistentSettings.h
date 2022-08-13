@@ -7,6 +7,7 @@
 #include <QString>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 extern const std::string VERSION;
@@ -36,4 +37,5 @@ public:
 extern PersistentSettings settings;
 
 
+}
 }

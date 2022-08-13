@@ -10,6 +10,7 @@
 #include <QTabWidget>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class MainWindow;
@@ -23,5 +24,6 @@ private:
 };
 
 
+}
 }
 #endif

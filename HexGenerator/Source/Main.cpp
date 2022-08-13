@@ -14,12 +14,15 @@
 //#include <QFile>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 std::unique_ptr<QApplication> application;
 
 }
+}
 
 using namespace PokemonAutomation;
+using namespace HexGenerator;
 
 int main(int argc, char *argv[])
 {

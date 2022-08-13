@@ -16,6 +16,7 @@
 #include "EnumDropdownOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string EnumDropdown::OPTION_TYPE = "EnumDropdown";
@@ -125,6 +126,7 @@ EnumDropdownUI::~EnumDropdownUI(){
 
 
 
+}
 }
 
 

@@ -12,6 +12,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 
@@ -43,6 +44,7 @@ public:
 };
 
 
+}
 }
 #endif
 

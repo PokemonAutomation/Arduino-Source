@@ -11,6 +11,7 @@
 #include "Divider.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string Divider::OPTION_TYPE = "Divider";
@@ -53,4 +54,5 @@ DividerUI::~DividerUI(){
 
 
 
+}
 }

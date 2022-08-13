@@ -10,7 +10,7 @@
 #define PokemonAutomation_StringOption_H
 
 #include "Common/Cpp/SpinLock.h"
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

@@ -13,10 +13,10 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace HexGenerator{
 
 
-class SwitchDate : public SingleStatementOption, public SwitchDateBaseOption{
+class SwitchDate : public SingleStatementOption, public NintendoSwitch::SwitchDateBaseOption{
 public:
     static const std::string OPTION_TYPE;
 
@@ -36,7 +36,7 @@ private:
     friend class SwitchDateUI;
 };
 
-class SwitchDateUI : public SwitchDateBaseWidget{
+class SwitchDateUI : public NintendoSwitch::SwitchDateBaseWidget{
 public:
     SwitchDateUI(QWidget& parent, SwitchDate& value);
 };

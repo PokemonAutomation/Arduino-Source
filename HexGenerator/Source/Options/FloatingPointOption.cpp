@@ -15,6 +15,7 @@
 #include "FloatingPointOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string FloatingPoint::OPTION_TYPE = "FloatingPoint";
@@ -73,5 +74,7 @@ FloatingPointUI::FloatingPointUI(QWidget& parent, FloatingPoint& value)
 {}
 
 
+
+}
 }
 

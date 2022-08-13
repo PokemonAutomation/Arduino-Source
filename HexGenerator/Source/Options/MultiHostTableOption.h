@@ -16,8 +16,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace HexGenerator{
 
 
 class MultiHostTable : public SingleStatementOption{
@@ -38,13 +37,12 @@ public:
 
 private:
     friend class MultiHostTableUI;
-    MultiHostSlotOptionFactory m_factory;
+    NintendoSwitch::PokemonSwSh::MultiHostSlotOptionFactory m_factory;
     EditableTableBaseOption m_table;
 };
 
 
 
-}
 }
 }
 #endif

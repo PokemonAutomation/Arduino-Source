@@ -25,6 +25,7 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -178,5 +179,5 @@ void MainWindow::change_panel(RightPanel& panel){
 
 
 
-
+}
 }

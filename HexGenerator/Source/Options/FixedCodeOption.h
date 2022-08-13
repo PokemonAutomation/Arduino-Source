@@ -10,6 +10,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class FixedCode : public SingleStatementOption{
@@ -52,5 +53,6 @@ private:
 
 
 
+}
 }
 #endif

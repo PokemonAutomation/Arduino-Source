@@ -15,6 +15,7 @@
 #include "SimpleIntegerOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string SimpleInteger::OPTION_TYPE = "SimpleInteger";
@@ -75,6 +76,7 @@ SimpleIntegerUI::SimpleIntegerUI(QWidget& parent, SimpleInteger& value)
 
 
 
+}
 }
 
 

@@ -12,6 +12,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class BooleanCheckBox : public SingleStatementOption, private BooleanCheckBoxBaseOption{
@@ -41,5 +42,7 @@ public:
 };
 
 
+
+}
 }
 #endif

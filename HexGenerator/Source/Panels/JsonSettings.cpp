@@ -14,6 +14,7 @@
 #include "JsonSettings.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 Settings_JsonFile::Settings_JsonFile(std::string category, const std::string& filepath)
@@ -78,6 +79,8 @@ QWidget* Settings_JsonFile::make_options_body(QWidget& parent){
 }
 
 
+
+}
 }
 
 

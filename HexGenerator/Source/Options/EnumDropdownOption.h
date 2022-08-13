@@ -12,6 +12,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class EnumDropdown : public SingleStatementOption{
@@ -51,6 +52,7 @@ private:
 
 
 
+}
 }
 #endif
 

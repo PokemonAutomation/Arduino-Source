@@ -12,6 +12,7 @@
 #include "ConfigItem.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class SingleStatementOption : public ConfigItem{
@@ -30,5 +31,7 @@ protected:
 };
 
 
+
+}
 }
 #endif

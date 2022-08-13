@@ -11,7 +11,7 @@
 
 #include <limits>
 #include <atomic>
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

@@ -15,6 +15,7 @@
 #include <QDate>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 extern const std::string STRING_POKEMON;
@@ -44,5 +45,6 @@ void run_on_main_thread(Lambda&& lambda){
 }
 
 
+}
 }
 #endif

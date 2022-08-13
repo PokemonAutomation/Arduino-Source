@@ -16,6 +16,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string VERSION = "v0.5.18";
@@ -76,5 +77,7 @@ void PersistentSettings::write() const{
 }
 
 
+
+}
 }
 

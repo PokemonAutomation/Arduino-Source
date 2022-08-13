@@ -12,8 +12,10 @@
 #include "ConfigSet.h"
 
 namespace PokemonAutomation{
+    class JsonValue;
+namespace HexGenerator{
 
-class JsonValue;
+
 
 class PanelList : public QListWidget{
 public:
@@ -31,5 +33,6 @@ private:
 };
 
 
+}
 }
 #endif

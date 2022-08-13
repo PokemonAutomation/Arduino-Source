@@ -19,6 +19,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 PanelLists::PanelLists(QWidget& parent, MainWindow& window)
     : QTabWidget(&parent)
@@ -51,5 +52,6 @@ PanelLists::PanelLists(QWidget& parent, MainWindow& window)
 }
 
 
+}
 }
 

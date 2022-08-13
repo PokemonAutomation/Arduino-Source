@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_EditableTableOption_H
 #define PokemonAutomation_EditableTableOption_H
 
+#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseOption.h"
-#include "ConfigOption.h"
 
 class QWidget;
 

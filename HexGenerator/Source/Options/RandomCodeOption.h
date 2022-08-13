@@ -11,6 +11,7 @@
 #include "ConfigItem.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class RandomCode : public ConfigItem{
@@ -66,5 +67,7 @@ private:
 };
 
 
+
+}
 }
 #endif

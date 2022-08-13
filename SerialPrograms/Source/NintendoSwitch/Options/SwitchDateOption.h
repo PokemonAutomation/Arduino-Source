@@ -9,8 +9,8 @@
 #ifndef PokemonAutomation_SwitchDate_H
 #define PokemonAutomation_SwitchDate_H
 
+#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h"
-#include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -11,6 +11,7 @@
 #include "ConfigItem.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string ConfigItem::JSON_TYPE     = "00-Type";
@@ -52,4 +53,5 @@ int register_option(const std::string& name, OptionMaker fp){
 
 
 
+}
 }

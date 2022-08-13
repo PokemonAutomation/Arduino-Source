@@ -16,8 +16,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace HexGenerator{
 
 
 #if 1
@@ -39,7 +38,7 @@ public:
 
 private:
     friend class FossilTableUI;
-    FossilGameOptionFactory m_factory;
+    NintendoSwitch::PokemonSwSh::FossilGameOptionFactory m_factory;
     EditableTableBaseOption m_table;
 };
 #endif
@@ -47,7 +46,6 @@ private:
 
 
 
-}
 }
 }
 #endif

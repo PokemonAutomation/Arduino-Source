@@ -20,6 +20,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 PanelList::PanelList(QWidget& parent, MainWindow& window, const JsonValue& json)
     : QListWidget(&parent)
@@ -115,4 +116,5 @@ void PanelList::row_selected(QListWidgetItem* item){
 }
 
 
+}
 }

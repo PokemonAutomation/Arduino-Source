@@ -8,8 +8,8 @@
 #define PokemonAutomation_OCR_LanguageOCR_H
 
 #include <map>
+#include "Common/Qt/Options/ConfigOption.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace OCR{

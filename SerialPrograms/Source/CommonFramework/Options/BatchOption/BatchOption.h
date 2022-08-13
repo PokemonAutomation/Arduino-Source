@@ -11,7 +11,7 @@
 
 #include <string>
 #include <vector>
-#include "CommonFramework/Options/ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

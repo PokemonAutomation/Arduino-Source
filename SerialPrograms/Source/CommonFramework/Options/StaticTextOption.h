@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_StaticTextOption_H
 #define PokemonAutomation_StaticTextOption_H
 
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

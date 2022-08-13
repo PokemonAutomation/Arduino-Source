@@ -10,6 +10,7 @@
 #include <QWidget>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class MainWindow;
@@ -37,5 +38,6 @@ protected:
 };
 
 
+}
 }
 #endif

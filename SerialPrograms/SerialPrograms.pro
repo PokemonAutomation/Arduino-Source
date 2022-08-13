@@ -107,6 +107,7 @@ SOURCES += \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp \
+    ../Common/Qt/Options/ConfigOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp \
@@ -216,7 +217,6 @@ SOURCES += \
     Source/CommonFramework/Options/BatchOption/BatchOption.cpp \
     Source/CommonFramework/Options/BatchOption/GroupOption.cpp \
     Source/CommonFramework/Options/BooleanCheckBoxOption.cpp \
-    Source/CommonFramework/Options/ConfigOption.cpp \
     Source/CommonFramework/Options/EditableTableOption.cpp \
     Source/CommonFramework/Options/EnumDropdownOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
@@ -816,6 +816,7 @@ HEADERS += \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h \
+    ../Common/Qt/Options/ConfigOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h \
@@ -946,7 +947,6 @@ HEADERS += \
     Source/CommonFramework/Options/BatchOption/GroupOption.h \
     Source/CommonFramework/Options/BatchOption/GroupWidget.h \
     Source/CommonFramework/Options/BooleanCheckBoxOption.h \
-    Source/CommonFramework/Options/ConfigOption.h \
     Source/CommonFramework/Options/EditableTableOption.h \
     Source/CommonFramework/Options/EditableTableWidget.h \
     Source/CommonFramework/Options/EnumDropdownOption.h \

@@ -13,6 +13,7 @@
 #include "RandomCodeOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string RandomCode::OPTION_TYPE               = "RandomCode";
@@ -205,4 +206,5 @@ RandomCodeUI::~RandomCodeUI(){
 
 
 
+}
 }

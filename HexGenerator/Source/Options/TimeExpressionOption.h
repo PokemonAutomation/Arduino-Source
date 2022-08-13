@@ -12,10 +12,10 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace HexGenerator{
 
 
-class TimeExpression : public SingleStatementOption, public TimeExpressionBaseOption<uint32_t>{
+class TimeExpression : public SingleStatementOption, public NintendoSwitch::TimeExpressionBaseOption<uint32_t>{
 public:
     static const std::string OPTION_TYPE;
     static const std::string JSON_MIN_VALUE;
@@ -35,7 +35,7 @@ public:
 };
 
 
-class TimeExpressionUI : public TimeExpressionBaseWidget<uint32_t>{
+class TimeExpressionUI : public NintendoSwitch::TimeExpressionBaseWidget<uint32_t>{
 public:
     TimeExpressionUI(QWidget& parent, TimeExpression& value);
 };

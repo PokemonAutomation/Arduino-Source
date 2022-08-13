@@ -11,6 +11,7 @@
 #include "ConfigItem.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class Divider : public ConfigItem{
@@ -37,5 +38,6 @@ public:
 };
 
 
+}
 }
 #endif

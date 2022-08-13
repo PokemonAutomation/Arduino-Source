@@ -24,8 +24,7 @@
 //using namespace std;
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace HexGenerator{
 
 
 const std::string MultiHostTable::OPTION_TYPE = "MultiHostTable";
@@ -65,7 +64,7 @@ std::string MultiHostTable::to_cpp() const{
     str += m_declaration;
     str += " = {\r\n";
     for (size_t c = 0; c < m_table.size(); c++){
-        const MultiHostSlot& item = static_cast<const MultiHostSlot&>(m_table[c]);
+        const NintendoSwitch::PokemonSwSh::MultiHostSlot& item = static_cast<const NintendoSwitch::PokemonSwSh::MultiHostSlot&>(m_table[c]);
         str += "    {\r\n";
         str += std::string("        .game_slot        = ") + std::to_string(item.game_slot) + ",\r\n";
         str += std::string("        .user_slot        = ") + std::to_string(item.user_slot) + ",\r\n";
@@ -87,7 +86,7 @@ QWidget* MultiHostTable::make_ui(QWidget& parent){
 }
 
 
-}
+
 }
 }
 

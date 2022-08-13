@@ -9,6 +9,7 @@
 #include "BoardList.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::vector<std::pair<std::string, QString>> BOARD_LIST{
@@ -38,4 +39,5 @@ const std::string& BoardList::get_board() const{
 }
 
 
+}
 }

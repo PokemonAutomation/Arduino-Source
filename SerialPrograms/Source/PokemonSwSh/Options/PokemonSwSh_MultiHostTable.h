@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_MultiHostTable_H
 #define PokemonAutomation_PokemonSwSh_MultiHostTable_H
 
+#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseOption.h"
 #include "Common/Qt/Options/MultiHostTableBaseOption.h"
-#include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

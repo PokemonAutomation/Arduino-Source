@@ -10,6 +10,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 const std::string SingleStatementOption::JSON_DECLARATION  = "02-Declaration";
 const std::string SingleStatementOption::JSON_DEFAULT      = "98-Default";
@@ -28,6 +29,7 @@ JsonObject SingleStatementOption::to_json() const{
 
 
 
+}
 }
 
 

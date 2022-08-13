@@ -11,8 +11,9 @@
 #include <QWidget>
 
 namespace PokemonAutomation{
+    class JsonObject;
+namespace HexGenerator{
 
-class JsonObject;
 
 
 class ConfigItem{
@@ -51,5 +52,6 @@ using OptionMaker = std::unique_ptr<ConfigItem> (*)(const JsonObject& obj);
 int register_option(const std::string& name, OptionMaker fp);
 
 
+}
 }
 #endif

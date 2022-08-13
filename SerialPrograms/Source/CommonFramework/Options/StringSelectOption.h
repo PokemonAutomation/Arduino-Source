@@ -12,7 +12,7 @@
 #include <vector>
 #include <map>
 #include <QIcon>
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

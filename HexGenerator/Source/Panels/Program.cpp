@@ -24,6 +24,7 @@ using std::endl;
 #include "Program.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string Program::JSON_PROGRAM_NAME    = "0-ProgramName";
@@ -251,4 +252,5 @@ QWidget* Program::make_ui(MainWindow& parent){
 }
 
 
+}
 }

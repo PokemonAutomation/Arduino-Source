@@ -10,7 +10,7 @@
 #define PokemonAutomation_BooleanCheckBoxOption_H
 
 #include <atomic>
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

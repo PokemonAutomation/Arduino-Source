@@ -14,9 +14,10 @@
 #include "RightPanel.h"
 
 namespace PokemonAutomation{
+    class JsonArray;
+    class JsonObject;
+namespace HexGenerator{
 
-class JsonArray;
-class JsonObject;
 
 
 class Program : public RightPanel{
@@ -62,6 +63,6 @@ private:
 
 
 
-
+}
 }
 #endif

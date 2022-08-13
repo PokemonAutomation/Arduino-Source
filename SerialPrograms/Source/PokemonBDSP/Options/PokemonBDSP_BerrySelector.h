@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BerrySelector_H
 #define PokemonAutomation_PokemonBDSP_BerrySelector_H
 
-#include "CommonFramework/Options/ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{

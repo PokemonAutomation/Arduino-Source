@@ -14,6 +14,7 @@
 #include "Panels/RightPanel.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class ProgramListUI;
@@ -43,5 +44,6 @@ private:
 
 
 
+}
 }
 #endif

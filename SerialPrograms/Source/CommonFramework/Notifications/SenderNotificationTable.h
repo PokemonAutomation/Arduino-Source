@@ -9,8 +9,8 @@
 
 #include <vector>
 #include <map>
+#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/AutoHeightTable.h"
-#include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

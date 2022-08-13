@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_RandomCode_H
 #define PokemonAutomation_RandomCode_H
 
-#include "ConfigOption.h"
+#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

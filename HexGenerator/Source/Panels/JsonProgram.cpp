@@ -14,6 +14,7 @@
 #include "JsonProgram.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 Program_JsonFile::Program_JsonFile(std::string category, const std::string& filepath)
@@ -84,4 +85,5 @@ QWidget* Program_JsonFile::make_options_body(QWidget& parent){
 }
 
 
+}
 }

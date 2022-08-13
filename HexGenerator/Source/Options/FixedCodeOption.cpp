@@ -13,6 +13,7 @@
 #include "FixedCodeOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string FixedCode::OPTION_TYPE = "FixedCode";
@@ -110,4 +111,5 @@ FixedCodeUI::~FixedCodeUI(){
 
 
 
+}
 }

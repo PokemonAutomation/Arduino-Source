@@ -16,7 +16,7 @@
 #include "TimeExpressionOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace HexGenerator{
 
 
 const std::string TimeExpression::OPTION_TYPE = "TimeExpression";
@@ -69,7 +69,7 @@ std::string TimeExpression::to_cpp() const{
     return str;
 }
 QWidget* TimeExpression::make_ui(QWidget& parent){
-    return new TimeExpressionBaseWidget<uint32_t>(parent, *this);
+    return new NintendoSwitch::TimeExpressionBaseWidget<uint32_t>(parent, *this);
 }
 
 TimeExpressionUI::TimeExpressionUI(QWidget& parent, TimeExpression& value)

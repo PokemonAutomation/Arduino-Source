@@ -10,6 +10,7 @@
 #include <QComboBox>
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 class BoardList : public QComboBox{
@@ -20,5 +21,6 @@ private:
 };
 
 
+}
 }
 #endif

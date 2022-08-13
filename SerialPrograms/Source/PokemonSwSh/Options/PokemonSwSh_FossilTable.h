@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_FossilTable_H
 #define PokemonAutomation_PokemonSwSh_FossilTable_H
 
+#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseOption.h"
 #include "Common/Qt/Options/FossilTableBaseOption.h"
-#include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

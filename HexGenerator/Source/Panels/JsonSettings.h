@@ -10,8 +10,9 @@
 #include "ConfigSet.h"
 
 namespace PokemonAutomation{
+    class JsonArray;
+namespace HexGenerator{
 
-class JsonArray;
 
 
 class Settings_JsonFile : public ConfigSet{
@@ -32,4 +33,5 @@ private:
 };
 
 
+}
 }

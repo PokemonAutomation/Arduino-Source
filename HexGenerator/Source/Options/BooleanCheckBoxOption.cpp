@@ -13,6 +13,7 @@
 #include "BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string BooleanCheckBox::OPTION_TYPE = "BooleanCheckBox";
@@ -61,4 +62,5 @@ BooleanCheckBoxUI::BooleanCheckBoxUI(QWidget& parent, BooleanCheckBox& value)
 {}
 
 
+}
 }

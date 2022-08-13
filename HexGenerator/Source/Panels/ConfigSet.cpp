@@ -19,6 +19,7 @@
 #include "ConfigSet.h"
 
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 
 const std::string ConfigSet::JSON_CONFIG_NAME   = "0-ConfigName";
@@ -157,6 +158,7 @@ JsonArray ConfigSet::options_json() const{
 
 
 
+}
 }
 
 

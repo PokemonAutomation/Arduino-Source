@@ -14,7 +14,7 @@
 #include "SwitchDateOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace HexGenerator{
 
 
 const std::string SwitchDate::OPTION_TYPE = "SwitchDate";

@@ -17,8 +17,7 @@
 #include "FossilTableOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace HexGenerator{
 
 
 const std::string FossilTable::OPTION_TYPE      = "FossilTable";
@@ -58,13 +57,13 @@ std::string FossilTable::to_cpp() const{
     str += m_declaration;
     str += " = {\r\n";
     for (size_t c = 0; c < m_table.size(); c++){
-        const FossilGame& item = static_cast<const FossilGame&>(m_table[c]);
+        const NintendoSwitch::PokemonSwSh::FossilGame& item = static_cast<const NintendoSwitch::PokemonSwSh::FossilGame&>(m_table[c]);
         str += "    {";
         str += std::to_string(item.game_slot);
         str += ", ";
         str += std::to_string(item.user_slot);
         str += ", ";
-        str += FossilGame::FOSSIL_LIST[item.fossil];
+        str += NintendoSwitch::PokemonSwSh::FossilGame::FOSSIL_LIST[item.fossil];
         str += ", ";
         str += std::to_string(item.revives);
         str += "},\r\n";
@@ -82,7 +81,7 @@ QWidget* FossilTable::make_ui(QWidget& parent){
 
 
 
-}
+
 }
 }
 

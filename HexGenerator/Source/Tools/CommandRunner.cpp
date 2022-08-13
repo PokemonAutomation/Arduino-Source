@@ -14,6 +14,7 @@
 #if _WIN32
 #include <Windows.h>
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 int build_hexfile(
     const std::string& board,
@@ -75,6 +76,7 @@ int build_hexfile(
     return ret;
 }
 
+}
 }
 #elif __APPLE__
 #include <stdio.h>
@@ -165,6 +167,7 @@ int build_hexfile(
     return ret;
 }
 
+}
 }
 #else
 #error "Platform not supported."
