@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsResetCalyrex_H
 #define PokemonAutomation_PokemonSwSh_StatsResetCalyrex_H
 
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

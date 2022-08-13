@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_TestProgram_H
 #define PokemonAutomation_NintendoSwitch_TestProgram_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"

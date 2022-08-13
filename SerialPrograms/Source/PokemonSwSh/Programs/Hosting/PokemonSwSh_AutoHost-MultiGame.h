@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostMultiGame_H
 #define PokemonAutomation_PokemonSwSh_AutoHostMultiGame_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/RandomCodeOption.h"

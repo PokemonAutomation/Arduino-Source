@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_ClothingBuyer_H
 #define PokemonAutomation_PokemonLA_ClothingBuyer_H
 
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

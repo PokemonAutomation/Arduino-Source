@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 #define PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

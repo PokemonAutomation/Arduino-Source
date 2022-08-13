@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_DoublesLeveling_H
 #define PokemonAutomation_PokemonBDSP_DoublesLeveling_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

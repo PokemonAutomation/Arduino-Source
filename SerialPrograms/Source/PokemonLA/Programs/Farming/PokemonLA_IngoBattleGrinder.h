@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_IngoBattleGrinder_H
 #define PokemonAutomation_PokemonLA_IngoBattleGrinder_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"

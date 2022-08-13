@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
 #define PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"

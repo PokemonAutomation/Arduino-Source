@@ -148,10 +148,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h
+    ../Common/Qt/Options/BooleanCheckBoxOption.cpp
+    ../Common/Qt/Options/BooleanCheckBoxOption.h
     ../Common/Qt/Options/ConfigOption.cpp
     ../Common/Qt/Options/ConfigOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
@@ -391,8 +389,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/BatchOption/GroupOption.cpp
     Source/CommonFramework/Options/BatchOption/GroupOption.h
     Source/CommonFramework/Options/BatchOption/GroupWidget.h
-    Source/CommonFramework/Options/BooleanCheckBoxOption.cpp
-    Source/CommonFramework/Options/BooleanCheckBoxOption.h
     Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h

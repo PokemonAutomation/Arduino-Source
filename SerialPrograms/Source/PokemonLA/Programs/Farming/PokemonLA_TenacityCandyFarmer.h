@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_TenacityCandyFarmer_H
 #define PokemonAutomation_PokemonLA_TenacityCandyFarmer_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

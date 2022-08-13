@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_RaidItemFarmerOHKO_H
 #define PokemonAutomation_PokemonSwSh_RaidItemFarmerOHKO_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 //#include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 

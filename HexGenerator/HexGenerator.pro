@@ -33,8 +33,8 @@ SOURCES += \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp \
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp \
+    ../Common/Qt/Options/BooleanCheckBoxOption.cpp \
+    ../Common/Qt/Options/ConfigOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp \
@@ -50,7 +50,7 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     Source/Main.cpp \
-    Source/Options/BooleanCheckBoxOption.cpp \
+    Source/Options/BooleanCheckBox.cpp \
     Source/Options/ConfigItem.cpp \
     Source/Options/Divider.cpp \
     Source/Options/EnumDropdownOption.cpp \
@@ -88,8 +88,8 @@ HEADERS += \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h \
-    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \
+    ../Common/Qt/Options/BooleanCheckBoxOption.h \
+    ../Common/Qt/Options/ConfigOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h \
@@ -104,7 +104,7 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
-    Source/Options/BooleanCheckBoxOption.h \
+    Source/Options/BooleanCheckBox.h \
     Source/Options/ConfigItem.h \
     Source/Options/Divider.h \
     Source/Options/EnumDropdownOption.h \

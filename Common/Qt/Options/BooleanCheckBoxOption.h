@@ -23,6 +23,8 @@ public:
     );
 
     const std::string& label() const{ return m_label; }
+    bool default_value() const{ return m_default; }
+
     operator bool() const{ return m_current.load(std::memory_order_relaxed); }
     void operator=(bool x);
 

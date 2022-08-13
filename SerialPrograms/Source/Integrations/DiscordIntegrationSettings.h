@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_DiscordIntegrationSettings_H
 #define PokemonAutomation_DiscordIntegrationSettings_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/BatchOption/GroupWidget.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "DiscordIntegrationTable.h"
 

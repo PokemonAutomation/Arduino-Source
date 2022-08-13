@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_CurryHunter_H
 #define PokemonAutomation_PokemonSwSh_CurryHunter_H
 
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"

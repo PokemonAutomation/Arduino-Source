@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_Settings_H
 #define PokemonAutomation_PokemonLA_Settings_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_PokemonLA_MagikarpMoveGrinder_H
 #define PokemonAutomation_PokemonLA_MagikarpMoveGrinder_H
 
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 

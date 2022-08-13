@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_BooleanCheckBox_H
 #define PokemonAutomation_BooleanCheckBox_H
 
-#include "Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h"
-#include "Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h"
+#include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
 
 
-class BooleanCheckBox : public SingleStatementOption, private BooleanCheckBoxBaseOption{
+class BooleanCheckBox : public SingleStatementOption{
 public:
     static const std::string OPTION_TYPE;
 
@@ -31,15 +30,9 @@ public:
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class BooleanCheckBoxUI;
+    BooleanCheckBoxOption m_option;
 };
 
-
-
-class BooleanCheckBoxUI : public BooleanCheckBoxBaseWidget{
-public:
-    BooleanCheckBoxUI(QWidget& parent, BooleanCheckBox& value);
-};
 
 
 

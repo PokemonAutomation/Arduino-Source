@@ -59,7 +59,6 @@ public:
         : QWidget(&parent)
         , ConfigWidget(value, *this)
         , m_value(value)
-        , m_box(new QCheckBox(this))
     {
         QHBoxLayout* layout = new QHBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
