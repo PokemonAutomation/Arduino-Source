@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
