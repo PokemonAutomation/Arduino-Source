@@ -7,7 +7,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "PokemonSV_Panels.h"
 
-//#include "PokemonSV_Settings.h"
+#include "PokemonSV_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,7 +18,7 @@ namespace PokemonSV{
 std::vector<PanelEntry> make_panels(){
     std::vector<PanelEntry> ret;
 
-//    ret.emplace_back("---- Settings ----");
+    ret.emplace_back("---- Settings ----");
 //    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
 //    ret.emplace_back("---- General ----");

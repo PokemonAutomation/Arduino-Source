@@ -561,6 +561,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
+    Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1321,6 +1322,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonSV/PokemonSV_Panels.h \
+    Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

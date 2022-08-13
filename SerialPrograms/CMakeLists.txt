@@ -1124,6 +1124,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
+    Source/PokemonSV/PokemonSV_Panels.cpp
+    Source/PokemonSV/PokemonSV_Panels.h
+    Source/PokemonSV/PokemonSV_Settings.cpp
+    Source/PokemonSV/PokemonSV_Settings.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
@@ -1483,8 +1487,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
-    Source/PokemonSV/PokemonSV_Panels.cpp
-    Source/PokemonSV/PokemonSV_Panels.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/PokemonLA_Tests.cpp
