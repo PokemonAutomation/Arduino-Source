@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 class ProcessPriorityOption : public EnumDropdownOption{
 public:
     ProcessPriorityOption();
-    virtual void set(size_t index) override;
+    virtual bool set(size_t index) override;
     void update_priority_to_option() const;
 };
 

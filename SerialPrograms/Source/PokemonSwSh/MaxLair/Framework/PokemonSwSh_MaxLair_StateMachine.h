@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"

@@ -45,9 +45,12 @@ ProcessorLevelOption::ProcessorLevelOption()
 {
     set_global();
 }
-void ProcessorLevelOption::set(size_t index){
-    EnumDropdownOption::set(index);
+bool ProcessorLevelOption::set(size_t index){
+    if (!EnumDropdownOption::set(index)){
+        return false;
+    }
     set_global(index);
+    return true;
 }
 void ProcessorLevelOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
@@ -85,7 +88,7 @@ void ProcessorLevelOption::set_global(){
 }
 void ProcessorLevelOption::set_global(size_t index){
     const auto& LIST = AVAILABLE_CAPABILITIES();
-    if (index < 0 || (size_t)index >= LIST.size()){
+    if ((size_t)index >= LIST.size()){
         return;
     }
     CPU_CAPABILITY_CURRENT = LIST[index].features;

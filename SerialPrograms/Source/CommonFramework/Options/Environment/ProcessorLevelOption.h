@@ -17,7 +17,7 @@ class ProcessorLevelOption : public EnumDropdownOption{
 public:
     ProcessorLevelOption();
 
-    virtual void set(size_t index) override;
+    virtual bool set(size_t index) override;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

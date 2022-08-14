@@ -231,7 +231,6 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
-    Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelElements.cpp \

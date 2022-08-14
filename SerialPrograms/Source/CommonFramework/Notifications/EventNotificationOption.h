@@ -9,9 +9,8 @@
 
 #include <vector>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
 
 namespace PokemonAutomation{
 

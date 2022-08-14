@@ -26,9 +26,12 @@ ProcessPriorityOption::ProcessPriorityOption()
         PRIORITY_MODES, DEFAULT_PRIORITY_INDEX
     )
 {}
-void ProcessPriorityOption::set(size_t index){
-    EnumDropdownOption::set(index);
+bool ProcessPriorityOption::set(size_t index){
+    if (!EnumDropdownOption::set(index)){
+        return false;
+    }
     set_priority_by_index((int)index);
+    return true;
 }
 void ProcessPriorityOption::update_priority_to_option() const{
     if (PRIORITY_MODES.size() > 1){

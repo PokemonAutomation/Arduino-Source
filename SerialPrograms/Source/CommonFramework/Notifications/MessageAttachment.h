@@ -10,8 +10,8 @@
 #include <atomic>
 #include <memory>
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 

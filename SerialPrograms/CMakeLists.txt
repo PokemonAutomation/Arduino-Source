@@ -423,7 +423,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
-    Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h

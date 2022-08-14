@@ -12,8 +12,8 @@
 #include <thread>
 #include <QNetworkReply>
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
 namespace PokemonAutomation{

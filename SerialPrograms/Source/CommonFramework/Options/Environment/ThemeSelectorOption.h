@@ -17,7 +17,7 @@ class ThemeSelectorOption : public EnumDropdownOption{
 public:
     ThemeSelectorOption();
 
-    virtual void set(size_t index) override;
+    virtual bool set(size_t index) override;
     virtual void load_json(const JsonValue& json) override;
 };
 

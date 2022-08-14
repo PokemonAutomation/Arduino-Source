@@ -37,9 +37,13 @@ EnumDropdownOption::EnumDropdownOption(
     }
 }
 
-void EnumDropdownOption::set(size_t index){
+bool EnumDropdownOption::set(size_t index){
+    if (index >= m_case_list.size()){
+        return false;
+    }
     m_current.store(index, std::memory_order_relaxed);
     push_update();
+    return true;
 }
 
 void EnumDropdownOption::load_json(const JsonValue& json){

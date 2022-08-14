@@ -57,11 +57,12 @@ ThemeSelectorOption::ThemeSelectorOption()
     )
 {}
 
-void ThemeSelectorOption::set(size_t index){
-    EnumDropdownOption::set(index);
-    if (index < case_list().size()){
-        set_theme(index);
+bool ThemeSelectorOption::set(size_t index){
+    if (!EnumDropdownOption::set(index)){
+        return false;
     }
+    set_theme(index);
+    return true;
 }
 void ThemeSelectorOption::load_json(const JsonValue& json){
     EnumDropdownOption::load_json(json);

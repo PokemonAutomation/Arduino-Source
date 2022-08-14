@@ -52,7 +52,7 @@ public:
     const std::string& current_case() const { return m_case_list[m_current].name; }
 
     operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
-    virtual void set(size_t index);
+    virtual bool set(size_t index); //  Returns false if index is out of range.
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
