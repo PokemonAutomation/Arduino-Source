@@ -10,10 +10,10 @@
 
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_WeatherAndTime.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

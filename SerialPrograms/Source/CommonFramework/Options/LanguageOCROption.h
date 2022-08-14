@@ -4,9 +4,10 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_LanguageOCR_H
-#define PokemonAutomation_OCR_LanguageOCR_H
+#ifndef PokemonAutomation_Options_LanguageOCROption_H
+#define PokemonAutomation_Options_LanguageOCROption_H
 
+#include <atomic>
 #include <map>
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Language.h"
@@ -21,7 +22,8 @@ public:
 
 //    explicit operator bool() const{ return m_case_list[m_current].first != Language::None && m_case_list[m_current].second; }
 //    operator size_t() const{ return m_current; }
-    operator Language() const{ return m_case_list[m_current].first; }
+    operator Language() const{ return m_case_list[m_current.load(std::memory_order_relaxed)].first; }
+    void set(Language language);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -34,12 +36,12 @@ public:
 private:
     friend class LanguageOCRWidget;
 
-    std::string m_label;
-
+    const std::string m_label;
     std::vector<std::pair<Language, bool>> m_case_list;
     std::map<Language, size_t> m_case_map;
-    size_t m_default;
-    size_t m_current;
+    const size_t m_default;
+
+    std::atomic<size_t> m_current;
 };
 
 

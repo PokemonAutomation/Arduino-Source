@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_OutbreakFinder_H
 #define PokemonAutomation_PokemonLA_OutbreakFinder_H
 
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"

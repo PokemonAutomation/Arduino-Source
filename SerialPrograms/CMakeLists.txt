@@ -385,8 +385,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h
     Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h
-    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp
-    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonFramework/OCR/OCR_NumberReader.cpp
@@ -421,6 +419,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
+    Source/CommonFramework/Options/LanguageOCROption.cpp
+    Source/CommonFramework/Options/LanguageOCROption.h
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h

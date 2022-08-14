@@ -9,11 +9,11 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"

@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonLA_RamanasIslandCombee_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

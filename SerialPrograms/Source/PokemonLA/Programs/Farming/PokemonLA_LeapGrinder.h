@@ -8,13 +8,13 @@
 #define PokemonAutomation_PokemonLA_LeapGrinder_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 
 namespace PokemonAutomation{

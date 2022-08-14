@@ -214,7 +214,6 @@ SOURCES += \
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp \
-    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_NumberReader.cpp \
     Source/CommonFramework/OCR/OCR_RawOCR.cpp \
@@ -230,7 +229,9 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
+    Source/CommonFramework/Options/LanguageOCROption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelElements.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
@@ -940,7 +941,6 @@ HEADERS += \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h \
-    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_NumberReader.h \
     Source/CommonFramework/OCR/OCR_RawOCR.h \
@@ -958,8 +958,10 @@ HEADERS += \
     Source/CommonFramework/Options/EditableTableWidget.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
+    Source/CommonFramework/Options/LanguageOCROption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelElements.h \
     Source/CommonFramework/Panels/PanelInstance.h \

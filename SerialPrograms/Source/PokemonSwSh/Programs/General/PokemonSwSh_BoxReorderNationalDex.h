@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

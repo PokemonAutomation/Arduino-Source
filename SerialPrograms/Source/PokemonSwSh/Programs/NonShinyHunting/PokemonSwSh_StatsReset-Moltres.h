@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsResetMoltres_H
 #define PokemonAutomation_PokemonSwSh_StatsResetMoltres_H
 
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"

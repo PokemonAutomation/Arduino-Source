@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "PokemonLA/Options/PokemonLA_TradeCountTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
