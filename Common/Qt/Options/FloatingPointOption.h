@@ -28,6 +28,7 @@ public:
     const std::string& label() const{ return m_label; }
     double min_value() const{ return m_min_value; }
     double max_value() const{ return m_max_value; }
+    double default_value() const{ return m_default; }
 
     operator double() const{ return m_current.load(std::memory_order_relaxed); }
     std::string set(double x);

@@ -156,10 +156,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h
+    ../Common/Qt/Options/FloatingPointOption.cpp
+    ../Common/Qt/Options/FloatingPointOption.h
     ../Common/Qt/Options/FossilTableBaseOption.cpp
     ../Common/Qt/Options/FossilTableBaseOption.h
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp
@@ -402,8 +400,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
     Source/CommonFramework/Options/FixedCodeOption.cpp
     Source/CommonFramework/Options/FixedCodeOption.h
-    Source/CommonFramework/Options/FloatingPointOption.cpp
-    Source/CommonFramework/Options/FloatingPointOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp

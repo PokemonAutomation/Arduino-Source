@@ -109,8 +109,7 @@ SOURCES += \
     ../Common/Qt/Options/ConfigOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp \
+    ../Common/Qt/Options/FloatingPointOption.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
     ../Common/Qt/Options/SimpleIntegerOption.cpp \
@@ -220,7 +219,6 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/FixedCodeOption.cpp \
-    Source/CommonFramework/Options/FloatingPointOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/StaticTextOption.cpp \
@@ -814,8 +812,7 @@ HEADERS += \
     ../Common/Qt/Options/ConfigOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h \
+    ../Common/Qt/Options/FloatingPointOption.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
@@ -947,7 +944,6 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/FixedCodeOption.h \
-    Source/CommonFramework/Options/FloatingPointOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StaticTextOption.h \

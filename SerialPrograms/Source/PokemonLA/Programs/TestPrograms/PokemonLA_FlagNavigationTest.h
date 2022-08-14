@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_FlagNavigationTest_H
 
 #include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/FloatingPointOption.h"
+#include "Common/Qt/Options/FloatingPointOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 //#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 

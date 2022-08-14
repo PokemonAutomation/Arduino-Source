@@ -37,8 +37,7 @@ SOURCES += \
     ../Common/Qt/Options/ConfigOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp \
+    ../Common/Qt/Options/FloatingPointOption.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
     ../Common/Qt/Options/SimpleIntegerOption.cpp \
@@ -54,7 +53,7 @@ SOURCES += \
     Source/Options/Divider.cpp \
     Source/Options/EnumDropdownOption.cpp \
     Source/Options/FixedCodeOption.cpp \
-    Source/Options/FloatingPointOption.cpp \
+    Source/Options/FloatingPoint.cpp \
     Source/Options/FossilTableOption.cpp \
     Source/Options/MultiHostTableOption.cpp \
     Source/Options/RandomCodeOption.cpp \
@@ -91,8 +90,7 @@ HEADERS += \
     ../Common/Qt/Options/ConfigOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h \
-    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h \
+    ../Common/Qt/Options/FloatingPointOption.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
@@ -107,7 +105,7 @@ HEADERS += \
     Source/Options/Divider.h \
     Source/Options/EnumDropdownOption.h \
     Source/Options/FixedCodeOption.h \
-    Source/Options/FloatingPointOption.h \
+    Source/Options/FloatingPoint.h \
     Source/Options/FossilTableOption.h \
     Source/Options/MultiHostTableOption.h \
     Source/Options/RandomCodeOption.h \

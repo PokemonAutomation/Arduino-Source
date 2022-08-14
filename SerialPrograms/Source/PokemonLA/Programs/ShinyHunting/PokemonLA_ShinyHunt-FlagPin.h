@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
 
 #include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"

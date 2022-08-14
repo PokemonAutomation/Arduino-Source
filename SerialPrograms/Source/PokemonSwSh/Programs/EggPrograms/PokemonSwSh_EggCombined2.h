@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_EggCombined2_H
 
 #include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Qt/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-#include "CommonFramework/Options/FloatingPointOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
