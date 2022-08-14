@@ -82,14 +82,12 @@ bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
         Color(0, 0, 0), 0.9,
-        Color(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.1
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
         Color(0, 0, 0), 0.1,
-        Color(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.9
     );
     if (!fight){
 //        cout << "Failed: m_text_fight" << endl;
@@ -103,14 +101,12 @@ bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
         Color(0, 0, 0), 0.1,
-        Color(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.9
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
         Color(0, 0, 0), 0.9,
-        Color(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.1
     );
     if (!fight){
 //        cout << "Failed: m_text_pokemon" << endl;
@@ -124,14 +120,12 @@ bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_bag),
         Color(0, 0, 0), 0.1,
-        Color(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.9
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_bag),
         Color(0, 0, 0), 0.9,
-        Color(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.1
     );
     if (!fight){
 //        cout << "Failed: m_text_bag" << endl;
@@ -145,14 +139,12 @@ bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
         Color(0, 0, 0), 0.1,
-        Color(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.9
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
         Color(0, 0, 0), 0.9,
-        Color(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        Color(255, 255, 255), 0.1
     );
     if (!fight){
 //        cout << "Failed: m_text_run" << endl;
