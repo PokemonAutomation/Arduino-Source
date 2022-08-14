@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"

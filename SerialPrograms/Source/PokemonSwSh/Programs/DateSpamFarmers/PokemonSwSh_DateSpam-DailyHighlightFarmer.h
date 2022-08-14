@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DailyHighlightFarmer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

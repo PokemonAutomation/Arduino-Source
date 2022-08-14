@@ -360,9 +360,10 @@ SOURCES += \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp \
-    Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
+    Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
+    Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
@@ -645,7 +646,6 @@ SOURCES += \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOverride.cpp \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterWidget.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
-    Source/PokemonSwSh/Options/PokemonSwSh_Catchability.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.cpp \
@@ -1115,10 +1115,11 @@ HEADERS += \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h \
-    Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
-    Source/NintendoSwitch/Options/StartInGripMenuOption.h \
+    Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h \
+    Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/TestPathMakerTable.h \
+    Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \

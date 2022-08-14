@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_GoHomeWhenDone_H
-#define PokemonAutomation_GoHomeWhenDone_H
+#ifndef PokemonAutomation_NintendoSwitch_GoHomeWhenDone_H
+#define PokemonAutomation_NintendoSwitch_GoHomeWhenDone_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "ClientSource/Connection/BotBase.h"

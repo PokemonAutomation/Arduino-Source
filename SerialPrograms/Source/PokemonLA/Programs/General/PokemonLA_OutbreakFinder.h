@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"

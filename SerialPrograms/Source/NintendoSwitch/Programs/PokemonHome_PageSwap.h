@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonHome_PageSwap_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

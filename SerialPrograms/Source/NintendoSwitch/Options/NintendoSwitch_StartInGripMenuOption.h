@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_StartInGripMenu_H
-#define PokemonAutomation_StartInGripMenu_H
+#ifndef PokemonAutomation_NintendoSwitch_StartInGripMenu_H
+#define PokemonAutomation_NintendoSwitch_StartInGripMenu_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 

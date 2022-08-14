@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"

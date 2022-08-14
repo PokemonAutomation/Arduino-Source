@@ -5,7 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "GoHomeWhenDoneOption.h"
+#include "NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

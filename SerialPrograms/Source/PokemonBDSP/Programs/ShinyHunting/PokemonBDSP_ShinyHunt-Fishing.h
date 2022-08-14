@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"

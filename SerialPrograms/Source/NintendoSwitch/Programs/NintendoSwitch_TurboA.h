@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_TurboA_H
 #define PokemonAutomation_NintendoSwitch_TurboA_H
 
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

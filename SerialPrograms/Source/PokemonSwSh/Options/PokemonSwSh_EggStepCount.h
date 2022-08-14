@@ -7,13 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggStepCount_H
 #define PokemonAutomation_PokemonSwSh_EggStepCount_H
 
-#include <stdint.h>
-#include <vector>
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 
 extern const std::vector<uint16_t> STEP_COUNTS;
+
 
 class EggStepCountOption : public ConfigOption{
 public:
@@ -21,21 +20,15 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    operator uint16_t() const{ return STEP_COUNTS[m_current]; }
-    uint16_t value() const{ return STEP_COUNTS[m_current]; }
+    operator uint16_t() const{ return STEP_COUNTS[m_option]; }
 
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-
 private:
-    friend class EggStepCountWidget;
-    std::string m_label;
-    const size_t m_default;
-    size_t m_current;
+    EnumDropdownOption m_option;
 };
-
 
 
 

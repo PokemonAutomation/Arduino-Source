@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonBDSP_StarterReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 

@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

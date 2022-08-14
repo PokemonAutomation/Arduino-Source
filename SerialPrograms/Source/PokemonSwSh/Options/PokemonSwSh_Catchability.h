@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_Catchability_H
 #define PokemonAutomation_PokemonSwSh_Catchability_H
 
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{
@@ -15,25 +16,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CatchabilitySelectorOption : public ConfigOption{
+class CatchabilitySelectorOption : public EnumDropdownOption{
 public:
-    CatchabilitySelectorOption();
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
+    CatchabilitySelectorOption()
+        : EnumDropdownOption(
+            "<b>" + Pokemon::STRING_POKEMON + " Catchability</b>",
+            {
+                "Always Catchable",
+                "Maybe Uncatchable",
+                "Never Catchable",
+            },
+            0
+        )
+    {}
 
-    operator Catchability() const{ return m_current; }
-    Catchability value() const{ return m_current; }
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
-
-private:
-    friend class CatchabilitySelectorWidget;
-    std::string m_label;
-    const Catchability m_default;
-    Catchability m_current;
+    operator Catchability() const{ return (Catchability)(size_t)*this; }
 };
 
 

@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{ 
 namespace NintendoSwitch{

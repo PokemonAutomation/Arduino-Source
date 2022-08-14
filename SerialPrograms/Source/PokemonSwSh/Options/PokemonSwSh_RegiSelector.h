@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiSelector_H
 #define PokemonAutomation_PokemonSwSh_RegiSelector_H
 
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,8 +28,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    operator RegiGolem() const{ return m_current; }
-    RegiGolem value() const{ return m_current; }
+    operator RegiGolem() const{ return (RegiGolem)(size_t)m_option; }
 
     virtual void restore_defaults() override;
 
@@ -37,10 +36,7 @@ public:
 
 
 private:
-    friend class RegiSelectorWidget;
-    std::string m_label;
-    const RegiGolem m_default;
-    RegiGolem m_current;
+    EnumDropdownOption m_option;
 };
 
 

@@ -54,6 +54,8 @@ public:
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;
+
+    SpinLock m_lock;
     WallClock m_last_touch;
 };
 

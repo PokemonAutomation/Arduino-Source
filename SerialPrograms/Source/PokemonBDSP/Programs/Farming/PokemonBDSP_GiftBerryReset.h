@@ -10,7 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonBDSP/Options/PokemonBDSP_BerrySelector.h"
 
 namespace PokemonAutomation{

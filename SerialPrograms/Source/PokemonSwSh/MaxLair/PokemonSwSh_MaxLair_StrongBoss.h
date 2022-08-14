@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "Options/PokemonSwSh_MaxLair_Options.h"

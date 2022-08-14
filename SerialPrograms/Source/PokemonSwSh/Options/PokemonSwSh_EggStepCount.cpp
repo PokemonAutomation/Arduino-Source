@@ -4,13 +4,8 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QComboBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "PokemonSwSh_EggStepCount.h"
 
 namespace PokemonAutomation{
@@ -31,74 +26,37 @@ const std::vector<uint16_t> STEP_COUNTS{
 
 
 
-class EggStepCountWidget : public QWidget, public ConfigWidget{
-public:
-    EggStepCountWidget(QWidget& parent, EggStepCountOption& value);
-
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
-
-
-private:
-    EggStepCountOption& m_value;
-    QComboBox* m_box;
-};
-
-
 EggStepCountOption::EggStepCountOption()
-    : m_label("<b>Step Count:</b><br>Lookup the # of steps on Serebii.")
-    , m_default(3)
-    , m_current(3)
+    : m_option(
+        "<b>Step Count:</b><br>Lookup the # of steps on Serebii.",
+        {
+            tostr_u_commas(STEP_COUNTS[0]),
+            tostr_u_commas(STEP_COUNTS[1]),
+            tostr_u_commas(STEP_COUNTS[2]),
+            tostr_u_commas(STEP_COUNTS[3]),
+            tostr_u_commas(STEP_COUNTS[4]),
+            tostr_u_commas(STEP_COUNTS[5]),
+            tostr_u_commas(STEP_COUNTS[6]),
+            tostr_u_commas(STEP_COUNTS[7]),
+        },
+        3
+    )
 {}
 void EggStepCountOption::load_json(const JsonValue& json){
-    json.read_integer(m_current, 0, STEP_COUNTS.size() - 1);
+    m_option.load_json(json);
 }
 JsonValue EggStepCountOption::to_json() const{
-    return (int)m_current;
+    return m_option.to_json();
 }
 
-
 void EggStepCountOption::restore_defaults(){
-    m_current = m_default;
+    m_option.restore_defaults();
 }
 
 ConfigWidget* EggStepCountOption::make_ui(QWidget& parent){
-    return new EggStepCountWidget(parent, *this);
+    return m_option.make_ui(parent);
 }
 
-
-EggStepCountWidget::EggStepCountWidget(QWidget& parent, EggStepCountOption& value)
-    : QWidget(&parent)
-    , ConfigWidget(value, *this)
-    , m_value(value)
-{
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(m_value.m_label), this);
-    text->setWordWrap(true);
-    layout->addWidget(text, 1);
-    m_box = new NoWheelComboBox(&parent);
-    layout->addWidget(m_box);
-    for (uint16_t count : STEP_COUNTS){
-        m_box->addItem(QString::fromStdString(PokemonAutomation::tostr_u_commas(count)));
-    }
-    m_box->setCurrentIndex((int)m_value.m_current);
-    layout->addWidget(m_box, 1);
-
-    connect(
-        m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this, [=](int index){
-            m_value.m_current = index;
-        }
-    );
-}
-void EggStepCountWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void EggStepCountWidget::update_ui(){
-    m_box->setCurrentIndex((int)m_value.m_current);
-}
 
 
 

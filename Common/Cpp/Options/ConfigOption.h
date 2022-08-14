@@ -32,16 +32,16 @@ enum class ConfigOptionState{
 // a json file, so that the program can remember what user has selected.
 class ConfigOption{
 public:
-    ConfigOption(ConfigOption&&) = delete;
-    void operator=(ConfigOption&&) = delete;
-    virtual ~ConfigOption();
-
-public:
     struct Listener{
         virtual void value_changed() = 0;
     };
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
+
+public:
+    ConfigOption(ConfigOption&&) = delete;
+    void operator=(ConfigOption&&) = delete;
+    virtual ~ConfigOption();
 
 public:
     ConfigOption();

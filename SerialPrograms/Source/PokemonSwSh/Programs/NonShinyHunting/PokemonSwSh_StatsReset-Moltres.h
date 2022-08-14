@@ -11,8 +11,8 @@
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 

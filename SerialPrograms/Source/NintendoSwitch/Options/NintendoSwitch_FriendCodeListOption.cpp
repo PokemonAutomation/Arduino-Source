@@ -4,33 +4,12 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QTextEdit>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "NintendoSwitch_FriendCodeListOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-
-class FriendCodeListWidget : public QWidget, public ConfigWidget{
-public:
-    FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value);
-
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
-
-private:
-    class Box;
-
-    FriendCodeListOption& m_value;
-    Box* m_box;
-};
-
 
 
 
@@ -45,27 +24,34 @@ void FriendCodeListOption::load_json(const JsonValue& json){
     if (list == nullptr){
         return;
     }
-    m_lines.clear();
+    std::vector<std::string> lines;
     for (const auto& line : *list){
         const std::string* str = line.get_string();
         if (str == nullptr || str->empty()){
             continue;
         }
-        m_lines.emplace_back(*str);
+        lines.emplace_back(*str);
     }
+    {
+        SpinLockGuard lg(m_lock);
+        m_lines = std::move(lines);
+    }
+    push_update();
 }
 JsonValue FriendCodeListOption::to_json() const{
     JsonArray list;
+    SpinLockGuard lg(m_lock);
     for (const std::string& line : m_lines){
         list.push_back(line);
     }
     return list;
 }
 void FriendCodeListOption::restore_defaults(){
-    m_lines = m_default;
-}
-ConfigWidget* FriendCodeListOption::make_ui(QWidget& parent){
-    return new FriendCodeListWidget(parent, *this);
+    {
+        SpinLockGuard lg(m_lock);
+        m_lines = m_default;
+    }
+    push_update();
 }
 
 
@@ -79,7 +65,32 @@ std::vector<uint8_t> FriendCodeListOption::parse(const std::string& line){
     }
     return code;
 }
+void FriendCodeListOption::set(const std::string& text){
+    std::vector<std::string> lines;
+    std::string line;
+    for (char ch : text){
+        if (ch == '\n'){
+            lines.emplace_back(std::move(line));
+            line.clear();
+            continue;
+        }
+        line += ch;
+    }
+    if (line.size() > 0){
+        lines.emplace_back(std::move(line));
+    }
+    {
+        SpinLockGuard lg(m_lock);
+        m_lines = std::move(lines);
+    }
+    push_update();
+}
+std::vector<std::string> FriendCodeListOption::lines() const{
+    SpinLockGuard lg(m_lock);
+    return m_lines;
+}
 std::vector<std::string> FriendCodeListOption::list() const{
+    SpinLockGuard lg(m_lock);
     std::vector<std::string> ret;
     for (const auto& item : m_lines){
         std::vector<uint8_t> line = parse(item);
@@ -99,77 +110,6 @@ std::vector<std::string> FriendCodeListOption::list() const{
 }
 
 
-
-class FriendCodeListWidget::Box : public QTextEdit{
-public:
-    Box(FriendCodeListWidget& parent)
-        : QTextEdit(&parent)
-        , m_parent(parent)
-    {
-        this->setAcceptRichText(false);
-        this->setFocusPolicy(Qt::StrongFocus);
-    }
-
-    void redraw(){
-        this->clear();
-        for (const std::string& line : m_parent.m_value.m_lines){
-            if (FriendCodeListOption::parse(line).size() == 12){
-                this->append(QString::fromStdString(line));
-            }else{
-//                this->append("<font color=\"red\">" + line + "</font>");
-            }
-        }
-    }
-    void update_backing(){
-        m_parent.m_value.m_lines.clear();
-        std::string body = this->toPlainText().toStdString();
-        std::string line;
-        for (char ch : body){
-            if (ch == '\n'){
-                m_parent.m_value.m_lines.emplace_back(std::move(line));
-                line.clear();
-                continue;
-            }
-            line += ch;
-        }
-        if (line.size() > 0){
-            m_parent.m_value.m_lines.emplace_back(std::move(line));
-        }
-    }
-
-    virtual void focusOutEvent(QFocusEvent* event) override{
-        QTextEdit::focusOutEvent(event);
-//        cout << "focusOutEvent()" << endl;
-        update_backing();
-        redraw();
-    }
-
-private:
-    FriendCodeListWidget& m_parent;
-};
-
-FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value)
-    : QWidget(&parent)
-    , ConfigWidget(value, *this)
-    , m_value(value)
-{
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    QLabel* label = new QLabel(QString::fromStdString(value.m_label), this);
-    label->setWordWrap(true);
-    layout->addWidget(label);
-    m_box = new Box(*this);
-    layout->addWidget(m_box);
-
-    m_box->redraw();
-}
-
-void FriendCodeListWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void FriendCodeListWidget::update_ui(){
-    m_box->redraw();
-}
 
 
 
