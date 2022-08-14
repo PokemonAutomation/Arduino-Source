@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatcher_H
 #define PokemonAutomation_PokemonBDSP_EggHatcher_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"

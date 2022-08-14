@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "StringSelectOption.h"
 
 #include <iostream>

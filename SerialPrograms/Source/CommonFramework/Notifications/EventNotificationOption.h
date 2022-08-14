@@ -9,7 +9,7 @@
 
 #include <vector>
 #include "Common/Cpp/Time.h"
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 

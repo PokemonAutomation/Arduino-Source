@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedIoATrade_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedIoATrade_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

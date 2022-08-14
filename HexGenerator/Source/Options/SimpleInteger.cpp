@@ -11,6 +11,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Tools/Tools.h"
 #include "SimpleInteger.h"
 

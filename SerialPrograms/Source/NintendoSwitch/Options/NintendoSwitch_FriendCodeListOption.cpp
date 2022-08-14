@@ -9,6 +9,7 @@
 #include <QTextEdit>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "NintendoSwitch_FriendCodeListOption.h"
 
 namespace PokemonAutomation{

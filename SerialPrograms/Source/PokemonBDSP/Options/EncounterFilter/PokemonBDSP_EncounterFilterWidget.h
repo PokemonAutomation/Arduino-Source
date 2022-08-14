@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_EncounterFilterWidget_H
 
 #include <QComboBox>
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "PokemonBDSP_EncounterFilterOption.h"
 
 namespace PokemonAutomation{

@@ -7,11 +7,12 @@
 #ifndef PokemonAutomation_GlobalSettingsPanel_H
 #define PokemonAutomation_GlobalSettingsPanel_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "Common/Qt/Options/FloatingPointOption.h"
-#include "Common/Qt/Options/StringOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"

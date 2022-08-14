@@ -8,7 +8,7 @@
 #define PokemonAutomation_EventNotificationsTable_H
 
 #include <map>
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "EventNotificationOption.h"
 

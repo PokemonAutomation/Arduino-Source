@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_LeapGrinder_H
 #define PokemonAutomation_PokemonLA_LeapGrinder_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"

@@ -2,15 +2,13 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This option is thread-safe.
- *
  */
 
-#ifndef PokemonAutomation_FixedCode_H
-#define PokemonAutomation_FixedCode_H
+#ifndef PokemonAutomation_Options_FixedCodeOption_H
+#define PokemonAutomation_Options_FixedCodeOption_H
 
 #include "Common/Cpp/SpinLock.h"
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

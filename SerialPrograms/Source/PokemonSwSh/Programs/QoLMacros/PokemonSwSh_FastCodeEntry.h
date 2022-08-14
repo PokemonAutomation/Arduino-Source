@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_FastCodeEntry_H
 #define PokemonAutomation_PokemonSwSh_FastCodeEntry_H
 
-#include "Common/Qt/Options/FixedCodeOption.h"
+#include "Common/Cpp/Options/FixedCodeOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

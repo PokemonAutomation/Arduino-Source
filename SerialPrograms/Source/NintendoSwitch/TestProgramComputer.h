@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Computer_TestProgram_H
 #define PokemonAutomation_Computer_TestProgram_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedStrongSpawn_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedStrongSpawn_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 //#include "CommonFramework/Options/SectionDivider.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"

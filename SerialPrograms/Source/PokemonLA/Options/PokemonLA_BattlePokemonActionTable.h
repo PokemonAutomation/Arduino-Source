@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 #define PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 

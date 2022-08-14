@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiSelector_H
 #define PokemonAutomation_PokemonSwSh_RegiSelector_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

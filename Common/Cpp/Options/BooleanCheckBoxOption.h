@@ -2,15 +2,13 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This option is thread-safe.
- *
  */
 
-#ifndef PokemonAutomation_BooleanCheckBoxOption_H
-#define PokemonAutomation_BooleanCheckBoxOption_H
+#ifndef PokemonAutomation_Options_BooleanCheckBoxOption_H
+#define PokemonAutomation_Options_BooleanCheckBoxOption_H
 
 #include <atomic>
-#include "Common/Qt/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 

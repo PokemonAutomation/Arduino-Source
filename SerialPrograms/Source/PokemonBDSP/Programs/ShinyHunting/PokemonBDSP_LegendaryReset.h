@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_LegendaryReset_H
 #define PokemonAutomation_PokemonBDSP_LegendaryReset_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

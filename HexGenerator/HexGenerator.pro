@@ -26,6 +26,10 @@ SOURCES += \
     ../Common/Cpp/Json/JsonObject.cpp \
     ../Common/Cpp/Json/JsonTools.cpp \
     ../Common/Cpp/Json/JsonValue.cpp \
+    ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
+    ../Common/Cpp/Options/ConfigOption.cpp \
+    ../Common/Cpp/Options/FloatingPointOption.cpp \
+    ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
@@ -33,14 +37,14 @@ SOURCES += \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBoxOption.cpp \
-    ../Common/Qt/Options/ConfigOption.cpp \
+    ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
+    ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
-    ../Common/Qt/Options/FloatingPointOption.cpp \
+    ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
-    ../Common/Qt/Options/SimpleIntegerOption.cpp \
+    ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
@@ -51,11 +55,9 @@ SOURCES += \
     Source/Options/Divider.cpp \
     Source/Options/EnumDropdownOption.cpp \
     Source/Options/FixedCodeOption.cpp \
-    Source/Options/FloatingPoint.cpp \
     Source/Options/FossilTableOption.cpp \
     Source/Options/MultiHostTableOption.cpp \
     Source/Options/RandomCodeOption.cpp \
-    Source/Options/SimpleInteger.cpp \
     Source/Options/SingleStatementOption.cpp \
     Source/Options/SwitchDateOption.cpp \
     Source/Options/TimeExpressionOption.cpp \
@@ -77,6 +79,10 @@ HEADERS += \
     ../Common/Cpp/Json/JsonObject.h \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
+    ../Common/Cpp/Options/BooleanCheckBoxOption.h \
+    ../Common/Cpp/Options/ConfigOption.h \
+    ../Common/Cpp/Options/FloatingPointOption.h \
+    ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
@@ -84,14 +90,16 @@ HEADERS += \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
-    ../Common/Qt/Options/BooleanCheckBoxOption.h \
-    ../Common/Qt/Options/ConfigOption.h \
+    ../Common/Qt/Options/BooleanCheckBoxWidget.h \
+    ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/FloatingPointOption.h \
+    ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
+    ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \

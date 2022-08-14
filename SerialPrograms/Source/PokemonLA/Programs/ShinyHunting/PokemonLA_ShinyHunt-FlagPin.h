@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
 #define PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "Common/Qt/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

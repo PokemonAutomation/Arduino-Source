@@ -2,16 +2,14 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This option is thread-safe.
- *
  */
 
-#ifndef PokemonAutomation_FloatingPoint_H
-#define PokemonAutomation_FloatingPoint_H
+#ifndef PokemonAutomation_Options_FloatingPointOption_H
+#define PokemonAutomation_Options_FloatingPointOption_H
 
 #include <limits>
 #include <atomic>
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

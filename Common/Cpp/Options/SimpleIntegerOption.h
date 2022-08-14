@@ -6,12 +6,12 @@
  *
  */
 
-#ifndef PokemonAutomation_SimpleIntegerOption_H
-#define PokemonAutomation_SimpleIntegerOption_H
+#ifndef PokemonAutomation_Options_SimpleIntegerOption_H
+#define PokemonAutomation_Options_SimpleIntegerOption_H
 
 #include <limits>
 #include <atomic>
-#include "Common/Qt/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 

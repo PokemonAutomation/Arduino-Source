@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_SelfBoxTrade_H
 #define PokemonAutomation_PokemonLA_SelfBoxTrade_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"

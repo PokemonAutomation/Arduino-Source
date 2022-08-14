@@ -10,6 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "PokemonSwSh_EggStepCount.h"
 
 namespace PokemonAutomation{

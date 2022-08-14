@@ -1,4 +1,4 @@
-/*  Text Edit
+/*  Text Edit Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,85 +8,15 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTextEdit>
-#include "Common/Cpp/Json/JsonValue.h"
-#include "TextEditOption.h"
+#include "TextEditWidget.h"
 
 namespace PokemonAutomation{
 
 
 
-
-class TextEditWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
-public:
-    ~TextEditWidget();
-    TextEditWidget(QWidget& parent, TextEditOption& value);
-
-    virtual void update_ui() override;
-    virtual void restore_defaults() override;
-    virtual void value_changed() override{
-        QMetaObject::invokeMethod(m_box, [=]{
-            update_ui();
-        });
-    }
-
-private:
-    class Box;
-
-    TextEditOption& m_value;
-    QTextEdit* m_box;
-};
-
-
-
-TextEditOption::TextEditOption(
-    std::string label,
-    std::string default_value,
-    std::string placeholder_text
-)
-    : m_label(std::move(label))
-    , m_default(std::move(default_value))
-    , m_placeholder_text(std::move(placeholder_text))
-    , m_current(m_default)
-{}
-
-TextEditOption::operator const std::string&() const{
-    SpinLockGuard lg(m_lock);
-    return m_current;
-}
-void TextEditOption::set(std::string x){
-    {
-        SpinLockGuard lg(m_lock);
-        m_current = std::move(x);
-    }
-    push_update();
-}
-
-
-void TextEditOption::load_json(const JsonValue& json){
-    const std::string* str = json.get_string();
-    if (str == nullptr){
-        return;
-    }
-    {
-        SpinLockGuard lg(m_lock);
-        m_current = *str;
-    }
-    push_update();
-}
-JsonValue TextEditOption::to_json() const{
-    SpinLockGuard lg(m_lock);
-    return m_current;
-}
-void TextEditOption::restore_defaults(){
-    SpinLockGuard lg(m_lock);
-    m_current = m_default;
-}
 ConfigWidget* TextEditOption::make_ui(QWidget& parent){
     return new TextEditWidget(parent, *this);
 }
-
-
-
 
 
 
@@ -132,7 +62,6 @@ private:
 
 
 
-
 TextEditWidget::~TextEditWidget(){
     m_value.remove_listener(*this);
 }
@@ -157,7 +86,11 @@ void TextEditWidget::update_ui(){
 }
 void TextEditWidget::restore_defaults(){
     m_value.restore_defaults();
-    update_ui();
+}
+void TextEditWidget::value_changed(){
+    QMetaObject::invokeMethod(m_box, [=]{
+        update_ui();
+    });
 }
 
 

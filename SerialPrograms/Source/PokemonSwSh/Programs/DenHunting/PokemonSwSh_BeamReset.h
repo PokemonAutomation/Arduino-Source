@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_BeamReset_H
 #define PokemonAutomation_PokemonSwSh_BeamReset_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

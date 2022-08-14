@@ -4,11 +4,11 @@
  *
  */
 
-#ifndef PokemonAutomation_StaticTextOption_H
-#define PokemonAutomation_StaticTextOption_H
+#ifndef PokemonAutomation_Options_StaticTextOption_H
+#define PokemonAutomation_Options_StaticTextOption_H
 
 #include "Common/Cpp/SpinLock.h"
-#include "Common/Qt/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 

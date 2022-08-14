@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_SettingsPanel_H
 #define PokemonAutomation_SettingsPanel_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 

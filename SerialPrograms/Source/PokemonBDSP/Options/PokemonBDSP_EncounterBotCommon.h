@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterBotCommon_H
 #define PokemonAutomation_PokemonBDSP_EncounterBotCommon_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"

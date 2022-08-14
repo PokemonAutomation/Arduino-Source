@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_Catchability.h"

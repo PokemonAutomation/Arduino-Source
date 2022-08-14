@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 #define PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

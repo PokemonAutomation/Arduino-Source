@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StrongBoss_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StrongBoss_H
 
-#include "Common/Qt/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_DexRecFinder_H
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

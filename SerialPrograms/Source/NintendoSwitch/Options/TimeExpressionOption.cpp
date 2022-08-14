@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h"
 #include "TimeExpressionOption.h"
 

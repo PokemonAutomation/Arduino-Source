@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 #define PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/TextEditOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 //#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"

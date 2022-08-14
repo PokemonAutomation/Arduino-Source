@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_PageSwap_H
 #define PokemonAutomation_PokemonHome_PageSwap_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

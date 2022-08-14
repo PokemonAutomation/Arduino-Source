@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_BossAction_H
 
 #include "Common/Qt/AutoHeightTable.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "Pokemon/Options/Pokemon_BallSelectWidget.h"
 

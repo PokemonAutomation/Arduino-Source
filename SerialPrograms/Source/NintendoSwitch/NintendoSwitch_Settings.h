@@ -8,8 +8,8 @@
 #define PokemonAutomation_NintendoSwitch_Settings_H
 
 #include "Common/Cpp/ImageResolution.h"
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "Common/Qt/Options/StringOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

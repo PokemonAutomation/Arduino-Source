@@ -9,8 +9,9 @@
 
 #include <string>
 #include <vector>
-#include "Common/Qt/Options/ConfigOption.h"
 #include "Common/Qt/AutoHeightTable.h"
+#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 
 class QLineEdit;
 

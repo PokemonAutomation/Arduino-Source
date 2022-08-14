@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_DailyHighlightFarmer_H
 #define PokemonAutomation_PokemonSwSh_DailyHighlightFarmer_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

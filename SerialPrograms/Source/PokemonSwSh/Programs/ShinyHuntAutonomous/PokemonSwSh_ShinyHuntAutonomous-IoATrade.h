@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousIoATrade_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousIoATrade_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"

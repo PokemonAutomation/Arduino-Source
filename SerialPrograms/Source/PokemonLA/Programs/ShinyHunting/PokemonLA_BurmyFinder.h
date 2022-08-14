@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_BurmyFinder_H
 #define PokemonAutomation_PokemonLA_BurmyFinder_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"

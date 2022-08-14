@@ -89,6 +89,14 @@ SOURCES += \
     ../Common/Cpp/Json/JsonTools.cpp \
     ../Common/Cpp/Json/JsonValue.cpp \
     ../Common/Cpp/LifetimeSanitizer.cpp \
+    ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
+    ../Common/Cpp/Options/ConfigOption.cpp \
+    ../Common/Cpp/Options/FixedCodeOption.cpp \
+    ../Common/Cpp/Options/FloatingPointOption.cpp \
+    ../Common/Cpp/Options/SimpleIntegerOption.cpp \
+    ../Common/Cpp/Options/StaticTextOption.cpp \
+    ../Common/Cpp/Options/StringOption.cpp \
+    ../Common/Cpp/Options/TextEditOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
     ../Common/Cpp/PeriodicScheduler.cpp \
@@ -105,20 +113,20 @@ SOURCES += \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/CollapsibleGroupBox.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBoxOption.cpp \
-    ../Common/Qt/Options/ConfigOption.cpp \
+    ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
+    ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
-    ../Common/Qt/Options/FixedCodeOption.cpp \
-    ../Common/Qt/Options/FloatingPointOption.cpp \
+    ../Common/Qt/Options/FixedCodeWidget.cpp \
+    ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
-    ../Common/Qt/Options/SimpleIntegerOption.cpp \
-    ../Common/Qt/Options/StaticTextOption.cpp \
-    ../Common/Qt/Options/StringOption.cpp \
+    ../Common/Qt/Options/SimpleIntegerWidget.cpp \
+    ../Common/Qt/Options/StaticTextWidget.cpp \
+    ../Common/Qt/Options/StringWidget.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
-    ../Common/Qt/Options/TextEditOption.cpp \
+    ../Common/Qt/Options/TextEditWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
@@ -774,6 +782,14 @@ HEADERS += \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/LifetimeSanitizer.h \
+    ../Common/Cpp/Options/BooleanCheckBoxOption.h \
+    ../Common/Cpp/Options/ConfigOption.h \
+    ../Common/Cpp/Options/FixedCodeOption.h \
+    ../Common/Cpp/Options/FloatingPointOption.h \
+    ../Common/Cpp/Options/SimpleIntegerOption.h \
+    ../Common/Cpp/Options/StaticTextOption.h \
+    ../Common/Cpp/Options/StringOption.h \
+    ../Common/Cpp/Options/TextEditOption.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
     ../Common/Cpp/PeriodicScheduler.h \
@@ -806,20 +822,20 @@ HEADERS += \
     ../Common/Qt/CollapsibleGroupBox.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
-    ../Common/Qt/Options/BooleanCheckBoxOption.h \
-    ../Common/Qt/Options/ConfigOption.h \
+    ../Common/Qt/Options/BooleanCheckBoxWidget.h \
+    ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
-    ../Common/Qt/Options/FixedCodeOption.h \
-    ../Common/Qt/Options/FloatingPointOption.h \
+    ../Common/Qt/Options/FixedCodeWidget.h \
+    ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
-    ../Common/Qt/Options/SimpleIntegerOption.h \
-    ../Common/Qt/Options/StaticTextOption.h \
-    ../Common/Qt/Options/StringOption.h \
+    ../Common/Qt/Options/SimpleIntegerWidget.h \
+    ../Common/Qt/Options/StaticTextWidget.h \
+    ../Common/Qt/Options/StringWidget.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
-    ../Common/Qt/Options/TextEditOption.h \
+    ../Common/Qt/Options/TextEditWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/Redispatch.h \

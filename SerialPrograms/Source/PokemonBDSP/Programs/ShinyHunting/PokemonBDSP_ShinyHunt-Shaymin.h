@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyHuntShaymin_H
 #define PokemonAutomation_PokemonBDSP_ShinyHuntShaymin_H
 
-#include "Common/Qt/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

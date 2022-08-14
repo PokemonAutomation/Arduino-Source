@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_Catchability_H
 #define PokemonAutomation_PokemonSwSh_Catchability_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{

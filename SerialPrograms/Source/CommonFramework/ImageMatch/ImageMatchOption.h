@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ImageMatchOption_H
 #define PokemonAutomation_ImageMatchOption_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{

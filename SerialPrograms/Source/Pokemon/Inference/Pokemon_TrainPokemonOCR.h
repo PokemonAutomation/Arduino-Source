@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Pokemon_TrainPokemonOCR_H
 #define PokemonAutomation_Pokemon_TrainPokemonOCR_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "Common/Qt/Options/StringOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 

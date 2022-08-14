@@ -16,6 +16,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Common/Qt/AutoHeightTable.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "ProgramNotifications.h"
 #include "EventNotificationsTable.h"
 

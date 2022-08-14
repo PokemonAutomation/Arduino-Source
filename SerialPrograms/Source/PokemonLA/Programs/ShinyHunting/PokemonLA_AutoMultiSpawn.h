@@ -8,7 +8,7 @@
 #ifndef PokemonAutomation_PokemonLA_AutoMultiSpawn_H
 #define PokemonAutomation_PokemonLA_AutoMultiSpawn_H
 
-#include "Common/Qt/Options/StringOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

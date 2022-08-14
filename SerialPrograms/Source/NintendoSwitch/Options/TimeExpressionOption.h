@@ -10,8 +10,8 @@
 #define PokemonAutomation_TimeExpression_H
 
 #include <limits>
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h"
-#include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

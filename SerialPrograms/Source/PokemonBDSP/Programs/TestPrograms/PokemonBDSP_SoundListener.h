@@ -8,7 +8,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_SoundListener_H
 #define PokemonAutomation_PokemonBDSP_SoundListener_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 

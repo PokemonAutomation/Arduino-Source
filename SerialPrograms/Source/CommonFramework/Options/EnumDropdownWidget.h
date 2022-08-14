@@ -8,6 +8,7 @@
 #define PokemonAutomation_EnumDropdownWidget_H
 
 #include <QComboBox>
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "EnumDropdownOption.h"
 
 namespace PokemonAutomation{

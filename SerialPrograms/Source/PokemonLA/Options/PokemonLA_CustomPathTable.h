@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_CustomPathTableTable_H
 #define PokemonAutomation_PokemonLA_CustomPathTableTable_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"

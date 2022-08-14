@@ -12,6 +12,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "OCR_LanguageOptionOCR.h"

@@ -8,6 +8,7 @@
 #define PokemonAutomation_BatchWidget_H
 
 #include <QWidget>
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "BatchOption.h"
 
 namespace PokemonAutomation{

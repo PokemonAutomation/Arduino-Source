@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_GoHomeWhenDone_H
 #define PokemonAutomation_GoHomeWhenDone_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{

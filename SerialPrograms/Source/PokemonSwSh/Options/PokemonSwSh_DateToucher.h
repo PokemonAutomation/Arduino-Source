@@ -8,7 +8,7 @@
 #define PokemonAutomation_DateToucher_H
 
 #include <chrono>
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

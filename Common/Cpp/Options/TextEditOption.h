@@ -1,34 +1,30 @@
-/*  String Option
+/*  Text Edit
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This option is thread-safe.
- *
  */
 
-#ifndef PokemonAutomation_StringOption_H
-#define PokemonAutomation_StringOption_H
+#ifndef PokemonAutomation_Options_TextEditOption_H
+#define PokemonAutomation_Options_TextEditOption_H
 
 #include "Common/Cpp/SpinLock.h"
-#include "Common/Qt/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class StringOption : public ConfigOption{
+class TextEditOption : public ConfigOption{
 public:
-    StringOption(
-        bool is_password,
+    TextEditOption(
         std::string label,
         std::string default_value,
         std::string placeholder_text
     );
 
-    bool is_password() const{ return m_is_password; }
     const std::string& label() const{ return m_label; }
     const std::string& placeholder_text() const{ return m_placeholder_text; }
 
-    operator std::string() const;
+    operator const std::string&() const;
     void set(std::string x);
 
     virtual void load_json(const JsonValue& json) override;
@@ -40,7 +36,6 @@ public:
 
 private:
     const std::string m_label;
-    const bool m_is_password;
     const std::string m_default;
     const std::string m_placeholder_text;
 
@@ -53,4 +48,3 @@ private:
 
 }
 #endif
-

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_SelfTouchTrade_H
 #define PokemonAutomation_PokemonBDSP_SelfTouchTrade_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"

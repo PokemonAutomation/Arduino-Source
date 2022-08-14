@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
-#include "Common/Qt/Options/ConfigOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
