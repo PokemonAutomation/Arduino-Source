@@ -69,8 +69,8 @@ TimeExpressionOption<Type>::TimeExpressionOption(
     Type min_value,
     Type max_value
 )
-    : m_label(std::move(label))
-    , m_ticks_per_second(ticks_per_second)
+    : m_ticks_per_second(ticks_per_second)
+    , m_label(std::move(label))
     , m_min_value(min_value)
     , m_max_value(max_value)
     , m_default(std::move(default_value))
