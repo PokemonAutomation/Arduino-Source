@@ -18,6 +18,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
 )
     : m_label(std::move(label))
     , m_default(default_value)
+    , m_current(default_value)
 {}
 
 

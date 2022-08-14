@@ -23,6 +23,7 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     , m_min_value(min_value)
     , m_max_value(max_value)
     , m_default(default_value)
+    , m_current(default_value)
 {}
 
 template <typename Type>
@@ -39,8 +40,6 @@ void SimpleIntegerOption<Type>::load_json(const JsonValue& json){
     Type value;
     if (json.read_integer(value, m_min_value, m_max_value)){
         set(value);
-        m_current.store(value, std::memory_order_relaxed);
-        push_update();
     }
 }
 template <typename Type>

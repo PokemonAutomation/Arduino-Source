@@ -170,6 +170,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Load the program panel specified in the persistent setting.
     m_program_list->load_persistent_panel();
+
+//    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
     close_panel();

@@ -55,7 +55,7 @@ void BooleanCheckBoxWidget::update_ui(){
 void BooleanCheckBoxWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 
