@@ -82,7 +82,7 @@ void FixedCodeWidget::update_ui(){
 void FixedCodeWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

@@ -114,7 +114,7 @@ void LanguageOCRWidget::update_ui(){
 void LanguageOCRWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

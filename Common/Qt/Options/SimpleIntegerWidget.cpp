@@ -81,7 +81,7 @@ template <typename Type>
 void SimpleIntegerWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

@@ -58,7 +58,7 @@ void StringWidget::update_ui(){
 void StringWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

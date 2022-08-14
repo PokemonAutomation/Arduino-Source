@@ -49,7 +49,7 @@ void StaticTextWidget::restore_defaults(){}
 void StaticTextWidget::value_changed(){
     QMetaObject::invokeMethod(m_text, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 
@@ -83,7 +83,7 @@ void SectionDividerWidget::restore_defaults(){}
 void SectionDividerWidget::value_changed(){
     QMetaObject::invokeMethod(m_text, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

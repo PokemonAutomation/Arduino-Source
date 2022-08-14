@@ -83,7 +83,7 @@ void FloatingPointWidget::update_ui(){
 void FloatingPointWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 

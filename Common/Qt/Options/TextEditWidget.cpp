@@ -90,7 +90,7 @@ void TextEditWidget::restore_defaults(){
 void TextEditWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update_ui();
-    });
+    }, Qt::QueuedConnection);
 }
 
 
