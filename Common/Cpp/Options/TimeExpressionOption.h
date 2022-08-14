@@ -14,10 +14,14 @@
 namespace PokemonAutomation{
 
 
+std::string ticks_to_time(double ticks_per_second, int64_t ticks);
+
+
 template <typename Type>
 class TimeExpressionOption : public ConfigOption{
 public:
     TimeExpressionOption(
+        double ticks_per_second,
         std::string label,
         std::string default_value,
         Type min_value = std::numeric_limits<Type>::min(),
@@ -48,6 +52,7 @@ private:
     std::string process(const std::string& text, Type& value) const;
 
 private:
+    const double m_ticks_per_second;
     const std::string m_label;
     const Type m_min_value;
     const Type m_max_value;

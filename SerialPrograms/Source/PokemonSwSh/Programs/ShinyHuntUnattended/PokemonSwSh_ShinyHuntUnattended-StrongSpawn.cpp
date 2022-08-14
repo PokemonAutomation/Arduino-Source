@@ -34,10 +34,12 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
 
 ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
     : ENTER_GAME_TO_RUN_DELAY(
+        TICKS_PER_SECOND,
         "<b>Enter Game to Run Delay:</b><br>This needs to be carefully calibrated.",
         "2280"
     )
     , START_GAME_WAIT_DELAY(
+        TICKS_PER_SECOND,
         "<b>Start Game Wait Delay:</b><br>Decrease this if your game starts quickly.",
         "20 * TICKS_PER_SECOND"
     )

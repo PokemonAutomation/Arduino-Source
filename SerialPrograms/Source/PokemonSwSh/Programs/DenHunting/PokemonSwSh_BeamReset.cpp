@@ -32,6 +32,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
 
 BeamReset::BeamReset()
     : DELAY_BEFORE_RESET(
+        TICKS_PER_SECOND,
         "<b>Delay before Reset:</b>",
         "5 * TICKS_PER_SECOND"
     )

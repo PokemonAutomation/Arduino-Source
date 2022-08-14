@@ -37,6 +37,7 @@ SurpriseTrade::SurpriseTrade()
         2
     )
     , INITIAL_WAIT(
+        TICKS_PER_SECOND,
         "<b>Time to wait for a Trade Partner:</b>",
         "30 * TICKS_PER_SECOND"
     )
@@ -44,10 +45,12 @@ SurpriseTrade::SurpriseTrade()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , TRADE_ANIMATION(
+        TICKS_PER_SECOND,
         "<b>Trade Animation Time:</b>",
         "23 * TICKS_PER_SECOND"
     )
     , EVOLVE_DELAY(
+        TICKS_PER_SECOND,
         "<b>Evolve Delay:</b>",
         "30 * TICKS_PER_SECOND"
     )

@@ -46,8 +46,16 @@ TurboButton::TurboButton()
         },
         2
     )
-    , PRESS_DURATION("<b>Press Duration:</b><br>Hold the button down for this long.", "5", 5)
-    , RELEASE_DURATION("<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.", "3", 3)
+    , PRESS_DURATION(
+        TICKS_PER_SECOND,
+        "<b>Press Duration:</b><br>Hold the button down for this long.",
+        "5", 5
+    )
+    , RELEASE_DURATION(
+        TICKS_PER_SECOND,
+        "<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        "3", 3
+    )
     , TOTAL_PRESSES("<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.", 0)
 {
     PA_ADD_OPTION(BUTTON);

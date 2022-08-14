@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_Settings.h"
@@ -30,6 +31,7 @@ GameSettings::GameSettings()
         false
     )
     , FETCH_EGG_MASH_DELAY(
+        TICKS_PER_SECOND,
         "<b>Fetch Egg Mash Delay:</b><br>Time needed to mash B to fetch an egg and return to overworld when auto-deposit is on.",
         "800"
     )
@@ -41,118 +43,148 @@ GameSettings::GameSettings()
     , m_advanced_options("<font size=5><b>Advanced Options:</b></font> You shouldn't need to touch anything below here.")
     , m_general_options("<font size=4><b>General Timings:</b></font>")
     , AUTO_FR_DURATION(
+        TICKS_PER_SECOND,
         "<b>Auto-FR Duration:</b><br>Time to accept FRs before returning to den lobby.",
         "8 * TICKS_PER_SECOND"
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , OVERWORLD_TO_MENU_DELAY(
+        TICKS_PER_SECOND,
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
         "120"
     )
     , MENU_TO_OVERWORLD_DELAY(
+        TICKS_PER_SECOND,
         "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
         "250"
     )
     , GAME_TO_HOME_DELAY_FAST(
-        "<b>Game to Home Delay (fast):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
+        TICKS_PER_SECOND,
+        "<b>Game to Home Delay (fast):</b><br>"
+        "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         "100"
     )
     , GAME_TO_HOME_DELAY_SAFE(
-        "<b>Game to Home Delay (safe):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
+        TICKS_PER_SECOND,
+        "<b>Game to Home Delay (safe):</b><br>"
+        "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         "125"
     )
     , HOME_TO_GAME_DELAY(
+        TICKS_PER_SECOND,
         "<b>Home to Game Delay:</b><br>Delay to enter game from home menu.",
         "3 * TICKS_PER_SECOND"
     )
     , OPEN_YCOMM_DELAY(
+        TICKS_PER_SECOND,
         "<b>Open Y-COMM Delay:</b><br>Time needed to open Y-COMM.",
         "200"
     )
     , ENTER_PROFILE_DELAY(
+        TICKS_PER_SECOND,
         "<b>Enter Profile Delay:</b><br>Delay to enter your Switch profile.",
         "2 * TICKS_PER_SECOND"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
+        TICKS_PER_SECOND,
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         "2 * TICKS_PER_SECOND"
     )
     , START_GAME_WAIT(
+        TICKS_PER_SECOND,
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         "20 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
+        TICKS_PER_SECOND,
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         "3 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
+        TICKS_PER_SECOND,
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         "11 * TICKS_PER_SECOND"
     )
     , m_den_timings("<font size=4><b>Den Timings:</b></font>")
     , ENTER_OFFLINE_DEN_DELAY(
+        TICKS_PER_SECOND,
         "<b>Enter Offline Game Delay:</b><br>Time needed to enter a den on final button press.",
         "125"
     )
     , REENTER_DEN_DELAY(
+        TICKS_PER_SECOND,
         "<b>Re-enter Den Delay:</b><br>Time from exiting den after a day-skip to when you can collect watts and re-enter it.",
         "5 * TICKS_PER_SECOND"
     )
     , COLLECT_WATTS_OFFLINE_DELAY(
+        TICKS_PER_SECOND,
         "<b>Collect Watts Delay (offline):</b>",
         "80"
     )
     , COLLECT_WATTS_ONLINE_DELAY(
+        TICKS_PER_SECOND,
         "<b>Collect Watts Delay (online):</b>",
         "3 * TICKS_PER_SECOND"
     )
     , UNCATCHABLE_PROMPT_DELAY(
+        TICKS_PER_SECOND,
         "<b>Uncatchable Prompt Delay:</b><br>Time needed to bypass uncatchable pokemon prompt.",
         "110"
     )
     , OPEN_LOCAL_DEN_LOBBY_DELAY(
+        TICKS_PER_SECOND,
         "<b>Open Local Den Lobby Delay:</b><br>Time needed to open a den lobby on local connection.",
         "3 * TICKS_PER_SECOND"
     )
     , ENTER_SWITCH_POKEMON(
+        TICKS_PER_SECOND,
         "<b>Enter Switch " + STRING_POKEMON + ":</b><br>Time needed to enter Switch " + STRING_POKEMON + ".",
         "4 * TICKS_PER_SECOND"
     )
     , EXIT_SWITCH_POKEMON(
+        TICKS_PER_SECOND,
         "<b>Exit Switch " + STRING_POKEMON + ":</b><br>Time needed to exit Switch " + STRING_POKEMON + " back to den lobby.",
         "3 * TICKS_PER_SECOND"
     )
     , FULL_LOBBY_TIMER(
+        TICKS_PER_SECOND,
         "<b>Full Lobby Timer:</b><br>Always 3 minutes.",
         "180 * TICKS_PER_SECOND"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY(
+        TICKS_PER_SECOND,
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
         "20"
     )
     , BOX_CHANGE_DELAY(
+        TICKS_PER_SECOND,
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
         "80"
     )
     , BOX_PICKUP_DROP_DELAY(
+        TICKS_PER_SECOND,
         "<b>Box Pickup/Drop Delay:</b><br>Delay to pickup/drop " + STRING_POKEMON + ".",
         "90"
     )
     , MENU_TO_POKEMON_DELAY(
+        TICKS_PER_SECOND,
         "<b>Menu To " + STRING_POKEMON + " Delay:</b><br>Delay to enter " + STRING_POKEMON + " menu.",
         "300"
     )
     , POKEMON_TO_BOX_DELAY(
+        TICKS_PER_SECOND,
         "<b>" + STRING_POKEMON + " to Box Delay:</b><br>Delay to enter box system.",
         "300"
     )
     , BOX_TO_POKEMON_DELAY(
+        TICKS_PER_SECOND,
         "<b>Box to " + STRING_POKEMON + " Delay:</b><br>Delay to exit box system.",
         "250"
     )
     , POKEMON_TO_MENU_DELAY(
+        TICKS_PER_SECOND,
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         "250"
     )

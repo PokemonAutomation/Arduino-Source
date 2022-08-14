@@ -98,6 +98,7 @@ DexRecFilters::DexRecFilters()
 DexRecFinder::DexRecFinder()
     : GO_HOME_WHEN_DONE(false)
     , VIEW_TIME(
+        TICKS_PER_SECOND,
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
         "2 * TICKS_PER_SECOND"
     )
@@ -110,10 +111,12 @@ DexRecFinder::DexRecFinder()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , ENTER_POKEDEX_TIME(
+        TICKS_PER_SECOND,
         "<b>Enter " + STRING_POKEDEX + " Time:</b><br>Wait this long for the " + STRING_POKEDEX + " to open.",
         "3 * TICKS_PER_SECOND"
     )
     , BACK_OUT_TIME(
+        TICKS_PER_SECOND,
         "<b>Back Out Time:</b><br>Mash B for this long to return to the overworld.",
         "3 * TICKS_PER_SECOND"
     )

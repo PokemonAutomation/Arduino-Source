@@ -33,6 +33,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
 
 EventBeamFinder::EventBeamFinder()
     : WAIT_TIME_IN_DEN(
+        TICKS_PER_SECOND,
         "<b>Wait time in Den:</b>",
         "5 * TICKS_PER_SECOND"
     )

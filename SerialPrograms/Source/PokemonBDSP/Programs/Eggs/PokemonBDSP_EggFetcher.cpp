@@ -51,6 +51,7 @@ EggFetcher::EggFetcher()
         2000
     )
     , TRAVEL_TIME_PER_FETCH(
+        TICKS_PER_SECOND,
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         "15 * TICKS_PER_SECOND"
     )

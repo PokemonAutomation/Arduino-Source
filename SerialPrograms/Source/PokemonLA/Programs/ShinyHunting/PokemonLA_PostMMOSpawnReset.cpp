@@ -63,14 +63,17 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset_Descriptor::make_stats() const{
 
 PostMMOSpawnReset::PostMMOSpawnReset()
     : TURN_DURATION(
+        TICKS_PER_SECOND,
         "<b>Camera Turn:</b><br>How many ticks to turn the camera. <br>Positive values for right turns. Negative values for left turns.",
         "0"
     )
     , FORWARD_DURATION(
+        TICKS_PER_SECOND,
         "<b>Move Forward:</b><br>After turning the camera, how many ticks to move forward.",
         "0"
     )
     , WAIT_DURATION(
+        TICKS_PER_SECOND,
         "<b>Wait Time:</b><br> Wait time after movement.",
         "5 * TICKS_PER_SECOND"
     )

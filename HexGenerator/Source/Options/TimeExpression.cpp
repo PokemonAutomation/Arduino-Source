@@ -13,6 +13,7 @@
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Tools/Tools.h"
 #include "TimeExpression.h"
 
@@ -38,6 +39,7 @@ int TimeExpression_init = register_option(
 TimeExpression::TimeExpression(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_option(
+        TICKS_PER_SECOND,
         SingleStatementOption::m_label,
         obj.get_string_throw(JSON_DEFAULT),
         obj.get_integer_throw(JSON_MIN_VALUE),

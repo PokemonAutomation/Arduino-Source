@@ -43,14 +43,17 @@ FriendCodeAdder::FriendCodeAdder()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , OPEN_CODE_PAD_DELAY(
+        TICKS_PER_SECOND,
         "<b>Open Code Pad Delay</b>",
         "1 * TICKS_PER_SECOND"
     )
     , SEARCH_TIME(
+        TICKS_PER_SECOND,
         "<b>Search Time:</b><br>Wait this long after initiating search.",
         "3 * TICKS_PER_SECOND"
     )
     , TOGGLE_BEST_STATUS_DELAY(
+        TICKS_PER_SECOND,
         "<b>Toggle Best Delay:</b><br>Time needed to toggle the best friend status.",
         "1 * TICKS_PER_SECOND"
     )

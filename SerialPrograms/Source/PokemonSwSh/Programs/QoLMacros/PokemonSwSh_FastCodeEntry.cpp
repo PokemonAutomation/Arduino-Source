@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
@@ -36,6 +37,7 @@ FastCodeEntry::FastCodeEntry()
         "9107 3091"
     )
     , INITIAL_DELAY(
+        TICKS_PER_SECOND,
         "<b>Initial Delay:</b><br>Wait this long before entering the code.",
         "0 * TICKS_PER_SECOND"
     )

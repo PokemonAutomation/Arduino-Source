@@ -34,6 +34,7 @@ OverworldTrigger::OverworldTrigger()
         }, 0
     )
     , MOVE_DURATION(
+        TICKS_PER_SECOND,
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
         "1 * TICKS_PER_SECOND"
     )

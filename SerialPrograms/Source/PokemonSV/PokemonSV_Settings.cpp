@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_Settings.h"
@@ -22,18 +23,22 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
+        TICKS_PER_SECOND,
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         "2 * TICKS_PER_SECOND"
     )
     , START_GAME_WAIT(
+        TICKS_PER_SECOND,
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         "40 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
+        TICKS_PER_SECOND,
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         "5 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
+        TICKS_PER_SECOND,
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         "40 * TICKS_PER_SECOND"
     )

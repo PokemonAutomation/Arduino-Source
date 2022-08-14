@@ -55,6 +55,7 @@ EggAutonomous::EggAutonomous()
         10, 1, 30
     )
     , TRAVEL_TIME_PER_FETCH(
+        TICKS_PER_SECOND,
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         "20 * TICKS_PER_SECOND"
     )
@@ -101,6 +102,7 @@ EggAutonomous::EggAutonomous()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , SCROLL_TO_READ_DELAY(
+        TICKS_PER_SECOND,
         "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
         "Increase this if your video has high latency.",
         "125"

@@ -33,19 +33,25 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
 
 PokeJobsFarmer::PokeJobsFarmer()
     : SKIPS(
-          "<b>Number of days:</b>",
-          200),
-      CONCURRENCY(
-          "<b>Number of concurrent " + STRING_POKEJOB + "s per day:</b>",
-          2),
-      MENU_INDEX(
-          "<b>Index of " + STRING_POKEJOB + "s in Rotom menu:</b>",
-          3),
-      m_advanced_options(
-          "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"),
-      MASH_B_DURATION(
-          "<b>Mash B for this long upon completion of " + STRING_POKEJOB + ":</b>",
-          "8 * TICKS_PER_SECOND")
+        "<b>Number of days:</b>",
+        200
+    )
+    , CONCURRENCY(
+        "<b>Number of concurrent " + STRING_POKEJOB + "s per day:</b>",
+        2
+    )
+    , MENU_INDEX(
+        "<b>Index of " + STRING_POKEJOB + "s in Rotom menu:</b>",
+        3
+    )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , MASH_B_DURATION(
+        TICKS_PER_SECOND,
+        "<b>Mash B for this long upon completion of " + STRING_POKEJOB + ":</b>",
+        "8 * TICKS_PER_SECOND"
+    )
 {
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(CONCURRENCY);

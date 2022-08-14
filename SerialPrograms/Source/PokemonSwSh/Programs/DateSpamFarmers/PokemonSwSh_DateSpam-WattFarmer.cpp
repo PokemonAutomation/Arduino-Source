@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -33,7 +34,9 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
 
 WattFarmer::WattFarmer()
     : GRIP_MENU_WAIT(
-        "<b>Exit Grip Menu Delay:</b> Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
+        TICKS_PER_SECOND,
+        "<b>Exit Grip Menu Delay:</b> "
+        "Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
         "5 * TICKS_PER_SECOND"
     )
     , SKIPS(

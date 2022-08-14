@@ -51,14 +51,17 @@ EggSuperCombined2::EggSuperCombined2()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , SAFETY_TIME(
+        TICKS_PER_SECOND,
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
         "12 * TICKS_PER_SECOND"
     )
     , EARLY_HATCH_SAFETY(
+        TICKS_PER_SECOND,
         "<b>Early Hatch Time:</b><br>Eggs should not hatch more than this much early.",
         "5 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
+        TICKS_PER_SECOND,
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
         "88 * TICKS_PER_SECOND"
     )

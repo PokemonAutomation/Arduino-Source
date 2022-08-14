@@ -67,10 +67,12 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , EXIT_BATTLE_TIMEOUT(
+        TICKS_PER_SECOND,
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
         "10 * TICKS_PER_SECOND"
     )
     , FISH_RESPAWN_TIME(
+        TICKS_PER_SECOND,
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
         "5 * TICKS_PER_SECOND"
     )
