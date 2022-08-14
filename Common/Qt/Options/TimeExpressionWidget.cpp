@@ -1,4 +1,4 @@
-/*  Time Option
+/*  Time Expression Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -6,15 +6,20 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include "TimeExpressionBaseWidget.h"
+#include <QLineEdit>
+#include "TimeExpressionWidget.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
 
 
 template <typename Type>
-TimeExpressionBaseWidget<Type>::TimeExpressionBaseWidget(QWidget& parent, TimeExpressionBaseOption<Type>& value)
+TimeExpressionWidget<Type>::~TimeExpressionWidget(){
+    m_value.remove_listener(*this);
+}
+template <typename Type>
+TimeExpressionWidget<Type>::TimeExpressionWidget(QWidget& parent, TimeExpressionOption<Type>& value)
     : QWidget(&parent)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -50,32 +55,32 @@ TimeExpressionBaseWidget<Type>::TimeExpressionBaseWidget(QWidget& parent, TimeEx
             }
         }
     );
-    connect(
-        m_box, &QLineEdit::editingFinished,
-        this, [=](){
-            m_box->setText(QString::fromStdString(m_value.text()));
-            seconds->setText(QString::fromStdString(m_value.time_string()));
-        }
-    );
+
+    value.add_listener(*this);
 }
 template <typename Type>
-void TimeExpressionBaseWidget<Type>::restore_defaults(){
+void TimeExpressionWidget<Type>::restore_defaults(){
     m_value.restore_defaults();
-    update_ui();
 }
 template <typename Type>
-void TimeExpressionBaseWidget<Type>::update_ui(){
+void TimeExpressionWidget<Type>::update_ui(){
     m_box->setText(QString::fromStdString(m_value.text()));
 }
-
-
-
-template class TimeExpressionBaseWidget<uint16_t>;
-template class TimeExpressionBaseWidget<uint32_t>;
-template class TimeExpressionBaseWidget<int16_t>;
-template class TimeExpressionBaseWidget<int32_t>;
-
-
-
+template <typename Type>
+void TimeExpressionWidget<Type>::value_changed(){
+    QMetaObject::invokeMethod(m_box, [=]{
+        update_ui();
+    }, Qt::QueuedConnection);
 }
+
+
+
+template class TimeExpressionWidget<uint16_t>;
+template class TimeExpressionWidget<uint32_t>;
+template class TimeExpressionWidget<int16_t>;
+template class TimeExpressionWidget<int32_t>;
+
+
+
+
 }

@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"

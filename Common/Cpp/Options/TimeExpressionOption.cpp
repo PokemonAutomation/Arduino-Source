@@ -1,4 +1,4 @@
-/*  Time Option
+/*  Time Expression Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,19 +8,19 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/ExpressionEvaluator.h"
+#include "Common/Qt/Options/TimeExpressionWidget.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
-#include "TimeExpressionBaseOption.h"
+#include "TimeExpressionOption.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
 
 
 template <typename Type>
-TimeExpressionBaseOption<Type>::TimeExpressionBaseOption(
+TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
+    std::string default_value,
     Type min_value,
-    Type max_value,
-    std::string default_value
+    Type max_value
 )
     : m_label(std::move(label))
     , m_min_value(min_value)
@@ -32,35 +32,35 @@ TimeExpressionBaseOption<Type>::TimeExpressionBaseOption(
 }
 
 template <typename Type>
-TimeExpressionBaseOption<Type>::operator Type() const{
+TimeExpressionOption<Type>::operator Type() const{
     SpinLockGuard lg(m_lock);
     return m_value;
 }
 template <typename Type>
-Type TimeExpressionBaseOption<Type>::get() const{
+Type TimeExpressionOption<Type>::get() const{
     SpinLockGuard lg(m_lock);
     return m_value;
 }
 template <typename Type>
-std::string TimeExpressionBaseOption<Type>::set(std::string text){
+std::string TimeExpressionOption<Type>::set(std::string text){
     Type value = 0;
     std::string error = process(text, value);
-    if (error.empty()){
+    {
         SpinLockGuard lg(m_lock);
         m_current = std::move(text);
         m_value = value;
         m_error.clear();
     }
+    push_update();
     return error;
 }
-
 template <typename Type>
-std::string TimeExpressionBaseOption<Type>::text() const{
+std::string TimeExpressionOption<Type>::text() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 template <typename Type>
-std::string TimeExpressionBaseOption<Type>::time_string() const{
+std::string TimeExpressionOption<Type>::time_string() const{
     SpinLockGuard lg(m_lock);
     if (!m_error.empty()){
         return "<font color=\"red\">" + m_error + "</font>";
@@ -69,49 +69,41 @@ std::string TimeExpressionBaseOption<Type>::time_string() const{
 }
 
 template <typename Type>
-void TimeExpressionBaseOption<Type>::load_default(const JsonValue& json){
+void TimeExpressionOption<Type>::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
     }
-    m_default = *str;
-    m_error = process(m_current, m_value);
-}
-template <typename Type>
-void TimeExpressionBaseOption<Type>::load_current(const JsonValue& json){
-    const std::string* str = json.get_string();
-    if (str == nullptr){
-        return;
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = *str;
+        m_error = process(m_current, m_value);
     }
-    SpinLockGuard lg(m_lock);
-    m_current = *str;
-    m_error = process(m_current, m_value);
+    push_update();
 }
 template <typename Type>
-JsonValue TimeExpressionBaseOption<Type>::write_default() const{
-    return m_default;
-}
-template <typename Type>
-JsonValue TimeExpressionBaseOption<Type>::write_current() const{
+JsonValue TimeExpressionOption<Type>::to_json() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 
 template <typename Type>
-std::string TimeExpressionBaseOption<Type>::check_validity() const{
+std::string TimeExpressionOption<Type>::check_validity() const{
     SpinLockGuard lg(m_lock);
     return m_error;
 }
 template <typename Type>
-void TimeExpressionBaseOption<Type>::restore_defaults(){
-    SpinLockGuard lg(m_lock);
-    m_current = m_default;
-    m_error = process(m_current, m_value);
+void TimeExpressionOption<Type>::restore_defaults(){
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = m_default;
+        m_error = process(m_current, m_value);
+    }
+    push_update();
 }
 
-
 template <typename Type>
-std::string TimeExpressionBaseOption<Type>::process(const std::string& text, Type& value) const{
+std::string TimeExpressionOption<Type>::process(const std::string& text, Type& value) const{
     if (text.empty()){
         return "Expression is empty.";
     }
@@ -136,12 +128,18 @@ std::string TimeExpressionBaseOption<Type>::process(const std::string& text, Typ
 
 
 
-template class TimeExpressionBaseOption<uint16_t>;
-template class TimeExpressionBaseOption<uint32_t>;
-template class TimeExpressionBaseOption<int16_t>;
-template class TimeExpressionBaseOption<int32_t>;
 
-
-
+template <typename Type>
+ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
+    return new TimeExpressionWidget<Type>(parent, *this);
 }
+
+
+template class TimeExpressionOption<uint16_t>;
+template class TimeExpressionOption<uint32_t>;
+template class TimeExpressionOption<int16_t>;
+template class TimeExpressionOption<int32_t>;
+
+
+
 }

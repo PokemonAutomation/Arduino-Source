@@ -6,9 +6,10 @@
 
 #ifndef PokemonAutomation_PokemonLA_FroslassFinder_H
 #define PokemonAutomation_PokemonLA_FroslassFinder_H
+
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"

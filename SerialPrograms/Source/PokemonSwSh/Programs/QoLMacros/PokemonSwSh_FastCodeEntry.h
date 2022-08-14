@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_FastCodeEntry_H
 
 #include "Common/Cpp/Options/FixedCodeOption.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

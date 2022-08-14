@@ -118,6 +118,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/StringOption.h
     ../Common/Cpp/Options/TextEditOption.cpp
     ../Common/Cpp/Options/TextEditOption.h
+    ../Common/Cpp/Options/TimeExpressionOption.cpp
+    ../Common/Cpp/Options/TimeExpressionOption.h
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
     ../Common/Cpp/ParallelTaskRunner.cpp
@@ -200,10 +202,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h
     ../Common/Qt/Options/TextEditWidget.cpp
     ../Common/Qt/Options/TextEditWidget.h
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
+    ../Common/Qt/Options/TimeExpressionWidget.cpp
+    ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
@@ -725,8 +725,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/SwitchDateOption.h
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp
     Source/NintendoSwitch/Options/TestPathMakerTable.h
-    Source/NintendoSwitch/Options/TimeExpressionOption.cpp
-    Source/NintendoSwitch/Options/TimeExpressionOption.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp

@@ -9,8 +9,8 @@
 
 #include <chrono>
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

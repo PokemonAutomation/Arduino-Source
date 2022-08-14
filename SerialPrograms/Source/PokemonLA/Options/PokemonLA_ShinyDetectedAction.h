@@ -11,9 +11,9 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

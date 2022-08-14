@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousBerryTree_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

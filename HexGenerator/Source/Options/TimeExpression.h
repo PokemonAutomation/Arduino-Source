@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_TimeOption_H
 #define PokemonAutomation_TimeOption_H
 
-#include "Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h"
-#include "Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
 
 
-class TimeExpression : public SingleStatementOption, public NintendoSwitch::TimeExpressionBaseOption<uint32_t>{
+class TimeExpression : public SingleStatementOption{
 public:
     static const std::string OPTION_TYPE;
     static const std::string JSON_MIN_VALUE;
@@ -32,13 +31,12 @@ public:
     virtual std::string to_cpp() const override;
 
     virtual QWidget* make_ui(QWidget& parent) override;
+
+private:
+    TimeExpressionOption<uint32_t> m_option;
 };
 
 
-class TimeExpressionUI : public NintendoSwitch::TimeExpressionBaseWidget<uint32_t>{
-public:
-    TimeExpressionUI(QWidget& parent, TimeExpression& value);
-};
 
 
 }

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -17,7 +18,6 @@
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

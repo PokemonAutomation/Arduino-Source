@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 #define PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

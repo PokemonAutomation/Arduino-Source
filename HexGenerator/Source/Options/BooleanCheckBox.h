@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_BooleanCheckBox_H
 #define PokemonAutomation_BooleanCheckBox_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{

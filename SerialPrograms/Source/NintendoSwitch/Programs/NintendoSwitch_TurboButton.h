@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

@@ -12,8 +12,9 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Tools/Tools.h"
-#include "TimeExpressionOption.h"
+#include "TimeExpression.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
@@ -36,45 +37,42 @@ int TimeExpression_init = register_option(
 
 TimeExpression::TimeExpression(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , TimeExpressionBaseOption<uint32_t>(
+    , m_option(
         SingleStatementOption::m_label,
+        obj.get_string_throw(JSON_DEFAULT),
         obj.get_integer_throw(JSON_MIN_VALUE),
-        obj.get_integer_throw(JSON_MAX_VALUE),
-        obj.get_string_throw(JSON_DEFAULT)
+        obj.get_integer_throw(JSON_MAX_VALUE)
     )
 {
-    load_current(obj.get_string_throw(JSON_CURRENT));
+    m_option.set(obj.get_string_throw(JSON_CURRENT));
 }
 
 std::string TimeExpression::check_validity() const{
-    return TimeExpressionBaseOption<uint32_t>::check_validity();
+    return m_option.check_validity();
 }
 void TimeExpression::restore_defaults(){
-    TimeExpressionBaseOption<uint32_t>::restore_defaults();
+    m_option.restore_defaults();
 }
 JsonObject TimeExpression::to_json() const{
     JsonObject root = SingleStatementOption::to_json();
-    root[JSON_MIN_VALUE] = min();
-    root[JSON_MAX_VALUE] = max();
-    root[JSON_DEFAULT] = write_default();
-    root[JSON_CURRENT] = write_current();
+    root[JSON_MIN_VALUE] = m_option.min_value();
+    root[JSON_MAX_VALUE] = m_option.max_value();
+    root[JSON_DEFAULT] = m_option.default_value();
+    root[JSON_CURRENT] = m_option.text();
     return root;
 }
 std::string TimeExpression::to_cpp() const{
     std::string str;
     str += m_declaration;
     str += " = ";
-    str += std::to_string(get());
+    str += std::to_string(m_option.get());
     str += ";\r\n";
     return str;
 }
 QWidget* TimeExpression::make_ui(QWidget& parent){
-    return new NintendoSwitch::TimeExpressionBaseWidget<uint32_t>(parent, *this);
+    return &m_option.make_ui(parent)->widget();
 }
 
-TimeExpressionUI::TimeExpressionUI(QWidget& parent, TimeExpression& value)
-    : TimeExpressionBaseWidget(parent, value)
-{}
 
 
 

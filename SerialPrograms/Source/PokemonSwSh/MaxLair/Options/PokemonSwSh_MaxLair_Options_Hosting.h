@@ -9,9 +9,9 @@
 
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/BatchOption/GroupWidget.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{

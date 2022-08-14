@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonBDSP_OverworldTrigger_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{

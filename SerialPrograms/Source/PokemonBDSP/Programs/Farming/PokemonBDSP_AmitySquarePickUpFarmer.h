@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonBDSP_AmitySquarePickUpFarmer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

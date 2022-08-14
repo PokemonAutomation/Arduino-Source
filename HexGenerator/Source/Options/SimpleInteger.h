@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_SimpleInteger_H
 #define PokemonAutomation_SimpleInteger_H
 
-#include "Common/Qt/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{

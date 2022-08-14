@@ -10,8 +10,8 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

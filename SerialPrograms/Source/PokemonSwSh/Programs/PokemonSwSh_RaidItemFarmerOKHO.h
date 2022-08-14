@@ -8,8 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_RaidItemFarmerOHKO_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-//#include "CommonFramework/Options/SectionDivider.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{

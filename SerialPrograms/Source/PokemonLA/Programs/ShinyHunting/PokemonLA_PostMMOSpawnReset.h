@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonLA_PostMMOSpawnReset_H
 #define PokemonAutomation_PokemonLA_PostMMOSpawnReset_H
 
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

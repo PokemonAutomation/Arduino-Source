@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ActivateMenuGlitchPoketch_H
 #define PokemonAutomation_PokemonBDSP_ActivateMenuGlitchPoketch_H
 
-#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

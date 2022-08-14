@@ -30,6 +30,7 @@ SOURCES += \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
+    ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
@@ -47,20 +48,21 @@ SOURCES += \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
+    ../Common/Qt/Options/TimeExpressionWidget.cpp \
     Source/Main.cpp \
     Source/Options/BooleanCheckBox.cpp \
     Source/Options/ConfigItem.cpp \
     Source/Options/Divider.cpp \
     Source/Options/EnumDropdownOption.cpp \
     Source/Options/FixedCodeOption.cpp \
+    Source/Options/FloatingPoint.cpp \
     Source/Options/FossilTableOption.cpp \
     Source/Options/MultiHostTableOption.cpp \
     Source/Options/RandomCodeOption.cpp \
+    Source/Options/SimpleInteger.cpp \
     Source/Options/SingleStatementOption.cpp \
     Source/Options/SwitchDateOption.cpp \
-    Source/Options/TimeExpressionOption.cpp \
+    Source/Options/TimeExpression.cpp \
     Source/Panels/ConfigSet.cpp \
     Source/Panels/JsonProgram.cpp \
     Source/Panels/JsonSettings.cpp \
@@ -83,6 +85,7 @@ HEADERS += \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
+    ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
@@ -94,16 +97,13 @@ HEADERS += \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
-    ../Common/Qt/Options/FloatingPointOption.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
-    ../Common/Qt/Options/SimpleIntegerOption.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
+    ../Common/Qt/Options/TimeExpressionWidget.h \
     Source/Options/BooleanCheckBox.h \
     Source/Options/ConfigItem.h \
     Source/Options/Divider.h \
@@ -116,7 +116,7 @@ HEADERS += \
     Source/Options/SimpleInteger.h \
     Source/Options/SingleStatementOption.h \
     Source/Options/SwitchDateOption.h \
-    Source/Options/TimeExpressionOption.h \
+    Source/Options/TimeExpression.h \
     Source/Panels/ConfigSet.h \
     Source/Panels/JsonProgram.h \
     Source/Panels/JsonSettings.h \

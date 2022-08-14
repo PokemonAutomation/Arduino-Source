@@ -99,6 +99,7 @@ SOURCES += \
     ../Common/Cpp/Options/StaticTextOption.cpp \
     ../Common/Cpp/Options/StringOption.cpp \
     ../Common/Cpp/Options/TextEditOption.cpp \
+    ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
     ../Common/Cpp/PeriodicScheduler.cpp \
@@ -131,8 +132,7 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TextEditWidget.cpp \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
+    ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
@@ -365,7 +365,6 @@ SOURCES += \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Options/SwitchDateOption.cpp \
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
-    Source/NintendoSwitch/Options/TimeExpressionOption.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
@@ -793,6 +792,7 @@ HEADERS += \
     ../Common/Cpp/Options/StaticTextOption.h \
     ../Common/Cpp/Options/StringOption.h \
     ../Common/Cpp/Options/TextEditOption.h \
+    ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
     ../Common/Cpp/PeriodicScheduler.h \
@@ -841,8 +841,7 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TextEditWidget.h \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
-    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
+    ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
@@ -1124,7 +1123,6 @@ HEADERS += \
     Source/NintendoSwitch/Options/StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/SwitchDateOption.h \
     Source/NintendoSwitch/Options/TestPathMakerTable.h \
-    Source/NintendoSwitch/Options/TimeExpressionOption.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
