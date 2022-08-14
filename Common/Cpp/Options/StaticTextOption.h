@@ -1,4 +1,4 @@
-/*  Static Text
+/*  Static Text Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

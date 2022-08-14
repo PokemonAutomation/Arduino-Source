@@ -42,6 +42,7 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k()
     )
     , START_DATE(
         "<b>Start Date:</b>",
+        QDate(2000, 1, 1), QDate(2060, 12, 31),
         QDate(2000, 1, 1)
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))

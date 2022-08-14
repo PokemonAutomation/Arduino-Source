@@ -1,4 +1,4 @@
-/*  Switch Date Option
+/*  Date Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -6,14 +6,25 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include "SwitchDateBaseWidget.h"
+#include <QDateEdit>
+#include "DateWidget.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
 
 
-SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption& value)
+
+ConfigWidget* DateOption::make_ui(QWidget& parent){
+    return new DateWidget(parent, *this);
+}
+
+
+
+DateWidget::~DateWidget(){
+    m_value.remove_listener(*this);
+}
+DateWidget::DateWidget(QWidget& parent, DateOption& value)
     : QWidget(&parent)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -25,8 +36,8 @@ SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption
     m_date_edit = new QDateEdit(m_value.get());
     layout->addWidget(m_date_edit, 1);
     m_date_edit->setDisplayFormat("MMMM d, yyyy");
-    m_date_edit->setMinimumDate(QDate(2000, 1, 1));
-    m_date_edit->setMaximumDate(QDate(2060, 12, 31));
+    m_date_edit->setMinimumDate(value.min_value());
+    m_date_edit->setMaximumDate(value.max_value());
 
     connect(
         m_date_edit, &QDateEdit::dateChanged,
@@ -34,16 +45,21 @@ SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption
             m_value.set(date);
         }
     );
+
+    value.add_listener(*this);
 }
-void SwitchDateBaseWidget::restore_defaults(){
+void DateWidget::restore_defaults(){
     m_value.restore_defaults();
-    update_ui();
 }
-void SwitchDateBaseWidget::update_ui(){
+void DateWidget::update_ui(){
     m_date_edit->setDate(m_value.get());
 }
-
-
-
+void DateWidget::value_changed(){
+    QMetaObject::invokeMethod(m_date_edit, [=]{
+        update_ui();
+    }, Qt::QueuedConnection);
 }
+
+
+
 }

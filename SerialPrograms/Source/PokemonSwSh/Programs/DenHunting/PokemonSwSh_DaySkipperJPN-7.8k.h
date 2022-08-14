@@ -9,9 +9,9 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/DateOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/SwitchDateOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -35,7 +35,7 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;
-    SwitchDateOption START_DATE;
+    DateOption START_DATE;
 
     EventNotificationOption NOTIFICATION_PROGRESS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

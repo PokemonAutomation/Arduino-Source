@@ -7,16 +7,14 @@
 #ifndef PokemonAutomation_SwitchDate_H
 #define PokemonAutomation_SwitchDate_H
 
-#include <QDate>
-#include "Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h"
-#include "Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h"
+#include "Common/Cpp/Options/DateOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
 
 
-class SwitchDate : public SingleStatementOption, public NintendoSwitch::SwitchDateBaseOption{
+class SwitchDate : public SingleStatementOption{
 public:
     static const std::string OPTION_TYPE;
 
@@ -33,12 +31,7 @@ public:
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SwitchDateUI;
-};
-
-class SwitchDateUI : public NintendoSwitch::SwitchDateBaseWidget{
-public:
-    SwitchDateUI(QWidget& parent, SwitchDate& value);
+    DateOption m_option;
 };
 
 

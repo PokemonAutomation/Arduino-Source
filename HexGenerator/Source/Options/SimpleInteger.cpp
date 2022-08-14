@@ -4,10 +4,6 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QIntValidator>
-#include <QLineEdit>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"

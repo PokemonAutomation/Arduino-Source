@@ -10,8 +10,9 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
@@ -347,7 +348,7 @@ void BotBaseHandle::thread_body(){
 //            cout << "system_clock()" << endl;
             uint32_t wallclock = NintendoSwitch::system_clock(context);
 //            cout << "system_clock() - done" << endl;
-            str = NintendoSwitch::ticks_to_time(wallclock);
+            str = ticks_to_time(TICKS_PER_SECOND, wallclock);
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){

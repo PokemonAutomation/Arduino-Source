@@ -102,6 +102,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
+    ../Common/Cpp/Options/DateOption.cpp
+    ../Common/Cpp/Options/DateOption.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
@@ -150,8 +152,6 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
-    ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp
-    ../Common/NintendoSwitch/NintendoSwitch_Tools.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
@@ -174,6 +174,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
     ../Common/Qt/Options/ConfigWidget.h
+    ../Common/Qt/Options/DateWidget.cpp
+    ../Common/Qt/Options/DateWidget.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
@@ -196,10 +198,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/StaticTextWidget.h
     ../Common/Qt/Options/StringWidget.cpp
     ../Common/Qt/Options/StringWidget.h
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h
     ../Common/Qt/Options/TextEditWidget.cpp
     ../Common/Qt/Options/TextEditWidget.h
     ../Common/Qt/Options/TimeExpressionWidget.cpp
@@ -721,8 +719,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h
     Source/NintendoSwitch/Options/StartInGripMenuOption.h
-    Source/NintendoSwitch/Options/SwitchDateOption.cpp
-    Source/NintendoSwitch/Options/SwitchDateOption.h
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp
     Source/NintendoSwitch/Options/TestPathMakerTable.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp

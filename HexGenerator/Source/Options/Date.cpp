@@ -10,8 +10,9 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Tools/Tools.h"
-#include "SwitchDateOption.h"
+#include "Date.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{
@@ -31,42 +32,44 @@ int SwitchDate_init = register_option(
 
 SwitchDate::SwitchDate(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , SwitchDateBaseOption(SingleStatementOption::m_label, QDate(2000, 1, 1))
+    , m_option(
+        SingleStatementOption::m_label,
+        QDate(2000, 1, 1), QDate(2060, 12, 31),
+        DateOption::from_json(obj.get_value_throw(JSON_DEFAULT))
+    )
 {
-    load_default(obj.get_value_throw(JSON_DEFAULT));
-    load_current(obj.get_value_throw(JSON_CURRENT));
+    m_option.set(DateOption::from_json(obj.get_value_throw(JSON_CURRENT)));
 }
 std::string SwitchDate::check_validity() const{
-    return SwitchDateBaseOption::check_validity();
+    return m_option.check_validity();
 }
 void SwitchDate::restore_defaults(){
-    SwitchDateBaseOption::restore_defaults();
+    m_option.restore_defaults();
 }
 JsonObject SwitchDate::to_json() const{
     JsonObject root = SingleStatementOption::to_json();
-    root[JSON_DEFAULT] = write_default();
-    root[JSON_CURRENT] = write_current();
+    root[JSON_DEFAULT] = DateOption::to_json(m_option.default_value());
+    root[JSON_CURRENT] = m_option.to_json();
     return root;
 }
 std::string SwitchDate::to_cpp() const{
+    QDate date = m_option;
+
     std::string str;
     str += m_declaration;
     str += " = {";
-    str += std::to_string(m_current.year());
+    str += std::to_string(date.year());
     str += ", ";
-    str += std::to_string(m_current.month());
+    str += std::to_string(date.month());
     str += ", ";
-    str += std::to_string(m_current.day());
+    str += std::to_string(date.day());
     str += "};\r\n";
     return str;
 }
 QWidget* SwitchDate::make_ui(QWidget& parent){
-    return new SwitchDateUI(parent, *this);
+    return &m_option.make_ui(parent)->widget();
 }
 
-SwitchDateUI::SwitchDateUI(QWidget& parent, SwitchDate& value)
-    : SwitchDateBaseWidget(parent, value)
-{}
 
 
 

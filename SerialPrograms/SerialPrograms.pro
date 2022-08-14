@@ -91,6 +91,7 @@ SOURCES += \
     ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
+    ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
@@ -110,7 +111,6 @@ SOURCES += \
     ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Microcontroller/DeviceRoutines.cpp \
-    ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \
@@ -118,6 +118,7 @@ SOURCES += \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
+    ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
@@ -129,8 +130,6 @@ SOURCES += \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTextWidget.cpp \
     ../Common/Qt/Options/StringWidget.cpp \
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TextEditWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
@@ -363,7 +362,6 @@ SOURCES += \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
-    Source/NintendoSwitch/Options/SwitchDateOption.cpp \
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
@@ -784,6 +782,7 @@ HEADERS += \
     ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
+    ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
@@ -811,7 +810,6 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Tools.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h \
@@ -827,6 +825,7 @@ HEADERS += \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
+    ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
@@ -838,8 +837,6 @@ HEADERS += \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTextWidget.h \
     ../Common/Qt/Options/StringWidget.h \
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
-    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TextEditWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
@@ -1121,7 +1118,6 @@ HEADERS += \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/StartInGripMenuOption.h \
-    Source/NintendoSwitch/Options/SwitchDateOption.h \
     Source/NintendoSwitch/Options/TestPathMakerTable.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
