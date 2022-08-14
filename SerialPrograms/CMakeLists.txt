@@ -156,6 +156,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
+    ../Common/Qt/Options/FixedCodeOption.cpp
+    ../Common/Qt/Options/FixedCodeOption.h
     ../Common/Qt/Options/FloatingPointOption.cpp
     ../Common/Qt/Options/FloatingPointOption.h
     ../Common/Qt/Options/FossilTableBaseOption.cpp
@@ -172,6 +174,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h
+    ../Common/Qt/Options/TextEditOption.cpp
+    ../Common/Qt/Options/TextEditOption.h
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp
@@ -398,16 +402,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
-    Source/CommonFramework/Options/FixedCodeOption.cpp
-    Source/CommonFramework/Options/FixedCodeOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
-    Source/CommonFramework/Options/TextEditOption.cpp
-    Source/CommonFramework/Options/TextEditOption.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelElements.cpp

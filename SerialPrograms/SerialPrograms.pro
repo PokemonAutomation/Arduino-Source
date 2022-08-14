@@ -109,6 +109,7 @@ SOURCES += \
     ../Common/Qt/Options/ConfigOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
+    ../Common/Qt/Options/FixedCodeOption.cpp \
     ../Common/Qt/Options/FloatingPointOption.cpp \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
@@ -117,6 +118,7 @@ SOURCES += \
     ../Common/Qt/Options/StringOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
+    ../Common/Qt/Options/TextEditOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
@@ -218,11 +220,9 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
-    Source/CommonFramework/Options/FixedCodeOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
-    Source/CommonFramework/Options/TextEditOption.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelElements.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
@@ -810,6 +810,7 @@ HEADERS += \
     ../Common/Qt/Options/ConfigOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
+    ../Common/Qt/Options/FixedCodeOption.h \
     ../Common/Qt/Options/FloatingPointOption.h \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
@@ -818,6 +819,7 @@ HEADERS += \
     ../Common/Qt/Options/StringOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
+    ../Common/Qt/Options/TextEditOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/Redispatch.h \
@@ -941,11 +943,9 @@ HEADERS += \
     Source/CommonFramework/Options/EnumDropdownWidget.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
-    Source/CommonFramework/Options/FixedCodeOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
-    Source/CommonFramework/Options/TextEditOption.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelElements.h \
     Source/CommonFramework/Panels/PanelInstance.h \

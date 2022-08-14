@@ -12,15 +12,25 @@
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 
-class FixedCodeWidget : public QWidget, public ConfigWidget{
+class FixedCodeWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~FixedCodeWidget();
     FixedCodeWidget(QWidget& parent, FixedCodeOption& value);
     virtual void restore_defaults() override;
     virtual void update_ui() override;
+    virtual void value_changed() override{
+        QMetaObject::invokeMethod(m_box, [=]{
+            update_ui();
+        });
+    }
 
 private:
     std::string sanitized_code(const std::string& text) const;
@@ -54,10 +64,15 @@ const std::string& FixedCodeOption::get() const{
 }
 std::string FixedCodeOption::set(std::string x){
     std::string error = check_validity(x);
-    if (error.empty()){
+    if (!error.empty()){
+        return error;
+    }
+    {
+        SpinLockGuard lg(m_lock);
         m_current = std::move(x);
     }
-    return error;
+    push_update();
+    return std::string();
 }
 
 void FixedCodeOption::load_json(const JsonValue& json){
@@ -65,8 +80,11 @@ void FixedCodeOption::load_json(const JsonValue& json){
     if (str == nullptr){
         return;
     }
-    SpinLockGuard lg(m_lock);
-    m_current = *str;
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = *str;
+    }
+    push_update();
 }
 JsonValue FixedCodeOption::to_json() const{
     SpinLockGuard lg(m_lock);
@@ -89,8 +107,11 @@ std::string FixedCodeOption::check_validity(const std::string& x) const{
     return validate_code(m_digits, x) ? std::string() : "Code is invalid.";
 }
 void FixedCodeOption::restore_defaults(){
-    SpinLockGuard lg(m_lock);
-    m_current = m_default;
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = m_default;
+    }
+    push_update();
 }
 
 ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
@@ -106,6 +127,9 @@ std::string FixedCodeWidget::sanitized_code(const std::string& text) const{
         message = "<font color=\"red\">" + e.message() + "</font>";
     }
     return message;
+}
+FixedCodeWidget::~FixedCodeWidget(){
+    m_value.remove_listener(*this);
 }
 FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     : QWidget(&parent)
@@ -132,22 +156,23 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
         m_box, &QLineEdit::textChanged,
         this, [=](const QString& text){
             std::string str = text.toStdString();
-            m_value.set(str);
             under_text->setText(QString::fromStdString(sanitized_code(str)));
+//            m_value.set(str);
         }
     );
     connect(
         m_box, &QLineEdit::editingFinished,
         m_box, [=](){
-            std::string current = m_value.get();
-            m_box->setText(QString::fromStdString(current));
+            std::string current = m_box->text().toStdString();
             under_text->setText(QString::fromStdString(sanitized_code(current)));
+//            m_box->setText(QString::fromStdString(current));
+            m_value.set(current);
         }
     );
+    m_value.add_listener(*this);
 }
 void FixedCodeWidget::restore_defaults(){
     m_value.restore_defaults();
-    update_ui();
 }
 void FixedCodeWidget::update_ui(){
     m_box->setText(QString::fromStdString(m_value));

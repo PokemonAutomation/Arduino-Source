@@ -16,12 +16,18 @@ namespace PokemonAutomation{
 
 
 
-class TextEditWidget : public QWidget, public ConfigWidget{
+class TextEditWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~TextEditWidget();
     TextEditWidget(QWidget& parent, TextEditOption& value);
 
     virtual void update_ui() override;
     virtual void restore_defaults() override;
+    virtual void value_changed() override{
+        QMetaObject::invokeMethod(m_box, [=]{
+            update_ui();
+        });
+    }
 
 private:
     class Box;
@@ -48,8 +54,11 @@ TextEditOption::operator const std::string&() const{
     return m_current;
 }
 void TextEditOption::set(std::string x){
-    SpinLockGuard lg(m_lock);
-    m_current = std::move(x);
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = std::move(x);
+    }
+    push_update();
 }
 
 
@@ -58,8 +67,11 @@ void TextEditOption::load_json(const JsonValue& json){
     if (str == nullptr){
         return;
     }
-    SpinLockGuard lg(m_lock);
-    m_current = *str;
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = *str;
+    }
+    push_update();
 }
 JsonValue TextEditOption::to_json() const{
     SpinLockGuard lg(m_lock);
@@ -107,13 +119,9 @@ public:
 //        this->hide();
     }
 
-    void update_backing(){
-        m_parent.m_value.set(this->toPlainText().toStdString());
-    }
-
     virtual void focusOutEvent(QFocusEvent* event) override{
         QTextEdit::focusOutEvent(event);
-        update_backing();
+        m_parent.m_value.set(this->toPlainText().toStdString());
     }
 
 private:
@@ -125,7 +133,9 @@ private:
 
 
 
-
+TextEditWidget::~TextEditWidget(){
+    m_value.remove_listener(*this);
+}
 TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -139,6 +149,8 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     m_box = new Box(*this);
     m_box->setText(QString::fromStdString(value));
     layout->addWidget(m_box);
+
+    m_value.add_listener(*this);
 }
 void TextEditWidget::update_ui(){
     m_box->setText(QString::fromStdString(m_value));
