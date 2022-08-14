@@ -164,10 +164,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/MultiHostTableBaseOption.h
     ../Common/Qt/Options/SimpleIntegerOption.cpp
     ../Common/Qt/Options/SimpleIntegerOption.h
-    ../Common/Qt/Options/String/StringBaseOption.cpp
-    ../Common/Qt/Options/String/StringBaseOption.h
-    ../Common/Qt/Options/String/StringBaseWidget.cpp
-    ../Common/Qt/Options/String/StringBaseWidget.h
+    ../Common/Qt/Options/StaticTextOption.cpp
+    ../Common/Qt/Options/StaticTextOption.h
+    ../Common/Qt/Options/StringOption.cpp
+    ../Common/Qt/Options/StringOption.h
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp
@@ -404,10 +404,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
-    Source/CommonFramework/Options/StaticTextOption.cpp
-    Source/CommonFramework/Options/StaticTextOption.h
-    Source/CommonFramework/Options/StringOption.cpp
-    Source/CommonFramework/Options/StringOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/TextEditOption.cpp

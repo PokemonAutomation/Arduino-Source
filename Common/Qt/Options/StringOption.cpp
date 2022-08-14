@@ -68,6 +68,9 @@ void StringOption::restore_defaults(){
 
 class StringWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~StringWidget(){
+        m_value.remove_listener(*this);
+    }
     StringWidget(QWidget& parent, StringOption& value)
         : QWidget(&parent)
         , ConfigWidget(value, *this)
@@ -93,6 +96,8 @@ public:
                 m_value.set(m_box->text().toStdString());
             }
         );
+
+        m_value.add_listener(*this);
     }
     virtual void restore_defaults() override{
         m_value.restore_defaults();

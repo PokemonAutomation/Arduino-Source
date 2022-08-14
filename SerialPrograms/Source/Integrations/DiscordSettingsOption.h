@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_DiscordSettings_H
 #define PokemonAutomation_DiscordSettings_H
 
+#include "Common/Qt/Options/StringOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "CommonFramework/Options/StringOption.h"
 #include "DiscordWebhookSettings.h"
 #include "DiscordIntegrationSettings.h"
 

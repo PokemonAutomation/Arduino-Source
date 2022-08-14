@@ -68,6 +68,7 @@ TestProgram::TestProgram()
         "<b>OCR Language:</b>",
         { Language::English }
     )
+    , STATIC_TEXT("Test text...")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -76,6 +77,7 @@ TestProgram::TestProgram()
     })
 {
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -104,11 +106,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    ImageRGB32 image("screenshot-20220807-171750797516.png");
+    for (size_t c = 0; c < 1000; c++){
+        STATIC_TEXT.set_text("Timer: " + std::to_string(c));
+        scope.wait_for(std::chrono::milliseconds(100));
+    }
 
 
-    BattleMenuDetector detector(logger, overlay, true);
-    cout << detector.process_frame(image, current_time()) << endl;
+
+//    ImageRGB32 image("screenshot-20220807-171750797516.png");
+
+
+//    BattleMenuDetector detector(logger, overlay, true);
+//    cout << detector.process_frame(image, current_time()) << endl;
 
 
 //    ImageRGB32 image("04_True_True_eng_hippowdon_NotShiny_NotAlpha_Female.png");

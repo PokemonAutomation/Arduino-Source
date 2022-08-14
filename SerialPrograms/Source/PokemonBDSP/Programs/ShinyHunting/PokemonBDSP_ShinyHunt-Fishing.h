@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyHuntFishing_H
 #define PokemonAutomation_PokemonBDSP_ShinyHuntFishing_H
 
-#include "CommonFramework/Options/StaticTextOption.h"
+#include "Common/Qt/Options/StaticTextOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"

@@ -61,7 +61,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     )
     , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
-    if (!DESCRIPTION.label().empty()){
+    if (!DESCRIPTION.text().empty()){
         PA_ADD_OPTION(DESCRIPTION);
     }
     PA_ADD_OPTION(ACTION);

@@ -98,7 +98,11 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
         "Test Program"
     )
 {}
-TestProgramComputer::TestProgramComputer(){}
+TestProgramComputer::TestProgramComputer()
+    : STATIC_TEXT("test text")
+{
+    PA_ADD_OPTION(STATIC_TEXT);
+}
 
 WallClock REFERENCE = current_time();
 
@@ -130,6 +134,11 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+
+    STATIC_TEXT.set_text("123456789");
+
+
 
 //    cv::Mat image;
 

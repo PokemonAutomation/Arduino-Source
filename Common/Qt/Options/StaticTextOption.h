@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_StaticTextOption_H
 #define PokemonAutomation_StaticTextOption_H
 
+#include "Common/Cpp/SpinLock.h"
 #include "Common/Qt/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -17,7 +18,8 @@ class StaticTextOption : public ConfigOption{
 public:
     StaticTextOption(std::string label);
 
-    const std::string& label() const{ return m_label; }
+    std::string text() const;
+    void set_text(std::string label);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -25,8 +27,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class StaticTextWidget;
-    std::string m_label;
+    mutable SpinLock m_lock;
+    std::string m_text;
 };
 
 
@@ -35,7 +37,8 @@ class SectionDividerOption : public ConfigOption{
 public:
     SectionDividerOption(std::string label);
 
-    void set_label(std::string label);
+    std::string text() const;
+    void set_text(std::string label);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -43,8 +46,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SectionDividerWidget;
-    std::string m_label;
+    mutable SpinLock m_lock;
+    std::string m_text;
 };
 
 

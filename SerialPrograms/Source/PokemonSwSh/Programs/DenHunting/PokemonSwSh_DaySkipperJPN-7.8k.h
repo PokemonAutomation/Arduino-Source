@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_DaySkipperJPN7p8k_H
 #define PokemonAutomation_PokemonSwSh_DaySkipperJPN7p8k_H
 
+#include "Common/Qt/Options/StaticTextOption.h"
 #include "Common/Qt/Options/SimpleIntegerOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
-#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/SwitchDateOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

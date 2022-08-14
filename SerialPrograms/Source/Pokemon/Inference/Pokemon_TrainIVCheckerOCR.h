@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_TrainIVCheckerOCR_H
 
 #include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/StringOption.h"
+#include "Common/Qt/Options/StringOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 

@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/StringOption.h"
+#include "Common/Qt/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

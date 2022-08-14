@@ -41,8 +41,6 @@ SOURCES += \
     ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
     ../Common/Qt/Options/SimpleIntegerOption.cpp \
-    ../Common/Qt/Options/String/StringBaseOption.cpp \
-    ../Common/Qt/Options/String/StringBaseWidget.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
@@ -94,8 +92,6 @@ HEADERS += \
     ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
-    ../Common/Qt/Options/String/StringBaseOption.h \
-    ../Common/Qt/Options/String/StringBaseWidget.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
     ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \

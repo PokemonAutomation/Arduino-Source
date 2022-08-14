@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_Settings_H
 #define PokemonAutomation_PokemonSwSh_Settings_H
 
+#include "Common/Qt/Options/StaticTextOption.h"
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "Common/Qt/Options/FloatingPointOption.h"
-#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

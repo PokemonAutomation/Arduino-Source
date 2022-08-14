@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/Options/StaticTextOption.h"
 #include "Common/Qt/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

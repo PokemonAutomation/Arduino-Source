@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 
+#include "Common/Qt/Options/StaticTextOption.h"
 #include "Common/Qt/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
