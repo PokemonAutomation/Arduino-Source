@@ -421,11 +421,11 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
-    Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
-    Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
+    Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelElements.cpp
@@ -1543,7 +1543,7 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
     # Find OpenCV
-    
+
     # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
     find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/opencv/lib/pkgconfig")
@@ -1567,7 +1567,7 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    # Add -Wno-c11-extensions to avoid clang gives 
+    # Add -Wno-c11-extensions to avoid clang gives
     # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
     # when compiling OpenCV
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
