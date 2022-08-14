@@ -72,14 +72,12 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
         qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.1
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_fight),
         qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.9
     );
     if (!fight){
 //        cout << "Fight out" << endl;
@@ -90,14 +88,12 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
         qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.9
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_pokemon),
         qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.1
     );
     if (!fight){
 //        cout << "Pokemon out" << endl;
@@ -108,14 +104,12 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
         qRgb(0, 0, 0), 0.1,
-        qRgb(255, 255, 255), 0.9,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.9
     );
     fight |= !fight && cluster_fit_2(
         extract_box_reference(screen, m_text_run),
         qRgb(0, 0, 0), 0.9,
-        qRgb(255, 255, 255), 0.1,
-        0.2, 50, 0.1
+        qRgb(255, 255, 255), 0.1
     );
     if (!fight){
 //        cout << "Run out" << endl;
