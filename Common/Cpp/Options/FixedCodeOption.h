@@ -8,7 +8,7 @@
 #define PokemonAutomation_Options_FixedCodeOption_H
 
 #include "Common/Cpp/SpinLock.h"
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 

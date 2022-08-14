@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHost_H
 #define PokemonAutomation_PokemonSwSh_AutoHost_H
 
-#include "CommonFramework/Options/RandomCodeOption.h"
+#include "Common/Cpp/Options/RandomCodeOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"

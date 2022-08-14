@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 
+#include "Common/Cpp/Options/RandomCodeOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/BatchOption/GroupWidget.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/RandomCodeOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
@@ -44,11 +44,15 @@ public:
     AutoHostNotificationOption NOTIFICATIONS;
 };
 
-class HostingSettingsUI : public GroupWidget{
+class HostingSettingsUI : public GroupWidget, private ConfigOption::Listener{
 public:
+    ~HostingSettingsUI();
     HostingSettingsUI(QWidget& parent, HostingSettings& value);
 private:
     void update_option_visibility();
+    virtual void value_changed() override;
+
+    HostingSettings& m_value;
 };
 
 

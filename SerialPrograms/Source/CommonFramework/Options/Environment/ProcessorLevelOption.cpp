@@ -9,7 +9,6 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "ProcessorLevelOption.h"
 
 namespace PokemonAutomation{
@@ -46,6 +45,10 @@ ProcessorLevelOption::ProcessorLevelOption()
 {
     set_global();
 }
+void ProcessorLevelOption::set(size_t index){
+    EnumDropdownOption::set(index);
+    set_global(index);
+}
 void ProcessorLevelOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
@@ -78,9 +81,9 @@ JsonValue ProcessorLevelOption::to_json() const{
     return obj;
 }
 void ProcessorLevelOption::set_global(){
-    set_global((int)(size_t)*this);
+    set_global((size_t)*this);
 }
-void ProcessorLevelOption::set_global(int index){
+void ProcessorLevelOption::set_global(size_t index){
     const auto& LIST = AVAILABLE_CAPABILITIES();
     if (index < 0 || (size_t)index >= LIST.size()){
         return;
@@ -89,22 +92,6 @@ void ProcessorLevelOption::set_global(int index){
     global_logger_tagged().log(std::string("Processor capability set to: ") + LIST[index].label, COLOR_BLUE);
 }
 
-class ProcessPriorityWidget : public EnumDropdownWidget{
-public:
-    ProcessPriorityWidget(QWidget& parent, ProcessorLevelOption& value)
-         : EnumDropdownWidget(parent, value)
-    {
-        connect(
-            this, &EnumDropdownWidget::on_changed,
-            this, [=](){
-                static_cast<ProcessorLevelOption&>(m_value).set_global();
-            }
-        );
-    }
-};
-ConfigWidget* ProcessorLevelOption::make_ui(QWidget& parent){
-    return new ProcessPriorityWidget(parent, *this);
-}
 
 
 

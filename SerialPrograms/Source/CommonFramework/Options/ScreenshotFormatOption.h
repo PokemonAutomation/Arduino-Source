@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ScreenshotFormat_H
 #define PokemonAutomation_ScreenshotFormat_H
 
-#include "EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 

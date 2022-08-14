@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_IVCheckerOption_H
 #define PokemonAutomation_Pokemon_IVCheckerOption_H
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{

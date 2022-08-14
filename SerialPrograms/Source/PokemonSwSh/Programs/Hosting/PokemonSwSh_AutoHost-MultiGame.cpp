@@ -42,7 +42,8 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{
 
 
 AutoHostMultiGame::AutoHostMultiGame()
-    : HOST_ONLINE("<b>Host Online:</b>", true)
+    : RAID_CODE(8)
+    , HOST_ONLINE("<b>Host Online:</b>", true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         "60 * TICKS_PER_SECOND"

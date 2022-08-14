@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_SelfTouchTrade_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 

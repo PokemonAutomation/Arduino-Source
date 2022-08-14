@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

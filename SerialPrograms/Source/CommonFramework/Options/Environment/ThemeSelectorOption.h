@@ -8,7 +8,7 @@
 #define PokemonAutomation_ThemeSelectorOption_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 
@@ -17,10 +17,8 @@ class ThemeSelectorOption : public EnumDropdownOption{
 public:
     ThemeSelectorOption();
 
+    virtual void set(size_t index) override;
     virtual void load_json(const JsonValue& json) override;
-
-private:
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
 };
 
 

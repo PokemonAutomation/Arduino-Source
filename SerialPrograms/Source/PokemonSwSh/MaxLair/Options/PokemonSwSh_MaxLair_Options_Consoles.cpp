@@ -5,8 +5,9 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Qt/Options/EnumDropdownWidget.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_MaxLair_Options_Consoles.h"
@@ -136,11 +137,6 @@ ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
     : BatchWidget(parent, value)
 {
     ConsolesUI::update_ui();
-    EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
-    connect(
-        host, &EnumDropdownWidget::on_changed,
-        this, [=]{ update_ui(); }
-    );
 }
 void ConsolesUI::update_ui(){
     EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
@@ -152,6 +148,11 @@ void ConsolesUI::update_ui(){
         console.set_host(c == host_index);
     }
     BatchWidget::update_ui();
+}
+void ConsolesUI::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update_ui();
+    }, Qt::QueuedConnection);
 }
 
 

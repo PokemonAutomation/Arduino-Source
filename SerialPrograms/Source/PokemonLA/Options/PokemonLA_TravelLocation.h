@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_TravelLocation_H
 #define PokemonAutomation_PokemonLA_TravelLocation_H
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 
 namespace PokemonAutomation{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ProcessPriorityOption_H
 #define PokemonAutomation_ProcessPriorityOption_H
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 class QThread;
 
@@ -17,9 +17,8 @@ namespace PokemonAutomation{
 class ProcessPriorityOption : public EnumDropdownOption{
 public:
     ProcessPriorityOption();
+    virtual void set(size_t index) override;
     void update_priority_to_option() const;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
 };
 
 

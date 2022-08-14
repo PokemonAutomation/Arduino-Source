@@ -10,8 +10,8 @@
 #define PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

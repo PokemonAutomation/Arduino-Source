@@ -102,10 +102,14 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
+    ../Common/Cpp/Options/EnumDropdownOption.cpp
+    ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
     ../Common/Cpp/Options/FixedCodeOption.h
     ../Common/Cpp/Options/FloatingPointOption.cpp
     ../Common/Cpp/Options/FloatingPointOption.h
+    ../Common/Cpp/Options/RandomCodeOption.cpp
+    ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTextOption.cpp
@@ -172,6 +176,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
+    ../Common/Qt/Options/EnumDropdownWidget.cpp
+    ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
@@ -180,6 +186,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FossilTableBaseOption.h
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp
     ../Common/Qt/Options/MultiHostTableBaseOption.h
+    ../Common/Qt/Options/RandomCodeWidget.cpp
+    ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
     ../Common/Qt/Options/SimpleIntegerWidget.h
     ../Common/Qt/Options/StaticTextWidget.cpp
@@ -409,17 +417,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
     Source/CommonFramework/Options/EditableTableWidget.h
-    Source/CommonFramework/Options/EnumDropdownOption.cpp
-    Source/CommonFramework/Options/EnumDropdownOption.h
-    Source/CommonFramework/Options/EnumDropdownWidget.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
-    Source/CommonFramework/Options/RandomCodeOption.cpp
-    Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp

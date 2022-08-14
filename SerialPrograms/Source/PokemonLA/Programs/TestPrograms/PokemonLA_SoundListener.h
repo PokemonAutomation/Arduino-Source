@@ -9,9 +9,9 @@
 #define PokemonAutomation_PokemonLA_SoundListener_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{ 
 namespace NintendoSwitch{

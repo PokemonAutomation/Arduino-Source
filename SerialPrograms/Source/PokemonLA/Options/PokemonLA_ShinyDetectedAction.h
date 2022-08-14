@@ -10,8 +10,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 

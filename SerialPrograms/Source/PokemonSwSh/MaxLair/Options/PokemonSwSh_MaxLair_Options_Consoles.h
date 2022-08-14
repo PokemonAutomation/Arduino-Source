@@ -88,10 +88,11 @@ public:
     HostingSwitch HOST;
     std::unique_ptr<ConsoleSpecificOptions> PLAYERS[4];
 };
-class ConsolesUI : public BatchWidget{
+class ConsolesUI final : public BatchWidget, private ConfigOption::Listener{
 public:
     ConsolesUI(QWidget& parent, Consoles& value);
     virtual void update_ui() override;
+    virtual void value_changed() override;
 };
 
 

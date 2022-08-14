@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Options/EnumDropdownWidget.h"
+#include "Common/Qt/Options/EnumDropdownWidget.h"
 #include "PokemonSwSh_MaxLair_Options_Hosting.h"
 
 namespace PokemonAutomation{
@@ -28,7 +28,7 @@ HostingSettings::HostingSettings()
     , RAID_CODE(
         "<b>Raid Code:</b><br>Required if using multiple Switches. "
         "Random code is strongly recommended when hosting to ensure your own Switches get in.",
-        4, ""
+        8, 4, ""
     )
     , CONNECT_TO_INTERNET_DELAY(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to start adventure.",
@@ -65,24 +65,15 @@ ConfigWidget* HostingSettings::make_ui(QWidget& parent){
     return new HostingSettingsUI(parent, *this);
 }
 
+HostingSettingsUI::~HostingSettingsUI(){
+    m_value.MODE.remove_listener(*this);
+}
 HostingSettingsUI::HostingSettingsUI(QWidget& parent, HostingSettings& value)
     : GroupWidget(parent, value)
+    , m_value(value)
 {
     update_option_visibility();
-
-    EnumDropdownWidget* mode = nullptr;
-    for (ConfigWidget* option : m_options){
-        if (&option->option() == &value.MODE){
-            mode = static_cast<EnumDropdownWidget*>(option);
-        }
-    }
-    connect(
-        mode, &EnumDropdownWidget::on_changed,
-        this, [=]{
-            update_option_visibility();
-            this->update_visibility();
-        }
-    );
+    m_value.MODE.add_listener(*this);
 }
 void HostingSettingsUI::update_option_visibility(){
     HostingSettings& value = static_cast<HostingSettings&>(m_value);
@@ -98,6 +89,12 @@ void HostingSettingsUI::update_option_visibility(){
         value.START_DELAY.visibility = ConfigOptionState::DISABLED;
         value.NOTIFICATIONS.visibility = ConfigOptionState::DISABLED;
     }
+}
+void HostingSettingsUI::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update_option_visibility();
+        this->update_visibility();
+    }, Qt::QueuedConnection);
 }
 
 

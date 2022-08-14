@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 #define PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

@@ -8,8 +8,8 @@
 #include <QTextStream>
 #include <QApplication>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/EnumDropdownWidget.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Qt/Options/EnumDropdownWidget.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
 
@@ -56,35 +56,18 @@ ThemeSelectorOption::ThemeSelectorOption()
         0
     )
 {}
+
+void ThemeSelectorOption::set(size_t index){
+    EnumDropdownOption::set(index);
+    if (index < case_list().size()){
+        set_theme(index);
+    }
+}
 void ThemeSelectorOption::load_json(const JsonValue& json){
     EnumDropdownOption::load_json(json);
     set_theme(*this);
 }
 
-
-class ThemeSelectorWidget : public EnumDropdownWidget{
-public:
-    ThemeSelectorWidget(QWidget& parent, EnumDropdownOption& value)
-        : EnumDropdownWidget(parent, value)
-    {
-        connect(
-            m_box, qOverload<int>(&QComboBox::currentIndexChanged),
-            this, [&](int index){
-                if (0 <= index && index <= 1){
-                    set_theme(index);
-                    m_value.set(index);
-                }
-            }
-        );
-    }
-};
-
-
-
-
-ConfigWidget* ThemeSelectorOption::make_ui(QWidget& parent){
-    return new ThemeSelectorWidget(parent, *this);
-}
 
 
 #if 1

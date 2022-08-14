@@ -4,18 +4,19 @@
  *
  */
 
-#ifndef PokemonAutomation_RandomCode_H
-#define PokemonAutomation_RandomCode_H
+#ifndef PokemonAutomation_Options_RandomCodeOption_H
+#define PokemonAutomation_Options_RandomCodeOption_H
 
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/SpinLock.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
 class RaidCodeOption{
 public:
-    RaidCodeOption();
-    RaidCodeOption(size_t random_digits, std::string code_string);
+    RaidCodeOption(size_t total_digits);
+    RaidCodeOption(size_t total_digits, size_t random_digits, std::string code_string);
 
     size_t total_digits() const{ return m_digits; }
     size_t random_digits() const{ return m_random_digits; }
@@ -31,16 +32,20 @@ public:
     std::string m_code;
 };
 
+
+
 class RandomCodeOption : public ConfigOption{
 public:
-    RandomCodeOption();
-    RandomCodeOption(std::string label, size_t random_digits, std::string code_string);
+    RandomCodeOption(size_t total_digits);
+    RandomCodeOption(std::string label, size_t total_digits, size_t random_digits, std::string code_string);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    operator RaidCodeOption() const;
+    std::string set(RaidCodeOption code);
+
     bool code_enabled() const;
-    size_t random_digits() const{ return m_current.random_digits(); }
     bool get_code(uint8_t* code) const;
 
     virtual std::string check_validity() const override;
@@ -50,8 +55,10 @@ public:
 
 private:
     friend class RandomCodeWidget;
-    std::string m_label;
+    const std::string m_label;
     const RaidCodeOption m_default;
+
+    mutable SpinLock m_lock;
     RaidCodeOption m_current;
 };
 

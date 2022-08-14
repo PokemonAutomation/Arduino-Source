@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_TurboButton_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

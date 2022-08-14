@@ -6,14 +6,14 @@
  *
  */
 
-#ifndef PokemonAutomation_EnumDropdownOption_H
-#define PokemonAutomation_EnumDropdownOption_H
+#ifndef PokemonAutomation_Options_EnumDropdownOption_H
+#define PokemonAutomation_Options_EnumDropdownOption_H
 
 #include <string>
 #include <vector>
 #include <map>
 #include <atomic>
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
@@ -46,11 +46,13 @@ public:
     );
 
     const std::string& label() const{ return m_label; }
+    const std::vector<Option>& case_list() const{ return m_case_list; }
+
     const std::string& case_name(size_t index) const{ return m_case_list[index].name; }
     const std::string& current_case() const { return m_case_list[m_current].name; }
 
     operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
-    void set(size_t index){ m_current.store(index, std::memory_order_relaxed); }
+    virtual void set(size_t index);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -60,9 +62,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class EnumDropdownWidget;
-
-    std::string m_label;
+    const std::string m_label;
     std::vector<Option> m_case_list;
     std::map<std::string, size_t> m_case_map;
     const size_t m_default;
