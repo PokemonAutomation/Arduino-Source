@@ -13,6 +13,10 @@
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_SummaryShinySymbolDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -46,6 +50,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const I
         Color(156, 33, 80), 0.16,
         0.1
     )){
+//        symbol.save("test.png");
         return Detection::SHINY;
     }
     if (cluster_fit_2(
@@ -54,7 +59,6 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const I
         Color(0, 0, 0), 0.08,
         0.1
     )){
-//        screen.save("test.png");
         return Detection::NOT_SHINY;
     }
 

@@ -74,6 +74,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "Common/Cpp/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
 
@@ -136,12 +137,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+//    ImageRGB32 image("screenshot-20220814-164611520622.png");
 
+//    SummaryShinySymbolDetector detector;
+
+
+#if 0
+    BattleMenuDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
     ImageRGB32 image("screenshot-20220814-144223026390.png");
 
     StandardBattleMenuDetector detector(false);
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 //    STATIC_TEXT.set_text("123456789");

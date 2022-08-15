@@ -31,6 +31,7 @@
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 #include <QVideoFrame>
 
@@ -106,11 +107,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+
+    ImageRGB32 image("screenshot-20220814-170240979105.png");
+
+    PokemonSwSh::SummaryShinySymbolDetector detector(logger, overlay);
+
+    cout << detector.detect(image) << endl;
+//    detector.wait_for_detection(scope, feed);
+
+
+
+
+#if 0
     for (size_t c = 0; c < 1000; c++){
         STATIC_TEXT.set_text("Timer: " + std::to_string(c));
         scope.wait_for(std::chrono::milliseconds(100));
     }
-
+#endif
 
 
 //    ImageRGB32 image("screenshot-20220807-171750797516.png");

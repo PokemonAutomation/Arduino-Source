@@ -27,7 +27,7 @@ struct FloatPixel{
         : FloatPixel(Color(pixel))
     {}
     FloatPixel(Color pixel)
-        : r(pixel.alpha()), g(pixel.green()), b(pixel.blue())
+        : r(pixel.red()), g(pixel.green()), b(pixel.blue())
     {}
 
     Color round() const{

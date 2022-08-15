@@ -8,6 +8,7 @@
 #include "ImageBoxes.h"
 #include "ColorClustering.h"
 
+#include <fstream>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -16,6 +17,7 @@ namespace PokemonAutomation{
 
 void PixelEuclideanStatAccumulator::clear(){
     m_count = 0;
+    m_sum_x = 0;
     m_sum_y = 0;
     m_sum_z = 0;
     m_sqr_x = 0;
@@ -67,17 +69,18 @@ double cluster_fit_2(
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             Color pixel(image.pixel(c, r));
-//            ss << "{" << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << "}," << endl;
+//            ss << "{" << (int)pixel.red() << ", " << (int)pixel.green() << ", " << (int)pixel.blue() << "}," << endl;
             FloatPixel p0 = f0 - pixel;
             FloatPixel p1 = f1 - pixel;
             double distance0 = (p0 * p0).sum();
             double distance1 = (p1 * p1).sum();
             if (distance0 < distance1){
                 stats0 += pixel;
-//                cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << ": " << std::sqrt(distance0) << endl;
+//                cout << (int)pixel.red() << ", " << (int)pixel.green() << ", " << (int)pixel.blue() << ": " << std::sqrt(distance0) << endl;
             }else{
                 stats1 += pixel;
-//                cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << ": " << std::sqrt(distance1) << endl;
+//                cout << (int)pixel.red() << ", " << (int)pixel.green() << ", " << (int)pixel.blue() << ": " << std::sqrt(distance1) << endl;
+//                cout << "stats = " << stats1.center() << endl;
             }
         }
     }
@@ -89,6 +92,8 @@ double cluster_fit_2(
 
     cluster0 = stats0;
     cluster1 = stats1;
+
+//    cout << "stats = " << stats1.center() << endl;
 
     return (stats0.deviation() * stats0.count() + stats1.deviation() * stats1.count()) / (stats0.count() + stats1.count());
 }
