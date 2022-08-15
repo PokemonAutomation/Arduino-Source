@@ -503,7 +503,7 @@ public:
                 box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
                 return;
             }
-            m_travel_location->update_ui();
+            m_travel_location->update();
             m_table_widget->update_ui();
         });
 
@@ -524,12 +524,9 @@ public:
         });
     }
 
-    virtual void restore_defaults() override{
-        m_travel_location->restore_defaults();
-        m_table_widget->restore_defaults();
-    }
-    virtual void update_ui() override{
-        m_travel_location->update_ui();
+    virtual void update() override{
+        ConfigWidget::update();
+        m_travel_location->update();
         m_table_widget->update_ui();
     }
 

@@ -60,8 +60,7 @@ class BossActionWidget : public QWidget, public ConfigWidget{
 public:
     BossActionWidget(QWidget& parent, BossActionOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
 
 private:
     void redraw_table();

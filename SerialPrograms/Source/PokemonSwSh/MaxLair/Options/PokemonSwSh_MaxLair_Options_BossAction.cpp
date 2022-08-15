@@ -125,11 +125,8 @@ BossActionWidget::BossActionWidget(QWidget& parent, BossActionOption& value)
     layout->addWidget(label);
     redraw_table();
 }
-void BossActionWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void BossActionWidget::update_ui(){
+void BossActionWidget::update(){
+    ConfigWidget::update();
     redraw_table();
 }
 void BossActionWidget::redraw_table(){

@@ -121,28 +121,12 @@ void GroupWidget::set_options_enabled(bool enabled){
         item->widget().setEnabled(enabled);
     }
 }
-void GroupWidget::restore_defaults(){
-    bool on = m_value.m_default_enabled;
-    m_value.m_enabled.store(on, std::memory_order_relaxed);
-    m_group_box->setChecked(on);
-    m_value.on_set_enabled(on);
-    on_set_enabled(on);
-    for (ConfigWidget* item : m_options){
-        item->restore_defaults();
-    }
-}
-void GroupWidget::update_ui(){
-    ConfigWidget::update_visibility();
+void GroupWidget::update(){
+    ConfigWidget::update();
     bool on = m_value.m_enabled.load(std::memory_order_acquire);
     m_group_box->setChecked(on);
     for (ConfigWidget* item : m_options){
-        item->update_ui();
-    }
-}
-void GroupWidget::update_visibility(){
-    ConfigWidget::update_visibility();
-    for (ConfigWidget* item : m_options){
-        item->update_visibility();
+        item->update();
     }
 }
 void GroupWidget::on_set_enabled(bool enabled){}

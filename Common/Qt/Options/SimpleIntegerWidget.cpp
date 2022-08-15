@@ -70,17 +70,14 @@ SimpleIntegerWidget<Type>::SimpleIntegerWidget(QWidget& parent, SimpleIntegerOpt
     value.add_listener(*this);
 }
 template <typename Type>
-void SimpleIntegerWidget<Type>::restore_defaults(){
-    m_value.restore_defaults();
-}
-template <typename Type>
-void SimpleIntegerWidget<Type>::update_ui(){
+void SimpleIntegerWidget<Type>::update(){
+    ConfigWidget::update();
     m_box->setText(QString::number(m_value));
 }
 template <typename Type>
 void SimpleIntegerWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

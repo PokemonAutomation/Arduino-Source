@@ -23,9 +23,7 @@ public:
 
     void set_options_enabled(bool enabled);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
-    virtual void update_visibility() override;
+    virtual void update() override;
 
 
 public:

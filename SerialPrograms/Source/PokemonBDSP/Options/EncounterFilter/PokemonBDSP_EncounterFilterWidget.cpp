@@ -69,11 +69,8 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
         layout->addWidget(&m_table->widget());
     }
 }
-void EncounterFilterWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void EncounterFilterWidget::update_ui(){
+void EncounterFilterWidget::update(){
+    ConfigWidget::update();
     ShinyFilter current = m_value.m_shiny_filter_current.load(std::memory_order_acquire);
     for (int c = 0; c < m_shininess->count(); c++){
         if (m_shininess->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
@@ -82,7 +79,7 @@ void EncounterFilterWidget::update_ui(){
         }
     }
     if (m_table){
-        m_table->update_ui();
+        m_table->update();
     }
 }
 

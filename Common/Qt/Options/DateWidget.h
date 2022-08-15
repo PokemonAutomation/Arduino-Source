@@ -21,8 +21,8 @@ class DateWidget : public QWidget, public ConfigWidget, private ConfigOption::Li
 public:
     ~DateWidget();
     DateWidget(QWidget& parent, DateOption& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

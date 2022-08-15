@@ -454,10 +454,8 @@ public:
 
     }
 
-    virtual void restore_defaults() override{
-        m_table_widget->restore_defaults();
-    }
-    virtual void update_ui() override{
+    virtual void update() override{
+        ConfigWidget::update();
         m_table_widget->update_ui();
     }
 

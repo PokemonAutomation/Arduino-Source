@@ -106,7 +106,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         this, [&]{
             std::lock_guard<std::mutex> lg(m_session.program_lock());
             option.restore_defaults();
-            m_options->update_ui();
+            m_options->update();
         }
     );
 

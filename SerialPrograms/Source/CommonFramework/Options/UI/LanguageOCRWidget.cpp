@@ -104,16 +104,14 @@ void LanguageOCRWidget::update_status(){
     }
 }
 
-void LanguageOCRWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void LanguageOCRWidget::update_ui(){
+void LanguageOCRWidget::update(){
+    ConfigWidget::update();
     m_box->setCurrentIndex((int)(Language)m_value);
     update_status();
 }
 void LanguageOCRWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

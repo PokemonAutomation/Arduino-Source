@@ -21,8 +21,7 @@ public:
     ~FriendCodeListWidget();
     FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

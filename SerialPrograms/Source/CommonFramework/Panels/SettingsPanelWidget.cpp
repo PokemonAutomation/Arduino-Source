@@ -91,7 +91,7 @@ QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
 }
 
 void SettingsPanelWidget::restore_defaults(){
-    m_options->restore_defaults();
+    m_options->option().restore_defaults();
 }
 
 

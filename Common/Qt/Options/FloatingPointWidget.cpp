@@ -74,15 +74,13 @@ FloatingPointWidget::FloatingPointWidget(QWidget& parent, FloatingPointOption& v
     );
     value.add_listener(*this);
 }
-void FloatingPointWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void FloatingPointWidget::update_ui(){
+void FloatingPointWidget::update(){
+    ConfigWidget::update();
     m_box->setText(QString::number(m_value, 'f'));
 }
 void FloatingPointWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

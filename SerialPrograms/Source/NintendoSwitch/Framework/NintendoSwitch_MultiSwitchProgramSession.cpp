@@ -136,6 +136,7 @@ void MultiSwitchProgramSession::internal_stop_program(){
 }
 void MultiSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    m_option.options().reset_state();
 
     ProgramInfo program_info(
         identifier(),

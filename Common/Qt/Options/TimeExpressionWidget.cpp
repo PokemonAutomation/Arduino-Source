@@ -59,17 +59,14 @@ TimeExpressionWidget<Type>::TimeExpressionWidget(QWidget& parent, TimeExpression
     value.add_listener(*this);
 }
 template <typename Type>
-void TimeExpressionWidget<Type>::restore_defaults(){
-    m_value.restore_defaults();
-}
-template <typename Type>
-void TimeExpressionWidget<Type>::update_ui(){
+void TimeExpressionWidget<Type>::update(){
+    ConfigWidget::update();
     m_box->setText(QString::fromStdString(m_value.text()));
 }
 template <typename Type>
 void TimeExpressionWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

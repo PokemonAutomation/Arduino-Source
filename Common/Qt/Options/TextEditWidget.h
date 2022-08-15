@@ -22,8 +22,7 @@ public:
     ~TextEditWidget();
     TextEditWidget(QWidget& parent, TextEditOption& value);
 
-    virtual void update_ui() override;
-    virtual void restore_defaults() override;
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

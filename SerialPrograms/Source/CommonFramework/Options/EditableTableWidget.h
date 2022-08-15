@@ -20,10 +20,8 @@ public:
         : EditableTableBaseWidget(parent, value)
         , ConfigWidget(value, *this)
     {}
-    virtual void restore_defaults() override{
-        EditableTableBaseWidget::restore_defaults();
-    }
-    virtual void update_ui() override{
+    virtual void update() override{
+        ConfigWidget::update();
         EditableTableBaseWidget::update_ui();
     }
 };

@@ -74,16 +74,13 @@ FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption
     m_value.add_listener(*this);
 }
 
-void FriendCodeListWidget::restore_defaults(){
-    m_value.restore_defaults();
-//    update_ui();
-}
-void FriendCodeListWidget::update_ui(){
+void FriendCodeListWidget::update(){
+    ConfigWidget::update();
     m_box->redraw();
 }
 void FriendCodeListWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

@@ -26,8 +26,7 @@ class StringSelectWidget : public QWidget, public ConfigWidget{
 public:
     StringSelectWidget(QWidget& parent, StringSelectOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
 
 private:
     StringSelectOption& m_value;
@@ -156,11 +155,8 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
 }
 
 
-void StringSelectWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void StringSelectWidget::update_ui(){
+void StringSelectWidget::update(){
+    ConfigWidget::update();
     m_box->setCurrentIndex((int)(size_t)m_value);
 }
 

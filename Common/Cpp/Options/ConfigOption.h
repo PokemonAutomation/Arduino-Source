@@ -58,19 +58,19 @@ public:
     //  transient state that the option object may have.
     virtual void reset_state(){};
 
+    ConfigOptionState visibility() const;
+    virtual void set_visibility(ConfigOptionState visibility);
+
 
 public:
     virtual ConfigWidget* make_ui(QWidget& parent) = 0;
-
-public:
-    ConfigOptionState visibility = ConfigOptionState::ENABLED;
 
 protected:
     void push_update();
 
 private:
-    struct Listeners;
-    Pimpl<Listeners> m_listeners;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

@@ -73,15 +73,13 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     );
     m_value.add_listener(*this);
 }
-void FixedCodeWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void FixedCodeWidget::update_ui(){
+void FixedCodeWidget::update(){
+    ConfigWidget::update();
     m_box->setText(QString::fromStdString(m_value));
 }
 void FixedCodeWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

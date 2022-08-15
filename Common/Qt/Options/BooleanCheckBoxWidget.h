@@ -20,8 +20,8 @@ class BooleanCheckBoxWidget : public QWidget, public ConfigWidget, private Confi
 public:
     ~BooleanCheckBoxWidget();
     BooleanCheckBoxWidget(QWidget& parent, BooleanCheckBoxOption& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

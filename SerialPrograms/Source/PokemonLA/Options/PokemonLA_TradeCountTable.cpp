@@ -163,11 +163,8 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
     m_table->resizeColumnsToContents();
 
 }
-void TradeCountTableWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void TradeCountTableWidget::update_ui(){
+void TradeCountTableWidget::update(){
+    ConfigWidget::update();
     for (size_t c = 0; c < m_value.m_list.size(); c++){
         m_entries[c]->setText(QString::number(m_value.m_list[0].second));
     }

@@ -22,8 +22,7 @@ class EncounterFilterWidget : public QWidget, public ConfigWidget{
 public:
     EncounterFilterWidget(QWidget& parent, EncounterFilterOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
 
 private:
     EncounterFilterOption& m_value;

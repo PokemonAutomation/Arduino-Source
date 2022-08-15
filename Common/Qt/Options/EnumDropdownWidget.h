@@ -22,8 +22,7 @@ public:
     ~EnumDropdownWidget();
     EnumDropdownWidget(QWidget& parent, EnumDropdownOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
     virtual void value_changed() override;
 
 protected:

@@ -82,22 +82,22 @@ HostingSettingsUI::HostingSettingsUI(QWidget& parent, HostingSettings& value)
 void HostingSettingsUI::update_option_visibility(){
     HostingSettings& value = static_cast<HostingSettings&>(m_value);
     if ((size_t)value.MODE == (size_t)HostingMode::HOST_ONLINE){
-        value.CONNECT_TO_INTERNET_DELAY.visibility = ConfigOptionState::ENABLED;
+        value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        value.CONNECT_TO_INTERNET_DELAY.visibility = ConfigOptionState::DISABLED;
+        value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::DISABLED);
     }
     if ((size_t)value.MODE != (size_t)HostingMode::NOT_HOSTING){
-        value.START_DELAY.visibility = ConfigOptionState::ENABLED;
-        value.NOTIFICATIONS.visibility = ConfigOptionState::ENABLED;
+        value.START_DELAY.set_visibility(ConfigOptionState::ENABLED);
+        value.NOTIFICATIONS.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        value.START_DELAY.visibility = ConfigOptionState::DISABLED;
-        value.NOTIFICATIONS.visibility = ConfigOptionState::DISABLED;
+        value.START_DELAY.set_visibility(ConfigOptionState::DISABLED);
+        value.NOTIFICATIONS.set_visibility(ConfigOptionState::DISABLED);
     }
 }
 void HostingSettingsUI::value_changed(){
     QMetaObject::invokeMethod(this, [=]{
         update_option_visibility();
-        this->update_visibility();
+        this->update();
     }, Qt::QueuedConnection);
 }
 

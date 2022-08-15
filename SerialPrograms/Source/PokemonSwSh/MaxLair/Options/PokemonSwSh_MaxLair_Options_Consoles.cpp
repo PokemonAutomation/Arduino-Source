@@ -93,7 +93,7 @@ ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const Language
 }
 void ConsoleSpecificOptions::set_host(bool is_host){
     this->is_host = is_host;
-    is_host_label.visibility = is_host ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    is_host_label.set_visibility(is_host ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 
 
@@ -123,22 +123,30 @@ void Consoles::set_active_consoles(size_t consoles){
 //    cout << "Consoles::set_active_consoles() = " << consoles << endl;
     size_t c = 0;
     for (; c < consoles; c++){
-        PLAYERS[c]->visibility = ConfigOptionState::ENABLED;
+        PLAYERS[c]->set_visibility(ConfigOptionState::ENABLED);
     }
     for (; c < 4; c++){
-        PLAYERS[c]->visibility = ConfigOptionState::HIDDEN;
+        PLAYERS[c]->set_visibility(ConfigOptionState::HIDDEN);
     }
     m_active_consoles = consoles;
 }
 ConfigWidget* Consoles::make_ui(QWidget& parent){
     return new ConsolesUI(parent, *this);
 }
+ConsolesUI::~ConsolesUI(){
+    m_value.HOST.remove_listener(*this);
+    m_value.remove_listener(*this);
+}
 ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
     : BatchWidget(parent, value)
+    , m_value(value)
 {
-    ConsolesUI::update_ui();
+    ConsolesUI::update();
+    value.add_listener(*this);
+    value.HOST.add_listener(*this);
 }
-void ConsolesUI::update_ui(){
+void ConsolesUI::update(){
+    BatchWidget::update();
     EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
     size_t host_index = static_cast<EnumDropdownOption&>(host->option());
 //    cout << "ConsolesUI::update_ui()" << endl;
@@ -147,11 +155,10 @@ void ConsolesUI::update_ui(){
         ConsoleSpecificOptions& console = static_cast<ConsoleSpecificOptions&>(console_widget->option());
         console.set_host(c == host_index);
     }
-    BatchWidget::update_ui();
 }
 void ConsolesUI::value_changed(){
     QMetaObject::invokeMethod(this, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

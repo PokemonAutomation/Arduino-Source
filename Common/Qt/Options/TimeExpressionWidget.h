@@ -21,8 +21,8 @@ class TimeExpressionWidget : public QWidget, public ConfigWidget, private Config
 public:
     ~TimeExpressionWidget();
     TimeExpressionWidget(QWidget& parent, TimeExpressionOption<Type>& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

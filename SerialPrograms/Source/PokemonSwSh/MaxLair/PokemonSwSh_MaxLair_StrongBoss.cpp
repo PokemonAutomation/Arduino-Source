@@ -66,11 +66,11 @@ public:
     virtual void set_host(bool is_host) override{
         ConsoleSpecificOptions::set_host(is_host);
         if (is_host){
-            actions_host.visibility = ConfigOptionState::ENABLED;
-            actions_non_host.visibility = ConfigOptionState::HIDDEN;
+            actions_host.set_visibility(ConfigOptionState::ENABLED);
+            actions_non_host.set_visibility(ConfigOptionState::HIDDEN);
         }else{
-            actions_host.visibility = ConfigOptionState::HIDDEN;
-            actions_non_host.visibility = ConfigOptionState::ENABLED;
+            actions_host.set_visibility(ConfigOptionState::HIDDEN);
+            actions_non_host.set_visibility(ConfigOptionState::ENABLED);
         }
     }
 

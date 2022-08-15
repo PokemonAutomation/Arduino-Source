@@ -90,9 +90,12 @@ public:
 };
 class ConsolesUI final : public BatchWidget, private ConfigOption::Listener{
 public:
+    ~ConsolesUI();
     ConsolesUI(QWidget& parent, Consoles& value);
-    virtual void update_ui() override;
+    virtual void update() override;
     virtual void value_changed() override;
+private:
+    Consoles& m_value;
 };
 
 

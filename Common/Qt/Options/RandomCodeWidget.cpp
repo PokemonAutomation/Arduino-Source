@@ -120,17 +120,15 @@ void RandomCodeWidget::update_labels(){
         m_under_text->setText(QString::fromStdString("Random Code: " + random_code_string()));
     }
 }
-void RandomCodeWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void RandomCodeWidget::update_ui(){
+void RandomCodeWidget::update(){
+    ConfigWidget::update();
     m_box_random->setText(QString::number(m_value.m_current.random_digits()));
     m_box_code->setText(QString::fromStdString(m_value.m_current.code_string()));
     update_labels();
 }
 void RandomCodeWidget::value_changed(){
     QMetaObject::invokeMethod(this, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

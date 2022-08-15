@@ -20,8 +20,8 @@ class SimpleIntegerWidget : public QWidget, public ConfigWidget, private ConfigO
 public:
     ~SimpleIntegerWidget();
     SimpleIntegerWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

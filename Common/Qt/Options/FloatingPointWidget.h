@@ -21,8 +21,8 @@ class FloatingPointWidget : public QWidget, public ConfigWidget, private ConfigO
 public:
     ~FloatingPointWidget();
     FloatingPointWidget(QWidget& parent, FloatingPointOption& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

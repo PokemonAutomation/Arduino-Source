@@ -44,17 +44,15 @@ BooleanCheckBoxWidget::BooleanCheckBoxWidget(QWidget& parent, BooleanCheckBoxOpt
     );
     value.add_listener(*this);
 }
-void BooleanCheckBoxWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void BooleanCheckBoxWidget::update_ui(){
+void BooleanCheckBoxWidget::update(){
+    ConfigWidget::update();
     if (m_value != m_box->isChecked()){
         m_box->setChecked(m_value);
     }
 }
 void BooleanCheckBoxWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

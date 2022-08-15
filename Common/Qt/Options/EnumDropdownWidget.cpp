@@ -68,16 +68,13 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
 }
 
 
-void EnumDropdownWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void EnumDropdownWidget::update_ui(){
+void EnumDropdownWidget::update(){
+    ConfigWidget::update();
     m_box->setCurrentIndex((int)m_value);
 }
 void EnumDropdownWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

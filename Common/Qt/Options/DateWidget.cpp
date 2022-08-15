@@ -48,15 +48,13 @@ DateWidget::DateWidget(QWidget& parent, DateOption& value)
 
     value.add_listener(*this);
 }
-void DateWidget::restore_defaults(){
-    m_value.restore_defaults();
-}
-void DateWidget::update_ui(){
+void DateWidget::update(){
+    ConfigWidget::update();
     m_date_edit->setDate(m_value.get());
 }
 void DateWidget::value_changed(){
     QMetaObject::invokeMethod(m_date_edit, [=]{
-        update_ui();
+        update();
     }, Qt::QueuedConnection);
 }
 

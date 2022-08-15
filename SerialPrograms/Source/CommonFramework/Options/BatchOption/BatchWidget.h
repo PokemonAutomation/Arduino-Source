@@ -19,9 +19,7 @@ class BatchWidget : public QWidget, public ConfigWidget{
 public:
     BatchWidget(QWidget& parent, BatchOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
-    virtual void update_visibility() override;
+    virtual void update() override;
 
 protected:
     BatchOption& m_value;

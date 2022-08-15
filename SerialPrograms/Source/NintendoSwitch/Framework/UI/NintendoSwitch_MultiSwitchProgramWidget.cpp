@@ -112,7 +112,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         this, [&]{
             std::lock_guard<std::mutex> lg(m_session.program_lock());
             option.restore_defaults();
-            m_options->update_ui();
+            m_options->update();
         }
     );
 
@@ -152,7 +152,7 @@ void MultiSwitchProgramWidget2::error(const std::string& message){
 
 void MultiSwitchProgramWidget2::redraw_options(){
     QMetaObject::invokeMethod(this, [=]{
-        m_options->update_ui();
+        m_options->update();
     });
 }
 

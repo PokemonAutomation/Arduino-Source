@@ -21,8 +21,8 @@ class StringWidget : public QWidget, public ConfigWidget, private ConfigOption::
 public:
     ~StringWidget();
     StringWidget(QWidget& parent, StringOption& value);
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

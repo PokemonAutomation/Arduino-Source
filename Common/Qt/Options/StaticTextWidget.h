@@ -21,8 +21,8 @@ class StaticTextWidget : public QWidget, public ConfigWidget, private ConfigOpti
 public:
     ~StaticTextWidget();
     StaticTextWidget(QWidget& parent, StaticTextOption& value);
-    virtual void update_ui() override;
-    virtual void restore_defaults() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:
@@ -35,8 +35,8 @@ class SectionDividerWidget : public QWidget, public ConfigWidget, private Config
 public:
     ~SectionDividerWidget();
     SectionDividerWidget(QWidget& parent, SectionDividerOption& value);
-    virtual void update_ui() override;
-    virtual void restore_defaults() override;
+
+    virtual void update() override;
     virtual void value_changed() override;
 
 private:

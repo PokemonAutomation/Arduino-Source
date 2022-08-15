@@ -45,8 +45,7 @@ class TradeCountTableWidget : public QWidget, public ConfigWidget{
 public:
     TradeCountTableWidget(QWidget& parent, TradeCountTableOption& value);
 
-    virtual void restore_defaults() override;
-    virtual void update_ui() override;
+    virtual void update() override;
 
 private:
     QLineEdit* make_count_box(QWidget& parent, int row, int count);

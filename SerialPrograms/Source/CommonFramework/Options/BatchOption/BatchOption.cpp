@@ -82,22 +82,10 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
         options_layout->addWidget(&m_options.back()->widget(), 0);
     }
 }
-void BatchWidget::restore_defaults(){
+void BatchWidget::update(){
+    ConfigWidget::update();
     for (ConfigWidget* item : m_options){
-        item->restore_defaults();
-    }
-}
-void BatchWidget::update_ui(){
-//    ConfigWidget::update_visibility();
-    update_visibility();
-    for (ConfigWidget* item : m_options){
-        item->update_ui();
-    }
-}
-void BatchWidget::update_visibility(){
-    ConfigWidget::update_visibility();
-    for (ConfigWidget* item : m_options){
-        item->update_visibility();
+        item->update();
     }
 }
 
