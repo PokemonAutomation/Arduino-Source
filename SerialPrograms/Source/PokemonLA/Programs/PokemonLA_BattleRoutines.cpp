@@ -140,7 +140,24 @@ bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemo
     return still_on_move_screen == false;
 }
 
-
+void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemon, size_t& cur_move){
+    const bool check_move_success = true;
+    while (use_move(console, context, cur_pokemon, cur_move, MoveStyle::NoStyle, check_move_success) == false){
+        // We are still on the move selection screen. No PP.
+        if (cur_move == 3){
+            // Pokemon has zero PP on all moves. This should not happen as it will just use
+            // Struggle.
+            console.log("No PP on all moves. Abort program.", COLOR_RED);
+            throw OperationFailedException(console, "No PP on all moves.");
+        }
+        
+        // Go to the next move.
+        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+        // env.console.context().wait_for_all_requests();
+        cur_move++;
+        console.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);
+    }
+}
 
 
 

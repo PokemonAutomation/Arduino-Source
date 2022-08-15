@@ -24,6 +24,7 @@ namespace PokemonLA{
 
 BattleStartDetector::BattleStartDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("BattleStartDetector")
+    , m_logger(logger)
     , m_upper_boundary  (0.0, 0.113, 1.0, 0.15)
     , m_lower_boundary (0.2, 0.871, 0.63, 0.015)
 {}
@@ -51,7 +52,14 @@ bool BattleStartDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 
     const size_t lower_border_length = count_horizontal_translucent_border_pixels(lower_boundary, threshold, false);
 
-    return lower_border_length / (float)lower_boundary.width() > 0.9;
+    detected = lower_border_length / (float)lower_boundary.width() > 0.9;
+
+    if (detected && m_started == false){
+        m_started = true;
+        m_logger.log("Detected battle start by black borders.");
+    }
+
+    return detected;
 }
 
 

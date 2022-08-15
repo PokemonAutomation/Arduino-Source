@@ -51,7 +51,10 @@ public:
 private:
 
     // Set the bool value of the detected sprites in `sprites` to true
-    void set_detected_sprites(const ImageViewRGB32& frame, std::vector<bool>& sprites) const;
+    // Return true if at least one sprite is newly detected
+    bool set_detected_sprites(const ImageViewRGB32& frame, std::vector<bool>& sprites) const;
+
+    Logger& m_logger;
 
     BattleStartDetector m_battle_start_detector;
     std::vector<ImageFloatBox> m_sprite_boxes;

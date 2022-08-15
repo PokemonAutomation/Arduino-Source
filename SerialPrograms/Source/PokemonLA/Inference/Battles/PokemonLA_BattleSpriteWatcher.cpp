@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/AbstractLogger.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageGradient.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_BattleSpriteWatcher.h"
 
@@ -28,6 +30,7 @@ const size_t MAX_WILD_POKEMON_IN_MULTI_BATTLE = 8;
 
 BattleSpriteWatcher::BattleSpriteWatcher(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("BattleSpriteWatcher")
+    , m_logger(logger)
     , m_battle_start_detector(logger, overlay)
 {
     for(size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
@@ -48,7 +51,10 @@ bool BattleSpriteWatcher::process_frame(const ImageViewRGB32& frame, WallClock t
         return false;
     }
 
-    set_detected_sprites(frame, m_sprite_appeared);
+    const bool found_new_sprites = set_detected_sprites(frame, m_sprite_appeared);
+    if (found_new_sprites && PreloadSettings::instance().DEVELOPER_MODE){
+        dump_debug_image(m_logger, "PokemonLA/BattleSpriteWatcher", "SpriteDetected", frame);
+    }
 
     return false;
 }
@@ -61,15 +67,19 @@ std::vector<bool> BattleSpriteWatcher::detect_sprites(const ImageViewRGB32& fram
 }
 
 
-void BattleSpriteWatcher::set_detected_sprites(const ImageViewRGB32& frame, std::vector<bool>& sprites) const{
+bool BattleSpriteWatcher::set_detected_sprites(const ImageViewRGB32& frame, std::vector<bool>& sprites) const{
+    bool ret = false;
     for(size_t i = 0; i < m_sprite_boxes.size(); i++){
         const auto& box = m_sprite_boxes[i];
         const auto stats = image_stats(extract_box_reference(frame, box));
         // cout << stats.average.to_string() << " " << stats.stddev.to_string() << endl;
-        if (stats.average.sum() > 150.0 || stats.stddev.sum() > 20.0){
+        if (sprites[i] == false && (stats.average.sum() > 150.0 || stats.stddev.sum() > 60.0)){
+            ret = true;
             sprites[i] = true;
         }
     }
+
+    return ret;
 }
 
 

@@ -26,9 +26,12 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
+    Logger& m_logger;
     // The upper and lower black area boundary
     ImageFloatBox m_upper_boundary;
     ImageFloatBox m_lower_boundary;
+    // Record whether a battle start has been detected. This is used for logging.
+    bool m_started = false;
 };
 
 

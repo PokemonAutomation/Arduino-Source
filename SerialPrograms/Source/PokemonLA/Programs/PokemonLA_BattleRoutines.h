@@ -34,10 +34,16 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
 // `cur_move` the index of the move (0, 1, 2 or 3). It is only used when `check_success` is true.
 // If `check_success` is true, return whether the move is successfully used, by checking whether the game is still in the move selection
 // menu after some ticks (need correct `cur_move` to do this). If `check_success` is false, always return true.
-// `wait_for_all_requests()` is called at the end of the function no matter `check_success` is true of false.
+// `wait_for_all_requests()` is called at the end of the function no matter `check_success` is true or false.
 bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemon, size_t cur_move, MoveStyle style, bool check_success);
 
-
+// Assuming the game is at the move selection menu, use the current selected move with no style.
+// If the move has no PP, move to use the next move.
+// `cur_pokemon` does not affect game control. It is passed in only for the logging purpose.
+// In order for the move PP detection to be correct, must pass in the correct `cur_move`.
+// When the function moves to using the next move, it also updates `cur_move`.
+// This function assumes it starts with the move selection menu, so it does not consider the case the pokemon has no PP and has to use Struggle.
+void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemon, size_t& cur_move);
 
 
 }

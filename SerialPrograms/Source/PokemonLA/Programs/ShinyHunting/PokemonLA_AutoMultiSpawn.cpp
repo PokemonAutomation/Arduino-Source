@@ -5,14 +5,16 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -20,6 +22,7 @@
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
+#include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_TimeOfDayChange.h"
@@ -58,11 +61,17 @@ const std::set<std::string> WILD_NEARBY_POKEMON[] = {
 
 // Focus on a pokemon, change focus if possible until one of the target pokemon is found.
 // Then thow the current item/pokemon to start a battle or catch/hit the pokemon.
+// 
+// If a target pokemon is focused, the function returns immediately when the item/pokemon is throw, with
+// return value: (true, target pokemon details).
+// If it fails to find any pokemon, return (false, empty details).
+// If it can focus on one pokemon but cannot find a target pokemon, return (true, empty details).
+//
 // Currently it hardcoded to do maximum 4 focus change attempts before giving up.
 // If it cannot find the target pokemon or OCR pokemon name reading fails, it returns
 // an empty PokemonDetails.
 // Otherwise, it returns the details of the pokemon thrown at.
-PokemonDetails control_focus_to_throw(
+std::pair<bool, PokemonDetails> control_focus_to_throw(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context, 
     const std::set<std::string>& target_pokemon,
@@ -89,10 +98,12 @@ PokemonDetails control_focus_to_throw(
         if (ret < 0){
             env.log("Failed to focus on one pokemon.");
             session.stop_session_and_rethrow(); // Stop the commands
-            return PokemonDetails();
+            return std::make_pair(false, PokemonDetails());
         }
 
         // We have successfully focused on one pokemon.
+        // Wait for a while so that the pokemon name is fully rendered, to avoid mis-read pokemon name.
+        context.wait_for(std::chrono::milliseconds(300));
         // Read its details and detect whether we can change focus.
         auto focused_frame = env.console.video().snapshot();
         PokemonDetails details = read_focused_wild_pokemon_info(env.console, env.console, focused_frame, language);
@@ -102,7 +113,7 @@ PokemonDetails control_focus_to_throw(
             // Somehow the program detects a pokemon focus, but cannot read any names
             env.log("Warning: Focus on a pokemon but cannot read pokemon name.", COLOR_RED);
             session.stop_session_and_rethrow(); // Stop the commands
-            return PokemonDetails();
+            return std::make_pair(false, PokemonDetails());
         }
 
         { // log pokemon name candidates
@@ -138,8 +149,9 @@ PokemonDetails control_focus_to_throw(
             env.log("Sending command to throw pokemon to start battle");
             session.wait();
             env.log("Waited for the throw pokemon command to finish");
-            
-            return details;
+            session.stop_session_and_rethrow();
+            context.wait_for_all_requests();
+            return std::make_pair(true, details);
         }
 
         // Target pokemon not focused:
@@ -158,7 +170,7 @@ PokemonDetails control_focus_to_throw(
             }
             
             session.stop_session_and_rethrow();
-            return PokemonDetails();
+            return std::make_pair(true, PokemonDetails());
         }
 
         if (focus_index < max_focus_change_attempt){
@@ -176,7 +188,7 @@ PokemonDetails control_focus_to_throw(
 
     session.stop_session_and_rethrow();
     env.log("After four focus change attempts we cannot find a target pokemon");
-    return PokemonDetails();
+    return std::make_pair(true, PokemonDetails());
 }
 
 
@@ -246,6 +258,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     std::vector<TimeOfDay> path_times;
     // We + 1 here because we need one more time change to read the desired target pokemon at the end (usually a shiny alpha)
     for(size_t i = 0; i < path_despawns.size() + 1; i++){
+        // TODO: if murkrow path is added, need to output 'N'
         path_times.push_back(i % 2 == 0 ? TimeOfDay::MORNING : TimeOfDay::MIDDAY);
     }
     
@@ -255,21 +268,30 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             if (i >0){
                 os << '|';
             }
-            // TODO: if murkrow path is added, need to output 'N'
             os << 'A' << path_despawns[i] << '(' << timeOfDayOneLetter(path_times[i]) << ')';
         }
         env.log("The path is: " + os.str());
     }
     
-    // change_time_of_day(TimeOfDay.MORNING);
+    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    change_time_of_day_at_tent(env.console, context, path_times[0], Camp::MIRELANDS_MIRELANDS);
 
-    for(size_t i = 0; i < path_despawns.size(); i++){
+    for(size_t iStep = 0; iStep < path_despawns.size(); iStep++){
         // - Teleport to a camp
         // - From camp, go to the spawn point
         // - Battle the pokemon there to remove them
         // - Teleport back to camp
         // - Got to tent to change time of day
-        advance_one_path_step(env, context, path_despawns[i], path_times[i], path_times[i+1]);
+        advance_one_path_step(env, context, max_num_despawn, path_despawns[iStep], path_times[iStep], path_times[iStep+1]);
+
+        std::ostringstream os;
+        for(size_t jStep = 0; jStep < path_despawns.size(); jStep++){
+            os << 'A' << path_despawns[jStep] << '(' << timeOfDayOneLetter(path_times[jStep]) << ")|";
+            if (iStep == jStep){
+                os << '*';
+            }
+        }
+        env.log("Path Progress: " + os.str(), COLOR_CYAN);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
@@ -278,6 +300,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 void AutoMultiSpawn::advance_one_path_step(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
+    size_t num_spawned_pokemon,
     size_t num_to_despawn,
     TimeOfDay cur_time,
     TimeOfDay next_time
@@ -295,22 +318,26 @@ void AutoMultiSpawn::advance_one_path_step(
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_X, 20, 230);
     }
+
+    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
     
     // We try at most three battles to remove pokemon
     size_t already_removed_pokemon = 0;
     size_t remained_to_remove = num_to_despawn;
+    size_t pokemon_left = num_spawned_pokemon;
     for(int i = 0; i < 3; i++){
         // Go to spawn point to start a battle, remove some pokemon, then return to camp.
-        size_t num_pokemon_removed = one_battle_to_remove_pokemon(env, context, remained_to_remove);
+        size_t num_pokemon_removed = try_one_battle_to_remove_pokemon(env, context, pokemon_left, remained_to_remove);
         already_removed_pokemon += num_pokemon_removed;
         env.log("Removed " + std::to_string(num_pokemon_removed) + " via battle, total "
-             + std::to_string(already_removed_pokemon) + " pokemon rmoved, target total pokemon to remove: " + std::to_string(num_to_despawn));
+             + std::to_string(already_removed_pokemon) + " pokemon removed, target total pokemon to remove: " + std::to_string(num_to_despawn));
         if (already_removed_pokemon > num_to_despawn){
             throw OperationFailedException(env.console, "Removed more pokemon than required. Removed "
                  + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn));
         }
 
         remained_to_remove -= num_pokemon_removed;
+        pokemon_left -= num_pokemon_removed;
 
         // XXX
         // Check weather. If weather does not match the weather at the beginning of the path step, then
@@ -324,45 +351,25 @@ void AutoMultiSpawn::advance_one_path_step(
         throw OperationFailedException(env.console, "After trying to start three battles, cannot remove enough pokemon.");
     }
 
-    // All pokemon removed.
-    // Now go to tent to change time of day.
+    // All pokemon removed. Now go to tent to change time of day.
     change_time_of_day_at_tent(env.console, context, next_time, Camp::MIRELANDS_MIRELANDS);
 }
 
 // From camp, go to spawn, do one battle to remove pokemon. If no error, return camp
-size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t num_to_despawn){
-    // From camp fly to the spawn point, focus on a target pokemon and start a battle
-    auto go_to_spawn_point_and_start_battle = [&]() -> PokemonDetails {
-        goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
-        change_mount(env.console, context, MountState::BRAVIARY_ON);
-        pbf_wait(context, 40);
-        
-        // Move to spawn location on Braviary
-        pbf_move_left_joystick(context, 255, 165, 150, 0); // 170
-        pbf_press_button(context, BUTTON_B, 200, 10);
-        pbf_mash_button(context, BUTTON_B, 1500); // 1450
-
-        // Descend down from the air:
-        pbf_press_button(context, BUTTON_PLUS, 20, 150); // jump down from Braviary
-        for(int i = 0; i < 2; i++){
-            pbf_press_button(context, BUTTON_PLUS, 20, 50); // Call back Braviary to stop falling
-            pbf_press_button(context, BUTTON_PLUS, 20, 150); // fall down again
-        }
-        
-        // Move forward on foot
-        pbf_move_left_joystick(context, 128, 0, 150, 0);
-
-        context.wait_for_all_requests();
-        
-        return control_focus_to_throw(env, context, TARGET_POKEMON[SPAWN], WILD_NEARBY_POKEMON[SPAWN], LANGUAGE);
-    };
-
+size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    size_t num_left,
+    size_t num_to_despawn
+){
     // Try to go to spawn point and focus on one pokemon
     PokemonDetails focused_pokemon;
     const size_t num_tries = 5;
     for(size_t i = 0; i < num_tries; i++){
-        focused_pokemon = go_to_spawn_point_and_start_battle();
-        env.log("Finish trying to start a battle");
+        // From camp go to the spawn point, try focusing on one pokemon.
+        // Return the pokemon details if found the target pokemon. Otherwise if cannot find one, return empty details.
+        focused_pokemon = go_to_spawn_point_and_try_focusing_pokemon(env, context, num_left);
+
         if (focused_pokemon.name_candidates.size() > 0){
             // We found one
             env.log("Focused on one pokemon and starting battle.");
@@ -380,13 +387,18 @@ size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironme
     }
     
     // We have found a target pokemon and initiated a pokemon battle
-
-    // BattleStartDetector battle_start_detector(env.console.logger(), env.console);
+    env.log("Now waiting for pokemon battle to begin...");
     BattleSpriteWatcher battle_sprite_watcher(env.console.logger(), env.console.overlay());
-    env.log("Starting watching for battle menu or battle ending");
+    wait_until(
+        env.console, context, std::chrono::seconds(3), {{battle_sprite_watcher}}
+    );
+    env.log("Waited for 3 sec. Now start detecting battle menu or battle ends.");
 
     bool battle_starting = true;
-    size_t num_initial_pokemon = 0;
+    size_t num_initial_sprites = 0;
+    size_t num_removed_pokemon = 0;
+    bool battle_menu_detectd = false;
+    size_t cur_move = 0;
     while(true){
         const bool stop_on_detected = true;
         BattleMenuDetector battle_menu_detector(env.console.logger(), env.console, stop_on_detected);
@@ -396,12 +408,16 @@ size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironme
             {arc_phone_detector},
             {battle_menu_detector}
         };
+        int seconds_to_wait = 60;
         if (battle_starting){
             callbacks.emplace_back(battle_sprite_watcher);
+            // When battle starts, assume your pokemon is the fastest, your turn should
+            // arrive very quickly.
+            seconds_to_wait = 30;
         }
 
         int ret = wait_until(
-            env.console, context, std::chrono::seconds(30), callbacks
+            env.console, context, std::chrono::seconds(seconds_to_wait), callbacks
         );
 
         if (ret < 0){
@@ -410,45 +426,59 @@ size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironme
 
         if (battle_starting){
             for(bool appeared: battle_sprite_watcher.sprites_appeared()){
-                num_initial_pokemon += appeared;
+                num_initial_sprites += appeared;
             }
 
+            env.log("Battle started, detected battle sprite count: " + std::to_string(num_initial_sprites) +
+                    ", number to despawn: " + std::to_string(num_to_despawn));
             battle_starting = false;
         }
 
         if (ret == 0){  // battle ends
             env.log("Battle ends");
-            size_t num_removed_pokemon = 0;
-            if (num_initial_pokemon == 0){
-                // battle ends but no sprite detected. So there is only one pokmeon in the battle and it immediately fled.
+            if (num_initial_sprites == 0 || battle_menu_detectd == false){
+                // num_initial_sprites == 0: battle ends but no sprite detected. So there is only one pokmeon in the battle and it is removed
+                // battle_menu_detectd == false: we don't go to battle menu before battle ends. This means there is only skittish pokemon and
+                // it/they flee. Because skittish pokemon cannot be multi-battled, so there is only one skitish pokemon.
+                //
+                // Note we need `battle_menu_detectd == false` condition because if battle ends without entering battle menu, battle sprite
+                // watcher will have lots of false positives when the upper and lower dark borders gradually fade away.
                 num_removed_pokemon = 1;
             } else {
                 // More than one pokemon attended the battle and they all fled.
                 // We think our pokemon is strong enough to defeat all the wild pokemon in the battle, so it is not possible
                 // that the battle ends because we lost.
-                num_removed_pokemon = num_initial_pokemon;
+                num_removed_pokemon = num_initial_sprites;
             }
-            return num_removed_pokemon;
+            break;
         }
 
-        env.log("Found battle menu");
         // now in battle menu
-        const auto sprites_remain = battle_sprite_watcher.detect_sprites(*(env.console.video().snapshot().frame));
+        battle_menu_detectd = true;
+        const auto sprite_detection_frame = env.console.video().snapshot().frame;
+        const auto sprites_remain = battle_sprite_watcher.detect_sprites(*sprite_detection_frame);
         size_t num_sprites_remain = 0;
         for(bool remain : sprites_remain){
             num_sprites_remain += remain;
         }
+        num_removed_pokemon = num_initial_sprites - num_sprites_remain;
 
-        size_t num_removed_pokemon = num_initial_pokemon - num_sprites_remain;
+        if (PreloadSettings::instance().DEVELOPER_MODE){
+            dump_debug_image(env.logger(), "PokemonLA/AutoMultiSpawn", "battle_sprite_" + std::to_string(num_sprites_remain), *sprite_detection_frame);
+        }
+        env.log("Found battle menu, num sprites removed: " + std::to_string(num_removed_pokemon));
+        
         if (num_removed_pokemon > num_to_despawn){
-            // Oh no, we removed more than needed. Return immediately
-            return num_removed_pokemon;
+            // Oh no, we removed more than needed.
+            // XXX can try to reset the game to fix this. But for now let user handles this.
+            env.log("Removed more than needed!");
+            throw OperationFailedException(env.console, "Removed more pokemon than needed!");
         } else if (num_removed_pokemon < num_to_despawn){
-            // Mash A to remove pokemon
-            // We assume we have enough PP
-            pbf_mash_button(context, BUTTON_A, 500);
-            // Wait for three seconds, then check for the next turn of the battle (or battle ends)
-            context.wait_for(std::chrono::seconds(3));
+
+            // Press A to select moves
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            context.wait_for_all_requests();
+            use_next_move_with_pp(env.console, context, 0, cur_move);
             continue;
         }
         
@@ -466,9 +496,73 @@ size_t AutoMultiSpawn::one_battle_to_remove_pokemon(SingleSwitchProgramEnvironme
         if (ret < 0){
             throw OperationFailedException(env.console, "Cannot detect end of battle when escaping");
         }
-        goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
-        return num_removed_pokemon;
     }
+
+    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    return num_removed_pokemon;
+}
+
+PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    size_t nun_pokemon_left
+){
+    // From camp fly to the spawn point, focus on a target pokemon and start a battle
+    change_mount(env.console, context, MountState::BRAVIARY_ON);
+    pbf_wait(context, 40);
+    
+    // Move to spawn location on Braviary
+    pbf_move_left_joystick(context, 255, 165, 150, 0); // 170
+    pbf_press_button(context, BUTTON_B, 200, 10);
+    pbf_mash_button(context, BUTTON_B, 1500); // 1450
+
+    // Descend down from the air:
+    for(int i = 0; i < 2 ; i++){
+        change_mount(env.console, context, MountState::BRAVIARY_OFF);
+        context.wait_for(std::chrono::milliseconds(300));
+        change_mount(env.console, context, MountState::BRAVIARY_ON);
+    }
+
+    // pbf_press_button(context, BUTTON_PLUS, 20, 150); // jump down from Braviary
+    // for(int i = 0; i < 2; i++){
+    //     pbf_press_button(context, BUTTON_PLUS, 20, 50); // Call back Braviary to stop falling
+    //     pbf_press_button(context, BUTTON_PLUS, 20, 150); // fall down again
+    // }
+    // In case the character hits a tree and change the Braviary mount state due to the hit,
+    // use visual feedback to makse sure the character is now dismounted.
+    change_mount(env.console, context, MountState::BRAVIARY_OFF);
+    pbf_wait(context, 50);
+    
+    // Move forward on foot
+    pbf_move_left_joystick(context, 128, 0, 160, 0);
+
+    context.wait_for_all_requests();
+
+    // Try three focus sessions:
+    const int max_focus_try = 5;
+    for(int i = 0; i < max_focus_try; i++){
+        // ret.first: whether we can focus on some pokemon
+        // ret.second: the details of the target pokemon being focused, or empty if no target pokemon found.
+        const auto ret = control_focus_to_throw(env, context, TARGET_POKEMON[SPAWN], WILD_NEARBY_POKEMON[SPAWN], LANGUAGE);
+        if (ret.first){
+            return ret.second;
+        }
+
+        if (i + 1 < max_focus_try){
+            env.log("Try another focus attempt.");
+            pbf_wait(context, 200);
+            context.wait_for_all_requests();
+        }
+
+        if (i == 2 && nun_pokemon_left == 1){
+            // If its' only one pokemon to despawn, then we don't need to worry about scare multiple pokemon at once.
+            // We can move closer.
+            pbf_move_left_joystick(context, 128, 0, 150, 60);
+            context.wait_for_all_requests();
+        }
+    }
+
+    return PokemonDetails();
 }
 
 

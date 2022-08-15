@@ -72,6 +72,7 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
 
     // Press A to interact with tent
     pbf_press_button(context, BUTTON_A, 30, 30);
+    context.wait_for_all_requests();
 
     const bool stop_on_detected = true;
     DialogueYellowArrowDetector yellow_arrow_detector(console, console, stop_on_detected);
@@ -86,16 +87,18 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
     }
 
     // Press A to clear the dialog box, and show the time menu
-    pbf_press_button(context, BUTTON_A, 30, 100);
+    // pbf_wait(context, 40);
+    pbf_press_button(context, BUTTON_A, 30, 80);
     console.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time
     for(int i = 0; i < (int)target_time; i++){
-        pbf_press_button(context, DPAD_DOWN, 30, 90);
+        pbf_press_dpad(context, DPAD_DOWN, 30, 70);
     }
 
     // Press A to start resting
     pbf_press_button(context, BUTTON_A, 30, 100);
+    context.wait_for_all_requests();
 
     // Wait for the dialog box to show up
     ret = wait_until(
