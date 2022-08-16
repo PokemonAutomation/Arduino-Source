@@ -182,7 +182,7 @@ void run_autohost(
         //  Make sure we're actually in a den.
         std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
         DenMonReadResults results;
-        if (!*screen){
+        if (*screen){
             results = reader.read(*screen);
             switch (results.type){
             case DenMonReadResults::RED_BEAM:
