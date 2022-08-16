@@ -49,6 +49,7 @@ AutoHostMultiGame::AutoHostMultiGame()
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         "60 * TICKS_PER_SECOND"
     )
+    , GAME_LIST2(true)
     , FR_FORWARD_ACCEPT(
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
         1
@@ -93,7 +94,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     PA_ADD_OPTION(RAID_CODE);
     PA_ADD_OPTION(HOST_ONLINE);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
-    PA_ADD_OPTION(GAME_LIST);
+    PA_ADD_OPTION(GAME_LIST2);
     PA_ADD_OPTION(FR_FORWARD_ACCEPT);
     PA_ADD_OPTION(HOSTING_NOTIFICATIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -117,10 +118,12 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         ? 0
         : LOBBY_WAIT_DELAY - start_raid_delay;
 
+    std::vector<std::unique_ptr<MultiHostSlot2>> list = GAME_LIST2.copy_snapshot();
+
     //  Scan den list for any rolling dens.
     bool enable_touch = true;
-    for (uint8_t index = 0; index < GAME_LIST.size(); index++){
-        const MultiHostSlot& game = GAME_LIST[index];
+    for (uint8_t index = 0; index < list.size(); index++){
+        const MultiHostSlot2& game = *list[index];
 //        if (game.user_slot == 0){
 //            break;
 //        }
@@ -145,10 +148,10 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     bool game_slot_flipped = false;
     while (true){
         env.log("Beginning from start of game list.");
-        for (uint8_t index = 0; index < GAME_LIST.size(); index++){
+        for (uint8_t index = 0; index < list.size(); index++){
             env.update_stats();
 
-            const MultiHostSlot& game = GAME_LIST[index];
+            const MultiHostSlot2& game = *list[index];
 //            if (game.user_slot == 0){
 //                break;
 //            }
@@ -159,7 +162,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             rollback_date_from_home(context, game.skips);
 
             //  Sanitize game slot.
-            uint8_t game_slot = game.game_slot;
+            uint8_t game_slot = (uint8_t)game.game_slot + 1;
             if (game_slot > 2){
                 game_slot = 0;
             }
@@ -179,7 +182,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
-                game.user_slot,
+                (uint8_t)game.user_slot + 1,
                 game.backup_save
             );
             if (game_slot == 2){
@@ -190,21 +193,21 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             size_t FR_index = index;
             for (uint8_t c = 0; c < FR_FORWARD_ACCEPT; c++){
                 FR_index++;
-                if (FR_index >= GAME_LIST.size()){
+                if (FR_index >= list.size()){
                     FR_index = 0;
                 }
             }
 
             //  Run auto-host.
-            const MultiHostSlot& fr_game = GAME_LIST[FR_index];
+            const MultiHostSlot2& fr_game = *list[FR_index];
             run_autohost(
                 env, env.console, context,
                 game.always_catchable
                     ? Catchability::ALWAYS_CATCHABLE
                     : Catchability::MAYBE_UNCATCHABLE,
-                game.skips,
+                (uint8_t)game.skips,
                 game.use_raid_code ? &RAID_CODE : nullptr, lobby_wait_delay,
-                HOST_ONLINE, fr_game.accept_FRs ? fr_game.user_slot : 0,
+                HOST_ONLINE, fr_game.accept_FRs ? (uint8_t)fr_game.user_slot + 1 : 0,
                 game.move_slot, game.dynamax, 0,
                 HOSTING_NOTIFICATIONS,
                 CONNECT_TO_INTERNET_DELAY,
@@ -219,7 +222,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             close_game(context);
 
             //  Post-raid delay.
-            pbf_wait(context, parse_ticks_i32(game.post_raid_delay));
+            pbf_wait(context, game.post_raid_delay);
 
             //  Touch the date.
             if (enable_touch){

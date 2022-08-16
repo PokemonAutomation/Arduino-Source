@@ -156,6 +156,7 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h
+    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable2.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h
@@ -191,8 +192,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
     ../Common/Qt/Options/FloatingPointWidget.h
-    ../Common/Qt/Options/MultiHostTableBaseOption.cpp
-    ../Common/Qt/Options/MultiHostTableBaseOption.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
@@ -1308,8 +1307,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
-    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.cpp
-    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp

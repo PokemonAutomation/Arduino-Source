@@ -60,8 +60,7 @@ private:
 
 
 
-//  This the table itself. Don't use this directly.
-//  Use EditableTableOption2<> instead since it is type-aware of the row.
+//  This is the table itself.
 class EditableTableOptionCore : public ConfigOption{
 public:
     EditableTableOptionCore(
@@ -117,7 +116,7 @@ private:
 };
 
 
-
+//  Convenience helper class that's type-aware.
 template <typename RowType>
 class EditableTableOption2 : public EditableTableOptionCore{
 public:

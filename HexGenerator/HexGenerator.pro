@@ -48,7 +48,6 @@ SOURCES += \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
-    ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     Source/Main.cpp \
@@ -60,7 +59,7 @@ SOURCES += \
     Source/Options/FixedCodeOption.cpp \
     Source/Options/FloatingPoint.cpp \
     Source/Options/FossilTableOption.cpp \
-    Source/Options/MultiHostTableOption.cpp \
+    Source/Options/MultiHostTable.cpp \
     Source/Options/RandomCodeOption.cpp \
     Source/Options/SimpleInteger.cpp \
     Source/Options/SingleStatementOption.cpp \
@@ -106,7 +105,6 @@ HEADERS += \
     ../Common/Qt/Options/EditableTableWidget2.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
-    ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     Source/Options/BooleanCheckBox.h \
@@ -117,7 +115,7 @@ HEADERS += \
     Source/Options/FixedCodeOption.h \
     Source/Options/FloatingPoint.h \
     Source/Options/FossilTableOption.h \
-    Source/Options/MultiHostTableOption.h \
+    Source/Options/MultiHostTable.h \
     Source/Options/RandomCodeOption.h \
     Source/Options/SimpleInteger.h \
     Source/Options/SingleStatementOption.h \
