@@ -15,6 +15,7 @@ namespace NintendoSwitch{
 
 
 void open_game_from_home(
+    Logger& logger,
     BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
