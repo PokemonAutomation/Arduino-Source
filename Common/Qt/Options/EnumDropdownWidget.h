@@ -7,27 +7,34 @@
 #ifndef PokemonAutomation_Options_EnumDropdownWidget_H
 #define PokemonAutomation_Options_EnumDropdownWidget_H
 
-#include <QWidget>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "ConfigWidget.h"
-
-class QComboBox;
 
 namespace PokemonAutomation{
 
 
-
-class EnumDropdownWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class EnumDropdownCellWidget : public NoWheelComboBox, public ConfigWidget, private ConfigOption::Listener{
 public:
-    ~EnumDropdownWidget();
-    EnumDropdownWidget(QWidget& parent, EnumDropdownOption& value);
+    ~EnumDropdownCellWidget();
+    EnumDropdownCellWidget(QWidget& parent, EnumDropdownCell& value);
 
     virtual void update() override;
     virtual void value_changed() override;
 
 protected:
-    EnumDropdownOption& m_value;
-    QComboBox* m_box;
+    EnumDropdownCell& m_value;
+};
+
+
+class EnumDropdownOptionWidget : public QWidget, public ConfigWidget{
+public:
+    EnumDropdownOptionWidget(QWidget& parent, EnumDropdownOption& value);
+
+    virtual void update() override;
+
+private:
+    EnumDropdownCellWidget* m_cell;
 };
 
 

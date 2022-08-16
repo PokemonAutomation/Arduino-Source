@@ -13,14 +13,11 @@
 namespace PokemonAutomation{
 
 
-class BooleanCheckBoxOption : public ConfigOption{
-public:
-    BooleanCheckBoxOption(
-        std::string label,
-        bool default_value
-    );
 
-    const std::string& label() const{ return m_label; }
+class BooleanCheckBoxCell : public ConfigOption{
+public:
+    BooleanCheckBoxCell(bool default_value);
+
     bool default_value() const{ return m_default; }
 
     operator bool() const{ return m_current.load(std::memory_order_relaxed); }
@@ -34,9 +31,24 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    const std::string m_label;
     const bool m_default;
     std::atomic<bool> m_current;
+};
+
+
+
+
+class BooleanCheckBoxOption : public BooleanCheckBoxCell{
+public:
+    BooleanCheckBoxOption(std::string label, bool default_value);
+
+    const std::string& label() const{ return m_label; }
+    using BooleanCheckBoxCell::operator=;
+
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    const std::string m_label;
 };
 
 

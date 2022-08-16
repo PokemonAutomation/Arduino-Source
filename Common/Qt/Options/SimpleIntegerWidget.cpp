@@ -13,28 +13,20 @@
 namespace PokemonAutomation{
 
 
+
+
 template <typename Type>
-SimpleIntegerWidget<Type>::~SimpleIntegerWidget(){
+SimpleIntegerCellWidget<Type>::~SimpleIntegerCellWidget(){
     m_value.remove_listener(*this);
 }
 template <typename Type>
-SimpleIntegerWidget<Type>::SimpleIntegerWidget(QWidget& parent, SimpleIntegerOption<Type>& value)
-    : QWidget(&parent)
+SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value)
+    : QLineEdit(QString::number(value), &parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
-    text->setWordWrap(true);
-    layout->addWidget(text, 1);
-    m_box = new QLineEdit(QString::number(m_value), this);
-//    box->setInputMask("999999999");
-//    QIntValidator* validator = new QIntValidator(value.m_min_value, value.m_max_value, box);
-//    box->setValidator(validator);
-    layout->addWidget(m_box, 1);
     connect(
-        m_box, &QLineEdit::textChanged,
+        this, &QLineEdit::textChanged,
         this, [=](const QString& text){
             bool ok;
             Type current = (Type)text.toLong(&ok);
@@ -44,21 +36,21 @@ SimpleIntegerWidget<Type>::SimpleIntegerWidget(QWidget& parent, SimpleIntegerOpt
             }else{
                 palette.setColor(QPalette::Text, Qt::red);
             }
-            m_box->setPalette(palette);
+            this->setPalette(palette);
         }
     );
     connect(
-        m_box, &QLineEdit::editingFinished,
+        this, &QLineEdit::editingFinished,
         this, [=](){
             bool ok;
-            Type current = (Type)m_box->text().toLong(&ok);
+            Type current = (Type)this->text().toLong(&ok);
             QPalette palette;
             if (ok && m_value.check_validity(current).empty()){
                 palette.setColor(QPalette::Text, Qt::black);
             }else{
                 palette.setColor(QPalette::Text, Qt::red);
             }
-            m_box->setPalette(palette);
+            this->setPalette(palette);
 
             if (current == m_value){
                 return;
@@ -70,13 +62,13 @@ SimpleIntegerWidget<Type>::SimpleIntegerWidget(QWidget& parent, SimpleIntegerOpt
     value.add_listener(*this);
 }
 template <typename Type>
-void SimpleIntegerWidget<Type>::update(){
+void SimpleIntegerCellWidget<Type>::update(){
     ConfigWidget::update();
-    m_box->setText(QString::number(m_value));
+    this->setText(QString::number(m_value));
 }
 template <typename Type>
-void SimpleIntegerWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+void SimpleIntegerCellWidget<Type>::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -84,11 +76,41 @@ void SimpleIntegerWidget<Type>::value_changed(){
 
 
 
-template class SimpleIntegerWidget<uint8_t>;
-template class SimpleIntegerWidget<uint16_t>;
-template class SimpleIntegerWidget<uint32_t>;
-template class SimpleIntegerWidget<uint64_t>;
-template class SimpleIntegerWidget<int8_t>;
+
+
+
+template <typename Type>
+SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+    , m_cell(new SimpleIntegerCellWidget<Type>(*this, value))
+{
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
+    text->setWordWrap(true);
+    layout->addWidget(text, 1);
+    layout->addWidget(m_cell, 1);
+}
+template <typename Type>
+void SimpleIntegerOptionWidget<Type>::update(){
+    ConfigWidget::update();
+    m_cell->update();
+}
+
+
+
+template class SimpleIntegerCellWidget<uint8_t>;
+template class SimpleIntegerCellWidget<uint16_t>;
+template class SimpleIntegerCellWidget<uint32_t>;
+template class SimpleIntegerCellWidget<uint64_t>;
+template class SimpleIntegerCellWidget<int8_t>;
+
+template class SimpleIntegerOptionWidget<uint8_t>;
+template class SimpleIntegerOptionWidget<uint16_t>;
+template class SimpleIntegerOptionWidget<uint32_t>;
+template class SimpleIntegerOptionWidget<uint64_t>;
+template class SimpleIntegerOptionWidget<int8_t>;
 
 
 }

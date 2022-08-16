@@ -16,21 +16,16 @@
 namespace PokemonAutomation{
 
 
-template <typename Type>
-class SimpleIntegerWidget;
-
 
 template <typename Type>
-class SimpleIntegerOption : public ConfigOption{
+class SimpleIntegerCell : public ConfigOption{
 public:
-    SimpleIntegerOption(
-        std::string label,
+    SimpleIntegerCell(
         Type default_value,
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     );
 
-    const std::string& label() const{ return m_label; }
     Type min_value() const{ return m_min_value; }
     Type max_value() const{ return m_max_value; }
     Type default_value() const{ return m_default; }
@@ -49,11 +44,33 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    const std::string m_label;
     const Type m_min_value;
     const Type m_max_value;
     const Type m_default;
     std::atomic<Type> m_current;
+};
+
+
+
+
+
+template <typename Type>
+class SimpleIntegerOption : public SimpleIntegerCell<Type>{
+public:
+    SimpleIntegerOption(
+        std::string label,
+        Type default_value,
+        Type min_value = std::numeric_limits<Type>::min(),
+        Type max_value = std::numeric_limits<Type>::max()
+    );
+
+    const std::string& label() const{ return m_label; }
+
+public:
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    const std::string m_label;
 };
 
 

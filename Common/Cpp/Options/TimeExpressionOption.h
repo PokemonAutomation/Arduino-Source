@@ -17,18 +17,17 @@ namespace PokemonAutomation{
 std::string ticks_to_time(double ticks_per_second, int64_t ticks);
 
 
+
 template <typename Type>
-class TimeExpressionOption : public ConfigOption{
+class TimeExpressionCell : public ConfigOption{
 public:
-    TimeExpressionOption(
+    TimeExpressionCell(
         double ticks_per_second,
-        std::string label,
         std::string default_value,
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     );
 
-    const std::string& label() const{ return m_label; }
     Type min_value() const{ return m_min_value; }
     Type max_value() const{ return m_max_value; }
     const std::string& default_value() const{ return m_default; }
@@ -53,7 +52,6 @@ private:
 
 private:
     const double m_ticks_per_second;
-    const std::string m_label;
     const Type m_min_value;
     const Type m_max_value;
     const std::string m_default;
@@ -62,6 +60,27 @@ private:
     std::string m_current;
     Type m_value;
     std::string m_error;
+};
+
+
+
+template <typename Type>
+class TimeExpressionOption : public TimeExpressionCell<Type>{
+public:
+    TimeExpressionOption(
+        double ticks_per_second,
+        std::string label,
+        std::string default_value,
+        Type min_value = std::numeric_limits<Type>::min(),
+        Type max_value = std::numeric_limits<Type>::max()
+    );
+
+    const std::string& label() const{ return m_label; }
+
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    const std::string m_label;
 };
 
 

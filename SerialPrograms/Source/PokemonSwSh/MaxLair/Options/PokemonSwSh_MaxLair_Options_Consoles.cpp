@@ -147,7 +147,7 @@ ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
 }
 void ConsolesUI::update(){
     BatchWidget::update();
-    EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
+    EnumDropdownOptionWidget* host = static_cast<EnumDropdownOptionWidget*>(m_options[0]);
     size_t host_index = static_cast<EnumDropdownOption&>(host->option());
 //    cout << "ConsolesUI::update_ui()" << endl;
     for (size_t c = 0; c < 4; c++){

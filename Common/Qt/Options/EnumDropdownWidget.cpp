@@ -15,46 +15,42 @@ namespace PokemonAutomation{
 
 
 
+ConfigWidget* EnumDropdownCell::make_ui(QWidget& parent){
+    return new EnumDropdownCellWidget(parent, *this);
+}
 ConfigWidget* EnumDropdownOption::make_ui(QWidget& parent){
-    return new EnumDropdownWidget(parent, *this);
+    return new EnumDropdownOptionWidget(parent, *this);
 }
 
 
-EnumDropdownWidget::~EnumDropdownWidget(){
+
+
+EnumDropdownCellWidget::~EnumDropdownCellWidget(){
     m_value.remove_listener(*this);
 }
-EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& value)
-    : QWidget(&parent)
+EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, EnumDropdownCell& value)
+    : NoWheelComboBox(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
-    text->setWordWrap(true);
-    layout->addWidget(text, 1);
-    m_box = new NoWheelComboBox(&parent);
-    layout->addWidget(m_box);
-
     for (const auto& item : m_value.case_list()){
-        m_box->addItem(QString::fromStdString(item.name));
+        this->addItem(QString::fromStdString(item.name));
         if (item.enabled){
             continue;
         }
-        auto* model = qobject_cast<QStandardItemModel*>(m_box->model());
+        auto* model = qobject_cast<QStandardItemModel*>(this->model());
         if (model == nullptr){
             continue;
         }
-        QStandardItem* line_handle = model->item(m_box->count() - 1);
+        QStandardItem* line_handle = model->item(this->count() - 1);
         if (line_handle != nullptr){
             line_handle->setEnabled(false);
         }
     }
-    m_box->setCurrentIndex((int)m_value);
-    layout->addWidget(m_box, 1);
+    this->setCurrentIndex((int)m_value);
 
     connect(
-        m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
             if (index < 0){
                 m_value.restore_defaults();
@@ -68,14 +64,37 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
 }
 
 
-void EnumDropdownWidget::update(){
+void EnumDropdownCellWidget::update(){
     ConfigWidget::update();
-    m_box->setCurrentIndex((int)m_value);
+    this->setCurrentIndex((int)m_value);
 }
-void EnumDropdownWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+void EnumDropdownCellWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
         update();
     }, Qt::QueuedConnection);
+}
+
+
+
+
+
+EnumDropdownOptionWidget::EnumDropdownOptionWidget(QWidget& parent, EnumDropdownOption& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+    , m_cell(new EnumDropdownCellWidget(*this, value))
+{
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
+    text->setWordWrap(true);
+    layout->addWidget(text, 1);
+    layout->addWidget(m_cell, 1);
+}
+
+
+void EnumDropdownOptionWidget::update(){
+    ConfigWidget::update();
+    m_cell->update();
 }
 
 

@@ -18,7 +18,8 @@
 namespace PokemonAutomation{
 
 
-class EnumDropdownOption : public ConfigOption{
+
+class EnumDropdownCell : public ConfigOption{
 public:
     struct Option{
         std::string name;
@@ -34,18 +35,15 @@ public:
 
 public:
     template <typename ListType>
-    EnumDropdownOption(
-        std::string label,
+    EnumDropdownCell(
         ListType&& cases,
         size_t default_index
     );
-    EnumDropdownOption(
-        std::string label,
+    EnumDropdownCell(
         std::initializer_list<Option> cases,
         size_t default_index
     );
 
-    const std::string& label() const{ return m_label; }
     const std::vector<Option>& case_list() const{ return m_case_list; }
 
     const std::string& case_name(size_t index) const{ return m_case_list[index].name; }
@@ -62,7 +60,6 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    const std::string m_label;
     std::vector<Option> m_case_list;
     std::map<std::string, size_t> m_case_map;
     const size_t m_default;
@@ -71,19 +68,45 @@ private:
 
 
 
+class EnumDropdownOption : public EnumDropdownCell{
+public:
+    template <typename ListType>
+    EnumDropdownOption(
+        std::string label,
+        ListType&& cases,
+        size_t default_index
+    )
+        : EnumDropdownCell(std::move(cases), default_index)
+        , m_label(std::move(label))
+    {}
+    EnumDropdownOption(
+        std::string label,
+        std::initializer_list<Option> cases,
+        size_t default_index
+    )
+        : EnumDropdownCell(std::move(cases), default_index)
+        , m_label(std::move(label))
+    {}
+
+    const std::string& label() const{ return m_label; }
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    const std::string m_label;
+};
+
+
 
 
 
 
 
 template <typename ListType>
-EnumDropdownOption::EnumDropdownOption(
-    std::string label,
+EnumDropdownCell::EnumDropdownCell(
     ListType&& cases,
     size_t default_index
 )
-    : m_label(std::move(label))
-    , m_default(default_index)
+    : m_default(default_index)
     , m_current(default_index)
 {
     if (default_index >= cases.size()){
@@ -102,6 +125,9 @@ EnumDropdownOption::EnumDropdownOption(
         }
     }
 }
+
+
+
 
 
 

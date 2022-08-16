@@ -7,20 +7,34 @@
 #ifndef PokemonAutomation_Options_TimeExpressionWidget_H
 #define PokemonAutomation_Options_TimeExpressionWidget_H
 
-#include <QWidget>
+#include <QLineEdit>
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "ConfigWidget.h"
-
-class QLineEdit;
 
 namespace PokemonAutomation{
 
 
+
 template <typename Type>
-class TimeExpressionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class TimeExpressionCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
 public:
-    ~TimeExpressionWidget();
-    TimeExpressionWidget(QWidget& parent, TimeExpressionOption<Type>& value);
+    ~TimeExpressionCellWidget();
+    TimeExpressionCellWidget(QWidget& parent, TimeExpressionCell<Type>& value);
+
+    virtual void update() override;
+    virtual void value_changed() override;
+
+private:
+    TimeExpressionCell<Type>& m_value;
+};
+
+
+
+template <typename Type>
+class TimeExpressionOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+public:
+    ~TimeExpressionOptionWidget();
+    TimeExpressionOptionWidget(QWidget& parent, TimeExpressionOption<Type>& value);
 
     virtual void update() override;
     virtual void value_changed() override;

@@ -62,15 +62,13 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks){
 
 
 template <typename Type>
-TimeExpressionOption<Type>::TimeExpressionOption(
+TimeExpressionCell<Type>::TimeExpressionCell(
     double ticks_per_second,
-    std::string label,
     std::string default_value,
     Type min_value,
     Type max_value
 )
     : m_ticks_per_second(ticks_per_second)
-    , m_label(std::move(label))
     , m_min_value(min_value)
     , m_max_value(max_value)
     , m_default(std::move(default_value))
@@ -80,17 +78,17 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 }
 
 template <typename Type>
-TimeExpressionOption<Type>::operator Type() const{
+TimeExpressionCell<Type>::operator Type() const{
     SpinLockGuard lg(m_lock);
     return m_value;
 }
 template <typename Type>
-Type TimeExpressionOption<Type>::get() const{
+Type TimeExpressionCell<Type>::get() const{
     SpinLockGuard lg(m_lock);
     return m_value;
 }
 template <typename Type>
-std::string TimeExpressionOption<Type>::set(std::string text){
+std::string TimeExpressionCell<Type>::set(std::string text){
     Type value = 0;
     std::string error = process(text, value);
     {
@@ -103,12 +101,12 @@ std::string TimeExpressionOption<Type>::set(std::string text){
     return error;
 }
 template <typename Type>
-std::string TimeExpressionOption<Type>::text() const{
+std::string TimeExpressionCell<Type>::text() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 template <typename Type>
-std::string TimeExpressionOption<Type>::time_string() const{
+std::string TimeExpressionCell<Type>::time_string() const{
     SpinLockGuard lg(m_lock);
     if (!m_error.empty()){
         return "<font color=\"red\">" + m_error + "</font>";
@@ -117,7 +115,7 @@ std::string TimeExpressionOption<Type>::time_string() const{
 }
 
 template <typename Type>
-void TimeExpressionOption<Type>::load_json(const JsonValue& json){
+void TimeExpressionCell<Type>::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -130,18 +128,18 @@ void TimeExpressionOption<Type>::load_json(const JsonValue& json){
     push_update();
 }
 template <typename Type>
-JsonValue TimeExpressionOption<Type>::to_json() const{
+JsonValue TimeExpressionCell<Type>::to_json() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 
 template <typename Type>
-std::string TimeExpressionOption<Type>::check_validity() const{
+std::string TimeExpressionCell<Type>::check_validity() const{
     SpinLockGuard lg(m_lock);
     return m_error;
 }
 template <typename Type>
-void TimeExpressionOption<Type>::restore_defaults(){
+void TimeExpressionCell<Type>::restore_defaults(){
     {
         SpinLockGuard lg(m_lock);
         m_current = m_default;
@@ -151,7 +149,7 @@ void TimeExpressionOption<Type>::restore_defaults(){
 }
 
 template <typename Type>
-std::string TimeExpressionOption<Type>::process(const std::string& text, Type& value) const{
+std::string TimeExpressionCell<Type>::process(const std::string& text, Type& value) const{
     if (text.empty()){
         return "Expression is empty.";
     }
@@ -175,13 +173,43 @@ std::string TimeExpressionOption<Type>::process(const std::string& text, Type& v
 
 
 
+template <typename Type>
+TimeExpressionOption<Type>::TimeExpressionOption(
+    double ticks_per_second,
+    std::string label,
+    std::string default_value,
+    Type min_value,
+    Type max_value
+)
+    : TimeExpressionCell<Type>(
+        ticks_per_second,
+        default_value,
+        min_value, max_value
+    )
+    , m_label(std::move(label))
+{}
+
+
+
+
+
 
 
 template <typename Type>
-ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
-    return new TimeExpressionWidget<Type>(parent, *this);
+ConfigWidget* TimeExpressionCell<Type>::make_ui(QWidget& parent){
+    return new TimeExpressionCellWidget<Type>(parent, *this);
 }
 
+template <typename Type>
+ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
+    return new TimeExpressionOptionWidget<Type>(parent, *this);
+}
+
+
+template class TimeExpressionCell<uint16_t>;
+template class TimeExpressionCell<uint32_t>;
+template class TimeExpressionCell<int16_t>;
+template class TimeExpressionCell<int32_t>;
 
 template class TimeExpressionOption<uint16_t>;
 template class TimeExpressionOption<uint32_t>;

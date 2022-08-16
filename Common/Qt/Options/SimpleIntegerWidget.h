@@ -7,26 +7,38 @@
 #ifndef PokemonAutomation_SimpleIntegerWidget_H
 #define PokemonAutomation_SimpleIntegerWidget_H
 
-#include <QWidget>
+#include <QLineEdit>
 #include "ConfigWidget.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 
-class QLineEdit;
-
 namespace PokemonAutomation{
 
+
+
 template <typename Type>
-class SimpleIntegerWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
 public:
-    ~SimpleIntegerWidget();
-    SimpleIntegerWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
+    ~SimpleIntegerCellWidget();
+    SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
 
     virtual void update() override;
     virtual void value_changed() override;
 
 private:
-    SimpleIntegerOption<Type>& m_value;
-    QLineEdit* m_box;
+    SimpleIntegerCell<Type>& m_value;
+};
+
+
+
+template <typename Type>
+class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
+public:
+    SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
+
+    virtual void update() override;
+
+private:
+    SimpleIntegerCellWidget<Type>* m_cell;
 };
 
 

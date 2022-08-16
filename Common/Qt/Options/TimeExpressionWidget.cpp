@@ -12,12 +12,48 @@
 namespace PokemonAutomation{
 
 
+
 template <typename Type>
-TimeExpressionWidget<Type>::~TimeExpressionWidget(){
+TimeExpressionCellWidget<Type>::~TimeExpressionCellWidget(){
     m_value.remove_listener(*this);
 }
 template <typename Type>
-TimeExpressionWidget<Type>::TimeExpressionWidget(QWidget& parent, TimeExpressionOption<Type>& value)
+TimeExpressionCellWidget<Type>::TimeExpressionCellWidget(QWidget& parent, TimeExpressionCell<Type>& value)
+    : QLineEdit(QString::fromStdString(value.text()), &parent)
+    , ConfigWidget(value, *this)
+    , m_value(value)
+{
+    connect(
+        this, &QLineEdit::textChanged,
+        this, [=](const QString& text){
+            std::string error = m_value.set(text.toStdString());
+        }
+    );
+
+    value.add_listener(*this);
+}
+template <typename Type>
+void TimeExpressionCellWidget<Type>::update(){
+    ConfigWidget::update();
+    this->setText(QString::fromStdString(m_value.text()));
+}
+template <typename Type>
+void TimeExpressionCellWidget<Type>::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
+}
+
+
+
+
+
+template <typename Type>
+TimeExpressionOptionWidget<Type>::~TimeExpressionOptionWidget(){
+    m_value.remove_listener(*this);
+}
+template <typename Type>
+TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, TimeExpressionOption<Type>& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -59,12 +95,12 @@ TimeExpressionWidget<Type>::TimeExpressionWidget(QWidget& parent, TimeExpression
     value.add_listener(*this);
 }
 template <typename Type>
-void TimeExpressionWidget<Type>::update(){
+void TimeExpressionOptionWidget<Type>::update(){
     ConfigWidget::update();
     m_box->setText(QString::fromStdString(m_value.text()));
 }
 template <typename Type>
-void TimeExpressionWidget<Type>::value_changed(){
+void TimeExpressionOptionWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update();
     }, Qt::QueuedConnection);
@@ -72,10 +108,17 @@ void TimeExpressionWidget<Type>::value_changed(){
 
 
 
-template class TimeExpressionWidget<uint16_t>;
-template class TimeExpressionWidget<uint32_t>;
-template class TimeExpressionWidget<int16_t>;
-template class TimeExpressionWidget<int32_t>;
+
+
+template class TimeExpressionCellWidget<uint16_t>;
+template class TimeExpressionCellWidget<uint32_t>;
+template class TimeExpressionCellWidget<int16_t>;
+template class TimeExpressionCellWidget<int32_t>;
+
+template class TimeExpressionOptionWidget<uint16_t>;
+template class TimeExpressionOptionWidget<uint32_t>;
+template class TimeExpressionOptionWidget<int16_t>;
+template class TimeExpressionOptionWidget<int32_t>;
 
 
 

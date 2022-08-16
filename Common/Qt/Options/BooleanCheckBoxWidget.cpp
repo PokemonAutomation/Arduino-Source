@@ -14,16 +14,54 @@ namespace PokemonAutomation{
 
 
 
+ConfigWidget* BooleanCheckBoxCell::make_ui(QWidget& parent){
+    return new BooleanCheckBoxCellWidget(parent, *this);
+}
 ConfigWidget* BooleanCheckBoxOption::make_ui(QWidget& parent){
-    return new BooleanCheckBoxWidget(parent, *this);
+    return new BooleanCheckBoxOptionWidget(parent, *this);
 }
 
 
 
-BooleanCheckBoxWidget::~BooleanCheckBoxWidget(){
+
+BooleanCheckBoxCellWidget::~BooleanCheckBoxCellWidget(){
     m_value.remove_listener(*this);
 }
-BooleanCheckBoxWidget::BooleanCheckBoxWidget(QWidget& parent, BooleanCheckBoxOption& value)
+BooleanCheckBoxCellWidget::BooleanCheckBoxCellWidget(QWidget& parent, BooleanCheckBoxCell& value)
+    : QCheckBox(&parent)
+    , ConfigWidget(value, *this)
+    , m_value(value)
+{
+    this->setChecked(m_value);
+    connect(
+        this, &QCheckBox::stateChanged,
+        this, [=](int){
+            m_value = this->isChecked();
+        }
+    );
+    value.add_listener(*this);
+}
+void BooleanCheckBoxCellWidget::update(){
+    ConfigWidget::update();
+    if (m_value != this->isChecked()){
+        this->setChecked(m_value);
+    }
+}
+void BooleanCheckBoxCellWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
+}
+
+
+
+
+
+
+BooleanCheckBoxOptionWidget::~BooleanCheckBoxOptionWidget(){
+    m_value.remove_listener(*this);
+}
+BooleanCheckBoxOptionWidget::BooleanCheckBoxOptionWidget(QWidget& parent, BooleanCheckBoxOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -44,13 +82,13 @@ BooleanCheckBoxWidget::BooleanCheckBoxWidget(QWidget& parent, BooleanCheckBoxOpt
     );
     value.add_listener(*this);
 }
-void BooleanCheckBoxWidget::update(){
+void BooleanCheckBoxOptionWidget::update(){
     ConfigWidget::update();
     if (m_value != m_box->isChecked()){
         m_box->setChecked(m_value);
     }
 }
-void BooleanCheckBoxWidget::value_changed(){
+void BooleanCheckBoxOptionWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update();
     }, Qt::QueuedConnection);

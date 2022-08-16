@@ -10,13 +10,11 @@
 namespace PokemonAutomation{
 
 
-EnumDropdownOption::EnumDropdownOption(
-    std::string label,
+EnumDropdownCell::EnumDropdownCell(
     std::initializer_list<Option> cases,
     size_t default_index
 )
-    : m_label(std::move(label))
-    , m_default(default_index)
+    : m_default(default_index)
     , m_current(default_index)
 {
     if (default_index >= cases.size()){
@@ -37,7 +35,7 @@ EnumDropdownOption::EnumDropdownOption(
     }
 }
 
-bool EnumDropdownOption::set(size_t index){
+bool EnumDropdownCell::set(size_t index){
     if (index >= m_case_list.size()){
         return false;
     }
@@ -46,7 +44,7 @@ bool EnumDropdownOption::set(size_t index){
     return true;
 }
 
-void EnumDropdownOption::load_json(const JsonValue& json){
+void EnumDropdownCell::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -57,11 +55,11 @@ void EnumDropdownOption::load_json(const JsonValue& json){
         push_update();
     }
 }
-JsonValue EnumDropdownOption::to_json() const{
+JsonValue EnumDropdownCell::to_json() const{
     return m_case_list[m_current].name;
 }
 
-void EnumDropdownOption::restore_defaults(){
+void EnumDropdownCell::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
     push_update();
 }
