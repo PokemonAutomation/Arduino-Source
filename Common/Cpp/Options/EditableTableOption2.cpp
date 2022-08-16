@@ -68,11 +68,10 @@ std::vector<ConfigOption*> EditableTableRow2::make_cells(){
 
 
 EditableTableOptionCore::EditableTableOptionCore(
-    std::string label, const EditableTableFactory2& factory,
+    std::string label,
     std::vector<std::unique_ptr<EditableTableRow2>> default_value
 )
     : m_label(std::move(label))
-    , m_factory(factory)
     , m_default(std::move(default_value))
 {
     restore_defaults();
@@ -92,7 +91,7 @@ void EditableTableOptionCore::load_json(const JsonValue& json){
         SpinLockGuard lg(m_lock);
         std::vector<std::shared_ptr<EditableTableRow2>> table;
         for (const auto& item : *array){
-            std::unique_ptr<EditableTableRow2> row = m_factory.make_row();
+            std::unique_ptr<EditableTableRow2> row = make_row();
             row->m_seqnum = m_seqnum++;
             row->m_index = table.size();
             table.emplace_back(std::move(row));
@@ -122,12 +121,14 @@ std::string EditableTableOptionCore::check_validity() const{
     return std::string();
 }
 void EditableTableOptionCore::restore_defaults(){
-    std::vector<std::shared_ptr<EditableTableRow2>> tmp;
-    for (const std::unique_ptr<EditableTableRow2>& item : m_default){
-        tmp.emplace_back(item->clone());
-    }
     {
+        std::vector<std::shared_ptr<EditableTableRow2>> tmp;
         SpinLockGuard lg(m_lock);
+        for (const std::unique_ptr<EditableTableRow2>& item : m_default){
+            tmp.emplace_back(item->clone());
+            tmp.back()->m_seqnum = m_seqnum++;
+            tmp.back()->m_index = tmp.size() - 1;
+        }
         m_current = std::move(tmp);
     }
     push_update();

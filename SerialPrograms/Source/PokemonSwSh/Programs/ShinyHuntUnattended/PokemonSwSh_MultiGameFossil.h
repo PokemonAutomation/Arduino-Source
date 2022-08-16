@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MultiGameFossil_H
 #define PokemonAutomation_PokemonSwSh_MultiGameFossil_H
 
-#include "PokemonSwSh/Options/PokemonSwSh_FossilTable.h"
+#include "Common/PokemonSwSh/PokemonSwSh_FossilTable2.h"
+//#include "PokemonSwSh/Options/PokemonSwSh_FossilTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -31,7 +32,8 @@ public:
 
 private:
     StartInGripOrClosedOption START_IN_GRIP_MENU;
-    FossilTableOption GAME_LIST;
+//    FossilTableOption GAME_LIST;
+    FossilTable2 GAME_LIST2;
 };
 
 

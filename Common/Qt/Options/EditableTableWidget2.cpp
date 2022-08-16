@@ -46,7 +46,7 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOptionC
     layout->addWidget(m_table, 0, Qt::AlignTop);
 
     QStringList header;
-    for (const std::string& name : m_value.factory().make_header()){
+    for (const std::string& name : m_value.make_header()){
         header << QString::fromStdString(name);
     }
     header << "" << "" << "";
@@ -71,7 +71,7 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOptionC
             button, &QPushButton::clicked,
             this, [=](bool){
                 int index = (int)m_current.size();
-                m_value.insert_row(index, m_value.factory().make_row());
+                m_value.insert_row(index, m_value.make_row());
             }
         );
     }
@@ -181,7 +181,7 @@ QWidget* EditableTableWidget2::make_insert_button(EditableTableRow2& row){
     connect(
         button, &QPushButton::clicked,
         this, [&](bool){
-            m_value.insert_row(row.index(), m_value.factory().make_row());
+            m_value.insert_row(row.index(), m_value.make_row());
         }
     );
 

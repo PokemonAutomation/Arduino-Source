@@ -54,27 +54,31 @@ private:
 
 
 
-class EditableTableFactory2{
-public:
-    virtual std::vector<std::string> make_header() const = 0;
-    virtual std::unique_ptr<EditableTableRow2> make_row() const = 0;
-};
-
-
-
 
 
 class EditableTableOptionCore : public ConfigOption{
 public:
     EditableTableOptionCore(
-        std::string label, const EditableTableFactory2& factory,
+        std::string label,
         std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
     );
 
     const std::string& label() const{ return m_label; }
-    const EditableTableFactory2& factory() const{ return m_factory; }
 
     std::vector<std::shared_ptr<EditableTableRow2>> current() const;
+
+    template <typename RowType>
+    std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
+        std::vector<std::unique_ptr<RowType>> ret;
+        SpinLockGuard lg(m_lock);
+        ret.reserve(m_current.size());
+        for (auto& item : m_current){
+            std::unique_ptr<EditableTableRow2> parent = item->clone();
+            std::unique_ptr<RowType> ptr(static_cast<RowType*>(parent.release()));
+            ret.emplace_back(std::move(ptr));
+        }
+        return ret;
+    }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -83,6 +87,9 @@ public:
     virtual void restore_defaults() override final;
 
 public:
+    virtual std::vector<std::string> make_header() const = 0;
+    virtual std::unique_ptr<EditableTableRow2> make_row() const = 0;
+
     //  Undefined behavior to call these on rows that aren't part of the table.
     void insert_row(size_t index, std::unique_ptr<EditableTableRow2> row);
     void clone_row(const EditableTableRow2& row);
@@ -92,8 +99,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    std::string m_label;
-    const EditableTableFactory2& m_factory;
+    const std::string m_label;
     const std::vector<std::unique_ptr<EditableTableRow2>> m_default;
 
     mutable SpinLock m_lock;
@@ -103,15 +109,18 @@ private:
 
 
 
-template <typename Factory>
-class EditableTableOption2 : public Factory, public EditableTableOptionCore{
+template <typename RowType>
+class EditableTableOption2 : public EditableTableOptionCore{
 public:
-    EditableTableOption2(
-        std::string label,
-        std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
-    )
-        : EditableTableOptionCore(std::move(label), *this, std::move(default_value))
-    {}
+    using EditableTableOptionCore::EditableTableOptionCore;
+
+    std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
+        return EditableTableOptionCore::copy_snapshot<RowType>();
+    }
+
+    virtual std::unique_ptr<EditableTableRow2> make_row() const override{
+        return std::unique_ptr<EditableTableRow2>(new RowType());
+    }
 };
 
 

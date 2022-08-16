@@ -35,21 +35,31 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
 
 MultiGameFossil::MultiGameFossil(){
     PA_ADD_OPTION(START_IN_GRIP_MENU);
-    PA_ADD_OPTION(GAME_LIST);
+//    PA_ADD_OPTION(GAME_LIST);
+    PA_ADD_OPTION(GAME_LIST2);
 }
 
 void run_fossil_batch(
+    Logger& logger,
     BotBaseContext& context,
-    const FossilGame& batch,
+    const FossilGame2& batch,
     bool* game_slot_flipped,
     bool save_and_exit
 ){
     //  Sanitize Slots
-    uint8_t game_slot = batch.game_slot;
-    uint8_t user_slot = batch.user_slot;
+    uint8_t game_slot = (uint8_t)batch.game_slot + 1;
+    uint8_t user_slot = (uint8_t)batch.user_slot + 1;
     if (game_slot > 2){
         game_slot = 0;
     }
+
+    logger.log(
+        std::string("Batch:") +
+        "\nGame Slot: " + std::to_string(game_slot) +
+        "\nUser Slot: " + std::to_string(user_slot) +
+        "\nFossil: " + std::to_string(batch.fossil) +
+        "\nRevives: " + std::to_string(batch.revives)
+    );
 
     //  Calculate current game slot.
     switch (game_slot){
@@ -126,14 +136,16 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    FossilGame batch;
+    std::vector<std::unique_ptr<FossilGame2>> list = GAME_LIST2.copy_snapshot();
 
-    size_t games = GAME_LIST.size();
+//    FossilGame2 batch;
+
+    size_t games = list.size();
 
     bool game_slot_flipped = false;
     for (size_t c = 0; c < games; c++){
-        batch = GAME_LIST[c];
-        run_fossil_batch(context, batch, &game_slot_flipped, c + 1 < games);
+//        batch = GAME_LIST2[c];
+        run_fossil_batch(env.logger(), context, *list[c], &game_slot_flipped, c + 1 < games);
     }
 
     ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
