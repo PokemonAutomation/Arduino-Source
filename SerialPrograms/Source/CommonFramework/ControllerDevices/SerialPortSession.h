@@ -50,6 +50,7 @@ public:
 
     bool is_ready() const{ return m_connection.state() == BotBaseHandle::State::READY; }
     BotBaseHandle& botbase(){ return m_connection; }
+    PABotBaseLevel min_pabotbase() const{ return m_connection.min_pabotbase(); }
 
     void stop();
     void reset();

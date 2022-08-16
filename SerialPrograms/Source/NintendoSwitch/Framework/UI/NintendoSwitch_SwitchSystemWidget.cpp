@@ -7,9 +7,11 @@
 #include <QKeyEvent>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QFileDialog>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
@@ -96,6 +98,57 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::set_inference_boxes,
         m_camera_widget, [=](bool enabled){
             m_camera_widget->set_overlay_enabled(enabled);
+        }
+    );
+    connect(
+        m_command, &CommandRow::load_profile,
+        m_command, [=](){
+            std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file")).toStdString();
+            if (path.empty()){
+                return;
+            }
+
+            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+
+            //  Deserialize into this local option instance.
+            option.load_json(load_json_file(path));
+
+            m_session.serial_session().botbase().reset(option.m_serial.port());
+            m_session.camera_session().set_source(option.m_camera.info);
+            m_session.camera_session().set_resolution(option.m_camera.current_resolution);
+            if (!option.m_audio.input_file().empty()){
+                m_session.audio_session().set_audio_input(option.m_audio.input_file());
+            }else{
+                m_session.audio_session().set_audio_input(option.m_audio.input_device());
+            }
+            m_session.audio_session().set_format(option.m_audio.input_format());
+            m_session.audio_session().set_audio_output(option.m_audio.output_device());
+            m_session.audio_session().set_volume(option.m_audio.volume());
+            m_session.audio_session().set_display(option.m_audio.display_type());
+        }
+    );
+    connect(
+        m_command, &CommandRow::save_profile,
+        m_command, [=]() {
+            std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file")).toStdString();
+            if (path.empty()) {
+                return;
+            }
+
+            // Create a copy of option, to be able to serialize it later on
+            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+            option.m_serial.set_port(*m_session.serial_session().option().port());
+            option.m_camera.info = m_session.camera_session().current_device();
+            option.m_camera.current_resolution = m_session.camera_session().current_resolution();
+            auto [input_file, input_device] = m_session.audio_session().input_device();
+            option.m_audio.set_input_file(std::move(input_file));
+            option.m_audio.set_input_device(std::move(input_device));
+            option.m_audio.set_input_format(m_session.audio_session().input_format());
+            option.m_audio.set_output_device(m_session.audio_session().output_device());
+            option.m_audio.set_volume(m_session.audio_session().output_volume());
+            option.m_audio.set_display_type(m_session.audio_session().display_type());
+
+            option.to_json().dump(path);
         }
     );
     connect(

@@ -38,6 +38,12 @@ CommandRow::CommandRow(
     command_row->addWidget(m_overlay_box, 4);
     command_row->addSpacing(5);
 
+    m_load_profile_button = new QPushButton("Load Profile", this);
+    command_row->addWidget(m_load_profile_button, 2);
+
+    m_save_profile_button = new QPushButton("Save Profile", this);
+    command_row->addWidget(m_save_profile_button, 2);
+
     m_screenshot_button = new QPushButton("Screenshot", this);
     command_row->addWidget(m_screenshot_button, 2);
 
@@ -50,6 +56,14 @@ CommandRow::CommandRow(
     connect(
         m_overlay_box, &QCheckBox::stateChanged,
         this, [=](int){ emit set_inference_boxes(m_overlay_box->isChecked()); }
+    );
+    connect(
+        m_load_profile_button, &QPushButton::clicked,
+        this, [=](bool) { emit load_profile(); }
+    );
+    connect(
+        m_save_profile_button, &QPushButton::clicked,
+        this, [=](bool) { emit save_profile(); }
     );
     connect(
         m_screenshot_button, &QPushButton::clicked,
@@ -80,8 +94,9 @@ void CommandRow::set_focus(bool focused){
 }
 
 void CommandRow::update_ui(){
+    bool stopped = last_known_state() == ProgramState::STOPPED;
+    m_load_profile_button->setEnabled(stopped);
     if (!m_allow_commands_while_running){
-        bool stopped = last_known_state() == ProgramState::STOPPED;
 //        m_reset_button->setEnabled(stopped);
         if (!stopped){
             m_status->setText(
@@ -124,9 +139,6 @@ void CommandRow::update_ui(){
 }
 
 void CommandRow::on_state_changed(ProgramState state){
-    if (state == last_known_state()){
-        return;
-    }
     VirtualController::on_state_changed(state);
     update_ui();
 }

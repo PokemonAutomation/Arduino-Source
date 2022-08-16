@@ -33,6 +33,8 @@ public:
 
 signals:
     void set_inference_boxes(bool enabled);
+    void load_profile();
+    void save_profile();
     void screenshot_requested();
 
 public:
@@ -46,6 +48,8 @@ private:
     QComboBox* m_command_box;
     QLabel* m_status;
     QCheckBox* m_overlay_box;
+    QPushButton* m_load_profile_button;
+    QPushButton* m_save_profile_button;
     QPushButton* m_screenshot_button;
     bool m_last_known_focus;
 };
