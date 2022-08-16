@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 
-class BooleanCheckBoxCellWidget : public QCheckBox, public ConfigWidget, private ConfigOption::Listener{
+class BooleanCheckBoxCellWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
     ~BooleanCheckBoxCellWidget();
     BooleanCheckBoxCellWidget(QWidget& parent, BooleanCheckBoxCell& value);
@@ -25,6 +25,7 @@ public:
 
 private:
     BooleanCheckBoxCell& m_value;
+    QCheckBox* m_box;
 };
 
 

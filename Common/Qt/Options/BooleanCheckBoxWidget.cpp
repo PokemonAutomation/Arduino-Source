@@ -28,23 +28,28 @@ BooleanCheckBoxCellWidget::~BooleanCheckBoxCellWidget(){
     m_value.remove_listener(*this);
 }
 BooleanCheckBoxCellWidget::BooleanCheckBoxCellWidget(QWidget& parent, BooleanCheckBoxCell& value)
-    : QCheckBox(&parent)
+    : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    this->setChecked(m_value);
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setAlignment(Qt::AlignHCenter);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_box = new QCheckBox(this);
+    m_box->setChecked(m_value);
+    layout->addWidget(m_box);
     connect(
-        this, &QCheckBox::stateChanged,
+        m_box, &QCheckBox::stateChanged,
         this, [=](int){
-            m_value = this->isChecked();
+            m_value = m_box->isChecked();
         }
     );
     value.add_listener(*this);
 }
 void BooleanCheckBoxCellWidget::update(){
     ConfigWidget::update();
-    if (m_value != this->isChecked()){
-        this->setChecked(m_value);
+    if (m_value != m_box->isChecked()){
+        m_box->setChecked(m_value);
     }
 }
 void BooleanCheckBoxCellWidget::value_changed(){
