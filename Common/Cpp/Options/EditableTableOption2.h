@@ -15,28 +15,33 @@
 namespace PokemonAutomation{
 
 
-
+//  Represents a row of the table. Users should subclass this and add all the
+//  configs/fields that is in the row.
 class EditableTableRow2{
 public:
     virtual ~EditableTableRow2() = default;
     EditableTableRow2();
 
+    //  Duplicate/deep-copy the entire row. Does not copy over listeners.
     virtual std::unique_ptr<EditableTableRow2> clone() const = 0;
 
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
 
     virtual std::string check_validity() const;
-    std::vector<ConfigOption*> make_cells();
-
-    uint64_t seqnum() const{ return m_seqnum; }
-    size_t index() const{ return m_index.load(std::memory_order_relaxed); }
 
 
 protected:
     void add_option(ConfigOption& option, std::string serialization_string);
 
 #define PA_ADD_OPTION(x)    add_option(x, #x)
+
+
+public:
+    //  Internal use by table.
+    uint64_t seqnum() const{ return m_seqnum; }
+    size_t index() const{ return m_index.load(std::memory_order_relaxed); }
+    std::vector<ConfigOption*> make_cells();
 
 
 private:
@@ -55,7 +60,8 @@ private:
 
 
 
-
+//  This the table itself. Don't use this directly.
+//  Use EditableTableOption2<> instead since it is type-aware of the row.
 class EditableTableOptionCore : public ConfigOption{
 public:
     EditableTableOptionCore(
@@ -65,8 +71,11 @@ public:
 
     const std::string& label() const{ return m_label; }
 
+    //  Return a list of references to all the rows at this exact moment.
+    //  These reference are live in that they may be asynchronously changed.
     std::vector<std::shared_ptr<EditableTableRow2>> current() const;
 
+    //  Return a copy of the entire table at the exact moment this is called.
     template <typename RowType>
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
         std::vector<std::unique_ptr<RowType>> ret;

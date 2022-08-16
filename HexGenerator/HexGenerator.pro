@@ -29,6 +29,8 @@ SOURCES += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
+    ../Common/Cpp/Options/EditableTableOption2.cpp \
+    ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
@@ -43,8 +45,9 @@ SOURCES += \
     ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
+    ../Common/Qt/Options/EditableTableWidget2.cpp \
+    ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
-    ../Common/Qt/Options/FossilTableBaseOption.cpp \
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
@@ -53,7 +56,7 @@ SOURCES += \
     Source/Options/ConfigItem.cpp \
     Source/Options/Date.cpp \
     Source/Options/Divider.cpp \
-    Source/Options/EnumDropdownOption.cpp \
+    Source/Options/EnumDropdown.cpp \
     Source/Options/FixedCodeOption.cpp \
     Source/Options/FloatingPoint.cpp \
     Source/Options/FossilTableOption.cpp \
@@ -83,12 +86,15 @@ HEADERS += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
+    ../Common/Cpp/Options/EditableTableOption2.h \
+    ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
+    ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
@@ -97,8 +103,9 @@ HEADERS += \
     ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
+    ../Common/Qt/Options/EditableTableWidget2.h \
+    ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
-    ../Common/Qt/Options/FossilTableBaseOption.h \
     ../Common/Qt/Options/MultiHostTableBaseOption.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
@@ -106,7 +113,7 @@ HEADERS += \
     Source/Options/ConfigItem.h \
     Source/Options/Date.h \
     Source/Options/Divider.h \
-    Source/Options/EnumDropdownOption.h \
+    Source/Options/EnumDropdown.h \
     Source/Options/FixedCodeOption.h \
     Source/Options/FloatingPoint.h \
     Source/Options/FossilTableOption.h \

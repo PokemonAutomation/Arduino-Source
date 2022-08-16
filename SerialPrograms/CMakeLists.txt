@@ -191,8 +191,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
     ../Common/Qt/Options/FloatingPointWidget.h
-    ../Common/Qt/Options/FossilTableBaseOption.cpp
-    ../Common/Qt/Options/FossilTableBaseOption.h
     ../Common/Qt/Options/MultiHostTableBaseOption.cpp
     ../Common/Qt/Options/MultiHostTableBaseOption.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
@@ -1310,8 +1308,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
-    Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.cpp
-    Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp

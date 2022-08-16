@@ -13,7 +13,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Tools/Tools.h"
-#include "EnumDropdownOption.h"
+#include "EnumDropdown.h"
 
 namespace PokemonAutomation{
 namespace HexGenerator{

@@ -12,6 +12,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"
 #include "FossilTableOption.h"
@@ -21,6 +22,14 @@ namespace HexGenerator{
 
 
 const std::string FossilTable::OPTION_TYPE      = "FossilTable";
+
+
+const std::vector<std::string> FossilTable::FOSSIL_LIST{
+    "Dracozolt",
+    "Arctozolt",
+    "Dracovish",
+    "Arctovish",
+};
 
 
 int FossilTable_init = register_option(
@@ -35,10 +44,8 @@ int FossilTable_init = register_option(
 
 FossilTable::FossilTable(const JsonObject& obj)
     : SingleStatementOption(obj)
-    , m_table(SingleStatementOption::m_label, m_factory)
 {
-    m_table.load_default(obj.get_value_throw(JSON_DEFAULT));
-    m_table.load_current(obj.get_value_throw(JSON_CURRENT));
+    m_table.load_json(obj.get_value_throw(JSON_CURRENT));
 }
 std::string FossilTable::check_validity() const{
     return m_table.check_validity();
@@ -48,22 +55,22 @@ void FossilTable::restore_defaults(){
 }
 JsonObject FossilTable::to_json() const{
     JsonObject root = SingleStatementOption::to_json();
-    root[JSON_DEFAULT] = m_table.write_default();
-    root[JSON_CURRENT] = m_table.write_current();
+    root[JSON_CURRENT] = m_table.to_json();
     return root;
 }
 std::string FossilTable::to_cpp() const{
     std::string str;
     str += m_declaration;
     str += " = {\r\n";
-    for (size_t c = 0; c < m_table.size(); c++){
-        const NintendoSwitch::PokemonSwSh::FossilGame& item = static_cast<const NintendoSwitch::PokemonSwSh::FossilGame&>(m_table[c]);
+    std::vector<std::unique_ptr<NintendoSwitch::PokemonSwSh::FossilGame2>> list = m_table.copy_snapshot();
+    for (size_t c = 0; c < list.size(); c++){
+        const NintendoSwitch::PokemonSwSh::FossilGame2& item = *list[c];
         str += "    {";
-        str += std::to_string(item.game_slot);
+        str += std::to_string(item.game_slot + 1);
         str += ", ";
-        str += std::to_string(item.user_slot);
+        str += std::to_string(item.user_slot + 1);
         str += ", ";
-        str += NintendoSwitch::PokemonSwSh::FossilGame::FOSSIL_LIST[item.fossil];
+        str += FOSSIL_LIST[item.fossil];
         str += ", ";
         str += std::to_string(item.revives);
         str += "},\r\n";
@@ -73,7 +80,7 @@ std::string FossilTable::to_cpp() const{
     return str;
 }
 QWidget* FossilTable::make_ui(QWidget& parent){
-    return new EditableTableBaseWidget(parent, m_table);
+    return &m_table.make_ui(parent)->widget();
 }
 
 

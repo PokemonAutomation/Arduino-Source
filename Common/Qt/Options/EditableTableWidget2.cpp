@@ -109,6 +109,9 @@ void EditableTableWidget2::update(){
         if (index_new == latest.size() ||
             (index_old < m_current.size() && m_current[index_old]->index() == (size_t)0 - 1)
         ){
+            //  QTableWidget::removeRow() does not immediately delete the
+            //  widgets in that row. So we need to do it manually to drop the
+            //  references to the row objects.
             int stop = m_table->columnCount();
             for (int c = 0; c < stop; c++){
                 delete m_table->cellWidget((int)index_new, c);

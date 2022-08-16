@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
-#include "Common/Qt/Options/FossilTableBaseOption.h"
+#include "Common/PokemonSwSh/PokemonSwSh_FossilTable2.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
@@ -23,6 +23,8 @@ namespace HexGenerator{
 class FossilTable : public SingleStatementOption{
 public:
     static const std::string OPTION_TYPE;
+
+    static const std::vector<std::string> FOSSIL_LIST;
 
 public:
     FossilTable(const JsonObject& obj);
@@ -38,8 +40,7 @@ public:
 
 private:
     friend class FossilTableUI;
-    NintendoSwitch::PokemonSwSh::FossilGameOptionFactory m_factory;
-    EditableTableBaseOption m_table;
+    NintendoSwitch::PokemonSwSh::FossilTable2 m_table;
 };
 #endif
 
