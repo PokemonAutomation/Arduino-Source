@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -13,6 +14,10 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_GameEntry.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,6 +36,7 @@ void move_to_user(BotBaseContext& context, uint8_t user_slot){
 }
 
 void open_game_from_home(
+    Logger& logger,
     BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
@@ -45,21 +51,28 @@ void open_game_from_home(
     }
 
     if (tolerate_update_menu){
+        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
+            throw UserSetupError(
+                logger,
+                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time."
+            );
+        }
+
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 5, 175);      //  Choose game
-        pbf_press_dpad(context, DPAD_UP, 5, 0);          //  Skip the update window.
+        pbf_press_button(context, BUTTON_A, 5, 175);    //  Choose game
+        pbf_press_dpad(context, DPAD_UP, 5, 0);         //  Skip the update window.
         move_to_user(context, user_slot);
     }
 
-//    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
+//    cout << "START_GAME_REQUIRES_INTERNET = " << ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET << endl;
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
         pbf_mash_button(context, BUTTON_A, start_game_mash);
     }else{
-        pbf_press_button(context, BUTTON_A, 5, 175);     //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 5, 175);    //  Enter select user menu.
         move_to_user(context, user_slot);
-        pbf_press_button(context, BUTTON_A, 5, 5);       //  Enter game
+        pbf_press_button(context, BUTTON_A, 5, 5);      //  Enter game
 
         //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.
