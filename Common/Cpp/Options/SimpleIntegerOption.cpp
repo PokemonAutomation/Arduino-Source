@@ -36,6 +36,14 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
     , m_default(default_value)
     , m_current(default_value)
 {}
+#if 0
+template <typename Type>
+std::unique_ptr<ConfigOption> SimpleIntegerCell<Type>::clone() const{
+    std::unique_ptr<SimpleIntegerCell> ret(new SimpleIntegerCell(m_default, m_min_value, m_max_value));
+    ret->m_current.store(*this, std::memory_order_relaxed);
+    return ret;
+}
+#endif
 
 template <typename Type>
 std::string SimpleIntegerCell<Type>::set(Type x){
@@ -92,6 +100,21 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     : SimpleIntegerCell<Type>(default_value, min_value, max_value)
     , m_label(std::move(label))
 {}
+#if 0
+template <typename Type>
+std::unique_ptr<ConfigOption> SimpleIntegerOption<Type>::clone() const{
+    std::unique_ptr<SimpleIntegerOption> ret(
+        new SimpleIntegerOption(
+            m_label,
+            this->m_default,
+            this->m_min_value,
+            this->m_max_value
+        )
+    );
+    ret->m_current.store(this->m_current, std::memory_order_relaxed);
+    return ret;
+}
+#endif
 
 
 

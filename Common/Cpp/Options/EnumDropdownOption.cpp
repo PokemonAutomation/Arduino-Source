@@ -34,6 +34,13 @@ EnumDropdownCell::EnumDropdownCell(
         }
     }
 }
+#if 0
+std::unique_ptr<ConfigOption> EnumDropdownCell::clone() const{
+    std::unique_ptr<EnumDropdownCell> ret(new EnumDropdownCell(m_case_list, m_default));
+    ret->m_current = m_current.load(std::memory_order_relaxed);
+    return ret;
+}
+#endif
 
 bool EnumDropdownCell::set(size_t index){
     if (index >= m_case_list.size()){
@@ -63,6 +70,18 @@ void EnumDropdownCell::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
     push_update();
 }
+
+
+
+#if 0
+std::unique_ptr<ConfigOption> EnumDropdownOption::clone() const{
+    std::unique_ptr<EnumDropdownOption> ret(new EnumDropdownOption(m_label, m_case_list, m_default));
+    ret->m_current = m_current.load(std::memory_order_relaxed);
+    return ret;
+}
+#endif
+
+
 
 
 

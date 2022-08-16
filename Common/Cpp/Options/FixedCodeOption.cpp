@@ -26,6 +26,13 @@ FixedCodeOption::FixedCodeOption(
     , m_default(default_value)
     , m_current(std::move(default_value))
 {}
+#if 0
+std::unique_ptr<ConfigOption> FixedCodeOption::clone() const{
+    std::unique_ptr<FixedCodeOption> ret(new FixedCodeOption(m_label, m_digits, m_default));
+    ret->m_current = m_current;
+    return ret;
+}
+#endif
 
 FixedCodeOption::operator const std::string&() const{
     SpinLockGuard lg(m_lock);

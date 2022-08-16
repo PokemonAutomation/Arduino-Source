@@ -12,21 +12,27 @@
 namespace PokemonAutomation{
 
 
-
-ConfigOption::~ConfigOption() = default;
-ConfigOption::ConfigOption()
-    : m_data(CONSTRUCT_TOKEN)
-{}
-
 struct ConfigOption::Data{
     SpinLock lock;
     std::atomic<ConfigOptionState> visibility;
     std::set<Listener*> listeners;
 
-    Data()
-        : visibility(ConfigOptionState::ENABLED)
+    Data(ConfigOptionState p_visibility = ConfigOptionState::ENABLED)
+        : visibility(p_visibility)
     {}
 };
+
+
+
+ConfigOption::~ConfigOption() = default;
+//ConfigOption::ConfigOption(const ConfigOption& x)
+//    : m_data(CONSTRUCT_TOKEN, x.visibility())
+//{}
+
+ConfigOption::ConfigOption(ConfigOptionState visibility)
+    : m_data(CONSTRUCT_TOKEN, visibility)
+{}
+
 void ConfigOption::add_listener(Listener& listener){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);

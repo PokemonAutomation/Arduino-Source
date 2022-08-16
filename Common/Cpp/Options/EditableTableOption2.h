@@ -1,0 +1,121 @@
+/*  Editable Table Option
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Options_EditableTableOption_H
+#define PokemonAutomation_Options_EditableTableOption_H
+
+#include <memory>
+#include <vector>
+#include "Common/Cpp/SpinLock.h"
+#include "ConfigOption.h"
+
+namespace PokemonAutomation{
+
+
+
+class EditableTableRow2{
+public:
+    virtual ~EditableTableRow2() = default;
+    EditableTableRow2();
+
+    virtual std::unique_ptr<EditableTableRow2> clone() const = 0;
+
+    virtual void load_json(const JsonValue& json);
+    virtual JsonValue to_json() const;
+
+    virtual std::string check_validity() const;
+    std::vector<ConfigOption*> make_cells();
+
+    uint64_t seqnum() const{ return m_seqnum; }
+    size_t index() const{ return m_index.load(std::memory_order_relaxed); }
+
+
+protected:
+    void add_option(ConfigOption& option, std::string serialization_string);
+
+#define PA_ADD_OPTION(x)    add_option(x, #x)
+
+
+private:
+    friend class EditableTableOptionCore;
+
+    //  A unique # for this row within its table.
+    uint64_t m_seqnum = 0;
+
+    //  The index in the table it resides in.
+    //  -1 means it's orphaned and not in the table.
+    std::atomic<size_t> m_index;
+
+    std::vector<std::pair<std::string, ConfigOption*>> m_options;
+};
+
+
+
+class EditableTableFactory2{
+public:
+    virtual std::vector<std::string> make_header() const = 0;
+    virtual std::unique_ptr<EditableTableRow2> make_row() const = 0;
+};
+
+
+
+
+
+class EditableTableOptionCore : public ConfigOption{
+public:
+    EditableTableOptionCore(
+        std::string label, const EditableTableFactory2& factory,
+        std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
+    );
+
+    const std::string& label() const{ return m_label; }
+    const EditableTableFactory2& factory() const{ return m_factory; }
+
+    std::vector<std::shared_ptr<EditableTableRow2>> current() const;
+
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+
+    virtual std::string check_validity() const override;
+    virtual void restore_defaults() override final;
+
+public:
+    //  Undefined behavior to call these on rows that aren't part of the table.
+    void insert_row(size_t index, std::unique_ptr<EditableTableRow2> row);
+    void clone_row(const EditableTableRow2& row);
+    void remove_row(EditableTableRow2& row);
+
+public:
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    std::string m_label;
+    const EditableTableFactory2& m_factory;
+    const std::vector<std::unique_ptr<EditableTableRow2>> m_default;
+
+    mutable SpinLock m_lock;
+    uint64_t m_seqnum = 0;
+    std::vector<std::shared_ptr<EditableTableRow2>> m_current;
+};
+
+
+
+template <typename Factory>
+class EditableTableOption2 : public Factory, public EditableTableOptionCore{
+public:
+    EditableTableOption2(
+        std::string label,
+        std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
+    )
+        : EditableTableOptionCore(std::move(label), *this, std::move(default_value))
+    {}
+};
+
+
+
+
+}
+#endif

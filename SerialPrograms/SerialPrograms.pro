@@ -92,6 +92,7 @@ SOURCES += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
+    ../Common/Cpp/Options/EditableTableOption2.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
@@ -121,6 +122,7 @@ SOURCES += \
     ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
+    ../Common/Qt/Options/EditableTableWidget2.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
@@ -784,6 +786,7 @@ HEADERS += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
+    ../Common/Cpp/Options/EditableTableOption2.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
@@ -812,6 +815,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
+    ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h \
@@ -829,6 +833,7 @@ HEADERS += \
     ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
+    ../Common/Qt/Options/EditableTableWidget2.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \

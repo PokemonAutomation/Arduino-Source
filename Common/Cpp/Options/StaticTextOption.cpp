@@ -16,6 +16,11 @@ namespace PokemonAutomation{
 StaticTextOption::StaticTextOption(std::string label)
     : m_text(std::move(label))
 {}
+#if 0
+std::unique_ptr<ConfigOption> StaticTextOption::clone() const{
+    return std::unique_ptr<ConfigOption>(new StaticTextOption(m_text));
+}
+#endif
 std::string StaticTextOption::text() const{
     SpinLockGuard lg(m_lock);
     return m_text;
@@ -38,6 +43,11 @@ JsonValue StaticTextOption::to_json() const{
 SectionDividerOption::SectionDividerOption(std::string label)
     : m_text(std::move(label))
 {}
+#if 0
+std::unique_ptr<ConfigOption> SectionDividerOption::clone() const{
+    return std::unique_ptr<ConfigOption>(new SectionDividerOption(m_text));
+}
+#endif
 std::string SectionDividerOption::text() const{
     SpinLockGuard lg(m_lock);
     return m_text;

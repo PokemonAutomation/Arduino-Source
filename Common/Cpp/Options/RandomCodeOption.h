@@ -38,6 +38,7 @@ class RandomCodeOption : public ConfigOption{
 public:
     RandomCodeOption(size_t total_digits);
     RandomCodeOption(std::string label, size_t total_digits, size_t random_digits, std::string code_string);
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

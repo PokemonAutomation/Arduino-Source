@@ -27,6 +27,7 @@ public:
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     Type min_value() const{ return m_min_value; }
     Type max_value() const{ return m_max_value; }
@@ -50,7 +51,7 @@ public:
 private:
     std::string process(const std::string& text, Type& value) const;
 
-private:
+protected:
     const double m_ticks_per_second;
     const Type m_min_value;
     const Type m_max_value;
@@ -74,6 +75,7 @@ public:
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
 

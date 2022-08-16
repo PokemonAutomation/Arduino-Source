@@ -76,6 +76,19 @@ TimeExpressionCell<Type>::TimeExpressionCell(
 {
     m_error = process(m_current, m_value);
 }
+#if 0
+template <typename Type>
+std::unique_ptr<ConfigOption> TimeExpressionCell<Type>::clone() const{
+    std::unique_ptr<TimeExpressionCell> ret(new TimeExpressionCell(
+        m_ticks_per_second,
+        m_default,
+        m_min_value,
+        m_max_value
+    ));
+    ret->m_current = m_current;
+    return ret;
+}
+#endif
 
 template <typename Type>
 TimeExpressionCell<Type>::operator Type() const{
@@ -188,6 +201,20 @@ TimeExpressionOption<Type>::TimeExpressionOption(
     )
     , m_label(std::move(label))
 {}
+#if 0
+template <typename Type>
+std::unique_ptr<ConfigOption> TimeExpressionOption<Type>::clone() const{
+    std::unique_ptr<TimeExpressionOption> ret(new TimeExpressionOption(
+        this->m_ticks_per_second,
+        this->m_label,
+        this->m_default,
+        this->m_min_value,
+        this->m_max_value
+    ));
+    ret->m_current = this->m_current;
+    return ret;
+}
+#endif
 
 
 

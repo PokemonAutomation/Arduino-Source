@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 class StaticTextOption : public ConfigOption{
 public:
     StaticTextOption(std::string label);
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     std::string text() const;
     void set_text(std::string label);
@@ -36,6 +37,7 @@ private:
 class SectionDividerOption : public ConfigOption{
 public:
     SectionDividerOption(std::string label);
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     std::string text() const;
     void set_text(std::string label);

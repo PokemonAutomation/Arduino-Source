@@ -22,6 +22,7 @@ public:
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     double min_value() const{ return m_min_value; }

@@ -20,6 +20,7 @@ public:
         std::string default_value,
         std::string placeholder_text
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     const std::string& placeholder_text() const{ return m_placeholder_text; }

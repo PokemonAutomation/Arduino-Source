@@ -21,6 +21,7 @@ public:
         std::string default_value,
         std::string placeholder_text
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     bool is_password() const{ return m_is_password; }
     const std::string& label() const{ return m_label; }

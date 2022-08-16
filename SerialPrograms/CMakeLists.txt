@@ -104,6 +104,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
     ../Common/Cpp/Options/DateOption.h
+    ../Common/Cpp/Options/EditableTableOption2.cpp
+    ../Common/Cpp/Options/EditableTableOption2.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
@@ -153,6 +155,7 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
+    ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h
@@ -180,6 +183,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
+    ../Common/Qt/Options/EditableTableWidget2.cpp
+    ../Common/Qt/Options/EditableTableWidget2.h
     ../Common/Qt/Options/EnumDropdownWidget.cpp
     ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp

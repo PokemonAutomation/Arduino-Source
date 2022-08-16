@@ -26,6 +26,13 @@ FloatingPointOption::FloatingPointOption(
     , m_default(default_value)
     , m_current(default_value)
 {}
+#if 0
+std::unique_ptr<ConfigOption> FloatingPointOption::clone() const{
+    std::unique_ptr<FloatingPointOption> ret(new FloatingPointOption(m_label, m_min_value, m_max_value));
+    ret->m_current.store(m_current, std::memory_order_relaxed);
+    return ret;
+}
+#endif
 
 std::string FloatingPointOption::set(double x){
     std::string err = check_validity(x);

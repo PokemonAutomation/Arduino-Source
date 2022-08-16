@@ -20,6 +20,7 @@ public:
         size_t digits,
         std::string default_value
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     operator const std::string&() const;
     const std::string& get() const;

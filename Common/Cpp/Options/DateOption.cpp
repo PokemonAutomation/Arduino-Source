@@ -23,6 +23,13 @@ DateOption::DateOption(
     , m_default(default_value)
     , m_current(default_value)
 {}
+#if 0
+std::unique_ptr<ConfigOption> DateOption::clone() const{
+    std::unique_ptr<DateOption> ret(new DateOption(m_label, m_min_value, m_max_value, m_default));
+    ret->m_current = m_current;
+    return ret;
+}
+#endif
 
 
 DateOption::operator QDate() const{

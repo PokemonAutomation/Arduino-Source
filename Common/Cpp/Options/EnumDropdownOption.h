@@ -43,6 +43,7 @@ public:
         std::initializer_list<Option> cases,
         size_t default_index
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::vector<Option>& case_list() const{ return m_case_list; }
 
@@ -59,7 +60,7 @@ public:
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-private:
+protected:
     std::vector<Option> m_case_list;
     std::map<std::string, size_t> m_case_map;
     const size_t m_default;
@@ -87,6 +88,7 @@ public:
         : EnumDropdownCell(std::move(cases), default_index)
         , m_label(std::move(label))
     {}
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     virtual ConfigWidget* make_ui(QWidget& parent) override;

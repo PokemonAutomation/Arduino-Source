@@ -21,6 +21,7 @@ public:
         QDate min_value, QDate max_value,
         QDate default_value
     );
+//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     const QDate& min_value() const{ return m_min_value; }

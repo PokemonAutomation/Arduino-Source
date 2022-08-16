@@ -22,6 +22,13 @@ TextEditOption::TextEditOption(
     , m_placeholder_text(std::move(placeholder_text))
     , m_current(m_default)
 {}
+#if 0
+std::unique_ptr<ConfigOption> TextEditOption::clone() const{
+   std::unique_ptr<TextEditOption> ret(new TextEditOption(m_label, m_default, m_placeholder_text));
+   ret->m_current = m_current;
+   return ret;
+}
+#endif
 
 TextEditOption::operator const std::string&() const{
     SpinLockGuard lg(m_lock);

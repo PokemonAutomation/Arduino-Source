@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Options_ConfigOption_H
 #define PokemonAutomation_Options_ConfigOption_H
 
+//#include <memory>
 #include <string>
 #include "Common/Cpp/Pimpl.h"
 
@@ -39,12 +40,18 @@ public:
     void remove_listener(Listener& listener);
 
 public:
+    virtual ~ConfigOption();
     ConfigOption(ConfigOption&&) = delete;
     void operator=(ConfigOption&&) = delete;
-    virtual ~ConfigOption();
+//protected:
+//    ConfigOption(const ConfigOption& x);
 
 public:
-    ConfigOption();
+    ConfigOption(ConfigOptionState visibility = ConfigOptionState::ENABLED);
+
+//    //  Deep copy this entire config. This will not copy listeners.
+//    //  Returns null if config cannot be copied.
+//    virtual std::unique_ptr<ConfigOption> clone() const = 0;
 
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;

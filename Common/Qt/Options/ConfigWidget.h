@@ -23,6 +23,7 @@ public:
 
     QWidget& widget(){ return *m_widget; }
 
+    //  Needs to be called on the UI thread.
     virtual void update();
 
 protected:

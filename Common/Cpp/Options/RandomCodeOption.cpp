@@ -77,6 +77,18 @@ RandomCodeOption::RandomCodeOption(std::string label, size_t total_digits, size_
     , m_default(total_digits, random_digits, std::move(code_string))
     , m_current(m_default)
 {}
+#if 0
+std::unique_ptr<ConfigOption> RandomCodeOption::clone() const{
+    std::unique_ptr<RandomCodeOption> ret(new RandomCodeOption(
+        m_label,
+        m_default.total_digits(),
+        m_default.random_digits(),
+        m_default.code_string()
+    ));
+    ret->m_current = m_current;
+    return ret;
+}
+#endif
 void RandomCodeOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){

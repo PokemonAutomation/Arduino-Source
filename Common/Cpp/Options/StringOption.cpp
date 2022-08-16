@@ -23,6 +23,18 @@ StringOption::StringOption(
     , m_placeholder_text(std::move(placeholder_text))
     , m_current(m_default)
 {}
+#if 0
+std::unique_ptr<ConfigOption> StringOption::clone() const{
+    std::unique_ptr<StringOption> ret(new StringOption(
+        m_is_password,
+        m_label,
+        m_default,
+        m_placeholder_text
+    ));
+    ret->m_current = m_current;
+    return ret;
+}
+#endif
 
 StringOption::operator std::string() const{
     SpinLockGuard lg(m_lock);
