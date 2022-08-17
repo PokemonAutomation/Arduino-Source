@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_DiscordWebhookSettings_H
 #define PokemonAutomation_DiscordWebhookSettings_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/EditableTableOption2.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 
@@ -14,46 +17,35 @@ namespace PokemonAutomation{
 namespace Integration{
 
 
-class DiscordWebhookUrl : public EditableTableRow{
+class DiscordWebhookUrl2 : public EditableTableRow2{
 public:
-    DiscordWebhookUrl();
-
+    DiscordWebhookUrl2();
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
     virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
-
-private:
-    QWidget* make_enabled_box(QWidget& parent);
-    QWidget* make_label_box(QWidget& parent);
-    QWidget* make_ping_box(QWidget& parent);
-    QWidget* make_tags_box(QWidget& parent);
-    QWidget* make_url_box(QWidget& parent);
 
 public:
-    bool enabled;
-    std::string label;
-    bool ping;
-    std::vector<std::string> tags;
-    std::string url;
+    BooleanCheckBoxCell enabled;
+    StringCell label;
+    BooleanCheckBoxCell ping;
+    StringCell tags_text;
+    StringCell url;
 };
 
-class DiscordWebhookUrlsFactory : public EditableTableFactory{
+class DiscordWebhookSettingsTable : public EditableTableOption2<DiscordWebhookUrl2>{
 public:
+    DiscordWebhookSettingsTable();
     virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
 };
+
+
+
 
 
 class DiscordWebhookSettingsOption : public GroupOption{
 public:
     DiscordWebhookSettingsOption();
 
-private:
-    DiscordWebhookUrlsFactory m_factory;
-
-public:
-    EditableTableOption urls;
+    DiscordWebhookSettingsTable urls;
 };
 
 

@@ -13,18 +13,16 @@
 namespace PokemonAutomation{
 
 
-class StringOption : public ConfigOption{
+class StringCell : public ConfigOption{
 public:
-    StringOption(
+    StringCell(
         bool is_password,
-        std::string label,
         std::string default_value,
         std::string placeholder_text
     );
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     bool is_password() const{ return m_is_password; }
-    const std::string& label() const{ return m_label; }
     const std::string& placeholder_text() const{ return m_placeholder_text; }
 
     operator std::string() const;
@@ -38,13 +36,30 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    const std::string m_label;
     const bool m_is_password;
     const std::string m_default;
     const std::string m_placeholder_text;
 
     mutable SpinLock m_lock;
     std::string m_current;
+};
+
+
+class StringOption : public StringCell{
+public:
+    StringOption(
+        bool is_password,
+        std::string label,
+        std::string default_value,
+        std::string placeholder_text
+    );
+
+    const std::string& label() const{ return m_label; }
+
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    const std::string m_label;
 };
 
 

@@ -12,16 +12,56 @@
 namespace PokemonAutomation{
 
 
+ConfigWidget* StringCell::make_ui(QWidget& parent){
+    return new StringCellWidget(parent, *this);
+}
+
 ConfigWidget* StringOption::make_ui(QWidget& parent){
-    return new StringWidget(parent, *this);
+    return new StringOptionWidget(parent, *this);
 }
 
 
 
-StringWidget::~StringWidget(){
+StringCellWidget::~StringCellWidget(){
     m_value.remove_listener(*this);
 }
-StringWidget::StringWidget(QWidget& parent, StringOption& value)
+StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
+    : QLineEdit(QString::fromStdString(value), &parent)
+    , ConfigWidget(value, *this)
+    , m_value(value)
+{
+    this->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
+
+    if (m_value.is_password()){
+        this->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    }
+
+    connect(
+        this, &QLineEdit::editingFinished,
+        this, [=](){
+            m_value.set(this->text().toStdString());
+        }
+    );
+
+    m_value.add_listener(*this);
+}
+void StringCellWidget::update(){
+    ConfigWidget::update();
+    this->setText(QString::fromStdString(m_value));
+}
+void StringCellWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
+}
+
+
+
+
+StringOptionWidget::~StringOptionWidget(){
+    m_value.remove_listener(*this);
+}
+StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -32,7 +72,7 @@ StringWidget::StringWidget(QWidget& parent, StringOption& value)
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 
-    m_box = new QLineEdit(QString::fromStdString(m_value));
+    m_box = new QLineEdit(QString::fromStdString(m_value), this);
     m_box->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
     layout->addWidget(m_box, 1);
 
@@ -49,11 +89,11 @@ StringWidget::StringWidget(QWidget& parent, StringOption& value)
 
     m_value.add_listener(*this);
 }
-void StringWidget::update(){
+void StringOptionWidget::update(){
     ConfigWidget::update();
     m_box->setText(QString::fromStdString(m_value));
 }
-void StringWidget::value_changed(){
+void StringOptionWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
         update();
     }, Qt::QueuedConnection);

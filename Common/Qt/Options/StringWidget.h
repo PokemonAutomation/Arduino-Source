@@ -7,20 +7,32 @@
 #ifndef PokemonAutomation_Options_StringWidget_H
 #define PokemonAutomation_Options_StringWidget_H
 
-#include <QWidget>
+#include <QLineEdit>
 #include "Common/Cpp/Options/StringOption.h"
 #include "ConfigWidget.h"
-
-class QLineEdit;
 
 namespace PokemonAutomation{
 
 
 
-class StringWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class StringCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
 public:
-    ~StringWidget();
-    StringWidget(QWidget& parent, StringOption& value);
+    ~StringCellWidget();
+    StringCellWidget(QWidget& parent, StringCell& value);
+
+    virtual void update() override;
+    virtual void value_changed() override;
+
+private:
+    StringCell& m_value;
+};
+
+
+
+class StringOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+public:
+    ~StringOptionWidget();
+    StringOptionWidget(QWidget& parent, StringOption& value);
 
     virtual void update() override;
     virtual void value_changed() override;

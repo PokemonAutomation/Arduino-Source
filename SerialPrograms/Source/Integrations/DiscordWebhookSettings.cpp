@@ -4,9 +4,6 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QLineEdit>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -18,28 +15,40 @@ namespace Integration{
 
 
 
-DiscordWebhookUrl::DiscordWebhookUrl()
+DiscordWebhookUrl2::DiscordWebhookUrl2()
     : enabled(true)
+    , label(false, "", "My test server")
     , ping(true)
-    , tags({"Notifs", "Showcase", "LiveHost"})
-{}
-
-void DiscordWebhookUrl::load_json(const JsonValue& json){
+    , tags_text(false, "Notifs, Showcase, LiveHost", "")
+    , url(true, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+{
+    //  Keep the old JSON tags for backwards compatibility.
+    add_option(enabled, "Enabled");
+    add_option(label, "Label");
+    add_option(ping, "Ping");
+    add_option(tags_text, "Tags");
+    add_option(url, "URL");
+}
+std::unique_ptr<EditableTableRow2> DiscordWebhookUrl2::clone() const{
+    std::unique_ptr<DiscordWebhookUrl2> ret(new DiscordWebhookUrl2());
+    ret->enabled = (bool)enabled;
+    ret->label.set(label);
+    ret->ping = (bool)ping;
+    ret->tags_text.set(tags_text);
+    ret->url.set(url);
+    return ret;
+}
+void DiscordWebhookUrl2::load_json(const JsonValue& json){
+    EditableTableRow2::load_json(json);
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
-    obj->read_boolean(enabled, "Enabled");
-    {
-        std::string str;
-        if (obj->read_string(str, "Label")){
-            label = str;
-        }
-    }
-    obj->read_boolean(ping, "Ping");
+
+    //  Load the old tags format.
     const JsonArray* array = obj->get_array("Tags");
     if (array){
-        tags.clear();
+        std::string tags;
         for (const auto& tag : *array){
             const std::string* str = tag.get_string();
             if (str == nullptr){
@@ -47,115 +56,24 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
             }
             std::string token = EventNotificationSettings::sanitize_tag(*str);
             if (!token.empty()){
-                tags.emplace_back(std::move(token));
+                if (!tags.empty()){
+                    tags += ", ";
+                }
+                tags += token;
             }
         }
+        tags_text.set(std::move(tags));
     }
-    {
-        std::string str;
-        if (obj->read_string(str, "URL")){
-            url = str;
-        }
-    }
-}
-JsonValue DiscordWebhookUrl::to_json() const{
-    JsonObject obj;
-    obj["Enabled"] = enabled;
-    obj["Label"] = label;
-    obj["Ping"] = ping;
-    JsonArray array;
-    for (const std::string& tag : tags){
-        array.push_back(tag);
-    }
-    obj["Tags"] = std::move(array);
-    obj["URL"] = url;
-    return obj;
-}
-std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
-    return std::unique_ptr<EditableTableRow>(new DiscordWebhookUrl(*this));
-}
-std::vector<QWidget*> DiscordWebhookUrl::make_widgets(QWidget& parent){
-    std::vector<QWidget*> widgets;
-    widgets.emplace_back(make_enabled_box(parent));
-    widgets.emplace_back(make_label_box(parent));
-    widgets.emplace_back(make_ping_box(parent));
-    widgets.emplace_back(make_tags_box(parent));
-    widgets.emplace_back(make_url_box(parent));
-    return widgets;
-}
-QWidget* DiscordWebhookUrl::make_enabled_box(QWidget& parent){
-    QWidget* wrapper = new QWidget(&parent);
-    QHBoxLayout* layout = new QHBoxLayout(wrapper);
-    layout->setAlignment(Qt::AlignCenter);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QCheckBox* box = new QCheckBox(&parent);
-    box->setChecked(enabled);
-    layout->addWidget(box);
-    box->connect(
-        box, &QCheckBox::stateChanged,
-        box, [=](int){
-            enabled = box->isChecked();
-        }
-    );
-    return wrapper;
-}
-QWidget* DiscordWebhookUrl::make_label_box(QWidget& parent){
-    QLineEdit* box = new QLineEdit(&parent);
-    box->setText(QString::fromStdString(label));
-    box->setPlaceholderText("My test server");
-    box->connect(
-        box, &QLineEdit::textChanged,
-        box, [=](const QString& line){
-            label = line.toStdString();
-        }
-    );
-    return box;
-}
-QWidget* DiscordWebhookUrl::make_ping_box(QWidget& parent){
-    QWidget* wrapper = new QWidget(&parent);
-    QHBoxLayout* layout = new QHBoxLayout(wrapper);
-    layout->setAlignment(Qt::AlignCenter);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QCheckBox* box = new QCheckBox(&parent);
-    box->setChecked(ping);
-    layout->addWidget(box);
-    box->connect(
-        box, &QCheckBox::stateChanged,
-        box, [=](int){
-            ping = box->isChecked();
-        }
-    );
-    return wrapper;
-}
-QWidget* DiscordWebhookUrl::make_tags_box(QWidget& parent){
-    QLineEdit* box = new QLineEdit(&parent);
-    box->setText(QString::fromStdString(EventNotificationSettings::tags_to_str(tags)));
-//    box->setAlignment(Qt::AlignHCenter);
-    box->connect(
-        box, &QLineEdit::textChanged,
-        box, [&](const QString& text){
-            tags = EventNotificationSettings::parse_tags(text.toStdString());
-        }
-    );
-    return box;
-}
-QWidget* DiscordWebhookUrl::make_url_box(QWidget& parent){
-    QLineEdit* box = new QLineEdit(&parent);
-    box->setText(QString::fromStdString(url));
-    box->setPlaceholderText("https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-    box->setEchoMode(QLineEdit::PasswordEchoOnEdit);
-    box->connect(
-        box, &QLineEdit::textChanged,
-        box, [=](const QString& line){
-            url = line.toStdString();
-        }
-    );
-    return box;
 }
 
 
 
-std::vector<std::string> DiscordWebhookUrlsFactory::make_header() const{
+DiscordWebhookSettingsTable::DiscordWebhookSettingsTable()
+    : EditableTableOption2<DiscordWebhookUrl2>(
+        "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event."
+    )
+{}
+std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
     return std::vector<std::string>{
         "Enabled",
         "Description",
@@ -164,19 +82,12 @@ std::vector<std::string> DiscordWebhookUrlsFactory::make_header() const{
         "Webhook URL",
     };
 }
-std::unique_ptr<EditableTableRow> DiscordWebhookUrlsFactory::make_row() const{
-    return std::unique_ptr<EditableTableRow>(new DiscordWebhookUrl());
-}
 
 
 
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
     : GroupOption("Discord Webhook Settings", true, false)
-    , urls(
-        "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event.",
-        m_factory
-    )
 {
     PA_ADD_OPTION(urls);
 }

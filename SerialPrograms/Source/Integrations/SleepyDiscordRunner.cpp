@@ -13,6 +13,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "IntegrationsAPI.h"
 #include "SleepyDiscordRunner.h"
 
@@ -502,21 +503,22 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
         }
 
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-        DiscordIntegrationTable& channels = settings.integration.channels;
+        const DiscordIntegrationTable2& channels = settings.integration.channels;
         std::vector<std::string> channel_vector;
         std::vector<std::string> message_vector;
 
-        for (size_t i = 0; i < channels.size(); i++){
-            Integration::DiscordIntegrationChannel channel = channels.operator[](i);
-            if (channel.tags.empty() || !channel.enabled){
+        std::vector<std::unique_ptr<DiscordIntegrationChannel2>> table = channels.copy_snapshot();
+        for (size_t i = 0; i < table.size(); i++){
+            const Integration::DiscordIntegrationChannel2& channel = *table[i];
+            if (((std::string)channel.tags_text).empty() || !channel.enabled){
                 continue;
             }
 
             bool send = false;
-            for (const std::string& tag : channel.tags){
+            for (const std::string& tag : EventNotificationSettings::parse_tags(channel.tags_text)){
                 auto iter = tag_set.find(to_lower(tag));
                 if (iter != tag_set.end()){
-                    channel_vector.emplace_back(channels.operator[](i).channel_id);
+                    channel_vector.emplace_back(channel.channel_id);
                     send = true;
                     break;
                 }

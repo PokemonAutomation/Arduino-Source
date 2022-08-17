@@ -18,6 +18,7 @@
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "DiscordWebhook.h"
 
 #include <iostream>
@@ -234,12 +235,13 @@ void send_message(
         tag_set.insert(to_lower(tag));
     }
 
-    for (size_t c = 0; c < settings.webhooks.urls.size(); c++){
-        const DiscordWebhookUrl& url = static_cast<const DiscordWebhookUrl&>(settings.webhooks.urls[c]);
+    std::vector<std::unique_ptr<DiscordWebhookUrl2>> list = settings.webhooks.urls.copy_snapshot();
+    for (size_t c = 0; c < list.size(); c++){
+        const DiscordWebhookUrl2& url = *list[c];
         if (!url.enabled){
             continue;
         }
-        if (url.url.empty()){
+        if (((std::string)url.url).empty()){
             continue;
         }
 //        cout << url.url.toStdString() << " : tags = " << url.tags.size() << endl;
@@ -249,7 +251,7 @@ void send_message(
 
         //  See if a tag matches.
         bool send = false;
-        for (const std::string& tag : url.tags){
+        for (const std::string& tag : EventNotificationSettings::parse_tags(url.tags_text)){
 //            cout << "find tag: " << tag.toStdString() << endl;
             auto iter = tag_set.find(to_lower(tag));
             if (iter != tag_set.end()){
