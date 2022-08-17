@@ -15,7 +15,7 @@ namespace Integration{
 
 
 
-DiscordIntegrationChannel2::DiscordIntegrationChannel2()
+DiscordIntegrationChannel::DiscordIntegrationChannel()
     : enabled(true)
     , label(false, "", "My test server")
     , ping(true)
@@ -31,8 +31,8 @@ DiscordIntegrationChannel2::DiscordIntegrationChannel2()
     add_option(allow_commands, "Commands");
     add_option(channel_id, "Channel");
 }
-std::unique_ptr<EditableTableRow2> DiscordIntegrationChannel2::clone() const{
-    std::unique_ptr<DiscordIntegrationChannel2> ret(new DiscordIntegrationChannel2());
+std::unique_ptr<EditableTableRow2> DiscordIntegrationChannel::clone() const{
+    std::unique_ptr<DiscordIntegrationChannel> ret(new DiscordIntegrationChannel());
     ret->enabled = (bool)enabled;
     ret->label.set(label);
     ret->ping = (bool)ping;
@@ -41,7 +41,7 @@ std::unique_ptr<EditableTableRow2> DiscordIntegrationChannel2::clone() const{
     ret->channel_id.set(channel_id);
     return ret;
 }
-void DiscordIntegrationChannel2::load_json(const JsonValue& json){
+void DiscordIntegrationChannel::load_json(const JsonValue& json){
     EditableTableRow2::load_json(json);
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
@@ -71,12 +71,12 @@ void DiscordIntegrationChannel2::load_json(const JsonValue& json){
 
 
 
-DiscordIntegrationTable2::DiscordIntegrationTable2()
-    : EditableTableOption2<DiscordIntegrationChannel2>(
+DiscordIntegrationTable::DiscordIntegrationTable()
+    : EditableTableOption2<DiscordIntegrationChannel>(
         "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in."
     )
 {}
-std::vector<std::string> DiscordIntegrationTable2::make_header() const{
+std::vector<std::string> DiscordIntegrationTable::make_header() const{
     return std::vector<std::string>{
         "Enabled",
         "Description",
@@ -86,8 +86,8 @@ std::vector<std::string> DiscordIntegrationTable2::make_header() const{
         "Channel ID",
     };
 }
-std::vector<std::string> DiscordIntegrationTable2::command_channels() const{
-    std::vector<std::unique_ptr<DiscordIntegrationChannel2>> table = copy_snapshot();
+std::vector<std::string> DiscordIntegrationTable::command_channels() const{
+    std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = copy_snapshot();
     std::vector<std::string> ret;
     for (const auto& channel : table){
         if (channel->enabled && channel->allow_commands){

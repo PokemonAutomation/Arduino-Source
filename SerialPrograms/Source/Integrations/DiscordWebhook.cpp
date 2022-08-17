@@ -235,9 +235,9 @@ void send_message(
         tag_set.insert(to_lower(tag));
     }
 
-    std::vector<std::unique_ptr<DiscordWebhookUrl2>> list = settings.webhooks.urls.copy_snapshot();
+    std::vector<std::unique_ptr<DiscordWebhookUrl>> list = settings.webhooks.urls.copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
-        const DiscordWebhookUrl2& url = *list[c];
+        const DiscordWebhookUrl& url = *list[c];
         if (!url.enabled){
             continue;
         }

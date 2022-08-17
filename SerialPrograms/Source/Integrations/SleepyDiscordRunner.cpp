@@ -503,13 +503,13 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
         }
 
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-        const DiscordIntegrationTable2& channels = settings.integration.channels;
+        const DiscordIntegrationTable& channels = settings.integration.channels;
         std::vector<std::string> channel_vector;
         std::vector<std::string> message_vector;
 
-        std::vector<std::unique_ptr<DiscordIntegrationChannel2>> table = channels.copy_snapshot();
+        std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = channels.copy_snapshot();
         for (size_t i = 0; i < table.size(); i++){
-            const Integration::DiscordIntegrationChannel2& channel = *table[i];
+            const Integration::DiscordIntegrationChannel& channel = *table[i];
             if (((std::string)channel.tags_text).empty() || !channel.enabled){
                 continue;
             }

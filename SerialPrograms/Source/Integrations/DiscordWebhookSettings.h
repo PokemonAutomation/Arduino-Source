@@ -11,15 +11,14 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace Integration{
 
 
-class DiscordWebhookUrl2 : public EditableTableRow2{
+class DiscordWebhookUrl : public EditableTableRow2{
 public:
-    DiscordWebhookUrl2();
+    DiscordWebhookUrl();
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
     virtual void load_json(const JsonValue& json) override;
 
@@ -31,7 +30,7 @@ public:
     StringCell url;
 };
 
-class DiscordWebhookSettingsTable : public EditableTableOption2<DiscordWebhookUrl2>{
+class DiscordWebhookSettingsTable : public EditableTableOption2<DiscordWebhookUrl>{
 public:
     DiscordWebhookSettingsTable();
     virtual std::vector<std::string> make_header() const override;

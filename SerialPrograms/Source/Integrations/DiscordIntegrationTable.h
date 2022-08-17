@@ -10,16 +10,15 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace Integration{
 
 
 
-class DiscordIntegrationChannel2 : public EditableTableRow2{
+class DiscordIntegrationChannel : public EditableTableRow2{
 public:
-    DiscordIntegrationChannel2();
+    DiscordIntegrationChannel();
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
     virtual void load_json(const JsonValue& json) override;
 
@@ -32,9 +31,9 @@ public:
     StringCell channel_id;
 };
 
-class DiscordIntegrationTable2 : public EditableTableOption2<DiscordIntegrationChannel2>{
+class DiscordIntegrationTable : public EditableTableOption2<DiscordIntegrationChannel>{
 public:
-    DiscordIntegrationTable2();
+    DiscordIntegrationTable();
     virtual std::vector<std::string> make_header() const override;
     std::vector<std::string> command_channels() const;
 };

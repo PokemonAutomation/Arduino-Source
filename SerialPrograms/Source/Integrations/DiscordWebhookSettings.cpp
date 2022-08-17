@@ -15,7 +15,7 @@ namespace Integration{
 
 
 
-DiscordWebhookUrl2::DiscordWebhookUrl2()
+DiscordWebhookUrl::DiscordWebhookUrl()
     : enabled(true)
     , label(false, "", "My test server")
     , ping(true)
@@ -29,8 +29,8 @@ DiscordWebhookUrl2::DiscordWebhookUrl2()
     add_option(tags_text, "Tags");
     add_option(url, "URL");
 }
-std::unique_ptr<EditableTableRow2> DiscordWebhookUrl2::clone() const{
-    std::unique_ptr<DiscordWebhookUrl2> ret(new DiscordWebhookUrl2());
+std::unique_ptr<EditableTableRow2> DiscordWebhookUrl::clone() const{
+    std::unique_ptr<DiscordWebhookUrl> ret(new DiscordWebhookUrl());
     ret->enabled = (bool)enabled;
     ret->label.set(label);
     ret->ping = (bool)ping;
@@ -38,7 +38,7 @@ std::unique_ptr<EditableTableRow2> DiscordWebhookUrl2::clone() const{
     ret->url.set(url);
     return ret;
 }
-void DiscordWebhookUrl2::load_json(const JsonValue& json){
+void DiscordWebhookUrl::load_json(const JsonValue& json){
     EditableTableRow2::load_json(json);
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
@@ -69,7 +69,7 @@ void DiscordWebhookUrl2::load_json(const JsonValue& json){
 
 
 DiscordWebhookSettingsTable::DiscordWebhookSettingsTable()
-    : EditableTableOption2<DiscordWebhookUrl2>(
+    : EditableTableOption2<DiscordWebhookUrl>(
         "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event."
     )
 {}

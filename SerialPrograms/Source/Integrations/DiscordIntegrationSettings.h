@@ -29,7 +29,7 @@ public:
     StringOption hello_message;
     StringOption sudo;
     StringOption owner;
-    DiscordIntegrationTable2 channels;
+    DiscordIntegrationTable channels;
 };
 class DiscordIntegrationSettingsOptionUI : public GroupWidget{
 public:
