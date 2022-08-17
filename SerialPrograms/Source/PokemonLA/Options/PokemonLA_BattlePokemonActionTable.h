@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 #define PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
