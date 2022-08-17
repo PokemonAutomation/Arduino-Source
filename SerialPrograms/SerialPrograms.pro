@@ -232,6 +232,7 @@ SOURCES += \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
+    Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelElements.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
@@ -961,6 +962,7 @@ HEADERS += \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
+    Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelElements.h \
     Source/CommonFramework/Panels/PanelInstance.h \

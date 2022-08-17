@@ -28,10 +28,14 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
         const PokemonNames& data = get_pokemon_name(slug);
         const SpriteDatabase::Sprite* sprite = ALL_POKEMON_SPRITES().get_nothrow(slug);
         if (sprite == nullptr){
-            m_list.emplace_back(data.display_name(), QIcon());
+            m_database.add_entry(StringSelectEntry(
+                slug, data.display_name()
+            ));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            m_list.emplace_back(data.display_name(), sprite->icon);
+            m_database.add_entry(StringSelectEntry(
+                slug, data.display_name(), sprite->icon
+            ));
         }
     }
 }
@@ -47,10 +51,14 @@ PokemonNameSelectData::PokemonNameSelectData(const std::string& json_file_slugs)
         const PokemonNames& data = get_pokemon_name(slug);
         const SpriteDatabase::Sprite* sprite = ALL_POKEMON_SPRITES().get_nothrow(slug);
         if (sprite == nullptr){
-            m_list.emplace_back(data.display_name(), QIcon());
+            m_database.add_entry(StringSelectEntry(
+                slug, data.display_name()
+            ));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            m_list.emplace_back(data.display_name(), sprite->icon);
+            m_database.add_entry(StringSelectEntry(
+                slug, data.display_name(), sprite->icon
+            ));
         }
     }
 }
@@ -63,10 +71,10 @@ PokemonNameSelect::PokemonNameSelect(
     const std::string& default_slug
 )
     : PokemonNameSelectData(slugs)
-    , StringSelectOption(
+    , StringSelectOption2(
         std::move(label),
-        cases(),
-        default_slug.empty() ? "" :get_pokemon_name(default_slug).display_name()
+        PokemonNameSelectData::m_database,
+        default_slug
     )
 {}
 PokemonNameSelect::PokemonNameSelect(
@@ -75,17 +83,13 @@ PokemonNameSelect::PokemonNameSelect(
     const std::string& default_slug
 )
     : PokemonNameSelectData(json_file_slugs)
-    , StringSelectOption(
+    , StringSelectOption2(
         std::move(label),
-        cases(),
-        default_slug.empty() ? "" :get_pokemon_name(default_slug).display_name()
+        PokemonNameSelectData::m_database,
+        default_slug
     )
 {}
 
-const std::string& PokemonNameSelect::slug() const{
-    const std::string& display = (const std::string&)*this;
-    return parse_pokemon_name(display);
-}
 
 
 

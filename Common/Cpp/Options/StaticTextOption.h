@@ -25,6 +25,8 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    virtual void restore_defaults() override{}
+
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
@@ -44,6 +46,8 @@ public:
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+
+    virtual void restore_defaults() override{}
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 

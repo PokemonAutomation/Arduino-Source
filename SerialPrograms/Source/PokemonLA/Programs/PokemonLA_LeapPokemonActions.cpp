@@ -20,8 +20,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
-    switch (static_cast<LeapPokemon>(pokemon)) {
+void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
+    switch (pokemon) {
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
         pbf_move_left_joystick(context, 240, 255, 30, 30);
@@ -154,9 +154,9 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
     context.wait_for_all_requests();
 }
 
-void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
+void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
     goto_camp_from_overworld(env, console, context);
-    switch (static_cast<LeapPokemon>(pokemon)) {
+    switch (pokemon) {
     case LeapPokemon::Aipom:
         goto_professor(console, context, Camp::COASTLANDS_BEACHSIDE);
         break;

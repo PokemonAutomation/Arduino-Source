@@ -51,6 +51,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+StringSelectDatabase make_database(){
+    StringSelectDatabase ret;
+    for (size_t c = 0; c < 1000; c++){
+        ret.add_entry(StringSelectEntry("slug" + std::to_string(c), "Display " + std::to_string(c)));
+    }
+    return ret;
+}
+const StringSelectDatabase& test_database(){
+    static StringSelectDatabase database = make_database();
+    return database;
+}
+
+
 TestProgram_Descriptor::TestProgram_Descriptor()
     : MultiSwitchProgramDescriptor(
         "NintendoSwitch:TestProgram",
@@ -67,9 +80,10 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 TestProgram::TestProgram()
     : LANGUAGE(
         "<b>OCR Language:</b>",
-        { Language::English }
+        { Language::English }, false
     )
     , STATIC_TEXT("Test text...")
+    , SELECT("String Select", test_database(), 0)
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -79,6 +93,7 @@ TestProgram::TestProgram()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STATIC_TEXT);
+    PA_ADD_OPTION(SELECT);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 

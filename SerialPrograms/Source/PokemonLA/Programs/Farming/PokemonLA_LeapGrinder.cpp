@@ -174,7 +174,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            route(env, env.console, context, (size_t)POKEMON);
+            route(env, env.console, context, (LeapPokemon)POKEMON.index());
         },
         {{shiny_detector}}
     );
@@ -252,7 +252,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
 
-    return_to_jubilife(env, env.console, context, (size_t)POKEMON);
+    return_to_jubilife(env, env.console, context, (LeapPokemon)POKEMON.index());
 
     if (stats.leaps == LEAPS){
         return true;

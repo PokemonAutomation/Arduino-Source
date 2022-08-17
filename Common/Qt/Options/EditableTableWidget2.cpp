@@ -82,6 +82,7 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOptionC
 }
 
 void EditableTableWidget2::update(){
+    ConfigWidget::update();
     std::vector<std::shared_ptr<EditableTableRow2>> latest = m_value.current_refs();
 //    cout << "latest.size() = " << latest.size() << endl;
 

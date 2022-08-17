@@ -59,7 +59,7 @@ public:
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual std::string check_validity() const;
 
-    virtual void restore_defaults(){};
+    virtual void restore_defaults() = 0;
 
     //  This is called by the framework at the start of a program to reset any
     //  transient state that the option object may have.

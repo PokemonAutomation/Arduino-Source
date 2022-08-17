@@ -428,6 +428,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
+    Source/CommonFramework/Options/UI/StringSelectWidget.cpp
+    Source/CommonFramework/Options/UI/StringSelectWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelElements.cpp
