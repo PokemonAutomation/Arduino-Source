@@ -21,7 +21,8 @@ public:
     LanguageOCR(std::string label, const LanguageSet& languages, bool required = true);
 
 //    explicit operator bool() const{ return m_case_list[m_current].first != Language::None && m_case_list[m_current].second; }
-//    operator size_t() const{ return m_current; }
+
+    operator size_t() const{ return m_current; }
     operator Language() const{ return m_case_list[m_current.load(std::memory_order_relaxed)].first; }
     void set(Language language);
 

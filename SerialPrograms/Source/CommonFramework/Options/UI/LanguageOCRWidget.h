@@ -26,12 +26,11 @@ public:
     virtual void value_changed() override;
 
 private:
-    void update_status();
-
-private:
     LanguageOCR& m_value;
     QComboBox* m_box;
     QLabel* m_status;
+    std::vector<Language> m_index_to_enum;
+//    std::map<Language, int> m_enum_to_index;
 };
 
 

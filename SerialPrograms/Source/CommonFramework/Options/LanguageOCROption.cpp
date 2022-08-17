@@ -52,10 +52,11 @@ LanguageOCR::LanguageOCR(std::string label, const LanguageSet& languages, bool r
 
 
 void LanguageOCR::set(Language language){
-    if ((size_t)language >= (size_t)Language::EndOfList){
+    auto iter = m_case_map.find(language);
+    if (iter == m_case_map.end()){
         return;
     }
-    m_current.store((size_t)language, std::memory_order_relaxed);
+    m_current.store(iter->second, std::memory_order_relaxed);
     push_update();
 }
 
@@ -73,9 +74,10 @@ void LanguageOCR::load_json(const JsonValue& json){
     }
 
     auto iter = m_case_map.find(language);
-    if (iter != m_case_map.end()){
-        m_current.store(iter->second, std::memory_order_relaxed);
+    if (iter == m_case_map.end()){
+        return;
     }
+    m_current.store(iter->second, std::memory_order_relaxed);
     push_update();
 }
 JsonValue LanguageOCR::to_json() const{

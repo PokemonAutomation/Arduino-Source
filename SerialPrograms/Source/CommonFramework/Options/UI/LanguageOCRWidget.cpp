@@ -13,6 +13,10 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "LanguageOCRWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace OCR{
 
@@ -40,6 +44,8 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     m_box = new NoWheelComboBox(&parent);
 
     for (const auto& item : m_value.m_case_list){
+//        m_enum_to_index[item.first] = (int)m_index_to_enum.size();
+        m_index_to_enum.emplace_back(item.first);
         m_box->addItem(QString::fromStdString(language_data(item.first).name));
         auto* model = qobject_cast<QStandardItemModel*>(m_box->model());
         if (model == nullptr){
@@ -59,7 +65,6 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
             }
         }
     }
-    m_box->setCurrentIndex((int)(Language)m_value);
     vbox->addWidget(m_box);
 
     m_status = new QLabel(this);
@@ -68,29 +73,28 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     m_status->setOpenExternalLinks(true);
     vbox->addWidget(m_status);
 
-    update_status();
+    LanguageOCRWidget::update();
 
     connect(
-        m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
             if (index < 0){
                 m_value.restore_defaults();
                 return;
             }
-//            m_value.m_current = index;
-            m_value.set((Language)index);
-
-//            const LanguageData& data = language_data(m_value);
-//            cout << "index = " << index << ", " << data.code << endl;
-
-//            update_status();
+            m_value.set(m_index_to_enum[index]);
         }
     );
 }
 
-void LanguageOCRWidget::update_status(){
-    const std::pair<Language, bool>& item = m_value.m_case_list[(size_t)(Language)m_value];
-    const LanguageData& language = language_data(m_value);
+
+void LanguageOCRWidget::update(){
+    ConfigWidget::update();
+    size_t index = m_value;
+    m_box->setCurrentIndex((int)index);
+
+    const std::pair<Language, bool>& item = m_value.m_case_list[index];
+    const LanguageData& language = language_data(item.first);
     if (item.second){
         m_status->setVisible(false);
     }else{
@@ -102,12 +106,6 @@ void LanguageOCRWidget::update_status(){
         );
         m_status->setVisible(true);
     }
-}
-
-void LanguageOCRWidget::update(){
-    ConfigWidget::update();
-    m_box->setCurrentIndex((int)(Language)m_value);
-    update_status();
 }
 void LanguageOCRWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [=]{
