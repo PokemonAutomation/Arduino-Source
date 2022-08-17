@@ -69,7 +69,7 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
 
 
 DiscordWebhookSettingsTable::DiscordWebhookSettingsTable()
-    : EditableTableOption2<DiscordWebhookUrl>(
+    : EditableTableOption_t<DiscordWebhookUrl>(
         "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event."
     )
 {}

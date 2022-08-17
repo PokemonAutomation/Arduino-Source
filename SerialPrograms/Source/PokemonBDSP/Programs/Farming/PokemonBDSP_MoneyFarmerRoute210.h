@@ -51,11 +51,11 @@ private:
 private:
     ShortcutDirection SHORTCUT;
 
-    EnumDropdownOption START_LOCATION;
+    DropdownOption START_LOCATION;
 
-    EnumDropdownOption HEALING_METHOD;
+    DropdownOption HEALING_METHOD;
 
-    EnumDropdownOption ON_LEARN_MOVE;
+    DropdownOption ON_LEARN_MOVE;
 
     SimpleIntegerOption<uint8_t> MON0_MOVE1_PP;
     SimpleIntegerOption<uint8_t> MON0_MOVE2_PP;

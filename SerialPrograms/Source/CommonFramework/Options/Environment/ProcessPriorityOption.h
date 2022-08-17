@@ -14,16 +14,16 @@ class QThread;
 namespace PokemonAutomation{
 
 
-class ProcessPriorityOption : public EnumDropdownOption{
+class ProcessPriorityOption : public DropdownOption{
 public:
     ProcessPriorityOption();
-    virtual bool set(size_t index) override;
+    virtual bool set_index(size_t index) override;
     void update_priority_to_option() const;
 };
 
 
 
-class ThreadPriorityOption : public EnumDropdownOption{
+class ThreadPriorityOption : public DropdownOption{
 public:
     ThreadPriorityOption(std::string label, int default_priority);
     void set_on_this_thread() const;

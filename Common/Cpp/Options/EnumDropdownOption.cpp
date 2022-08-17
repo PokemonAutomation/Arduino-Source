@@ -14,8 +14,8 @@
 namespace PokemonAutomation{
 
 
-struct EnumDropdownCell::Data{
-    std::vector<EnumDropdownEntry> m_case_list;
+struct DropdownCell::Data{
+    std::vector<DropdownEntry> m_case_list;
     std::map<std::string, size_t> m_case_map;
     const size_t m_default;
     std::atomic<size_t> m_current;
@@ -43,7 +43,7 @@ struct EnumDropdownCell::Data{
             }
         }
     }
-    Data(std::vector<EnumDropdownEntry> cases, size_t default_index)
+    Data(std::vector<DropdownEntry> cases, size_t default_index)
         : m_default(default_index)
         , m_current(default_index)
     {
@@ -63,7 +63,7 @@ struct EnumDropdownCell::Data{
         }
         m_case_list = std::move(cases);
     }
-    Data(std::initializer_list<EnumDropdownEntry> cases, size_t default_index)
+    Data(std::initializer_list<DropdownEntry> cases, size_t default_index)
         : m_default(default_index)
         , m_current(default_index)
     {
@@ -89,8 +89,8 @@ struct EnumDropdownCell::Data{
 
 
 
-EnumDropdownCell::~EnumDropdownCell() = default;
-EnumDropdownCell::EnumDropdownCell(const EnumDropdownCell& x)
+DropdownCell::~DropdownCell() = default;
+DropdownCell::DropdownCell(const DropdownCell& x)
     : ConfigOption(x)
     , m_data(CONSTRUCT_TOKEN, x.default_index())
 {
@@ -100,45 +100,50 @@ EnumDropdownCell::EnumDropdownCell(const EnumDropdownCell& x)
 }
 
 
-EnumDropdownCell::EnumDropdownCell(
+DropdownCell::DropdownCell(
     std::vector<std::string> cases,
     size_t default_index
 )
     : m_data(CONSTRUCT_TOKEN, std::move(cases), default_index)
 {}
-EnumDropdownCell::EnumDropdownCell(
-    std::vector<EnumDropdownEntry> cases,
+DropdownCell::DropdownCell(
+    std::vector<DropdownEntry> cases,
     size_t default_index
 )
     : m_data(CONSTRUCT_TOKEN, std::move(cases), default_index)
 {}
-EnumDropdownCell::EnumDropdownCell(
-    std::initializer_list<EnumDropdownEntry> cases,
+DropdownCell::DropdownCell(
+    std::initializer_list<DropdownEntry> cases,
     size_t default_index
 )
     : m_data(CONSTRUCT_TOKEN, std::move(cases), default_index)
 {}
 
 
-const std::vector<EnumDropdownEntry>& EnumDropdownCell::case_list() const{
+const std::vector<DropdownEntry>& DropdownCell::case_list() const{
     return m_data->m_case_list;
 }
-size_t EnumDropdownCell::default_index() const{
+size_t DropdownCell::default_index() const{
     return m_data->m_default;
 }
-const std::string& EnumDropdownCell::case_name(size_t index) const{
+size_t DropdownCell::current_index() const{
+    return m_data->m_current.load(std::memory_order_relaxed);
+}
+const std::string& DropdownCell::case_name(size_t index) const{
     return m_data->m_case_list[index].name;
 }
-const std::string& EnumDropdownCell::current_case() const{
+const std::string& DropdownCell::current_case() const{
     const Data& data = *m_data;
     return data.m_case_list[data.m_current].name;
 }
 
-EnumDropdownCell::operator size_t() const{
+#if 1
+DropdownCell::operator size_t() const{
     return m_data->m_current.load(std::memory_order_relaxed);
 }
+#endif
 
-bool EnumDropdownCell::set(size_t index){
+bool DropdownCell::set_index(size_t index){
     Data& data = *m_data;
     if (index >= data.m_case_list.size()){
         return false;
@@ -148,7 +153,7 @@ bool EnumDropdownCell::set(size_t index){
     return true;
 }
 
-void EnumDropdownCell::load_json(const JsonValue& json){
+void DropdownCell::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -160,12 +165,12 @@ void EnumDropdownCell::load_json(const JsonValue& json){
         push_update();
     }
 }
-JsonValue EnumDropdownCell::to_json() const{
+JsonValue DropdownCell::to_json() const{
     const Data& data = *m_data;
     return data.m_case_list[data.m_current].name;
 }
 
-void EnumDropdownCell::restore_defaults(){
+void DropdownCell::restore_defaults(){
     Data& data = *m_data;
     data.m_current.store(data.m_default, std::memory_order_relaxed);
     push_update();

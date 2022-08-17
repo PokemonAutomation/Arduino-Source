@@ -41,7 +41,7 @@ public:
     ShinyFilterCell shininess;
 };
 
-class EncounterFilterTable : public EditableTableOptionCore{
+class EncounterFilterTable : public EditableTableOption2{
 public:
     EncounterFilterTable(bool rare_stars);
     std::vector<std::unique_ptr<EncounterFilterOverride>> copy_snapshot() const;

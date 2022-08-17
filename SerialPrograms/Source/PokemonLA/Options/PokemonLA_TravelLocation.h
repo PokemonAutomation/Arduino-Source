@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class TravelLocationOption : public EnumDropdownOption{
+class TravelLocationOption : public DropdownOption{
 public:
     TravelLocationOption();
     operator TravelLocation() const;

@@ -26,10 +26,10 @@ enum class EncounterAction{
 extern const std::vector<std::string> EncounterAction_NAMES;
 extern const std::map<std::string, EncounterAction> EncounterAction_MAP;
 
-class EncounterActionCell : public EnumDropdownCell{
+class EncounterActionCell : public DropdownCell{
 public:
     EncounterActionCell()
-        : EnumDropdownCell(
+        : DropdownCell(
             {
                 "Stop Program",
                 "Run Away",
@@ -42,7 +42,7 @@ public:
         return (EncounterAction)(size_t)*this;
     }
     void set(EncounterAction action){
-        EnumDropdownCell::set((size_t)action);
+        DropdownCell::set_index((size_t)action);
     }
 };
 
@@ -58,10 +58,10 @@ enum class ShinyFilter{
 extern const std::vector<std::string> ShinyFilter_NAMES;
 extern const std::map<std::string, ShinyFilter> ShinyFilter_MAP;
 
-class ShinyFilterCell : public EnumDropdownCell{
+class ShinyFilterCell : public DropdownCell{
 public:
     ShinyFilterCell()
-        : EnumDropdownCell(
+        : DropdownCell(
             {
                 "Anything",
                 "Not Shiny",
@@ -75,7 +75,7 @@ public:
         return (ShinyFilter)(size_t)*this;
     }
     void set(ShinyFilter action){
-        EnumDropdownCell::set((size_t)action);
+        DropdownCell::set_index((size_t)action);
     }
 };
 

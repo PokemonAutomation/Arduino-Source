@@ -73,7 +73,7 @@ std::unique_ptr<EditableTableRow2> EncounterFilterOverride::clone() const{
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
-    ret->shininess.set(shininess);
+    ret->shininess.set((ShinyFilter)shininess);
     return ret;
 }
 void EncounterFilterOverride::value_changed(){
@@ -92,7 +92,7 @@ void EncounterFilterOverride::value_changed(){
 
 
 EncounterFilterTable::EncounterFilterTable(bool rare_stars)
-    : EditableTableOptionCore(
+    : EditableTableOption2(
         rare_stars
             ?   "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names. "
@@ -107,7 +107,7 @@ EncounterFilterTable::EncounterFilterTable(bool rare_stars)
     )
 {}
 std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy_snapshot() const{
-    return EditableTableOptionCore::copy_snapshot<EncounterFilterOverride>();
+    return EditableTableOption2::copy_snapshot<EncounterFilterOverride>();
 }
 std::vector<std::string> EncounterFilterTable::make_header() const{
     return std::vector<std::string>{

@@ -23,14 +23,14 @@ extern const std::chrono::milliseconds INFERENCE_RATE;
 
 
 
-class HostingSwitch : public EnumDropdownOption{
+class HostingSwitch : public DropdownOption{
 public:
     HostingSwitch();
-    using EnumDropdownOption::check_validity;
+    using DropdownOption::check_validity;
     std::string check_validity(size_t consoles) const;
 };
 
-class BossSlot : public EnumDropdownOption{
+class BossSlot : public DropdownOption{
 public:
     BossSlot();
 };

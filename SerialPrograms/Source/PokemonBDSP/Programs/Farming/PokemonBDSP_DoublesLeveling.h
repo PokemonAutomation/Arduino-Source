@@ -43,7 +43,7 @@ private:
     Pokemon::EncounterBotLanguage LANGUAGE;
 
     OverworldTrigger TRIGGER_METHOD;
-    EnumDropdownOption ON_LEARN_MOVE;
+    DropdownOption ON_LEARN_MOVE;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 

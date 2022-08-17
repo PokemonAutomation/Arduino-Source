@@ -66,32 +66,32 @@ public:
     FossilGame(uint8_t p_game_slot, uint8_t p_user_slot, Fossil p_fossil, uint16_t p_revives)
         : FossilGame()
     {
-        game_slot.set(p_game_slot - 1);
-        user_slot.set(p_user_slot - 1);
-        fossil.set((size_t)p_fossil);
+        game_slot.set_index(p_game_slot - 1);
+        user_slot.set_index(p_user_slot - 1);
+        fossil.set_index((size_t)p_fossil);
         revives.set(p_revives);
     }
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
         std::unique_ptr<FossilGame> ret(new FossilGame());
-        ret->game_slot.set(game_slot);
-        ret->user_slot.set(user_slot);
-        ret->fossil.set(fossil);
+        ret->game_slot.set_index(game_slot);
+        ret->user_slot.set_index(user_slot);
+        ret->fossil.set_index(fossil);
         ret->revives.set(revives);
         return ret;
     }
 
 public:
-    EnumDropdownCell game_slot;
-    EnumDropdownCell user_slot;
-    EnumDropdownCell fossil;
+    DropdownCell game_slot;
+    DropdownCell user_slot;
+    DropdownCell fossil;
     SimpleIntegerCell<uint16_t> revives;
 };
 
 
-class FossilTable : public EditableTableOption2<FossilGame>{
+class FossilTable : public EditableTableOption_t<FossilGame>{
 public:
     FossilTable()
-        : EditableTableOption2<FossilGame>("<b>Game List:</b>", make_defaults())
+        : EditableTableOption_t<FossilGame>("<b>Game List:</b>", make_defaults())
     {}
     virtual std::vector<std::string> make_header() const override{
         return std::vector<std::string>{

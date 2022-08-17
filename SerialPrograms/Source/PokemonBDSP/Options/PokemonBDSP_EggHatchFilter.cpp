@@ -43,13 +43,13 @@ EggHatchFilterRow::EggHatchFilterRow()
 EggHatchFilterRow::EggHatchFilterRow(EggHatchShinyFilter p_shiny)
     : EggHatchFilterRow()
 {
-    shiny.set((size_t)p_shiny);
+    shiny.set_index((size_t)p_shiny);
 }
 std::unique_ptr<EditableTableRow2> EggHatchFilterRow::clone() const{
     std::unique_ptr<EggHatchFilterRow> ret(new EggHatchFilterRow());
-    ret->action.set(action);
-    ret->shiny.set(shiny);
-    ret->gender.set(gender);
+    ret->action.set_index(action);
+    ret->shiny.set_index(shiny);
+    ret->gender.set_index(gender);
     ret->iv_hp.set(iv_hp);
     ret->iv_atk.set(iv_atk);
     ret->iv_def.set(iv_def);
@@ -64,7 +64,7 @@ std::unique_ptr<EditableTableRow2> EggHatchFilterRow::clone() const{
 
 
 EggHatchFilterTable::EggHatchFilterTable()
-    : EditableTableOption2<EggHatchFilterRow>(
+    : EditableTableOption_t<EggHatchFilterRow>(
         "<b>Actions Table:</b><br>"
         "If a hatchling matches one of these filters, the specified action will be performed. "
         "Otherwise, it will be released. "

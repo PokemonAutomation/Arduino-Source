@@ -70,8 +70,8 @@ public:
 
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
         std::unique_ptr<MultiHostSlot> ret(new MultiHostSlot(m_raid_code_option));
-        ret->game_slot.set(game_slot);
-        ret->user_slot.set(user_slot);
+        ret->game_slot.set_index(game_slot);
+        ret->user_slot.set_index(user_slot);
         ret->skips.set(skips);
         ret->backup_save = (bool)backup_save;
         ret->always_catchable = (bool)always_catchable;
@@ -86,8 +86,8 @@ public:
 private:
     const bool m_raid_code_option;
 public:
-    EnumDropdownCell game_slot;
-    EnumDropdownCell user_slot;
+    DropdownCell game_slot;
+    DropdownCell user_slot;
     SimpleIntegerCell<uint8_t> skips;
     BooleanCheckBoxCell backup_save;
     BooleanCheckBoxCell always_catchable;
@@ -100,14 +100,14 @@ public:
 
 
 
-class MultiHostTable : public EditableTableOptionCore{
+class MultiHostTable : public EditableTableOption2{
 public:
     MultiHostTable(bool raid_code_option)
-        : EditableTableOptionCore("<b>Game List:</b>")
+        : EditableTableOption2("<b>Game List:</b>")
         , m_raid_code_option(raid_code_option)
     {}
     std::vector<std::unique_ptr<MultiHostSlot>> copy_snapshot() const{
-        return EditableTableOptionCore::copy_snapshot<MultiHostSlot>();
+        return EditableTableOption2::copy_snapshot<MultiHostSlot>();
     }
     virtual std::vector<std::string> make_header() const override{
         if (m_raid_code_option){

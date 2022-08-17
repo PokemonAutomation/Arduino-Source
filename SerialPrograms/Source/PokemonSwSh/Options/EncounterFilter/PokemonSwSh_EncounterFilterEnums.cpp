@@ -46,6 +46,28 @@ const std::map<std::string, ShinyFilter> ShinyFilter_MAP{
 
 
 
+ShinyFilterCell::operator ShinyFilter() const{
+    if (m_rare_stars){
+        return current_index() == 0 ? ShinyFilter::NOT_SHINY : ShinyFilter::SQUARE_ONLY;
+    }
+    return (ShinyFilter)current_index();
+}
+void ShinyFilterCell::set(ShinyFilter action){
+    if (m_rare_stars){
+        if (action == ShinyFilter::NOT_SHINY){
+            DropdownCell::set_index(0);
+        }
+        if (action == ShinyFilter::SQUARE_ONLY){
+            DropdownCell::set_index(1);
+        }
+        return;
+    }
+    DropdownCell::set_index((size_t)action);
+}
+
+
+
+
 }
 }
 }

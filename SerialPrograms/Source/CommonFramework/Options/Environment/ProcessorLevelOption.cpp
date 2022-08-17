@@ -15,8 +15,8 @@ namespace PokemonAutomation{
 
 
 
-std::vector<EnumDropdownEntry> make_processor_labels(){
-    std::vector<EnumDropdownEntry> ret;
+std::vector<DropdownEntry> make_processor_labels(){
+    std::vector<DropdownEntry> ret;
     for (const CpuCapabilityOption& option : AVAILABLE_CAPABILITIES()){
         ret.emplace_back(option.label, option.available);
     }
@@ -36,7 +36,7 @@ size_t get_default_ProcessorLevel_index(){
 
 
 ProcessorLevelOption::ProcessorLevelOption()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Processor Specific Optimization:</b><br>"
         "Note that this only applies to this binary. External dependencies may ignore this and use higher instructions anyway.",
         make_processor_labels(),
@@ -45,8 +45,8 @@ ProcessorLevelOption::ProcessorLevelOption()
 {
     set_global();
 }
-bool ProcessorLevelOption::set(size_t index){
-    if (!EnumDropdownOption::set(index)){
+bool ProcessorLevelOption::set_index(size_t index){
+    if (!DropdownOption::set_index(index)){
         return false;
     }
     set_global(index);
@@ -70,7 +70,7 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
         global_logger_tagged().log("Processor string matches. Using stored processor level.", COLOR_BLUE);
         const JsonValue* value = obj->get_value("Level");
         if (value){
-            EnumDropdownOption::load_json(*value);
+            DropdownOption::load_json(*value);
         }
         set_global();
     }else{
@@ -79,7 +79,7 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
 }
 JsonValue ProcessorLevelOption::to_json() const{
     JsonObject obj;
-    obj["Level"] = EnumDropdownOption::to_json();
+    obj["Level"] = DropdownOption::to_json();
     obj["ProcessorString"] = get_processor_name();
     return obj;
 }

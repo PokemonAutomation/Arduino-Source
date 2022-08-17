@@ -27,7 +27,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    EnumDropdownOption ENCOUNTER_TYPE;
+    DropdownOption ENCOUNTER_TYPE;
 
 };
 

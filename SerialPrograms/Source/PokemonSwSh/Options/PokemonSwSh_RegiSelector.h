@@ -28,7 +28,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    operator RegiGolem() const{ return (RegiGolem)(size_t)m_option; }
+    operator RegiGolem() const{ return (RegiGolem)m_option.current_index(); }
 
     virtual void restore_defaults() override;
 
@@ -36,7 +36,7 @@ public:
 
 
 private:
-    EnumDropdownOption m_option;
+    DropdownOption m_option;
 };
 
 

@@ -52,8 +52,8 @@ private:
 
 private:
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdownOption POKEDEX;
-    EnumDropdownOption MODE;
+    DropdownOption POKEDEX;
+    DropdownOption MODE;
 };
 
 

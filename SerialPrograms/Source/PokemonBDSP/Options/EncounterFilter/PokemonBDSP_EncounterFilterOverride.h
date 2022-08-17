@@ -92,7 +92,7 @@ public:
     ShinyFilterCell shininess;
 };
 
-class EncounterFilterTable : public EditableTableOption2<EncounterFilterOverride2>{
+class EncounterFilterTable : public EditableTableOption_t<EncounterFilterOverride2>{
 public:
     EncounterFilterTable();
     virtual std::vector<std::string> make_header() const override;

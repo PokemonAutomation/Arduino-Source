@@ -19,10 +19,10 @@ enum class ImageAttachmentMode{
 };
 
 
-class ScreenshotOption : public EnumDropdownOption{
+class ScreenshotOption : public DropdownOption{
 public:
     ScreenshotOption(std::string label)
-        : EnumDropdownOption(
+        : DropdownOption(
             std::move(label),
             {
                 "No Screenshot.",
@@ -34,10 +34,10 @@ public:
     {}
 
     operator ImageAttachmentMode() const{
-        return (ImageAttachmentMode)(size_t)*this;
+        return (ImageAttachmentMode)current_index();
     }
     void operator=(ImageAttachmentMode mode){
-        this->set((size_t)mode);
+        this->set_index((size_t)mode);
     }
 };
 

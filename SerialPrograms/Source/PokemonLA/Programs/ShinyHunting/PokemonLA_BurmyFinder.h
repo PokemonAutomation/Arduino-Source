@@ -89,8 +89,8 @@ private:
     std::atomic<bool> m_enable_shiny_sound{true};
 
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdownOption STOP_ON;
-    EnumDropdownOption EXIT_METHOD;
+    DropdownOption STOP_ON;
+    DropdownOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
 

@@ -46,7 +46,7 @@ private:
 
     SimpleIntegerOption<uint16_t> ENROUTE_DISTANCE;
 
-    EnumDropdownOption RESET_METHOD;
+    DropdownOption RESET_METHOD;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;

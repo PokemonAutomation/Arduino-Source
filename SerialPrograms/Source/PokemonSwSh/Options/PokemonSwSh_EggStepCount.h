@@ -20,14 +20,14 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    operator uint16_t() const{ return STEP_COUNTS[m_option]; }
+    operator uint16_t() const{ return STEP_COUNTS[m_option.current_index()]; }
 
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    EnumDropdownOption m_option;
+    DropdownOption m_option;
 };
 
 

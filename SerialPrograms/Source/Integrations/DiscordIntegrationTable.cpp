@@ -72,7 +72,7 @@ void DiscordIntegrationChannel::load_json(const JsonValue& json){
 
 
 DiscordIntegrationTable::DiscordIntegrationTable()
-    : EditableTableOption2<DiscordIntegrationChannel>(
+    : EditableTableOption_t<DiscordIntegrationChannel>(
         "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in."
     )
 {}

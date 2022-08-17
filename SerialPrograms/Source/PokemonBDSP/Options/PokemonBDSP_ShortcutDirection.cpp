@@ -26,7 +26,7 @@ std::vector<std::string> buildShortcutValues(bool required){
 
 
 ShortcutDirection::ShortcutDirection(std::string label, bool required)
-    : EnumDropdownOption(
+    : DropdownOption(
         std::move(label),
         buildShortcutValues(required),
         0

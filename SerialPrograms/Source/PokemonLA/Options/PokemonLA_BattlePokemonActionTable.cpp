@@ -71,7 +71,7 @@ std::vector<std::unique_ptr<EditableTableRow2>> BattlePokemonActionTable::make_d
     return ret;
 }
 BattlePokemonActionTable::BattlePokemonActionTable()
-    : EditableTableOption2<BattlePokemonActionRow>(
+    : EditableTableOption_t<BattlePokemonActionRow>(
         "<b>" + STRING_POKEMON + " Action Table:</b><br>"
         "Set what move styles to use and whether to switch the " + STRING_POKEMON + " after some turns.<br><br>"
         "Each row is the action for one " + STRING_POKEMON + ". "
@@ -148,7 +148,7 @@ std::vector<std::unique_ptr<EditableTableRow2>> OneMoveBattlePokemonActionTable:
     return ret;
 }
 OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
-    : EditableTableOption2<OneMoveBattlePokemonActionRow>(
+    : EditableTableOption_t<OneMoveBattlePokemonActionRow>(
         "<b>" + STRING_POKEMON + " Action Table:</b><br>"
         "Set what move style to use for each " + STRING_POKEMON + " to grind against a Magikarp. "
         "Each row is the action for one " + STRING_POKEMON + ". "
@@ -200,15 +200,15 @@ MoveGrinderActionRow::MoveGrinderActionRow()
 }
 std::unique_ptr<EditableTableRow2> MoveGrinderActionRow::clone() const{
     std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow());
-    ret->pokemon_index.set(pokemon_index);
-    ret->move_index.set(move_index);
+    ret->pokemon_index.set_index(pokemon_index.current_index());
+    ret->move_index.set_index(move_index.current_index());
     ret->style.set(style);
     ret->attempts.set(attempts);
     return ret;
 }
 
 MoveGrinderActionTable::MoveGrinderActionTable()
-    : EditableTableOption2<MoveGrinderActionRow>(
+    : EditableTableOption_t<MoveGrinderActionRow>(
         "For every move you want to perform, input the style and the number of attemps you want to achieve."
     )
 {}
@@ -221,10 +221,10 @@ Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{
     std::vector<std::unique_ptr<MoveGrinderActionRow>> table = copy_snapshot();
     for (size_t i = 0; i < table.size(); ++i){
         const MoveGrinderActionRow& action = *table[i];
-        if (action.pokemon_index != pokemon){
+        if (action.pokemon_index.current_index() != pokemon){
             continue;
         }
-        if (action.move_index != move){
+        if (action.move_index.current_index() != move){
             continue;
         }
         return {action.style , action.attempts};

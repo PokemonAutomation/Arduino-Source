@@ -34,9 +34,9 @@ private:
     void run_trigger(BotBaseContext& context) const;
 
 public:
-    EnumDropdownOption TRIGGER_METHOD;
+    DropdownOption TRIGGER_METHOD;
     TimeExpressionOption<uint16_t> MOVE_DURATION;
-    EnumDropdownOption SWEET_SCENT_POKEMON_LOCATION;
+    DropdownOption SWEET_SCENT_POKEMON_LOCATION;
 };
 
 

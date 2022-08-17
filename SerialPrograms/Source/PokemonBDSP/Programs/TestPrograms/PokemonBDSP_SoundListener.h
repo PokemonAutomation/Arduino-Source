@@ -32,7 +32,7 @@ public:
 
 private:
 
-    EnumDropdownOption SOUND_TYPE;
+    DropdownOption SOUND_TYPE;
     BooleanCheckBoxOption STOP_ON_DETECTED_SOUND;
 };
 

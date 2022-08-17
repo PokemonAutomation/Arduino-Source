@@ -42,7 +42,7 @@ private:
 private:
     OCR::LanguageOCR LANGUAGE;
 
-    EnumDropdownOption HOSTING_SWITCH;
+    DropdownOption HOSTING_SWITCH;
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     TradeCountTableOption TRADE_COUNTS;
 

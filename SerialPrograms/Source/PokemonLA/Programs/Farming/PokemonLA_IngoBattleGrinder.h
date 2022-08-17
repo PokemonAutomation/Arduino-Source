@@ -66,7 +66,7 @@ private:
     bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
 
 private:
-    EnumDropdownOption OPPONENT;
+    DropdownOption OPPONENT;
     BattlePokemonActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;

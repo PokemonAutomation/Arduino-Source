@@ -47,9 +47,9 @@ public:
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
-    EnumDropdownCell action;
-    EnumDropdownCell shiny;
-    EnumDropdownCell gender;
+    DropdownCell action;
+    DropdownCell shiny;
+    DropdownCell gender;
     IVCheckerFilterCell iv_hp;
     IVCheckerFilterCell iv_atk;
     IVCheckerFilterCell iv_def;
@@ -58,7 +58,7 @@ public:
     IVCheckerFilterCell iv_speed;
 };
 
-class EggHatchFilterTable : public EditableTableOption2<EggHatchFilterRow>{
+class EggHatchFilterTable : public EditableTableOption_t<EggHatchFilterRow>{
 public:
     EggHatchFilterTable();
     virtual std::vector<std::string> make_header() const override;

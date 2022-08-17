@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    EnumDropdownOption ENCOUNTER_TYPE;
+    DropdownOption ENCOUNTER_TYPE;
 
     BooleanCheckBoxOption USE_SOUND_DETECTION;
     EventNotificationsOption NOTIFICATIONS;

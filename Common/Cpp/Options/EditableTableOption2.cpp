@@ -67,7 +67,7 @@ std::vector<ConfigOption*> EditableTableRow2::make_cells(){
 
 
 
-EditableTableOptionCore::EditableTableOptionCore(
+EditableTableOption2::EditableTableOption2(
     std::string label,
     std::vector<std::unique_ptr<EditableTableRow2>> default_value
 )
@@ -76,16 +76,16 @@ EditableTableOptionCore::EditableTableOptionCore(
 {
     restore_defaults();
 }
-size_t EditableTableOptionCore::current_rows() const{
+size_t EditableTableOption2::current_rows() const{
     SpinLockGuard lg(m_lock);
     return m_current.size();
 }
-std::vector<std::shared_ptr<EditableTableRow2>> EditableTableOptionCore::current_refs() const{
+std::vector<std::shared_ptr<EditableTableRow2>> EditableTableOption2::current_refs() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 
-void EditableTableOptionCore::load_json(const JsonValue& json){
+void EditableTableOption2::load_json(const JsonValue& json){
     const JsonArray* array = json.get_array();
     if (array == nullptr){
         return;
@@ -104,7 +104,7 @@ void EditableTableOptionCore::load_json(const JsonValue& json){
     }
     push_update();
 }
-JsonValue EditableTableOptionCore::to_json() const{
+JsonValue EditableTableOption2::to_json() const{
     SpinLockGuard lg(m_lock);
     JsonArray array;
     for (const std::shared_ptr<EditableTableRow2>& row : m_current){
@@ -113,7 +113,7 @@ JsonValue EditableTableOptionCore::to_json() const{
     return array;
 }
 
-std::string EditableTableOptionCore::check_validity() const{
+std::string EditableTableOption2::check_validity() const{
     SpinLockGuard lg(m_lock);
     for (const std::shared_ptr<EditableTableRow2>& item : m_current){
         std::string error = item->check_validity();
@@ -123,7 +123,7 @@ std::string EditableTableOptionCore::check_validity() const{
     }
     return std::string();
 }
-void EditableTableOptionCore::restore_defaults(){
+void EditableTableOption2::restore_defaults(){
     {
         std::vector<std::shared_ptr<EditableTableRow2>> tmp;
         SpinLockGuard lg(m_lock);
@@ -139,7 +139,7 @@ void EditableTableOptionCore::restore_defaults(){
 
 
 
-void EditableTableOptionCore::insert_row(size_t index, std::unique_ptr<EditableTableRow2> row){
+void EditableTableOption2::insert_row(size_t index, std::unique_ptr<EditableTableRow2> row){
     {
         SpinLockGuard lg(m_lock);
         index = std::min(index, m_current.size());
@@ -152,7 +152,7 @@ void EditableTableOptionCore::insert_row(size_t index, std::unique_ptr<EditableT
     }
     push_update();
 }
-void EditableTableOptionCore::clone_row(const EditableTableRow2& row){
+void EditableTableOption2::clone_row(const EditableTableRow2& row){
     {
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;
@@ -170,7 +170,7 @@ void EditableTableOptionCore::clone_row(const EditableTableRow2& row){
     }
     push_update();
 }
-void EditableTableOptionCore::remove_row(EditableTableRow2& row){
+void EditableTableOption2::remove_row(EditableTableRow2& row){
     {
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;

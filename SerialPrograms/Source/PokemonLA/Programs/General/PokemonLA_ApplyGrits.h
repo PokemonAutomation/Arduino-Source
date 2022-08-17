@@ -31,7 +31,7 @@ private:
 
     void ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t pokemon_index);
 
-    EnumDropdownOption NUM_POKEMON;
+    DropdownOption NUM_POKEMON;
 
     EventNotificationsOption NOTIFICATIONS;
 };

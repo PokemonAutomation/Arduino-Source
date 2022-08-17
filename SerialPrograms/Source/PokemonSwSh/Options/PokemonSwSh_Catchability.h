@@ -16,10 +16,10 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CatchabilitySelectorOption : public EnumDropdownOption{
+class CatchabilitySelectorOption : public DropdownOption{
 public:
     CatchabilitySelectorOption()
-        : EnumDropdownOption(
+        : DropdownOption(
             "<b>" + Pokemon::STRING_POKEMON + " Catchability</b>",
             {
                 "Always Catchable",

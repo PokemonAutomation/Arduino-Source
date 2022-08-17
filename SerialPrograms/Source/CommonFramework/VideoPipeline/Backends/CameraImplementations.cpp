@@ -43,13 +43,13 @@ struct CameraBackends{
     }
 
     std::vector<std::pair<std::string, std::unique_ptr<CameraBackend>>> m_backends;
-    std::vector<EnumDropdownEntry> m_cases;
+    std::vector<DropdownEntry> m_cases;
 };
 
 
 
 VideoBackendOption::VideoBackendOption()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Video Pipeline Backend:</b>",
         CameraBackends::instance().m_cases,
 #if QT_VERSION_MAJOR == 5

@@ -28,17 +28,17 @@ extern const std::string MoveStyle_NAMES[3];
 
 
 
-class MoveStyleCell : public EnumDropdownCell{
+class MoveStyleCell : public DropdownCell{
 public:
     MoveStyleCell()
-        : EnumDropdownCell({"No Style", "Agile", "Strong", }, 0)
+        : DropdownCell({"No Style", "Agile", "Strong", }, 0)
     {}
 
     operator MoveStyle() const{
         return (MoveStyle)(size_t)*this;
     }
     void set(MoveStyle style){
-        EnumDropdownCell::set((size_t)style);
+        DropdownCell::set_index((size_t)style);
     }
 };
 
@@ -64,7 +64,7 @@ public:
     SimpleIntegerCell<uint16_t> num_moves_to_stop;
 };
 
-class BattlePokemonActionTable : public EditableTableOption2<BattlePokemonActionRow>{
+class BattlePokemonActionTable : public EditableTableOption_t<BattlePokemonActionRow>{
 public:
     BattlePokemonActionTable();
 
@@ -110,7 +110,7 @@ public:
     MoveStyleCell style;
 };
 
-class OneMoveBattlePokemonActionTable : public EditableTableOption2<OneMoveBattlePokemonActionRow>{
+class OneMoveBattlePokemonActionTable : public EditableTableOption_t<OneMoveBattlePokemonActionRow>{
 public:
     OneMoveBattlePokemonActionTable();
 
@@ -136,8 +136,8 @@ public:
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
-    EnumDropdownCell pokemon_index;
-    EnumDropdownCell move_index;
+    DropdownCell pokemon_index;
+    DropdownCell move_index;
     MoveStyleCell style;
     SimpleIntegerCell<uint16_t> attempts;
 };
@@ -147,7 +147,7 @@ struct Move{
     uint16_t attempts;
 };
 
-class MoveGrinderActionTable : public EditableTableOption2<MoveGrinderActionRow>{
+class MoveGrinderActionTable : public EditableTableOption_t<MoveGrinderActionRow>{
 public:
     MoveGrinderActionTable();
 

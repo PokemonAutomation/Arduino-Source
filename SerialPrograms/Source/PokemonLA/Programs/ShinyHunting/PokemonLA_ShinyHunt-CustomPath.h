@@ -53,7 +53,7 @@ private:
 
     CustomPathTable PATH;
 
-    EnumDropdownOption RESET_METHOD;
+    DropdownOption RESET_METHOD;
 
     BooleanCheckBoxOption TEST_PATH;
 

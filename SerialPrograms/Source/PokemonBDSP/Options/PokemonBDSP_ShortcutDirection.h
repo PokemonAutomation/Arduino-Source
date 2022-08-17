@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class ShortcutDirection : public EnumDropdownOption{
+class ShortcutDirection : public DropdownOption{
 public:
     ShortcutDirection(std::string label, bool required = true);
 

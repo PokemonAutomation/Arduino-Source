@@ -31,7 +31,7 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    EnumDropdownOption HOSTING_SWITCH;
+    DropdownOption HOSTING_SWITCH;
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

@@ -13,7 +13,7 @@ namespace Pokemon{
 
 
 IVCheckerFilterCell::IVCheckerFilterCell(IVCheckerFilter default_value)
-    : EnumDropdownCell(
+    : DropdownCell(
         IVCheckerFilter_NAMES,
         (size_t)default_value
     )
@@ -23,7 +23,7 @@ IVCheckerFilterCell::IVCheckerFilterCell(IVCheckerFilter default_value)
 
 
 IVCheckerFilterOption::IVCheckerFilterOption(std::string label, size_t default_index)
-    : EnumDropdownOption(
+    : DropdownOption(
         std::move(label),
         IVCheckerFilter_NAMES,
         default_index

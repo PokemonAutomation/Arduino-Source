@@ -27,10 +27,10 @@ enum class EncounterAction{
 extern const std::vector<std::string> EncounterAction_NAMES;
 extern const std::map<std::string, EncounterAction> EncounterAction_MAP;
 
-class EncounterActionCell : public EnumDropdownCell{
+class EncounterActionCell : public DropdownCell{
 public:
     EncounterActionCell()
-        : EnumDropdownCell(
+        : DropdownCell(
             {
                 "Stop Program",
                 "Run Away",
@@ -40,10 +40,10 @@ public:
         )
     {}
     operator EncounterAction() const{
-        return (EncounterAction)(size_t)*this;
+        return (EncounterAction)current_index();
     }
     void set(EncounterAction action){
-        EnumDropdownCell::set((size_t)action);
+        DropdownCell::set_index((size_t)action);
     }
 };
 
@@ -62,10 +62,10 @@ extern const std::map<std::string, ShinyFilter> ShinyFilter_MAP;
 
 
 
-class ShinyFilterCell : public EnumDropdownCell{
+class ShinyFilterCell : public DropdownCell{
 public:
     PA_NO_INLINE ShinyFilterCell(bool rare_stars)
-        : EnumDropdownCell(
+        : DropdownCell(
             rare_stars
                 ? std::vector<std::string>{
                     "Not Shiny",
@@ -82,6 +82,7 @@ public:
 //            rare_stars ? 0 : 1
             no_opt_wrap(rare_stars) //  COMPILER-BUG: MSVC2019
         )
+        , m_rare_stars(rare_stars)
     {}
 
 
@@ -90,12 +91,14 @@ public:
         return x ? 0 : 1;
     }
 
-    operator ShinyFilter() const{
-        return (ShinyFilter)(size_t)*this;
-    }
-    void set(ShinyFilter action){
-        EnumDropdownCell::set((size_t)action);
-    }
+    operator ShinyFilter() const;
+    void set(ShinyFilter action);
+
+private:
+    using DropdownCell::set_index;
+
+private:
+    bool m_rare_stars;
 };
 
 

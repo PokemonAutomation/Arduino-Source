@@ -17,19 +17,19 @@ namespace PokemonAutomation{
 class EnumDropdownCellWidget : public NoWheelComboBox, public ConfigWidget, private ConfigOption::Listener{
 public:
     ~EnumDropdownCellWidget();
-    EnumDropdownCellWidget(QWidget& parent, EnumDropdownCell& value);
+    EnumDropdownCellWidget(QWidget& parent, DropdownCell& value);
 
     virtual void update() override;
     virtual void value_changed() override;
 
 protected:
-    EnumDropdownCell& m_value;
+    DropdownCell& m_value;
 };
 
 
 class EnumDropdownOptionWidget : public QWidget, public ConfigWidget{
 public:
-    EnumDropdownOptionWidget(QWidget& parent, EnumDropdownOption& value);
+    EnumDropdownOptionWidget(QWidget& parent, DropdownOption& value);
 
     virtual void update() override;
 

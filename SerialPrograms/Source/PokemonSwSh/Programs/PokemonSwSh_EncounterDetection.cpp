@@ -14,6 +14,10 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSwSh_EncounterDetection.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -131,6 +135,9 @@ std::pair<EncounterAction, std::string> StandardEncounterDetection::get_action()
             if (candidates->find(override->pokemon.slug()) == candidates->end()){
                 continue;
             }
+
+            //  REMOVE
+            cout << "m_shininess = " << (int)m_shininess << " : " << (int)(ShinyFilter)override->shininess << endl;
 
             //  Not a shiny filter match.
             if (!filter_match(m_shininess, override->shininess)){

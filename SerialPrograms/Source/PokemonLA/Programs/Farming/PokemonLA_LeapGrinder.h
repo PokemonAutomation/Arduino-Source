@@ -44,8 +44,8 @@ private:
     OCR::LanguageOCR LANGUAGE;
     Pokemon::PokemonNameSelectOption POKEMON;
     SimpleIntegerOption<uint8_t> LEAPS;
-    EnumDropdownOption STOP_ON;
-    EnumDropdownOption EXIT_METHOD;
+    DropdownOption STOP_ON;
+    DropdownOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
 

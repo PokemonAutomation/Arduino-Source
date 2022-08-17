@@ -46,7 +46,7 @@ private:
     std::string debug_current_info() const;
     std::string debug_move_attempts_info() const;
 
-    EnumDropdownOption OPPONENT;
+    DropdownOption OPPONENT;
     MoveGrinderActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;

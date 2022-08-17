@@ -13,10 +13,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class StartInGripOrGameOption : public EnumDropdownOption{
+class StartInGripOrGameOption : public DropdownOption{
 public:
     StartInGripOrGameOption(bool grip_menu = false)
-        : EnumDropdownOption(
+        : DropdownOption(
             "<b>Start Location:</b><br>"
             "If set to start in game, you must disconnect all other controllers.",
             {
@@ -28,15 +28,15 @@ public:
     {}
 
     operator bool() const{
-        return EnumDropdownOption::operator size_t() != 0;
+        return current_index() != 0;
     }
 
 };
 
-class StartInGripOrClosedOption : public EnumDropdownOption{
+class StartInGripOrClosedOption : public DropdownOption{
 public:
     StartInGripOrClosedOption(bool grip_menu = true)
-        : EnumDropdownOption(
+        : DropdownOption(
             "<b>Start Location:</b><br>"
             "If set to start in Switch Home, you must disconnect all other controllers.",
             {
@@ -48,7 +48,7 @@ public:
     {}
 
     operator bool() const{
-        return EnumDropdownOption::operator size_t() != 0;
+        return current_index() != 0;
     }
 
 };

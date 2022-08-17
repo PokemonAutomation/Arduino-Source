@@ -13,7 +13,7 @@ namespace PokemonLA{
 
 
 TravelLocationOption::TravelLocationOption()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Start Location:</b><br>Travel from this location.",
         TravelLocations::instance().all_location_names(),
         0

@@ -17,13 +17,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class IVCheckerOptionOCR : public EnumDropdownOption{
+class IVCheckerOptionOCR : public DropdownOption{
 public:
     static const std::string TOKENS[];
 
 public:
     IVCheckerOptionOCR(std::string label, size_t default_index = 0)
-        : EnumDropdownOption(
+        : DropdownOption(
             std::move(label),
             {
                 "No Good (0)",

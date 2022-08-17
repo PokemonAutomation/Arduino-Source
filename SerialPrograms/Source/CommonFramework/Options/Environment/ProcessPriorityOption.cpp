@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 ProcessPriorityOption::ProcessPriorityOption()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Process Priority:</b><br>"
         "Set the priority of this process.<br>"
         "Higher priority may reduce errors due to CPU starvation from background programs. "
@@ -26,8 +26,8 @@ ProcessPriorityOption::ProcessPriorityOption()
         PRIORITY_MODES, DEFAULT_PRIORITY_INDEX
     )
 {}
-bool ProcessPriorityOption::set(size_t index){
-    if (!EnumDropdownOption::set(index)){
+bool ProcessPriorityOption::set_index(size_t index){
+    if (!DropdownOption::set_index(index)){
         return false;
     }
     set_priority_by_index((int)index);
@@ -52,18 +52,18 @@ std::vector<std::string> make_thread_priority_list(){
     return ret;
 }
 ThreadPriorityOption::ThreadPriorityOption(std::string label, int default_priority)
-    : EnumDropdownOption(
+    : DropdownOption(
         std::move(label),
         make_thread_priority_list(),
         clip_priority(default_priority) - THREAD_PRIORITY_MIN
     )
 {}
 void ThreadPriorityOption::set_on_this_thread() const{
-    int priority = (int)(size_t)*this + THREAD_PRIORITY_MIN;
+    int priority = (int)current_index() + THREAD_PRIORITY_MIN;
     set_thread_priority(priority);
 }
 void ThreadPriorityOption::set_on_qthread(QThread& thread) const{
-    int priority = (int)(size_t)*this + THREAD_PRIORITY_MIN;
+    int priority = (int)current_index() + THREAD_PRIORITY_MIN;
     thread.setPriority(to_qt_priority(priority));
 }
 

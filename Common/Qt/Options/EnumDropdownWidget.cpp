@@ -15,10 +15,10 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* EnumDropdownCell::make_ui(QWidget& parent){
+ConfigWidget* DropdownCell::make_ui(QWidget& parent){
     return new EnumDropdownCellWidget(parent, *this);
 }
-ConfigWidget* EnumDropdownOption::make_ui(QWidget& parent){
+ConfigWidget* DropdownOption::make_ui(QWidget& parent){
     return new EnumDropdownOptionWidget(parent, *this);
 }
 
@@ -28,7 +28,7 @@ ConfigWidget* EnumDropdownOption::make_ui(QWidget& parent){
 EnumDropdownCellWidget::~EnumDropdownCellWidget(){
     m_value.remove_listener(*this);
 }
-EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, EnumDropdownCell& value)
+EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, DropdownCell& value)
     : NoWheelComboBox(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -56,7 +56,7 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, EnumDropdownCell
                 m_value.restore_defaults();
                 return;
             }
-            m_value.set(index);
+            m_value.set_index(index);
         }
     );
 
@@ -78,7 +78,7 @@ void EnumDropdownCellWidget::value_changed(){
 
 
 
-EnumDropdownOptionWidget::EnumDropdownOptionWidget(QWidget& parent, EnumDropdownOption& value)
+EnumDropdownOptionWidget::EnumDropdownOptionWidget(QWidget& parent, DropdownOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_cell(new EnumDropdownCellWidget(*this, value))

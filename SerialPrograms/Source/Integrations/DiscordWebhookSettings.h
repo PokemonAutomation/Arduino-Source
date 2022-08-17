@@ -30,7 +30,7 @@ public:
     StringCell url;
 };
 
-class DiscordWebhookSettingsTable : public EditableTableOption2<DiscordWebhookUrl>{
+class DiscordWebhookSettingsTable : public EditableTableOption_t<DiscordWebhookUrl>{
 public:
     DiscordWebhookSettingsTable();
     virtual std::vector<std::string> make_header() const override;

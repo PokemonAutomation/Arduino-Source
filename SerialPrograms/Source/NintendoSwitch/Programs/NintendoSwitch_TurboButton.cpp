@@ -64,13 +64,14 @@ TurboButton::TurboButton()
     PA_ADD_OPTION(TOTAL_PRESSES);
 }
 void TurboButton::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    size_t index = BUTTON.current_index();
     if (TOTAL_PRESSES == 0){
         while (true){
-            pbf_press_button(context, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)1 << index, PRESS_DURATION, RELEASE_DURATION);
         }
     }else{
         for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
-            pbf_press_button(context, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)1 << index, PRESS_DURATION, RELEASE_DURATION);
         }
     }
     context.wait_for_all_requests();

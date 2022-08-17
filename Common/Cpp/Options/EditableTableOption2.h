@@ -45,7 +45,7 @@ public:
 
 
 private:
-    friend class EditableTableOptionCore;
+    friend class EditableTableOption2;
 
     //  A unique # for this row within its table.
     uint64_t m_seqnum = 0;
@@ -61,9 +61,9 @@ private:
 
 
 //  This is the table itself.
-class EditableTableOptionCore : public ConfigOption{
+class EditableTableOption2 : public ConfigOption{
 public:
-    EditableTableOptionCore(
+    EditableTableOption2(
         std::string label,
         std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
     );
@@ -123,12 +123,12 @@ private:
 
 //  Convenience helper class that's type-aware.
 template <typename RowType>
-class EditableTableOption2 : public EditableTableOptionCore{
+class EditableTableOption_t : public EditableTableOption2{
 public:
-    using EditableTableOptionCore::EditableTableOptionCore;
+    using EditableTableOption2::EditableTableOption2;
 
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
-        return EditableTableOptionCore::copy_snapshot<RowType>();
+        return EditableTableOption2::copy_snapshot<RowType>();
     }
 
     virtual std::unique_ptr<EditableTableRow2> make_row() const override{

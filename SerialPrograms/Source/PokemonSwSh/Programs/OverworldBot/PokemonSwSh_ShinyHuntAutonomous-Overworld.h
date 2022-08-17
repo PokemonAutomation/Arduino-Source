@@ -62,8 +62,8 @@ private:
     EncounterBotLanguage LANGUAGE;
 
     FloatingPointOption MARK_OFFSET;
-    EnumDropdownOption MARK_PRIORITY;
-    EnumDropdownOption TRIGGER_METHOD;
+    DropdownOption MARK_PRIORITY;
+    DropdownOption TRIGGER_METHOD;
     TimeExpressionOption<uint16_t> MAX_MOVE_DURATION;
     FloatingPointOption MAX_TARGET_ALPHA;
 

@@ -23,13 +23,13 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-class CaughtScreenActionOption : public EnumDropdownOption{
+class CaughtScreenActionOption : public DropdownOption{
 public:
     CaughtScreenActionOption(
         bool take_non_shiny, bool reset_if_high_winrate,
         std::string label, CaughtScreenAction default_action
     );
-    operator CaughtScreenAction() const{ return (CaughtScreenAction)(size_t)*this;}
+    operator CaughtScreenAction() const{ return (CaughtScreenAction)current_index();}
 };
 class CaughtScreenActionsOption : public GroupOption{
 public:

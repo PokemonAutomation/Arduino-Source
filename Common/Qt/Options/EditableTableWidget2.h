@@ -19,7 +19,7 @@ class AutoHeightTableWidget;
 class EditableTableWidget2 : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
     ~EditableTableWidget2();
-    EditableTableWidget2(QWidget& parent, EditableTableOptionCore& value);
+    EditableTableWidget2(QWidget& parent, EditableTableOption2& value);
 
     virtual void update() override;
     virtual void value_changed() override;
@@ -32,7 +32,7 @@ private:
     QWidget* make_delete_button(EditableTableRow2& row);
 
 private:
-    EditableTableOptionCore& m_value;
+    EditableTableOption2& m_value;
     AutoHeightTableWidget* m_table;
     std::vector<std::shared_ptr<EditableTableRow2>> m_current;
 };

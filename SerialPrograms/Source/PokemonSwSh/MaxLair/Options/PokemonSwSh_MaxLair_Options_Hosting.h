@@ -35,7 +35,7 @@ public:
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-    EnumDropdownOption MODE;
+    DropdownOption MODE;
     RandomCodeOption RAID_CODE;
     TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
     TimeExpressionOption<uint16_t> START_DELAY;

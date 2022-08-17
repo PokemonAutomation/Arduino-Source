@@ -19,7 +19,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-ConfigWidget* EditableTableOptionCore::make_ui(QWidget& parent){
+ConfigWidget* EditableTableOption2::make_ui(QWidget& parent){
     return new EditableTableWidget2(parent, *this);
 }
 
@@ -29,7 +29,7 @@ EditableTableWidget2::~EditableTableWidget2(){
     m_value.remove_listener(*this);
     delete m_table;
 }
-EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOptionCore& value)
+EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOption2& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)

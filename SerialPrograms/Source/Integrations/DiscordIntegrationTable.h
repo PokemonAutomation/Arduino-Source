@@ -31,7 +31,7 @@ public:
     StringCell channel_id;
 };
 
-class DiscordIntegrationTable : public EditableTableOption2<DiscordIntegrationChannel>{
+class DiscordIntegrationTable : public EditableTableOption_t<DiscordIntegrationChannel>{
 public:
     DiscordIntegrationTable();
     virtual std::vector<std::string> make_header() const override;

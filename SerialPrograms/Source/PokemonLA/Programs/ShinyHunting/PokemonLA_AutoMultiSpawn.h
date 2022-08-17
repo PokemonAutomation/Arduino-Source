@@ -56,7 +56,7 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
 
-    EnumDropdownOption SPAWN;
+    DropdownOption SPAWN;
 
     StringOption PATH;
 

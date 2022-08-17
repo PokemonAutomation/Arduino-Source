@@ -36,7 +36,7 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    EnumDropdownOption FOURTH_MOVE_ON;
+    DropdownOption FOURTH_MOVE_ON;
 
     SimpleIntegerOption<uint32_t> SAVE_EVERY_FEW_BATTLES;
 

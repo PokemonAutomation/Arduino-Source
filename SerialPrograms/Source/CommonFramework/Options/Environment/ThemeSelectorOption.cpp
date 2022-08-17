@@ -47,7 +47,7 @@ void set_theme(size_t index){
 
 
 ThemeSelectorOption::ThemeSelectorOption()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Theme:</b>",
         {
             "Default",
@@ -57,15 +57,15 @@ ThemeSelectorOption::ThemeSelectorOption()
     )
 {}
 
-bool ThemeSelectorOption::set(size_t index){
-    if (!EnumDropdownOption::set(index)){
+bool ThemeSelectorOption::set_index(size_t index){
+    if (!DropdownOption::set_index(index)){
         return false;
     }
     set_theme(index);
     return true;
 }
 void ThemeSelectorOption::load_json(const JsonValue& json){
-    EnumDropdownOption::load_json(json);
+    DropdownOption::load_json(json);
     set_theme(*this);
 }
 

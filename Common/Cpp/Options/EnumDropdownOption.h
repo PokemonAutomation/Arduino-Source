@@ -21,46 +21,47 @@ namespace PokemonAutomation{
 
 
 
-struct EnumDropdownEntry{
+struct DropdownEntry{
     std::string name;
     bool enabled = true;
-    EnumDropdownEntry(const char* p_name)
+    DropdownEntry(const char* p_name)
         : name(p_name)
     {}
-    EnumDropdownEntry(std::string p_name, bool p_enabled = true)
+    DropdownEntry(std::string p_name, bool p_enabled = true)
         : name(std::move(p_name))
         , enabled(p_enabled)
     {}
 };
 
 
-class EnumDropdownCell : public ConfigOption{
+class DropdownCell : public ConfigOption{
 public:
-    ~EnumDropdownCell();
-    EnumDropdownCell(const EnumDropdownCell& x);
+    ~DropdownCell();
+    DropdownCell(const DropdownCell& x);
 
 public:
-    EnumDropdownCell(
+    DropdownCell(
         std::vector<std::string> cases,
         size_t default_index
     );
-    EnumDropdownCell(
-        std::vector<EnumDropdownEntry> cases,
+    DropdownCell(
+        std::vector<DropdownEntry> cases,
         size_t default_index
     );
-    EnumDropdownCell(
-        std::initializer_list<EnumDropdownEntry> cases,
+    DropdownCell(
+        std::initializer_list<DropdownEntry> cases,
         size_t default_index
     );
 
-    const std::vector<EnumDropdownEntry>& case_list() const;
+    const std::vector<DropdownEntry>& case_list() const;
     size_t default_index() const;
+    size_t current_index() const;
 
     const std::string& case_name(size_t index) const;
     const std::string& current_case() const;
 
     operator size_t() const;
-    virtual bool set(size_t index); //  Returns false if index is out of range.
+    virtual bool set_index(size_t index);   //  Returns false if index is out of range.
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -76,31 +77,31 @@ protected:
 
 
 
-class EnumDropdownOption : public EnumDropdownCell{
+class DropdownOption : public DropdownCell{
 public:
-    EnumDropdownOption(const EnumDropdownOption& x) = delete;
-    EnumDropdownOption(
+    DropdownOption(const DropdownOption& x) = delete;
+    DropdownOption(
         std::string label,
         std::vector<std::string> cases,
         size_t default_index
     )
-        : EnumDropdownCell(cases, default_index)
+        : DropdownCell(cases, default_index)
         , m_label(std::move(label))
     {}
-    EnumDropdownOption(
+    DropdownOption(
         std::string label,
-        std::vector<EnumDropdownEntry> cases,
+        std::vector<DropdownEntry> cases,
         size_t default_index
     )
-        : EnumDropdownCell(cases, default_index)
+        : DropdownCell(cases, default_index)
         , m_label(std::move(label))
     {}
-    EnumDropdownOption(
+    DropdownOption(
         std::string label,
-        std::initializer_list<EnumDropdownEntry> cases,
+        std::initializer_list<DropdownEntry> cases,
         size_t default_index
     )
-        : EnumDropdownCell(std::move(cases), default_index)
+        : DropdownCell(std::move(cases), default_index)
         , m_label(std::move(label))
     {}
 
@@ -113,7 +114,49 @@ private:
 
 
 
+#if 0
 
+template <typename EnumType>
+class EnumDropDownCell : public DropdownCell{
+public:
+    operator EnumType() const{
+        return (EnumType)current_index();
+    }
+    void operator=(EnumType x){
+        set_index((size_t)x);
+    }
+
+    EnumType default_value() const{
+        return (EnumType)default_index();
+    }
+
+private:
+    using DropdownCell::default_index;
+    using DropdownCell::current_index;
+    using DropdownCell::set_index;
+};
+
+template <typename EnumType>
+class EnumDropDownOption : public DropdownOption{
+public:
+    operator EnumType() const{
+        return (EnumType)current_index();
+    }
+    void operator=(EnumType x){
+        set_index((size_t)x);
+    }
+
+    EnumType default_value() const{
+        return (EnumType)default_index();
+    }
+
+private:
+    using DropdownCell::default_index;
+    using DropdownCell::current_index;
+    using DropdownCell::set_index;
+};
+
+#endif
 
 
 

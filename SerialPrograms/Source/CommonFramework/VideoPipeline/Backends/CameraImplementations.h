@@ -18,7 +18,7 @@
 namespace PokemonAutomation{
 
 
-class VideoBackendOption : public EnumDropdownOption{
+class VideoBackendOption : public DropdownOption{
 public:
     VideoBackendOption();
 };

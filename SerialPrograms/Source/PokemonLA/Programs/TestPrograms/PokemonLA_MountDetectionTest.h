@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    EnumDropdownOption FAILED_ACTION;
+    DropdownOption FAILED_ACTION;
 };
 
 

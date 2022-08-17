@@ -13,11 +13,11 @@
 namespace PokemonAutomation{
 
 
-class ProcessorLevelOption : public EnumDropdownOption{
+class ProcessorLevelOption : public DropdownOption{
 public:
     ProcessorLevelOption();
 
-    virtual bool set(size_t index) override;
+    virtual bool set_index(size_t index) override;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

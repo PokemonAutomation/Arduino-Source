@@ -42,7 +42,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdownOption POKEMON;
+    DropdownOption POKEMON;
     IVCheckerFilterOption HP;
     IVCheckerFilterOption ATTACK;
     IVCheckerFilterOption DEFENSE;

@@ -20,7 +20,7 @@ const std::chrono::milliseconds INFERENCE_RATE = std::chrono::milliseconds(200);
 
 
 HostingSwitch::HostingSwitch()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Host Switch:</b><br>This is the Switch that hosts the raid.",
         {
             "Switch 0 (Top Left)",
@@ -32,7 +32,7 @@ HostingSwitch::HostingSwitch()
     )
 {}
 std::string HostingSwitch::check_validity(size_t consoles) const{
-    if (*this >= consoles){
+    if (current_index() >= consoles){
         return "Host Switch cannot be larger than " + std::to_string(consoles - 1) +
         " since you only have " + std::to_string(consoles) + " Switch(es) enabled.";
     }
@@ -40,7 +40,7 @@ std::string HostingSwitch::check_validity(size_t consoles) const{
 }
 
 BossSlot::BossSlot()
-    : EnumDropdownOption(
+    : DropdownOption(
         "<b>Boss Slot:</b>",
         {
             "Anything is fine",
