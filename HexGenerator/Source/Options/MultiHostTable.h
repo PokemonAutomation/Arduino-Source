@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QPushButton>
-#include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable2.h"
+#include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
@@ -37,9 +37,7 @@ public:
 
 private:
     friend class MultiHostTableUI;
-//    NintendoSwitch::PokemonSwSh::MultiHostSlotOptionFactory m_factory;
-//    EditableTableBaseOption m_table;
-    NintendoSwitch::PokemonSwSh::MultiHostTable2 m_table;
+    NintendoSwitch::PokemonSwSh::MultiHostTable m_table;
 };
 
 

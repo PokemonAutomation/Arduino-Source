@@ -19,9 +19,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class MultiHostSlot2 : public EditableTableRow2{
+class MultiHostSlot : public EditableTableRow2{
 public:
-    MultiHostSlot2(bool raid_code_option)
+    MultiHostSlot(bool raid_code_option)
         : m_raid_code_option(raid_code_option)
         , game_slot(
             {
@@ -69,7 +69,7 @@ public:
 
 
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
-        std::unique_ptr<MultiHostSlot2> ret(new MultiHostSlot2(m_raid_code_option));
+        std::unique_ptr<MultiHostSlot> ret(new MultiHostSlot(m_raid_code_option));
         ret->game_slot.set(game_slot);
         ret->user_slot.set(user_slot);
         ret->skips.set(skips);
@@ -100,14 +100,14 @@ public:
 
 
 
-class MultiHostTable2 : public EditableTableOptionCore{
+class MultiHostTable : public EditableTableOptionCore{
 public:
-    MultiHostTable2(bool raid_code_option)
+    MultiHostTable(bool raid_code_option)
         : EditableTableOptionCore("<b>Game List:</b>")
         , m_raid_code_option(raid_code_option)
     {}
-    std::vector<std::unique_ptr<MultiHostSlot2>> copy_snapshot() const{
-        return EditableTableOptionCore::copy_snapshot<MultiHostSlot2>();
+    std::vector<std::unique_ptr<MultiHostSlot>> copy_snapshot() const{
+        return EditableTableOptionCore::copy_snapshot<MultiHostSlot>();
     }
     virtual std::vector<std::string> make_header() const override{
         if (m_raid_code_option){
@@ -138,7 +138,7 @@ public:
         }
     }
     virtual std::unique_ptr<EditableTableRow2> make_row() const override{
-        return std::unique_ptr<EditableTableRow2>(new MultiHostSlot2(m_raid_code_option));
+        return std::unique_ptr<EditableTableRow2>(new MultiHostSlot(m_raid_code_option));
     }
 
 private:

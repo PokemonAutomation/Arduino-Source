@@ -35,14 +35,13 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
 
 MultiGameFossil::MultiGameFossil(){
     PA_ADD_OPTION(START_IN_GRIP_MENU);
-//    PA_ADD_OPTION(GAME_LIST);
-    PA_ADD_OPTION(GAME_LIST2);
+    PA_ADD_OPTION(GAME_LIST);
 }
 
 void run_fossil_batch(
     Logger& logger,
     BotBaseContext& context,
-    const FossilGame2& batch,
+    const FossilGame& batch,
     bool* game_slot_flipped,
     bool save_and_exit
 ){
@@ -136,7 +135,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    std::vector<std::unique_ptr<FossilGame2>> list = GAME_LIST2.copy_snapshot();
+    std::vector<std::unique_ptr<FossilGame>> list = GAME_LIST.copy_snapshot();
 
 //    FossilGame2 batch;
 

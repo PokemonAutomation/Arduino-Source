@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
-#include "Common/PokemonSwSh/PokemonSwSh_FossilTable2.h"
+#include "Common/PokemonSwSh/PokemonSwSh_FossilTable.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
@@ -40,7 +40,7 @@ public:
 
 private:
     friend class FossilTableUI;
-    NintendoSwitch::PokemonSwSh::FossilTable2 m_table;
+    NintendoSwitch::PokemonSwSh::FossilTable m_table;
 };
 #endif
 

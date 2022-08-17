@@ -62,9 +62,9 @@ std::string FossilTable::to_cpp() const{
     std::string str;
     str += m_declaration;
     str += " = {\r\n";
-    std::vector<std::unique_ptr<NintendoSwitch::PokemonSwSh::FossilGame2>> list = m_table.copy_snapshot();
+    std::vector<std::unique_ptr<NintendoSwitch::PokemonSwSh::FossilGame>> list = m_table.copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
-        const NintendoSwitch::PokemonSwSh::FossilGame2& item = *list[c];
+        const NintendoSwitch::PokemonSwSh::FossilGame& item = *list[c];
         str += "    {";
         str += std::to_string(item.game_slot + 1);
         str += ", ";

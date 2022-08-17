@@ -93,7 +93,8 @@ HEADERS += \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
-    ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h \
+    ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
+    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \

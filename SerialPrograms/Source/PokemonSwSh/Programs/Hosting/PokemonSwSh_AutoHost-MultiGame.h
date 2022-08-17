@@ -12,14 +12,13 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable2.h"
+#include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
-//#include "PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
@@ -48,8 +47,7 @@ private:
     RandomCodeOption RAID_CODE;
     BooleanCheckBoxOption HOST_ONLINE;
     TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
-//    MultiHostTableOption GAME_LIST;
-    MultiHostTable2 GAME_LIST2;
+    MultiHostTable GAME_LIST;
     SimpleIntegerOption<uint8_t> FR_FORWARD_ACCEPT;
 
     AutoHostNotificationOption HOSTING_NOTIFICATIONS;

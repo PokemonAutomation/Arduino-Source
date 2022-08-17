@@ -61,9 +61,9 @@ std::string MultiHostTable::to_cpp() const{
     std::string str;
     str += m_declaration;
     str += " = {\r\n";
-    std::vector<std::unique_ptr<NintendoSwitch::PokemonSwSh::MultiHostSlot2>> list = m_table.copy_snapshot();
+    std::vector<std::unique_ptr<NintendoSwitch::PokemonSwSh::MultiHostSlot>> list = m_table.copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
-        const NintendoSwitch::PokemonSwSh::MultiHostSlot2& item = *list[c];
+        const NintendoSwitch::PokemonSwSh::MultiHostSlot& item = *list[c];
         str += "    {\r\n";
         str += std::string("        .game_slot        = ") + std::to_string(item.game_slot + 1) + ",\r\n";
         str += std::string("        .user_slot        = ") + std::to_string(item.user_slot + 1) + ",\r\n";

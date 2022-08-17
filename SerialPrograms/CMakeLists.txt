@@ -155,8 +155,8 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
-    ../Common/PokemonSwSh/PokemonSwSh_FossilTable2.h
-    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable2.h
+    ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
+    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h

@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class FossilGame2 : public EditableTableRow2{
+class FossilGame : public EditableTableRow2{
 public:
     enum Fossil{
         Dracozolt   =   0,
@@ -26,7 +26,7 @@ public:
     };
 
 public:
-    FossilGame2()
+    FossilGame()
         : game_slot(
             {
                 "Game 1",
@@ -63,8 +63,8 @@ public:
         PA_ADD_OPTION(fossil);
         PA_ADD_OPTION(revives);
     }
-    FossilGame2(uint8_t p_game_slot, uint8_t p_user_slot, Fossil p_fossil, uint16_t p_revives)
-        : FossilGame2()
+    FossilGame(uint8_t p_game_slot, uint8_t p_user_slot, Fossil p_fossil, uint16_t p_revives)
+        : FossilGame()
     {
         game_slot.set(p_game_slot - 1);
         user_slot.set(p_user_slot - 1);
@@ -72,7 +72,7 @@ public:
         revives.set(p_revives);
     }
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
-        std::unique_ptr<FossilGame2> ret(new FossilGame2());
+        std::unique_ptr<FossilGame> ret(new FossilGame());
         ret->game_slot.set(game_slot);
         ret->user_slot.set(user_slot);
         ret->fossil.set(fossil);
@@ -88,10 +88,10 @@ public:
 };
 
 
-class FossilTable2 : public EditableTableOption2<FossilGame2>{
+class FossilTable : public EditableTableOption2<FossilGame>{
 public:
-    FossilTable2()
-        : EditableTableOption2<FossilGame2>("<b>Game List:</b>", make_defaults())
+    FossilTable()
+        : EditableTableOption2<FossilGame>("<b>Game List:</b>", make_defaults())
     {}
     virtual std::vector<std::string> make_header() const override{
         return std::vector<std::string>{
@@ -104,7 +104,7 @@ public:
 
     static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults(){
         std::vector<std::unique_ptr<EditableTableRow2>> ret;
-        ret.emplace_back(new FossilGame2(1, 1, FossilGame2::Dracovish, 960));
+        ret.emplace_back(new FossilGame(1, 1, FossilGame::Dracovish, 960));
         return ret;
     }
 };

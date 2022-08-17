@@ -49,7 +49,7 @@ AutoHostMultiGame::AutoHostMultiGame()
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         "60 * TICKS_PER_SECOND"
     )
-    , GAME_LIST2(true)
+    , GAME_LIST(true)
     , FR_FORWARD_ACCEPT(
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
         1
@@ -94,7 +94,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     PA_ADD_OPTION(RAID_CODE);
     PA_ADD_OPTION(HOST_ONLINE);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
-    PA_ADD_OPTION(GAME_LIST2);
+    PA_ADD_OPTION(GAME_LIST);
     PA_ADD_OPTION(FR_FORWARD_ACCEPT);
     PA_ADD_OPTION(HOSTING_NOTIFICATIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -118,12 +118,12 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         ? 0
         : LOBBY_WAIT_DELAY - start_raid_delay;
 
-    std::vector<std::unique_ptr<MultiHostSlot2>> list = GAME_LIST2.copy_snapshot();
+    std::vector<std::unique_ptr<MultiHostSlot>> list = GAME_LIST.copy_snapshot();
 
     //  Scan den list for any rolling dens.
     bool enable_touch = true;
     for (uint8_t index = 0; index < list.size(); index++){
-        const MultiHostSlot2& game = *list[index];
+        const MultiHostSlot& game = *list[index];
 //        if (game.user_slot == 0){
 //            break;
 //        }
@@ -151,7 +151,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         for (uint8_t index = 0; index < list.size(); index++){
             env.update_stats();
 
-            const MultiHostSlot2& game = *list[index];
+            const MultiHostSlot& game = *list[index];
 //            if (game.user_slot == 0){
 //                break;
 //            }
@@ -199,7 +199,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
 
             //  Run auto-host.
-            const MultiHostSlot2& fr_game = *list[FR_index];
+            const MultiHostSlot& fr_game = *list[FR_index];
             run_autohost(
                 env, env.console, context,
                 game.always_catchable
