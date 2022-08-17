@@ -112,8 +112,6 @@ void DenRoller::ring_bell(BotBaseContext& context, int count) const{
 void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
-    std::string desired_slug = FILTER.slug();
-
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(context);
     }else{
@@ -129,7 +127,10 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     while (true){
         roll_den(context, 0, 0, SKIPS, CATCHABILITY);
 
-        if ((size_t)FILTER == 0){
+        size_t desired_index = FILTER.index();
+        std::string desired_slug = FILTER.slug();
+
+        if (desired_index == 0){
             ring_bell(context, 20);
         }else{
             context.wait_for_all_requests();
@@ -142,7 +143,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
             enter_den(context, 0, SKIPS != 0, false);
 
-            if ((size_t)FILTER != 0){
+            if (desired_index != 0){
                 pbf_wait(context, READ_DELAY);
             }
             context.wait_for_all_requests();
@@ -151,7 +152,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             DenMonReadResults results = reader.read(*screen);
 
             //  Give user time to look at the mon.
-            if ((size_t)FILTER == 0){
+            if (desired_index == 0){
                 //  No filter enabled. Keep going.
                 pbf_wait(context, VIEW_TIME);
             }else if (results.slugs.results.empty()){

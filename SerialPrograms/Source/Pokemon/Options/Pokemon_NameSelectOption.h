@@ -20,7 +20,7 @@ struct PokemonNameSelectData{
 };
 
 
-class PokemonNameSelect : private PokemonNameSelectData, public StringSelectOption2{
+class PokemonNameSelect : private PokemonNameSelectData, public StringSelectOption{
 public:
     PokemonNameSelect(
         std::string label,

@@ -36,9 +36,9 @@ private:
 
 
 
-class StringSelectOptionWidget2 : public QWidget, public ConfigWidget{
+class StringSelectOptionWidget : public QWidget, public ConfigWidget{
 public:
-    StringSelectOptionWidget2(QWidget& parent, StringSelectOption2& value);
+    StringSelectOptionWidget(QWidget& parent, StringSelectOption& value);
 
     virtual void update() override;
 

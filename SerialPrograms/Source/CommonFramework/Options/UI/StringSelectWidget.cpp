@@ -20,8 +20,8 @@ namespace PokemonAutomation{
 ConfigWidget* StringSelectCell::make_ui(QWidget& parent){
     return new StringSelectCellWidget(parent, *this);
 }
-ConfigWidget* StringSelectOption2::make_ui(QWidget& parent){
-    return new StringSelectOptionWidget2(parent, *this);
+ConfigWidget* StringSelectOption::make_ui(QWidget& parent){
+    return new StringSelectOptionWidget(parent, *this);
 }
 
 
@@ -128,7 +128,7 @@ void StringSelectCellWidget::value_changed(){
 
 
 
-StringSelectOptionWidget2::StringSelectOptionWidget2(QWidget& parent, StringSelectOption2& value)
+StringSelectOptionWidget::StringSelectOptionWidget(QWidget& parent, StringSelectOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_cell(new StringSelectCellWidget(parent, value))
@@ -140,7 +140,7 @@ StringSelectOptionWidget2::StringSelectOptionWidget2(QWidget& parent, StringSele
     layout->addWidget(text, 1);
     layout->addWidget(m_cell, 1);
 }
-void StringSelectOptionWidget2::update(){
+void StringSelectOptionWidget::update(){
     ConfigWidget::update();
     m_cell->update();
 }

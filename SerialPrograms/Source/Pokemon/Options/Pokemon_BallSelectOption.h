@@ -15,20 +15,13 @@ namespace Pokemon{
 
 struct PokemonBallSelectData{
     PokemonBallSelectData(const std::vector<std::string>& slugs);
-    const std::vector<std::pair<std::string, QIcon>>& cases() const{ return m_list; }
-
-protected:
-    std::vector<std::pair<std::string, QIcon>> m_list;
+    StringSelectDatabase m_database;
 };
 
 
 class PokemonBallSelect : private PokemonBallSelectData, public StringSelectOption{
 public:
     PokemonBallSelect(std::string label, const std::string& default_slug = "");
-
-    const std::string& slug() const;
-
-private:
 };
 
 

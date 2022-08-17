@@ -60,7 +60,7 @@ private:
 
     StaticTextOption STATIC_TEXT;
 
-    StringSelectOption2 SELECT;
+    StringSelectOption SELECT;
 
     EventNotificationOption NOTIFICATION_TEST;
     EventNotificationsOption NOTIFICATIONS;

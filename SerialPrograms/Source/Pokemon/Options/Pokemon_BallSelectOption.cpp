@@ -24,10 +24,10 @@ PokemonBallSelectData::PokemonBallSelectData(const std::vector<std::string>& slu
         const PokeballNames& data = get_pokeball_name(slug);
         const SpriteDatabase::Sprite* sprite = ALL_POKEBALL_SPRITES().get_nothrow(slug);
         if (sprite == nullptr){
-            m_list.emplace_back(data.display_name(), QIcon());
+            m_database.add_entry(StringSelectEntry(slug, data.display_name()));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            m_list.emplace_back(data.display_name(), sprite->icon);
+            m_database.add_entry(StringSelectEntry(slug, data.display_name(), sprite->icon));
         }
     }
 }
@@ -39,15 +39,10 @@ PokemonBallSelect::PokemonBallSelect(
     : PokemonBallSelectData(POKEBALL_SLUGS())
     , StringSelectOption(
         std::move(label),
-        cases(),
-        default_slug.empty() ? "" : get_pokeball_name(default_slug).display_name()
+        PokemonBallSelectData::m_database,
+        default_slug
     )
 {}
-
-const std::string& PokemonBallSelect::slug() const{
-    const std::string& display = (const std::string&)*this;
-    return parse_pokeball_name(display);
-}
 
 
 }

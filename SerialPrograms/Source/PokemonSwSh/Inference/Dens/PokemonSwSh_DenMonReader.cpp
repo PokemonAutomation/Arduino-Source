@@ -120,21 +120,14 @@ DenMonReadResults DenMonReader::read(const ImageViewRGB32& screen) const{
 
 
 DenMonSelectData::DenMonSelectData(){
-    m_list.emplace_back("(none)", QIcon());
+    m_database.add_entry(StringSelectEntry("", "(none)"));
     for (const auto& item : ALL_POKEMON_SPRITES()){
-        m_list.emplace_back(item.first, item.second.icon);
+        m_database.add_entry(StringSelectEntry(item.first, item.first, item.second.icon));
     }
 }
 DenMonSelectOption::DenMonSelectOption(std::string label)
-    : StringSelectOption(std::move(label), cases(), "")
+    : StringSelectOption(std::move(label), DenMonSelectData::m_database, "")
 {}
-std::string DenMonSelectOption::slug() const{
-    size_t index = (size_t)*this;
-    if (index == 0){
-        return "";
-    }
-    return (std::string)*this;
-}
 
 
 }

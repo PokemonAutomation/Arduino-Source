@@ -71,7 +71,7 @@ PokemonNameSelect::PokemonNameSelect(
     const std::string& default_slug
 )
     : PokemonNameSelectData(slugs)
-    , StringSelectOption2(
+    , StringSelectOption(
         std::move(label),
         PokemonNameSelectData::m_database,
         default_slug
@@ -83,7 +83,7 @@ PokemonNameSelect::PokemonNameSelect(
     const std::string& default_slug
 )
     : PokemonNameSelectData(json_file_slugs)
-    , StringSelectOption2(
+    , StringSelectOption(
         std::move(label),
         PokemonNameSelectData::m_database,
         default_slug
