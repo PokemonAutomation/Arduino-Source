@@ -13,6 +13,7 @@
 #include <vector>
 #include <map>
 #include <atomic>
+#include "Common/Compiler.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
