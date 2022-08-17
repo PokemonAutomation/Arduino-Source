@@ -59,8 +59,8 @@ public:
         PA_ADD_OPTION(actions);
     }
 
-    PokemonBallSelect normal_ball;
-    PokemonBallSelect boss_ball;
+    PokemonBallSelectOption normal_ball;
+    PokemonBallSelectOption boss_ball;
     CaughtScreenActionsOption actions;
 };
 class MaxLairStandard_ConsoleFactory : public ConsoleSpecificOptionsFactory{

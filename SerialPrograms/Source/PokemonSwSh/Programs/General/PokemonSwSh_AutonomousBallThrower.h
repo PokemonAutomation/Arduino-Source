@@ -12,12 +12,11 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "Pokemon/Options/Pokemon_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-using namespace Pokemon;
 
 
 class AutonomousBallThrower_Descriptor : public SingleSwitchProgramDescriptor{
@@ -38,7 +37,7 @@ public:
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-    PokemonBallSelect BALL_SELECT;
+    PokemonBallSelectOption BALL_SELECT;
     OCR::LanguageOCR LANGUAGE;
 
     EventNotificationOption NOTIFICATION_CATCH_SUCCESS;

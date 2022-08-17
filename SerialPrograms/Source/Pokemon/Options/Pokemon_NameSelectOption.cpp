@@ -65,7 +65,33 @@ PokemonNameSelectData::PokemonNameSelectData(const std::string& json_file_slugs)
 
 
 
-PokemonNameSelect::PokemonNameSelect(
+
+
+PokemonNameSelectCell::PokemonNameSelectCell(
+    const std::vector<std::string>& slugs,
+    const std::string& default_slug
+)
+    : PokemonNameSelectData(slugs)
+    , StringSelectCell(
+        PokemonNameSelectData::m_database,
+        default_slug
+    )
+{}
+PokemonNameSelectCell::PokemonNameSelectCell(
+    const std::string& json_file_slugs,
+    const std::string& default_slug
+)
+    : PokemonNameSelectData(json_file_slugs)
+    , StringSelectCell(
+        PokemonNameSelectData::m_database,
+        default_slug
+    )
+{}
+
+
+
+
+PokemonNameSelectOption::PokemonNameSelectOption(
     std::string label,
     const std::vector<std::string>& slugs,
     const std::string& default_slug
@@ -77,7 +103,7 @@ PokemonNameSelect::PokemonNameSelect(
         default_slug
     )
 {}
-PokemonNameSelect::PokemonNameSelect(
+PokemonNameSelectOption::PokemonNameSelectOption(
     std::string label,
     const std::string& json_file_slugs,
     const std::string& default_slug

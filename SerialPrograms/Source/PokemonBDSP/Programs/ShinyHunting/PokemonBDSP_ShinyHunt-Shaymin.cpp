@@ -39,7 +39,7 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{
 ShinyHuntShaymin::ShinyHuntShaymin()
     : GO_HOME_WHEN_DONE(false)
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
-    , ENCOUNTER_BOT_OPTIONS(false, false)
+    , ENCOUNTER_BOT_OPTIONS(false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

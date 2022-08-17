@@ -15,15 +15,16 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Options/Pokemon_NameListOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
 using namespace Pokemon;
 
 
@@ -42,7 +43,7 @@ public:
     DexRecFilters();
 
     OCR::LanguageOCR LANGUAGE;
-    PokemonNameSelect DESIRED;
+    PokemonNameSelectOption DESIRED;
     PokemonNameList EXCLUSIONS;
 };
 

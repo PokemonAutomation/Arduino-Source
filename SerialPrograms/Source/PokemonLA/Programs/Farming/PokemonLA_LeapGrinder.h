@@ -42,7 +42,7 @@ private:
     class RunRoute;
 
     OCR::LanguageOCR LANGUAGE;
-    Pokemon::PokemonNameSelect POKEMON;
+    Pokemon::PokemonNameSelectOption POKEMON;
     SimpleIntegerOption<uint8_t> LEAPS;
     EnumDropdownOption STOP_ON;
     EnumDropdownOption EXIT_METHOD;

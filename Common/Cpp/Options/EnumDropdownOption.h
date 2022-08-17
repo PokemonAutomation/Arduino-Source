@@ -14,7 +14,12 @@
 #include <map>
 #include <atomic>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
 #include "ConfigOption.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -112,8 +117,9 @@ EnumDropdownCell::EnumDropdownCell(
     : m_default(default_index)
     , m_current(default_index)
 {
+//    cout << default_index << endl;
     if (default_index >= cases.size()){
-        throw "Index is too large.";
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Index is too large: " + std::to_string(default_index));
     }
     for (size_t index = 0; index < cases.size(); index++){
         m_case_list.emplace_back(std::move(cases[index]));
@@ -124,7 +130,7 @@ EnumDropdownCell::EnumDropdownCell(
             std::forward_as_tuple(index)
         );
         if (!ret.second){
-            throw "Duplicate enum label.";
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label: " + item);
         }
     }
 }

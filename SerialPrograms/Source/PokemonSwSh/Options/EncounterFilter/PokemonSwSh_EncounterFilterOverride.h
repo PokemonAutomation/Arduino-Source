@@ -7,7 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterFilterOverride_H
 #define PokemonAutomation_PokemonSwSh_EncounterFilterOverride_H
 
-#include "CommonFramework/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
+#include "PokemonSwSh_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -20,48 +23,35 @@ using namespace Pokemon;
 
 
 
-enum class ShinyFilter{
-    ANYTHING,
-    NOT_SHINY,
-    ANY_SHINY,
-    STAR_ONLY,
-    SQUARE_ONLY,
-    NOTHING,
-};
-
-enum class EncounterAction{
-    StopProgram,
-    RunAway,
-    ThrowBalls,
-    ThrowBallsAndSave,
-};
-
-
-
-class EncounterFilterOverride : public EditableTableRow{
+class EncounterFilterOverride : public EditableTableRow2, private ConfigOption::Listener{
 public:
+    ~EncounterFilterOverride();
     EncounterFilterOverride(bool rare_stars);
-
     virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+
+    virtual void value_changed() override;
 
 private:
-    QWidget* make_action_box(QWidget& parent, BallSelectWidget& ball_select);
-    BallSelectWidget* make_ball_select(QWidget& parent);
-    QWidget* make_species_select(QWidget& parent);
-    QWidget* make_shiny_box(QWidget& parent);
+    const bool m_rare_stars;
+public:
+    EncounterActionCell action;
+    PokemonBallSelectCell pokeball;
+    PokemonNameSelectCell pokemon;
+    ShinyFilterCell shininess;
+};
+
+class EncounterFilterTable : public EditableTableOptionCore{
+public:
+    EncounterFilterTable(bool rare_stars);
+    std::vector<std::unique_ptr<EncounterFilterOverride>> copy_snapshot() const;
+    virtual std::vector<std::string> make_header() const override;
+    virtual std::unique_ptr<EditableTableRow2> make_row() const override;
 
 private:
     bool m_rare_stars;
-public:
-    EncounterAction action = EncounterAction::StopProgram;
-    std::string pokeball_slug = "poke-ball";
-
-    std::string pokemon_slug;
-    ShinyFilter shininess = ShinyFilter::NOT_SHINY;
 };
+
 
 
 

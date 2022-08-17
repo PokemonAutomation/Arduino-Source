@@ -41,7 +41,7 @@ private:
 //    StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    Pokemon::PokemonNameSelect STARTER;
+    Pokemon::PokemonNameSelectOption STARTER;
 
     BooleanCheckBoxOption USE_SOUND_DETECTION;
     BooleanCheckBoxOption VIDEO_ON_SHINY;

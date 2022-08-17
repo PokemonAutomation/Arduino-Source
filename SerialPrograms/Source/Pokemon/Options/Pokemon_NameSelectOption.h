@@ -20,19 +20,32 @@ struct PokemonNameSelectData{
 };
 
 
-class PokemonNameSelect : private PokemonNameSelectData, public StringSelectOption{
+class PokemonNameSelectCell : private PokemonNameSelectData, public StringSelectCell{
 public:
-    PokemonNameSelect(
+    PokemonNameSelectCell(
+        const std::vector<std::string>& slugs,
+        const std::string& default_slug = ""
+    );
+    PokemonNameSelectCell(
+        const std::string& json_file_slugs,
+        const std::string& default_slug = ""
+    );
+};
+
+class PokemonNameSelectOption : private PokemonNameSelectData, public StringSelectOption{
+public:
+    PokemonNameSelectOption(
         std::string label,
         const std::vector<std::string>& slugs,
         const std::string& default_slug = ""
     );
-    PokemonNameSelect(
+    PokemonNameSelectOption(
         std::string label,
         const std::string& json_file_slugs,
         const std::string& default_slug = ""
     );
 };
+
 
 
 }

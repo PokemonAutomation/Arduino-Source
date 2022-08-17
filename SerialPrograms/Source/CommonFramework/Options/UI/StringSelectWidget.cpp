@@ -7,6 +7,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "StringSelectWidget.h"
 
 #include <iostream>
@@ -64,12 +66,15 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 void StringSelectCellWidget::load_options(){
 //    cout << "load_options()" << endl;
     if (this->count() <= 1){
+        const std::vector<StringSelectEntry>& cases = m_value.database().case_list();
+        global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
         this->clear();
-        for (const auto& item : m_value.database().case_list()){
+        for (const auto& item : cases){
             this->addItem(item.icon, QString::fromStdString(item.display_name));
         }
     }
     this->setCurrentIndex((int)m_value.index());
+    update_size_cache();
 }
 void StringSelectCellWidget::hide_options(){
 //    cout << "hide_options()" << endl;

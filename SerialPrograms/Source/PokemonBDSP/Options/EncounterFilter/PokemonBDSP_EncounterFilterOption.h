@@ -17,7 +17,7 @@ namespace PokemonBDSP{
 
 class EncounterFilterOption : public ConfigOption{
 public:
-    EncounterFilterOption(bool enable_overrides, bool allow_autocatch);
+    EncounterFilterOption(bool enable_overrides);
 
     ShinyFilter shiny_filter() const{ return m_shiny_filter_current.load(std::memory_order_acquire); }
     std::vector<EncounterFilterOverride> overrides() const;
@@ -33,7 +33,6 @@ private:
     friend class EncounterFilterWidget;
 
     const bool m_enable_overrides;
-    const bool m_allow_autocatch;
 
     const ShinyFilter m_shiny_filter_default;
     std::atomic<ShinyFilter> m_shiny_filter_current;

@@ -13,8 +13,8 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -42,7 +42,7 @@ private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    PokemonBallSelect BALL_SELECT;
+    PokemonBallSelectOption BALL_SELECT;
     OCR::LanguageOCR LANGUAGE;
 
     BooleanCheckBoxOption CHECK_CALYREX_STATS;

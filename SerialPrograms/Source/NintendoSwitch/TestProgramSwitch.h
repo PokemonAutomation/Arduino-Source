@@ -17,7 +17,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 

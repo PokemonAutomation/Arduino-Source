@@ -19,20 +19,16 @@ namespace PokemonBDSP{
 
 
 
-EncounterFilterOption::EncounterFilterOption(bool enable_overrides, bool allow_autocatch)
+EncounterFilterOption::EncounterFilterOption(bool enable_overrides)
     : m_enable_overrides(enable_overrides)
-    , m_allow_autocatch(allow_autocatch)
     , m_shiny_filter_default(ShinyFilter::SHINY)
     , m_shiny_filter_current(m_shiny_filter_default)
-    , m_factory(allow_autocatch)
+    , m_factory(true)
     , m_table(
         "<b>Overrides:</b><br>"
         "The game language must be properly set to read " + STRING_POKEMON + " names. "
         "If multiple overrides apply and are conflicting, the program will stop." +
-        (allow_autocatch
-            ? "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle."
-            : ""
-        ),
+        "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle.",
         m_factory
     )
 {}

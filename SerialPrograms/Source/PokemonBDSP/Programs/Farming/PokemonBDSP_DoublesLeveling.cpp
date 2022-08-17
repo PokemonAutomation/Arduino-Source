@@ -58,7 +58,7 @@ DoublesLeveling::DoublesLeveling()
         },
         0
     )
-    , ENCOUNTER_BOT_OPTIONS(false, false)
+    , ENCOUNTER_BOT_OPTIONS(false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

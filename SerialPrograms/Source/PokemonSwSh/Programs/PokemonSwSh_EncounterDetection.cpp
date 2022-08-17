@@ -117,24 +117,28 @@ std::pair<EncounterAction, std::string> StandardEncounterDetection::get_action()
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<EncounterFilterOverride>& overrides = m_filter.overrides();
-    if (!overrides.empty()){
-        const std::set<std::string>* candidates = this->candidates();
-        if (candidates != nullptr){
-            for (const EncounterFilterOverride& override : overrides){
-                //  Not a token match.
-                if (candidates->find(override.pokemon_slug) == candidates->end()){
-                    continue;
-                }
+//    const std::vector<EncounterFilterOverride>& overrides = m_filter.overrides();
+    std::vector<std::unique_ptr<EncounterFilterOverride>> overrides = m_filter.copy_snapshot();
 
-                //  Not a shiny filter match.
-                if (!filter_match(m_shininess, override.shininess)){
-                    continue;
-                }
+    if (overrides.empty()){
+        return action;
+    }
 
-                action.first = override.action;
-                action.second = override.pokeball_slug;
+    const std::set<std::string>* candidates = this->candidates();
+    if (candidates != nullptr){
+        for (const std::unique_ptr<EncounterFilterOverride>& override : overrides){
+            //  Not a token match.
+            if (candidates->find(override->pokemon.slug()) == candidates->end()){
+                continue;
             }
+
+            //  Not a shiny filter match.
+            if (!filter_match(m_shininess, override->shininess)){
+                continue;
+            }
+
+            action.first = override->action;
+            action.second = override->pokeball.slug();
         }
     }
 

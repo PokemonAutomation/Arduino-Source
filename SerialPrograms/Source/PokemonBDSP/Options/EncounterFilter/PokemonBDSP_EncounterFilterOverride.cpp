@@ -260,6 +260,90 @@ std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const
 
 
 
+
+
+
+
+EncounterFilterOverride2::~EncounterFilterOverride2(){
+    action.remove_listener(*this);
+}
+EncounterFilterOverride2::EncounterFilterOverride2(){
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(pokeball);
+    PA_ADD_OPTION(pokemon);
+    PA_ADD_OPTION(shininess);
+    action.add_listener(*this);
+}
+void EncounterFilterOverride2::load_json(const JsonValue& json){
+    EditableTableRow2::load_json(json);
+
+    //  Parse old format for backwards compatibility.
+    const JsonObject* obj = json.get_object();
+    if (obj == nullptr){
+        return;
+    }
+
+    const JsonValue* value;
+    value = obj->get_value("Action");
+    if (value != nullptr){
+        action.load_json(*value);
+    }
+    value = obj->get_value("Ball");
+    if (value != nullptr){
+        pokeball.load_json(*value);
+    }
+    value = obj->get_value("Species");
+    if (value != nullptr){
+        pokemon.load_json(*value);
+    }
+    value = obj->get_value("ShinyFilter");
+    if (value != nullptr){
+        shininess.load_json(*value);
+    }
+}
+std::unique_ptr<EditableTableRow2> EncounterFilterOverride2::clone() const{
+    std::unique_ptr<EncounterFilterOverride2> ret(new EncounterFilterOverride2());
+    ret->action.set(action);
+    ret->pokeball.set_by_index(pokeball.index());
+    ret->pokemon.set_by_index(pokemon.index());
+    ret->shininess.set(shininess);
+    return ret;
+}
+void EncounterFilterOverride2::value_changed(){
+    switch ((EncounterAction)action){
+    case EncounterAction::StopProgram:
+    case EncounterAction::RunAway:
+        pokeball.set_visibility(ConfigOptionState::DISABLED);
+        break;
+    case EncounterAction::ThrowBalls:
+    case EncounterAction::ThrowBallsAndSave:
+        pokeball.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 }
 }

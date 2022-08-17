@@ -47,7 +47,7 @@ public:
         PA_ADD_OPTION(normal_ball);
     }
 
-    PokemonBallSelect normal_ball;
+    PokemonBallSelectOption normal_ball;
 };
 
 class MaxLairBossFinder_ConsoleFactory : public ConsoleSpecificOptionsFactory{

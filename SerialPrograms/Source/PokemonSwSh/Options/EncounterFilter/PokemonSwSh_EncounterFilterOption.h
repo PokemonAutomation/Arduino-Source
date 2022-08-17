@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterFilterOption_H
 #define PokemonAutomation_PokemonSwSh_EncounterFilterOption_H
 
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 #include "PokemonSwSh_EncounterFilterOverride.h"
 
 namespace PokemonAutomation{
@@ -17,11 +19,12 @@ namespace PokemonSwSh{
 
 class EncounterFilterOption : public ConfigOption{
 public:
-    virtual ~EncounterFilterOption();
     EncounterFilterOption(bool rare_stars, bool enable_overrides);
 
-    ShinyFilter shiny_filter() const{ return m_shiny_filter_current; }
-    std::vector<EncounterFilterOverride> overrides() const;
+    ShinyFilter shiny_filter() const{ return m_shiny_filter_current.load(std::memory_order_relaxed); }
+    std::vector<std::unique_ptr<EncounterFilterOverride>> copy_snapshot() const{
+        return m_table.copy_snapshot();
+    }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -37,10 +40,14 @@ private:
     const bool m_enable_overrides;
 
     const ShinyFilter m_shiny_filter_default;
-    ShinyFilter m_shiny_filter_current;
+    std::atomic<ShinyFilter> m_shiny_filter_current;
 
-    EditableTableOption m_table;
+    EncounterFilterTable m_table;
 };
+
+
+
+
 
 
 

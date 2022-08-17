@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "EnumDropdownOption.h"
 
@@ -18,7 +19,7 @@ EnumDropdownCell::EnumDropdownCell(
     , m_current(default_index)
 {
     if (default_index >= cases.size()){
-        throw "Index is too large.";
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Index is too large: " + std::to_string(default_index));
     }
     size_t index = 0;
     for (auto iter = cases.begin(); iter != cases.end(); ++iter){
@@ -30,7 +31,7 @@ EnumDropdownCell::EnumDropdownCell(
             std::forward_as_tuple(index++)
         );
         if (!ret.second){
-            throw "Duplicate enum label.";
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label: " + item);
         }
     }
 }

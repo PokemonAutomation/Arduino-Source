@@ -14,14 +14,13 @@
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "Pokemon/Options/Pokemon_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh_MaxLair_Options.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
-using namespace Pokemon;
 
 
 class CaughtScreenActionOption : public EnumDropdownOption{

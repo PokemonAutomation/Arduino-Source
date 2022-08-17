@@ -9,8 +9,8 @@
 
 #include "Common/Qt/AutoHeightTable.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "Pokemon/Options/Pokemon_BallSelectWidget.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

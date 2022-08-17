@@ -11,6 +11,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+
+const std::vector<std::string> EncounterAction_NAMES{
+    "Stop Program",
+    "Run Away",
+    "Throw balls.",
+    "Throw balls. Save if caught.",
+};
+const std::map<std::string, EncounterAction> EncounterAction_MAP{
+    {EncounterAction_NAMES[0], EncounterAction::StopProgram},
+    {EncounterAction_NAMES[1], EncounterAction::RunAway},
+    {EncounterAction_NAMES[2], EncounterAction::ThrowBalls},
+    {EncounterAction_NAMES[3], EncounterAction::ThrowBallsAndSave},
+};
+
+
 const std::vector<std::string> ShinyFilter_NAMES{
     "Anything",
     "Not Shiny",
@@ -26,19 +41,6 @@ const std::map<std::string, ShinyFilter> ShinyFilter_MAP{
     {ShinyFilter_NAMES[3], ShinyFilter::STAR_ONLY},
     {ShinyFilter_NAMES[4], ShinyFilter::SQUARE_ONLY},
     {ShinyFilter_NAMES[5], ShinyFilter::NOTHING},
-};
-
-const std::vector<std::string> EncounterAction_NAMES{
-    "Stop Program",
-    "Run Away",
-    "Throw balls.",
-    "Throw balls. Save if caught.",
-};
-const std::map<std::string, EncounterAction> EncounterAction_MAP{
-    {EncounterAction_NAMES[0], EncounterAction::StopProgram},
-    {EncounterAction_NAMES[1], EncounterAction::RunAway},
-    {EncounterAction_NAMES[2], EncounterAction::ThrowBalls},
-    {EncounterAction_NAMES[3], EncounterAction::ThrowBallsAndSave},
 };
 
 

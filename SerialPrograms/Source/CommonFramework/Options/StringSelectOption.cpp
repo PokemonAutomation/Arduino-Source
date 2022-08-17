@@ -88,6 +88,12 @@ StringSelectCell::StringSelectCell(const StringSelectDatabase& database, const s
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Default Slug: " + default_slug);
     }
 }
+void StringSelectCell::set_by_index(size_t index){
+    if (index >= m_database.case_list().size()){
+        index = m_default;
+    }
+    m_index.store(index, std::memory_order_relaxed);
+}
 std::string StringSelectCell::set_by_slug(const std::string& slug){
     size_t index = m_database.search_index_by_slug(slug);
     if (index == (size_t)0 - 1){

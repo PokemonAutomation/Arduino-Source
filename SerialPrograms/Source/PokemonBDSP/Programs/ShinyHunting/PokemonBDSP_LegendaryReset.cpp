@@ -41,7 +41,7 @@ std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
 LegendaryReset::LegendaryReset()
     : GO_HOME_WHEN_DONE(false)
     , WALK_UP("<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.", false)
-    , ENCOUNTER_BOT_OPTIONS(false, false)
+    , ENCOUNTER_BOT_OPTIONS(false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

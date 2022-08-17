@@ -7,7 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 #define PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 
+#include "Common/Cpp/Options/EditableTableOption2.h"
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
+#include "PokemonBDSP_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -19,19 +23,6 @@ namespace PokemonBDSP{
 using namespace Pokemon;
 
 
-enum class ShinyFilter{
-    ANYTHING,
-    NOT_SHINY,
-    SHINY,
-    NOTHING,
-};
-
-enum class EncounterAction{
-    StopProgram,
-    RunAway,
-    ThrowBalls,
-    ThrowBallsAndSave,
-};
 struct EncounterActionFull{
     EncounterAction action;
     std::string pokeball_slug;
@@ -78,6 +69,35 @@ public:
 private:
     bool m_allow_autocatch;
 };
+
+
+
+
+
+
+
+class EncounterFilterOverride2 : public EditableTableRow2, private ConfigOption::Listener{
+public:
+    ~EncounterFilterOverride2();
+    EncounterFilterOverride2();
+    virtual void load_json(const JsonValue& json) override;
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+
+    virtual void value_changed() override;
+
+public:
+    EncounterActionCell action;
+    PokemonSwSh::PokemonBallSelectCell pokeball;
+    PokemonSwSh::PokemonNameSelectCell pokemon;
+    ShinyFilterCell shininess;
+};
+
+class EncounterFilterTable : public EditableTableOption2<EncounterFilterOverride2>{
+public:
+    EncounterFilterTable();
+    virtual std::vector<std::string> make_header() const override;
+};
+
 
 
 

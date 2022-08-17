@@ -48,7 +48,7 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
 
 ShinyHuntOverworld::ShinyHuntOverworld()
     : GO_HOME_WHEN_DONE(false)
-    , ENCOUNTER_BOT_OPTIONS(true, true)
+    , ENCOUNTER_BOT_OPTIONS(true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

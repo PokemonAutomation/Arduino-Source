@@ -73,6 +73,7 @@ public:
         return m_database[index()];
     }
 
+    void set_by_index(size_t index);
     std::string set_by_slug(const std::string& slug);
     std::string set_by_name(const std::string& display_name);
 

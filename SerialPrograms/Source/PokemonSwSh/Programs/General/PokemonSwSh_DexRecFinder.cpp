@@ -79,7 +79,7 @@ DexRecFilters::DexRecFilters()
     )
     , DESIRED(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when it finds this " + STRING_POKEMON + ". Requires the language be set.",
-        "Pokemon/Pokedex/Pokedex-National.json"
+        ""
     )
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "

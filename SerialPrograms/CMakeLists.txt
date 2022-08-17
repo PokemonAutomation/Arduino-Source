@@ -767,8 +767,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
-    Source/Pokemon/Options/Pokemon_BallSelectOption.cpp
-    Source/Pokemon/Options/Pokemon_BallSelectOption.h
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h
     Source/Pokemon/Options/Pokemon_BerrySelectWidget.cpp
@@ -1301,12 +1299,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterWidget.h
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h
+    Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp
+    Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
+    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp
+    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp

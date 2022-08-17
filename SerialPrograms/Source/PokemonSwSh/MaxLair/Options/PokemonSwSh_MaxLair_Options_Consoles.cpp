@@ -21,6 +21,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
+using namespace Pokemon;
+
 
 CaughtScreenActionOption::CaughtScreenActionOption(
     bool take_non_shiny, bool reset_if_high_winrate,

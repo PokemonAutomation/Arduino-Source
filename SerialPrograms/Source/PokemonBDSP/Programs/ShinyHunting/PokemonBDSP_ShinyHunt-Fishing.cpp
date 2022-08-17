@@ -52,7 +52,7 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing_Descriptor::make_stats() const{
 ShinyHuntFishing::ShinyHuntFishing()
     : GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Fishing Shortcut:</b>")
-    , ENCOUNTER_BOT_OPTIONS(true, true)
+    , ENCOUNTER_BOT_OPTIONS(true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

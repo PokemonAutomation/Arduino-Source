@@ -74,8 +74,8 @@ public:
         }
     }
 
-    PokemonBallSelect normal_ball;
-    PokemonBallSelect boss_ball;
+    PokemonBallSelectOption normal_ball;
+    PokemonBallSelectOption boss_ball;
     CaughtScreenActionsOption actions_non_host;
     CaughtScreenActionsOption actions_host;
 };
