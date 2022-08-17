@@ -9,9 +9,10 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 #define PokemonAutomation_PokemonLA_BattlePokemonActionTable_H
 
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/EditableTableOption2.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,44 +24,47 @@ enum class MoveStyle{
     Agile,
     Strong,
 };
-
 extern const std::string MoveStyle_NAMES[3];
 
-// Used by IngoBattleGrinder, for each pokemon, set what style each move to use
-// and when to switch the pokemon.
-class BattlePokemonActionRow : public EditableTableRow{
-public:
-    BattlePokemonActionRow();
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
+
+class MoveStyleCell : public EnumDropdownCell{
 public:
-    // Move style (agile/strong) of each move
-    MoveStyle style[4] = {MoveStyle::NoStyle, MoveStyle::NoStyle, MoveStyle::NoStyle, MoveStyle::NoStyle};
-    // Whether to switch pokemon after a number of turns
-    bool switch_pokemon = false;
-    // The number of turns to switch
-    uint16_t num_turns_to_switch = 1;
-    // Whether to stop battling after a number of move attempts from a pokemon
-    bool stop_after_num_moves = false;
-    // The target number of move attempts after which to stop
-    uint16_t num_moves_to_stop = 25;
+    MoveStyleCell()
+        : EnumDropdownCell({"No Style", "Agile", "Strong", }, 0)
+    {}
+
+    operator MoveStyle() const{
+        return (MoveStyle)(size_t)*this;
+    }
+    void set(MoveStyle style){
+        EnumDropdownCell::set((size_t)style);
+    }
 };
 
-class BattlePokemonActionTableFactory : public EditableTableFactory{
-public:
-    virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
-};
+
+
 
 // A program option about which pokemon to use which move styles during battle, and whether to switch out
 // after some turns.
 // This table option is used in IngoBattleGrinder program to set the action of each pokemon sent out to
 // battle.
 // The pokemon order is defined as the order they are sent onto the battle.
-class BattlePokemonActionTable : public ConfigOption{
+
+class BattlePokemonActionRow : public EditableTableRow2{
+public:
+    BattlePokemonActionRow();
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+
+public:
+    MoveStyleCell style[4];
+    BooleanCheckBoxCell switch_pokemon;
+    SimpleIntegerCell<uint16_t> num_turns_to_switch;
+    BooleanCheckBoxCell stop_after_num_moves;
+    SimpleIntegerCell<uint16_t> num_moves_to_stop;
+};
+
+class BattlePokemonActionTable : public EditableTableOption2<BattlePokemonActionRow>{
 public:
     BattlePokemonActionTable();
 
@@ -79,42 +83,14 @@ public:
     // num_move_attempts: number of move attempts made from this pokemon so far.
     bool stop_battle(size_t pokemon, size_t num_move_attempts) const;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
 private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-
-private:
-    BattlePokemonActionTableFactory m_factory;
-    EditableTableOption m_table;
+    virtual std::vector<std::string> make_header() const;
+    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults();
 };
 
 
 
 
-// Used by MagikarpMoveGrinder, for each pokemon, set what style the first move to use
-class OneMoveBattlePokemonActionRow : public EditableTableRow{
-public:
-    OneMoveBattlePokemonActionRow();
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
-
-public:
-    MoveStyle style = MoveStyle::NoStyle;
-};
-
-class OneMoveBattlePokemonActionTableFactory : public EditableTableFactory{
-public:
-    virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
-};
 
 // A program option used by MagikarpMoveGrinder. To easily grind pokemon moves against a Magikarp which
 // only knows Splash.
@@ -123,50 +99,47 @@ public:
 // only non-damaging moves. There are not many pokemon whose pokedex researches require grinding more
 // than one non-damaging moves, so the program only grinds one move (the first move) per pokemon.
 // The pokemon order is defined as the order they are sent onto the battle.
-class OneMoveBattlePokemonActionTable : public ConfigOption{
+
+// Used by MagikarpMoveGrinder, for each pokemon, set what style the first move to use
+class OneMoveBattlePokemonActionRow : public EditableTableRow2{
+public:
+    OneMoveBattlePokemonActionRow();
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+
+public:
+    MoveStyleCell style;
+};
+
+class OneMoveBattlePokemonActionTable : public EditableTableOption2<OneMoveBattlePokemonActionRow>{
 public:
     OneMoveBattlePokemonActionTable();
 
-    size_t num_pokemon() const { return m_table.size(); }
+    size_t num_pokemon() const{ return current_rows(); }
 
     // Get which style to use according to the info in the table.
     // pokemon: pokemon index, range [0, 5]
     MoveStyle get_style(size_t pokemon);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
 private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-
-private:
-    OneMoveBattlePokemonActionTableFactory m_factory;
-    EditableTableOption m_table;
+    virtual std::vector<std::string> make_header() const;
+    std::vector<std::unique_ptr<EditableTableRow2>> make_defaults() const;
 };
 
 
 
-class MoveGrinderActionRow : public EditableTableRow {
-public:
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
-    size_t pokemon_index;
-    size_t move_index;
-    MoveStyle style = MoveStyle::NoStyle;
-    uint16_t attempts = 0;
-};
 
-class MoveGrinderActionTableFactory : public EditableTableFactory {
+
+class MoveGrinderActionRow2 : public EditableTableRow2{
 public:
-    virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
+    MoveGrinderActionRow2();
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+
+public:
+    EnumDropdownCell pokemon_index;
+    EnumDropdownCell move_index;
+    MoveStyleCell style;
+    SimpleIntegerCell<uint16_t> attempts;
 };
 
 struct Move{
@@ -174,21 +147,20 @@ struct Move{
     uint16_t attempts;
 };
 
-class MoveGrinderActionTable : public ConfigOption {
+class MoveGrinderActionTable : public EditableTableOption2<MoveGrinderActionRow2>{
 public:
     MoveGrinderActionTable();
 
     Move get_move(size_t pokemon, size_t move) const;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
 private:
-    MoveGrinderActionTableFactory m_factory;
-    EditableTableOption m_table;
+    virtual std::vector<std::string> make_header() const;
 };
+
+
+
+
+
 
 
 }

@@ -70,9 +70,14 @@ public:
 
     const std::string& label() const{ return m_label; }
 
+    //  Returns the # of rows at this moment of time.
+    //  Since this value can be out-of-date before you return, do not use
+    //  this for bound-checking where it's unsafe to read out-of-bounds.
+    size_t current_rows() const;
+
     //  Return a list of references to all the rows at this exact moment.
     //  These reference are live in that they may be asynchronously changed.
-    std::vector<std::shared_ptr<EditableTableRow2>> current() const;
+    std::vector<std::shared_ptr<EditableTableRow2>> current_refs() const;
 
     //  Return a copy of the entire table at the exact moment this is called.
     template <typename RowType>

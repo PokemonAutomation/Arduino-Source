@@ -76,8 +76,11 @@ EditableTableOptionCore::EditableTableOptionCore(
 {
     restore_defaults();
 }
-
-std::vector<std::shared_ptr<EditableTableRow2>> EditableTableOptionCore::current() const{
+size_t EditableTableOptionCore::current_rows() const{
+    SpinLockGuard lg(m_lock);
+    return m_current.size();
+}
+std::vector<std::shared_ptr<EditableTableRow2>> EditableTableOptionCore::current_refs() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
