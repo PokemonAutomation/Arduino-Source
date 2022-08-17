@@ -20,7 +20,6 @@
 #include "CommonFramework/Options/EditableTableWidget.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
-#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_CustomPathTable.h"
 
 #include <iostream>

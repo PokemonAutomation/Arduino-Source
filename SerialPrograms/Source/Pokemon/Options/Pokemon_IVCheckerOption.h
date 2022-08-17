@@ -14,6 +14,19 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
+class IVCheckerFilterCell : public EnumDropdownCell{
+public:
+    IVCheckerFilterCell(IVCheckerFilter default_value);
+
+    operator IVCheckerFilter() const{
+        return (IVCheckerFilter)(size_t)*this;
+    }
+    void set(IVCheckerFilter filter){
+        EnumDropdownCell::set((size_t)filter);
+    }
+};
+
+
 class IVCheckerFilterOption : public EnumDropdownOption{
 public:
     IVCheckerFilterOption(std::string label, size_t default_index = 0);

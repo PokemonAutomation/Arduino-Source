@@ -45,7 +45,7 @@ public:
         Language language,
         ShortcutDirection& shortcut,
         uint16_t travel_time_per_fetch,
-        const EggHatchFilterOption& filters,
+        const EggHatchFilterTable& filters,
         uint8_t max_keepers,
         uint8_t existing_eggs_in_columns
     );
@@ -91,7 +91,7 @@ private:
     Language m_language;
     ShortcutDirection& m_shortcut;
     uint16_t m_travel_time_per_fetch;
-    const EggHatchFilterOption& m_filters;
+    const EggHatchFilterTable& m_filters;
     uint8_t m_max_keepers;
 
     bool m_on_bike = true;

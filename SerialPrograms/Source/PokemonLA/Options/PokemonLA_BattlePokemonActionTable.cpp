@@ -12,7 +12,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_BattlePokemonActionTable.h"
 
 #include <QLabel>

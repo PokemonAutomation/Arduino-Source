@@ -56,7 +56,7 @@ private:
 
     EnumDropdownOption AUTO_SAVING;
 
-    EggHatchFilterOption FILTERS;
+    EggHatchFilterTable FILTERS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;

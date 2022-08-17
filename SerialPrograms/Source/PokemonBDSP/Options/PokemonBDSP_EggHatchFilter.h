@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
-#include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/EditableTableOption2.h"
 #include "Pokemon/Pokemon_IVChecker.h"
+#include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -38,59 +38,39 @@ enum class EggHatchGenderFilter{
 };
 
 
-class EggHatchFilterRow : public EditableTableRow{
-public:
-    EggHatchFilterRow(EggHatchShinyFilter p_shiny = EggHatchShinyFilter::Anything);
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
-private:
-    QWidget* make_action_box(QWidget& parent);
-    QWidget* make_shiny_box(QWidget& parent);
-    QWidget* make_iv_box(QWidget& parent, IVCheckerFilter& iv);
-    QWidget* make_gender_box(QWidget& parent);
+
+class EggHatchFilterRow : public EditableTableRow2{
+public:
+    EggHatchFilterRow();
+    EggHatchFilterRow(EggHatchShinyFilter p_shiny);
+    virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
-    EggHatchAction action = EggHatchAction::Keep;
-    EggHatchShinyFilter shiny = EggHatchShinyFilter::Anything;
-    EggHatchGenderFilter gender = EggHatchGenderFilter::Any;
-    IVCheckerFilter iv_hp = IVCheckerFilter::Anything;
-    IVCheckerFilter iv_atk = IVCheckerFilter::Anything;
-    IVCheckerFilter iv_def = IVCheckerFilter::Anything;
-    IVCheckerFilter iv_spatk = IVCheckerFilter::Anything;
-    IVCheckerFilter iv_spdef = IVCheckerFilter::Anything;
-    IVCheckerFilter iv_speed = IVCheckerFilter::Anything;
+    EnumDropdownCell action;
+    EnumDropdownCell shiny;
+    EnumDropdownCell gender;
+    IVCheckerFilterCell iv_hp;
+    IVCheckerFilterCell iv_atk;
+    IVCheckerFilterCell iv_def;
+    IVCheckerFilterCell iv_spatk;
+    IVCheckerFilterCell iv_spdef;
+    IVCheckerFilterCell iv_speed;
 };
 
-class EggHatchFilterOptionFactory : public EditableTableFactory{
+class EggHatchFilterTable : public EditableTableOption2<EggHatchFilterRow>{
 public:
+    EggHatchFilterTable();
     virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
-};
-
-
-class EggHatchFilterOption : public ConfigOption{
-public:
-    EggHatchFilterOption();
+    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults();
 
     EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const;
-
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
-private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-
-private:
-    EggHatchFilterOptionFactory m_factory;
-    EditableTableOption m_table;
 };
+
+
+
+
+
 
 
 

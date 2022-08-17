@@ -774,8 +774,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h
-    Source/Pokemon/Options/Pokemon_IVCheckerWidget.cpp
-    Source/Pokemon/Options/Pokemon_IVCheckerWidget.h
     Source/Pokemon/Options/Pokemon_NameListOption.cpp
     Source/Pokemon/Options/Pokemon_NameListOption.h
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp

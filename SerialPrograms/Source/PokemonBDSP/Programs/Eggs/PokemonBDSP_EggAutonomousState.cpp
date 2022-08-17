@@ -106,7 +106,7 @@ EggAutonomousState::EggAutonomousState(
     Language language,
     ShortcutDirection& shortcut,
     uint16_t travel_time_per_fetch,
-    const EggHatchFilterOption& filters,
+    const EggHatchFilterTable& filters,
     uint8_t max_keepers,
     uint8_t existing_eggs_in_columns
 )
