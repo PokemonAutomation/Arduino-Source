@@ -130,9 +130,9 @@ private:
 
 
 
-class MoveGrinderActionRow2 : public EditableTableRow2{
+class MoveGrinderActionRow : public EditableTableRow2{
 public:
-    MoveGrinderActionRow2();
+    MoveGrinderActionRow();
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
@@ -147,7 +147,7 @@ struct Move{
     uint16_t attempts;
 };
 
-class MoveGrinderActionTable : public EditableTableOption2<MoveGrinderActionRow2>{
+class MoveGrinderActionTable : public EditableTableOption2<MoveGrinderActionRow>{
 public:
     MoveGrinderActionTable();
 

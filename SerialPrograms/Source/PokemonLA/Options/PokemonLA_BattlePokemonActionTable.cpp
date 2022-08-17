@@ -178,7 +178,7 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 
 
 
-MoveGrinderActionRow2::MoveGrinderActionRow2()
+MoveGrinderActionRow::MoveGrinderActionRow()
     : pokemon_index({
         "1st " + STRING_POKEMON,
         "2nd " + STRING_POKEMON,
@@ -198,8 +198,8 @@ MoveGrinderActionRow2::MoveGrinderActionRow2()
     PA_ADD_OPTION(style);
     PA_ADD_OPTION(attempts);
 }
-std::unique_ptr<EditableTableRow2> MoveGrinderActionRow2::clone() const{
-    std::unique_ptr<MoveGrinderActionRow2> ret(new MoveGrinderActionRow2());
+std::unique_ptr<EditableTableRow2> MoveGrinderActionRow::clone() const{
+    std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow());
     ret->pokemon_index.set(pokemon_index);
     ret->move_index.set(move_index);
     ret->style.set(style);
@@ -208,7 +208,7 @@ std::unique_ptr<EditableTableRow2> MoveGrinderActionRow2::clone() const{
 }
 
 MoveGrinderActionTable::MoveGrinderActionTable()
-    : EditableTableOption2<MoveGrinderActionRow2>(
+    : EditableTableOption2<MoveGrinderActionRow>(
         "For every move you want to perform, input the style and the number of attemps you want to achieve."
     )
 {}
@@ -218,9 +218,9 @@ Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{
         return {MoveStyle::NoStyle, std::numeric_limits<decltype(Move::attempts)>::max()};
 
     }
-    std::vector<std::unique_ptr<MoveGrinderActionRow2>> table = copy_snapshot();
+    std::vector<std::unique_ptr<MoveGrinderActionRow>> table = copy_snapshot();
     for (size_t i = 0; i < table.size(); ++i){
-        const MoveGrinderActionRow2& action = *table[i];
+        const MoveGrinderActionRow& action = *table[i];
         if (action.pokemon_index != pokemon){
             continue;
         }
