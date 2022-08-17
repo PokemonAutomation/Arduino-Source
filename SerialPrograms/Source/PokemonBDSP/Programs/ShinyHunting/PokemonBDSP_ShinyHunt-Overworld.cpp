@@ -62,8 +62,8 @@ ShinyHuntOverworld::ShinyHuntOverworld()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , EXIT_BATTLE_TIMEOUT(
-        TICKS_PER_SECOND,
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
 {

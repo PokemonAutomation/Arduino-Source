@@ -86,8 +86,8 @@ PurpleBeamFinder::PurpleBeamFinder()
         false
     )
     , TIMEOUT_DELAY(
-        TICKS_PER_SECOND,
         "<b>Timeout Delay:</b><br>Reset if no beam is detected after this long.",
+        TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
 //    , MAX_STDDEV(

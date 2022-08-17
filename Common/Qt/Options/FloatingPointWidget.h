@@ -7,27 +7,35 @@
 #ifndef PokemonAutomation_FloatingPointWidget_H
 #define PokemonAutomation_FloatingPointWidget_H
 
-#include <QWidget>
+#include <QLineEdit>
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "ConfigWidget.h"
-
-class QLineEdit;
 
 namespace PokemonAutomation{
 
 
-
-class FloatingPointWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class FloatingPointCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
 public:
-    ~FloatingPointWidget();
-    FloatingPointWidget(QWidget& parent, FloatingPointOption& value);
+    ~FloatingPointCellWidget();
+    FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value);
 
     virtual void update() override;
     virtual void value_changed() override;
 
 private:
+    FloatingPointCell& m_value;
+};
+
+
+class FloatingPointOptionWidget : public QWidget, public ConfigWidget{
+public:
+    FloatingPointOptionWidget(QWidget& parent, FloatingPointOption& value);
+
+    virtual void update() override;
+
+private:
     FloatingPointOption& m_value;
-    QLineEdit* m_box;
+    FloatingPointCellWidget* m_cell;
 };
 
 

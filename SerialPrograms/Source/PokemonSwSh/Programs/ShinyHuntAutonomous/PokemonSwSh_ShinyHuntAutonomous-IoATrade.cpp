@@ -69,8 +69,8 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , MASH_TO_TRADE_DELAY(
-        TICKS_PER_SECOND,
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
+        TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
     , RUN_FROM_EVERYTHING(

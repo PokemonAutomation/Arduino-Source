@@ -48,36 +48,36 @@ TradeBot::TradeBot()
         false
     )
     , SEARCH_DELAY(
-        TICKS_PER_SECOND,
         "<b>Time to wait for a Trade Partner:</b>",
+        TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , CONFIRM_DELAY(
-        TICKS_PER_SECOND,
         "<b>Time to wait for Partner to Confirm:</b>",
+        TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , TRADE_START(
-        TICKS_PER_SECOND,
         "<b>Time for Trade to Start:</b>",
+        TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , TRADE_COMMUNICATION(
-        TICKS_PER_SECOND,
         "<b>Communication Window:</b>",
+        TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , TRADE_ANIMATION(
-        TICKS_PER_SECOND,
         "<b>Trade Animation Time:</b>",
+        TICKS_PER_SECOND,
         "23 * TICKS_PER_SECOND"
     )
     , EVOLVE_DELAY(
-        TICKS_PER_SECOND,
         "<b>Evolve Delay:</b>",
+        TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
 {

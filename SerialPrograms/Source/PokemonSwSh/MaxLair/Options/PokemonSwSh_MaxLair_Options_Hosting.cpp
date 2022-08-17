@@ -32,22 +32,22 @@ HostingSettings::HostingSettings()
         8, 4, ""
     )
     , CONNECT_TO_INTERNET_DELAY(
-        TICKS_PER_SECOND,
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to start adventure.",
+        TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , START_DELAY(
-        TICKS_PER_SECOND,
         "<b>Start Delay:</b><br>Wait this long before entering the lobby.<br><br>"
         "If two Switches open a lobby at the same time, they might not see each other and "
         "thus fail to join each other. If you are joining someone else's auto-host, you "
         "will want to set this to 3 seconds or more to make sure that the host opens the "
         "lobby before everyone else tries to join.",
+        TICKS_PER_SECOND,
         "0 * TICKS_PER_SECOND"
     )
     , LOBBY_WAIT_DELAY(
-        TICKS_PER_SECOND,
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
+        TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
     , NOTIFICATIONS("Live-Hosting Announcements", true)

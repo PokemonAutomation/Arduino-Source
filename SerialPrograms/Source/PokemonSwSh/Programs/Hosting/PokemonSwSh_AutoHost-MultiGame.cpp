@@ -45,8 +45,8 @@ AutoHostMultiGame::AutoHostMultiGame()
     : RAID_CODE(8)
     , HOST_ONLINE("<b>Host Online:</b>", true)
     , LOBBY_WAIT_DELAY(
-        TICKS_PER_SECOND,
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
+        TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
     , GAME_LIST(true)
@@ -63,28 +63,28 @@ AutoHostMultiGame::AutoHostMultiGame()
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
     , CONNECT_TO_INTERNET_DELAY(
-        TICKS_PER_SECOND,
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
+        TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , ENTER_ONLINE_DEN_DELAY(
-        TICKS_PER_SECOND,
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , OPEN_ONLINE_DEN_LOBBY_DELAY(
-        TICKS_PER_SECOND,
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , RAID_START_TO_EXIT_DELAY(
-        TICKS_PER_SECOND,
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
+        TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
     , DELAY_TO_SELECT_MOVE(
-        TICKS_PER_SECOND,
         "<b>Delay to Select Move:</b><br>This + above = time from start raid to select move.",
+        TICKS_PER_SECOND,
         "32 * TICKS_PER_SECOND"
     )
 {

@@ -15,8 +15,8 @@ namespace PokemonAutomation{
 
 
 
-std::vector<EnumDropdownOption::Option> make_processor_labels(){
-    std::vector<EnumDropdownOption::Option> ret;
+std::vector<EnumDropdownEntry> make_processor_labels(){
+    std::vector<EnumDropdownEntry> ret;
     for (const CpuCapabilityOption& option : AVAILABLE_CAPABILITIES()){
         ret.emplace_back(option.label, option.available);
     }

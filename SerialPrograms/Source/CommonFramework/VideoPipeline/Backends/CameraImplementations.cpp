@@ -43,7 +43,7 @@ struct CameraBackends{
     }
 
     std::vector<std::pair<std::string, std::unique_ptr<CameraBackend>>> m_backends;
-    std::vector<EnumDropdownOption::Option> m_cases;
+    std::vector<EnumDropdownEntry> m_cases;
 };
 
 

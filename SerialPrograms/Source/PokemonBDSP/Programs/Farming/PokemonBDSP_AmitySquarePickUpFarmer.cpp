@@ -47,8 +47,8 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
         100
     )
     , ONE_WAY_MOVING_TIME(
-        TICKS_PER_SECOND,
         "<b>One Way walking Time:</b><br>Walk this amount of time in one direction before going back to finish one round of walking.",
+        TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , ROUNDS_PER_FETCH(
@@ -56,8 +56,8 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
         3
     )
     , WAIT_TIME_FOR_POKEMON(
-        TICKS_PER_SECOND,
         "<b>Wait Time for Pokemon:</b><br>Wait this time for pokemon to catch up to you before you ask for a berry.",
+        TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

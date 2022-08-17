@@ -41,40 +41,40 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 //        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
 //    )
     , WAIT_FOR_STAMP_DELAY(
-        TICKS_PER_SECOND,
         "<b>Wait for Stamp Delay:</b><br>Wait this long for the stamp to show up.",
+        TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , ENTER_STAMP_MASH_DURATION(
-        TICKS_PER_SECOND,
         "<b>Enter Stamp Mash Duration:</b><br>Mash A this long to enter a raid from its stamp.",
+        TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , RAID_START_MASH_DURATION(
-        TICKS_PER_SECOND,
         "<b>Raid Start Mash Duration:</b><br>Mash A this long to start raid.",
+        TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , RAID_START_TO_ATTACK_DELAY(
-        TICKS_PER_SECOND,
         "<b>Raid Start to Attack Delay:</b><br>Time from start raid to when the raiders attack.<br>"
         "Do not over-optimize this timing unless you are running with 4 Switches. The Wishiwashi NPC will break the program.",
+        TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
     , ATTACK_TO_CATCH_DELAY(
-        TICKS_PER_SECOND,
         "<b>Attack to Catch Delay:</b><br>Time from when you attack to when the catch selection appears.<br>"
         "Do not over-optimize this timing unless you are running with 4 Switches. The Clefairy NPC's Follow Me will break the program.",
+        TICKS_PER_SECOND,
         "18 * TICKS_PER_SECOND"
     )
     , RETURN_TO_OVERWORLD_DELAY(
-        TICKS_PER_SECOND,
         "<b>Return to Overworld Delay:</b><br>Time from when you don't catch to when you return to the overworld.",
+        TICKS_PER_SECOND,
         "18 * TICKS_PER_SECOND"
     )
     , TOUCH_DATE_INTERVAL(
-        TICKS_PER_SECOND,
         "<b>Rollover Prevention:</b><br>Prevent the den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+        TICKS_PER_SECOND,
         "4 * 3600 * TICKS_PER_SECOND"
     )
 {

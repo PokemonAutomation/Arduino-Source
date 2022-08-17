@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_BooleanCheckBoxOption_H
 #define PokemonAutomation_Options_BooleanCheckBoxOption_H
 
-#include <atomic>
+#include "Common/Cpp/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -16,13 +16,17 @@ namespace PokemonAutomation{
 
 class BooleanCheckBoxCell : public ConfigOption{
 public:
+    ~BooleanCheckBoxCell();
+    BooleanCheckBoxCell(const BooleanCheckBoxCell& x);
+    BooleanCheckBoxCell(bool default_value, bool current_value);
+
+public:
     BooleanCheckBoxCell(bool default_value);
-    BooleanCheckBoxCell(bool default_value, bool value);
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
-    bool default_value() const{ return m_default; }
+    bool default_value() const;
+    bool current_value() const;
 
-    operator bool() const{ return m_current.load(std::memory_order_relaxed); }
+    operator bool() const;
     void operator=(bool x);
 
     virtual void load_json(const JsonValue& json) override;
@@ -33,8 +37,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 protected:
-    const bool m_default;
-    std::atomic<bool> m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
@@ -42,9 +46,9 @@ protected:
 
 class BooleanCheckBoxOption : public BooleanCheckBoxCell{
 public:
+    BooleanCheckBoxOption(const BooleanCheckBoxOption& x) = delete;
     BooleanCheckBoxOption(std::string label, bool default_value);
     BooleanCheckBoxOption(std::string label, bool default_value, bool value);
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     using BooleanCheckBoxCell::operator=;

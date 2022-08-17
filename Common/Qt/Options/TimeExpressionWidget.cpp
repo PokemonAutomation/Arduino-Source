@@ -19,7 +19,7 @@ TimeExpressionCellWidget<Type>::~TimeExpressionCellWidget(){
 }
 template <typename Type>
 TimeExpressionCellWidget<Type>::TimeExpressionCellWidget(QWidget& parent, TimeExpressionCell<Type>& value)
-    : QLineEdit(QString::fromStdString(value.text()), &parent)
+    : QLineEdit(QString::fromStdString(value.current_text()), &parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
@@ -35,7 +35,7 @@ TimeExpressionCellWidget<Type>::TimeExpressionCellWidget(QWidget& parent, TimeEx
 template <typename Type>
 void TimeExpressionCellWidget<Type>::update(){
     ConfigWidget::update();
-    this->setText(QString::fromStdString(m_value.text()));
+    this->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
 void TimeExpressionCellWidget<Type>::value_changed(){
@@ -71,7 +71,7 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
     QHBoxLayout* row1 = new QHBoxLayout();
     rows->addLayout(row1);
 
-    m_box = new QLineEdit(QString::fromStdString(m_value.text()), this);
+    m_box = new QLineEdit(QString::fromStdString(m_value.current_text()), this);
     row0->addWidget(m_box);
     row0->addWidget(new QLabel("ticks", this));
 
@@ -97,7 +97,7 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
 template <typename Type>
 void TimeExpressionOptionWidget<Type>::update(){
     ConfigWidget::update();
-    m_box->setText(QString::fromStdString(m_value.text()));
+    m_box->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
 void TimeExpressionOptionWidget<Type>::value_changed(){

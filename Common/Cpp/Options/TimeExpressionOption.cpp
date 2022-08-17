@@ -4,6 +4,9 @@
  *
  */
 
+#include <limits>
+#include "Common/Cpp/Pimpl.tpp"
+#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -60,7 +63,102 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks){
 
 
 
+template <typename Type>
+struct TimeExpressionCell<Type>::Data{
+    const double m_ticks_per_second;
+    const Type m_min_value;
+    const Type m_max_value;
+    const std::string m_default;
 
+    mutable SpinLock m_lock;
+    std::string m_current;
+    Type m_value;
+    std::string m_error;
+
+    Data(
+        double ticks_per_second, Type min_value, Type max_value,
+        std::string default_value, std::string current_value
+    )
+        : m_ticks_per_second(ticks_per_second)
+        , m_min_value(min_value)
+        , m_max_value(max_value)
+        , m_default(std::move(default_value))
+        , m_current(std::move(current_value))
+        , m_value(0)
+    {
+        m_error = process(m_current, m_value);
+    }
+
+    std::string process(const std::string& text, Type& value) const{
+        if (text.empty()){
+            return "Expression is empty.";
+        }
+        int32_t parsed;
+        try{
+            parsed = parse_ticks_i32(text);
+        }catch (const ParseException& str){
+            return str.message();
+        }
+        // std::cout << "value = " << parsed << " " << m_min_value << " " << m_max_value << std::endl;
+
+        if (parsed < (int64_t)m_min_value){
+            return "Overflow: Number is too small.";
+        }
+        if (parsed > (int64_t)m_max_value){
+            return "Overflow: Number is too large.";
+        }
+        value = (Type)parsed;
+        return std::string();
+    }
+};
+
+
+template <typename Type>
+TimeExpressionCell<Type>::~TimeExpressionCell() = default;
+template <typename Type>
+TimeExpressionCell<Type>::TimeExpressionCell(const TimeExpressionCell& x)
+    : ConfigOption(x)
+    , m_data(
+        CONSTRUCT_TOKEN, x.ticks_per_second(), x.min_value(), x.max_value(),
+        x.default_value(), x.current_text()
+    )
+{}
+template <typename Type>
+TimeExpressionCell<Type>::TimeExpressionCell(
+    double ticks_per_second,
+    Type min_value, Type max_value,
+    std::string default_value, std::string current_value
+)
+    : m_data(
+        CONSTRUCT_TOKEN, ticks_per_second, min_value, max_value,
+        std::move(default_value), std::move(current_value)
+    )
+{}
+
+template <typename Type>
+TimeExpressionCell<Type>::TimeExpressionCell(
+    double ticks_per_second,
+    std::string default_value
+)
+    : m_data(
+        CONSTRUCT_TOKEN, ticks_per_second,
+        std::numeric_limits<Type>::min(),
+        std::numeric_limits<Type>::max(),
+        default_value, default_value
+    )
+{}
+template <typename Type>
+TimeExpressionCell<Type>::TimeExpressionCell(
+    double ticks_per_second,
+    std::string default_value,
+    Type min_value
+)
+    : m_data(
+        CONSTRUCT_TOKEN, ticks_per_second, min_value,
+        std::numeric_limits<Type>::max(),
+        default_value, default_value
+    )
+{}
 template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
     double ticks_per_second,
@@ -68,128 +166,155 @@ TimeExpressionCell<Type>::TimeExpressionCell(
     Type min_value,
     Type max_value
 )
-    : m_ticks_per_second(ticks_per_second)
-    , m_min_value(min_value)
-    , m_max_value(max_value)
-    , m_default(std::move(default_value))
-    , m_current(m_default)
-{
-    m_error = process(m_current, m_value);
-}
-#if 0
-template <typename Type>
-std::unique_ptr<ConfigOption> TimeExpressionCell<Type>::clone() const{
-    std::unique_ptr<TimeExpressionCell> ret(new TimeExpressionCell(
-        m_ticks_per_second,
-        m_default,
-        m_min_value,
-        m_max_value
-    ));
-    ret->m_current = m_current;
-    return ret;
-}
-#endif
+    : m_data(
+        CONSTRUCT_TOKEN, ticks_per_second, min_value, max_value,
+        default_value, default_value
+    )
+{}
 
 template <typename Type>
+double TimeExpressionCell<Type>::ticks_per_second() const{
+    return m_data->m_ticks_per_second;
+}
+template <typename Type>
+Type TimeExpressionCell<Type>::min_value() const{
+    return m_data->m_min_value;
+}
+template <typename Type>
+Type TimeExpressionCell<Type>::max_value() const{
+    return m_data->m_max_value;
+}
+template <typename Type>
+const std::string& TimeExpressionCell<Type>::default_value() const{
+    return m_data->m_default;
+}
+template <typename Type>
+std::string TimeExpressionCell<Type>::current_text() const{
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    return data.m_current;
+}
+template <typename Type>
 TimeExpressionCell<Type>::operator Type() const{
-    SpinLockGuard lg(m_lock);
-    return m_value;
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    return data.m_value;
 }
 template <typename Type>
 Type TimeExpressionCell<Type>::get() const{
-    SpinLockGuard lg(m_lock);
-    return m_value;
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    return data.m_value;
 }
 template <typename Type>
 std::string TimeExpressionCell<Type>::set(std::string text){
+    Data& data = *m_data;
     Type value = 0;
-    std::string error = process(text, value);
+    std::string error = data.process(text, value);
     {
-        SpinLockGuard lg(m_lock);
-        m_current = std::move(text);
-        m_value = value;
-        m_error.clear();
+        SpinLockGuard lg(data.m_lock);
+        data.m_current = std::move(text);
+        data.m_value = value;
+        data.m_error.clear();
     }
     push_update();
     return error;
 }
 template <typename Type>
-std::string TimeExpressionCell<Type>::text() const{
-    SpinLockGuard lg(m_lock);
-    return m_current;
-}
-template <typename Type>
 std::string TimeExpressionCell<Type>::time_string() const{
-    SpinLockGuard lg(m_lock);
-    if (!m_error.empty()){
-        return "<font color=\"red\">" + m_error + "</font>";
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    if (!data.m_error.empty()){
+        return "<font color=\"red\">" + data.m_error + "</font>";
     }
-    return ticks_to_time(m_ticks_per_second, m_value);
+    return ticks_to_time(data.m_ticks_per_second, data.m_value);
 }
 
 template <typename Type>
 void TimeExpressionCell<Type>::load_json(const JsonValue& json){
+    Data& data = *m_data;
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
     }
     {
-        SpinLockGuard lg(m_lock);
-        m_current = *str;
-        m_error = process(m_current, m_value);
+        SpinLockGuard lg(data.m_lock);
+        data.m_current = *str;
+        data.m_error = data.process(data.m_current, data.m_value);
     }
     push_update();
 }
 template <typename Type>
 JsonValue TimeExpressionCell<Type>::to_json() const{
-    SpinLockGuard lg(m_lock);
-    return m_current;
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    return data.m_current;
 }
 
 template <typename Type>
 std::string TimeExpressionCell<Type>::check_validity() const{
-    SpinLockGuard lg(m_lock);
-    return m_error;
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    return data.m_error;
 }
 template <typename Type>
 void TimeExpressionCell<Type>::restore_defaults(){
+    Data& data = *m_data;
     {
-        SpinLockGuard lg(m_lock);
-        m_current = m_default;
-        m_error = process(m_current, m_value);
+        SpinLockGuard lg(data.m_lock);
+        data.m_current = data.m_default;
+        data.m_error = data.process(data.m_current, data.m_value);
     }
     push_update();
 }
 
-template <typename Type>
-std::string TimeExpressionCell<Type>::process(const std::string& text, Type& value) const{
-    if (text.empty()){
-        return "Expression is empty.";
-    }
-    int32_t parsed;
-    try{
-        parsed = parse_ticks_i32(text);
-    }catch (const ParseException& str){
-        return str.message();
-    }
-    // std::cout << "value = " << parsed << " " << m_min_value << " " << m_max_value << std::endl;
-
-    if (parsed < (int64_t)m_min_value){
-        return "Overflow: Number is too small.";
-    }
-    if (parsed > (int64_t)m_max_value){
-        return "Overflow: Number is too large.";
-    }
-    value = (Type)parsed;
-    return std::string();
-}
 
 
 
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
-    double ticks_per_second,
     std::string label,
+    double ticks_per_second, Type min_value, Type max_value,
+    std::string default_value, std::string current_value
+)
+    : TimeExpressionCell<Type>(
+        ticks_per_second,
+        min_value, max_value,
+        std::move(default_value), std::move(current_value)
+    )
+    , m_label(std::move(label))
+{}
+template <typename Type>
+TimeExpressionOption<Type>::TimeExpressionOption(
+    std::string label,
+    double ticks_per_second,
+    std::string default_value
+)
+    : TimeExpressionCell<Type>(
+        ticks_per_second,
+        default_value,
+        std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max()
+    )
+    , m_label(std::move(label))
+{}
+template <typename Type>
+TimeExpressionOption<Type>::TimeExpressionOption(
+    std::string label,
+    double ticks_per_second,
+    std::string default_value,
+    Type min_value
+)
+    : TimeExpressionCell<Type>(
+        ticks_per_second,
+        default_value,
+        min_value, std::numeric_limits<Type>::max()
+    )
+    , m_label(std::move(label))
+{}
+template <typename Type>
+TimeExpressionOption<Type>::TimeExpressionOption(
+    std::string label,
+    double ticks_per_second,
     std::string default_value,
     Type min_value,
     Type max_value
@@ -201,20 +326,6 @@ TimeExpressionOption<Type>::TimeExpressionOption(
     )
     , m_label(std::move(label))
 {}
-#if 0
-template <typename Type>
-std::unique_ptr<ConfigOption> TimeExpressionOption<Type>::clone() const{
-    std::unique_ptr<TimeExpressionOption> ret(new TimeExpressionOption(
-        this->m_ticks_per_second,
-        this->m_label,
-        this->m_default,
-        this->m_min_value,
-        this->m_max_value
-    ));
-    ret->m_current = this->m_current;
-    return ret;
-}
-#endif
 
 
 

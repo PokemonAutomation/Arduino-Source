@@ -90,13 +90,13 @@ EggHatcher::EggHatcher()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , SAFETY_TIME0(
-        TICKS_PER_SECOND,
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
+        TICKS_PER_SECOND,
         "12 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
-        TICKS_PER_SECOND,
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
+        TICKS_PER_SECOND,
         "88 * TICKS_PER_SECOND"
     )
 {

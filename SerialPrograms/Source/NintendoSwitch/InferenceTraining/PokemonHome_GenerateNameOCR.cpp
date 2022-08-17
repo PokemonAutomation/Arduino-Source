@@ -43,8 +43,8 @@ GenerateNameOCRData::GenerateNameOCRData()
         PokemonNameReader::instance().languages()
     )
     , DELAY(
-        TICKS_PER_SECOND,
         "<b>Delay Between Each Iteration:</b>",
+        TICKS_PER_SECOND,
         "30"
     )
 {

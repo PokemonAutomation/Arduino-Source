@@ -35,8 +35,8 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
 
 ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
     : EXIT_CAMP_TO_RUN_DELAY(
-        TICKS_PER_SECOND,
         "<b>Exit Camp to Run Delay:</b><br>This needs to be carefully calibrated.",
+        TICKS_PER_SECOND,
         "1890"
     )
     , AIRPLANE_MODE(
@@ -47,8 +47,8 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , ENTER_CAMP_DELAY(
-        TICKS_PER_SECOND,
         "<b>Enter Camp Delay:</b>",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
 {

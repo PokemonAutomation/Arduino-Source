@@ -9,8 +9,7 @@
 #ifndef PokemonAutomation_Options_SimpleIntegerOption_H
 #define PokemonAutomation_Options_SimpleIntegerOption_H
 
-#include <limits>
-#include <atomic>
+#include "Common/Cpp/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -20,19 +19,25 @@ namespace PokemonAutomation{
 template <typename Type>
 class SimpleIntegerCell : public ConfigOption{
 public:
+    ~SimpleIntegerCell();
+    SimpleIntegerCell(const SimpleIntegerCell& x);
     SimpleIntegerCell(
-        Type default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
+        Type min_value, Type max_value,
+        Type default_value, Type current_value
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
-    Type min_value() const{ return m_min_value; }
-    Type max_value() const{ return m_max_value; }
-    Type default_value() const{ return m_default; }
+public:
+    SimpleIntegerCell(Type default_value);
+    SimpleIntegerCell(Type default_value, Type min_value);
+    SimpleIntegerCell(Type default_value, Type min_value, Type max_value);
 
-    operator Type() const{ return m_current.load(std::memory_order_relaxed); }
-    std::string set(Type x);
+    Type min_value() const;
+    Type max_value() const;
+    Type default_value() const;
+    Type current_value() const;
+
+    operator Type() const;
+    virtual std::string set(Type x);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -45,10 +50,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 protected:
-    const Type m_min_value;
-    const Type m_max_value;
-    const Type m_default;
-    std::atomic<Type> m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
@@ -58,13 +61,17 @@ protected:
 template <typename Type>
 class SimpleIntegerOption : public SimpleIntegerCell<Type>{
 public:
+    SimpleIntegerOption(const SimpleIntegerOption& x) = delete;
     SimpleIntegerOption(
         std::string label,
-        Type default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
+        Type min_value, Type max_value,
+        Type default_value, Type current_value
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
+
+public:
+    SimpleIntegerOption(std::string label, Type default_value);
+    SimpleIntegerOption(std::string label, Type default_value, Type min_value);
+    SimpleIntegerOption(std::string label, Type default_value, Type min_value, Type max_value);
 
     const std::string& label() const{ return m_label; }
 

@@ -79,7 +79,7 @@ public:
         ret->accept_FRs = (bool)accept_FRs;
         ret->move_slot.set(move_slot);
         ret->dynamax = (bool)dynamax;
-        ret->post_raid_delay.set(post_raid_delay.text());
+        ret->post_raid_delay.set(post_raid_delay.current_text());
         return ret;
     }
 

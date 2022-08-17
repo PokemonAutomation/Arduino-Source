@@ -23,75 +23,75 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , OVERWORLD_TO_MENU_DELAY(
-        TICKS_PER_SECOND,
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
+        TICKS_PER_SECOND,
         "250"
     )
     , MENU_TO_OVERWORLD_DELAY(
-        TICKS_PER_SECOND,
         "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
+        TICKS_PER_SECOND,
         "250"
     )
     , GAME_TO_HOME_DELAY(
-        TICKS_PER_SECOND,
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
+        TICKS_PER_SECOND,
         "125"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
-        TICKS_PER_SECOND,
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
+        TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , START_GAME_WAIT(
-        TICKS_PER_SECOND,
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
+        TICKS_PER_SECOND,
         "40 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
-        TICKS_PER_SECOND,
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
+        TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
-        TICKS_PER_SECOND,
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
+        TICKS_PER_SECOND,
         "40 * TICKS_PER_SECOND"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY_0(
-        TICKS_PER_SECOND,
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
+        TICKS_PER_SECOND,
         "30"
     )
     , BOX_CHANGE_DELAY_0(
-        TICKS_PER_SECOND,
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
+        TICKS_PER_SECOND,
         "200"
     )
     , BOX_PICKUP_DROP_DELAY(
-        TICKS_PER_SECOND,
         "<b>Box Pickup/Drop Delay:</b><br>Delay to pickup/drop " + STRING_POKEMON + ".",
+        TICKS_PER_SECOND,
         "50"
     )
     , MENU_TO_POKEMON_DELAY(
-        TICKS_PER_SECOND,
         "<b>Menu To " + STRING_POKEMON + " Delay:</b><br>Delay to enter " + STRING_POKEMON + " menu.",
+        TICKS_PER_SECOND,
         "300"
     )
     , POKEMON_TO_BOX_DELAY0(
-        TICKS_PER_SECOND,
         "<b>" + STRING_POKEMON + " to Box Delay:</b><br>Delay to enter box system.",
+        TICKS_PER_SECOND,
         "320"
     )
     , BOX_TO_POKEMON_DELAY(
-        TICKS_PER_SECOND,
         "<b>Box to " + STRING_POKEMON + " Delay:</b><br>Delay to exit box system.",
+        TICKS_PER_SECOND,
         "250"
     )
     , POKEMON_TO_MENU_DELAY(
-        TICKS_PER_SECOND,
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
+        TICKS_PER_SECOND,
         "250"
     )
     , m_advanced_options(

@@ -34,18 +34,18 @@ FriendDelete::FriendDelete()
         false
     )
     , VIEW_FRIEND_DELAY(
-        TICKS_PER_SECOND,
         "<b>View Friend Delay:</b><br>Delay from opening a friend to when you can press buttons.",
+        TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , DELETE_FRIEND_DELAY(
-        TICKS_PER_SECOND,
         "<b>Delete Friend Delay:</b><br>Delay to delete the friend.",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , FINISH_DELETE_DELAY(
-        TICKS_PER_SECOND,
         "<b>Finish Delete Delay:</b><br>Delay after deleting a friend.",
+        TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
 {

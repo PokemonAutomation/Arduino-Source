@@ -73,7 +73,7 @@ std::string MultiHostTable::to_cpp() const{
         str += std::string("        .accept_FRs       = ") + (item.accept_FRs ? "true" : "false") + ",\r\n";
         str += std::string("        .move_slot        = ") + std::to_string(item.move_slot) + ",\r\n";
         str += std::string("        .dynamax          = ") + (item.dynamax ? "true" : "false") + ",\r\n";
-        str += std::string("        .post_raid_delay  = ") + item.post_raid_delay.text() + ",\r\n";
+        str += std::string("        .post_raid_delay  = ") + item.post_raid_delay.current_text() + ",\r\n";
         str += "    },\r\n";
     }
     str += "    {},\r\n";

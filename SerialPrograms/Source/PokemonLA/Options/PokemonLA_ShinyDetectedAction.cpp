@@ -54,10 +54,10 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)
     , SCREENSHOT_DELAY(
-        TICKS_PER_SECOND,
         "<b>Screenshot Delay:</b><br>"
         "Align the camera, then wait this long before taking a screenshot + video of the shiny.<br>"
         "Set to zero to skip this. Don't set this too large or the shiny may run away!",
+        TICKS_PER_SECOND,
         std::move(default_delay_ticks)
     )
     , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})

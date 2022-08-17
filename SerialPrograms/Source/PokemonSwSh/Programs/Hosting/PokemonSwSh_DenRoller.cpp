@@ -68,9 +68,9 @@ DenRoller::DenRoller()
         "Automatically stop when this " + STRING_POKEMON + " is rolled. Video output is required."
     )
     , VIEW_TIME(
-        TICKS_PER_SECOND,
         "<b>View Time:</b><br>Wait this long before restting. This wait is skipped if the desired " +
         STRING_POKEMON + " is set since the program will be watching it for you.",
+        TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
@@ -82,9 +82,9 @@ DenRoller::DenRoller()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , READ_DELAY(
-        TICKS_PER_SECOND,
         "<b>Read Delay:</b><br>Wait this long before attempting to " +
         STRING_POKEMON + ". This needs to be long enough for the silhouette to load.",
+        TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
 {

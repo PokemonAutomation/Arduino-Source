@@ -51,8 +51,8 @@ EggFetcher::EggFetcher()
         2000
     )
     , TRAVEL_TIME_PER_FETCH(
-        TICKS_PER_SECOND,
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
+        TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

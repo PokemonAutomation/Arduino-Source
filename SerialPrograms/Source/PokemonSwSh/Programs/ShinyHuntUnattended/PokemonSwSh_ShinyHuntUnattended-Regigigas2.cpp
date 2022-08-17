@@ -39,21 +39,21 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
         24
     )
     , START_TO_ATTACK_DELAY(
-        TICKS_PER_SECOND,
         "<b>Start to Attack Delay:</b><br>This needs to be carefully calibrated.",
+        TICKS_PER_SECOND,
         "3750"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , ATTACK_TO_CATCH_DELAY(
-        TICKS_PER_SECOND,
         "<b>Attack to Catch Delay:</b><br>Increase this if you seem to be catching Regigigas very often.",
+        TICKS_PER_SECOND,
         "9 * TICKS_PER_SECOND"
     )
     , CATCH_TO_OVERWORLD_DELAY(
-        TICKS_PER_SECOND,
         "<b>Catch to Overworld Delay:</b>",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
 {

@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_Options_TimeExpressionOption_H
 #define PokemonAutomation_Options_TimeExpressionOption_H
 
-#include <limits>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -21,23 +20,41 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks);
 template <typename Type>
 class TimeExpressionCell : public ConfigOption{
 public:
+    ~TimeExpressionCell();
+    TimeExpressionCell(const TimeExpressionCell& x);
+    TimeExpressionCell(
+        double ticks_per_second,
+        Type min_value, Type max_value,
+        std::string default_value, std::string current_value
+    );
+
+public:
+    TimeExpressionCell(
+        double ticks_per_second,
+        std::string default_value
+    );
     TimeExpressionCell(
         double ticks_per_second,
         std::string default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
+        Type min_value
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
+    TimeExpressionCell(
+        double ticks_per_second,
+        std::string default_value,
+        Type min_value,
+        Type max_value
+    );
 
-    Type min_value() const{ return m_min_value; }
-    Type max_value() const{ return m_max_value; }
-    const std::string& default_value() const{ return m_default; }
+    double ticks_per_second() const;
+    Type min_value() const;
+    Type max_value() const;
+    const std::string& default_value() const;
+    std::string current_text() const;
 
     operator Type() const;
     Type get() const;
     std::string set(std::string text);
 
-    std::string text() const;
     std::string time_string() const;
 
     virtual void load_json(const JsonValue& json) override;
@@ -48,19 +65,9 @@ public:
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-private:
-    std::string process(const std::string& text, Type& value) const;
-
 protected:
-    const double m_ticks_per_second;
-    const Type m_min_value;
-    const Type m_max_value;
-    const std::string m_default;
-
-    mutable SpinLock m_lock;
-    std::string m_current;
-    Type m_value;
-    std::string m_error;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
@@ -68,14 +75,32 @@ protected:
 template <typename Type>
 class TimeExpressionOption : public TimeExpressionCell<Type>{
 public:
+    TimeExpressionOption(const TimeExpressionOption& x) = delete;
     TimeExpressionOption(
-        double ticks_per_second,
         std::string label,
-        std::string default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
+        double ticks_per_second, Type min_value, Type max_value,
+        std::string default_value, std::string current_value
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
+
+public:
+    TimeExpressionOption(
+        std::string label,
+        double ticks_per_second,
+        std::string default_value
+    );
+    TimeExpressionOption(
+        std::string label,
+        double ticks_per_second,
+        std::string default_value,
+        Type min_value
+    );
+    TimeExpressionOption(
+        std::string label,
+        double ticks_per_second,
+        std::string default_value,
+        Type min_value,
+        Type max_value
+    );
 
     const std::string& label() const{ return m_label; }
 

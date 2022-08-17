@@ -34,8 +34,8 @@ OverworldTrigger::OverworldTrigger()
         }, 0
     )
     , MOVE_DURATION(
-        TICKS_PER_SECOND,
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
+        TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , SWEET_SCENT_POKEMON_LOCATION(

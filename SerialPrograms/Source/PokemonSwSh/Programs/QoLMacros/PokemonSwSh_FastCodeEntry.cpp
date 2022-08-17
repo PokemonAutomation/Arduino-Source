@@ -37,8 +37,8 @@ FastCodeEntry::FastCodeEntry()
         "9107 3091"
     )
     , INITIAL_DELAY(
-        TICKS_PER_SECOND,
         "<b>Initial Delay:</b><br>Wait this long before entering the code.",
+        TICKS_PER_SECOND,
         "0 * TICKS_PER_SECOND"
     )
 {

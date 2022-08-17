@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_StaticTextOption_H
 #define PokemonAutomation_Options_StaticTextOption_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -16,8 +16,8 @@ namespace PokemonAutomation{
 
 class StaticTextOption : public ConfigOption{
 public:
+    ~StaticTextOption();
     StaticTextOption(std::string label);
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     std::string text() const;
     void set_text(std::string label);
@@ -30,16 +30,16 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    mutable SpinLock m_lock;
-    std::string m_text;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
 
 class SectionDividerOption : public ConfigOption{
 public:
+    ~SectionDividerOption();
     SectionDividerOption(std::string label);
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     std::string text() const;
     void set_text(std::string label);
@@ -52,8 +52,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    mutable SpinLock m_lock;
-    std::string m_text;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

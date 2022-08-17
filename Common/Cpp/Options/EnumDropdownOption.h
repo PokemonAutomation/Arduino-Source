@@ -2,61 +2,64 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This option is thread-safe.
+ *      A simple dropdown menu for enums.
+ *
+ *  This should only be used when the number of options is small. If you need
+ *  something for many options, use StringSelectCell/Option instead.
  *
  */
 
 #ifndef PokemonAutomation_Options_EnumDropdownOption_H
 #define PokemonAutomation_Options_EnumDropdownOption_H
 
-#include <string>
 #include <vector>
-#include <map>
-#include <atomic>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Pimpl.h"
 #include "ConfigOption.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 
 
 
+struct EnumDropdownEntry{
+    std::string name;
+    bool enabled = true;
+    EnumDropdownEntry(const char* p_name)
+        : name(p_name)
+    {}
+    EnumDropdownEntry(std::string p_name, bool p_enabled = true)
+        : name(std::move(p_name))
+        , enabled(p_enabled)
+    {}
+};
+
+
 class EnumDropdownCell : public ConfigOption{
 public:
-    struct Option{
-        std::string name;
-        bool enabled = true;
-        Option(const char* p_name)
-            : name(p_name)
-        {}
-        Option(std::string p_name, bool p_enabled = true)
-            : name(std::move(p_name))
-            , enabled(p_enabled)
-        {}
-    };
+    ~EnumDropdownCell();
+    EnumDropdownCell(const EnumDropdownCell& x);
 
 public:
-    template <typename ListType>
     EnumDropdownCell(
-        ListType&& cases,
+        std::vector<std::string> cases,
         size_t default_index
     );
     EnumDropdownCell(
-        std::initializer_list<Option> cases,
+        std::vector<EnumDropdownEntry> cases,
         size_t default_index
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
+    EnumDropdownCell(
+        std::initializer_list<EnumDropdownEntry> cases,
+        size_t default_index
+    );
 
-    const std::vector<Option>& case_list() const{ return m_case_list; }
+    const std::vector<EnumDropdownEntry>& case_list() const;
+    size_t default_index() const;
 
-    const std::string& case_name(size_t index) const{ return m_case_list[index].name; }
-    const std::string& current_case() const { return m_case_list[m_current].name; }
+    const std::string& case_name(size_t index) const;
+    const std::string& current_case() const;
 
-    operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
+    operator size_t() const;
     virtual bool set(size_t index); //  Returns false if index is out of range.
 
     virtual void load_json(const JsonValue& json) override;
@@ -67,34 +70,39 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 protected:
-    std::vector<Option> m_case_list;
-    std::map<std::string, size_t> m_case_map;
-    const size_t m_default;
-    std::atomic<size_t> m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
 
 class EnumDropdownOption : public EnumDropdownCell{
 public:
-    template <typename ListType>
+    EnumDropdownOption(const EnumDropdownOption& x) = delete;
     EnumDropdownOption(
         std::string label,
-        ListType&& cases,
+        std::vector<std::string> cases,
+        size_t default_index
+    )
+        : EnumDropdownCell(cases, default_index)
+        , m_label(std::move(label))
+    {}
+    EnumDropdownOption(
+        std::string label,
+        std::vector<EnumDropdownEntry> cases,
+        size_t default_index
+    )
+        : EnumDropdownCell(cases, default_index)
+        , m_label(std::move(label))
+    {}
+    EnumDropdownOption(
+        std::string label,
+        std::initializer_list<EnumDropdownEntry> cases,
         size_t default_index
     )
         : EnumDropdownCell(std::move(cases), default_index)
         , m_label(std::move(label))
     {}
-    EnumDropdownOption(
-        std::string label,
-        std::initializer_list<Option> cases,
-        size_t default_index
-    )
-        : EnumDropdownCell(std::move(cases), default_index)
-        , m_label(std::move(label))
-    {}
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const{ return m_label; }
     virtual ConfigWidget* make_ui(QWidget& parent) override;
@@ -102,38 +110,6 @@ public:
 private:
     const std::string m_label;
 };
-
-
-
-
-
-
-
-template <typename ListType>
-EnumDropdownCell::EnumDropdownCell(
-    ListType&& cases,
-    size_t default_index
-)
-    : m_default(default_index)
-    , m_current(default_index)
-{
-//    cout << default_index << endl;
-    if (default_index >= cases.size()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Index is too large: " + std::to_string(default_index));
-    }
-    for (size_t index = 0; index < cases.size(); index++){
-        m_case_list.emplace_back(std::move(cases[index]));
-        const std::string& item = m_case_list.back().name;
-        auto ret = m_case_map.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(item),
-            std::forward_as_tuple(index)
-        );
-        if (!ret.second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label: " + item);
-        }
-    }
-}
 
 
 

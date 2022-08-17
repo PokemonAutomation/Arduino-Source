@@ -63,8 +63,8 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , CATCH_TO_OVERWORLD_DELAY(
-        TICKS_PER_SECOND,
         "<b>Catch to Overworld Delay:</b>",
+        TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
 {

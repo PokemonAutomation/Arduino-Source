@@ -39,8 +39,8 @@ int TimeExpression_init = register_option(
 TimeExpression::TimeExpression(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_option(
-        TICKS_PER_SECOND,
         SingleStatementOption::m_label,
+        TICKS_PER_SECOND,
         obj.get_string_throw(JSON_DEFAULT),
         obj.get_integer_throw(JSON_MIN_VALUE),
         obj.get_integer_throw(JSON_MAX_VALUE)
@@ -60,7 +60,7 @@ JsonObject TimeExpression::to_json() const{
     root[JSON_MIN_VALUE] = m_option.min_value();
     root[JSON_MAX_VALUE] = m_option.max_value();
     root[JSON_DEFAULT] = m_option.default_value();
-    root[JSON_CURRENT] = m_option.text();
+    root[JSON_CURRENT] = m_option.current_text();
     return root;
 }
 std::string TimeExpression::to_cpp() const{

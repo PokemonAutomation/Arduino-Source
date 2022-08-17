@@ -69,9 +69,9 @@ std::unique_ptr<StatsTracker> FroslassFinder_Descriptor::make_stats() const{
 
 FroslassFinder::FroslassFinder()
     : DASH_DURATION(
-        TICKS_PER_SECOND,
         "<b>Braviary dash duration:</b><br>"
         "How many ticks for Braviary to dash to reach the hole.",
+        TICKS_PER_SECOND,
         "986"
     )
     , SHINY_DETECTED_ENROUTE(

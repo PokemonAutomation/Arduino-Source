@@ -25,10 +25,13 @@ struct ConfigOption::Data{
 
 
 ConfigOption::~ConfigOption() = default;
-//ConfigOption::ConfigOption(const ConfigOption& x)
-//    : m_data(CONSTRUCT_TOKEN, x.visibility())
-//{}
+ConfigOption::ConfigOption(const ConfigOption& x)
+    : m_data(CONSTRUCT_TOKEN, x.visibility())
+{}
 
+ConfigOption::ConfigOption()
+    : m_data(CONSTRUCT_TOKEN)
+{}
 ConfigOption::ConfigOption(ConfigOptionState visibility)
     : m_data(CONSTRUCT_TOKEN, visibility)
 {}

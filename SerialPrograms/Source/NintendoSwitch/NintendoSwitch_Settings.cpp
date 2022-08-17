@@ -24,13 +24,13 @@ ConsoleSettings& ConsoleSettings::instance(){
 }
 ConsoleSettings::ConsoleSettings()
     : CONNECT_CONTROLLER_DELAY(
-        TICKS_PER_SECOND,
         "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
+        TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , SETTINGS_TO_HOME_DELAY(
-        TICKS_PER_SECOND,
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
+        TICKS_PER_SECOND,
         "120"
     )
     , START_GAME_REQUIRES_INTERNET(
@@ -40,9 +40,9 @@ ConsoleSettings::ConsoleSettings()
         true
     )
     , START_GAME_INTERNET_CHECK_DELAY(
-        TICKS_PER_SECOND,
         "<b>Start Game Internet Check Delay:</b><br>"
         "If starting the game requires checking the internet, wait this long for it.",
+        TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(

@@ -43,11 +43,12 @@ public:
     virtual ~ConfigOption();
     ConfigOption(ConfigOption&&) = delete;
     void operator=(ConfigOption&&) = delete;
-//protected:
-//    ConfigOption(const ConfigOption& x);
+protected:
+    ConfigOption(const ConfigOption& x);
 
 public:
-    ConfigOption(ConfigOptionState visibility = ConfigOptionState::ENABLED);
+    ConfigOption();
+    ConfigOption(ConfigOptionState visibility);
 
 //    //  Deep copy this entire config. This will not copy listeners.
 //    //  Returns null if config cannot be copied.
