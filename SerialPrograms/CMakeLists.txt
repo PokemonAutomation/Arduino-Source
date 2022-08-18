@@ -1198,6 +1198,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h
+    Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.cpp
+    Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp
@@ -1333,6 +1335,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/PokemonSwSh_Settings.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.cpp
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer2.cpp
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer2.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.cpp
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.cpp
