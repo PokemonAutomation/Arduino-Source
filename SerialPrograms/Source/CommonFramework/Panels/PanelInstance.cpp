@@ -30,7 +30,7 @@ JsonValue PanelInstance::to_json() const{
 void PanelInstance::save_settings() const{
     const std::string& identifier = m_descriptor.identifier();
     if (!identifier.empty()){
-        PERSISTENT_SETTINGS().panels[m_descriptor.identifier()] = to_json();
+        PERSISTENT_SETTINGS().panels[identifier] = to_json();
     }
     global_logger_tagged().log("Saving panel settings...");
     PERSISTENT_SETTINGS().write();

@@ -92,6 +92,39 @@ void pbf_controller_state(
     } // end while loop, and function 
 }
 
+std::string button_to_string(Button button){
+    std::string str;
+    if (button & BUTTON_Y) str += " BUTTON_Y ";
+    if (button & BUTTON_B) str += " BUTTON_B ";
+    if (button & BUTTON_A) str += " BUTTON_A ";
+    if (button & BUTTON_X) str += " BUTTON_X ";
+    if (button & BUTTON_L) str += " BUTTON_L ";
+    if (button & BUTTON_R) str += " BUTTON_R ";
+    if (button & BUTTON_ZL) str += " BUTTON_ZL ";
+    if (button & BUTTON_ZR) str += " BUTTON_ZR ";
+    if (button & BUTTON_MINUS) str += " BUTTON_MINUS ";
+    if (button & BUTTON_PLUS) str += " BUTTON_PLUS ";
+    if (button & BUTTON_LCLICK) str += " BUTTON_LCLICK ";
+    if (button & BUTTON_RCLICK) str += " BUTTON_RCLICK ";
+    if (button & BUTTON_HOME) str += " BUTTON_HOME ";
+    if (button & BUTTON_CAPTURE) str += " BUTTON_CAPTURE ";
+    return str;
+}
+
+std::string dpad_to_string(Button dpad){
+    switch (dpad){
+    case DPAD_UP            : return "DPAD_UP";
+    case DPAD_UP_RIGHT      : return "DPAD_UP_RIGHT";
+    case DPAD_RIGHT         : return "DPAD_RIGHT";
+    case DPAD_DOWN_RIGHT    : return "DPAD_DOWN_RIGHT";
+    case DPAD_DOWN          : return "DPAD_DOWN";
+    case DPAD_DOWN_LEFT     : return "DPAD_DOWN_LEFT";
+    case DPAD_LEFT          : return "DPAD_LEFT";
+    case DPAD_UP_LEFT       : return "DPAD_UP_LEFT";
+    case DPAD_NONE          : return "DPAD_NONE";
+    }
+    return "UNKNOWN_DPAD";
+}
 
 int register_message_converters_push_button_framework(){
     register_message_converter(
@@ -114,7 +147,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_pbf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_press_button*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
+            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
             ss << ", hold_ticks = " << params->hold_ticks;
             ss << ", release_ticks = " << params->release_ticks;
             return ss.str();
@@ -128,7 +161,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_pbf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_press_dpad*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", dpad = " << (unsigned)params->dpad;
+            ss << ", dpad = " << (unsigned)params->dpad << "(" << dpad_to_string(params->dpad) << ")";
             ss << ", hold_ticks = " << params->hold_ticks;
             ss << ", release_ticks = " << params->release_ticks;
             return ss.str();
@@ -172,7 +205,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_pbf_mash_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_pbf_mash_button*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
+            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
             ss << ", ticks = " << params->ticks;
             return ss.str();
         }
@@ -185,7 +218,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_controller_state)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_controller_state*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
+            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
             ss << ", dpad = " << (int)params->dpad;
             ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
             ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";

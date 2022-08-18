@@ -37,7 +37,7 @@ ConsoleSettings::ConsoleSettings()
         "<b>Start Game Requires Internet:</b><br>"
         "Set this to true if starting the game requires checking the internet. "
         "Otherwise, programs that require soft-resetting may not work properly.",
-        true
+        false
     )
     , START_GAME_INTERNET_CHECK_DELAY(
         "<b>Start Game Internet Check Delay:</b><br>"

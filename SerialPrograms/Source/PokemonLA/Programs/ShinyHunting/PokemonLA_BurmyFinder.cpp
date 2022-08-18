@@ -140,11 +140,11 @@ struct BurmyFinder::TreeCounter{
     
     void log(Logger& logger) const{
         std::ostringstream oss;
-        for(size_t i = 0; i < 10; i++){
+        for(size_t i = 0; i < size(tree); i++){
             if (i != 0){
                 oss << " - ";
             }
-            oss << "Tree" << i << ": " << tostr_u_commas(tree[i]);
+            oss << "Tree " << i << ": " << tostr_u_commas(tree[i]);
         }
         logger.log(oss.str());
     }
