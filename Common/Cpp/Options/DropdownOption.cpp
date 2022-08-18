@@ -1,4 +1,4 @@
-/*  Enum Dropdown Option
+/*  Dropdown Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -9,7 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "EnumDropdownOption.h"
+#include "DropdownOption.h"
 
 namespace PokemonAutomation{
 
@@ -183,7 +183,7 @@ void DropdownCell::load_json(const JsonValue& json){
 }
 JsonValue DropdownCell::to_json() const{
     const Data& data = *m_data;
-    return data.m_case_list[data.m_current].slug;
+    return data.m_case_list[data.m_current.load(std::memory_order_relaxed)].slug;
 }
 
 void DropdownCell::restore_defaults(){

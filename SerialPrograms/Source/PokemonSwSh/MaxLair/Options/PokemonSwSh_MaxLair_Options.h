@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_H
 
 #include <chrono>
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h"
 
 namespace PokemonAutomation{

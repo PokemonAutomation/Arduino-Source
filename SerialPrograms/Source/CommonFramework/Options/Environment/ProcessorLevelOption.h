@@ -4,11 +4,11 @@
  *
  */
 
-#ifndef PokemonAutomation_ProcessorLevelPption_H
-#define PokemonAutomation_ProcessorLevelPption_H
+#ifndef PokemonAutomation_ProcessorLevelOption_H
+#define PokemonAutomation_ProcessorLevelOption_H
 
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 
 namespace PokemonAutomation{
 

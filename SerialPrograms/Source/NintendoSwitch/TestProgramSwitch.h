@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"

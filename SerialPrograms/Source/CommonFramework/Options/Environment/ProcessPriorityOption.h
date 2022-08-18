@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ProcessPriorityOption_H
 #define PokemonAutomation_ProcessPriorityOption_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 
 class QThread;
 

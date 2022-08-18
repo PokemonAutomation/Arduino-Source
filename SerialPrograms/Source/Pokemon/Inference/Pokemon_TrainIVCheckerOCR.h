@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_TrainIVCheckerOCR_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 

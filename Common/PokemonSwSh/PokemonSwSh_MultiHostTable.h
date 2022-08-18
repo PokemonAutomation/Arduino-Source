@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 

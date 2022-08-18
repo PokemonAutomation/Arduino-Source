@@ -1,4 +1,4 @@
-/*  Enum Dropdown Option
+/*  Dropdown Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_EnumDropdownOption_H
-#define PokemonAutomation_Options_EnumDropdownOption_H
+#ifndef PokemonAutomation_Options_DropdownOption_H
+#define PokemonAutomation_Options_DropdownOption_H
 
 #include <vector>
 #include "Common/Compiler.h"

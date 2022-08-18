@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_StartInGripMenu_H
 #define PokemonAutomation_NintendoSwitch_StartInGripMenu_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

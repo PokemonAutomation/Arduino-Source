@@ -9,7 +9,7 @@
 
 #include <functional>
 #include <vector>
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"

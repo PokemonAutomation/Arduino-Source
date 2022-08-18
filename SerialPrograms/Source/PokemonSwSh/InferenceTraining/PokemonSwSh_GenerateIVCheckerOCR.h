@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 #define PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

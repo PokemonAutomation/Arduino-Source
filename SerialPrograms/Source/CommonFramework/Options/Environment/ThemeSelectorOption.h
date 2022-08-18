@@ -8,7 +8,7 @@
 #define PokemonAutomation_ThemeSelectorOption_H
 
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 
 namespace PokemonAutomation{
 

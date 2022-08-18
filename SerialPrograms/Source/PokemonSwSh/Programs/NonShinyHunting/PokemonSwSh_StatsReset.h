@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsReset_H
 #define PokemonAutomation_PokemonSwSh_StatsReset_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

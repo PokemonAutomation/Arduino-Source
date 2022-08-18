@@ -1,4 +1,4 @@
-/*  Enum Dropdown Option
+/*  Dropdown Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "EnumDropdownWidget.h"
+#include "DropdownWidget.h"
 
 namespace PokemonAutomation{
 

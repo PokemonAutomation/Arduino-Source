@@ -9,7 +9,7 @@
 #define PokemonAutomation_PokemonLA_AutoMultiSpawn_H
 
 #include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

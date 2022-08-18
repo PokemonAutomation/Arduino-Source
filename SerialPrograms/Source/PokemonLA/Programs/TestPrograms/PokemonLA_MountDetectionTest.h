@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_MountDetectionTest_H
 #define PokemonAutomation_PokemonLA_MountDetectionTest_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

@@ -1,14 +1,14 @@
-/*  Enum Dropdown Option
+/*  Dropdown Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Options_EnumDropdownWidget_H
-#define PokemonAutomation_Options_EnumDropdownWidget_H
+#ifndef PokemonAutomation_Options_DropdownWidget_H
+#define PokemonAutomation_Options_DropdownWidget_H
 
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "ConfigWidget.h"
 
 namespace PokemonAutomation{

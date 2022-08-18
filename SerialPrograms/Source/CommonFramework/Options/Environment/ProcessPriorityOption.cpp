@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Qt/Options/EnumDropdownWidget.h"
+#include "Common/Qt/Options/DropdownWidget.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "ProcessPriorityOption.h"
 

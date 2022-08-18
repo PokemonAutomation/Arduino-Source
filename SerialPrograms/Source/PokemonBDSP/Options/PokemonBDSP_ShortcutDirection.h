@@ -5,7 +5,7 @@
  */
 
 #include "ClientSource/Connection/BotBase.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DropdownOption.h"
 
 #ifndef PokemonAutomation_PokemonBDSP_ShortcutDirection_H
 #define PokemonAutomation_PokemonBDSP_ShortcutDirection_H

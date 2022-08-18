@@ -107,16 +107,18 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
+    ../Common/Cpp/NamedEnum.cpp
+    ../Common/Cpp/NamedEnum.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
     ../Common/Cpp/Options/DateOption.h
+    ../Common/Cpp/Options/DropdownOption.cpp
+    ../Common/Cpp/Options/DropdownOption.h
     ../Common/Cpp/Options/EditableTableOption2.cpp
     ../Common/Cpp/Options/EditableTableOption2.h
-    ../Common/Cpp/Options/EnumDropdownOption.cpp
-    ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
     ../Common/Cpp/Options/FixedCodeOption.h
     ../Common/Cpp/Options/FloatingPointOption.cpp
@@ -180,14 +182,14 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
     ../Common/Qt/Options/DateWidget.h
+    ../Common/Qt/Options/DropdownWidget.cpp
+    ../Common/Qt/Options/DropdownWidget.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
     ../Common/Qt/Options/EditableTableWidget2.cpp
     ../Common/Qt/Options/EditableTableWidget2.h
-    ../Common/Qt/Options/EnumDropdownWidget.cpp
-    ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
