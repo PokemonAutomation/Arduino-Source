@@ -8,7 +8,7 @@
 #define PokemonAutomation_SerialPortOption_H
 
 #include <memory>
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 
 class QSerialPortInfo;

@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_ImageRGB32_H
 
 #include <string>
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ImageViewRGB32.h"
 
 namespace PokemonAutomation{

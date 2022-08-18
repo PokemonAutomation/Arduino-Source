@@ -6,7 +6,7 @@
 
 #include <set>
 #include <iostream>
-#include "SpinLock.h"
+#include "Concurrency/SpinLock.h"
 #include "LifetimeSanitizer.h"
 
 //#define PA_SANITIZER_PRINT_ALL

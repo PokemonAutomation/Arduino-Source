@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/StreamConverters.h"
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 #include "AudioInfo.h"
 
 namespace PokemonAutomation{

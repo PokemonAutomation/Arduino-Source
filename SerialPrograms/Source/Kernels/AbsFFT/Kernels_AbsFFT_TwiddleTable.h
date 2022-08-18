@@ -8,8 +8,8 @@
 #define PokemonAutomation_Kernels_AbsFFT_TwiddleTable_H
 
 #include <atomic>
-#include "Common/Cpp/AlignedVector.h"
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Kernels_AbsFFT_Arch.h"
 
 namespace PokemonAutomation{

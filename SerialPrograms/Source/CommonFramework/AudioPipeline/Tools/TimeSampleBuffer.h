@@ -35,7 +35,7 @@
 #include <map>
 #include <string>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 
 namespace PokemonAutomation{
 

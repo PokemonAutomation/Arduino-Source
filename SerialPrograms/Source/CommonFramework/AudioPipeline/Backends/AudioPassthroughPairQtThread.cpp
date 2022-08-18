@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/SpinPause.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioPassthroughPairQt.h"
 #include "AudioPassthroughPairQtThread.h"

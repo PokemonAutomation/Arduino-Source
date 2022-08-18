@@ -10,7 +10,7 @@
 #include <QDir>
 #include "3rdParty/TesseractPA/TesseractPA.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "OCR_RawOCR.h"

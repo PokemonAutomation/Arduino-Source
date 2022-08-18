@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_TextEditOption_H
 #define PokemonAutomation_Options_TextEditOption_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{

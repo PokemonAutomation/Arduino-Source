@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "FFTStreamer.h"

@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_Options_SimpleIntegerOption_H
 #define PokemonAutomation_Options_SimpleIntegerOption_H
 
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{

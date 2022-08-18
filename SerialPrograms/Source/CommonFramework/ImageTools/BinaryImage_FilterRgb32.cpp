@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/FixedLimitVector.tpp"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "BinaryImage_FilterRgb32.h"

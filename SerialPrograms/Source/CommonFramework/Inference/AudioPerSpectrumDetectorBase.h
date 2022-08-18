@@ -32,8 +32,8 @@
 #include <functional>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
 
 namespace PokemonAutomation{

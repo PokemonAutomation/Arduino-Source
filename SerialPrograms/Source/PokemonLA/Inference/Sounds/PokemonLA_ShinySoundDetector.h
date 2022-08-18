@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_ShinySoundDetector_H
 
 #include <functional>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 

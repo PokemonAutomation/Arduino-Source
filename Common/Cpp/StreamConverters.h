@@ -8,7 +8,7 @@
 #define PokemonAutomation_StreamConverters_H
 
 #include <set>
-#include "AlignedVector.h"
+#include "Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 

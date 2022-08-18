@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_FriendCodeListOption_H
 
 #include <vector>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{

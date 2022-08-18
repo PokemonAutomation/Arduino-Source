@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Pimpl.tpp"
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "StaticTextOption.h"

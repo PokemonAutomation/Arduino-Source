@@ -9,7 +9,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "Common/Cpp/FixedLimitVector.tpp"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels_BinaryImage_BasicFilters.h"
 
 namespace PokemonAutomation{

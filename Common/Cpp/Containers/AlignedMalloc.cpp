@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <new>
-#include "Exceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "AlignedMalloc.h"
 
 #define PA_ENABLE_MALLOC_CHECKING

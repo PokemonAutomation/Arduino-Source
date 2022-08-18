@@ -6,8 +6,8 @@
 
 #include <map>
 #include <QtGlobal>
-#include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioInfo.h"
 

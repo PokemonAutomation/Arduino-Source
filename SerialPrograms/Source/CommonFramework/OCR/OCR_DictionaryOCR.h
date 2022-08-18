@@ -10,7 +10,7 @@
 #include <vector>
 #include <set>
 #include <map>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "OCR_StringMatchResult.h"
 

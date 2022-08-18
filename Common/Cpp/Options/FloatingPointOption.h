@@ -8,7 +8,7 @@
 #define PokemonAutomation_Options_FloatingPointOption_H
 
 #include <limits>
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{

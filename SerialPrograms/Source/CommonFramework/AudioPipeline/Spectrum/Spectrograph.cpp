@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Spectrograph.h"
 

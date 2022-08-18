@@ -13,7 +13,7 @@
 
 #include <memory>
 #include <set>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 

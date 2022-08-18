@@ -11,7 +11,7 @@
 #include <string>
 #include <iostream>
 #include "Common/Compiler.h"
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

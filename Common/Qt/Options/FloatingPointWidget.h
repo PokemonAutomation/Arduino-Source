@@ -34,7 +34,6 @@ public:
     virtual void update() override;
 
 private:
-    FloatingPointOption& m_value;
     FloatingPointCellWidget* m_cell;
 };
 

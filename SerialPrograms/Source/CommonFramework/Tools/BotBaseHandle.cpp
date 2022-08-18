@@ -6,10 +6,10 @@
 
 #include <QtGlobal>
 #include <QMessageBox>
-#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"

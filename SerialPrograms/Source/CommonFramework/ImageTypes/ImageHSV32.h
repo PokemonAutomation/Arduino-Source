@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_ImageHSV32_H
 
 #include <string>
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ImageViewHSV32.h"
 
 namespace PokemonAutomation{

@@ -15,7 +15,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramSession_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
 #include "ComputerPrograms/ComputerProgram.h"
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"

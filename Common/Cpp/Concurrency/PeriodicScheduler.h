@@ -13,9 +13,9 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
-#include "Time.h"
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "AsyncDispatcher.h"
-#include "CancellableScope.h"
 
 namespace PokemonAutomation{
 

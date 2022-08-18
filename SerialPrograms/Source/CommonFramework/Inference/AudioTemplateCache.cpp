@@ -6,8 +6,8 @@
 
 #include <QFileInfo>
 #include <QString>
-#include "Common/Cpp/AlignedVector.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "AudioTemplateCache.h"

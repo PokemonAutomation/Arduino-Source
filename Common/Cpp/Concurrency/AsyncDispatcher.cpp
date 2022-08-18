@@ -4,7 +4,7 @@
  * 
  */
 
-#include "PanicDump.h"
+#include "Common/Cpp/PanicDump.h"
 #include "AsyncDispatcher.h"
 
 namespace PokemonAutomation{

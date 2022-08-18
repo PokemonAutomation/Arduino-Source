@@ -4,7 +4,7 @@
  *
  */
 
-#include "CpuId/CpuId.h"
+#include "Common/Cpp/CpuId/CpuId.h"
 
 #if _WIN32 && defined PA_ARCH_x86
 #include <intrin.h>

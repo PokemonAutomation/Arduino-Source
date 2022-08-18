@@ -10,7 +10,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 

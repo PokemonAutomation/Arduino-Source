@@ -8,7 +8,7 @@
 #define PokemonAutomation_IntegrationsAPI_H
 
 #include <stdint.h>
-#include "Common/Cpp/DllSafeString.h"
+#include "Common/Cpp/Containers/DllSafeString.h"
 
 namespace PokemonAutomation{
 namespace Integration{

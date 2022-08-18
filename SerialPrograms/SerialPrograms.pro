@@ -77,12 +77,15 @@ SOURCES += \
     ../ClientSource/Libraries/Logging.cpp \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
-    ../Common/Cpp/AlignedMalloc.cpp \
-    ../Common/Cpp/AsyncDispatcher.cpp \
     ../Common/Cpp/CancellableScope.cpp \
+    ../Common/Cpp/Concurrency/AsyncDispatcher.cpp \
+    ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp \
+    ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp \
+    ../Common/Cpp/Concurrency/PeriodicScheduler.cpp \
+    ../Common/Cpp/Concurrency/SpinLock.cpp \
+    ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
-    ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/ImageResolution.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
@@ -103,10 +106,7 @@ SOURCES += \
     ../Common/Cpp/Options/TextEditOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
-    ../Common/Cpp/ParallelTaskRunner.cpp \
-    ../Common/Cpp/PeriodicScheduler.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
-    ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/StreamConverters.cpp \
     ../Common/Cpp/StringTools.cpp \
     ../Common/Cpp/Time.cpp \
@@ -761,19 +761,26 @@ HEADERS += \
     ../Common/CRC32.h \
     ../Common/Compiler.h \
     ../Common/Cpp/AbstractLogger.h \
-    ../Common/Cpp/AlignedMalloc.h \
-    ../Common/Cpp/AlignedVector.h \
-    ../Common/Cpp/AlignedVector.tpp \
-    ../Common/Cpp/AsyncDispatcher.h \
     ../Common/Cpp/CancellableScope.h \
     ../Common/Cpp/Color.h \
+    ../Common/Cpp/Concurrency/AsyncDispatcher.h \
+    ../Common/Cpp/Concurrency/FireForgetDispatcher.h \
+    ../Common/Cpp/Concurrency/ParallelTaskRunner.h \
+    ../Common/Cpp/Concurrency/PeriodicScheduler.h \
+    ../Common/Cpp/Concurrency/SpinLock.h \
+    ../Common/Cpp/Concurrency/SpinPause.h \
+    ../Common/Cpp/Containers/AlignedMalloc.h \
+    ../Common/Cpp/Containers/AlignedVector.h \
+    ../Common/Cpp/Containers/AlignedVector.tpp \
+    ../Common/Cpp/Containers/DllSafeString.h \
+    ../Common/Cpp/Containers/FixedLimitVector.h \
+    ../Common/Cpp/Containers/FixedLimitVector.tpp \
+    ../Common/Cpp/Containers/Pimpl.h \
+    ../Common/Cpp/Containers/Pimpl.tpp \
     ../Common/Cpp/CpuId/CpuId.h \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/Exceptions.h \
-    ../Common/Cpp/FireForgetDispatcher.h \
-    ../Common/Cpp/FixedLimitVector.h \
-    ../Common/Cpp/FixedLimitVector.tpp \
     ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
@@ -794,13 +801,9 @@ HEADERS += \
     ../Common/Cpp/Options/TextEditOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PanicDump.h \
-    ../Common/Cpp/ParallelTaskRunner.h \
-    ../Common/Cpp/PeriodicScheduler.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/PrintDebuggers.h \
     ../Common/Cpp/SIMDDebuggers.h \
-    ../Common/Cpp/SpinLock.h \
-    ../Common/Cpp/SpinPause.h \
     ../Common/Cpp/StreamConverters.h \
     ../Common/Cpp/StringTools.h \
     ../Common/Cpp/Time.h \
@@ -1413,7 +1416,6 @@ HEADERS += \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h \
-    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h \
     Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h \
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h \

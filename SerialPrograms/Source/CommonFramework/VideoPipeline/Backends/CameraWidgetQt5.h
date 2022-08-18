@@ -16,8 +16,8 @@
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
 #include <QVideoProbe>
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"

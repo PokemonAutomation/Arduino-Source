@@ -5,8 +5,8 @@
  */
 
 #include <set>
-#include "Common/Cpp/SpinLock.h"
-#include "Common/Cpp/Pimpl.tpp"
+#include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/ParallelTaskRunner.h"
+#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

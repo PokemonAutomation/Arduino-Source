@@ -5,9 +5,9 @@
  */
 
 #include <algorithm>
-#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "PABotBase.h"

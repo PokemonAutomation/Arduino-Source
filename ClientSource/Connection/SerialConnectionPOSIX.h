@@ -14,8 +14,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "StreamInterface.h"
 
 namespace PokemonAutomation{

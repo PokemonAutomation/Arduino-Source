@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferencePivot_H
 #define PokemonAutomation_CommonFramework_VisualInferencePivot_H
 
-#include "Common/Cpp/SpinLock.h"
-#include "Common/Cpp/PeriodicScheduler.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"

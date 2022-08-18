@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <vector>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{

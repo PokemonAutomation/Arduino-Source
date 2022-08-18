@@ -6,7 +6,7 @@
 
 #include <string.h>
 #include "Exceptions.h"
-#include "AlignedVector.tpp"
+#include "Containers/AlignedVector.tpp"
 #include "StreamConverters.h"
 
 #include <iostream>

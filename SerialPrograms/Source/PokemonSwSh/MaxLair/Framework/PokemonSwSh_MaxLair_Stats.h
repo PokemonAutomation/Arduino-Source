@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Stats_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Stats_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 
 //#include <iostream>

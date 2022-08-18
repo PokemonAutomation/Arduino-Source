@@ -29,8 +29,8 @@
 #include <atomic>
 #include <condition_variable>
 #include <thread>
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ClientSource/Connection/MessageLogger.h"
 #include "ClientSource/Connection/PABotBaseConnection.h"
 #include "BotBase.h"

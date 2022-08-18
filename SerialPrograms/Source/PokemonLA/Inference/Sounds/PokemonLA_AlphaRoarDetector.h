@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 #define PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 

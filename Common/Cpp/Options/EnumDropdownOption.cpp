@@ -6,8 +6,8 @@
 
 #include <map>
 #include <atomic>
-#include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "EnumDropdownOption.h"
 
@@ -16,7 +16,8 @@ namespace PokemonAutomation{
 
 struct DropdownCell::Data{
     std::vector<DropdownEntry> m_case_list;
-    std::map<std::string, size_t> m_case_map;
+    std::map<std::string, size_t> m_slug_to_index;
+    std::map<std::string, size_t> m_display_to_index;
     const size_t m_default;
     std::atomic<size_t> m_current;
 
@@ -32,14 +33,22 @@ struct DropdownCell::Data{
         }
         for (size_t index = 0; index < cases.size(); index++){
             m_case_list.emplace_back(std::move(cases[index]));
-            const std::string& item = m_case_list.back().name;
-            auto ret = m_case_map.emplace(
+            const DropdownEntry& item = m_case_list.back();
+            auto ret = m_slug_to_index.emplace(
                 std::piecewise_construct,
-                std::forward_as_tuple(item),
+                std::forward_as_tuple(item.slug),
                 std::forward_as_tuple(index)
             );
             if (!ret.second){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label: " + item);
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + item.slug);
+            }
+            ret = m_display_to_index.emplace(
+                std::piecewise_construct,
+                std::forward_as_tuple(item.display_name),
+                std::forward_as_tuple(index)
+            );
+            if (!ret.second){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Name: " + item.display_name);
             }
         }
     }
@@ -51,8 +60,8 @@ struct DropdownCell::Data{
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Index is too large: " + std::to_string(default_index));
         }
         for (size_t index = 0; index < cases.size(); index++){
-            const std::string& item = cases[index].name;
-            auto ret = m_case_map.emplace(
+            const std::string& item = cases[index].slug;
+            auto ret = m_slug_to_index.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(item),
                 std::forward_as_tuple(index)
@@ -73,8 +82,8 @@ struct DropdownCell::Data{
         size_t index = 0;
         for (auto iter = cases.begin(); iter != cases.end(); ++iter){
             m_case_list.emplace_back(*iter);
-            const std::string& item = m_case_list.back().name;
-            auto ret = m_case_map.emplace(
+            const std::string& item = m_case_list.back().slug;
+            auto ret = m_slug_to_index.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(item),
                 std::forward_as_tuple(index++)
@@ -95,7 +104,7 @@ DropdownCell::DropdownCell(const DropdownCell& x)
     , m_data(CONSTRUCT_TOKEN, x.default_index())
 {
     m_data->m_case_list = x.m_data->m_case_list;
-    m_data->m_case_map = x.m_data->m_case_map;
+    m_data->m_slug_to_index = x.m_data->m_slug_to_index;
     m_data->m_current.store(x.m_data->m_current.load(std::memory_order_relaxed), std::memory_order_relaxed);
 }
 
@@ -130,11 +139,11 @@ size_t DropdownCell::current_index() const{
     return m_data->m_current.load(std::memory_order_relaxed);
 }
 const std::string& DropdownCell::case_name(size_t index) const{
-    return m_data->m_case_list[index].name;
+    return m_data->m_case_list[index].slug;
 }
 const std::string& DropdownCell::current_case() const{
     const Data& data = *m_data;
-    return data.m_case_list[data.m_current].name;
+    return data.m_case_list[data.m_current].slug;
 }
 
 #if 1
@@ -159,15 +168,22 @@ void DropdownCell::load_json(const JsonValue& json){
         return;
     }
     Data& data = *m_data;
-    auto iter = data.m_case_map.find(*str);
-    if (iter != data.m_case_map.end() && data.m_case_list[iter->second].enabled){
+    auto iter = data.m_slug_to_index.find(*str);
+    if (iter != data.m_slug_to_index.end() && data.m_case_list[iter->second].enabled){
+        data.m_current.store(iter->second, std::memory_order_relaxed);
+        push_update();
+    }
+
+    //  Backward compatibility with display names.
+    iter = data.m_display_to_index.find(*str);
+    if (iter != data.m_display_to_index.end() && data.m_case_list[iter->second].enabled){
         data.m_current.store(iter->second, std::memory_order_relaxed);
         push_update();
     }
 }
 JsonValue DropdownCell::to_json() const{
     const Data& data = *m_data;
-    return data.m_case_list[data.m_current].name;
+    return data.m_case_list[data.m_current].slug;
 }
 
 void DropdownCell::restore_defaults(){

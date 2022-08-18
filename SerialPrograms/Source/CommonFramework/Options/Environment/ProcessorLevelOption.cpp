@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 std::vector<DropdownEntry> make_processor_labels(){
     std::vector<DropdownEntry> ret;
     for (const CpuCapabilityOption& option : AVAILABLE_CAPABILITIES()){
-        ret.emplace_back(option.label, option.available);
+        ret.emplace_back(option.label, option.label, option.available);
     }
     return ret;
 }

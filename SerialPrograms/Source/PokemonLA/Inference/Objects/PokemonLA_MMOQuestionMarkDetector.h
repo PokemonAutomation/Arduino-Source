@@ -9,8 +9,8 @@
 #define PokemonAutomation_PokemonLA_MMOQuestionMarkDetector_H
 
 #include <array>
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"

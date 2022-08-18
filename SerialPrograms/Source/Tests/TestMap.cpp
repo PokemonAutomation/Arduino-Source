@@ -5,7 +5,7 @@
  */
 
 
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "PokemonLA_Tests.h"
 #include "PokemonSwSh_Tests.h"
 #include "TestMap.h"

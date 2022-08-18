@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"

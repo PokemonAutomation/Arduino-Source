@@ -8,7 +8,7 @@
 #define PokemonAutomation_Kernels_PackedBinaryMatrixCore_TPP
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels_PackedBinaryMatrixCore.h"
 
 #include <iostream>

@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 

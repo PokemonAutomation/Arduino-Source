@@ -4,8 +4,8 @@
  *
  */
 
-#include "Exceptions.h"
-#include "PanicDump.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PanicDump.h"
 #include "FireForgetDispatcher.h"
 
 #include <iostream>

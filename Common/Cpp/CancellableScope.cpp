@@ -9,9 +9,9 @@
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
-#include "SpinLock.h"
-#include "Pimpl.tpp"
 #include "Exceptions.h"
+#include "Containers/Pimpl.tpp"
+#include "Concurrency/SpinLock.h"
 #include "CancellableScope.h"
 
 #include <iostream>

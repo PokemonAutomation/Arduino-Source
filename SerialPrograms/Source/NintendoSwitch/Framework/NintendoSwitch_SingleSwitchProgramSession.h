@@ -15,7 +15,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

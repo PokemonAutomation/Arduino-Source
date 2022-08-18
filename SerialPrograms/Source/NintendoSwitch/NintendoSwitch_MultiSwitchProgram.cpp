@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/FixedLimitVector.tpp"
-#include "Common/Cpp/AsyncDispatcher.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"

@@ -7,7 +7,7 @@
 #if _WIN32
 #include <Windows.h>
 #endif
-#include "PanicDump.h"
+#include "Common/Cpp/PanicDump.h"
 #include "ParallelTaskRunner.h"
 
 namespace PokemonAutomation{

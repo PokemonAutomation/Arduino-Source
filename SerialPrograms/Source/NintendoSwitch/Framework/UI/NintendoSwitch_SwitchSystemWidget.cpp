@@ -9,7 +9,7 @@
 #include <QGroupBox>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/FireForgetDispatcher.h"
+#include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"

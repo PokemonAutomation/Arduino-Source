@@ -8,7 +8,7 @@
 #define PokemonAutomation_Logging_OutputRedirector_H
 
 #include <streambuf>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "LoggerQt.h"
 
 namespace PokemonAutomation{

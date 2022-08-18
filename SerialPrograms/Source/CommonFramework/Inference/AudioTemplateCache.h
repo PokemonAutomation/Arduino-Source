@@ -9,7 +9,7 @@
 
 #include <string>
 #include <map>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 
 namespace PokemonAutomation{
 

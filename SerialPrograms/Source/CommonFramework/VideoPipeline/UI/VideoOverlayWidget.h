@@ -9,8 +9,8 @@
 
 #include <map>
 #include <QWidget>
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 

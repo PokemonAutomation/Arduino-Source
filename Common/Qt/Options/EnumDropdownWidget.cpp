@@ -34,7 +34,7 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, DropdownCell& va
     , m_value(value)
 {
     for (const auto& item : m_value.case_list()){
-        this->addItem(QString::fromStdString(item.name));
+        this->addItem(QString::fromStdString(item.display_name));
         if (item.enabled){
             continue;
         }

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_StringOption_H
 #define PokemonAutomation_Options_StringOption_H
 
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{

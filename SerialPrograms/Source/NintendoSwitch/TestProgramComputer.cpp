@@ -11,9 +11,9 @@
 #include <QJsonObject>
 #include <QDir>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Common/Cpp/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -26,6 +26,7 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
 #include "ClientSource/Libraries/Logging.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h"
@@ -41,13 +42,13 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
-#include "Common/Cpp/PeriodicScheduler.h"
+#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 #include "Kernels/Kernels_Alignment.h"
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -123,7 +124,191 @@ using namespace Kernels;
 
 
 
+struct EnumEntry{
+    std::string slug;
+    std::string display;
+    bool enabled;
+};
 
+//template <typename EnumType>
+
+#if 0
+using EnumType = int;
+
+class NamedEnumDatabase{
+public:
+    NamedEnumDatabase();
+    NamedEnumDatabase(std::initializer_list<std::pair<EnumType, EnumEntry>> list){
+        size_t index = 0;
+        for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
+            add(iter->first, iter->second);
+        }
+    }
+
+    void add(EnumType value, EnumEntry entry){
+        auto ret = m_list.emplace(value, std::move(entry));
+        if (!ret.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum: " + std::to_string((size_t)value));
+        }
+
+        auto ret1 = m_slug_to_enum.emplace(ret.first->second.slug, ret.first);
+        if (!ret1.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + ret.first->second.slug);
+        }
+
+        auto ret2 = m_display_to_enum.emplace(ret.first->second.display, ret.first);
+        if (!ret2.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Display: " + ret.first->second.display);
+        }
+    }
+
+    const EnumEntry& entry(EnumType value) const{
+        auto iter = m_list.find(value);
+        if (iter == m_list.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Enum: " + std::to_string((size_t)value));
+        }
+        return iter->second;
+    }
+    EnumType lookup_slug(const std::string& slug) const{
+        auto iter = m_slug_to_enum.find(slug);
+        if (iter == m_slug_to_enum.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Slug: " + slug);
+        }
+        return iter->second->first;
+    }
+    EnumType lookup_display(const std::string& display) const{
+        auto iter = m_slug_to_enum.find(display);
+        if (iter == m_slug_to_enum.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Display: " + display);
+        }
+        return iter->second->first;
+    }
+
+
+private:
+    using Node = typename std::map<EnumType, EnumEntry>::const_iterator;
+    std::map<EnumType, EnumEntry> m_list;
+    std::map<std::string, Node> m_slug_to_enum;
+    std::map<std::string, Node> m_display_to_enum;
+};
+#endif
+
+
+class IntegerEnumDatabaseCore{
+public:
+    IntegerEnumDatabaseCore();
+
+    void add(size_t value, EnumEntry entry){
+        auto ret = m_list.emplace(value, std::move(entry));
+        if (!ret.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum: " + std::to_string(value));
+        }
+
+        auto ret1 = m_slug_to_enum.emplace(ret.first->second.slug, ret.first);
+        if (!ret1.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + ret.first->second.slug);
+        }
+
+        auto ret2 = m_display_to_enum.emplace(ret.first->second.display, ret.first);
+        if (!ret2.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Display: " + ret.first->second.display);
+        }
+    }
+
+    const EnumEntry& entry(size_t value) const{
+        auto iter = m_list.find(value);
+        if (iter == m_list.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Enum: " + std::to_string(value));
+        }
+        return iter->second;
+    }
+    size_t lookup_slug(const std::string& slug) const{
+        auto iter = m_slug_to_enum.find(slug);
+        if (iter == m_slug_to_enum.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Slug: " + slug);
+        }
+        return iter->second->first;
+    }
+    size_t lookup_display(const std::string& display) const{
+        auto iter = m_slug_to_enum.find(display);
+        if (iter == m_slug_to_enum.end()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Display: " + display);
+        }
+        return iter->second->first;
+    }
+
+
+private:
+    using Node = typename std::map<size_t, EnumEntry>::const_iterator;
+    std::map<size_t, EnumEntry> m_list;
+    std::map<std::string, Node> m_slug_to_enum;
+    std::map<std::string, Node> m_display_to_enum;
+};
+
+
+
+class IntegerEnumDatabase{
+public:
+    ~IntegerEnumDatabase();
+    IntegerEnumDatabase();
+
+    void add(size_t value, EnumEntry entry);
+
+    const EnumEntry& entry(size_t value) const;
+    size_t lookup_slug(const std::string& slug) const;
+    size_t lookup_display(const std::string& display) const;
+
+private:
+    Pimpl<IntegerEnumDatabaseCore> m_core;
+};
+
+IntegerEnumDatabase::~IntegerEnumDatabase() = default;
+IntegerEnumDatabase::IntegerEnumDatabase() = default;
+void IntegerEnumDatabase::add(size_t value, EnumEntry entry){
+    m_core->add(value, entry);
+}
+const EnumEntry& IntegerEnumDatabase::entry(size_t value) const{
+    return m_core->entry(value);
+}
+size_t IntegerEnumDatabase::lookup_slug(const std::string& slug) const{
+    return m_core->lookup_slug(slug);
+}
+size_t IntegerEnumDatabase::lookup_display(const std::string& display) const{
+    return m_core->lookup_display(display);
+}
+
+
+
+
+
+template <typename EnumType>
+class NamedEnumDatabase{
+public:
+    NamedEnumDatabase();
+    NamedEnumDatabase(std::initializer_list<std::pair<EnumType, EnumEntry>> list){
+        size_t index = 0;
+        for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
+            m_database.add((size_t)iter->first, iter->second);
+        }
+    }
+
+    void add(EnumType value, EnumEntry entry){
+        m_database.add((size_t)value, entry);
+    }
+
+    const EnumEntry& entry(EnumType value) const{
+        return m_database.entry(value);
+    }
+    EnumType lookup_slug(const std::string& slug) const{
+        return m_database.lookup_slug(slug);
+    }
+    EnumType lookup_display(const std::string& display) const{
+        return m_database.lookup_display(display);
+    }
+
+private:
+    IntegerEnumDatabase m_database;
+};
 
 
 

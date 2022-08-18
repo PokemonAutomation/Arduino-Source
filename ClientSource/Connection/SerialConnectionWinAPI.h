@@ -12,11 +12,11 @@
 #include <thread>
 #include <windows.h>
 #include "Common/Compiler.h"
-#include "Common/Cpp/SpinPause.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Unicode.h"
-#include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "StreamInterface.h"
 

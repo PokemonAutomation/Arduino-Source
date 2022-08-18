@@ -14,7 +14,7 @@
 
 #include <vector>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -22,14 +22,27 @@ namespace PokemonAutomation{
 
 
 struct DropdownEntry{
-    std::string name;
+    std::string slug;
+    std::string display_name;
     bool enabled = true;
-    DropdownEntry(const char* p_name)
-        : name(p_name)
-    {}
-    DropdownEntry(std::string p_name, bool p_enabled = true)
-        : name(std::move(p_name))
+    DropdownEntry(std::string p_slug, std::string p_display_name, bool p_enabled)
+        : slug(std::move(p_slug))
+        , display_name(std::move(p_display_name))
         , enabled(p_enabled)
+    {}
+    DropdownEntry(std::string p_slug, std::string p_display_name)
+        : slug(std::move(p_slug))
+        , display_name(std::move(p_display_name))
+        , enabled(true)
+    {}
+    DropdownEntry(std::string p_display_name)
+        : slug(p_display_name)
+        , display_name(std::move(p_display_name))
+        , enabled(true)
+    {}
+    DropdownEntry(const char* p_display_name)
+        : slug(p_display_name)
+        , display_name(p_display_name)
     {}
 };
 
@@ -80,6 +93,7 @@ protected:
 class DropdownOption : public DropdownCell{
 public:
     DropdownOption(const DropdownOption& x) = delete;
+#if 1
     DropdownOption(
         std::string label,
         std::vector<std::string> cases,
@@ -88,6 +102,7 @@ public:
         : DropdownCell(cases, default_index)
         , m_label(std::move(label))
     {}
+#endif
     DropdownOption(
         std::string label,
         std::vector<DropdownEntry> cases,

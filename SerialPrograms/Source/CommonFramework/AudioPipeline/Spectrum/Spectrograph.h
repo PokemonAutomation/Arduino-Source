@@ -11,7 +11,7 @@
 #define PokemonAutomation_AudioPipeline_Spectrograph_H
 
 #include <stdint.h>
-#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
 
 namespace PokemonAutomation{
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_BattleWonDetector_H
 #define PokemonAutomation_PokemonSwSh_BattleWonDetector_H
 
-#include "Common/Cpp/FixedLimitVector.h"
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"

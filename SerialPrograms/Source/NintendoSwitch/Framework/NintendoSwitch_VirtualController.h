@@ -12,7 +12,7 @@
 #include <map>
 #include <thread>
 #include <Qt>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Logging/LoggerQt.h"

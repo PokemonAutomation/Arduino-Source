@@ -10,7 +10,7 @@
 #include <memory>
 #include <set>
 #include <QObject>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
 namespace PokemonAutomation{

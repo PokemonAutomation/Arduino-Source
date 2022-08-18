@@ -21,6 +21,7 @@ win32-msvc{
 }
 
 SOURCES += \
+    ../Common/Cpp/Concurrency/SpinLock.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
@@ -35,7 +36,6 @@ SOURCES += \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
-    ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
@@ -77,6 +77,8 @@ SOURCES += \
     Source/UI/MainWindow.cpp
 
 HEADERS += \
+    ../Common/Cpp/Containers/Pimpl.h \
+    ../Common/Cpp/Containers/Pimpl.tpp \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
@@ -91,7 +93,6 @@ HEADERS += \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PrettyPrint.h \
-    ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \

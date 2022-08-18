@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CommonFramework_AudioInferencePivot_H
 #define PokemonAutomation_CommonFramework_AudioInferencePivot_H
 
-#include "Common/Cpp/SpinLock.h"
-#include "Common/Cpp/PeriodicScheduler.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "AudioInferenceCallback.h"
 

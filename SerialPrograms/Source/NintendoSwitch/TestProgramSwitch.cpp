@@ -8,9 +8,9 @@
 
 //#include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AsyncDispatcher.h"
-#include "Common/Cpp/PeriodicScheduler.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"

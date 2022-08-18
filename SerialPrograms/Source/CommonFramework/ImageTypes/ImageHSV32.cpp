@@ -6,9 +6,9 @@
 
 #include <utility>
 #include <cmath>
-#include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ImageViewRGB32.h"
 #include "ImageViewHSV32.h"
 #include "ImageHSV32.h"

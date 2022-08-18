@@ -66,26 +66,35 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/Cpp/AbstractLogger.h
-    ../Common/Cpp/AlignedMalloc.cpp
-    ../Common/Cpp/AlignedMalloc.h
-    ../Common/Cpp/AlignedVector.h
-    ../Common/Cpp/AlignedVector.tpp
-    ../Common/Cpp/AsyncDispatcher.cpp
-    ../Common/Cpp/AsyncDispatcher.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.h
+    ../Common/Cpp/Concurrency/AsyncDispatcher.cpp
+    ../Common/Cpp/Concurrency/AsyncDispatcher.h
+    ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
+    ../Common/Cpp/Concurrency/FireForgetDispatcher.h
+    ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp
+    ../Common/Cpp/Concurrency/ParallelTaskRunner.h
+    ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
+    ../Common/Cpp/Concurrency/PeriodicScheduler.h
+    ../Common/Cpp/Concurrency/SpinLock.cpp
+    ../Common/Cpp/Concurrency/SpinLock.h
+    ../Common/Cpp/Concurrency/SpinPause.h
+    ../Common/Cpp/Containers/AlignedMalloc.cpp
+    ../Common/Cpp/Containers/AlignedMalloc.h
+    ../Common/Cpp/Containers/AlignedVector.h
+    ../Common/Cpp/Containers/AlignedVector.tpp
+    ../Common/Cpp/Containers/DllSafeString.h
+    ../Common/Cpp/Containers/FixedLimitVector.h
+    ../Common/Cpp/Containers/FixedLimitVector.tpp
+    ../Common/Cpp/Containers/Pimpl.h
+    ../Common/Cpp/Containers/Pimpl.tpp
     ../Common/Cpp/CpuId/CpuId.cpp
     ../Common/Cpp/CpuId/CpuId.h
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
-    ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
-    ../Common/Cpp/FireForgetDispatcher.cpp
-    ../Common/Cpp/FireForgetDispatcher.h
-    ../Common/Cpp/FixedLimitVector.h
-    ../Common/Cpp/FixedLimitVector.tpp
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -126,19 +135,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/TimeExpressionOption.h
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
-    ../Common/Cpp/ParallelTaskRunner.cpp
-    ../Common/Cpp/ParallelTaskRunner.h
-    ../Common/Cpp/PeriodicScheduler.cpp
-    ../Common/Cpp/PeriodicScheduler.h
-    ../Common/Cpp/Pimpl.h
-    ../Common/Cpp/Pimpl.tpp
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
     ../Common/Cpp/PrintDebuggers.h
     ../Common/Cpp/SIMDDebuggers.h
-    ../Common/Cpp/SpinLock.cpp
-    ../Common/Cpp/SpinLock.h
-    ../Common/Cpp/SpinPause.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/StringTools.cpp

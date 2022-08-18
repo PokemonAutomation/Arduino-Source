@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_BlackBorderCheck_H
 #define PokemonAutomation_CommonFramework_BlackBorderCheck_H
 
-#include "Common/Cpp/FixedLimitVector.h"
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Globals.h"
 
 namespace PokemonAutomation{

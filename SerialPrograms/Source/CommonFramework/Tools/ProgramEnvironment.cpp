@@ -6,9 +6,9 @@
 
 //#include <mutex>
 #include <condition_variable>
-#include "Common/Cpp/Pimpl.tpp"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"

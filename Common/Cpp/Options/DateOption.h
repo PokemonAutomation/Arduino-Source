@@ -8,7 +8,7 @@
 #define PokemonAutomation_Options_DateOption_H
 
 #include <QDate>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
 namespace PokemonAutomation{

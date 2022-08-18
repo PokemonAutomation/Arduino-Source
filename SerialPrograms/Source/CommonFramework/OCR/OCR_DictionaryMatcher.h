@@ -8,7 +8,7 @@
 #define PokemonAutomation_OCR_DictionaryMatcher_H
 
 #include <map>
-#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Language.h"
 #include "OCR_Routines.h"
 #include "OCR_DictionaryOCR.h"

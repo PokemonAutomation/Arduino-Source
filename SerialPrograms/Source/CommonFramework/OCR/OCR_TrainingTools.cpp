@@ -6,7 +6,7 @@
 
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/ParallelTaskRunner.h"
+#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
