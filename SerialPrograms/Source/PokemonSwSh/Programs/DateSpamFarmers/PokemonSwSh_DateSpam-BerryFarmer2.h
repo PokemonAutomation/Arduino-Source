@@ -1,4 +1,4 @@
-/*  Berry Farmer
+/*  Berry Farmer 2
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

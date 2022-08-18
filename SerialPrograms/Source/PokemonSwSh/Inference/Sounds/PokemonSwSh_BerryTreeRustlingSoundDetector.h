@@ -1,4 +1,4 @@
-/*  Tree Shake Sound Detector
+/*  Berry Tree Rustling Sound Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
