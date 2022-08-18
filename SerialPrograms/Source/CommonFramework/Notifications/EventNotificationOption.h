@@ -8,6 +8,7 @@
 #define PokemonAutomation_EventNotificationOption_H
 
 #include <vector>
+#include <atomic>
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
