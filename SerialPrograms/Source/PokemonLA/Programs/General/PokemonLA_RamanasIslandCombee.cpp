@@ -151,7 +151,7 @@ bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, Bot
 
     if (pokemon.name_candidates.find("combee") == pokemon.name_candidates.end()){
         env.console.log("Not a Combee, leaving battle.");
-        exit_battle(env.console, context);
+        exit_battle(env.console, context, ExitBattleMethod::RunAway);
         return false;
     }
 

@@ -67,14 +67,6 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
         "Keep in mind that the shiny sound radius is 30 and you will need some headroom.</font>",
         60
     )
-    , RESET_METHOD(
-          "<b>Reset Method:</b>",
-          {
-              "Soft Reset",
-              "Go back to village",
-          },
-          0
-    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the flag. (defined as being more than the \"Enroute Distance\" specified above)",
@@ -172,7 +164,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
             on_shiny_sound(env, env.console, context, *shiny_action, shiny_coefficient);
         }
 
-        if(RESET_METHOD == 0){
+        if(RESET_METHOD == ResetMethod::SoftReset){
             env.console.log("Resetting by closing the game.");
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

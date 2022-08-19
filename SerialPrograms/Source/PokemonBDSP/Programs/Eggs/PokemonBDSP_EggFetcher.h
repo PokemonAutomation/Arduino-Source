@@ -40,7 +40,7 @@ public:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    ShortcutDirection SHORTCUT;
+    ShortcutDirectionOption SHORTCUT;
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
     TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
 

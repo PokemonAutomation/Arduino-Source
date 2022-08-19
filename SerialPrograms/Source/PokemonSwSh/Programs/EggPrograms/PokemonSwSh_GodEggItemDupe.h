@@ -34,7 +34,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
     SimpleIntegerOption<uint8_t> PARTY_ROUND_ROBIN;
     BooleanCheckBoxOption DETACH_BEFORE_RELEASE;

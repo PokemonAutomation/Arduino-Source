@@ -34,14 +34,6 @@ TrainIVCheckerOCR::TrainIVCheckerOCR()
         "IVCheckerOCR/",
         "IVCheckerOCR/"
     )
-    , MODE(
-        "<b>Mode:</b>",
-        {
-            "Start Fresh: Use only baseline strings. (1st candidate of each entry in above path)",
-            "Incremental: Build off of the existing training data in the above path.",
-        },
-        0
-    )
     , THREADS(
         "<b>Worker Threads:</b>",
         std::thread::hardware_concurrency()
@@ -59,7 +51,7 @@ void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope
     session.generate_small_dictionary(
         "Pokemon/IVCheckerOCR.json",
         "IVCheckerOCR.json",
-        MODE != 0, THREADS,
+        MODE == TrainOCRMode::Incremental, THREADS,
         OCR::BLACK_TEXT_FILTERS(),
         IVCheckerReader::MAX_LOG10P,
         IVCheckerReader::MAX_LOG10P_SPREAD

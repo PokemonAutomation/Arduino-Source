@@ -38,7 +38,7 @@ EventBeamFinder::EventBeamFinder()
         "5 * TICKS_PER_SECOND"
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(WAIT_TIME_IN_DEN);
 }
 
@@ -70,7 +70,7 @@ void EventBeamFinder::drop_wishing_piece(BotBaseContext& context) const{
     pbf_mash_button(context, BUTTON_B, 600);
 }
 void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(context, BUTTON_B, 700);

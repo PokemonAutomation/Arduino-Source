@@ -48,10 +48,10 @@ SelfTouchTrade::SelfTouchTrade()
     , HOSTING_SWITCH(
         "<b>Host Switch:</b><br>This is the Switch hosting the " + STRING_POKEMON + " to be touch-traded to the other.",
         {
-            "Switch 0 (Left)",
-            "Switch 1 (Right)",
+            {HostingSwitch::Switch0, "switch0", "Switch 0 (Left)"},
+            {HostingSwitch::Switch1, "switch1", "Switch 1 (Right)"},
         },
-        0
+        HostingSwitch::Switch0
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
@@ -80,8 +80,7 @@ bool SelfTouchTrade::trade_one(
 ){
     TradeStats& stats = env.current_stats<TradeStats>();
 
-    ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
-//    ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
+    ConsoleHandle& host = HOSTING_SWITCH == HostingSwitch::Switch0 ? env.consoles[0] : env.consoles[1];
 
     //  Read the name and see if the receiver still needs it.
     TradeNameReader name_reader(host, host, LANGUAGE);
@@ -162,9 +161,10 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t row = 0;
     uint8_t col = 0;
 
-    BotBaseContext host_context(scope, (HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1]).botbase());
-    ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
-    ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
+    bool host0 = HOSTING_SWITCH == HostingSwitch::Switch0;
+    BotBaseContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).botbase());
+    ConsoleHandle& host = host0 ? env.consoles[0] : env.consoles[1];
+    ConsoleHandle& recv = host0 ? env.consoles[1] : env.consoles[0];
 
     for (uint8_t boxes = 0; boxes < BOXES_TO_TRADE;){
         env.update_stats();

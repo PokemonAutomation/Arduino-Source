@@ -67,26 +67,18 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
     , START_LOCATION(
         "<b>Start Location:</b>",
         {
-            "Start in front of the Hearthome City " + STRING_POKEMON + " center.",
-            "Start in the row above the rich couple in Route 212.",
+            {StartLocation::Hearthome, "hearthome", "In front of the Hearthome City " + STRING_POKEMON + " center."},
+            {StartLocation::OldCouple, "old-couple", "In the row above the rich couple in Route 212."},
         },
-        0
+        StartLocation::Hearthome
     )
     , HEALING_METHOD(
         "<b> Healing method:</b>",
         {
-            "Use the Hearthome City " + STRING_POKEMON + " center.",
-            "Use Global Room. (Disable WiFi if you want to keep playing an old version of the game.)"
+            {HealMethod::Hearthome, "hearthome", "Hearthome City " + STRING_POKEMON + " center."},
+            {HealMethod::GlobalRoom, "global-room", "Use Global Room. (will force update your game)"},
         },
-        0
-    )
-    , ON_LEARN_MOVE(
-        "<b>On Learn Move:</b>",
-        {
-            "Don't learn moves.",
-            "Stop Program",
-        },
-        0
+        HealMethod::Hearthome
     )
     , MOVE1_PP("<b>Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
     , MOVE2_PP("<b>Move 2 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
@@ -180,7 +172,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 //            return;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
-            if (ON_LEARN_MOVE == 0){
+            if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
                 pbf_move_right_joystick(context, 128, 255, 20, 105);
                 pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;
@@ -244,7 +236,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
     ConsoleHandle& console, BotBaseContext& context,
     uint8_t pp[4])
 {
-    if (HEALING_METHOD == 0){
+    if (HEALING_METHOD == HealMethod::Hearthome){
         // Go to Hearhome City Pokecenter to heal the party.
         fly_to_center_heal_and_return(console, context, pp);
         return false;
@@ -292,11 +284,11 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     pbf_press_button(context, BUTTON_B, 5, 5);
 
     bool need_to_charge = true;
-    if (START_LOCATION == 0){
+    if (START_LOCATION == StartLocation::Hearthome){
         heal_at_center_and_return(env.console, context, pp);
         need_to_charge = false;
     }else{
-        if (HEALING_METHOD == 1){
+        if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
         pbf_move_left_joystick(context, 255, 128, 180, 0);

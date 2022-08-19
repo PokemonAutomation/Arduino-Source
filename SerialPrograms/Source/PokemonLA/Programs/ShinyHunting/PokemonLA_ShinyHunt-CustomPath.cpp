@@ -62,15 +62,7 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath_Descriptor::make_stats() const
 
 
 ShinyHuntCustomPath::ShinyHuntCustomPath()
-    : RESET_METHOD(
-          "<b>Reset Method:</b>",
-          {
-              "Soft Reset",
-              "Go back to village",
-          },
-          0
-    )
-    , TEST_PATH(
+    : TEST_PATH(
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
@@ -283,7 +275,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             goto_camp_from_jubilife(env, env.console, context, PATH.travel_location());
             run_path(env, context);
 
-            if(RESET_METHOD == 0){
+            if(RESET_METHOD == ResetMethod::SoftReset){
                 env.console.log("Resetting by closing the game.");
                 pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

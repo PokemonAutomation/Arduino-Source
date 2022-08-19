@@ -81,7 +81,7 @@ StatsResetCalyrex::StatsResetCalyrex()
         true
     )
     , CALYREX_HP("<b>Calyrex HP:</b>")
-    , CALYREX_ATTACK("<b>Calyrex Attack:</b>", 1)
+    , CALYREX_ATTACK("<b>Calyrex Attack:</b>", IVCheckerFilter::NoGood)
     , CALYREX_DEFENSE("<b>Calyrex Defense:</b>")
     , CALYREX_SPATK("<b>Calyrex Sp. Atk:</b>")
     , CALYREX_SPDEF("<b>Calyrex Sp. Def:</b>")
@@ -91,7 +91,7 @@ StatsResetCalyrex::StatsResetCalyrex()
         true
     )
     , HORSE_HP("<b>Horse HP:</b>")
-    , HORSE_ATTACK("<b>Horse Attack:</b>", 1)
+    , HORSE_ATTACK("<b>Horse Attack:</b>", IVCheckerFilter::NoGood)
     , HORSE_DEFENSE("<b>Horse Defense:</b>")
     , HORSE_SPATK("<b>Horse Sp. Atk:</b>")
     , HORSE_SPDEF("<b>Horse Sp. Def:</b>")
@@ -106,7 +106,7 @@ StatsResetCalyrex::StatsResetCalyrex()
     })
 {
 
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(BALL_SELECT);
@@ -134,7 +134,7 @@ StatsResetCalyrex::StatsResetCalyrex()
 
 
 void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{

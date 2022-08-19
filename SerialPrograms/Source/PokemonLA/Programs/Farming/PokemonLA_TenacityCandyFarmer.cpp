@@ -27,15 +27,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
 
+using namespace Pokemon;
 
-namespace {
-    // Indices of FOURTH_MOVE_ON.
-    // These const ints are used to make code more readable.
-    const int OPPONENT_MAMOSWINE = 1;
-    const int OPPONENT_AVALUGG = 2;
-}
 
 TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -75,11 +69,11 @@ TenacityCandyFarmer::TenacityCandyFarmer()
     : FOURTH_MOVE_ON(
         "<b>Fourth Move On:</b><br>Use Arceus' fourth move to grind research tasks",
         {
-            "None",
-            "Mamoswine (fourth move needs to be set to Flamethrower)",
-            "Avalugg (fourth move needs to be set to Rock Smash)"
+            {FourthMoveOn::None,        "none", "None"},
+            {FourthMoveOn::Mamoswine,   "mamoswine", "Mamoswine (fourth move needs to be set to Flamethrower)"},
+            {FourthMoveOn::Avalugg,     "avalugg", "Avalugg (fourth move needs to be set to Rock Smash)"},
         },
-        0
+        FourthMoveOn::None
     )
     , SAVE_EVERY_FEW_BATTLES(
         "<b>Save every few battles:</b><br>After every this number of battles, save the game. Enter zero to never save the game.",
@@ -259,13 +253,13 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             if (cur_pokemon == 0){ // Arceus is still alive
                 size_t target_move = target_battle_moves[cur_battle][std::min(num_turns, 2)];
 
-                if (FOURTH_MOVE_ON == OPPONENT_MAMOSWINE && cur_battle == 0 && num_turns == 1){
+                if (FOURTH_MOVE_ON == FourthMoveOn::Mamoswine && cur_battle == 0 && num_turns == 1){
                     env.console.log("Target fourth move on Mamonswine");
                     target_move = 3;
                     stats.fourth_moves++;
                     env.update_stats();
                 }
-                else if (FOURTH_MOVE_ON == OPPONENT_AVALUGG && cur_battle == 1 && num_turns >= 1){
+                else if (FOURTH_MOVE_ON == FourthMoveOn::Avalugg && cur_battle == 1 && num_turns >= 1){
                     // Use Flash Cannon to finish Froslass first, then use fourth move, Rock Smash to grind Avalugg.
                     target_move = (num_turns == 1 ? 2 : 3);
                     if (num_turns == 2){

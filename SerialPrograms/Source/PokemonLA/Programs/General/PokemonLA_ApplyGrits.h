@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_ApplyGrits_H
 #define PokemonAutomation_PokemonLA_ApplyGrits_H
 
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -31,7 +32,7 @@ private:
 
     void ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t pokemon_index);
 
-    DropdownOption NUM_POKEMON;
+    IntegerEnumDropdownOption NUM_POKEMON;
 
     EventNotificationsOption NOTIFICATIONS;
 };

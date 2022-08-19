@@ -43,7 +43,7 @@ public:
         EventNotificationOption& notification_error,
         uint16_t scroll_to_read_delay,
         Language language,
-        ShortcutDirection& shortcut,
+        ShortcutDirectionOption& shortcut,
         uint16_t travel_time_per_fetch,
         const EggHatchFilterTable& filters,
         uint8_t max_keepers,
@@ -89,7 +89,7 @@ private:
     EventNotificationOption& m_notification_error;
     uint16_t m_scroll_to_read_delay;
     Language m_language;
-    ShortcutDirection& m_shortcut;
+    ShortcutDirectionOption& m_shortcut;
     uint16_t m_travel_time_per_fetch;
     const EggHatchFilterTable& m_filters;
     uint8_t m_max_keepers;

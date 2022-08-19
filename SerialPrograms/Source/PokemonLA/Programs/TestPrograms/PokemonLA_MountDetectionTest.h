@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    DropdownOption FAILED_ACTION;
+    MountDetectorLoggingOption FAILED_ACTION;
 };
 
 

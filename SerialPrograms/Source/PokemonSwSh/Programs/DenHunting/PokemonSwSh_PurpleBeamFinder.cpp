@@ -111,7 +111,7 @@ PurpleBeamFinder::PurpleBeamFinder()
         5.0, 0
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(EXTRA_LINE);
     PA_ADD_OPTION(NOTIFICATIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -128,7 +128,7 @@ PurpleBeamFinder::PurpleBeamFinder()
 
 
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(context, BUTTON_B, 100);

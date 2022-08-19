@@ -48,13 +48,13 @@ WattFarmer::WattFarmer()
         0, 0
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
 void WattFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         pbf_wait(context, GRIP_MENU_WAIT);
     }else{

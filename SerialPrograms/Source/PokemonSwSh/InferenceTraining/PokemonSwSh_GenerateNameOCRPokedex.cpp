@@ -48,19 +48,19 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
     , POKEDEX(
         "<b>" + STRING_POKEDEX + ":</b>",
         {
-            "Galar",
-            "Isle of Armor",
-            "Crown Tundra",
+            {Pokedex::Galar, "galar", "Galar"},
+            {Pokedex::IsleOfArmor, "isle-of-armor", "Isle of Armor"},
+            {Pokedex::CrownTundra, "crown-tundra", "Crown Tundra"},
         },
-        0
+        Pokedex::Galar
     )
     , MODE(
         "<b>Mode:</b>",
         {
-            "Read names and save to JSON.",
-            "Generate training data.",
+            {Mode::SaveToJson, "save-to-json", "Read names and save to JSON."},
+            {Mode::GenerateTrainingData, "generate-training-data", "Generate training data."},
         },
-        1
+        Mode::GenerateTrainingData
     )
 {
     PA_ADD_OPTION(LANGUAGE);
@@ -116,15 +116,15 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
     std::string dex_name;
     size_t dex_size = 0;
     switch (POKEDEX){
-    case 0:
+    case Pokedex::Galar:
         dex_name = "Galar";
         dex_size = 400;
         break;
-    case 1:
+    case Pokedex::IsleOfArmor:
         dex_name = "IsleOfArmor";
         dex_size = 211;
         break;
-    case 2:
+    case Pokedex::CrownTundra:
         dex_name = "CrownTundra";
         dex_size = 210;
         break;
@@ -142,7 +142,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
     JsonArray actual;
 //    OCR::DictionaryOCR& dictionary = m_reader.dictionary(LANGUAGE);
 
-    if (MODE == Mode::GENERATE_TRAINING_DATA){
+    if (MODE == Mode::GenerateTrainingData){
         std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json";
         JsonValue json = load_json_file(path);
         JsonArray& array = json.get_array_throw(path);
@@ -171,7 +171,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
 //        image1.save("test.png");
 
         switch (MODE){
-        case Mode::READ_AND_SAVE:
+        case Mode::SaveToJson:
             read(actual, env.console, image0);
             read(actual, env.console, image1);
             read(actual, env.console, image2);
@@ -180,7 +180,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
             read(actual, env.console, image5);
             read(actual, env.console, image6);
             break;
-        case Mode::GENERATE_TRAINING_DATA:
+        case Mode::GenerateTrainingData:
             dump_images(expected, c - 1 + 0, image0);
             dump_images(expected, c - 1 + 1, image1);
             dump_images(expected, c - 1 + 2, image2);
@@ -194,7 +194,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
         pbf_press_dpad(context, DPAD_RIGHT, 10, TICKS_PER_SECOND);
     }
 
-    if (MODE == Mode::READ_AND_SAVE){
+    if (MODE == Mode::SaveToJson){
         actual.dump("PokedexReadData.json");
     }
 

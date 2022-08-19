@@ -5,7 +5,7 @@
  */
 
 #include "ClientSource/Connection/BotBase.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 #ifndef PokemonAutomation_PokemonBDSP_ShortcutDirection_H
 #define PokemonAutomation_PokemonBDSP_ShortcutDirection_H
@@ -15,14 +15,25 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class ShortcutDirection : public DropdownOption{
+
+enum class ShortcutDirection{
+    NONE,
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT,
+};
+const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable();
+const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required();
+
+
+
+class ShortcutDirectionOption : public EnumDropdownOption<ShortcutDirection>{
 public:
-    ShortcutDirection(std::string label, bool required = true);
+    ShortcutDirectionOption(std::string label);
 
     void run(BotBaseContext& context, uint16_t delay);
 
-private:
-    bool m_required = true;
 };
 
 

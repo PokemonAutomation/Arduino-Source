@@ -47,26 +47,26 @@ void set_theme(size_t index){
 
 
 ThemeSelectorOption::ThemeSelectorOption()
-    : DropdownOption(
+    : IntegerEnumDropdownOption(
         "<b>Theme:</b>",
         {
-            "Default",
-            "Dark Mode",
+            {0, "default", "Default"},
+            {1, "dark", "Dark Mode"},
         },
         0
     )
 {}
 
-bool ThemeSelectorOption::set_index(size_t index){
-    if (!DropdownOption::set_index(index)){
+bool ThemeSelectorOption::set_value(size_t index){
+    if (!IntegerEnumDropdownOption::set_value(index)){
         return false;
     }
     set_theme(index);
     return true;
 }
 void ThemeSelectorOption::load_json(const JsonValue& json){
-    DropdownOption::load_json(json);
-    set_theme(*this);
+    IntegerEnumDropdownOption::load_json(json);
+    set_theme(current_value());
 }
 
 

@@ -29,54 +29,11 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 // #define DEBUG_INGO_BATTLE
-
-
-const char* INGO_OPPONENT_STRINGS[] = {
-    "Wenton",
-    "Bren",
-    "Zisu",
-    "Akari/Rei",
-    "Kamado",
-    "Beni",
-    "Ingo",
-    "Ingo - but tougher",
-    "Mai",
-    "Sabi",
-    "Ress",
-    "Ingo - but using alphas",
-};
-const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V10[] = {
-    {0, 0},     //  Wenton
-    {0, 1},     //  Bren
-    {0, 2},     //  Zisu
-    {0, 3},     //  Akari/Rei
-    {1, 0},     //  Kamado
-    {1, 1},     //  Beni
-    {1, 2},     //  Ingo
-    {-1, -1},   //  Ingo - but tougher
-    {-1, -1},   //  Mai
-    {-1, -1},   //  Sabi
-    {-1, -1},   //  Ress
-    {-1, -1},   //  Ingo - but using alphas
-};
-const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[] = {
-    {0, 0},     //  Wenton
-    {0, 1},     //  Bren
-    {0, 2},     //  Zisu
-    {0, 3},     //  Akari/Rei
-    {0, 4},     //  Kamado
-    {1, 0},     //  Beni
-    {1, 1},     //  Ingo
-    {1, 2},     //  Ingo - but tougher
-    {1, 3},     //  Mai
-    {1, 4},     //  Sabi
-    {2, 0},     //  Ress
-    {2, 1},     //  Ingo - but using alphas
-};
 
 
 
@@ -118,12 +75,7 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder_Descriptor::make_stats() const{
 
 
 IngoBattleGrinder::IngoBattleGrinder()
-    : OPPONENT(
-        "<b>Opponent:</b>",
-        std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
-        0
-    )
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    : NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -208,8 +160,8 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     env.log(std::string("Detected current version: ") + (version_10 ? "1.0" : "1.2"));
 
     IngoOpponentMenuLocation menu_location = version_10
-        ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
-        : INGO_OPPONENT_MENU_LOCATIONS_V12[OPPONENT];
+        ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT.current_value()]
+        : INGO_OPPONENT_MENU_LOCATIONS_V12[OPPONENT.current_value()];
 
     // Choose which opponent
     if (menu_location.page < 0){

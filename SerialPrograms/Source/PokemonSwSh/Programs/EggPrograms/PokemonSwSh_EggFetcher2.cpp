@@ -37,7 +37,7 @@ EggFetcher2::EggFetcher2()
         2000
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
 }
 
@@ -75,7 +75,7 @@ void EggFetcher2::run_eggfetcher(
 }
 
 void EggFetcher2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{

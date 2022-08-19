@@ -25,7 +25,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
+
 
 
 
@@ -67,12 +69,7 @@ std::unique_ptr<StatsTracker> IngoMoveGrinder_Descriptor::make_stats() const{
 
 
 IngoMoveGrinder::IngoMoveGrinder()
-    : OPPONENT(
-        "<b>Opponent:</b>",
-        std::vector<std::string>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
-        0
-    )
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    : NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -158,8 +155,8 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
     env.log(std::string("Detected current version: ") + (version_10 ? "1.0" : "1.2"));
 
     IngoOpponentMenuLocation menu_location = version_10
-        ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
-        : INGO_OPPONENT_MENU_LOCATIONS_V12[OPPONENT];
+        ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT.current_value()]
+        : INGO_OPPONENT_MENU_LOCATIONS_V12[OPPONENT.current_value()];
 
     // Choose which opponent
     if (menu_location.page < 0){

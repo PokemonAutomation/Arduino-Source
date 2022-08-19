@@ -88,7 +88,7 @@ DenRoller::DenRoller()
         "1 * TICKS_PER_SECOND"
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(CATCHABILITY);
@@ -112,7 +112,7 @@ void DenRoller::ring_bell(BotBaseContext& context, int count) const{
 void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);

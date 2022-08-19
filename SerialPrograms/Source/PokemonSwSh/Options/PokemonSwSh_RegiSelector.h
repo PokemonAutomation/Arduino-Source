@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiSelector_H
 #define PokemonAutomation_PokemonSwSh_RegiSelector_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,21 +22,21 @@ enum class RegiGolem{
     Regidrago,
 };
 
-class RegiSelectorOption : public ConfigOption{
+class RegiSelectorOption : public EnumDropdownOption<RegiGolem>{
 public:
-    RegiSelectorOption();
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    operator RegiGolem() const{ return (RegiGolem)m_option.current_index(); }
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
-
-private:
-    DropdownOption m_option;
+    RegiSelectorOption()
+        : EnumDropdownOption<RegiGolem>(
+            "<b>Name of Regi:</b>",
+            {
+                {RegiGolem::Regirock,   "regirock", "Regirock"},
+                {RegiGolem::Regice,     "regice", "Regice"},
+                {RegiGolem::Registeel,  "registeel", "Registeel"},
+                {RegiGolem::Regieleki,  "regieleki", "Regieleki"},
+                {RegiGolem::Regidrago,  "regidrago", "Regidrago"},
+            },
+            RegiGolem::Registeel
+        )
+    {}
 };
 
 

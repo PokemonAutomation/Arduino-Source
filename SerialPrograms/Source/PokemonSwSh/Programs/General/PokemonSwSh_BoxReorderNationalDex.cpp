@@ -135,14 +135,14 @@ BoxReorderNationalDex::BoxReorderNationalDex()
         false
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(POKEMON_COUNT);
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
 void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{

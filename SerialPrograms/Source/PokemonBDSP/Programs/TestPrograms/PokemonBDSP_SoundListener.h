@@ -9,7 +9,7 @@
 #define PokemonAutomation_PokemonBDSP_SoundListener_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
@@ -31,8 +31,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    enum class SoundType{
+        SHINY,
+    };
 
-    DropdownOption SOUND_TYPE;
+    EnumDropdownOption<SoundType> SOUND_TYPE;
     BooleanCheckBoxOption STOP_ON_DETECTED_SOUND;
 };
 

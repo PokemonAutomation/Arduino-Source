@@ -62,7 +62,12 @@ EggAutonomous::EggAutonomous()
     , NUM_EGGS_IN_COLUMN(
         "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
         {
-            "0", "1", "2", "3", "4", "5"
+            {0, "0", "0"},
+            {1, "1", "1"},
+            {2, "2", "2"},
+            {3, "3", "3"},
+            {4, "4", "4"},
+            {5, "5", "5"},
         },
         0
     )
@@ -73,11 +78,11 @@ EggAutonomous::EggAutonomous()
         "Then set the Action Table below to \"Stop Program\" on the desired stats. "
         "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
         {
-            "No auto-saving. (No error/crash recovery.)",
-            "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)",
-            "Save after every batch. (Allows you to unhatch eggs.)",
+            {AutoSave::NoAutoSave, "none", "No auto-saving. (No error/crash recovery.)"},
+            {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
+            {AutoSave::EveryBatch, "every-batch", "Save after every batch. (Allows you to unhatch eggs.)"},
         },
-        1
+        AutoSave::AfterStartAndKeep
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY_KEEP(
@@ -135,13 +140,13 @@ bool EggAutonomous::run_batch(
 
     bool save = false;
     switch (AUTO_SAVING){
-    case 0:
+    case AutoSave::NoAutoSave:
         save = false;
         break;
-    case 1:
+    case AutoSave::AfterStartAndKeep:
         save = saved_state.babies_saved() != current_state.babies_saved();
         break;
-    case 2:
+    case AutoSave::EveryBatch:
         save = true;
         break;
     default:
@@ -179,7 +184,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         TRAVEL_TIME_PER_FETCH,
         FILTERS,
         MAX_KEEPERS,
-        static_cast<uint8_t>(size_t(NUM_EGGS_IN_COLUMN))
+        static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value())
     );
     EggAutonomousState saved_state = current_state;
 
@@ -187,14 +192,14 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 //    current_state.withdraw_egg_column();
 //    box_to_overworld(env, env.console);
 
-    if (AUTO_SAVING == 1){
+    if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
         save_game(env.console, context);
         saved_state.set(current_state);
     }
 
     size_t consecutive_failures = 0;
     while (current_state.babies_saved() < MAX_KEEPERS){
-        if (AUTO_SAVING == 0){
+        if (AUTO_SAVING == AutoSave::NoAutoSave){
             if (run_batch(env, context, saved_state, current_state)){
                 break;
             }

@@ -7,51 +7,52 @@
 #ifndef PokemonAutomation_NintendoSwitch_StartInGripMenu_H
 #define PokemonAutomation_NintendoSwitch_StartInGripMenu_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class StartInGripOrGameOption : public DropdownOption{
+class StartInGripOrGameOption : public IntegerEnumDropdownOption{
 public:
     StartInGripOrGameOption(bool grip_menu = false)
-        : DropdownOption(
+        : IntegerEnumDropdownOption(
             "<b>Start Location:</b><br>"
             "If set to start in game, you must disconnect all other controllers.",
             {
-                "Start in game.",
-                "Start in grip menu.",
+                {0, "in-game", "Start in game."},
+                {1, "grip-menu", "Start in grip menu."},
             },
             grip_menu ? 1 : 0
         )
     {}
 
-    operator bool() const{
-        return current_index() != 0;
+    bool start_in_grip_menu() const{
+        return current_value() != 0;
     }
 
 };
 
-class StartInGripOrClosedOption : public DropdownOption{
+class StartInGripOrClosedOption : public IntegerEnumDropdownOption{
 public:
-    StartInGripOrClosedOption(bool grip_menu = true)
-        : DropdownOption(
+    StartInGripOrClosedOption(bool grip_menu = false)
+        : IntegerEnumDropdownOption(
             "<b>Start Location:</b><br>"
             "If set to start in Switch Home, you must disconnect all other controllers.",
             {
-                "Start in Switch Home with game closed.",
-                "Start in grip menu.",
+                {0, "home", "Start in Switch Home with game closed."},
+                {1, "grip-menu", "Start in grip menu."},
             },
             grip_menu ? 1 : 0
         )
     {}
 
-    operator bool() const{
-        return current_index() != 0;
+    bool start_in_grip_menu() const{
+        return current_value() != 0;
     }
 
 };
+
 
 
 }

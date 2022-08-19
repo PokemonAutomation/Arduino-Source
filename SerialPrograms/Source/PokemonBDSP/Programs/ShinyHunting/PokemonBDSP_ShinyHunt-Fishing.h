@@ -46,7 +46,7 @@ private:
 
     Pokemon::EncounterBotLanguage LANGUAGE;
 
-    ShortcutDirection SHORTCUT;
+    ShortcutDirectionOption SHORTCUT;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 

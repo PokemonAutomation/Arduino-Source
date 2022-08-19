@@ -25,36 +25,51 @@ std::vector<std::string> buildShortcutValues(bool required){
 }
 
 
-ShortcutDirection::ShortcutDirection(std::string label, bool required)
-    : DropdownOption(
+const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
+    static EnumDatabase<ShortcutDirection> database({
+        {ShortcutDirection::NONE,   "none", "None"},
+        {ShortcutDirection::UP,     "up", "Up"},
+        {ShortcutDirection::RIGHT,  "right", "Right"},
+        {ShortcutDirection::DOWN,   "down", "Down"},
+        {ShortcutDirection::LEFT,   "left", "Left"},
+    });
+    return database;
+}
+const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required(){
+    static EnumDatabase<ShortcutDirection> database({
+        {ShortcutDirection::UP,     "up", "Up"},
+        {ShortcutDirection::RIGHT,  "right", "Right"},
+        {ShortcutDirection::DOWN,   "down", "Down"},
+        {ShortcutDirection::LEFT,   "left", "Left"},
+    });
+    return database;
+}
+
+
+
+ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
+    : EnumDropdownOption<ShortcutDirection>(
         std::move(label),
-        buildShortcutValues(required),
-        0
+        false ? ShortcutDirection_Required() : ShortcutDirection_Nullable(),
+        ShortcutDirection::NONE
     )
-    , m_required(required)
 {}
 
-void ShortcutDirection::run(BotBaseContext& context, uint16_t delay){
+void ShortcutDirectionOption::run(BotBaseContext& context, uint16_t delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
-    size_t index = *this;
-    if (!m_required){
-        // If the shortcut direction is optional, the first value is "None".
-        if (index == 0) {
-            return;
-        }
-        --index;
-    }
-
-    switch (index){
-    case 0: shortcut_y = 0; break;
-    case 1: shortcut_x = 255; break;
-    case 2: shortcut_y = 255; break;
-    case 3: shortcut_x = 0; break;
+    switch (this->get()){
+    case ShortcutDirection::NONE:
+        pbf_press_button(context, BUTTON_PLUS, 20, 105);
+        return;
+    case ShortcutDirection::UP:     shortcut_y = 0; break;
+    case ShortcutDirection::RIGHT:  shortcut_x = 255; break;
+    case ShortcutDirection::DOWN:   shortcut_y = 255; break;
+    case ShortcutDirection::LEFT:   shortcut_x = 0; break;
     default:
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
-            "Invalid shortcut value: " + std::to_string(*this)
+            "Invalid shortcut value: " + std::to_string(current_value())
         );
     }
 

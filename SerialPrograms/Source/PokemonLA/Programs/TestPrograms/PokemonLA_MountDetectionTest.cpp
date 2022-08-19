@@ -28,23 +28,13 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
 {}
 
 
-MountDetectionTest::MountDetectionTest()
-    : FAILED_ACTION(
-        "<b>Detection Failed Action</b>",
-        {
-            "Do Nothing",
-            "Log to output window.",
-            "Log to output window and save to file.",
-        },
-        2
-    )
-{
+MountDetectionTest::MountDetectionTest(){
     PA_ADD_OPTION(FAILED_ACTION);
 }
 
 
 void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    MountTracker tracker(env.console, (MountDetectorLogging)(size_t)FAILED_ACTION);
+    MountTracker tracker(env.console, FAILED_ACTION);
     InferenceSession session(
         context, env.console,
         {{tracker, std::chrono::seconds(1)}}

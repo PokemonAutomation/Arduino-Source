@@ -107,8 +107,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
-    ../Common/Cpp/NamedEnum.cpp
-    ../Common/Cpp/NamedEnum.h
+    ../Common/Cpp/EnumDatabase.cpp
+    ../Common/Cpp/EnumDatabase.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -119,6 +119,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/DropdownOption.h
     ../Common/Cpp/Options/EditableTableOption2.cpp
     ../Common/Cpp/Options/EditableTableOption2.h
+    ../Common/Cpp/Options/EnumDropdownOption.cpp
+    ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
     ../Common/Cpp/Options/FixedCodeOption.h
     ../Common/Cpp/Options/FloatingPointOption.cpp
@@ -190,6 +192,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
     ../Common/Qt/Options/EditableTableWidget2.cpp
     ../Common/Qt/Options/EditableTableWidget2.h
+    ../Common/Qt/Options/EnumDropdownWidget.cpp
+    ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
@@ -858,6 +862,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
+    Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp
@@ -1024,6 +1029,9 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.h
+    Source/PokemonLA/Options/PokemonLA_IngoOpponent.cpp
+    Source/PokemonLA/Options/PokemonLA_IngoOpponent.h
+    Source/PokemonLA/Options/PokemonLA_MiscOptions.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
@@ -1306,12 +1314,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
-    Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
     Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h
-    Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h

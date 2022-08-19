@@ -10,7 +10,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -36,7 +36,12 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    DropdownOption FOURTH_MOVE_ON;
+    enum class FourthMoveOn{
+        None,
+        Mamoswine,
+        Avalugg,
+    };
+    EnumDropdownOption<FourthMoveOn> FOURTH_MOVE_ON;
 
     SimpleIntegerOption<uint32_t> SAVE_EVERY_FEW_BATTLES;
 

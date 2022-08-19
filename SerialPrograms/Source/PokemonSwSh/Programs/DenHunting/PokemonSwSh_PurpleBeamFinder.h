@@ -36,7 +36,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     BooleanCheckBoxOption EXTRA_LINE;
 
     EventNotificationOption NOTIFICATION_RED_BEAM;

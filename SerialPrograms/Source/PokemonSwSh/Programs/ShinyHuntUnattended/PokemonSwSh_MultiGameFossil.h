@@ -30,7 +30,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    StartInGripOrClosedOption START_LOCATION;
     FossilTable GAME_LIST;
 };
 

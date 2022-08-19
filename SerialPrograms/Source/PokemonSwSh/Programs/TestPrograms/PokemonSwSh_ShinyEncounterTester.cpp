@@ -30,10 +30,10 @@ ShinyEncounterTester::ShinyEncounterTester()
     : ENCOUNTER_TYPE(
         "<b>Encounter Type:</b>",
         {
-            "Wild Encounter",
-            "Raid Den",
+            {EncounterType::Wild, "wild", "Wild Encounter"},
+            {EncounterType::Raid, "raid", "Raid Den"},
         },
-        0
+        EncounterType::Wild
     )
 {
     PA_ADD_OPTION(ENCOUNTER_TYPE);
@@ -43,7 +43,7 @@ ShinyEncounterTester::ShinyEncounterTester()
 void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyDetectionResult result = detect_shiny_battle(
         env.console, context,
-        ENCOUNTER_TYPE == 0 ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,
+        ENCOUNTER_TYPE == EncounterType::Wild ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,
         std::chrono::seconds(30)
     );
     result.get_best_screenshot().save(now_to_filestring() + ".png");

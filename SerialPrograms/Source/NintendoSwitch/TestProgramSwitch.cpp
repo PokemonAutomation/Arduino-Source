@@ -122,14 +122,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    PokemonSwSh::StandardBattleMenuDetector detector(true);
+    cout << detector.detect(feed.snapshot()) << endl;
 
+#if 0
     ImageRGB32 image("screenshot-20220814-170240979105.png");
 
     PokemonSwSh::SummaryShinySymbolDetector detector(logger, overlay);
 
     cout << detector.detect(image) << endl;
 //    detector.wait_for_detection(scope, feed);
-
+#endif
 
 
 

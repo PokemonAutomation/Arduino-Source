@@ -83,24 +83,6 @@ std::unique_ptr<StatsTracker> BurmyFinder_Descriptor::make_stats() const{
 
 BurmyFinder::BurmyFinder()
     : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
-    , STOP_ON(
-        "<b>Stop On:</b>",
-        {
-            "Shiny",
-            "Alpha",
-            "Shiny or Alpha",
-            "Shiny and Alpha",
-        },
-        2
-    )
-    , EXIT_METHOD(
-        "<b>Exit Battle Method:</b>",
-        {
-            "Run Away",
-            "Mash A to Kill",
-        },
-        0
-    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
@@ -161,7 +143,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     if (pokemon.name_candidates.find("burmy") == pokemon.name_candidates.end()){
         env.console.log("Not a burmy. Leaving battle.");
-        exit_battle(env.console, context, EXIT_METHOD == 1);
+        exit_battle(env.console, context, EXIT_METHOD);
         return false;
     }
 
@@ -185,16 +167,16 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     bool is_match = false;
     switch (STOP_ON){
-    case 0: //  Shiny
+    case StopOn::Shiny:
         is_match = pokemon.is_shiny;
         break;
-    case 1: //  Alpha
+    case StopOn::Alpha:
         is_match = pokemon.is_alpha;
         break;
-    case 2: //  Shiny or Alpha
+    case StopOn::ShinyOrAlpha:
         is_match = pokemon.is_alpha || pokemon.is_shiny;
         break;
-    case 3: //  Shiny and Alpha
+    case StopOn::ShinyAndAlpha:
         is_match = pokemon.is_alpha && pokemon.is_shiny;
         break;
     }
@@ -203,7 +185,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseCont
         on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
     }
 
-    exit_battle(env.console, context, EXIT_METHOD == 1);
+    exit_battle(env.console, context, EXIT_METHOD);
 
     return true;
 }

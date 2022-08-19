@@ -11,6 +11,21 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
+const EnumDatabase<IVCheckerFilter>& IVCheckerFilter_Database(){
+    static EnumDatabase<IVCheckerFilter> database({
+        {IVCheckerFilter::Anything,     "anything",     "Anything (0-31)"},
+        {IVCheckerFilter::NoGood,       "no-good",      "No Good (0)"},
+        {IVCheckerFilter::Decent,       "decent",       "Decent (1-15)"},
+        {IVCheckerFilter::PrettyGood,   "pretty-good",  "Pretty Good (16-25)"},
+        {IVCheckerFilter::VeryGood,     "very-good",    "Very Good (26-29)"},
+        {IVCheckerFilter::Fantastic,    "fantastic",    "Fantastic (30)"},
+        {IVCheckerFilter::Best,         "best",         "Best (31)"},
+    });
+    return database;
+}
+
+
+
 
 IVCheckerFilterCell::IVCheckerFilterCell(IVCheckerFilter default_value)
     : DropdownCell(
@@ -22,16 +37,13 @@ IVCheckerFilterCell::IVCheckerFilterCell(IVCheckerFilter default_value)
 
 
 
-IVCheckerFilterOption::IVCheckerFilterOption(std::string label, size_t default_index)
-    : DropdownOption(
+IVCheckerFilterOption::IVCheckerFilterOption(std::string label, IVCheckerFilter default_value)
+    : EnumDropdownOption<IVCheckerFilter>(
         std::move(label),
-        IVCheckerFilter_NAMES,
-        default_index
+        IVCheckerFilter_Database(),
+        default_value
     )
 {}
-IVCheckerFilterOption::operator IVCheckerFilter() const{
-    return (IVCheckerFilter)(size_t)*this;
-}
 
 bool IVCheckerFilterOption::matches(std::atomic<uint64_t>& errors, IVCheckerValue result) const{
     if (result == IVCheckerValue::UnableToDetect){

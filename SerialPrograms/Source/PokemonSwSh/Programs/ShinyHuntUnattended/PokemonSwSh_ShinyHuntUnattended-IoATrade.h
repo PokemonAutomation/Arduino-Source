@@ -32,7 +32,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     TimeExpressionOption<uint16_t> START_TO_RUN_DELAY;

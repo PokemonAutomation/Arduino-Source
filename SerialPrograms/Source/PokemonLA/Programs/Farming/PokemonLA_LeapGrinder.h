@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
@@ -44,8 +45,8 @@ private:
     OCR::LanguageOCR LANGUAGE;
     Pokemon::PokemonNameSelectOption POKEMON;
     SimpleIntegerOption<uint8_t> LEAPS;
-    DropdownOption STOP_ON;
-    DropdownOption EXIT_METHOD;
+    StopOnOption STOP_ON;
+    ExitBattleMethodOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
 

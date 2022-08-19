@@ -30,10 +30,10 @@ ShinyEncounterTester::ShinyEncounterTester()
     : ENCOUNTER_TYPE(
         "<b>Encounter Type:</b>",
         {
-            "Starter Battle",
-            "Wild Encounter",
+            {BattleType::STARTER, "starter", "Starter Battle"},
+            {BattleType::STANDARD, "standard", "Wild Encounter"},
         },
-        1
+        BattleType::STANDARD
     )
     , USE_SOUND_DETECTION(
         "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
@@ -57,11 +57,11 @@ void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseC
         env, env.console, context,
         result_wild, result_own,
         NOTIFICATION_ERROR_RECOVERABLE,
-        ENCOUNTER_TYPE == 0 ? YOUR_POKEMON : WILD_POKEMON,
+        ENCOUNTER_TYPE == BattleType::STARTER ? YOUR_POKEMON : WILD_POKEMON,
         std::chrono::seconds(30),
         USE_SOUND_DETECTION
     );
-    if (ENCOUNTER_TYPE == 0){
+    if (ENCOUNTER_TYPE == BattleType::STARTER){
         result_own.get_best_screenshot().save(now_to_filestring() + ".png");
     }else{
         result_wild.get_best_screenshot().save(now_to_filestring() + ".png");

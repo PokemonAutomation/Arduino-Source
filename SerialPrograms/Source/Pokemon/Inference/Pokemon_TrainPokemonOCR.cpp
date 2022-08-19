@@ -34,14 +34,6 @@ TrainPokemonOCR::TrainPokemonOCR()
         "PokemonNameOCR/",
         "PokemonNameOCR/"
     )
-    , MODE(
-        "<b>Mode:</b>",
-        {
-            "Start Fresh: Use only baseline strings. (1st candidate of each entry in above path)",
-            "Incremental: Build off of the existing training data in the above path.",
-        },
-        0
-    )
     , THREADS(
         "<b>Worker Threads:</b>",
         std::thread::hardware_concurrency()
@@ -58,7 +50,7 @@ void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
     session.generate_large_dictionary(
         "Pokemon/PokemonNameOCR/",
         "PokemonOCR-",
-        MODE != 0,
+        MODE == TrainOCRMode::Incremental,
         THREADS,
         OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
         PokemonNameReader::MAX_LOG10P + 1.0,

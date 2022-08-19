@@ -57,7 +57,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
         "8 * TICKS_PER_SECOND"
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
     PA_ADD_OPTION(REVERSAL_PP);
@@ -68,7 +68,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
 }
 
 void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
     }else{

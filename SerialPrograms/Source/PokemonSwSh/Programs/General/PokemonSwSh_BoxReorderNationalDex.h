@@ -32,7 +32,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     OCR::LanguageOCR LANGUAGE;
     SimpleIntegerOption<uint16_t> POKEMON_COUNT;
     BooleanCheckBoxOption DODGE_SYSTEM_UPDATE_WINDOW;

@@ -8,6 +8,7 @@
 #define PokemonAutomation_DateToucher_H
 
 #include <chrono>
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "ClientSource/Connection/BotBase.h"

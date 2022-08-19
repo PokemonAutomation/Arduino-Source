@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      A simple dropdown menu for enums.
+ *      A simple dropdown menu for strings.
  *
  *  This should only be used when the number of options is small. If you need
  *  something for many options, use StringSelectCell/Option instead.

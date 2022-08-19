@@ -208,10 +208,12 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
 
 AutoMultiSpawn::AutoMultiSpawn()
     : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
-    ,SPAWN("<b>Spawn Point</b>:",
-    {
-        "Mirelands - Hippopotas"
-    }, 0)
+    , SPAWN(
+        "<b>Spawn Point</b>:",
+        {
+            {MultiSpawn::MirelandsHippopotas, "mirelands-hippopotas", "Mirelands - Hippopotas"},
+        }, MultiSpawn::MirelandsHippopotas
+        )
     , PATH(false, "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".", "", "")
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -251,7 +253,8 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
-    const int max_num_despawn = MAX_DESPAWN_COUNT[SPAWN];
+    MultiSpawn spawn = SPAWN;
+    const int max_num_despawn = MAX_DESPAWN_COUNT[(size_t)spawn];
 
     // Parse input path string:
     std::vector<int> path_despawns = parse_multispawn_path(env, PATH, max_num_despawn);
@@ -543,7 +546,13 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     for(int i = 0; i < max_focus_try; i++){
         // ret.first: whether we can focus on some pokemon
         // ret.second: the details of the target pokemon being focused, or empty if no target pokemon found.
-        const auto ret = control_focus_to_throw(env, context, TARGET_POKEMON[SPAWN], WILD_NEARBY_POKEMON[SPAWN], LANGUAGE);
+        MultiSpawn spawn = SPAWN;
+        const auto ret = control_focus_to_throw(
+            env, context,
+            TARGET_POKEMON[(size_t)spawn],
+            WILD_NEARBY_POKEMON[(size_t)spawn],
+            LANGUAGE
+        );
         if (ret.first){
             return ret.second;
         }

@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    DropdownOption BUTTON;
+    IntegerEnumDropdownOption BUTTON;
     TimeExpressionOption<uint16_t> PRESS_DURATION;
     TimeExpressionOption<uint16_t> RELEASE_DURATION;
     SimpleIntegerOption<uint64_t> TOTAL_PRESSES;

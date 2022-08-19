@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
@@ -89,8 +90,8 @@ private:
     std::atomic<bool> m_enable_shiny_sound{true};
 
     OCR::LanguageOCR LANGUAGE;
-    DropdownOption STOP_ON;
-    DropdownOption EXIT_METHOD;
+    StopOnOption STOP_ON;
+    ExitBattleMethodOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
 

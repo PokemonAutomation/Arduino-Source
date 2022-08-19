@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_Catchability_H
 #define PokemonAutomation_PokemonSwSh_Catchability_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
@@ -16,21 +16,26 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CatchabilitySelectorOption : public DropdownOption{
+enum class Catchability{
+    ALWAYS_CATCHABLE,
+    MAYBE_UNCATCHABLE,
+    ALWAYS_UNCATCHABLE,
+};
+
+
+class CatchabilitySelectorOption : public EnumDropdownOption<Catchability>{
 public:
     CatchabilitySelectorOption()
-        : DropdownOption(
+        : EnumDropdownOption<Catchability>(
             "<b>" + Pokemon::STRING_POKEMON + " Catchability</b>",
             {
-                "Always Catchable",
-                "Maybe Uncatchable",
-                "Never Catchable",
+                {Catchability::ALWAYS_CATCHABLE,    "always", "Always Catchable"},
+                {Catchability::MAYBE_UNCATCHABLE,   "maybe", "Maybe Uncatchable"},
+                {Catchability::ALWAYS_UNCATCHABLE,  "never", "Never Catchable"},
             },
-            0
+            Catchability::ALWAYS_CATCHABLE
         )
     {}
-
-    operator Catchability() const{ return (Catchability)(size_t)*this; }
 };
 
 

@@ -38,7 +38,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    StartInGripOrClosedOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 

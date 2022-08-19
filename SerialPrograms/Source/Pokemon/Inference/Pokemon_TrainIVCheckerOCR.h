@@ -8,8 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_TrainIVCheckerOCR_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/TrainOCRModeOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{
@@ -31,7 +32,7 @@ public:
 
 private:
     StringOption DIRECTORY;
-    DropdownOption MODE;
+    TrainOCRModeOption MODE;
     SimpleIntegerOption<uint32_t> THREADS;  //  Can't use "size_t" due to integer type ambiguity.
 
 };

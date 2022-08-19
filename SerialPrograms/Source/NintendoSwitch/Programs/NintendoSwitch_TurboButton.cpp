@@ -29,22 +29,22 @@ TurboButton::TurboButton()
     : BUTTON(
         "<b>Button to Mash:</b>",
         {
-            "Y",
-            "B",
-            "A",
-            "X",
-            "L",
-            "R",
-            "ZL",
-            "ZR",
-            "Minus (-)",
-            "Plus (+)",
-            "L-Click (left joystick click)",
-            "R-Click (right joystick click)",
-            "Home",
-            "Capture",
+            {BUTTON_Y,          "Y", "Y"},
+            {BUTTON_B,          "B", "B"},
+            {BUTTON_A,          "A", "A"},
+            {BUTTON_X,          "X", "X"},
+            {BUTTON_L,          "L", "L"},
+            {BUTTON_R,          "R", "R"},
+            {BUTTON_ZL,         "ZL", "ZL"},
+            {BUTTON_ZR,         "ZR", "ZR"},
+            {BUTTON_MINUS,      "MINUS", "Minus (-)"},
+            {BUTTON_PLUS,       "PLUS", "Plus (+)"},
+            {BUTTON_LCLICK,     "LCLICK", "L-Click (left joystick click)"},
+            {BUTTON_RCLICK,     "RCLICK", "R-Click (right joystick click)"},
+            {BUTTON_HOME,       "HOME", "Home"},
+            {BUTTON_CAPTURE,    "CAPTURE", "Capture"},
         },
-        2
+        BUTTON_A
     )
     , PRESS_DURATION(
         "<b>Press Duration:</b><br>Hold the button down for this long.",
@@ -64,14 +64,13 @@ TurboButton::TurboButton()
     PA_ADD_OPTION(TOTAL_PRESSES);
 }
 void TurboButton::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    size_t index = BUTTON.current_index();
     if (TOTAL_PRESSES == 0){
         while (true){
-            pbf_press_button(context, (Button)1 << index, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);
         }
     }else{
         for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
-            pbf_press_button(context, (Button)1 << index, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);
         }
     }
     context.wait_for_all_requests();

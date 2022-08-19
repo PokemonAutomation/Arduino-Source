@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_SelfTouchTrade_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
@@ -31,7 +31,11 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    DropdownOption HOSTING_SWITCH;
+    enum class HostingSwitch{
+        Switch0,
+        Switch1
+    };
+    EnumDropdownOption<HostingSwitch> HOSTING_SWITCH;
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

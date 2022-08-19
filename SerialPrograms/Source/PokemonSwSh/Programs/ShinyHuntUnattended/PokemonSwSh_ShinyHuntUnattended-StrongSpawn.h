@@ -33,7 +33,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    StartInGripOrClosedOption START_LOCATION;
     TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 
     TimeExpressionOption<uint16_t> ENTER_GAME_TO_RUN_DELAY;

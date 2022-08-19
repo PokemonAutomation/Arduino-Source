@@ -42,7 +42,12 @@ private:
 private:
     OCR::LanguageOCR LANGUAGE;
 
-    DropdownOption HOSTING_SWITCH;
+    enum class HostingSwitch{
+        Switch0,
+        Switch1
+    };
+    EnumDropdownOption<HostingSwitch> HOSTING_SWITCH;
+
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     TradeCountTableOption TRADE_COUNTS;
 

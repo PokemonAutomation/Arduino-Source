@@ -19,19 +19,20 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+
 OverworldTrigger::OverworldTrigger()
     : GroupOption("Trigger Method")
     , TRIGGER_METHOD(
         "<b>Maneuver:</b><br>How to trigger an encounter",
         {
-            "Move left/right. (no bias)",
-            "Move left/right. (bias left)",
-            "Move left/right. (bias right)",
-            "Move up/down. (no bias)",
-            "Move up/down. (bias up)",
-            "Move up/down. (bias down)",
-            "Sweet scent",
-        }, 0
+            {TriggerMethod::HORIZONTAL_NO_BIAS,     "horizontal-none",  "Move left/right. (no bias)"},
+            {TriggerMethod::HORIZONTAL_BIAS_LEFT,   "horizontal-left",  "Move left/right. (bias left)"},
+            {TriggerMethod::HORIZONTAL_BIAS_RIGHT,  "horizontal-right", "Move left/right. (bias right)"},
+            {TriggerMethod::VERTICAL_NO_BIAS,       "vertical-none",    "Move up/down. (no bias)"},
+            {TriggerMethod::VERTICAL_BIAS_UP,       "vertical-up",      "Move up/down. (bias up)"},
+            {TriggerMethod::VERTICAL_BIAS_DOWN,     "vertical-down",    "Move up/down. (bias down)"},
+            {TriggerMethod::SWEET_SCENT,            "sweet-scent",      "Sweet scent"},
+        }, TriggerMethod::HORIZONTAL_NO_BIAS
     )
     , MOVE_DURATION(
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
@@ -41,12 +42,12 @@ OverworldTrigger::OverworldTrigger()
     , SWEET_SCENT_POKEMON_LOCATION(
         "<b>Sweet Scent Pokemon Location:</b><br>Which Pokemon in the party knows Sweet Scent.",
         {
-          "1st",
-          "2nd",
-          "3rd",
-          "4th",
-          "2nd last",
-          "Last",
+            {0, "slot1", "1st"},
+            {1, "slot2", "2nd"},
+            {2, "slot3", "3rd"},
+            {3, "slot4", "4th"},
+            {4, "slot5", "2nd last"},
+            {5, "slot6", "Last"},
         }, 0
     )
 {
@@ -58,36 +59,37 @@ OverworldTrigger::OverworldTrigger()
 
 void OverworldTrigger::run_trigger(BotBaseContext& context) const{
     switch (TRIGGER_METHOD){
-    case 0:
+    case TriggerMethod::HORIZONTAL_NO_BIAS:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
 //        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
         pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
         break;
-    case 1:
+    case TriggerMethod::HORIZONTAL_BIAS_LEFT:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION + 25);
 //        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
         break;
-    case 2:
+    case TriggerMethod::HORIZONTAL_BIAS_RIGHT:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, MOVE_DURATION + 25);
 //        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
         break;
-    case 3:
+    case TriggerMethod::VERTICAL_NO_BIAS:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION);
 //        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
         pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
         break;
-    case 4:
+    case TriggerMethod::VERTICAL_BIAS_UP:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION + 25);
 //        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
         break;
-    case 5:
+    case TriggerMethod::VERTICAL_BIAS_DOWN:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, MOVE_DURATION + 25);
 //        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
         break;
+    default:;
     }
 }
 
@@ -96,7 +98,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
     StartBattleDetector start_battle_detector(console);
 
     int result = 0;
-    if (TRIGGER_METHOD < 6){
+    if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
         result = run_until(
             console, context,
@@ -119,7 +121,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
 
         //  Go to the pokemon that knows Sweet Scent
-        const size_t location = SWEET_SCENT_POKEMON_LOCATION;
+        const size_t location = SWEET_SCENT_POKEMON_LOCATION.current_value();
         const uint16_t change_pokemon_delay = 20;
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;

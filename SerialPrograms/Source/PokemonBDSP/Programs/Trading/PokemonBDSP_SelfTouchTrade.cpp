@@ -37,10 +37,10 @@ SelfTouchTrade::SelfTouchTrade()
     : HOSTING_SWITCH(
         "<b>Host Switch:</b><br>This is the Switch hosting the " + STRING_POKEMON + " to be touch-traded to the other.",
         {
-            "Switch 0 (Left)",
-            "Switch 1 (Right)",
+            {HostingSwitch::Switch0, "switch0", "Switch 0 (Left)"},
+            {HostingSwitch::Switch1, "switch1", "Switch 1 (Right)"},
         },
-        0
+        HostingSwitch::Switch0
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
@@ -65,7 +65,8 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
 
-    BotBaseContext host(scope, env.consoles[HOSTING_SWITCH].botbase());
+    size_t host_index = HOSTING_SWITCH == HostingSwitch::Switch0 ? 0 : 1;
+    BotBaseContext host(scope, env.consoles[host_index].botbase());
 
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){

@@ -35,7 +35,7 @@ public:
 
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_HATCH;
     EggStepCountOption STEPS_TO_HATCH;

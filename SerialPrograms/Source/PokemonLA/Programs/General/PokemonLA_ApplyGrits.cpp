@@ -39,8 +39,15 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
 
 ApplyGrits::ApplyGrits()
     : NUM_POKEMON(
-        "<b>Num " + STRING_POKEMON + " to Apply Grits</b>:",
-        {"1", "2", "3", "4", "5", "6"}, 0
+        "<b>Number of " + STRING_POKEMON + " to Apply Grits</b>:",
+        {
+            {1, "1", "1"},
+            {2, "2", "2"},
+            {3, "3", "3"},
+            {4, "4", "4"},
+            {5, "5", "5"},
+            {6, "6", "6"},
+        }, 1
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -106,7 +113,7 @@ void ApplyGrits::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
-    size_t num_pokemon = size_t(NUM_POKEMON) + 1;
+    size_t num_pokemon = NUM_POKEMON.current_value();
     for(size_t i = 0; i < num_pokemon; i++){
         ApplyGritsOnOnePokemon(env, context, i);
     }

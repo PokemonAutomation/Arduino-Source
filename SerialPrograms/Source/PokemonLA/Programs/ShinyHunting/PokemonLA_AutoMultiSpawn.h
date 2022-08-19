@@ -9,7 +9,7 @@
 #define PokemonAutomation_PokemonLA_AutoMultiSpawn_H
 
 #include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -24,6 +24,11 @@ namespace PokemonLA{
 class AutoMultiSpawn_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoMultiSpawn_Descriptor();
+};
+
+
+enum class MultiSpawn{
+    MirelandsHippopotas,
 };
 
 
@@ -56,7 +61,7 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
 
-    DropdownOption SPAWN;
+    EnumDropdownOption<MultiSpawn> SPAWN;
 
     StringOption PATH;
 

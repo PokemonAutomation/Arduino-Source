@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

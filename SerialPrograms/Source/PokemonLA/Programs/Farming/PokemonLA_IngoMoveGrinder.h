@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonLA_IngoMoveGrinder_H
 #define PokemonAutomation_PokemonLA_IngoMoveGrinder_H
 
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
-#include "PokemonLA_IngoBattleGrinder.h"
-
 #include <array>
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_IngoOpponent.h"
+#include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,7 +46,7 @@ private:
     std::string debug_current_info() const;
     std::string debug_move_attempts_info() const;
 
-    DropdownOption OPPONENT;
+    IngoOpponentOption OPPONENT;
     MoveGrinderActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;

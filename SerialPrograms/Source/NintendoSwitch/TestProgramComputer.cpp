@@ -76,7 +76,7 @@
 #include "Common/Cpp/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
-#include "Common/Cpp/NamedEnum.h"
+#include "Common/Cpp/EnumDatabase.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -117,113 +117,21 @@ using namespace Kernels;
 
 
 
-class IntegerEnumDropdownCell : public ConfigOption{
-public:
-    ~IntegerEnumDropdownCell();
-    IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x);
-
-public:
-    IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value);
-    IntegerEnumDropdownCell(const IntegerEnumDatabase& database);
-
-    size_t default_value() const;
-    size_t current_value() const;
-
-    bool set_value(size_t value);
-
-    const IntegerEnumDatabase& database() const;
-
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
-private:
-    struct Data;
-    Pimpl<Data> m_data;
-};
-
-struct IntegerEnumDropdownCell::Data{
-    const IntegerEnumDatabase& m_database;
-    const size_t m_default;
-    std::atomic<size_t> m_current;
-};
-
-
-size_t IntegerEnumDropdownCell::default_value() const{
-    return m_data->m_default;
-}
-size_t IntegerEnumDropdownCell::current_value() const{
-    return m_data->m_current.load(std::memory_order_relaxed);
-}
-bool IntegerEnumDropdownCell::set_value(size_t value){
-    Data& data = *m_data;
-    if (data.m_database.find(value) == nullptr){
-        return false;
-    }
-    data.m_current.store(value, std::memory_order_relaxed);
-    push_update();
-    return true;
-}
-const IntegerEnumDatabase& IntegerEnumDropdownCell::database() const{
-    return m_data->m_database;
-}
-void IntegerEnumDropdownCell::load_json(const JsonValue& json){
-    const std::string* str = json.get_string();
-    if (str == nullptr){
-        return;
-    }
-    Data& data = *m_data;
-    const EnumEntry* entry = data.m_database.find_slug(*str);
-    if (entry != nullptr && entry->enabled){
-        data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        push_update();
-    }
-
-    //  Backward compatibility with display names.
-    entry = data.m_database.find_display(*str);
-    if (entry != nullptr && entry->enabled){
-        data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        push_update();
-    }
-}
-JsonValue IntegerEnumDropdownCell::to_json() const{
-    const Data& data = *m_data;
-    return data.m_database.find(data.m_current.load(std::memory_order_relaxed))->slug;
-}
-void IntegerEnumDropdownCell::restore_defaults(){
-    Data& data = *m_data;
-    data.m_current.store(data.m_default, std::memory_order_relaxed);
-    push_update();
-}
 
 
 
 
 
 
-using EnumType = int;
 
-class EnumDropdownCell : public IntegerEnumDropdownCell{
-public:
-    EnumDropdownCell(const NamedEnumDatabase<EnumType>& database);
+//using EnumType = int;
 
-    operator EnumType() const;
-    bool set(EnumType value);
-
-
-private:
-
-
-};
 
 
 using ShinyFilter = NintendoSwitch::PokemonSwSh::ShinyFilter;
 
-const NamedEnumDatabase<ShinyFilter>& ShinyFilterDatabase(){
-    static NamedEnumDatabase<ShinyFilter> database({
+const EnumDatabase<ShinyFilter>& ShinyFilterDatabase(){
+    static EnumDatabase<ShinyFilter> database({
         {ShinyFilter::ANYTHING,     "ANYTHING",    "Anything"},
         {ShinyFilter::NOT_SHINY,    "NOT_SHINY",   "Not Shiny"},
         {ShinyFilter::ANY_SHINY,    "ANY_SHINY",   "Any Shiny"},

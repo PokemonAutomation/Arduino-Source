@@ -35,7 +35,7 @@ private:
     void trade_slot(BotBaseContext& context, uint8_t slot, bool next_box) const;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     TimeExpressionOption<uint16_t> INITIAL_WAIT;

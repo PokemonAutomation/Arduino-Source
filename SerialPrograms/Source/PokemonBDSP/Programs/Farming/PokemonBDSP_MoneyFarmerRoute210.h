@@ -9,9 +9,11 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
+#include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -49,13 +51,20 @@ private:
     static bool has_pp(uint8_t pp0[4], uint8_t pp1[4]);
 
 private:
-    ShortcutDirection SHORTCUT;
+    enum class StartLocation{
+        CelesticTown,
+        AceTrainerPair,
+    };
+    enum class HealMethod{
+        CelesticTown,
+        GlobalRoom,
+    };
 
-    DropdownOption START_LOCATION;
+    ShortcutDirectionOption SHORTCUT;
 
-    DropdownOption HEALING_METHOD;
-
-    DropdownOption ON_LEARN_MOVE;
+    EnumDropdownOption<StartLocation> START_LOCATION;
+    EnumDropdownOption<HealMethod> HEALING_METHOD;
+    OnLearnMoveOption ON_LEARN_MOVE;
 
     SimpleIntegerOption<uint8_t> MON0_MOVE1_PP;
     SimpleIntegerOption<uint8_t> MON0_MOVE2_PP;

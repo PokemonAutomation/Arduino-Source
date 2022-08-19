@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_OverworldTrigger_H
 #define PokemonAutomation_PokemonBDSP_OverworldTrigger_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -34,9 +34,19 @@ private:
     void run_trigger(BotBaseContext& context) const;
 
 public:
-    DropdownOption TRIGGER_METHOD;
+    enum class TriggerMethod{
+        HORIZONTAL_NO_BIAS,
+        HORIZONTAL_BIAS_LEFT,
+        HORIZONTAL_BIAS_RIGHT,
+        VERTICAL_NO_BIAS,
+        VERTICAL_BIAS_UP,
+        VERTICAL_BIAS_DOWN,
+        SWEET_SCENT,
+    };
+
+    EnumDropdownOption<TriggerMethod> TRIGGER_METHOD;
     TimeExpressionOption<uint16_t> MOVE_DURATION;
-    DropdownOption SWEET_SCENT_POKEMON_LOCATION;
+    IntegerEnumDropdownOption SWEET_SCENT_POKEMON_LOCATION;
 };
 
 

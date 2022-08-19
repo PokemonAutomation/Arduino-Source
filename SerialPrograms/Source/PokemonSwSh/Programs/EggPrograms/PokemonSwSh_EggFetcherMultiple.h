@@ -32,7 +32,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     SimpleIntegerOption<uint16_t> POKEMON_SPECIES_COUNT;
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS_PER_SPECIES;
 };

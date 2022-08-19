@@ -46,7 +46,7 @@ public:
 
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     FloatingPointOption MIN_WIN_RATE;

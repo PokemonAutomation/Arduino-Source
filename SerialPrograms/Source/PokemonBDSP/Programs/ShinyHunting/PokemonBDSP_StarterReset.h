@@ -38,7 +38,7 @@ private:
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:
-//    StartInGripOrGameOption START_IN_GRIP_MENU;
+//    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     Pokemon::PokemonNameSelectOption STARTER;

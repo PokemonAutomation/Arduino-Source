@@ -20,6 +20,23 @@
 namespace PokemonAutomation{
 
 
+struct CameraEntry{
+    std::string slug;
+    std::string display;
+    std::unique_ptr<CameraBackend> backend;
+
+    CameraEntry(
+        std::string p_slug,
+        std::string p_display,
+        std::unique_ptr<CameraBackend> p_backend
+    )
+        : slug(std::move(p_slug))
+        , display(std::move(p_display))
+        , backend(std::move(p_backend))
+    {}
+};
+
+
 struct CameraBackends{
     static const CameraBackends& instance(){
         static CameraBackends backends;
@@ -28,30 +45,35 @@ struct CameraBackends{
 
     CameraBackends(){
 #if QT_VERSION_MAJOR == 5
-        m_backends.emplace_back("Qt5: QCameraViewfinder",                   new CameraQt5QCameraViewfinder::CameraBackend());
-//        if (PreloadSettings::instance().DEVELOPER_MODE){
-//            m_backends.emplace_back("Qt5: QCameraViewfinder (separate thread)", new CameraQt5QCameraViewfinderSeparateThread::CameraBackend());
-//        }
+        m_backends.emplace_back(
+            "qt5-QCameraViewfinder", "Qt5: QCameraViewfinder",
+            std::make_unique<CameraQt5QCameraViewfinder::CameraBackend>()
+        );
 #endif
 #if QT_VERSION_MAJOR == 6
-        m_backends.emplace_back("Qt6: QVideoSink",                          new CameraQt6QVideoSink::CameraBackend());
+        m_backends.emplace_back(
+            "qt6-QVideoSink", "Qt6: QVideoSink",
+            std::make_unique<CameraQt6QVideoSink::CameraBackend>()
+        );
 #endif
 
+        size_t items = 0;
         for (const auto& item : m_backends){
-            m_cases.emplace_back(item.first);
+            m_database.add(items, item.slug, item.display, true);
+            items++;
         }
     }
 
-    std::vector<std::pair<std::string, std::unique_ptr<CameraBackend>>> m_backends;
-    std::vector<DropdownEntry> m_cases;
+    std::vector<CameraEntry> m_backends;
+    IntegerEnumDatabase m_database;
 };
 
 
 
 VideoBackendOption::VideoBackendOption()
-    : DropdownOption(
+    : IntegerEnumDropdownOption(
         "<b>Video Pipeline Backend:</b>",
-        CameraBackends::instance().m_cases,
+        CameraBackends::instance().m_database,
 #if QT_VERSION_MAJOR == 5
         0
 #elif QT_VERSION_MAJOR == 6
@@ -67,16 +89,18 @@ VideoBackendOption::VideoBackendOption()
 
 
 std::vector<CameraInfo> get_all_cameras(){
-    const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
+    const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
     return backend.get_all_cameras();
 }
 std::string get_camera_name(const CameraInfo& info){
-    const CameraBackend& backend = *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
+    const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
     return backend.get_camera_name(info);
 }
-
 const CameraBackend& get_camera_backend(){
-    return *CameraBackends::instance().m_backends[GlobalSettings::instance().VIDEO_BACKEND].second;
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
+    return *CameraBackends::instance().m_backends[index].backend;
 }
 
 

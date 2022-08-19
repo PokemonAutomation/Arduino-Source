@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 #define PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -28,10 +28,6 @@ public:
 
 class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
-    enum Mode{
-        READ_AND_SAVE,
-        GENERATE_TRAINING_DATA,
-    };
 
 public:
     GenerateNameOCRDataPokedex();
@@ -52,8 +48,19 @@ private:
 
 private:
     OCR::LanguageOCR LANGUAGE;
-    DropdownOption POKEDEX;
-    DropdownOption MODE;
+
+    enum class Pokedex{
+        Galar,
+        IsleOfArmor,
+        CrownTundra,
+    };
+    EnumDropdownOption<Pokedex> POKEDEX;
+
+    enum class Mode{
+        SaveToJson,
+        GenerateTrainingData,
+    };
+    EnumDropdownOption<Mode> MODE;
 };
 
 

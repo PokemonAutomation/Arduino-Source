@@ -65,7 +65,7 @@ CurryHunter::CurryHunter()
     )
 {
     PA_ADD_OPTION(WALK_UP_DELAY);
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(ITERATIONS);
 }
@@ -73,7 +73,7 @@ CurryHunter::CurryHunter()
 
 
 void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{

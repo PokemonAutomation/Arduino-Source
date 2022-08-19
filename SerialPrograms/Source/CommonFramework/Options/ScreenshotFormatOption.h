@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ScreenshotFormat_H
 #define PokemonAutomation_ScreenshotFormat_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 
@@ -17,28 +17,35 @@ enum class ImageAttachmentMode{
     JPG,
     PNG,
 };
+inline const EnumDatabase<ImageAttachmentMode>& ImageAttachmentMode_Database(){
+    static EnumDatabase<ImageAttachmentMode> database({
+        {ImageAttachmentMode::NO_SCREENSHOT,    "none", "No Screenshot."},
+        {ImageAttachmentMode::JPG,              "jpg",  "Attach as .jpg."},
+        {ImageAttachmentMode::PNG,              "png",  "Attach as .png."},
+    });
+    return database;
+}
 
 
-class ScreenshotOption : public DropdownOption{
+
+class ScreenshotCell : public EnumDropdownCell<ImageAttachmentMode>{
 public:
-    ScreenshotOption(std::string label)
-        : DropdownOption(
-            std::move(label),
-            {
-                "No Screenshot.",
-                "Attach as .jpg.",
-                "Attach as .png.",
-            },
-            1
+    ScreenshotCell()
+        : EnumDropdownCell<ImageAttachmentMode>(
+            ImageAttachmentMode_Database(),
+            ImageAttachmentMode::JPG
         )
     {}
-
-    operator ImageAttachmentMode() const{
-        return (ImageAttachmentMode)current_index();
-    }
-    void operator=(ImageAttachmentMode mode){
-        this->set_index((size_t)mode);
-    }
+};
+class ScreenshotOption : public EnumDropdownOption<ImageAttachmentMode>{
+public:
+    ScreenshotOption(std::string label)
+        : EnumDropdownOption<ImageAttachmentMode>(
+            std::move(label),
+            ImageAttachmentMode_Database(),
+            ImageAttachmentMode::JPG
+        )
+    {}
 };
 
 

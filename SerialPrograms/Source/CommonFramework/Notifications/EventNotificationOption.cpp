@@ -84,7 +84,7 @@ JsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
     obj["Ping"] = ping;
     if (enable_screenshot){
         ScreenshotOption screenshot_option("");
-        screenshot_option = screenshot;
+        screenshot_option.set(screenshot);
         obj["Screenshot"] = screenshot_option.to_json();
     }
     JsonArray array;

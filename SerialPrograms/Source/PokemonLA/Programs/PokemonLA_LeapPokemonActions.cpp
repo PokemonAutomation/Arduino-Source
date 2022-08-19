@@ -232,10 +232,10 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     return false;
 }
 
-void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to_kill){
+void exit_battle(ConsoleHandle& console, BotBaseContext& context, ExitBattleMethod exit_method){
 //    pbf_press_button(context, BUTTON_B, 20, 225);
 
-    if (!mash_A_to_kill){
+    if (exit_method == ExitBattleMethod::RunAway){
         console.log("Running from battle...");
         pbf_press_button(context, BUTTON_B, 20, 225);
         pbf_press_button(context, BUTTON_A, 20, 100 + (uint16_t)(3.5 * TICKS_PER_SECOND));

@@ -62,26 +62,18 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
     , START_LOCATION(
         "<b>Start Location:</b>",
         {
-            "Start in front of the Celestic Town " + STRING_POKEMON + " center.",
-            "Start in the lowermost row of the platform the Ace Trainer pair in Route 210 os on.",
+            {StartLocation::CelesticTown, "celestic", "In front of the Celestic Town " + STRING_POKEMON + " center."},
+            {StartLocation::AceTrainerPair, "trainer-pair", "Lower-most row of the platform the Ace Trainer pair in Route 210 is on."},
         },
-        0
+        StartLocation::CelesticTown
     )
     , HEALING_METHOD(
         "<b> Healing method:</b>",
         {
-            "Use the Hearthome City " + STRING_POKEMON + " center.",
-            "Use Global Room. (Disable WiFi if you want to keep playing an old version of the game.)"
+            {HealMethod::CelesticTown, "celestic", "Celestic Town " + STRING_POKEMON + " center."},
+            {HealMethod::GlobalRoom, "global-room", "Use Global Room. (will force update your game)"},
         },
-        0
-    )
-    , ON_LEARN_MOVE(
-        "<b>On Learn Move:</b>",
-        {
-            "Don't learn moves.",
-            "Stop Program",
-        },
-        0
+        HealMethod::CelesticTown
     )
     , MON0_MOVE1_PP("<b>Lead " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
     , MON0_MOVE2_PP("<b>Lead " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
@@ -217,7 +209,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
-            if (ON_LEARN_MOVE == 0){
+            if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
                 pbf_move_right_joystick(context, 128, 255, 20, 105);
                 pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;
@@ -284,8 +276,8 @@ bool MoneyFarmerRoute210::heal_after_battle_and_return(
     SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint8_t pp0[4], uint8_t pp1[4])
 {
-    if (HEALING_METHOD == 0){
-        // Go to Hearhome City Pokecenter to heal the party.
+    if (HEALING_METHOD == HealMethod::CelesticTown){
+        // Go to Celestic Town Pokecenter to heal the party.
         fly_to_center_heal_and_return(console, context, pp0, pp1);
         return false;
     }else{
@@ -337,11 +329,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     pbf_press_button(context, BUTTON_B, 5, 5);
 
     bool need_to_charge = true;
-    if (START_LOCATION == 0){
+    if (START_LOCATION == StartLocation::CelesticTown){
         heal_at_center_and_return(env.console, context, pp0, pp1);
         need_to_charge = false;
     }else{
-        if (HEALING_METHOD == 1){
+        if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
         pbf_move_left_joystick(context, 255, 128, 140, 0);

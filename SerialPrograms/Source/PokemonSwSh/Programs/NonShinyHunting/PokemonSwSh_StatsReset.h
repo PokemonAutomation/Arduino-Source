@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsReset_H
 #define PokemonAutomation_PokemonSwSh_StatsReset_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -38,11 +38,18 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCR LANGUAGE;
-    DropdownOption POKEMON;
+
+    enum class GiftPokemon{
+        TypeNull,
+        Cosmog,
+        Poipole,
+    };
+    EnumDropdownOption<GiftPokemon> POKEMON;
+
     IVCheckerFilterOption HP;
     IVCheckerFilterOption ATTACK;
     IVCheckerFilterOption DEFENSE;

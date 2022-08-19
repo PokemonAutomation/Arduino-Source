@@ -41,7 +41,7 @@ private:
     bool kill_and_return(ConsoleHandle& console, BotBaseContext& context) const;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 

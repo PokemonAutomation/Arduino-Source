@@ -8,10 +8,13 @@
 #define PokemonAutomation_Pokemon_IVCheckerOption_H
 
 #include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
+
+
 
 
 class IVCheckerFilterCell : public DropdownCell{
@@ -27,14 +30,13 @@ public:
 };
 
 
-class IVCheckerFilterOption : public DropdownOption{
+class IVCheckerFilterOption : public EnumDropdownOption<IVCheckerFilter>{
 public:
-    IVCheckerFilterOption(std::string label, size_t default_index = 0);
-
-    operator IVCheckerFilter() const;
+    IVCheckerFilterOption(std::string label, IVCheckerFilter default_value = IVCheckerFilter::Anything);
 
     bool matches(std::atomic<uint64_t>& errors, IVCheckerValue result) const;
 };
+
 
 
 

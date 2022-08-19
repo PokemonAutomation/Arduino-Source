@@ -48,16 +48,10 @@ std::unique_ptr<StatsTracker> DoublesLeveling_Descriptor::make_stats() const{
 }
 
 
+
+
 DoublesLeveling::DoublesLeveling()
     : GO_HOME_WHEN_DONE(false)
-    , ON_LEARN_MOVE(
-        "<b>On Learn Move:</b>",
-        {
-            "Don't learn moves.",
-            "Stop Program",
-        },
-        0
-    )
     , ENCOUNTER_BOT_OPTIONS(false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
@@ -131,7 +125,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
-            if (ON_LEARN_MOVE == 0){
+            if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
                 pbf_move_right_joystick(context, 128, 255, 20, 105);
                 pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;

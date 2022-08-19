@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -46,9 +47,10 @@ SoundListener_Descriptor::SoundListener_Descriptor()
 
 SoundListener::SoundListener()
     : SOUND_TYPE("<b>Which Sound to Detect</b>",
-    {
-        "Shiny Sound",
-    }, 0
+        {
+            {SoundType::SHINY, "shiny", "Shiny Sound"},
+        },
+        SoundType::SHINY
     )
     , STOP_ON_DETECTED_SOUND("<b>Stop on the detected sound</b><br>Stop program when the sound is detected.", false)
 {
@@ -72,10 +74,16 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         return STOP_ON_DETECTED_SOUND;
     };
 
-    if (SOUND_TYPE == 0){
+    SoundType type = SOUND_TYPE;
+    switch (type){
+    case SoundType::SHINY:
         detector = std::make_shared<ShinySoundDetector>(env.console.logger(), env.console, action);
-    } else {
-        QMessageBox::critical(nullptr, "Error","Not such sound detector as sound type " + QString::number(SOUND_TYPE));
+        break;
+    default:
+        throw InternalProgramError(
+            &env.logger(), PA_CURRENT_FUNCTION,
+            "Not such sound detector as sound type " + std::to_string((size_t)type)
+        );
         return;
     }
 

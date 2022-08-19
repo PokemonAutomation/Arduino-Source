@@ -104,7 +104,7 @@ EggAutonomousState::EggAutonomousState(
     EventNotificationOption& notification_error,
     uint16_t scroll_to_read_delay,
     Language language,
-    ShortcutDirection& shortcut,
+    ShortcutDirectionOption& shortcut,
     uint16_t travel_time_per_fetch,
     const EggHatchFilterTable& filters,
     uint8_t max_keepers,

@@ -7,12 +7,9 @@
 #ifndef PokemonAutomation_PokemonLA_IngoBattleGrinder_H
 #define PokemonAutomation_PokemonLA_IngoBattleGrinder_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_IngoOpponent.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{
@@ -20,29 +17,6 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-enum class IngoOpponents{
-    Wenton,
-    Bren,
-    Zisu,
-    Akari_Rei,
-    Kamado,
-    Beni,
-    Ingo,
-    Ingo_Tougher,
-    Mai,
-    Sabi,
-    Ress,
-    Ingo_Alphas,
-    END_LIST,
-};
-extern const char* INGO_OPPONENT_STRINGS[];
-
-struct IngoOpponentMenuLocation{
-    int8_t page;
-    int8_t index;
-};
-extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V10[];
-extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[];
 
 
 
@@ -66,7 +40,7 @@ private:
     bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
 
 private:
-    DropdownOption OPPONENT;
+    IngoOpponentOption OPPONENT;
     BattlePokemonActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;

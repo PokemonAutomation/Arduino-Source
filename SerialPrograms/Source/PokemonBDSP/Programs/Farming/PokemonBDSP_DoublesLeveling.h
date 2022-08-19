@@ -12,6 +12,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h"
 
@@ -29,6 +30,7 @@ public:
 };
 
 
+
 class DoublesLeveling : public SingleSwitchProgramInstance{
 public:
     DoublesLeveling();
@@ -43,7 +45,7 @@ private:
     Pokemon::EncounterBotLanguage LANGUAGE;
 
     OverworldTrigger TRIGGER_METHOD;
-    DropdownOption ON_LEARN_MOVE;
+    OnLearnMoveOption ON_LEARN_MOVE;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 

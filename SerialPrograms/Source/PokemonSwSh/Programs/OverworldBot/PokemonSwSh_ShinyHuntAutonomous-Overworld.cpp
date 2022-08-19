@@ -69,22 +69,30 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , MARK_PRIORITY(
         "<b>Mark Priority:</b><br>Favor exclamation marks or question marks?",
-        MARK_PRIORITY_STRINGS, 1
+        {
+            {MarkPriority::EXCLAMATION_ONLY,        "exclamation-only",         "Exclamation Marks Only (Ignore Question Marks)"},
+            {MarkPriority::PRIORITIZE_EXCLAMATION,  "prioritize-exclamation",   "Prioritize Exclamation Marks"},
+            {MarkPriority::NO_PREFERENCE,           "no-preference",            "No Preference"},
+            {MarkPriority::PRIORITIZE_QUESTION,     "prioritize-question",      "Prioritize Question Marks"},
+            {MarkPriority::QUESTION_ONLY,           "question-only",            "Question Marks Only (Ignore Exclamation Marks)"},
+        },
+        MarkPriority::PRIORITIZE_EXCLAMATION
     )
     , TRIGGER_METHOD(
         "<b>Trigger Method:</b><br>How to trigger an overworld reaction mark?",
         {
-            "Whistle Only",
-            "Whistle 3 times, then circle once.",
-            "Circle 3 times, then whistle 3 times.",
-            "Circle Only",
-            "Horizontal Line Only",
-            "Whistle 3 times, then do horizontal line once.",
-            "Do horizontal line 3 times, then whistle 3 times.",
-            "Vertical Line Only",
-            "Whistle 3 times, then do vertical line once.",
-            "Do vertical line 3 times, then whistle 3 times.",
-        }, 1
+            {TriggerMethod::WhistleOnly,            "whistle-only",         "Whistle Only"},
+            {TriggerMethod::Whistle3Circle1,        "whistle3-circle1",     "Whistle 3 times, then circle once."},
+            {TriggerMethod::Circle3Whistle3,        "circle3-whistle3",     "Circle 3 times, then whistle 3 times."},
+            {TriggerMethod::CircleOnly,             "circle-only",          "Circle Only"},
+            {TriggerMethod::Horizontal,             "horizontal",           "Horizontal Line Only"},
+            {TriggerMethod::Whistle3Horizontal1,    "whistle3-horizontal1", "Whistle 3 times, then do horizontal line once."},
+            {TriggerMethod::Horizontal3Whistle3,    "horizontal3-whistle3", "Do horizontal line 3 times, then whistle 3 times."},
+            {TriggerMethod::Vertical,               "vertical",             "Vertical Line Only"},
+            {TriggerMethod::Whistle3Vertical1,      "whistle3-vertical1",   "Whistle 3 times, then do vertical line once."},
+            {TriggerMethod::Vertical3Whistle3,      "vertical3-whistle3",   "Do vertical line 3 times, then whistle 3 times."},
+        },
+        TriggerMethod::Whistle3Circle1
     )
     , MAX_MOVE_DURATION(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
@@ -124,7 +132,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         true
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
@@ -163,40 +171,40 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         console, console,
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
-        (MarkPriority)(size_t)MARK_PRIORITY,
+        MARK_PRIORITY,
         MAX_TARGET_ALPHA
     );
 
     std::unique_ptr<OverworldTrigger> trigger;
-    switch ((size_t)TRIGGER_METHOD){
-    case 0:
+    switch (TRIGGER_METHOD){
+    case TriggerMethod::WhistleOnly:
         trigger.reset(new OverworldTrigger_Whistle(target_tracker));
         break;
-    case 1:
+    case TriggerMethod::Whistle3Circle1:
         trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, true, 3, 1));
         break;
-    case 2:
+    case TriggerMethod::Circle3Whistle3:
         trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, false, 3, 3));
         break;
-    case 3:
+    case TriggerMethod::CircleOnly:
         trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, false, 0, 1));
         break;
-    case 4:
+    case TriggerMethod::Horizontal:
         trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, false, 0, 1));
         break;
-    case 5:
+    case TriggerMethod::Whistle3Horizontal1:
         trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, true, 3, 1));
         break;
-    case 6:
+    case TriggerMethod::Horizontal3Whistle3:
         trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, false, 3, 3));
         break;
-    case 7:
+    case TriggerMethod::Vertical:
         trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, false, 0, 1));
         break;
-    case 8:
+    case TriggerMethod::Whistle3Vertical1:
         trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, true, 3, 1));
         break;
-    case 9:
+    case TriggerMethod::Vertical3Whistle3:
         trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, false, 3, 3));
         break;
     }
@@ -302,7 +310,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         console, console,
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
-        (MarkPriority)(size_t)MARK_PRIORITY,
+        MARK_PRIORITY,
         MAX_TARGET_ALPHA
     );
 
@@ -355,7 +363,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     srand((unsigned)time(nullptr));
 
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{

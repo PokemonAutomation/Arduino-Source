@@ -85,6 +85,7 @@ SOURCES += \
     ../Common/Cpp/Concurrency/SpinLock.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
+    ../Common/Cpp/EnumDatabase.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/ImageResolution.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
@@ -92,12 +93,12 @@ SOURCES += \
     ../Common/Cpp/Json/JsonTools.cpp \
     ../Common/Cpp/Json/JsonValue.cpp \
     ../Common/Cpp/LifetimeSanitizer.cpp \
-    ../Common/Cpp/NamedEnum.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/DropdownOption.cpp \
     ../Common/Cpp/Options/EditableTableOption2.cpp \
+    ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
@@ -125,6 +126,7 @@ SOURCES += \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
+    ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
@@ -511,6 +513,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
+    Source/PokemonLA/Options/PokemonLA_IngoOpponent.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp \
@@ -649,9 +652,7 @@ SOURCES += \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp \
-    Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp \
-    Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.cpp \
@@ -781,6 +782,7 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId.h \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
+    ../Common/Cpp/EnumDatabase.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \
@@ -788,12 +790,12 @@ HEADERS += \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/LifetimeSanitizer.h \
-    ../Common/Cpp/NamedEnum.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/DropdownOption.h \
     ../Common/Cpp/Options/EditableTableOption2.h \
+    ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
@@ -838,6 +840,7 @@ HEADERS += \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EditableTableWidget2.h \
+    ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
@@ -1194,6 +1197,7 @@ HEADERS += \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
     Source/PokemonBDSP/PokemonBDSP_Panels.h \
     Source/PokemonBDSP/PokemonBDSP_Settings.h \
@@ -1276,6 +1280,8 @@ HEADERS += \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
+    Source/PokemonLA/Options/PokemonLA_IngoOpponent.h \
+    Source/PokemonLA/Options/PokemonLA_MiscOptions.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Options/PokemonLA_TravelLocation.h \

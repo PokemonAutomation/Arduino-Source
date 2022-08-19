@@ -41,7 +41,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    StartInGripOrClosedOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     RandomCodeOption RAID_CODE;

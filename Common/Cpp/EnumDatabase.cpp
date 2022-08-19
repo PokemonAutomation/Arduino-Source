@@ -9,7 +9,7 @@
 #include "Exceptions.h"
 #include "Containers/Pimpl.tpp"
 #include "Containers/FixedLimitVector.tpp"
-#include "NamedEnum.h"
+#include "EnumDatabase.h"
 
 namespace PokemonAutomation{
 
@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 class IntegerEnumDatabaseImpl{
 public:
-    IntegerEnumDatabaseImpl();
+//    IntegerEnumDatabaseImpl() = default;
 
     void add(EnumEntry entry){
         size_t enum_value = entry.enum_value;
@@ -79,9 +79,22 @@ private:
 
 
 
-
+IntegerEnumDatabase::IntegerEnumDatabase(IntegerEnumDatabase&& x) = default;
+IntegerEnumDatabase& IntegerEnumDatabase::operator=(IntegerEnumDatabase&& x) = default;
 IntegerEnumDatabase::~IntegerEnumDatabase() = default;
-IntegerEnumDatabase::IntegerEnumDatabase() = default;
+
+IntegerEnumDatabase::IntegerEnumDatabase(void*){}
+IntegerEnumDatabase::IntegerEnumDatabase()
+    : m_core(CONSTRUCT_TOKEN)
+{}
+IntegerEnumDatabase::IntegerEnumDatabase(std::initializer_list<EnumEntry> list)
+    : m_core(CONSTRUCT_TOKEN)
+{
+    size_t index = 0;
+    for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
+        add(iter->enum_value, std::move(iter->slug), std::move(iter->display), iter->enabled);
+    }
+}
 void IntegerEnumDatabase::add(EnumEntry entry){
     m_core->add(entry);
 }

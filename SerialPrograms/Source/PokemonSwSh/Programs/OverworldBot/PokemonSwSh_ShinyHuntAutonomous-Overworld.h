@@ -55,15 +55,29 @@ private:
     ) const;
 
 private:
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint8_t> TIME_ROLLBACK_HOURS;
 
     EncounterBotLanguage LANGUAGE;
 
     FloatingPointOption MARK_OFFSET;
-    DropdownOption MARK_PRIORITY;
-    DropdownOption TRIGGER_METHOD;
+    EnumDropdownOption<MarkPriority> MARK_PRIORITY;
+
+    enum class TriggerMethod{
+        WhistleOnly,
+        Whistle3Circle1,
+        Circle3Whistle3,
+        CircleOnly,
+        Horizontal,
+        Whistle3Horizontal1,
+        Horizontal3Whistle3,
+        Vertical,
+        Whistle3Vertical1,
+        Vertical3Whistle3,
+    };
+    EnumDropdownOption<TriggerMethod> TRIGGER_METHOD;
+
     TimeExpressionOption<uint16_t> MAX_MOVE_DURATION;
     FloatingPointOption MAX_TARGET_ALPHA;
 

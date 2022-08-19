@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -27,8 +27,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    DropdownOption ENCOUNTER_TYPE;
-
+    enum class EncounterType{
+        Wild,
+        Raid,
+    };
+    EnumDropdownOption<EncounterType> ENCOUNTER_TYPE;
 };
 
 

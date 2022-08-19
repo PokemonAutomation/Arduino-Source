@@ -17,12 +17,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-enum class Catchability{
-    ALWAYS_CATCHABLE,
-    MAYBE_UNCATCHABLE,
-    ALWAYS_UNCATCHABLE,
-};
-
 
 class GameSettings : public BatchOption{
     GameSettings();

@@ -188,10 +188,9 @@ QWidget* EventNotificationsTableWidget::make_ping_box(EventNotificationOption& e
 QWidget* EventNotificationsTableWidget::make_screenshot_box(EventNotificationOption& entry){
     if (entry.screenshot_supported){
         QComboBox* box = new NoWheelComboBox(this);
-        ScreenshotOption screenshot_option("");
-        box->addItem(QString::fromStdString(screenshot_option.case_name(0)));
-        box->addItem(QString::fromStdString(screenshot_option.case_name(1)));
-        box->addItem(QString::fromStdString(screenshot_option.case_name(2)));
+        box->addItem("No Screenshot.");
+        box->addItem("Attach as .jpg.");
+        box->addItem("Attach as .png.");
         box->setCurrentIndex((int)entry.m_current.screenshot);
         box->connect(
             box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),

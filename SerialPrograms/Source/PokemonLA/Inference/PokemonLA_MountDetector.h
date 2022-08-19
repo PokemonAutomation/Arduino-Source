@@ -10,6 +10,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -40,6 +41,24 @@ enum class MountDetectorLogging{
     LOG_ONLY,
     LOG_AND_DUMP_FAILURES,
 };
+
+class MountDetectorLoggingOption : public EnumDropdownOption<MountDetectorLogging>{
+public:
+    MountDetectorLoggingOption()
+        : EnumDropdownOption<MountDetectorLogging>(
+            "<b>Detection Failed Action</b>",
+            {
+                {MountDetectorLogging::NONE,                    "none",     "Do Nothing"},
+                {MountDetectorLogging::LOG_ONLY,                "log",      "Log to output window."},
+                {MountDetectorLogging::LOG_AND_DUMP_FAILURES,   "log+dump", "Log to output window and save to file."},
+            },
+            MountDetectorLogging::LOG_AND_DUMP_FAILURES
+        )
+    {}
+};
+
+
+
 
 
 class MountDetector{

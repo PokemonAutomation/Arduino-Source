@@ -13,6 +13,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
+#include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,13 +51,20 @@ private:
     static size_t total_pp(uint8_t pp[4]);
 
 private:
-    ShortcutDirection SHORTCUT;
+    enum class StartLocation{
+        Hearthome,
+        OldCouple,
+    };
+    enum class HealMethod{
+        Hearthome,
+        GlobalRoom,
+    };
 
-    DropdownOption START_LOCATION;
+    ShortcutDirectionOption SHORTCUT;
 
-    DropdownOption HEALING_METHOD;
-
-    DropdownOption ON_LEARN_MOVE;
+    EnumDropdownOption<StartLocation> START_LOCATION;
+    EnumDropdownOption<HealMethod> HEALING_METHOD;
+    OnLearnMoveOption ON_LEARN_MOVE;
 
     SimpleIntegerOption<uint8_t> MOVE1_PP;
     SimpleIntegerOption<uint8_t> MOVE2_PP;

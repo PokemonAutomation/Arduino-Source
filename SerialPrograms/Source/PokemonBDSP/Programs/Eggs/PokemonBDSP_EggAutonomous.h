@@ -49,12 +49,17 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
 
-    ShortcutDirection SHORTCUT;
+    ShortcutDirectionOption SHORTCUT;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
-    DropdownOption NUM_EGGS_IN_COLUMN;
+    IntegerEnumDropdownOption NUM_EGGS_IN_COLUMN;
 
-    DropdownOption AUTO_SAVING;
+    enum class AutoSave{
+        NoAutoSave,
+        AfterStartAndKeep,
+        EveryBatch,
+    };
+    EnumDropdownOption<AutoSave> AUTO_SAVING;
 
     EggHatchFilterTable FILTERS;
 
