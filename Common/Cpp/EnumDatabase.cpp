@@ -112,6 +112,7 @@ FixedLimitVector<size_t> IntegerEnumDatabase::all_values() const{
 }
 
 
+template class FixedLimitVector<size_t>;
 
 
 
