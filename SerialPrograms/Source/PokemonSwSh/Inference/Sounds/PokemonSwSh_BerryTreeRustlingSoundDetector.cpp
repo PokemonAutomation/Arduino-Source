@@ -4,18 +4,10 @@
  *
  */
 
-#include <QString>
+
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-//#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_BerryTreeRustlingSoundDetector.h"
-
-#include <sstream>
-#include <cfloat>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

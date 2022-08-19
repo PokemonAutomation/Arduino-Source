@@ -9,9 +9,9 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

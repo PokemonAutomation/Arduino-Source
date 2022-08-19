@@ -5,17 +5,17 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh_DateSpam-BerryFarmer2.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
+#include "PokemonSwSh_DateSpam-BerryFarmer2.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
