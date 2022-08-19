@@ -52,7 +52,7 @@ private:
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
-    TimeExpressionOption<uint16_t> START_BATTLE_DELAY;
+    SimpleIntegerOption<uint16_t> START_BATTLE_TIMEOUT;
     SimpleIntegerOption<uint16_t> RUSTLING_INTERVAL;
     TimeExpressionOption<uint16_t> RUSTLING_TIMEOUT;
     TimeExpressionOption<uint16_t> SECONDARY_ATTEMPT_MASH_TIME;

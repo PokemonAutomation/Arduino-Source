@@ -60,10 +60,9 @@ BerryFarmer2::BerryFarmer2()
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
-    , START_BATTLE_DELAY(
-        "<b>Start Battle Delay:</b><br>After a battle is detected, wait this long to flee.",
-        TICKS_PER_SECOND,
-        "15 * TICKS_PER_SECOND"
+    , START_BATTLE_TIMEOUT(
+        "<b>Start Battle Timeout:</b><br>After a battle is detected, wait this long to flee in seconds.",
+        15
     )
     , RUSTLING_INTERVAL(
         "<b>Rustling Interval:</b><br>How much time between two rustling sounds has to pass to be considered slow rustling in ms.",
@@ -87,7 +86,7 @@ BerryFarmer2::BerryFarmer2()
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(START_BATTLE_DELAY);
+    PA_ADD_OPTION(START_BATTLE_TIMEOUT);
     PA_ADD_OPTION(RUSTLING_INTERVAL);
     PA_ADD_OPTION(RUSTLING_TIMEOUT);
     PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME);
@@ -125,7 +124,6 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     if (ret == 0) {
         env.console.log("BerryFarmer: Initial Rustling detected.");
         WallClock initial_rustling_time = current_time();
-
         result = Rustling::Slow;
         
         int ret1 = run_until(
@@ -152,9 +150,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     } 
     else if (ret == 2) {
         env.console.log("BerryFarmer: Battle Start detected.");
-        // waiting here so we can be sure the battle is fully underway so escaping is possible
-        pbf_wait(context, START_BATTLE_DELAY);
-        context.wait_for_all_requests();
+        wait_until(env.console, context, std::chrono::seconds(START_BATTLE_TIMEOUT), { battle_menu_detector });
         result = Rustling::Battle;
     }
     else {
