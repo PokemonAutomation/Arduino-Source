@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -98,8 +99,6 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     pbf_wait(context, 80);
     context.wait_for_all_requests();
 
-    std::chrono::time_point initial_rustling_time = std::chrono::system_clock::now();
-
     BerryTreeRustlingSoundDetector initial_rustling_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool {
         //  Warning: This callback will be run from a different thread than this function.
         return true;
@@ -125,7 +124,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
 
     if (ret == 0) {
         env.console.log("BerryFarmer: Initial Rustling detected.");
-        initial_rustling_time = std::chrono::system_clock::now();
+        WallClock initial_rustling_time = current_time();
 
         result = Rustling::Slow;
         
@@ -140,8 +139,8 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
 
         if (ret1 == 0) {
             env.console.log("BerryFarmer: Secondary Rustling detected.");
-            std::chrono::time_point secondary_rustling_time = std::chrono::system_clock::now();
-            if (std::chrono::duration_cast<std::chrono::milliseconds>(secondary_rustling_time - initial_rustling_time).count() <= RUSTLING_INTERVAL) {
+            WallClock secondary_rustling_time = current_time();
+            if (std::chrono::duration_cast<Milliseconds>(secondary_rustling_time - initial_rustling_time).count() <= RUSTLING_INTERVAL) {
                 result = Rustling::Fast;
             }
         }
