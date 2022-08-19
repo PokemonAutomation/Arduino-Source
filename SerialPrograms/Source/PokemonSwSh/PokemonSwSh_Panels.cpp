@@ -23,6 +23,7 @@
 
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
+#include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer2.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h"
@@ -111,6 +112,7 @@ std::vector<PanelEntry> make_panels(){
     ret.emplace_back("---- Date-Spam Farmers ----");
     ret.emplace_back(make_single_switch_program<WattFarmer_Descriptor, WattFarmer>());
     ret.emplace_back(make_single_switch_program<BerryFarmer_Descriptor, BerryFarmer>());
+    ret.emplace_back(make_single_switch_program<BerryFarmer2_Descriptor, BerryFarmer2>());
     ret.emplace_back(make_single_switch_program<LotoFarmer_Descriptor, LotoFarmer>());
     ret.emplace_back(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
     ret.emplace_back(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
