@@ -45,7 +45,7 @@ private:
 
 private:
     StaticTextOption REQUIRES_AUDIO;
-    StartInGripOrGameOption START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> FETCH_ATTEMPTS;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;

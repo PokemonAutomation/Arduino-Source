@@ -80,7 +80,7 @@ BerryFarmer2::BerryFarmer2()
     )
 {
     PA_ADD_OPTION(REQUIRES_AUDIO);
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(FETCH_ATTEMPTS);
     PA_ADD_OPTION(SAVE_ITERATIONS);
 
@@ -199,7 +199,7 @@ uint32_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
 }
 
 void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (START_IN_GRIP_MENU){
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }
     else {
