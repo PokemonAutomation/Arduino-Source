@@ -12,18 +12,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-std::vector<std::string> buildShortcutValues(bool required){
-    std::vector<std::string> values;
-    if (!required){
-        values.emplace_back("None");
-    }
-    values.emplace_back("Up");
-    values.emplace_back("Right");
-    values.emplace_back("Down");
-    values.emplace_back("Left");
-    return values;
-}
-
 
 const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
     static EnumDatabase<ShortcutDirection> database({
