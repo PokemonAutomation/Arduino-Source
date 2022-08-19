@@ -210,7 +210,8 @@ private:
 
 
 void MaxLairStrongBoss::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    if (CONSOLES.HOST.current_index() >= env.consoles.size()){
+    size_t host_index = CONSOLES.HOST.current_value();
+    if (host_index >= env.consoles.size()){
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
@@ -225,13 +226,13 @@ void MaxLairStrongBoss::program(MultiSwitchProgramEnvironment& env, CancellableS
 
     EndBattleDecider_StrongBoss decider(
         env.logger(),
-        CONSOLES, CONSOLES.HOST.current_index(),
+        CONSOLES, host_index,
         MIN_WIN_RATE
     );
 
     loop_adventures(
         env, scope, CONSOLES,
-        CONSOLES.HOST.current_index(), BOSS_SLOT.current_index(),
+        host_index, BOSS_SLOT.current_value(),
         decider,
         GO_HOME_WHEN_DONE,
         HOSTING,

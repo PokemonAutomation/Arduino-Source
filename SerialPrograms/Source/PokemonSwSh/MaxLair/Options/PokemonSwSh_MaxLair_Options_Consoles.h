@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"
@@ -23,13 +24,12 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-class CaughtScreenActionOption : public DropdownOption{
+class CaughtScreenActionOption : public EnumDropdownOption<CaughtScreenAction>{
 public:
     CaughtScreenActionOption(
         bool take_non_shiny, bool reset_if_high_winrate,
         std::string label, CaughtScreenAction default_action
     );
-    operator CaughtScreenAction() const{ return (CaughtScreenAction)current_index();}
 };
 class CaughtScreenActionsOption : public GroupOption{
 public:
@@ -50,11 +50,14 @@ public:
 
 
 
-class ConsoleSpecificOptions : public GroupOption{
+class ConsoleSpecificOptions : public GroupOption, private ConfigOption::Listener{
 public:
     ConsoleSpecificOptions(std::string label, const LanguageSet& languages);
 
     virtual void set_host(bool is_host);
+    virtual void value_changed() override{}
+
+
 
     bool is_host;
     StaticTextOption is_host_label;

@@ -45,11 +45,11 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     , ACTION(
         "<b>Shiny Detected Action:</b>",
         {
-            "Ignore the shiny. Do not stop the program.",
-            "Stop program. Align camera for a screenshot. Then go Home.",
-            "Stop program. Align camera for a screenshot + video. Then go Home.",
+            {ShinyDetectedAction::IGNORE,                   "ignore",       "Ignore the shiny. Do not stop the program."},
+            {ShinyDetectedAction::STOP_PROGRAM,             "stop",         "Stop program. Align camera for a screenshot. Then go Home."},
+            {ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM,  "video+stop",   "Stop program. Align camera for a screenshot + video. Then go Home."},
         },
-        (size_t)default_action
+        default_action
     )
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)
@@ -71,7 +71,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     PA_ADD_OPTION(SCREENSHOT_DELAY);
 }
 bool ShinyDetectedActionOption::stop_on_shiny() const{
-    return ACTION != (size_t)ShinyDetectedAction::IGNORE;
+    return ACTION != ShinyDetectedAction::IGNORE;
 }
 
 
@@ -91,7 +91,7 @@ bool on_shiny_callback(
 
         //  If we're not ignoring the shiny, return now. Actions will be deferred
         //  until after the session ends.
-        ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+        ShinyDetectedAction action = options.ACTION;
         if (action != ShinyDetectedAction::IGNORE){
             return true;
         }
@@ -156,7 +156,7 @@ void on_shiny_sound(
         console.video().snapshot(), true
     );
 
-    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+    ShinyDetectedAction action = options.ACTION;
     if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
@@ -191,7 +191,7 @@ void on_match_found(
         console.video().snapshot(), true
     );
 
-    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+    ShinyDetectedAction action = options.ACTION;
     if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 
 #include "Common/Cpp/Options/RandomCodeOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/BatchOption/GroupWidget.h"
@@ -35,7 +35,7 @@ public:
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-    DropdownOption MODE;
+    EnumDropdownOption<HostingMode> MODE;
     RandomCodeOption RAID_CODE;
     TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
     TimeExpressionOption<uint16_t> START_DELAY;

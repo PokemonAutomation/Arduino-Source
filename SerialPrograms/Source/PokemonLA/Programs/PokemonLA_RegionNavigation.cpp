@@ -223,7 +223,7 @@ void goto_camp_from_jubilife(
     }
     if (current_region != location.region){
         dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot());
-        throw OperationFailedException(console, std::string("Unable to find: ") + location.label);
+        throw OperationFailedException(console, std::string("Unable to find: ") + location.display);
     }
 
     if (location.warp_slot != 0){

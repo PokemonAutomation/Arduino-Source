@@ -50,7 +50,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     FloatingPointOption MIN_WIN_RATE;
-    MaxLairInternal::BossSlot BOSS_SLOT;
+    MaxLairInternal::BossSlotOption BOSS_SLOT;
 
     MaxLairInternal::Consoles CONSOLES;
     MaxLairInternal::HostingSettings HOSTING;

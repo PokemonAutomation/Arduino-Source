@@ -13,21 +13,16 @@ namespace PokemonLA{
 
 
 TravelLocationOption::TravelLocationOption()
-    : DropdownOption(
+    : IntegerEnumDropdownOption(
         "<b>Start Location:</b><br>Travel from this location.",
-        TravelLocations::instance().all_location_names(),
+        TravelLocations::instance().database(),
         0
     )
 {}
 
 TravelLocationOption::operator TravelLocation() const{
-    size_t index = (size_t)*this;
-    const std::string& label = this->case_name(index);
-    const TravelLocation* location = TravelLocations::instance().get_from_name(label);
-    if (location == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid TravelLocation: " + label);
-    }
-    return *location;
+    size_t index = this->current_value();
+    return TravelLocations::instance()[index];
 }
 
 

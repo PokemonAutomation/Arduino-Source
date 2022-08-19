@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_H
 
 #include <chrono>
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h"
 
 namespace PokemonAutomation{
@@ -23,16 +23,17 @@ extern const std::chrono::milliseconds INFERENCE_RATE;
 
 
 
-class HostingSwitch : public DropdownOption{
+class HostingSwitch : public IntegerEnumDropdownOption{
 public:
     HostingSwitch();
-    using DropdownOption::check_validity;
     std::string check_validity(size_t consoles) const;
 };
 
-class BossSlot : public DropdownOption{
+
+
+class BossSlotOption : public IntegerEnumDropdownOption{
 public:
-    BossSlot();
+    BossSlotOption();
 };
 
 

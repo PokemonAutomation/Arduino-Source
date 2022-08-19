@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include "Common/Cpp/EnumDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -24,8 +25,8 @@ enum class IVCheckerValue{
     Best,
     HyperTrained,
 };
+const EnumDatabase<IVCheckerValue>& IVCheckerValue_Database();
 IVCheckerValue IVCheckerValue_string_to_enum(const std::string& token);
-const std::string& IVCheckerValue_enum_to_string(IVCheckerValue result);
 
 
 enum class IVCheckerFilter{
@@ -37,11 +38,7 @@ enum class IVCheckerFilter{
     Fantastic,
     Best,
 };
-extern const std::vector<std::string> IVCheckerFilter_NAMES;
-IVCheckerFilter IVCheckerFilter_string_to_enum(const std::string& string);
-const std::string& IVCheckerFilter_enum_to_string(IVCheckerFilter result);
-
-
+const EnumDatabase<IVCheckerFilter>& IVCheckerFilter_Database();
 bool IVChecker_filter_match(IVCheckerFilter filter, IVCheckerValue value);
 
 

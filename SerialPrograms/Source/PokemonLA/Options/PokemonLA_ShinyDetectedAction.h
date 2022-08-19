@@ -62,7 +62,7 @@ public:
     bool stop_on_shiny() const;
 
     StaticTextOption DESCRIPTION;
-    DropdownOption ACTION;
+    EnumDropdownOption<ShinyDetectedAction> ACTION;
 //    BooleanCheckBoxOption STOP_PROGRAM;
 //    BooleanCheckBoxOption TAKE_VIDEO;
     TimeExpressionOption<uint16_t> SCREENSHOT_DELAY;

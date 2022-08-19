@@ -45,12 +45,12 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages()
     )
-    , HP("<b>HP:</b>")
-    , ATTACK("<b>Attack:</b>")
-    , DEFENSE("<b>Defense:</b>")
-    , SPATK("<b>Sp. Atk:</b>")
-    , SPDEF("<b>Sp. Def:</b>")
-    , SPEED("<b>Speed:</b>")
+    , HP("<b>HP:</b>", IVCheckerValue::Best)
+    , ATTACK("<b>Attack:</b>", IVCheckerValue::Best)
+    , DEFENSE("<b>Defense:</b>", IVCheckerValue::Best)
+    , SPATK("<b>Sp. Atk:</b>", IVCheckerValue::Best)
+    , SPDEF("<b>Sp. Def:</b>", IVCheckerValue::Best)
+    , SPEED("<b>Speed:</b>", IVCheckerValue::Best)
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(HP);
@@ -78,12 +78,14 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseC
     std::vector<ImageViewRGB32> images = reader.dump_images(*screen);
 
     std::string now = now_to_filestring();
-    images[0].save(path + IVCheckerOptionOCR::TOKENS[HP] + "-" + now + "a.png");
-    images[1].save(path + IVCheckerOptionOCR::TOKENS[ATTACK] + "-" + now + "b.png");
-    images[2].save(path + IVCheckerOptionOCR::TOKENS[DEFENSE] + "-" + now + "c.png");
-    images[3].save(path + IVCheckerOptionOCR::TOKENS[SPATK] + "-" + now + "d.png");
-    images[4].save(path + IVCheckerOptionOCR::TOKENS[SPDEF] + "-" + now + "e.png");
-    images[5].save(path + IVCheckerOptionOCR::TOKENS[SPEED] + "-" + now + "f.png");
+
+    const EnumDatabase<IVCheckerValue>& database = IVCheckerValue_Database();
+    images[0].save(path + database.find(HP)->display + "-" + now + "a.png");
+    images[1].save(path + database.find(ATTACK)->display + "-" + now + "b.png");
+    images[2].save(path + database.find(DEFENSE)->display + "-" + now + "c.png");
+    images[3].save(path + database.find(SPATK)->display + "-" + now + "d.png");
+    images[4].save(path + database.find(SPDEF)->display + "-" + now + "e.png");
+    images[5].save(path + database.find(SPEED)->display + "-" + now + "f.png");
 
 }
 

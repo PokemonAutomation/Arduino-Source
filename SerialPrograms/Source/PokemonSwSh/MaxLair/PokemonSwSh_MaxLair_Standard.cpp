@@ -163,7 +163,8 @@ private:
 
 
 void MaxLairStandard::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    if (CONSOLES.HOST >= env.consoles.size()){
+    size_t host_index = CONSOLES.HOST.current_value();
+    if (host_index >= env.consoles.size()){
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
@@ -180,7 +181,7 @@ void MaxLairStandard::program(MultiSwitchProgramEnvironment& env, CancellableSco
 
     loop_adventures(
         env, scope, CONSOLES,
-        CONSOLES.HOST, BOSS_SLOT,
+        host_index, BOSS_SLOT.current_value(),
         decider,
         GO_HOME_WHEN_DONE,
         HOSTING,

@@ -48,7 +48,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    MaxLairInternal::BossSlot BOSS_SLOT;
+    MaxLairInternal::BossSlotOption BOSS_SLOT;
 
     MaxLairInternal::Consoles CONSOLES;
     MaxLairInternal::HostingSettings HOSTING;

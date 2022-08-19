@@ -17,12 +17,13 @@ namespace PokemonLA{
 
 
 TravelLocation::TravelLocation(
-    const char* p_label,
+    const char* p_slug, const char* p_display,
     MapRegion p_region,
     uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
     std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver
 )
-    : label(p_label)
+    : slug(p_slug)
+    , display(p_display)
     , region(p_region)
     , warp_slot(p_warp_slot)
     , warp_sub_slot(p_warp_sub_slot)
@@ -34,75 +35,76 @@ const TravelLocations& TravelLocations::instance(){
     static const TravelLocations locations;
     return locations;
 }
-const TravelLocation* TravelLocations::get_from_name(const std::string& name) const{
-    auto iter = m_map.find(name);
-    if (iter != m_map.end()){
-        return iter->second;
-    }
-    return nullptr;
-}
-std::vector<std::string> TravelLocations::all_location_names() const{
-    std::vector<std::string> ret;
-    for (const TravelLocation* item : m_list){
-        ret.emplace_back(item->label);
-    }
-    return ret;
+const IntegerEnumDatabase& TravelLocations::database() const{
+    return m_database;
 }
 
 
 void TravelLocations::add_location(const TravelLocation& location){
-    if (!m_map.emplace(location.label, &location).second){
+    if (!m_map.emplace(location.display, &location).second){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
-            std::string("Duplicate TravelLocation name: ") + location.label
+            std::string("Duplicate TravelLocation name: ") + location.display
         );
     }
     m_list.emplace_back(&location);
+    m_database.add(m_list.size() - 1, location.slug, location.display, true);
 }
 TravelLocations::TravelLocations()
     : Fieldlands_Fieldlands(
+        "fieldlands-fieldlands",
         "Obsidian Fieldlands - Fieldlands Camp",
         MapRegion::FIELDLANDS, 0, 0, nullptr
     )
     , Fieldlands_Heights(
+        "fieldlands-heights",
         "Obsidian Fieldlands - Heights Camp",
         MapRegion::FIELDLANDS, 1, 0, nullptr
     )
     , Fieldlands_Arena(
+        "fieldlands-arena",
         "Obsidian Fieldlands - Grandtree Arena",
         MapRegion::FIELDLANDS, 0, 2, nullptr
     )
 
     , Mirelands_Mirelands(
+        "mirelands-mirelands",
         "Crimson Mirelands - Mirelands Camp",
         MapRegion::MIRELANDS, 0, 0, nullptr
     )
     , Mirelands_Bogbound(
+        "mirelands-bogboung",
         "Crimson Mirelands - Bogbound Camp",
         MapRegion::MIRELANDS, 1, 0, nullptr
     )
     , Mirelands_DiamondSettlement(
+        "mirelands-settlement",
         "Crimson Mirelands - Diamond Settlement",
         MapRegion::MIRELANDS, 0, 2, nullptr
     )
     , Mirelands_Arena(
+        "mirelands-arena",
         "Crimson Mirelands - Brava Arena",
         MapRegion::MIRELANDS, 0, 3, nullptr
     )
 
     , Coastlands_Beachside(
+        "coastlands-beachside",
         "Cobalt Coastlands - Beachside Camp",
         MapRegion::COASTLANDS, 0, 0, nullptr
     )
     , Coastlands_Coastlands(
+        "coastlands-coastlands",
         "Cobalt Coastlands - Coastlands Camp",
         MapRegion::COASTLANDS, 1, 0, nullptr
     )
     , Coastlands_Arena(
+        "coastlands-arena",
         "Cobalt Coastlands - Molten Arena",
         MapRegion::COASTLANDS, 0, 2, nullptr
     )
     , Coastlands_Arena_NW(
+        "coastlands-arena-nw",
         "Cobalt Coastlands - Molten Arena (NW of Volcano)",
         MapRegion::COASTLANDS, 0, 2, [](ConsoleHandle& console, BotBaseContext& context){
             change_mount(console, context, MountState::BRAVIARY_ON);
@@ -112,35 +114,43 @@ TravelLocations::TravelLocations()
     )
 
     , Highlands_Highlands(
+        "highlands-highlands",
         "Coronet Highlands - Highlands Camp",
         MapRegion::HIGHLANDS, 0, 0, nullptr
     )
     , Highlands_Mountain(
+        "highlands-mountain",
         "Coronet Highlands - Mountain Camp",
         MapRegion::HIGHLANDS, 1, 0, nullptr
     )
     , Highlands_Summit(
+        "highlands-summit",
         "Coronet Highlands - Summit Camp",
         MapRegion::HIGHLANDS, 2, 0, nullptr
     )
     , Highlands_Arena(
+        "highlands-arena",
         "Coronet Highlands - Moonview Arena",
         MapRegion::HIGHLANDS, 0, 3, nullptr
     )
 
     , Icelands_Snowfields(
+        "icelands-icelands",
         "Alabaster Icelands - Snowfields Camp",
         MapRegion::ICELANDS, 0, 0, nullptr
     )
     , Icelands_Icepeak(
+        "icelands-icepeak",
         "Alabaster Icelands - Icepeak Camp",
         MapRegion::ICELANDS, 1, 0, nullptr
     )
     , Icelands_PearlSettlement(
+        "icelands-settlement",
         "Alabaster Icelands - Pearl Settlement",
         MapRegion::ICELANDS, 0, 2, nullptr
     )
     , Icelands_Arena(
+        "icelands-arena",
         "Alabaster Icelands - Icepeak Arena",
         MapRegion::ICELANDS, 0, 3, nullptr
     )

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "Common/Cpp/EnumDatabase.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_Locations.h"
@@ -23,7 +24,8 @@ namespace PokemonLA{
 
 
 struct TravelLocation{
-    const char* label;
+    const char* slug;
+    const char* display;
 
     MapRegion region;
     uint8_t warp_slot;
@@ -32,7 +34,7 @@ struct TravelLocation{
     std::function<void(ConsoleHandle& console, BotBaseContext& context)> post_arrival_maneuver;
 
     TravelLocation(
-        const char* p_label,
+        const char* p_slug, const char* p_display,
         MapRegion p_region,
         uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
         std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver
@@ -44,9 +46,10 @@ class TravelLocations{
 public:
     static const TravelLocations& instance();
 
-    const TravelLocation* get_from_name(const std::string& name) const;
-
-    std::vector<std::string> all_location_names() const;
+    const TravelLocation& operator[](size_t index) const{
+        return *m_list[index];
+    }
+    const IntegerEnumDatabase& database() const;
 
 
 public:
@@ -81,6 +84,8 @@ private:
 
     std::vector<const TravelLocation*> m_list;
     std::map<std::string, const TravelLocation*> m_map;
+
+    IntegerEnumDatabase m_database;
 };
 
 

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
+#include "Common/Cpp/Options/DropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"

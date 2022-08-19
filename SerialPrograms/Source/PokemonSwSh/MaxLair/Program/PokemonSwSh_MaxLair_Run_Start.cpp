@@ -156,7 +156,7 @@ bool start_raid_local(
         entrance[index] = enter_lobby(
             console, context,
             is_host ? boss_slot : 0,
-            (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
+            settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
         );
         if (!*entrance[index]){
@@ -312,7 +312,7 @@ bool start_raid_host(
         entrance[index] = enter_lobby(
             console, context,
             is_host ? boss_slot : 0,
-            (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
+            settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
         );
         if (!*entrance[index]){
@@ -456,7 +456,7 @@ bool start_adventure(
     const StatsTracker& session_stats,
     ConsoleRuntime console_stats[4]
 ){
-    switch ((HostingMode)(size_t)settings.MODE){
+    switch (settings.MODE){
     case HostingMode::NOT_HOSTING:
         return start_raid_local(env, scope, state_tracker, entrance, host, boss_slot, settings, console_stats);
     case HostingMode::HOST_LOCALLY:

@@ -20,11 +20,11 @@ HostingSettings::HostingSettings()
     , MODE(
         "<b>Mode:</b>",
         {
-            "Not Hosting: Run by yourself using only Switches controlled by this program.",
-            "Host Locally: Allow other local Switches to join.",
-            "Host Online: Allow other people online to join.",
-        }
-        , 0
+            {HostingMode::NOT_HOSTING, "none", "Not Hosting: Run by yourself using only Switches controlled by this program."},
+            {HostingMode::HOST_LOCALLY, "local", "Host Locally: Allow other local Switches to join."},
+            {HostingMode::HOST_ONLINE, "online", "Host Online: Allow other people online to join."},
+        },
+        HostingMode::NOT_HOSTING
     )
     , RAID_CODE(
         "<b>Raid Code:</b><br>Required if using multiple Switches. "
@@ -81,12 +81,12 @@ HostingSettingsUI::HostingSettingsUI(QWidget& parent, HostingSettings& value)
 }
 void HostingSettingsUI::update_option_visibility(){
     HostingSettings& value = static_cast<HostingSettings&>(m_value);
-    if ((size_t)value.MODE == (size_t)HostingMode::HOST_ONLINE){
+    if (value.MODE == HostingMode::HOST_ONLINE){
         value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);
     }else{
         value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::DISABLED);
     }
-    if ((size_t)value.MODE != (size_t)HostingMode::NOT_HOSTING){
+    if (value.MODE != HostingMode::NOT_HOSTING){
         value.START_DELAY.set_visibility(ConfigOptionState::ENABLED);
         value.NOTIFICATIONS.set_visibility(ConfigOptionState::ENABLED);
     }else{

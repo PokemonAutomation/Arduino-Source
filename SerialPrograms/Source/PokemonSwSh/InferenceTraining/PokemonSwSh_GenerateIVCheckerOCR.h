@@ -17,24 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class IVCheckerOptionOCR : public DropdownOption{
+class IVCheckerOptionOCR : public EnumDropdownOption<IVCheckerValue>{
 public:
     static const std::string TOKENS[];
 
 public:
-    IVCheckerOptionOCR(std::string label, size_t default_index = 0)
-        : DropdownOption(
+    IVCheckerOptionOCR(std::string label, IVCheckerValue default_value)
+        : EnumDropdownOption<IVCheckerValue>(
             std::move(label),
-            {
-                "No Good (0)",
-                "Decent (1-15)",
-                "Pretty Good (16-25)",
-                "Very Good (26-29)",
-                "Fantastic (30)",
-                "Best (31)",
-                "Hyper trained!",
-            },
-            default_index
+            IVCheckerValue_Database(),
+            default_value
         )
     {}
 };

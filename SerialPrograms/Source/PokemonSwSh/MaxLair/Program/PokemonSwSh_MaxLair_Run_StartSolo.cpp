@@ -173,7 +173,7 @@ bool start_raid_host_solo(
     //  Enter lobby.
     entrance = enter_lobby(
         console, context, boss_slot,
-        (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
+        settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
     if (!*entrance){

@@ -28,20 +28,22 @@ CaughtScreenActionOption::CaughtScreenActionOption(
     bool take_non_shiny, bool reset_if_high_winrate,
     std::string label, CaughtScreenAction default_action
 )
-    : DropdownOption(
+    : EnumDropdownOption<CaughtScreenAction>(
         std::move(label),
         {
-            "Stop Program",
-            take_non_shiny
+            {CaughtScreenAction::STOP_PROGRAM, "stop-program", "Stop Program"},
+            {CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE, "continue", take_non_shiny
                 ? "Continue Running. (Take any shiny non-boss " + STRING_POKEMON + " along the way.)"
-                : "Continue Running",
-            !reset_if_high_winrate
+                : "Continue Running"
+            },
+            {CaughtScreenAction::RESET, "reset", !reset_if_high_winrate
                 ? "Reset Game"
                 : take_non_shiny
                     ? "Reset Game if win-rate is above the threshold. Otherwise take any non-boss shinies and continue."
-                    : "Reset Game if win-rate is above the threshold. Otherwise continue running.",
+                    : "Reset Game if win-rate is above the threshold. Otherwise continue running."
+            },
         },
-        (size_t)default_action
+        default_action
     )
 {}
 
@@ -149,13 +151,10 @@ ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
 }
 void ConsolesUI::update(){
     BatchWidget::update();
-    DropdownOptionWidget* host = static_cast<DropdownOptionWidget*>(m_options[0]);
-    size_t host_index = static_cast<DropdownOption&>(host->option());
-//    cout << "ConsolesUI::update_ui()" << endl;
+
+    size_t host_index = m_value.HOST.current_value();
     for (size_t c = 0; c < 4; c++){
-        ConfigWidget* console_widget = m_options[c + 1];
-        ConsoleSpecificOptions& console = static_cast<ConsoleSpecificOptions&>(console_widget->option());
-        console.set_host(c == host_index);
+        m_value.PLAYERS[c]->set_host(c == host_index);
     }
 }
 void ConsolesUI::value_changed(){
