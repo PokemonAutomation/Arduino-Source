@@ -39,7 +39,7 @@ StandardBattleMenuDetector::StandardBattleMenuDetector(
     , m_text_bag    (0.830, 0.576 + 2 * 0.1075, 0.08, 0.080)
     , m_text_run    (0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
 //    , m_status0     (0.280, 0.870, 0.015, 0.030)
-    , m_status1     (0.165, 0.945, 0.100, 0.020)
+    , m_status1     (0.165, 0.945, 0.100, 0.015)
 {}
 void StandardBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     if (!m_den){
