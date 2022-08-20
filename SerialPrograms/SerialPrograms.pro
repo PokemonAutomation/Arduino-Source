@@ -386,7 +386,6 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
-    Source/Pokemon/Options/Pokemon_BerrySelectWidget.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
     Source/Pokemon/Options/Pokemon_NameListOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
@@ -426,7 +425,8 @@ SOURCES += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.cpp \
-    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/PokemonBDSP_Panels.cpp \
@@ -1152,7 +1152,6 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
-    Source/Pokemon/Options/Pokemon_BerrySelectWidget.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
     Source/Pokemon/Options/Pokemon_NameListOption.h \
@@ -1194,7 +1193,8 @@ HEADERS += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h \
-    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h \

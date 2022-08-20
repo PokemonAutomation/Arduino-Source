@@ -11,7 +11,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonBDSP/Options/PokemonBDSP_BerrySelector.h"
+#include "PokemonBDSP/Options/PokemonBDSP_BerryTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,7 +37,7 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
     
-    BerrySelectorOption TARGET_BERRIES;
+    BerryTable TARGET_BERRIES;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

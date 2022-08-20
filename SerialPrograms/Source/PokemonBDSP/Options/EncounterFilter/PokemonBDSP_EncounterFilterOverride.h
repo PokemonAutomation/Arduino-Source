@@ -14,13 +14,8 @@
 #include "PokemonBDSP_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
-namespace Pokemon{
-    class BallSelectWidget;
-}
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-
-using namespace Pokemon;
 
 
 struct EncounterActionFull{

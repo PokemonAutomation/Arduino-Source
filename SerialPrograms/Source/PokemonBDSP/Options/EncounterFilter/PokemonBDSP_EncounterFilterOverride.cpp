@@ -22,6 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+using namespace Pokemon;
 
 
 bool EncounterActionFull::operator==(const EncounterActionFull& x) const{

@@ -13,13 +13,8 @@
 #include "PokemonSwSh_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
-namespace Pokemon{
-    class BallSelectWidget;
-}
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-
-using namespace Pokemon;
 
 
 
