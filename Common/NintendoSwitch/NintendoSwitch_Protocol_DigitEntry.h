@@ -4,8 +4,8 @@
  * 
  */
 
-#ifndef PokemonAutomation_Protocol_SwitchDigitEntry_H
-#define PokemonAutomation_Protocol_SwitchDigitEntry_H
+#ifndef PokemonAutomation_NintendoSwitch_Protocol_SwitchDigitEntry_H
+#define PokemonAutomation_NintendoSwitch_Protocol_SwitchDigitEntry_H
 
 #ifdef __AVR__
 #include "NativePrograms/NintendoSwitch/Framework/Master.h"

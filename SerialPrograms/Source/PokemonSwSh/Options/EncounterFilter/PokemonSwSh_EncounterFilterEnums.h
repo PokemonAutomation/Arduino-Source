@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,27 +24,14 @@ enum class EncounterAction{
     ThrowBalls,
     ThrowBallsAndSave,
 };
-extern const std::vector<std::string> EncounterAction_NAMES;
-extern const std::map<std::string, EncounterAction> EncounterAction_MAP;
+const EnumDatabase<EncounterAction>& EncounterAction_Database();
 
-class EncounterActionCell : public DropdownCell{
+
+class EncounterActionCell : public EnumDropdownCell<EncounterAction>{
 public:
     EncounterActionCell()
-        : DropdownCell(
-            {
-                "Stop Program",
-                "Run Away",
-                "Throw balls.",
-                "Throw balls. Save if caught.",
-            }, 0
-        )
+        : EnumDropdownCell<EncounterAction>(EncounterAction_Database(), EncounterAction::StopProgram)
     {}
-    operator EncounterAction() const{
-        return (EncounterAction)current_index();
-    }
-    void set(EncounterAction action){
-        DropdownCell::set_index((size_t)action);
-    }
 };
 
 
@@ -57,50 +44,22 @@ enum class ShinyFilter{
     SQUARE_ONLY,
     NOTHING,
 };
-extern const std::vector<std::string> ShinyFilter_NAMES;
-extern const std::map<std::string, ShinyFilter> ShinyFilter_MAP;
+const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database();
+const EnumDatabase<ShinyFilter>& ShinyFilter_RareStars_Database();
 
-
-
-class ShinyFilterCell : public DropdownCell{
+class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
 public:
-    PA_NO_INLINE ShinyFilterCell(bool rare_stars)
-        : DropdownCell(
-            rare_stars
-                ? std::vector<std::string>{
-                    "Not Shiny",
-                    "Square Shiny",
-                }
-                : std::vector<std::string>{
-                    "Anything",
-                    "Not Shiny",
-                    "Any Shiny",
-                    "Star Shiny",
-                    "Square Shiny",
-                    "Nothing",
-                },
-//            rare_stars ? 0 : 1
-            no_opt_wrap(rare_stars) //  COMPILER-BUG: MSVC2019
+    ShinyFilterCell(bool rare_stars)
+        : EnumDropdownCell<ShinyFilter>(
+            rare_stars ? ShinyFilter_RareStars_Database() : ShinyFilter_Normal_Database(),
+            ShinyFilter::NOT_SHINY
         )
-        , m_rare_stars(rare_stars)
     {}
-
-
-    static PA_NO_INLINE size_t no_opt_wrap(bool& x){
-    //    cout << "no_opt_wrap = " << x << endl;
-        return x ? 0 : 1;
-    }
-
-    operator ShinyFilter() const;
-    void set(ShinyFilter action);
-
-private:
-    using DropdownCell::set_index;
-
-private:
-    bool m_rare_stars;
 };
 
+
+extern const std::vector<std::string> ShinyFilter_NAMES;
+extern const std::map<std::string, ShinyFilter> ShinyFilter_MAP;
 
 
 

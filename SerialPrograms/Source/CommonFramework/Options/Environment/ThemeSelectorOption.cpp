@@ -8,8 +8,6 @@
 #include <QTextStream>
 #include <QApplication>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Options/DropdownOption.h"
-#include "Common/Qt/Options/DropdownWidget.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
 

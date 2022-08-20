@@ -10,41 +10,19 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-enum class EncounterAction{
-    StopProgram,
-    RunAway,
-    ThrowBalls,
-    ThrowBallsAndSave,
-};
+using EncounterAction = PokemonSwSh::EncounterAction;
+using EncounterActionCell = PokemonSwSh::EncounterActionCell;
+
 extern const std::vector<std::string> EncounterAction_NAMES;
 extern const std::map<std::string, EncounterAction> EncounterAction_MAP;
 
-class EncounterActionCell : public DropdownCell{
-public:
-    EncounterActionCell()
-        : DropdownCell(
-            {
-                "Stop Program",
-                "Run Away",
-                "Throw balls.",
-                "Throw balls. Save if caught.",
-            }, 0
-        )
-    {}
-    operator EncounterAction() const{
-        return (EncounterAction)(size_t)*this;
-    }
-    void set(EncounterAction action){
-        DropdownCell::set_index((size_t)action);
-    }
-};
 
 
 
@@ -55,29 +33,18 @@ enum class ShinyFilter{
     SHINY,
     NOTHING,
 };
+const EnumDatabase<ShinyFilter>& ShinyFilter_Database();
+
+class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
+public:
+    ShinyFilterCell()
+        : EnumDropdownCell<ShinyFilter>(ShinyFilter_Database(), ShinyFilter::ANYTHING)
+    {}
+};
+
 extern const std::vector<std::string> ShinyFilter_NAMES;
 extern const std::map<std::string, ShinyFilter> ShinyFilter_MAP;
 
-class ShinyFilterCell : public DropdownCell{
-public:
-    ShinyFilterCell()
-        : DropdownCell(
-            {
-                "Anything",
-                "Not Shiny",
-                "Shiny",
-                "Nothing",
-            },
-            1
-        )
-    {}
-    operator ShinyFilter() const{
-        return (ShinyFilter)(size_t)*this;
-    }
-    void set(ShinyFilter action){
-        DropdownCell::set_index((size_t)action);
-    }
-};
 
 
 

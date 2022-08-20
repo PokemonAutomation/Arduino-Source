@@ -162,7 +162,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             rollback_date_from_home(context, game.skips);
 
             //  Sanitize game slot.
-            uint8_t game_slot = (uint8_t)game.game_slot + 1;
+            uint8_t game_slot = (uint8_t)game.game_slot.current_value();
             if (game_slot > 2){
                 game_slot = 0;
             }
@@ -182,7 +182,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
-                (uint8_t)game.user_slot + 1,
+                (uint8_t)game.user_slot.current_value(),
                 game.backup_save
             );
             if (game_slot == 2){
@@ -207,7 +207,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     : Catchability::MAYBE_UNCATCHABLE,
                 (uint8_t)game.skips,
                 game.use_raid_code ? &RAID_CODE : nullptr, lobby_wait_delay,
-                HOST_ONLINE, fr_game.accept_FRs ? (uint8_t)fr_game.user_slot + 1 : 0,
+                HOST_ONLINE, fr_game.accept_FRs ? (uint8_t)fr_game.user_slot.current_value() : 0,
                 game.move_slot, game.dynamax, 0,
                 HOSTING_NOTIFICATIONS,
                 CONNECT_TO_INTERNET_DELAY,

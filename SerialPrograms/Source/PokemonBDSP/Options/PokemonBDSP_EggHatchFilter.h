@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
@@ -48,9 +48,9 @@ public:
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
-    DropdownCell action;
-    DropdownCell shiny;
-    DropdownCell gender;
+    EnumDropdownCell<EggHatchAction> action;
+    EnumDropdownCell<EggHatchShinyFilter> shiny;
+    EnumDropdownCell<EggHatchGenderFilter> gender;
     IVCheckerFilterCell iv_hp;
     IVCheckerFilterCell iv_atk;
     IVCheckerFilterCell iv_def;

@@ -46,8 +46,8 @@ void run_fossil_batch(
     bool save_and_exit
 ){
     //  Sanitize Slots
-    uint8_t game_slot = (uint8_t)batch.game_slot + 1;
-    uint8_t user_slot = (uint8_t)batch.user_slot + 1;
+    uint8_t game_slot = (uint8_t)batch.game_slot.current_value();
+    uint8_t user_slot = (uint8_t)batch.user_slot.current_value();
     if (game_slot > 2){
         game_slot = 0;
     }
@@ -56,7 +56,7 @@ void run_fossil_batch(
         std::string("Batch:") +
         "\nGame Slot: " + std::to_string(game_slot) +
         "\nUser Slot: " + std::to_string(user_slot) +
-        "\nFossil: " + std::to_string(batch.fossil) +
+        "\nFossil: " + std::to_string(batch.fossil.current_value()) +
         "\nRevives: " + std::to_string(batch.revives)
     );
 
@@ -94,12 +94,23 @@ void run_fossil_batch(
         pbf_wait(context, 140);
         ssf_press_button1(context, BUTTON_A, 160);
 #endif
-        if (batch.fossil & 2){
+        switch (batch.fossil){
+        case Fossil::Dracozolt:
+            ssf_press_button1(context, BUTTON_A, 160);
+            break;
+        case Fossil::Arctozolt:
+            ssf_press_button1(context, BUTTON_A, 160);
             ssf_press_dpad1(context, DPAD_DOWN, 5);
-        }
-        ssf_press_button1(context, BUTTON_A, 160);
-        if (batch.fossil & 1){
+            break;
+        case Fossil::Dracovish:
             ssf_press_dpad1(context, DPAD_DOWN, 5);
+            ssf_press_button1(context, BUTTON_A, 160);
+            break;
+        case Fossil::Arctovish:
+            ssf_press_dpad1(context, DPAD_DOWN, 5);
+            ssf_press_button1(context, BUTTON_A, 160);
+            ssf_press_dpad1(context, DPAD_DOWN, 5);
+            break;
         }
         mash_A(context, 400);
         pbf_mash_button(

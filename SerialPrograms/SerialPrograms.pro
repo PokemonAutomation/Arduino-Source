@@ -96,7 +96,6 @@ SOURCES += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
-    ../Common/Cpp/Options/DropdownOption.cpp \
     ../Common/Cpp/Options/EditableTableOption2.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
@@ -122,7 +121,6 @@ SOURCES += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
-    ../Common/Qt/Options/DropdownWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
@@ -794,7 +792,6 @@ HEADERS += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
-    ../Common/Cpp/Options/DropdownOption.h \
     ../Common/Cpp/Options/EditableTableOption2.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
@@ -819,6 +816,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
+    ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
@@ -837,7 +835,6 @@ HEADERS += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
-    ../Common/Qt/Options/DropdownWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EditableTableWidget2.h \

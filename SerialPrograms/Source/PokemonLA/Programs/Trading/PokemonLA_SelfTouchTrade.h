@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_SelfTouchTrade_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "PokemonLA/Options/PokemonLA_TradeCountTable.h"

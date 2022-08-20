@@ -34,10 +34,21 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& 
 {}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value, size_t current_value)
     : m_data(CONSTRUCT_TOKEN, database, default_value, current_value)
-{}
+{
+    if (database.find(default_value) == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Default value is not in the database: " + std::to_string(default_value));
+    }
+    if (database.find(current_value) == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Current value is not in the database: " + std::to_string(current_value));
+    }
+}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value)
     : m_data(CONSTRUCT_TOKEN, database, default_value, default_value)
-{}
+{
+    if (database.find(default_value) == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Default value is not in the database: " + std::to_string(default_value));
+    }
+}
 size_t IntegerEnumDropdownCell::default_value() const{
     return m_data->m_default;
 }

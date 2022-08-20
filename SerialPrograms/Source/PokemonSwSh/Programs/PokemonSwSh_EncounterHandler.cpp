@@ -14,9 +14,9 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh_EncounterHandler.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -195,8 +195,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     std::pair<EncounterAction, std::string> action = encounter.get_action();
 
-    //  REMOVE
-    cout << "action = " << (int)action.first << " : " << action.second << endl;
+//    cout << "action = " << (int)action.first << " : " << action.second << endl;
 
     //  Fast run-away sequence to save time.
     if (action.first == EncounterAction::RunAway){

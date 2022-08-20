@@ -5,7 +5,6 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "Common/Qt/Options/DropdownWidget.h"
 #include "PokemonSwSh_MaxLair_Options_Hosting.h"
 
 namespace PokemonAutomation{

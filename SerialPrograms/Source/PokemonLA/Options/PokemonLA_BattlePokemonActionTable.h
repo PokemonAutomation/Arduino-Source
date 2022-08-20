@@ -11,7 +11,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 
 namespace PokemonAutomation{
@@ -24,22 +24,15 @@ enum class MoveStyle{
     Agile,
     Strong,
 };
-extern const std::string MoveStyle_NAMES[3];
+const EnumDatabase<MoveStyle>& MoveStyle_Database();
 
 
 
-class MoveStyleCell : public DropdownCell{
+class MoveStyleCell : public EnumDropdownCell<MoveStyle>{
 public:
     MoveStyleCell()
-        : DropdownCell({"No Style", "Agile", "Strong", }, 0)
+        : EnumDropdownCell<MoveStyle>(MoveStyle_Database(), MoveStyle::NoStyle)
     {}
-
-    operator MoveStyle() const{
-        return (MoveStyle)(size_t)*this;
-    }
-    void set(MoveStyle style){
-        DropdownCell::set_index((size_t)style);
-    }
 };
 
 
@@ -136,8 +129,8 @@ public:
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
 public:
-    DropdownCell pokemon_index;
-    DropdownCell move_index;
+    IntegerEnumDropdownCell pokemon_index;
+    IntegerEnumDropdownCell move_index;
     MoveStyleCell style;
     SimpleIntegerCell<uint16_t> attempts;
 };

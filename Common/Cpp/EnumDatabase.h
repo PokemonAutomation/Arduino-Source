@@ -51,10 +51,12 @@ public:
         add(EnumEntry{value, std::move(slug), std::move(display), enabled});
     }
 
+    //  Find an enum. Returns null if not in the database.
     const EnumEntry* find(size_t value) const;
     const EnumEntry* find_slug(const std::string& slug) const;
     const EnumEntry* find_display(const std::string& display) const;
 
+    //  Returns the integer enum values of everything in the database.
     FixedLimitVector<size_t> all_values() const;
 
 protected:
@@ -93,6 +95,7 @@ public:
         IntegerEnumDatabase::add(EnumEntry{(size_t)value, std::move(slug), std::move(display), enabled});
     }
 
+    //  Find an enum. Returns null if not in the database.
     const EnumEntry* find(EnumType value) const{
         return IntegerEnumDatabase::find((size_t)value);
     }

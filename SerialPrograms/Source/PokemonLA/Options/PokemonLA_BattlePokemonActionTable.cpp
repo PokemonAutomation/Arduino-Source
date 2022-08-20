@@ -22,16 +22,15 @@ namespace PokemonLA{
     using namespace Pokemon;
 
 
-const std::string MoveStyle_NAMES[] = {
-    "No Style",
-    "Agile",
-    "Strong",
-};
-const std::map<std::string, MoveStyle> MoveStyle_MAP{
-    {MoveStyle_NAMES[0], MoveStyle::NoStyle},
-    {MoveStyle_NAMES[1], MoveStyle::Agile},
-    {MoveStyle_NAMES[2], MoveStyle::Strong},
-};
+
+const EnumDatabase<MoveStyle>& MoveStyle_Database(){
+    static const EnumDatabase<MoveStyle> database({
+        {MoveStyle::NoStyle,    "none",     "No Style"},
+        {MoveStyle::Agile,      "agile",    "Agile"},
+        {MoveStyle::Strong,     "strong",   "Strong"},
+    });
+    return database;
+}
 
 
 
@@ -176,21 +175,30 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 
 
 
+const IntegerEnumDatabase& PokemonIndex_Database(){
+    static const IntegerEnumDatabase database({
+        {0, "1st", "1st " + STRING_POKEMON},
+        {1, "2nd", "2nd " + STRING_POKEMON},
+        {2, "3rd", "3rd " + STRING_POKEMON},
+        {3, "4th", "4th " + STRING_POKEMON},
+    });
+    return database;
+}
+const IntegerEnumDatabase& MoveIndex_Database(){
+    static const IntegerEnumDatabase database({
+        {0, "1st", "1st Move"},
+        {1, "2nd", "2nd Move"},
+        {2, "3rd", "3rd Move"},
+        {3, "4th", "4th Move"},
+    });
+    return database;
+}
+
 
 
 MoveGrinderActionRow::MoveGrinderActionRow()
-    : pokemon_index({
-        "1st " + STRING_POKEMON,
-        "2nd " + STRING_POKEMON,
-        "3rd " + STRING_POKEMON,
-        "4th " + STRING_POKEMON,
-    }, 0)
-    , move_index({
-        "1st Move",
-        "2nd Move",
-        "3rd Move",
-        "4th Move",
-    }, 0)
+    : pokemon_index(PokemonIndex_Database(), 0)
+    , move_index(MoveIndex_Database(), 0)
     , attempts(1, 1)
 {
     PA_ADD_OPTION(pokemon_index);
@@ -200,8 +208,8 @@ MoveGrinderActionRow::MoveGrinderActionRow()
 }
 std::unique_ptr<EditableTableRow2> MoveGrinderActionRow::clone() const{
     std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow());
-    ret->pokemon_index.set_index(pokemon_index.current_index());
-    ret->move_index.set_index(move_index.current_index());
+    ret->pokemon_index.set_value(pokemon_index.current_value());
+    ret->move_index.set_value(move_index.current_value());
     ret->style.set(style);
     ret->attempts.set(attempts);
     return ret;
@@ -221,10 +229,10 @@ Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{
     std::vector<std::unique_ptr<MoveGrinderActionRow>> table = copy_snapshot();
     for (size_t i = 0; i < table.size(); ++i){
         const MoveGrinderActionRow& action = *table[i];
-        if (action.pokemon_index.current_index() != pokemon){
+        if (action.pokemon_index.current_value() != pokemon){
             continue;
         }
-        if (action.move_index.current_index() != move){
+        if (action.move_index.current_value() != move){
             continue;
         }
         return {action.style , action.attempts};

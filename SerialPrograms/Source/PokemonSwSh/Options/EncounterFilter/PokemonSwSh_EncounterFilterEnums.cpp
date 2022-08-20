@@ -12,18 +12,37 @@ namespace PokemonSwSh{
 
 
 
-const std::vector<std::string> EncounterAction_NAMES{
-    "Stop Program",
-    "Run Away",
-    "Throw balls.",
-    "Throw balls. Save if caught.",
-};
-const std::map<std::string, EncounterAction> EncounterAction_MAP{
-    {EncounterAction_NAMES[0], EncounterAction::StopProgram},
-    {EncounterAction_NAMES[1], EncounterAction::RunAway},
-    {EncounterAction_NAMES[2], EncounterAction::ThrowBalls},
-    {EncounterAction_NAMES[3], EncounterAction::ThrowBallsAndSave},
-};
+const EnumDatabase<EncounterAction>& EncounterAction_Database(){
+    static const EnumDatabase<EncounterAction> database({
+        {EncounterAction::StopProgram,          "stop",                 "Stop Program"},
+        {EncounterAction::RunAway,              "run",                  "Run Away"},
+        {EncounterAction::ThrowBalls,           "throw-balls",          "Throw balls."},
+        {EncounterAction::ThrowBallsAndSave,    "throw-balls-and-save", "Throw balls. Save if caught."},
+    });
+    return database;
+}
+
+
+
+const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database(){
+    static const EnumDatabase<ShinyFilter> database({
+        {ShinyFilter::ANYTHING,     "anything",     "Anything"},
+        {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
+        {ShinyFilter::ANY_SHINY,    "any-shiny",    "Any Shiny"},
+        {ShinyFilter::STAR_ONLY,    "star-shiny",   "Star Shiny"},
+        {ShinyFilter::SQUARE_ONLY,  "square-shiny", "Square Shiny"},
+//        {ShinyFilter::NOTHING,      "nothing",      "Nothing"},
+    });
+    return database;
+}
+const EnumDatabase<ShinyFilter>& ShinyFilter_RareStars_Database(){
+    static const EnumDatabase<ShinyFilter> database({
+        {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
+        {ShinyFilter::SQUARE_ONLY,  "square-shiny", "Square Shiny"},
+    });
+    return database;
+}
+
 
 
 const std::vector<std::string> ShinyFilter_NAMES{
@@ -45,25 +64,6 @@ const std::map<std::string, ShinyFilter> ShinyFilter_MAP{
 
 
 
-
-ShinyFilterCell::operator ShinyFilter() const{
-    if (m_rare_stars){
-        return current_index() == 0 ? ShinyFilter::NOT_SHINY : ShinyFilter::SQUARE_ONLY;
-    }
-    return (ShinyFilter)current_index();
-}
-void ShinyFilterCell::set(ShinyFilter action){
-    if (m_rare_stars){
-        if (action == ShinyFilter::NOT_SHINY){
-            DropdownCell::set_index(0);
-        }
-        if (action == ShinyFilter::SQUARE_ONLY){
-            DropdownCell::set_index(1);
-        }
-        return;
-    }
-    DropdownCell::set_index((size_t)action);
-}
 
 
 

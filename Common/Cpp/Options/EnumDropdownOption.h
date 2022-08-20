@@ -29,6 +29,10 @@ public:
     IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value, size_t current_value);
     IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value);
 
+    //  Constructing from inlined database is not supported for cell.
+    IntegerEnumDropdownCell(IntegerEnumDatabase&& database, size_t default_value, size_t current_value) = delete;
+    IntegerEnumDropdownCell(IntegerEnumDatabase&& database, size_t default_value) = delete;
+
     size_t default_value() const;
     size_t current_value() const;
 
@@ -57,12 +61,24 @@ public:
         : IntegerEnumDropdownCell(database, (size_t)default_value)
     {}
 
+    //  Constructing from inlined database is not supported for cell.
+    EnumDropdownCell(EnumDatabase<EnumType>&& database, EnumType default_value) = delete;
+
     operator EnumType() const{
         return (EnumType)current_value();
     }
     bool set(EnumType value){
         return set_value((size_t)value);
     }
+
+#if 0
+    const std::string& current_slug() const{
+        return database().find(current_value())->slug;
+    }
+    const std::string& current_display() const{
+        return database().find(current_value())->display;
+    }
+#endif
 };
 
 

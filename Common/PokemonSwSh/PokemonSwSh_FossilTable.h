@@ -8,54 +8,40 @@
 #define PokemonAutomation_PokemonSwSh_FossilTableOption_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+enum class Fossil{
+    Dracozolt   =   0,
+    Arctozolt   =   1,
+    Dracovish   =   2,
+    Arctovish   =   3,
+};
+
+
 class FossilGame : public EditableTableRow2{
-public:
-    enum Fossil{
-        Dracozolt   =   0,
-        Arctozolt   =   1,
-        Dracovish   =   2,
-        Arctovish   =   3,
-    };
+private:
+    static const EnumDatabase<Fossil>& Fossil_Database(){
+        static const EnumDatabase<Fossil> database({
+            {Fossil::Dracozolt, "dracozolt", "Dracozolt"},
+            {Fossil::Arctozolt, "arctozolt", "Arctozolt"},
+            {Fossil::Dracovish, "dracovish", "Dracovish"},
+            {Fossil::Arctovish, "arctovish", "Arctovish"},
+        });
+        return database;
+    }
 
 public:
     FossilGame()
-        : game_slot(
-            {
-                "Game 1",
-                "Game 2",
-            },
-            0
-        )
-        , user_slot(
-            {
-                "User 1",
-                "User 2",
-                "User 3",
-                "User 4",
-                "User 5",
-                "User 6",
-                "User 7",
-                "User 8",
-            },
-            0
-        )
-        , fossil(
-            {
-                "Dracozolt",
-                "Arctozolt",
-                "Dracovish",
-                "Arctovish",
-            },
-            2
-        )
+        : game_slot(GameSlot_Database(), 1)
+        , user_slot(UserSlot_Database(), 1)
+        , fossil(Fossil_Database(), Fossil::Dracovish)
         , revives(960, 0, 965)
     {
         PA_ADD_OPTION(game_slot);
@@ -66,24 +52,24 @@ public:
     FossilGame(uint8_t p_game_slot, uint8_t p_user_slot, Fossil p_fossil, uint16_t p_revives)
         : FossilGame()
     {
-        game_slot.set_index(p_game_slot - 1);
-        user_slot.set_index(p_user_slot - 1);
-        fossil.set_index((size_t)p_fossil);
+        game_slot.set_value(p_game_slot);
+        user_slot.set_value(p_user_slot);
+        fossil.set(p_fossil);
         revives.set(p_revives);
     }
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
         std::unique_ptr<FossilGame> ret(new FossilGame());
-        ret->game_slot.set_index(game_slot);
-        ret->user_slot.set_index(user_slot);
-        ret->fossil.set_index(fossil);
+        ret->game_slot.set_value(game_slot.current_value());
+        ret->user_slot.set_value(user_slot.current_value());
+        ret->fossil.set(fossil);
         ret->revives.set(revives);
         return ret;
     }
 
 public:
-    DropdownCell game_slot;
-    DropdownCell user_slot;
-    DropdownCell fossil;
+    IntegerEnumDropdownCell game_slot;
+    IntegerEnumDropdownCell user_slot;
+    EnumDropdownCell<Fossil> fossil;
     SimpleIntegerCell<uint16_t> revives;
 };
 
@@ -104,7 +90,7 @@ public:
 
     static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults(){
         std::vector<std::unique_ptr<EditableTableRow2>> ret;
-        ret.emplace_back(new FossilGame(1, 1, FossilGame::Dracovish, 960));
+        ret.emplace_back(new FossilGame(1, 1, Fossil::Dracovish, 960));
         return ret;
     }
 };

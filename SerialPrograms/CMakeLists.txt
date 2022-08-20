@@ -115,8 +115,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
     ../Common/Cpp/Options/DateOption.h
-    ../Common/Cpp/Options/DropdownOption.cpp
-    ../Common/Cpp/Options/DropdownOption.h
     ../Common/Cpp/Options/EditableTableOption2.cpp
     ../Common/Cpp/Options/EditableTableOption2.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
@@ -158,6 +156,7 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
+    ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
@@ -184,8 +183,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
     ../Common/Qt/Options/DateWidget.h
-    ../Common/Qt/Options/DropdownWidget.cpp
-    ../Common/Qt/Options/DropdownWidget.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp

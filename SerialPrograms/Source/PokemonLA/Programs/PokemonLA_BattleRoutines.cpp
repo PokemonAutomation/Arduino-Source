@@ -97,7 +97,7 @@ void use_move_blindly(ConsoleHandle& console, BotBaseContext& context, MoveStyle
 
     console.log(
         "Using pokemon " + std::to_string(cur_pokemon) + " move " + std::to_string(cur_move) +
-        " style " + MoveStyle_NAMES[(int)style]
+        " style " + MoveStyle_Database().find(style)->display
     );
 
     pbf_wait(context, 1 * TICKS_PER_SECOND);

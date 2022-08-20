@@ -10,9 +10,10 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/Cpp/Options/DropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,26 +24,8 @@ class MultiHostSlot : public EditableTableRow2{
 public:
     MultiHostSlot(bool raid_code_option)
         : m_raid_code_option(raid_code_option)
-        , game_slot(
-            {
-                "Game 1",
-                "Game 2",
-            },
-            0
-        )
-        , user_slot(
-            {
-                "User 1",
-                "User 2",
-                "User 3",
-                "User 4",
-                "User 5",
-                "User 6",
-                "User 7",
-                "User 8",
-            },
-            0
-        )
+        , game_slot(GameSlot_Database(), 1)
+        , user_slot(UserSlot_Database(), 1)
         , skips(3, 0, 7)
         , backup_save(false)
         , always_catchable(true)
@@ -70,8 +53,8 @@ public:
 
     virtual std::unique_ptr<EditableTableRow2> clone() const override{
         std::unique_ptr<MultiHostSlot> ret(new MultiHostSlot(m_raid_code_option));
-        ret->game_slot.set_index(game_slot);
-        ret->user_slot.set_index(user_slot);
+        ret->game_slot.set_value(game_slot.current_value());
+        ret->user_slot.set_value(user_slot.current_value());
         ret->skips.set(skips);
         ret->backup_save = (bool)backup_save;
         ret->always_catchable = (bool)always_catchable;
@@ -86,8 +69,8 @@ public:
 private:
     const bool m_raid_code_option;
 public:
-    DropdownCell game_slot;
-    DropdownCell user_slot;
+    IntegerEnumDropdownCell game_slot;
+    IntegerEnumDropdownCell user_slot;
     SimpleIntegerCell<uint8_t> skips;
     BooleanCheckBoxCell backup_save;
     BooleanCheckBoxCell always_catchable;

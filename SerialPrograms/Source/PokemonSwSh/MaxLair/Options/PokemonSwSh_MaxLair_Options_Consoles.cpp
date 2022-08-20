@@ -5,8 +5,6 @@
  */
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/Options/DropdownOption.h"
-#include "Common/Qt/Options/DropdownWidget.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

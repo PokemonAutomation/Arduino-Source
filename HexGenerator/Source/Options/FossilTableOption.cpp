@@ -66,11 +66,11 @@ std::string FossilTable::to_cpp() const{
     for (size_t c = 0; c < list.size(); c++){
         const NintendoSwitch::PokemonSwSh::FossilGame& item = *list[c];
         str += "    {";
-        str += std::to_string(item.game_slot + 1);
+        str += std::to_string(item.game_slot.current_value());
         str += ", ";
-        str += std::to_string(item.user_slot + 1);
+        str += std::to_string(item.user_slot.current_value());
         str += ", ";
-        str += FOSSIL_LIST[item.fossil];
+        str += FOSSIL_LIST[item.fossil.current_value()];
         str += ", ";
         str += std::to_string(item.revives);
         str += "},\r\n";

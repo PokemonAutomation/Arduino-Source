@@ -65,8 +65,8 @@ std::string MultiHostTable::to_cpp() const{
     for (size_t c = 0; c < list.size(); c++){
         const NintendoSwitch::PokemonSwSh::MultiHostSlot& item = *list[c];
         str += "    {\r\n";
-        str += std::string("        .game_slot        = ") + std::to_string(item.game_slot + 1) + ",\r\n";
-        str += std::string("        .user_slot        = ") + std::to_string(item.user_slot + 1) + ",\r\n";
+        str += std::string("        .game_slot        = ") + std::to_string(item.game_slot.current_value()) + ",\r\n";
+        str += std::string("        .user_slot        = ") + std::to_string(item.user_slot.current_value()) + ",\r\n";
         str += std::string("        .skips            = ") + std::to_string(item.skips) + ",\r\n";
         str += std::string("        .backup_save      = ") + (item.backup_save ? "true" : "false") + ",\r\n";
         str += std::string("        .always_catchable = ") + (item.always_catchable ? "true" : "false") + ",\r\n";

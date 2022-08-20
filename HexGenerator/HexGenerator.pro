@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
 CONFIG -= app_bundle
 INCLUDEPATH += ../
 INCLUDEPATH += Source/
@@ -22,16 +22,19 @@ win32-msvc{
 
 SOURCES += \
     ../Common/Cpp/Concurrency/SpinLock.cpp \
+    ../Common/Cpp/Containers/AlignedMalloc.cpp \
+    ../Common/Cpp/EnumDatabase.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
     ../Common/Cpp/Json/JsonTools.cpp \
     ../Common/Cpp/Json/JsonValue.cpp \
+    ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption2.cpp \
-    ../Common/Cpp/Options/DropdownOption.cpp \
+    ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
@@ -43,10 +46,10 @@ SOURCES += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
-    ../Common/Qt/Options/DropdownWidget.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
+    ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
@@ -77,23 +80,27 @@ SOURCES += \
     Source/UI/MainWindow.cpp
 
 HEADERS += \
+    ../Common/Cpp/Containers/AlignedMalloc.h \
     ../Common/Cpp/Containers/Pimpl.h \
     ../Common/Cpp/Containers/Pimpl.tpp \
+    ../Common/Cpp/EnumDatabase.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
+    ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption2.h \
-    ../Common/Cpp/Options/DropdownOption.h \
+    ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/Unicode.h \
+    ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
     ../Common/Qt/AutoHeightTable.h \
@@ -102,10 +109,10 @@ HEADERS += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
-    ../Common/Qt/Options/DropdownWidget.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
     ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EditableTableWidget2.h \
+    ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
