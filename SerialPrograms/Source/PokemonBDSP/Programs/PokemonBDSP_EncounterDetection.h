@@ -49,16 +49,9 @@ public:
 
 private:
     std::set<std::string> read_name(const ImageViewRGB32& screen, const ImageFloatBox& box);
-#if 0
-    void run_overrides(
-        std::vector<std::pair<EncounterAction, std::string>>& actions,
-        const std::vector<EncounterFilterOverride>& overrides,
-        const PokemonDetection& pokemon, ShinyType side_shiny
-    ) const;
-#endif
     bool run_overrides(
         EncounterActionFull& action,
-        const std::vector<EncounterFilterOverride>& overrides,
+        const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides,
         const PokemonDetection& pokemon, ShinyType side_shiny
     ) const;
     EncounterActionFull get_action_singles();

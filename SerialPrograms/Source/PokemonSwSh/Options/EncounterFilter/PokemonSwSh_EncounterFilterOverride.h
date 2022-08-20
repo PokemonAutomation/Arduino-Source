@@ -41,6 +41,9 @@ public:
     ShinyFilterCell shininess;
 };
 
+
+//  Cannot use "EditableTableOption_t<>" since the row class takes an extra
+//  parameter.
 class EncounterFilterTable : public EditableTableOption2{
 public:
     EncounterFilterTable(bool rare_stars);

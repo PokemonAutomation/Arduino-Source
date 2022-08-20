@@ -73,7 +73,7 @@ std::unique_ptr<EditableTableRow2> EncounterFilterOverride::clone() const{
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
-    ret->shininess.set((ShinyFilter)shininess);
+    ret->shininess.set(shininess);
     return ret;
 }
 void EncounterFilterOverride::value_changed(){

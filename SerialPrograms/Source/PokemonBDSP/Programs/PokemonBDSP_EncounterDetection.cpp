@@ -161,16 +161,16 @@ bool filter_match(ShinyType detection, ShinyFilter filter){
 }
 bool StandardEncounterDetection::run_overrides(
     EncounterActionFull& action,
-    const std::vector<EncounterFilterOverride>& overrides,
+    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides,
     const PokemonDetection& pokemon, ShinyType side_shiny
 ) const{
     if (!pokemon.exists || !pokemon.detection_enabled){
         return false;
     }
     bool triggered = false;
-    for (const EncounterFilterOverride& override : overrides){
+    for (const std::unique_ptr<EncounterFilterOverride>& override : overrides){
         //  Not a token match.
-        if (pokemon.slugs.find(override.pokemon_slug) == pokemon.slugs.end()){
+        if (pokemon.slugs.find(override->pokemon.slug()) == pokemon.slugs.end()){
             continue;
         }
 
@@ -181,9 +181,9 @@ bool StandardEncounterDetection::run_overrides(
         }
 
         //  Matched the filter.
-        if (filter_match(shiny, override.shininess)){
+        if (filter_match(shiny, override->shininess)){
             triggered = true;
-            action = {override.action, override.pokeball_slug};
+            action = {override->action, override->pokeball.slug()};
         }
     }
     return triggered;
@@ -200,7 +200,7 @@ EncounterActionFull StandardEncounterDetection::get_action_singles(){
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<EncounterFilterOverride>& overrides = m_filter.overrides();
+    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.copy_snapshot();
     if (m_language != Language::None && !overrides.empty()){
         run_overrides(default_action, overrides, m_pokemon_right, m_shininess_right);
     }
@@ -220,7 +220,7 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<EncounterFilterOverride>& overrides = m_filter.overrides();
+    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.copy_snapshot();
     if (m_language != Language::None && !overrides.empty()){
         run_overrides(action_left, overrides, m_pokemon_left, m_shininess_left);
         run_overrides(action_right, overrides, m_pokemon_right, m_shininess_right);

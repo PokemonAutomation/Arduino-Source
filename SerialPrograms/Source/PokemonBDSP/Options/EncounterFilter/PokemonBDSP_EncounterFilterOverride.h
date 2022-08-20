@@ -33,53 +33,12 @@ struct EncounterActionFull{
 };
 
 
-class EncounterFilterOverride : public EditableTableRow{
+
+
+class EncounterFilterOverride : public EditableTableRow2, private ConfigOption::Listener{
 public:
-    EncounterFilterOverride(bool allow_autocatch);
-
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
-
-private:
-    QWidget* make_action_box(QWidget& parent);
-    BallSelectWidget* make_ball_select(QWidget& parent);
-    QWidget* make_species_select(QWidget& parent);
-    QWidget* make_shiny_box(QWidget& parent);
-
-    void update_ball_select();
-
-private:
-    bool m_allow_autocatch;
-    BallSelectWidget* m_ball_select;
-public:
-    EncounterAction action = EncounterAction::StopProgram;
-    std::string pokeball_slug = "poke-ball";
-
-    std::string pokemon_slug;
-    ShinyFilter shininess = ShinyFilter::ANYTHING;
-};
-
-class EncounterFilterOptionFactory : public EditableTableFactory{
-public:
-    EncounterFilterOptionFactory(bool allow_autocatch);
-    virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
-private:
-    bool m_allow_autocatch;
-};
-
-
-
-
-
-
-
-class EncounterFilterOverride2 : public EditableTableRow2, private ConfigOption::Listener{
-public:
-    ~EncounterFilterOverride2();
-    EncounterFilterOverride2();
+    ~EncounterFilterOverride();
+    EncounterFilterOverride();
     virtual void load_json(const JsonValue& json) override;
     virtual std::unique_ptr<EditableTableRow2> clone() const override;
 
@@ -92,7 +51,7 @@ public:
     ShinyFilterCell shininess;
 };
 
-class EncounterFilterTable : public EditableTableOption_t<EncounterFilterOverride2>{
+class EncounterFilterTable : public EditableTableOption_t<EncounterFilterOverride>{
 public:
     EncounterFilterTable();
     virtual std::vector<std::string> make_header() const override;

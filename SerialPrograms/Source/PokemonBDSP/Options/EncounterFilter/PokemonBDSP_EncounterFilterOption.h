@@ -20,7 +20,9 @@ public:
     EncounterFilterOption(bool enable_overrides);
 
     ShinyFilter shiny_filter() const{ return m_shiny_filter_current.load(std::memory_order_acquire); }
-    std::vector<EncounterFilterOverride> overrides() const;
+    std::vector<std::unique_ptr<EncounterFilterOverride>> copy_snapshot() const{
+        return m_table.copy_snapshot();
+    }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -37,8 +39,7 @@ private:
     const ShinyFilter m_shiny_filter_default;
     std::atomic<ShinyFilter> m_shiny_filter_current;
 
-    EncounterFilterOptionFactory m_factory;
-    EditableTableOption m_table;
+    EncounterFilterTable m_table;
 };
 
 

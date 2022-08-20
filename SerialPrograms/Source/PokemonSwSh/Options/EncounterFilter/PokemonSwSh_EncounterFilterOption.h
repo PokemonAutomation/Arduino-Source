@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterFilterOption_H
 #define PokemonAutomation_PokemonSwSh_EncounterFilterOption_H
 
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 #include "PokemonSwSh_EncounterFilterOverride.h"
 
 namespace PokemonAutomation{

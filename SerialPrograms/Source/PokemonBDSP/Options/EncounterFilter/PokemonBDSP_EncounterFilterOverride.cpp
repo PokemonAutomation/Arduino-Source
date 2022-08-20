@@ -54,227 +54,19 @@ std::string EncounterActionFull::to_str() const{
 
 
 
-EncounterFilterOverride::EncounterFilterOverride(bool allow_autocatch)
-    : m_allow_autocatch(allow_autocatch)
-    , m_ball_select(nullptr)
-{}
-
-void EncounterFilterOverride::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
-    if (obj == nullptr){
-        return;
-    }
-    const std::string* str;
-    str = obj->get_string("Action");
-    if (str){
-        auto iter = EncounterAction_MAP.find(*str);
-        if (iter != EncounterAction_MAP.end()){
-            action = iter->second;
-        }
-    }
-    if (!m_allow_autocatch && action >= EncounterAction::ThrowBalls){
-        action = EncounterAction::StopProgram;
-    }
-    if (m_allow_autocatch){
-        obj->read_string(pokeball_slug, "Ball");
-    }
-    obj->read_string(pokemon_slug, "Species");
-    {
-        str = obj->get_string("ShinyFilter");
-        if (str != nullptr){
-            auto iter = ShinyFilter_MAP.find(*str);
-            if (iter != ShinyFilter_MAP.end()){
-                shininess = iter->second;
-            }
-        }
-    }
-}
-JsonValue EncounterFilterOverride::to_json() const{
-    JsonObject obj;
-    obj["Action"] = EncounterAction_NAMES[(size_t)action];
-    if (m_allow_autocatch){
-        obj["Ball"] = pokeball_slug;
-    }
-    obj["Species"] = pokemon_slug;
-    obj["ShinyFilter"] = ShinyFilter_NAMES[(size_t)shininess];
-    return obj;
-}
-std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
-    return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(*this));
-}
-std::vector<QWidget*> EncounterFilterOverride::make_widgets(QWidget& parent){
-    std::vector<QWidget*> widgets;
-    if (m_allow_autocatch){
-        m_ball_select = make_ball_select(parent);
-        widgets.emplace_back(make_action_box(parent));
-        widgets.emplace_back(m_ball_select);
-    }else{
-        widgets.emplace_back(make_action_box(parent));
-    }
-    widgets.emplace_back(make_species_select(parent));
-    widgets.emplace_back(make_shiny_box(parent));
-    return widgets;
-}
-void EncounterFilterOverride::update_ball_select(){
-    if (!m_allow_autocatch){
-        return;
-    }
-    switch (action){
-    case EncounterAction::StopProgram:
-    case EncounterAction::RunAway:
-        m_ball_select->setEnabled(false);
-        break;
-    case EncounterAction::ThrowBalls:
-    case EncounterAction::ThrowBallsAndSave:
-        m_ball_select->setEnabled(true);
-        break;
-    }
-}
-QWidget* EncounterFilterOverride::make_action_box(QWidget& parent){
-    QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(QString::fromStdString(EncounterAction_NAMES[0]));
-    box->addItem(QString::fromStdString(EncounterAction_NAMES[1]));
-    if (m_allow_autocatch){
-        box->addItem(QString::fromStdString(EncounterAction_NAMES[2]));
-        box->addItem(QString::fromStdString(EncounterAction_NAMES[3]));
-    }
-    box->setCurrentIndex((int)action);
-
-    if (m_allow_autocatch){
-        switch (action){
-        case EncounterAction::StopProgram:
-        case EncounterAction::RunAway:
-            m_ball_select->setEnabled(false);
-            break;
-        case EncounterAction::ThrowBalls:
-        case EncounterAction::ThrowBallsAndSave:
-            m_ball_select->setEnabled(true);
-            break;
-        }
-    }
-
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&](int index){
-            if (index < 0){
-                index = 0;
-            }
-            action = (EncounterAction)index;
-            if (m_allow_autocatch){
-                switch ((EncounterAction)index){
-                case EncounterAction::StopProgram:
-                case EncounterAction::RunAway:
-                    m_ball_select->setEnabled(false);
-                    break;
-                case EncounterAction::ThrowBalls:
-                case EncounterAction::ThrowBallsAndSave:
-                    m_ball_select->setEnabled(true);
-                    break;
-                }
-            }
-        }
-    );
-    return box;
-}
-BallSelectWidget* EncounterFilterOverride::make_ball_select(QWidget& parent){
-    using namespace Pokemon;
-    BallSelectWidget* box = new BallSelectWidget(parent, POKEBALL_SLUGS(), pokeball_slug);
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&, box](int index){
-            pokeball_slug = box->slug();
-        }
-    );
-    return box;
-}
-QWidget* EncounterFilterOverride::make_species_select(QWidget& parent){
-    using namespace Pokemon;
-    NameSelectWidget* box = new NameSelectWidget(
-        parent,
-        PokemonSwSh::ALL_POKEMON_SPRITES(),
-        NATIONAL_DEX_SLUGS(),
-        pokemon_slug
-    );
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&, box](int index){
-            pokemon_slug = box->slug();
-        }
-    );
-    return box;
-}
-QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
-    QComboBox* box = new NoWheelComboBox(&parent);
-    for (const std::string& action : ShinyFilter_NAMES){
-        box->addItem(QString::fromStdString(action));
-    }
-    ShinyFilter current = shininess;
-    for (int c = 0; c < box->count(); c++){
-        if (box->itemText(c).toStdString() == ShinyFilter_NAMES[(int)current]){
-            box->setCurrentIndex(c);
-            break;
-        }
-    }
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&, box](int index){
-            if (index < 0){
-                return;
-            }
-            std::string text = box->itemText(index).toStdString();
-            auto iter = ShinyFilter_MAP.find(text);
-            if (iter == ShinyFilter_MAP.end()){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text);
-            }
-            shininess = iter->second;
-        }
-    );
-    return box;
-}
 
 
-
-EncounterFilterOptionFactory::EncounterFilterOptionFactory(bool allow_autocatch)
-    : m_allow_autocatch(allow_autocatch)
-{}
-std::vector<std::string> EncounterFilterOptionFactory::make_header() const{
-    if (m_allow_autocatch){
-        return std::vector<std::string>{
-            "Action",
-            STRING_POKEBALL,
-            STRING_POKEMON,
-            "Shininess",
-        };
-    }else{
-        return std::vector<std::string>{
-            "Action",
-            STRING_POKEMON,
-            "Shininess",
-        };
-    }
-}
-std::unique_ptr<EditableTableRow> EncounterFilterOptionFactory::make_row() const{
-    return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(m_allow_autocatch));
-}
-
-
-
-
-
-
-
-
-EncounterFilterOverride2::~EncounterFilterOverride2(){
+EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
-EncounterFilterOverride2::EncounterFilterOverride2(){
+EncounterFilterOverride::EncounterFilterOverride(){
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(pokemon);
     PA_ADD_OPTION(shininess);
     action.add_listener(*this);
 }
-void EncounterFilterOverride2::load_json(const JsonValue& json){
+void EncounterFilterOverride::load_json(const JsonValue& json){
     EditableTableRow2::load_json(json);
 
     //  Parse old format for backwards compatibility.
@@ -301,15 +93,15 @@ void EncounterFilterOverride2::load_json(const JsonValue& json){
         shininess.load_json(*value);
     }
 }
-std::unique_ptr<EditableTableRow2> EncounterFilterOverride2::clone() const{
-    std::unique_ptr<EncounterFilterOverride2> ret(new EncounterFilterOverride2());
+std::unique_ptr<EditableTableRow2> EncounterFilterOverride::clone() const{
+    std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride());
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
     ret->shininess.set(shininess);
     return ret;
 }
-void EncounterFilterOverride2::value_changed(){
+void EncounterFilterOverride::value_changed(){
     switch ((EncounterAction)action){
     case EncounterAction::StopProgram:
     case EncounterAction::RunAway:
@@ -326,7 +118,22 @@ void EncounterFilterOverride2::value_changed(){
 
 
 
-
+EncounterFilterTable::EncounterFilterTable()
+    : EditableTableOption_t<EncounterFilterOverride>(
+        "<b>Overrides:</b><br>"
+        "The game language must be properly set to read " + STRING_POKEMON + " names. "
+        "If multiple overrides apply and are conflicting, the program will stop." +
+        "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle."
+    )
+{}
+std::vector<std::string> EncounterFilterTable::make_header() const{
+    return std::vector<std::string>{
+        "Action",
+        STRING_POKEBALL,
+        STRING_POKEMON,
+        "Shininess",
+    };
+}
 
 
 

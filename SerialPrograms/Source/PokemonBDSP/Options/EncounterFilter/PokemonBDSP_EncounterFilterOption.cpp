@@ -23,22 +23,7 @@ EncounterFilterOption::EncounterFilterOption(bool enable_overrides)
     : m_enable_overrides(enable_overrides)
     , m_shiny_filter_default(ShinyFilter::SHINY)
     , m_shiny_filter_current(m_shiny_filter_default)
-    , m_factory(true)
-    , m_table(
-        "<b>Overrides:</b><br>"
-        "The game language must be properly set to read " + STRING_POKEMON + " names. "
-        "If multiple overrides apply and are conflicting, the program will stop." +
-        "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle.",
-        m_factory
-    )
 {}
-std::vector<EncounterFilterOverride> EncounterFilterOption::overrides() const{
-    std::vector<EncounterFilterOverride> ret;
-    for (size_t c = 0; c < m_table.size(); c++){
-        ret.emplace_back(static_cast<const EncounterFilterOverride&>(m_table[c]));
-    }
-    return ret;
-}
 void EncounterFilterOption::load_json(const JsonValue& json){
     using namespace Pokemon;
 
