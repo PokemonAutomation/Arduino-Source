@@ -15,13 +15,6 @@ namespace PokemonAutomation{
 
 
 
-std::vector<DropdownEntry> make_processor_labels(){
-    std::vector<DropdownEntry> ret;
-    for (const CpuCapabilityOption& option : AVAILABLE_CAPABILITIES()){
-        ret.emplace_back(option.label, option.label, option.available);
-    }
-    return ret;
-}
 size_t get_default_ProcessorLevel_index(){
     const std::vector<CpuCapabilityOption>& LEVELS = AVAILABLE_CAPABILITIES();
     size_t best = 0;
@@ -36,20 +29,20 @@ size_t get_default_ProcessorLevel_index(){
 
 
 ProcessorLevelOption::ProcessorLevelOption()
-    : DropdownOption(
+    : IntegerEnumDropdownOption(
         "<b>Processor Specific Optimization:</b><br>"
         "Note that this only applies to this binary. External dependencies may ignore this and use higher instructions anyway.",
-        make_processor_labels(),
+        CAPABILITIES_DATABASE(),
         get_default_ProcessorLevel_index()
     )
 {
     set_global();
 }
-bool ProcessorLevelOption::set_index(size_t index){
-    if (!DropdownOption::set_index(index)){
+bool ProcessorLevelOption::set_value(size_t value){
+    if (!IntegerEnumDropdownOption::set_value(value)){
         return false;
     }
-    set_global(index);
+    set_global(value);
     return true;
 }
 void ProcessorLevelOption::load_json(const JsonValue& json){
@@ -70,7 +63,7 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
         global_logger_tagged().log("Processor string matches. Using stored processor level.", COLOR_BLUE);
         const JsonValue* value = obj->get_value("Level");
         if (value){
-            DropdownOption::load_json(*value);
+            IntegerEnumDropdownOption::load_json(*value);
         }
         set_global();
     }else{
@@ -79,12 +72,12 @@ void ProcessorLevelOption::load_json(const JsonValue& json){
 }
 JsonValue ProcessorLevelOption::to_json() const{
     JsonObject obj;
-    obj["Level"] = DropdownOption::to_json();
+    obj["Level"] = IntegerEnumDropdownOption::to_json();
     obj["ProcessorString"] = get_processor_name();
     return obj;
 }
 void ProcessorLevelOption::set_global(){
-    set_global((size_t)*this);
+    set_global(current_value());
 }
 void ProcessorLevelOption::set_global(size_t index){
     const auto& LIST = AVAILABLE_CAPABILITIES();
@@ -92,7 +85,7 @@ void ProcessorLevelOption::set_global(size_t index){
         return;
     }
     CPU_CAPABILITY_CURRENT = LIST[index].features;
-    global_logger_tagged().log(std::string("Processor capability set to: ") + LIST[index].label, COLOR_BLUE);
+    global_logger_tagged().log(std::string("Processor capability set to: ") + LIST[index].display, COLOR_BLUE);
 }
 
 

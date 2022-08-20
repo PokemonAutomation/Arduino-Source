@@ -267,7 +267,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
+    Source/CommonFramework/Environment/Environment_Linux.h
     Source/CommonFramework/Environment/Environment_Linux.tpp
+    Source/CommonFramework/Environment/Environment_Windows.h
     Source/CommonFramework/Environment/Environment_Windows.tpp
     Source/CommonFramework/Environment/Environment_x86.tpp
     Source/CommonFramework/Environment/Environment_x86_Linux.tpp
@@ -421,7 +423,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
     Source/CommonFramework/Options/EditableTableWidget.h
-    Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h

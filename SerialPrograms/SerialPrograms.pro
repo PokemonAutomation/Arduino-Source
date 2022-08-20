@@ -229,7 +229,6 @@ SOURCES += \
     Source/CommonFramework/Options/BatchOption/BatchOption.cpp \
     Source/CommonFramework/Options/BatchOption/GroupOption.cpp \
     Source/CommonFramework/Options/EditableTableOption.cpp \
-    Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
@@ -882,7 +881,9 @@ HEADERS += \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h \
     Source/CommonFramework/CrashDump.h \
     Source/CommonFramework/Environment/Environment.h \
+    Source/CommonFramework/Environment/Environment_Linux.h \
     Source/CommonFramework/Environment/Environment_Linux.tpp \
+    Source/CommonFramework/Environment/Environment_Windows.h \
     Source/CommonFramework/Environment/Environment_Windows.tpp \
     Source/CommonFramework/Environment/Environment_x86.tpp \
     Source/CommonFramework/Environment/Environment_x86_Linux.tpp \

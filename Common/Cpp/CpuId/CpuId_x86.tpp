@@ -340,23 +340,51 @@ const CPU_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();
 CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
 
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
-//    static const std::vector<CpuCapabilityOption> LIST = make_AVAILABLE_CAPABILITIES();
     static const std::vector<CpuCapabilityOption> LIST{
-        {"Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true},
+        {
+            "none", "Nothing (C++ Only)",
+            CPU_CAPABILITY_NOTHING, true
+        },
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-        {"Intel Nehalem (x64 SSE4.2)",     CPU_CAPABILITY_09_NEHALEM,  CPU_CAPABILITY_NATIVE.OK_08_Nehalem},
+        {
+            "nehalem-sse4.2", "Intel Nehalem (x64 SSE4.2)",
+            CPU_CAPABILITY_09_NEHALEM, CPU_CAPABILITY_NATIVE.OK_08_Nehalem
+        },
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-        {"Intel Haswell (x64 AVX2)",       CPU_CAPABILITY_13_Haswell,  CPU_CAPABILITY_NATIVE.OK_13_Haswell},
+        {
+            "haswell-avx2", "Intel Haswell (x64 AVX2)",
+            CPU_CAPABILITY_13_Haswell, CPU_CAPABILITY_NATIVE.OK_13_Haswell
+        },
 #endif
 #ifdef PA_AutoDispatch_x64_17_Skylake
-        {"Intel Skylake (x64 AVX512)",     CPU_CAPABILITY_17_Skylake,  CPU_CAPABILITY_NATIVE.OK_17_Skylake},
+        {
+            "skylake-avx512", "Intel Skylake (x64 AVX512)",
+            CPU_CAPABILITY_17_Skylake, CPU_CAPABILITY_NATIVE.OK_17_Skylake
+        },
 #endif
 #ifdef PA_AutoDispatch_x64_19_IceLake
-        {"Intel Ice Lake (x64 AVX512-GF)", CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake},
+        {
+            "icelake-avx512gf", "Intel Ice Lake (x64 AVX512-GF)",
+            CPU_CAPABILITY_19_IceLake,  CPU_CAPABILITY_NATIVE.OK_19_IceLake
+        },
 #endif
     };
     return LIST;
+}
+
+IntegerEnumDatabase make_CAPABILITIES_DATABASE(){
+    IntegerEnumDatabase ret;
+    size_t c = 0;
+    for (const CpuCapabilityOption& item : AVAILABLE_CAPABILITIES()){
+        ret.add(c, item.slug, item.display, item.available);
+        c++;
+    }
+    return ret;
+};
+const IntegerEnumDatabase& CAPABILITIES_DATABASE(){
+    static const IntegerEnumDatabase database = make_CAPABILITIES_DATABASE();
+    return database;
 }
 
 

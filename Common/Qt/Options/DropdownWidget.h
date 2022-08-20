@@ -27,17 +27,6 @@ protected:
 };
 
 
-class DropdownOptionWidget : public QWidget, public ConfigWidget{
-public:
-    DropdownOptionWidget(QWidget& parent, DropdownOption& value);
-
-    virtual void update() override;
-
-private:
-    DropdownCellWidget* m_cell;
-};
-
-
 
 
 

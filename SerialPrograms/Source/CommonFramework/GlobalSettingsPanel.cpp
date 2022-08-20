@@ -122,17 +122,17 @@ GlobalSettings::GlobalSettings()
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
         "Restart the program for this to fully take effect.",
-        2
+        DEFAULT_PRIORITY_REALTIME
     )
     , INFERENCE_PRIORITY0(
         "<b>Inference Priority:</b><br>"
         "Thread priority of inference threads. (image/sound recognition)",
-        1
+        DEFAULT_PRIORITY_INFERENCE
     )
     , COMPUTE_PRIORITY0(
         "<b>Compute Priority:</b><br>"
         "Thread priority of computation threads.",
-        -1
+        DEFAULT_PRIORITY_COMPUTE
     )
     , AUDIO_FILE_VOLUME_SCALE(
         "<b>Audio File Input Volume Scale:</b><br>"

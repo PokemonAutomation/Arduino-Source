@@ -10,26 +10,23 @@
 #include <string>
 #include <vector>
 #include <QThread>
+#include "Common/Cpp/EnumDatabase.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+
+#if _WIN32
+#include "Environment_Windows.h"
+#elif defined(__linux) || defined(__APPLE__)
+#include "Environment_Linux.h"
+#else
+#error "Unsupported platform."
+#endif
 
 namespace PokemonAutomation{
 
 
+const EnumDatabase<ThreadPriority>& PRIORITY_DATABASE();
 
-extern const int DEFAULT_PRIORITY_INDEX;
-extern const std::vector<std::string> PRIORITY_MODES;
-int priority_name_to_index(const std::string& name);
-bool set_priority_by_index(int index);
-bool set_priority_by_name(const std::string& name);
-int read_priority_index();
-
-
-extern const int THREAD_PRIORITY_MIN;
-extern const int THREAD_PRIORITY_MAX;
-int clip_priority(int priority);
-const char* thread_priority_name(int priority);
-bool set_thread_priority(int priority);
-QThread::Priority to_qt_priority(int priority);
+bool set_thread_priority(ThreadPriority priority);
 
 
 

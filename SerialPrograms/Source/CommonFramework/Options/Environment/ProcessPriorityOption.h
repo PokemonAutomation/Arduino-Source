@@ -7,28 +7,28 @@
 #ifndef PokemonAutomation_ProcessPriorityOption_H
 #define PokemonAutomation_ProcessPriorityOption_H
 
-#include "Common/Cpp/Options/DropdownOption.h"
-
-class QThread;
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Environment/Environment.h"
 
 namespace PokemonAutomation{
 
 
-class ProcessPriorityOption : public DropdownOption{
+
+
+class ThreadPriorityOption : public EnumDropdownOption<ThreadPriority>{
 public:
-    ProcessPriorityOption();
-    virtual bool set_index(size_t index) override;
-    void update_priority_to_option() const;
+    ThreadPriorityOption(std::string label, ThreadPriority default_priority)
+        : EnumDropdownOption<ThreadPriority>(
+            std::move(label),
+            PRIORITY_DATABASE(),
+            default_priority
+        )
+    {}
+    void set_on_this_thread() const{
+        set_thread_priority(*this);
+    }
 };
 
-
-
-class ThreadPriorityOption : public DropdownOption{
-public:
-    ThreadPriorityOption(std::string label, int default_priority);
-    void set_on_this_thread() const;
-    void set_on_qthread(QThread& thread) const;
-};
 
 
 

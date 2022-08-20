@@ -18,9 +18,6 @@ namespace PokemonAutomation{
 ConfigWidget* DropdownCell::make_ui(QWidget& parent){
     return new DropdownCellWidget(parent, *this);
 }
-ConfigWidget* DropdownOption::make_ui(QWidget& parent){
-    return new DropdownOptionWidget(parent, *this);
-}
 
 
 
@@ -75,27 +72,6 @@ void DropdownCellWidget::value_changed(){
 }
 
 
-
-
-
-DropdownOptionWidget::DropdownOptionWidget(QWidget& parent, DropdownOption& value)
-    : QWidget(&parent)
-    , ConfigWidget(value, *this)
-    , m_cell(new DropdownCellWidget(*this, value))
-{
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
-    text->setWordWrap(true);
-    layout->addWidget(text, 1);
-    layout->addWidget(m_cell, 1);
-}
-
-
-void DropdownOptionWidget::update(){
-    ConfigWidget::update();
-    m_cell->update();
-}
 
 
 
