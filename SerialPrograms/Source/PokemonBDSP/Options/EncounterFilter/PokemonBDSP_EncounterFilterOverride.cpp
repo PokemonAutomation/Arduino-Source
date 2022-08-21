@@ -4,17 +4,12 @@
  *
  */
 
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Options/Pokemon_BallSelectWidget.h"
-#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 #include "PokemonBDSP_EncounterFilterOverride.h"
 
@@ -60,7 +55,9 @@ std::string EncounterActionFull::to_str() const{
 EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
-EncounterFilterOverride::EncounterFilterOverride(){
+EncounterFilterOverride::EncounterFilterOverride()
+    : pokemon(ALL_POKEMON_NAMES(), "starly")
+{
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(pokemon);

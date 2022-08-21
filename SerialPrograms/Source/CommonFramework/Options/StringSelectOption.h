@@ -38,10 +38,10 @@ struct StringSelectEntry{
 
 class StringSelectDatabase{
 public:
-    StringSelectDatabase(const StringSelectDatabase&) = delete;
-    StringSelectDatabase& operator=(const StringSelectDatabase&) = delete;
     StringSelectDatabase(StringSelectDatabase&&);
     StringSelectDatabase& operator=(StringSelectDatabase&&);
+    StringSelectDatabase(const StringSelectDatabase&);
+    StringSelectDatabase& operator=(const StringSelectDatabase&);
     ~StringSelectDatabase();
 
 public:

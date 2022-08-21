@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
@@ -52,9 +53,10 @@ std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
 
 StarterReset::StarterReset()
     : GO_HOME_WHEN_DONE(false)
+    , STARTER_DATABSE(make_name_database({"turtwig", "chimchar", "piplup"}))
     , STARTER(
         "<b>Starter:</b>",
-        {"turtwig", "chimchar", "piplup"},
+        STARTER_DATABSE,
         "turtwig"
     )
     , USE_SOUND_DETECTION(

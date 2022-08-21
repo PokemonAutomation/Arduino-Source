@@ -41,7 +41,8 @@ private:
 //    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    Pokemon::PokemonNameSelectOption STARTER;
+    StringSelectDatabase STARTER_DATABSE;
+    StringSelectOption STARTER;
 
     BooleanCheckBoxOption USE_SOUND_DETECTION;
     BooleanCheckBoxOption VIDEO_ON_SHINY;

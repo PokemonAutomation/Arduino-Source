@@ -466,6 +466,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
+    Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
@@ -1236,6 +1237,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
+    Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
