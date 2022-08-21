@@ -4,20 +4,20 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonBDSP_NameDatabase_H
-#define PokemonAutomation_PokemonBDSP_NameDatabase_H
+#ifndef PokemonAutomation_PokemonSwSh_NameDatabase_H
+#define PokemonAutomation_PokemonSwSh_NameDatabase_H
 
 #include "CommonFramework/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonSwSh{
 
 
 StringSelectDatabase make_name_database(const std::vector<std::string>& slugs);
 StringSelectDatabase make_name_database(const char* json_file_slugs);
 
-const StringSelectDatabase& ALL_POKEMON_NAMES();
+const StringSelectDatabase& COMBINED_DEX_NAMES();
 
 
 

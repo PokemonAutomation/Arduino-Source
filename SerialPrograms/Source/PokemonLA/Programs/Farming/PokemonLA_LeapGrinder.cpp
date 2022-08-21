@@ -12,12 +12,13 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
-#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
-#include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
-#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Resources/PokemonLA_NameDatabase.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -72,39 +73,37 @@ std::unique_ptr<StatsTracker> LeapGrinder_Descriptor::make_stats() const{
 
 LeapGrinder::LeapGrinder()
     : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
-    , POKEMON(
-        "<b>Pokemon Species</b>",
-        {
-            "aipom",
-            "burmy",
-            "cherrim",
-            "cherubi",
-            "combee",
-            "heracross",
-            "pachirisu",
-            "vespiquen",
-            "wormadam",
-            "geodude",
-            "graveler",
-            "bonsly",
-            "bronzor",
-            "nosepass",
-            "bergmite"
-          }
-    )
+    , POKEMON_DATABASE(make_name_database({
+        "aipom",
+        "burmy",
+        "cherrim",
+        "cherubi",
+        "combee",
+        "heracross",
+        "pachirisu",
+        "vespiquen",
+        "wormadam",
+        "geodude",
+        "graveler",
+        "bonsly",
+        "bronzor",
+        "nosepass",
+        "bergmite",
+    }))
+    , POKEMON("<b>Pokemon Species</b>", POKEMON_DATABASE, "cherubi")
     , LEAPS(
-      "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
-      1, 1, 100
-      )
+        "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
+        1, 1, 100
+    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to destination.",
         "0 * TICKS_PER_SECOND"
     )
     , MATCH_DETECTED_OPTIONS(
-      "Match Action",
-      "What to do when the leaping Pokemon matches the *Stop On*.",
-      "0 * TICKS_PER_SECOND"
+        "Match Action",
+        "What to do when the leaping Pokemon matches the *Stop On*.",
+        "0 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

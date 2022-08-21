@@ -24,6 +24,10 @@ void EditableTableRow2::add_option(ConfigOption& option, std::string serializati
     m_options.emplace_back(std::move(serialization_string), &option);
 }
 void EditableTableRow2::load_json(const JsonValue& json){
+    if (m_options.size() == 1){
+        m_options[0].second->load_json(json);
+        return;
+    }
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
@@ -38,6 +42,9 @@ void EditableTableRow2::load_json(const JsonValue& json){
     }
 }
 JsonValue EditableTableRow2::to_json() const{
+    if (m_options.size() == 1){
+        return m_options[0].second->to_json();
+    }
     JsonObject obj;
     for (auto& item : m_options){
         if (!item.first.empty()){

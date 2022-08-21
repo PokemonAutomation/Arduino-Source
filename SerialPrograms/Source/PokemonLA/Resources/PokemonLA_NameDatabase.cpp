@@ -7,19 +7,19 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
-#include "PokemonBDSP_NameDatabase.h"
+#include "PokemonLA_PokemonSprites.h"
+#include "PokemonLA_NameDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonLA{
 
 using namespace Pokemon;
 
 
 
 StringSelectDatabase make_name_database(const std::vector<std::string>& slugs){
-    const SpriteDatabase& sprites = PokemonSwSh::ALL_POKEMON_SPRITES();
+    const SpriteDatabase& sprites = ALL_POKEMON_SPRITES();
 
     StringSelectDatabase database;
     for (const std::string& slug : slugs){
@@ -47,20 +47,8 @@ StringSelectDatabase make_name_database(const char* json_file_slugs){
 
 
 
-StringSelectDatabase make_ALL_POKEMON_NAMES(){
-    std::vector<std::string> slugs = load_pokemon_slug_json_list("Pokemon/Pokedex/Pokedex-National.json");
-    if (slugs.size() < 493){
-        throw FileException(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Expected national dex to be greater than 493 members.",
-            "Pokemon/Pokedex/Pokedex-National.json"
-        );
-    }
-    slugs.resize(493);
-    return make_name_database(slugs);
-}
 const StringSelectDatabase& ALL_POKEMON_NAMES(){
-    static const StringSelectDatabase database = make_ALL_POKEMON_NAMES();
+    static const StringSelectDatabase database = make_name_database("Pokemon/Pokedex/Pokedex-Hisui.json");
     return database;
 }
 

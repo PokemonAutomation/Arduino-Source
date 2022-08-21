@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/Options/EditableTableOption2.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 #include "PokemonSwSh_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
@@ -32,7 +31,7 @@ private:
 public:
     EncounterActionCell action;
     PokemonBallSelectCell pokeball;
-    PokemonNameSelectCell pokemon;
+    StringSelectCell pokemon;
     ShinyFilterCell shininess;
 };
 

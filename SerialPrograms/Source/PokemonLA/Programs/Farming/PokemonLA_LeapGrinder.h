@@ -43,7 +43,10 @@ private:
     class RunRoute;
 
     OCR::LanguageOCR LANGUAGE;
-    Pokemon::PokemonNameSelectOption POKEMON;
+
+    StringSelectDatabase POKEMON_DATABASE;
+    StringSelectOption POKEMON;
+
     SimpleIntegerOption<uint8_t> LEAPS;
     StopOnOption STOP_ON;
     ExitBattleMethodOption EXIT_METHOD;

@@ -85,6 +85,7 @@ public:
 
 
 
+#if 0
 
 
 class PokemonNameListRow2 : public EditableTableRow2{
@@ -103,7 +104,6 @@ public:
 };
 
 
-#if 0
 class PokemonNameList2 : public EditableTableOption2{
 public:
     PokemonNameList2()

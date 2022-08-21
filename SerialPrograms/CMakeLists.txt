@@ -430,6 +430,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
+    Source/CommonFramework/Options/StringSelectTableOption.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp
@@ -1130,6 +1131,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.h
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
@@ -1318,8 +1321,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h
@@ -1488,6 +1489,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.cpp
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp

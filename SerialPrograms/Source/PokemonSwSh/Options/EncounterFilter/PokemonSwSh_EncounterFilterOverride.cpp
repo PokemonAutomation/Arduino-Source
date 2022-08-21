@@ -4,16 +4,10 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/NoWheelComboBox.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Resources/Pokemon_PokeballNames.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Options/Pokemon_BallSelectWidget.h"
-#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h"
 #include "PokemonSwSh_EncounterFilterOverride.h"
 
 //#include <iostream>
@@ -34,6 +28,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     : m_rare_stars(rare_stars)
+    , pokemon(COMBINED_DEX_NAMES(), "rookidee")
     , shininess(rare_stars)
 {
     PA_ADD_OPTION(action);

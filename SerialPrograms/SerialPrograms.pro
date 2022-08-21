@@ -560,6 +560,7 @@ SOURCES += \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
@@ -651,7 +652,6 @@ SOURCES += \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp \
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.cpp \
@@ -733,6 +733,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
@@ -1332,6 +1333,7 @@ HEADERS += \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
@@ -1427,7 +1429,6 @@ HEADERS += \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h \
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h \
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.h \
@@ -1515,6 +1516,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \

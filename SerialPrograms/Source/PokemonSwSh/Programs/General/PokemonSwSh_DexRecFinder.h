@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Options/StringSelectTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -19,7 +20,6 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -43,8 +43,8 @@ public:
     DexRecFilters();
 
     OCR::LanguageOCR LANGUAGE;
-    PokemonNameSelectOption DESIRED;
-    PokemonNameList EXCLUSIONS;
+    StringSelectOption DESIRED;
+    StringSelectTableOption EXCLUSIONS;
 };
 
 
