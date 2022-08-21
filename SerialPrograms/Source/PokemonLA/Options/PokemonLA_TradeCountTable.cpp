@@ -150,7 +150,8 @@ TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOpt
 
         const SpriteDatabase::Sprite* sprite = ICONS.get_nothrow(entry.first);
         if (sprite != nullptr){
-            icon_item->setIcon(sprite->icon);
+            QPixmap pixmap = QPixmap::fromImage(sprite->icon.to_QImage_ref());
+            icon_item->setIcon(pixmap);
         }
 
         m_table->setItem(c, 0, icon_item);

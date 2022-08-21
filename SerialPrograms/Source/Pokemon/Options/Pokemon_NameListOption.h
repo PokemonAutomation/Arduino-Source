@@ -9,10 +9,11 @@
 
 #include <map>
 #include <vector>
+#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
-
-class QIcon;
+#include "Pokemon/Pokemon_Strings.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -80,6 +81,71 @@ public:
 
     const std::string& operator[](size_t index) const;
 };
+
+
+
+
+
+
+class PokemonNameListRow2 : public EditableTableRow2{
+public:
+    PokemonNameListRow2(const StringSelectDatabase& database, const std::string& default_pokemon)
+        : pokemon(database, default_pokemon)
+    {}
+    virtual std::unique_ptr<EditableTableRow2> clone() const override{
+        std::unique_ptr<PokemonNameListRow2> ret(new PokemonNameListRow2(pokemon.database(), pokemon.default_slug()));
+        ret->pokemon.set_by_index(pokemon.index());
+        return ret;
+    }
+
+public:
+    StringSelectCell pokemon;
+};
+
+
+#if 0
+class PokemonNameList2 : public EditableTableOption2{
+public:
+    PokemonNameList2()
+        :
+    {}
+
+    std::vector<std::unique_ptr<PokemonNameListRow2>> copy_snapshot() const{
+        return EditableTableOption2::copy_snapshot<PokemonNameListRow2>();
+    }
+    virtual std::vector<std::string> make_header() const override{
+        return std::vector<std::string>{
+            STRING_POKEMON,
+        };
+    }
+    virtual std::unique_ptr<EditableTableRow2> make_row() const override{
+
+    }
+
+public:
+    const StringSelectDatabase& m_database;
+    const std::string& m_default_pokemon;
+};
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

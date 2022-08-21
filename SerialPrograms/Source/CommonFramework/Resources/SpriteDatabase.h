@@ -8,7 +8,6 @@
 #define PokemonAutomation_Resources_SpriteCompositeImage_H
 
 #include <map>
-#include <QIcon>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
@@ -38,7 +37,7 @@ public:
 public:
     struct Sprite{
         ImageViewRGB32 sprite;
-        QIcon icon;
+        ImageViewRGB32 icon;    //  Cropped sprite for better viewing.
     };
     const Sprite& get_throw(const std::string& slug) const;
     const Sprite* get_nothrow(const std::string& slug) const;

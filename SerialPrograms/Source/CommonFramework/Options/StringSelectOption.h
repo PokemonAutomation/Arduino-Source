@@ -8,8 +8,8 @@
 #define PokemonAutomation_Options_StringSelectOption_H
 
 #include <vector>
-#include <map>
 #include <QIcon>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
@@ -21,13 +21,13 @@ namespace PokemonAutomation{
 struct StringSelectEntry{
     std::string slug;
     std::string display_name;
-    QIcon icon;
+    ImageViewRGB32 icon;
 
     StringSelectEntry(std::string p_slug, std::string p_display_name)
         : slug(std::move(p_slug))
         , display_name(std::move(p_display_name))
     {}
-    StringSelectEntry(std::string p_slug, std::string p_display_name, QIcon p_icon)
+    StringSelectEntry(std::string p_slug, std::string p_display_name, ImageViewRGB32 p_icon)
         : slug(std::move(p_slug))
         , display_name(std::move(p_display_name))
         , icon(std::move(p_icon))
@@ -38,19 +38,26 @@ struct StringSelectEntry{
 
 class StringSelectDatabase{
 public:
-    const std::vector<StringSelectEntry>& case_list() const{ return m_list; }
+    StringSelectDatabase(const StringSelectDatabase&) = delete;
+    StringSelectDatabase& operator=(const StringSelectDatabase&) = delete;
+    StringSelectDatabase(StringSelectDatabase&&);
+    StringSelectDatabase& operator=(StringSelectDatabase&&);
+    ~StringSelectDatabase();
 
-    const StringSelectEntry& operator[](size_t index) const{ return m_list[index]; }
+public:
+    StringSelectDatabase();
+    void add_entry(StringSelectEntry entry);
+
+public:
+    const std::vector<StringSelectEntry>& case_list() const;
+
+    const StringSelectEntry& operator[](size_t index) const;
     size_t search_index_by_slug(const std::string& slug) const;
     size_t search_index_by_name(const std::string& display_name) const;
 
-public:
-    void add_entry(StringSelectEntry entry);
-
 private:
-    std::vector<StringSelectEntry> m_list;
-    std::map<std::string, size_t> m_slug_to_entry;
-    std::map<std::string, size_t> m_display_name_to_entry;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
@@ -60,9 +67,10 @@ public:
     StringSelectCell(const StringSelectDatabase& database, size_t default_index);
     StringSelectCell(const StringSelectDatabase& database, const std::string& default_slug);
 
-    size_t index() const{
-        return m_index.load(std::memory_order_relaxed);
-    }
+    size_t default_index() const;
+    const std::string& default_slug() const;
+
+    size_t index() const;
     const std::string& slug() const{
         return entry().slug;
     }
@@ -70,14 +78,14 @@ public:
         return entry().display_name;
     }
     const StringSelectEntry& entry() const{
-        return m_database[index()];
+        return database()[index()];
     }
 
     void set_by_index(size_t index);
     std::string set_by_slug(const std::string& slug);
     std::string set_by_name(const std::string& display_name);
 
-    const StringSelectDatabase& database() const{ return m_database; }
+    const StringSelectDatabase& database() const;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -87,9 +95,8 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    const StringSelectDatabase& m_database;
-    const size_t m_default;
-    std::atomic<size_t> m_index;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

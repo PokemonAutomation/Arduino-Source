@@ -80,7 +80,8 @@ NameSelectWidget::NameSelectWidget(
         if (sprite == nullptr){
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
-            this->setItemIcon((int)index, sprite->icon);
+            QPixmap pixmap = QPixmap::fromImage(sprite->icon.to_QImage_ref());
+            this->setItemIcon((int)index, pixmap);
         }
 
         if (slug == current_slug){

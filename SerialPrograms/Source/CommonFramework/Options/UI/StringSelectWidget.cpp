@@ -43,7 +43,8 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     this->completer()->setFilterMode(Qt::MatchContains);
 
     const StringSelectEntry& entry = value.entry();
-    this->addItem(entry.icon, QString::fromStdString(entry.display_name));
+    QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
+    this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 
     StringSelectCellWidget::update();
@@ -70,7 +71,8 @@ void StringSelectCellWidget::load_options(){
         global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
         this->clear();
         for (const auto& item : cases){
-            this->addItem(item.icon, QString::fromStdString(item.display_name));
+            QPixmap pixmap = QPixmap::fromImage(item.icon.to_QImage_ref());
+            this->addItem(pixmap, QString::fromStdString(item.display_name));
         }
     }
     this->setCurrentIndex((int)m_value.index());
@@ -102,7 +104,8 @@ void StringSelectCellWidget::hide_options(){
     //  Remove all elements and add the one that is selected.
     this->clear();
     const StringSelectEntry& entry = m_value.entry();
-    this->addItem(entry.icon, QString::fromStdString(entry.display_name));
+    QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
+    this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 }
 void StringSelectCellWidget::focusInEvent(QFocusEvent* event){

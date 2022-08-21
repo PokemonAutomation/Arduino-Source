@@ -22,8 +22,8 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
     JsonValue json = load_json_file(path);
     JsonObject& root = json.get_object_throw(path);
 
-    int width = root.get_integer_throw("spriteWidth", path);
-    int height = root.get_integer_throw("spriteHeight", path);
+    int64_t width = root.get_integer_throw("spriteWidth", path);
+    int64_t height = root.get_integer_throw("spriteHeight", path);
     if (width <= 0){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", path);
     }
@@ -39,8 +39,10 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
         int x = (int)obj.get_integer_throw("left", path);
 
         ImageViewRGB32 sprite = extract_box_reference(m_backing_image, ImagePixelBox(x, y, x + width, y + height));
-        QPixmap pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(sprite).to_QImage_ref());
-        m_database.emplace(slug, Sprite{sprite, pixmap});
+        m_database.emplace(
+            slug,
+            Sprite{sprite, ImageMatch::trim_image_alpha(sprite)}
+        );
     }
 }
 

@@ -38,7 +38,7 @@ const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required(){
 ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
     : EnumDropdownOption<ShortcutDirection>(
         std::move(label),
-        false ? ShortcutDirection_Required() : ShortcutDirection_Nullable(),
+        ShortcutDirection_Nullable(),
         ShortcutDirection::NONE
     )
 {}

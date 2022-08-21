@@ -152,10 +152,12 @@ void BossActionWidget::redraw_table(){
 
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
-        const QIcon& icon = ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon;
+        const ImageViewRGB32& icon = ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon;
         const std::string& display_name = get_pokemon_name(name_slug).display_name();
-        QTableWidgetItem* icon_item = new QTableWidgetItem(icon, QString::fromStdString(display_name));
-//        icon_item->setIcon(icon);
+
+        QPixmap pixmap = QPixmap::fromImage(icon.to_QImage_ref());
+        QTableWidgetItem* icon_item = new QTableWidgetItem(pixmap, QString::fromStdString(display_name));
+
         m_table->setItem(c, 0, icon_item);
 
         BallSelectWidget* ball_select = make_ball_select(*m_table, c, m_value.m_list[c].ball);

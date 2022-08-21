@@ -39,7 +39,8 @@ BallSelectWidget::BallSelectWidget(
         const std::string& slug = slugs[index];
 
         const SpriteDatabase::Sprite& sprite = ALL_POKEBALL_SPRITES().get_throw(slug);
-        this->setItemIcon((int)index, sprite.icon);
+        QPixmap pixmap = QPixmap::fromImage(sprite.icon.to_QImage_ref());
+        this->setItemIcon((int)index, pixmap);
 
         if (slug == current_slug){
             this->setCurrentIndex((int)index);
