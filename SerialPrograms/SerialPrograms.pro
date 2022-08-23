@@ -93,6 +93,7 @@ SOURCES += \
     ../Common/Cpp/Json/JsonTools.cpp \
     ../Common/Cpp/Json/JsonValue.cpp \
     ../Common/Cpp/LifetimeSanitizer.cpp \
+    ../Common/Cpp/Options/BatchOption.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
@@ -100,6 +101,7 @@ SOURCES += \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
+    ../Common/Cpp/Options/GroupOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTextOption.cpp \
@@ -118,6 +120,7 @@ SOURCES += \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/CollapsibleGroupBox.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
+    ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
@@ -127,6 +130,7 @@ SOURCES += \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
+    ../Common/Qt/Options/GroupWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTextWidget.cpp \
@@ -224,8 +228,6 @@ SOURCES += \
     Source/CommonFramework/OCR/OCR_StringNormalization.cpp \
     Source/CommonFramework/OCR/OCR_TextMatcher.cpp \
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp \
-    Source/CommonFramework/Options/BatchOption/BatchOption.cpp \
-    Source/CommonFramework/Options/BatchOption/GroupOption.cpp \
     Source/CommonFramework/Options/EditableTableOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
@@ -791,6 +793,7 @@ HEADERS += \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/LifetimeSanitizer.h \
+    ../Common/Cpp/Options/BatchOption.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
@@ -798,6 +801,7 @@ HEADERS += \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
+    ../Common/Cpp/Options/GroupOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTextOption.h \
@@ -834,6 +838,7 @@ HEADERS += \
     ../Common/Qt/CollapsibleGroupBox.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
+    ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
@@ -843,6 +848,7 @@ HEADERS += \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
+    ../Common/Qt/Options/GroupWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTextWidget.h \
@@ -961,10 +967,6 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \
     Source/CommonFramework/OCR/OCR_TextMatcher.h \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
-    Source/CommonFramework/Options/BatchOption/BatchOption.h \
-    Source/CommonFramework/Options/BatchOption/BatchWidget.h \
-    Source/CommonFramework/Options/BatchOption/GroupOption.h \
-    Source/CommonFramework/Options/BatchOption/GroupWidget.h \
     Source/CommonFramework/Options/EditableTableOption.h \
     Source/CommonFramework/Options/EditableTableWidget.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \

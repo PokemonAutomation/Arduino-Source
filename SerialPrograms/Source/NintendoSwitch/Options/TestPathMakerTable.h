@@ -2,7 +2,7 @@
 #define TESTPATHMAKERTABLE_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{

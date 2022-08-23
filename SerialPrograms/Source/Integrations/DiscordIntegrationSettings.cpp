@@ -106,11 +106,6 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     );
 #endif
 }
-void DiscordIntegrationSettingsOptionUI::on_set_enabled(bool enabled){
-#ifdef PA_SLEEPY
-    set_options_enabled(enabled && !SleepyDiscordRunner::is_running());
-#endif
-}
 
 
 

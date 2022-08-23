@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "Common/Cpp/Options/ConfigOption.h"
+#include "ConfigOption.h"
 
 namespace PokemonAutomation{
 

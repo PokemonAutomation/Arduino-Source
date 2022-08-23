@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterBotCommon_H
 #define PokemonAutomation_PokemonSwSh_EncounterBotCommon_H
 
+#include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "EncounterFilter/PokemonSwSh_EncounterFilterOption.h"

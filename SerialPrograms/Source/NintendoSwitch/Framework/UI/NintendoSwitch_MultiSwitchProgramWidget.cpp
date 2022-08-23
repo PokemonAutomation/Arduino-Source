@@ -10,7 +10,7 @@
 #include <QScrollArea>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/PanelElements.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"

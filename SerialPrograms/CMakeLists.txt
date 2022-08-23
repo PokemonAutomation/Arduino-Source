@@ -109,6 +109,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/EnumDatabase.cpp
     ../Common/Cpp/EnumDatabase.h
+    ../Common/Cpp/Options/BatchOption.cpp
+    ../Common/Cpp/Options/BatchOption.h
+    ../Common/Cpp/Options/GroupOption.cpp
+    ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -177,6 +181,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/Options/BatchWidget.cpp
+    ../Common/Qt/Options/BatchWidget.h
+    ../Common/Qt/Options/GroupWidget.cpp
+    ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
@@ -410,12 +418,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
-    Source/CommonFramework/Options/BatchOption/BatchOption.cpp
-    Source/CommonFramework/Options/BatchOption/BatchOption.h
-    Source/CommonFramework/Options/BatchOption/BatchWidget.h
-    Source/CommonFramework/Options/BatchOption/GroupOption.cpp
-    Source/CommonFramework/Options/BatchOption/GroupOption.h
-    Source/CommonFramework/Options/BatchOption/GroupWidget.h
     Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h

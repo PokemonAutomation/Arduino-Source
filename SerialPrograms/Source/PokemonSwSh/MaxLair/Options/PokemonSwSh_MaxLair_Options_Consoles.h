@@ -8,13 +8,13 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Consoles_H
 
 #include <memory>
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "CommonFramework/Options/BatchOption/BatchWidget.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh_MaxLair_Options.h"
 

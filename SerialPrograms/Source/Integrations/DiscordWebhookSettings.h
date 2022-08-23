@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 
 namespace PokemonAutomation{
 namespace Integration{

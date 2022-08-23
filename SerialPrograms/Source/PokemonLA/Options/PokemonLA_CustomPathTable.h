@@ -8,12 +8,12 @@
 #define PokemonAutomation_PokemonLA_CustomPathTableTable_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"
 

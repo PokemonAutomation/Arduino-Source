@@ -8,56 +8,15 @@
 #include <QLabel>
 #include <QGroupBox>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "GroupOption.h"
 #include "GroupWidget.h"
 
 namespace PokemonAutomation{
 
 
-GroupOption::GroupOption(
-    std::string label,
-    bool toggleable,
-    bool enabled
-)
-    : m_label(std::move(label))
-    , m_toggleable(toggleable)
-    , m_default_enabled(enabled)
-    , m_enabled(enabled)
-{}
-inline ConfigWidget* GroupOption::make_ui(QWidget& parent){
+
+ConfigWidget* GroupOption::make_ui(QWidget& parent){
     return new GroupWidget(parent, *this);
 }
-bool GroupOption::enabled() const{
-    return m_enabled.load(std::memory_order_relaxed);
-}
-void GroupOption::load_json(const JsonValue& json){
-    BatchOption::load_json(json);
-    const JsonObject* obj = json.get_object();
-    if (obj == nullptr){
-        return;
-    }
-    if (m_toggleable){
-        bool enabled;
-        if (obj->read_boolean(enabled, "Enabled")){
-            m_enabled.store(enabled, std::memory_order_relaxed);
-            on_set_enabled(enabled);
-        }
-    }
-}
-JsonValue GroupOption::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().get_object());
-    if (m_toggleable){
-        obj["Enabled"] = m_enabled.load(std::memory_order_relaxed);
-    }
-    return obj;
-}
-void GroupOption::restore_defaults(){
-    m_enabled.store(m_default_enabled, std::memory_order_relaxed);
-    BatchOption::restore_defaults();
-}
-void GroupOption::on_set_enabled(bool enabled){}
 
 
 GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
@@ -112,7 +71,6 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
         this, [=](bool on){
             m_value.m_enabled.store(on, std::memory_order_relaxed);
             m_value.on_set_enabled(on);
-            on_set_enabled(on);
         }
     );
 }
@@ -129,7 +87,6 @@ void GroupWidget::update(){
         item->update();
     }
 }
-void GroupWidget::on_set_enabled(bool enabled){}
 void GroupWidget::mouseDoubleClickEvent(QMouseEvent* event){
     m_expand_text->setVisible(m_expanded);
     m_expanded = !m_expanded;

@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
-#include "CommonFramework/Options/BatchOption/GroupWidget.h"
+#include "Common/Qt/Options/GroupWidget.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
