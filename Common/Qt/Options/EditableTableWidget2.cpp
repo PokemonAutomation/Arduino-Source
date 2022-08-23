@@ -77,6 +77,11 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOption2
     }
 
     EditableTableWidget2::update();
+    m_table->update_height();
+//    EditableTableWidget2::value_changed();
+
+//    m_table->resizeColumnsToContents();
+//    m_table->resizeRowsToContents();
 
     value.add_listener(*this);
 }
@@ -142,16 +147,28 @@ void EditableTableWidget2::update(){
         index_new++;
     }
 
+#if 0
+    for (int r = 0; r < m_table->rowCount() - 1; r++){
+        for (int c = 0; c < m_table->columnCount(); c++){
+            cout << m_table->cellWidget(r, c)->sizeHint().width() << "  ";
+        }
+        cout << endl;
+    }
+#endif
+
+//    cout << "latest.size() = " << latest.size() << endl;
     m_current = std::move(latest);
     m_table->resizeColumnsToContents();
+    m_table->resizeRowsToContents();
 }
 void EditableTableWidget2::value_changed(){
     QMetaObject::invokeMethod(m_table, [=]{
         update();
     }, Qt::QueuedConnection);
 }
-void EditableTableWidget2::update_column_sizes(){
+void EditableTableWidget2::update_sizes(){
     m_table->resizeColumnsToContents();
+    m_table->resizeRowsToContents();
 }
 
 

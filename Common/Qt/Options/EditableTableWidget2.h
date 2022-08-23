@@ -24,7 +24,7 @@ public:
     virtual void update() override;
     virtual void value_changed() override;
 
-    void update_column_sizes();
+    void update_sizes();
 
 private:
     QWidget* make_clone_button(EditableTableRow2& row);

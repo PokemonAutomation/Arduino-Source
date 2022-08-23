@@ -20,6 +20,22 @@ struct ConfigOption::Data{
     Data(ConfigOptionState p_visibility = ConfigOptionState::ENABLED)
         : visibility(p_visibility)
     {}
+
+    bool set_visibility(ConfigOptionState state){
+        while (true){
+            ConfigOptionState current = visibility.load(std::memory_order_acquire);
+
+            //  Already in that state. No change.
+            if (current == state){
+                return false;
+            }
+
+            //  Attempt to change.
+            if (visibility.compare_exchange_weak(current, state)){
+                return true;
+            }
+        }
+    }
 };
 
 
@@ -65,8 +81,9 @@ ConfigOptionState ConfigOption::visibility() const{
     return m_data->visibility.load(std::memory_order_relaxed);
 }
 void ConfigOption::set_visibility(ConfigOptionState visibility){
-    m_data->visibility.store(visibility, std::memory_order_relaxed);
-    push_update();
+    if (m_data->set_visibility(visibility)){
+        push_update();
+    }
 }
 
 

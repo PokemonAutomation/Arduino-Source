@@ -9,7 +9,7 @@
 
 #include <QComboBox>
 
-#define PA_ENABLE_SIZE_CACHING
+//#define PA_ENABLE_SIZE_CACHING
 
 namespace PokemonAutomation{
 

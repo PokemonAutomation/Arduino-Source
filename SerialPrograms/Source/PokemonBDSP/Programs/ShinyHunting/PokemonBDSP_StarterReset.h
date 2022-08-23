@@ -41,7 +41,7 @@ private:
 //    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    StringSelectDatabase STARTER_DATABSE;
+    StringSelectDatabase STARTER_DATABASE;
     StringSelectOption STARTER;
 
     BooleanCheckBoxOption USE_SOUND_DETECTION;

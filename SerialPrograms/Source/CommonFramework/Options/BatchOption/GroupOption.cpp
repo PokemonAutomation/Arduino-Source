@@ -101,8 +101,8 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     m_options_layout = new QVBoxLayout(m_options_holder);
     m_options_layout->setContentsMargins(0, 0, 0, 0);
 
-    for (auto& item : m_value.m_options){
-        m_options.emplace_back(item.first->make_ui(parent));
+    for (auto& item : value.options()){
+        m_options.emplace_back(item->make_ui(parent));
         m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
         m_options_layout->addWidget(&m_options.back()->widget());
     }

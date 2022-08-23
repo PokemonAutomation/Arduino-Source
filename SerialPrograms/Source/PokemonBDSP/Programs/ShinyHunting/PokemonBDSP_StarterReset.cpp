@@ -53,10 +53,10 @@ std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
 
 StarterReset::StarterReset()
     : GO_HOME_WHEN_DONE(false)
-    , STARTER_DATABSE(make_name_database({"turtwig", "chimchar", "piplup"}))
+    , STARTER_DATABASE(make_name_database({"turtwig", "chimchar", "piplup"}))
     , STARTER(
         "<b>Starter:</b>",
-        STARTER_DATABSE,
+        STARTER_DATABASE,
         "turtwig"
     )
     , USE_SOUND_DETECTION(

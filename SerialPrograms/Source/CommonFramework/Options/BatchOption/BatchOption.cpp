@@ -4,8 +4,13 @@
  *
  */
 
+#include <string>
+#include <vector>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "BatchOption.h"
@@ -13,9 +18,24 @@
 
 namespace PokemonAutomation{
 
-//BatchOption::BatchOption(){}
+
+struct BatchOption::Data{
+    const bool m_horizontal;
+    std::vector<std::pair<ConfigOption*, std::string>> m_options;
+
+    Data(bool horizontal)
+        : m_horizontal(horizontal)
+    {}
+};
+
+
+
+BatchOption::~BatchOption() = default;
+BatchOption::BatchOption(bool horizontal)
+    : m_data(CONSTRUCT_TOKEN, horizontal)
+{}
 void BatchOption::add_option(ConfigOption& option, std::string serialization_string){
-    m_options.emplace_back(&option, std::move(serialization_string));
+    m_data->m_options.emplace_back(&option, std::move(serialization_string));
 }
 
 void BatchOption::load_json(const JsonValue& json){
@@ -23,7 +43,7 @@ void BatchOption::load_json(const JsonValue& json){
     if (obj == nullptr){
         return;
     }
-    for (auto& item : m_options){
+    for (auto& item : m_data->m_options){
         if (!item.second.empty()){
             const JsonValue* value = obj->get_value(item.second);
             if (value){
@@ -34,7 +54,7 @@ void BatchOption::load_json(const JsonValue& json){
 }
 JsonValue BatchOption::to_json() const{
     JsonObject obj;
-    for (auto& item : m_options){
+    for (auto& item : m_data->m_options){
         if (!item.second.empty()){
             obj[item.second] = item.first->to_json();
         }
@@ -43,7 +63,7 @@ JsonValue BatchOption::to_json() const{
 }
 
 std::string BatchOption::check_validity() const{
-    for (const auto& item : m_options){
+    for (const auto& item : m_data->m_options){
         std::string error = item.first->check_validity();
         if (!error.empty()){
             return error;
@@ -52,12 +72,12 @@ std::string BatchOption::check_validity() const{
     return std::string();
 }
 void BatchOption::restore_defaults(){
-    for (const auto& item : m_options){
+    for (const auto& item : m_data->m_options){
         item.first->restore_defaults();
     }
 }
 void BatchOption::reset_state(){
-    for (const auto& item : m_options){
+    for (const auto& item : m_data->m_options){
         item.first->reset_state();
     }
 }
@@ -65,6 +85,16 @@ ConfigWidget* BatchOption::make_ui(QWidget& parent){
     return new BatchWidget(parent, *this);
 }
 
+bool BatchOption::horizontal() const{
+    return m_data->m_horizontal;
+}
+FixedLimitVector<ConfigOption*> BatchOption::options() const{
+    FixedLimitVector<ConfigOption*> ret(m_data->m_options.size());
+    for (const auto& item : m_data->m_options){
+        ret.emplace_back(item.first);
+    }
+    return ret;
+}
 
 
 BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
@@ -72,13 +102,24 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    QVBoxLayout* options_layout = new QVBoxLayout(this);
-    options_layout->setAlignment(Qt::AlignTop);
-    options_layout->setContentsMargins(0, 0, 0, 0);
+    QBoxLayout* options_layout;
+    if (value.horizontal()){
+        options_layout = new QHBoxLayout(this);
+        options_layout->setAlignment(Qt::AlignLeft);
+        options_layout->setContentsMargins(0, 0, 0, 0);
+    }else{
+        options_layout = new QVBoxLayout(this);
+        options_layout->setAlignment(Qt::AlignTop);
+        options_layout->setContentsMargins(0, 0, 0, 0);
+    }
 
-    for (auto& item : m_value.m_options){
-        m_options.emplace_back(item.first->make_ui(parent));
-        m_options.back()->widget().setContentsMargins(0, 5, 0, 5);
+    for (auto& item : value.options()){
+        m_options.emplace_back(item->make_ui(parent));
+        if (value.horizontal()){
+            m_options.back()->widget().setContentsMargins(3, 0, 3, 0);
+        }else{
+            m_options.back()->widget().setContentsMargins(0, 3, 0, 3);
+        }
         options_layout->addWidget(&m_options.back()->widget(), 0);
     }
 }
@@ -89,6 +130,9 @@ void BatchWidget::update(){
     }
 }
 
+
+
+template class FixedLimitVector<ConfigOption*>;
 
 
 
