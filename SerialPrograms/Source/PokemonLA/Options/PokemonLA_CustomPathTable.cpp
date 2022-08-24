@@ -112,7 +112,6 @@ CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
     action.add_listener(*this);
 }
 void CustomPathCell::value_changed(){
-    PathAction action = m_action;
     text.set_visibility(ConfigOptionState::HIDDEN);
     mount.set_visibility(ConfigOptionState::HIDDEN);
     move_forward_ticks.set_visibility(ConfigOptionState::HIDDEN);
@@ -121,7 +120,7 @@ void CustomPathCell::value_changed(){
     left_y.set_visibility(ConfigOptionState::HIDDEN);
     jump_wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
     wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
-    switch (action){
+    switch (m_action){
     case PathAction::NO_ACTION:
         break;
     case PathAction::CHANGE_MOUNT:
@@ -241,7 +240,7 @@ void CustomPathTableRow2::load_json(const JsonValue& json){
 JsonValue CustomPathTableRow2::to_json() const{
     JsonObject obj;
     obj["Action"] = action.to_json();
-    switch(action){
+    switch (action){
     case PathAction::CHANGE_MOUNT:
         obj["Mount"] = parameters.mount.to_json();
         break;

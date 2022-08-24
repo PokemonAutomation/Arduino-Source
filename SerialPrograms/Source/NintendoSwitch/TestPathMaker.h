@@ -1,4 +1,4 @@
-/*  Test Program (Computer)
+/*  Test Path Maker Table
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -29,10 +29,10 @@ public:
 private:
     void run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void execute_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index);
+    void execute_action(ConsoleHandle& console, BotBaseContext& context, const PathMakerRow2& row);
 
 private:
-    TestPathMakerTable PATH;
+    PathMakerTable PATH;
 };
 
 

@@ -1,3 +1,11 @@
+/*  Test Path Maker Table
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <iostream>
+#include <fstream>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -8,110 +16,157 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "CommonFramework/Options/EditableTableWidget.h"
-#include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
+
 #include <iostream>
-#include <fstream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-const std::string PathAction_NAMES[] = {
-    "No Action",
-    "Left Joystick",
-    "Right Joystick",
-    "Press B",
-    "Press A",
-    "Press Y",
-    "Press X",
-    "Press R",
-    "Press L",
-    "Press ZR",
-    "Press ZL",
-    "Press PLUS",
-    "Press MINUS",
-    "Press DPad Left",
-    "Press DPad Right",
-    "Press DPad Up",
-    "Press DPad Down",
-    "Wait"
-};
 
-const std::map<std::string, PathAction> PathAction_MAP{
-    {PathAction_NAMES[0], PathAction::NO_ACTION},
-    {PathAction_NAMES[1], PathAction::LEFT_JOYSTICK},
-    {PathAction_NAMES[2], PathAction::RIGHT_JOYSTICK},
-    {PathAction_NAMES[3], PathAction::B},
-    {PathAction_NAMES[4], PathAction::A},
-    {PathAction_NAMES[5], PathAction::Y},
-    {PathAction_NAMES[6], PathAction::X},
-    {PathAction_NAMES[7], PathAction::R},
-    {PathAction_NAMES[8], PathAction::L},
-    {PathAction_NAMES[9], PathAction::ZR},
-    {PathAction_NAMES[10], PathAction::ZL},
-    {PathAction_NAMES[11], PathAction::PLUS},
-    {PathAction_NAMES[12], PathAction::MINUS},
-    {PathAction_NAMES[13], PathAction::DPADLEFT},
-    {PathAction_NAMES[14], PathAction::DPADRIGHT},
-    {PathAction_NAMES[15], PathAction::DPADUP},
-    {PathAction_NAMES[16], PathAction::DPADDOWN},
-    {PathAction_NAMES[17], PathAction::WAIT}
-};
 
-TestPathMakerTableRow::TestPathMakerTableRow() {}
+const EnumDatabase<PathAction>& PathAction_Database(){
+    static const EnumDatabase<PathAction> database({
+        {PathAction::NO_ACTION,         "no-action",        "No Action"},
+        {PathAction::LEFT_JOYSTICK,     "left-joystick",    "Left Joystick"},
+        {PathAction::RIGHT_JOYSTICK,    "right-joystick",   "Right Joystick"},
+        {PathAction::B,                 "button-B",         "Press B"},
+        {PathAction::A,                 "button-A",         "Press A"},
+        {PathAction::Y,                 "button-Y",         "Press Y"},
+        {PathAction::X,                 "button-X",         "Press X"},
+        {PathAction::R,                 "button-R",         "Press R"},
+        {PathAction::L,                 "button-L",         "Press L"},
+        {PathAction::ZR,                "button-ZR",        "Press ZR"},
+        {PathAction::ZL,                "button-ZL",        "Press ZL"},
+        {PathAction::PLUS,              "button-plus",      "Press PLUS"},
+        {PathAction::MINUS,             "button-minus",     "Press MINUS"},
+        {PathAction::DPADLEFT,          "dpad-left",        "Press DPad Left"},
+        {PathAction::DPADRIGHT,         "dpad-right",       "Press DPad Right"},
+        {PathAction::DPADUP,            "dpad-up",          "Press DPad Up"},
+        {PathAction::DPADDOWN,          "dpad-down",        "Press DPad Down"},
+        {PathAction::WAIT,              "wait",             "Wait"}
+    });
+    return database;
+}
 
-void TestPathMakerTableRow::load_json(const JsonValue& json){
+
+
+
+
+PathMakerCell::~PathMakerCell(){
+    m_action.remove_listener(*this);
+}
+void PathMakerCell::operator=(const PathMakerCell& x){
+    x_axis.set(x.x_axis);
+    y_axis.set(x.y_axis);
+    button_hold_ticks.set(x.button_hold_ticks);
+    button_release_ticks.set(x.button_release_ticks);
+    wait_ticks.set(x.wait_ticks);
+}
+PathMakerCell::PathMakerCell(EnumDropdownCell<PathAction>& action)
+    : BatchOption(true)
+    , m_action(action)
+    , x_axis("X:", 128), y_axis("Y:", 128)
+    , button_hold_ticks("Ticks to Hold:", 250)
+    , button_release_ticks("Ticks to Release:", 250)
+    , wait_ticks("Ticks to Wait:", 125)
+{
+    PA_ADD_OPTION(x_axis);
+    PA_ADD_OPTION(y_axis);
+    PA_ADD_OPTION(button_hold_ticks);
+    PA_ADD_OPTION(button_release_ticks);
+    PA_ADD_OPTION(wait_ticks);
+
+    PathMakerCell::value_changed();
+    action.add_listener(*this);
+}
+void PathMakerCell::value_changed(){
+    x_axis.set_visibility(ConfigOptionState::HIDDEN);
+    y_axis.set_visibility(ConfigOptionState::HIDDEN);
+    button_hold_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    button_release_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    switch (m_action){
+    case PathAction::LEFT_JOYSTICK:
+    case PathAction::RIGHT_JOYSTICK:
+    case PathAction::B:
+    case PathAction::A:
+    case PathAction::Y:
+    case PathAction::X:
+    case PathAction::R:
+    case PathAction::L:
+    case PathAction::ZR:
+    case PathAction::ZL:
+    case PathAction::PLUS:
+    case PathAction::MINUS:
+    case PathAction::DPADLEFT:
+    case PathAction::DPADRIGHT:
+    case PathAction::DPADUP:
+    case PathAction::DPADDOWN:
+        x_axis.set_visibility(ConfigOptionState::ENABLED);
+        y_axis.set_visibility(ConfigOptionState::ENABLED);
+        button_hold_ticks.set_visibility(ConfigOptionState::ENABLED);
+        button_release_ticks.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::WAIT:
+        wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    default:
+        break;
+    }
+}
+
+
+
+
+PathMakerRow2::PathMakerRow2()
+    : action(PathAction_Database(), PathAction::NO_ACTION)
+    , parameters(action)
+{
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(parameters);
+}
+std::unique_ptr<EditableTableRow2> PathMakerRow2::clone() const{
+    std::unique_ptr<PathMakerRow2> ret(new PathMakerRow2());
+    ret->action.set(action);
+    ret->parameters = parameters;
+    return ret;
+}
+
+void PathMakerRow2::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
-    {
-        const std::string* str = obj->get_string("Action");
-        if (str != nullptr){
-            const auto iter = PathAction_MAP.find(*str);
-            if (iter != PathAction_MAP.end()){
-                action = iter->second;
-            }
-        }
-        switch(action){
-        case PathAction::LEFT_JOYSTICK:
-        case PathAction::RIGHT_JOYSTICK:
-            obj->read_integer(x_axis, "MoveDirectionX");
-            obj->read_integer(y_axis, "MoveDirectionY");
-            obj->read_integer(button_hold_ticks, "Hold");
-            obj->read_integer(button_release_ticks, "Release");
-            break;
-        case PathAction::B:
-        case PathAction::A:
-        case PathAction::Y:
-        case PathAction::X:
-        case PathAction::R:
-        case PathAction::L:
-        case PathAction::ZR:
-        case PathAction::ZL:
-        case PathAction::PLUS:
-        case PathAction::MINUS:
-        case PathAction::DPADLEFT:
-        case PathAction::DPADRIGHT:
-        case PathAction::DPADUP:
-        case PathAction::DPADDOWN:
-            obj->read_integer(button_hold_ticks, "Hold");
-            obj->read_integer(button_release_ticks, "Release");
-            break;
-        case PathAction::WAIT:
-            obj->read_integer(wait_ticks, "Wait");
-        default:
-            break;
-        }
+
+    const JsonValue* value = obj->get_value("Action");
+    if (value == nullptr){
+        return;
     }
+    action.load_json(*value);
 
-}
-
-JsonValue TestPathMakerTableRow::to_json() const{
-    JsonObject obj;
-    obj["Action"] = PathAction_NAMES[(size_t)action];
-    switch(action){
+    switch (action){
+    case PathAction::LEFT_JOYSTICK:
+    case PathAction::RIGHT_JOYSTICK:
+        value = obj->get_value("MoveDirectionX");
+        if (value != nullptr){
+            parameters.x_axis.load_json(*value);
+        }
+        value = obj->get_value("MoveDirectionY");
+        if (value != nullptr){
+            parameters.y_axis.load_json(*value);
+        }
+        value = obj->get_value("Hold");
+        if (value != nullptr){
+            parameters.button_hold_ticks.load_json(*value);
+        }
+        value = obj->get_value("Release");
+        if (value != nullptr){
+            parameters.button_release_ticks.load_json(*value);
+        }
+        break;
     case PathAction::B:
     case PathAction::A:
     case PathAction::Y:
@@ -126,346 +181,83 @@ JsonValue TestPathMakerTableRow::to_json() const{
     case PathAction::DPADRIGHT:
     case PathAction::DPADUP:
     case PathAction::DPADDOWN:
-        obj["Hold"] = button_hold_ticks;
-        obj["Release"] = button_release_ticks;
-        break;
-    case PathAction::LEFT_JOYSTICK:
-    case PathAction::RIGHT_JOYSTICK:
-        obj["MoveDirectionX"] = x_axis;
-        obj["MoveDirectionY"] = y_axis;
-        obj["Hold"] = button_hold_ticks;
-        obj["Release"] = button_release_ticks;
+        value = obj->get_value("Hold");
+        if (value != nullptr){
+            parameters.button_hold_ticks.load_json(*value);
+        }
+        value = obj->get_value("Release");
+        if (value != nullptr){
+            parameters.button_release_ticks.load_json(*value);
+        }
         break;
     case PathAction::WAIT:
-        obj["Wait"] = wait_ticks;
+        value = obj->get_value("Wait");
+        if (value != nullptr){
+            parameters.wait_ticks.load_json(*value);
+        }
         break;
     default:
         break;
     }
-
+}
+JsonValue PathMakerRow2::to_json() const{
+    JsonObject obj;
+    obj["Action"] = action.to_json();
+    switch (action){
+    case PathAction::B:
+    case PathAction::A:
+    case PathAction::Y:
+    case PathAction::X:
+    case PathAction::R:
+    case PathAction::L:
+    case PathAction::ZR:
+    case PathAction::ZL:
+    case PathAction::PLUS:
+    case PathAction::MINUS:
+    case PathAction::DPADLEFT:
+    case PathAction::DPADRIGHT:
+    case PathAction::DPADUP:
+    case PathAction::DPADDOWN:
+        obj["Hold"] = parameters.button_hold_ticks.to_json();
+        obj["Release"] = parameters.button_release_ticks.to_json();
+        break;
+    case PathAction::LEFT_JOYSTICK:
+    case PathAction::RIGHT_JOYSTICK:
+        obj["MoveDirectionX"] = parameters.x_axis.to_json();
+        obj["MoveDirectionY"] = parameters.y_axis.to_json();
+        obj["Hold"] = parameters.button_hold_ticks.to_json();
+        obj["Release"] = parameters.button_release_ticks.to_json();
+        break;
+    case PathAction::WAIT:
+        obj["Wait"] = parameters.wait_ticks.to_json();
+        break;
+    default:
+        break;
+    }
     return obj;
 }
 
-std::unique_ptr<EditableTableRow> TestPathMakerTableRow::clone() const{
-    return std::unique_ptr<EditableTableRow>(new TestPathMakerTableRow(*this));
-}
 
-class ActionParameterWidget : public QWidget{
-public:
-    ActionParameterWidget(QWidget& parent, TestPathMakerTableRow& row);
-
-    void setParameter();
-
-private:
-    TestPathMakerTableRow& m_row;
-
-    QHBoxLayout* m_layout = nullptr;
-
-    QWidget* m_hold_label;
-    QWidget* m_hold_duration;
-    QWidget* m_release_label;
-    QWidget* m_release_duration;
-
-    QWidget* m_axis_x_label;
-    QWidget* m_axis_x_value;
-    QWidget* m_axis_y_label;
-    QWidget* m_axis_y_value;
-
-    QWidget* m_wait_start_label;
-    QWidget* m_wait_end_label;
-    QWidget* m_wait_value;
-
-};
-
-ActionParameterWidget::ActionParameterWidget(QWidget& parent, TestPathMakerTableRow& row)
-    : QWidget(&parent), m_row(row)
-{
-    this->setContentsMargins(0, 0, 0, 0);
-    m_layout = new QHBoxLayout(this);
-
-    m_layout->setContentsMargins(5, 0, 5, 0);
-
-    m_hold_label = new QLabel("Ticks to hold:", this);
-    m_hold_duration = make_integer_table_cell(*this, m_row.button_hold_ticks);
-    m_release_label = new QLabel("Ticks to release:", this);
-    m_release_duration = make_integer_table_cell(*this, m_row.button_release_ticks);
-
-    m_axis_x_label = new QLabel("X:", this);
-    m_axis_x_value = make_integer_table_cell(*this, m_row.x_axis);
-    m_axis_x_value->setMaximumWidth(80);
-
-    m_axis_y_label = new QLabel("Y:", this);
-    m_axis_y_value = make_integer_table_cell(*this, m_row.y_axis);
-    m_axis_y_value->setMaximumWidth(80);
-
-    m_wait_start_label = new QLabel("Wait for:");
-    m_wait_value = make_integer_table_cell<uint16_t>(*this, m_row.wait_ticks);
-    m_wait_end_label = new QLabel("ticks.");
-
-    m_layout->addWidget(m_axis_x_label);
-    m_layout->addWidget(m_axis_x_value);
-    m_layout->addWidget(m_axis_y_label);
-    m_layout->addWidget(m_axis_y_value);
-
-    m_layout->addWidget(m_hold_label);
-    m_layout->addWidget(m_hold_duration);
-    m_layout->addWidget(m_release_label);
-    m_layout->addWidget(m_release_duration);
-
-    m_layout->addWidget(m_wait_start_label);
-    m_layout->addWidget(m_wait_value);
-    m_layout->addWidget(m_wait_end_label);
-
-    setParameter();
-}
-
-void ActionParameterWidget::setParameter(){
-    for(int i = 0; i < m_layout->count(); i++){
-        m_layout->itemAt(i)->widget()->hide();
-    }
-    switch(m_row.action){
-    case PathAction::B:
-    case PathAction::A:
-    case PathAction::Y:
-    case PathAction::X:
-    case PathAction::R:
-    case PathAction::L:
-    case PathAction::ZR:
-    case PathAction::ZL:
-    case PathAction::PLUS:
-    case PathAction::MINUS:
-    case PathAction::DPADLEFT:
-    case PathAction::DPADRIGHT:
-    case PathAction::DPADUP:
-    case PathAction::DPADDOWN:
-            m_hold_label->show();
-            m_hold_duration->show();
-            m_release_label->show();
-            m_release_duration->show();
-            break;
-    case PathAction::LEFT_JOYSTICK:
-    case PathAction::RIGHT_JOYSTICK:
-            m_axis_x_label->show();
-            m_axis_x_value->show();
-            m_axis_y_label->show();
-            m_axis_y_value->show();
-            m_hold_label->show();
-            m_hold_duration->show();
-            m_release_label->show();
-            m_release_duration->show();
-            break;
-    case PathAction::WAIT:
-            m_wait_start_label->show();
-            m_wait_value->show();
-            m_wait_end_label->show();
-        break;
-
-    default:
-        break;
-    }
-}
-
-std::vector<QWidget*> TestPathMakerTableRow::make_widgets(QWidget& parent){
-    std::vector<QWidget*> widgets;
-    auto parameterWidget = new ActionParameterWidget(parent, *this);
-    widgets.emplace_back(make_action_box(parent, action, parameterWidget));
-    widgets.emplace_back(parameterWidget);
-    return widgets;
-}
-
-QWidget* TestPathMakerTableRow::make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget){
-    QComboBox* box = new NoWheelComboBox(&parent);
-    for(size_t i = 0; i < PathAction_MAP.size(); i++){
-        box->addItem(QString::fromStdString(PathAction_NAMES[i]));
-    }
-    box->setCurrentIndex((int)action);
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&action, parameterWidget](int index){
-            if (index < 0){
-                index = 0;
-            }
-            action = (PathAction)index;
-            parameterWidget->setParameter();
-        }
-    );
-    return box;
-}
-
-std::vector<std::string> TestPathMakerTableFactory::make_header() const{
+PathMakerTable::PathMakerTable()
+    : EditableTableOption_t<PathMakerRow2>(
+        "<b>Custom Path Table:</b><br>"
+        "Set a sequence of actions to navigate the map."
+    )
+{}
+std::vector<std::string> PathMakerTable::make_header() const{
     return std::vector<std::string>{
         "Action",
         "Parameters",
     };
 }
 
-std::unique_ptr<EditableTableRow> TestPathMakerTableFactory::make_row() const{
-    return std::unique_ptr<EditableTableRow>(new TestPathMakerTableRow());
-}
 
 
 
-std::vector<std::unique_ptr<EditableTableRow>> TestPathMakerTable::make_defaults() const{
-    std::vector<std::unique_ptr<EditableTableRow>> ret;
-    auto row = std::make_unique<TestPathMakerTableRow>();
-    row = std::make_unique<TestPathMakerTableRow>();
-    row->action = PathAction::LEFT_JOYSTICK;
-    row->button_hold_ticks = 400;
-    row->button_release_ticks = 500;
-    row->x_axis = 127;
-    row->y_axis = 127;
-    ret.emplace_back(std::move(row));
 
-    return ret;
-}
 
-TestPathMakerTable::TestPathMakerTable()
-    : PATH(
-        "<b>Custom Path Table:</b><br>"
-        "Set a sequence of actions to navigate the map.",
-        m_factory, make_defaults()
-    )
-{
-    PA_ADD_OPTION(PATH);
-}
 
-class TestPathMakerTableWidget : public QWidget, public ConfigWidget{
-public:
-    TestPathMakerTableWidget(QWidget& parent, TestPathMakerTable& value)
-        : QWidget(&parent)
-        , ConfigWidget(value, *this)
-    {
-        m_table_widget = static_cast<EditableTableWidget*>(value.PATH.make_ui(*this));
 
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->addWidget(&m_table_widget->widget());
-
-        QHBoxLayout* button_layout = new QHBoxLayout();
-
-        button_layout->setContentsMargins(0, 0, 0, 0);
-        layout->addLayout(button_layout);
-
-        auto load_button = new QPushButton("Load Options", this);
-        button_layout->addWidget(load_button);
-
-        auto save_button = new QPushButton("Save Options", this);
-        button_layout->addWidget(save_button);
-
-        auto dump_button = new QPushButton("Dump Actions",this);
-        button_layout->addWidget(dump_button);
-
-        connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
-            std::string path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json").toStdString();
-            std::cout << "Load TestPath from " << path << std::endl;
-            if (path.empty()){
-                return;
-            }
-            JsonValue json = load_json_file(path);
-            JsonObject& root = json.get_object_throw(path);
-            JsonValue& obj = root.get_value_throw("TEST_PATH_MAKER_TABLE", path);
-            value.load_json(obj);
-            if (m_table_widget == nullptr){
-                QMessageBox box;
-                box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
-                return;
-            }
-            m_table_widget->update_ui();
-        });
-
-        connect(save_button,  &QPushButton::clicked, this, [&value, this](bool){
-            std::string path = QFileDialog::getSaveFileName(this, tr("Open option file"), ".", "*.json").toStdString();
-            std::cout << "Save TestPath from " << path << std::endl;
-            if (path.size() > 0){
-                try{
-                    JsonObject root;
-                    root["TEST_PATH_MAKER_TABLE"] = value.to_json();
-                    root.dump(path);
-                }catch (FileException&){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", QString::fromStdString("Failed to save to file: " + path));
-                    return;
-                }
-            }
-        });
-
-        connect(dump_button,  &QPushButton::clicked, this,[&value](bool){
-            std::ofstream myfile;
-            myfile.open("dump_actions.txt");
-            for (size_t action_index = 0; action_index < value.num_actions(); action_index++){
-                const auto& row = value.get_action(action_index);
-                switch(row.action){
-                case PathAction::LEFT_JOYSTICK:
-                    myfile << "pbf_move_left_joystick(context, " + std::to_string(row.x_axis) + ", " + std::to_string(row.y_axis) + ", " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::RIGHT_JOYSTICK:
-                    myfile << "pbf_move_right_joystick(context, " + std::to_string(row.x_axis) + ", " + std::to_string(row.y_axis) + ", " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::B:
-                    myfile << "pbf_press_button(context, BUTTON_B, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::A:
-                    myfile << "pbf_press_button(context, BUTTON_A, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::Y:
-                    myfile << "pbf_press_button(context, BUTTON_Y, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::X:
-                    myfile << "pbf_press_button(context, BUTTON_X, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::R:
-                    myfile << "pbf_press_button(context, BUTTON_R, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::L:
-                    myfile << "pbf_press_button(context, BUTTON_L, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::ZR:
-                    myfile << "pbf_press_button(context, BUTTON_ZR, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::ZL:
-                    myfile << "pbf_press_button(context, BUTTON_ZL, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::PLUS:
-                    myfile << "pbf_press_button(context, BUTTON_PLUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::MINUS:
-                    myfile << "pbf_press_button(context, BUTTON_MINUS, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::DPADLEFT:
-                    myfile << "pbf_press_dpad(context, DPAD_LEFT, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::DPADRIGHT:
-                    myfile << "pbf_press_dpad(context, DPAD_RIGHT, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::DPADUP:
-                    myfile << "pbf_press_dpad(context, DPAD_UP, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::DPADDOWN:
-                    myfile << "pbf_press_dpad(context, DPAD_DOWN, " + std::to_string(row.button_hold_ticks) + ", " + std::to_string(row.button_release_ticks) + ");\n";
-                    break;
-                case PathAction::WAIT:
-                    myfile << "pbf_wait(context, (" + std::to_string(row.wait_ticks) + "* TICKS_PER_SECOND));\n";
-                default:
-                    break;
-                }
-            }
-            myfile.close();
-        });
-
-    }
-
-    virtual void update() override{
-        ConfigWidget::update();
-        m_table_widget->update_ui();
-    }
-
-private:
-    EditableTableWidget* m_table_widget = nullptr;
-};
-
-ConfigWidget* TestPathMakerTable::make_ui(QWidget& parent){
-    return new TestPathMakerTableWidget(parent, *this);
-}
 
 
 }

@@ -10,6 +10,10 @@
 #include "ConfigWidget.h"
 #include "SimpleIntegerWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -80,6 +84,10 @@ void SimpleIntegerCellWidget<Type>::value_changed(){
 
 
 template <typename Type>
+SimpleIntegerOptionWidget<Type>::~SimpleIntegerOptionWidget(){
+    m_value.remove_listener(*this);
+}
+template <typename Type>
 SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -91,11 +99,18 @@ SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, Simp
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     layout->addWidget(m_cell, 1);
+    value.add_listener(*this);
 }
 template <typename Type>
 void SimpleIntegerOptionWidget<Type>::update(){
     ConfigWidget::update();
-    m_cell->update();
+//    m_cell->update();
+}
+template <typename Type>
+void SimpleIntegerOptionWidget<Type>::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
 }
 
 

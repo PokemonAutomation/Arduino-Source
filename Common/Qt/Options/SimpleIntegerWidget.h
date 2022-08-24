@@ -31,11 +31,13 @@ private:
 
 
 template <typename Type>
-class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
+class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~SimpleIntegerOptionWidget();
     SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
 
     virtual void update() override;
+    virtual void value_changed() override;
 
 private:
     SimpleIntegerCellWidget<Type>* m_cell;

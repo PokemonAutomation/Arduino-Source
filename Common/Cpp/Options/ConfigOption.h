@@ -38,6 +38,7 @@ public:
     };
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
+    size_t total_listeners() const;
 
 public:
     virtual ~ConfigOption();

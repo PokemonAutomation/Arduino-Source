@@ -14,7 +14,6 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"
 
 namespace PokemonAutomation{
@@ -26,7 +25,6 @@ namespace PokemonLA{
 enum class PathAction{
     NO_ACTION,
     CHANGE_MOUNT,
-//    ROTATE_CAMERA,
     MOVE_FORWARD,
     MOVE_IN_DIRECTION,
     CENTER_CAMERA,
@@ -117,15 +115,10 @@ public:
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-
 public:
     friend class CustomPathTableWidget;
 
     TravelLocationOption TRAVEL_LOCATION;
-//    CustomPathTableTableFactory m_factory;
-//    EditableTableOption PATH;
     CustomPathTable2 PATH;
 };
 

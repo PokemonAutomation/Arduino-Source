@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 
 struct ConfigOption::Data{
-    SpinLock lock;
+    mutable SpinLock lock;
     std::atomic<ConfigOptionState> visibility;
     std::set<Listener*> listeners;
 
@@ -61,6 +61,11 @@ void ConfigOption::remove_listener(Listener& listener){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     data.listeners.erase(&listener);
+}
+size_t ConfigOption::total_listeners() const{
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.lock);
+    return data.listeners.size();
 }
 void ConfigOption::push_update(){
     Data& data = *m_data;
