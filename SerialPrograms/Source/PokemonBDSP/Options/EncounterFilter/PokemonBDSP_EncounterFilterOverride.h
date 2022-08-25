@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 
 #include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 

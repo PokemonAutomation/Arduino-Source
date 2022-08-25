@@ -16,10 +16,8 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "CommonFramework/Options/EditableTableOption.h"
-#include "CommonFramework/Options/EditableTableWidget.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "PokemonLA_CustomPathTable.h"
 
 #include <iostream>

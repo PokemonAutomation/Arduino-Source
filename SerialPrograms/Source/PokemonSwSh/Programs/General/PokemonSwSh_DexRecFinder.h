@@ -11,7 +11,6 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Options/StringSelectTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"

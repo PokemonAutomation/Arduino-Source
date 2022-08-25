@@ -191,10 +191,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
     ../Common/Qt/Options/DateWidget.h
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
     ../Common/Qt/Options/EditableTableWidget2.cpp
     ../Common/Qt/Options/EditableTableWidget2.h
     ../Common/Qt/Options/EnumDropdownWidget.cpp
@@ -418,10 +414,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
-    Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
-    Source/CommonFramework/Options/EditableTableOption.cpp
-    Source/CommonFramework/Options/EditableTableOption.h
-    Source/CommonFramework/Options/EditableTableWidget.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h

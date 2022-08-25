@@ -124,8 +124,6 @@ SOURCES += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
@@ -228,7 +226,6 @@ SOURCES += \
     Source/CommonFramework/OCR/OCR_StringNormalization.cpp \
     Source/CommonFramework/OCR/OCR_TextMatcher.cpp \
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp \
-    Source/CommonFramework/Options/EditableTableOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
@@ -841,8 +838,6 @@ HEADERS += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EditableTableWidget2.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FixedCodeWidget.h \
@@ -966,8 +961,6 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \
     Source/CommonFramework/OCR/OCR_TextMatcher.h \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
-    Source/CommonFramework/Options/EditableTableOption.h \
-    Source/CommonFramework/Options/EditableTableWidget.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \

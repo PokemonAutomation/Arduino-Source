@@ -46,8 +46,6 @@ SOURCES += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget2.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
@@ -109,8 +107,6 @@ HEADERS += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
     ../Common/Qt/Options/EditableTableWidget2.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
