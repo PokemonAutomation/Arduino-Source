@@ -74,7 +74,7 @@ EggHatchFilterRow::EggHatchFilterRow(EggHatchShinyFilter p_shiny)
 {
     shiny.set(p_shiny);
 }
-std::unique_ptr<EditableTableRow2> EggHatchFilterRow::clone() const{
+std::unique_ptr<EditableTableRow> EggHatchFilterRow::clone() const{
     std::unique_ptr<EggHatchFilterRow> ret(new EggHatchFilterRow());
     ret->action.set(action);
     ret->shiny.set(shiny);
@@ -115,8 +115,8 @@ std::vector<std::string> EggHatchFilterTable::make_header() const{
         "Speed",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow2>> EggHatchFilterTable::make_defaults(){
-    std::vector<std::unique_ptr<EditableTableRow2>> ret;
+std::vector<std::unique_ptr<EditableTableRow>> EggHatchFilterTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
     ret.emplace_back(new EggHatchFilterRow(EggHatchShinyFilter::Shiny));
     return ret;
 }

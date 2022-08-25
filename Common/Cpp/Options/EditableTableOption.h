@@ -17,13 +17,13 @@ namespace PokemonAutomation{
 
 //  Represents a row of the table. Users should subclass this and add all the
 //  configs/fields that is in the row.
-class EditableTableRow2{
+class EditableTableRow{
 public:
-    virtual ~EditableTableRow2() = default;
-    EditableTableRow2();
+    virtual ~EditableTableRow() = default;
+    EditableTableRow();
 
     //  Duplicate/deep-copy the entire row. Does not copy over listeners.
-    virtual std::unique_ptr<EditableTableRow2> clone() const = 0;
+    virtual std::unique_ptr<EditableTableRow> clone() const = 0;
 
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
@@ -45,7 +45,7 @@ public:
 
 
 private:
-    friend class EditableTableOption2;
+    friend class EditableTableOption;
 
     //  A unique # for this row within its table.
     uint64_t m_seqnum = 0;
@@ -61,11 +61,11 @@ private:
 
 
 //  This is the table itself.
-class EditableTableOption2 : public ConfigOption{
+class EditableTableOption : public ConfigOption{
 public:
-    EditableTableOption2(
+    EditableTableOption(
         std::string label,
-        std::vector<std::unique_ptr<EditableTableRow2>> default_value = {}
+        std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 
     const std::string& label() const{ return m_label; }
@@ -77,7 +77,7 @@ public:
 
     //  Return a list of references to all the rows at this exact moment.
     //  These reference are live in that they may be asynchronously changed.
-    std::vector<std::shared_ptr<EditableTableRow2>> current_refs() const;
+    std::vector<std::shared_ptr<EditableTableRow>> current_refs() const;
 
     //  Return a copy of the entire table at the exact moment this is called.
     template <typename RowType>
@@ -86,7 +86,7 @@ public:
         SpinLockGuard lg(m_lock);
         ret.reserve(m_current.size());
         for (auto& item : m_current){
-            std::unique_ptr<EditableTableRow2> parent = item->clone();
+            std::unique_ptr<EditableTableRow> parent = item->clone();
             std::unique_ptr<RowType> ptr(static_cast<RowType*>(parent.release()));
             ret.emplace_back(std::move(ptr));
         }
@@ -101,38 +101,38 @@ public:
 
 public:
     virtual std::vector<std::string> make_header() const = 0;
-    virtual std::unique_ptr<EditableTableRow2> make_row() const = 0;
+    virtual std::unique_ptr<EditableTableRow> make_row() const = 0;
 
     //  Undefined behavior to call these on rows that aren't part of the table.
-    void insert_row(size_t index, std::unique_ptr<EditableTableRow2> row);
-    void clone_row(const EditableTableRow2& row);
-    void remove_row(EditableTableRow2& row);
+    void insert_row(size_t index, std::unique_ptr<EditableTableRow> row);
+    void clone_row(const EditableTableRow& row);
+    void remove_row(EditableTableRow& row);
 
 public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     const std::string m_label;
-    const std::vector<std::unique_ptr<EditableTableRow2>> m_default;
+    const std::vector<std::unique_ptr<EditableTableRow>> m_default;
 
     mutable SpinLock m_lock;
     uint64_t m_seqnum = 0;
-    std::vector<std::shared_ptr<EditableTableRow2>> m_current;
+    std::vector<std::shared_ptr<EditableTableRow>> m_current;
 };
 
 
 //  Convenience helper class that's type-aware.
 template <typename RowType>
-class EditableTableOption_t : public EditableTableOption2{
+class EditableTableOption_t : public EditableTableOption{
 public:
-    using EditableTableOption2::EditableTableOption2;
+    using EditableTableOption::EditableTableOption;
 
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
-        return EditableTableOption2::copy_snapshot<RowType>();
+        return EditableTableOption::copy_snapshot<RowType>();
     }
 
-    virtual std::unique_ptr<EditableTableRow2> make_row() const override{
-        return std::unique_ptr<EditableTableRow2>(new RowType());
+    virtual std::unique_ptr<EditableTableRow> make_row() const override{
+        return std::unique_ptr<EditableTableRow>(new RowType());
     }
 };
 

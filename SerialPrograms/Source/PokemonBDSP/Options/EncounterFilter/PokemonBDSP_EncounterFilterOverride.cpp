@@ -65,7 +65,7 @@ EncounterFilterOverride::EncounterFilterOverride()
     action.add_listener(*this);
 }
 void EncounterFilterOverride::load_json(const JsonValue& json){
-    EditableTableRow2::load_json(json);
+    EditableTableRow::load_json(json);
 
     //  Parse old format for backwards compatibility.
     const JsonObject* obj = json.get_object();
@@ -91,7 +91,7 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
         shininess.load_json(*value);
     }
 }
-std::unique_ptr<EditableTableRow2> EncounterFilterOverride::clone() const{
+std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride());
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());

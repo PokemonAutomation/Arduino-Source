@@ -29,7 +29,7 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     add_option(tags_text, "Tags");
     add_option(url, "URL");
 }
-std::unique_ptr<EditableTableRow2> DiscordWebhookUrl::clone() const{
+std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
     std::unique_ptr<DiscordWebhookUrl> ret(new DiscordWebhookUrl());
     ret->enabled = (bool)enabled;
     ret->label.set(label);
@@ -39,7 +39,7 @@ std::unique_ptr<EditableTableRow2> DiscordWebhookUrl::clone() const{
     return ret;
 }
 void DiscordWebhookUrl::load_json(const JsonValue& json){
-    EditableTableRow2::load_json(json);
+    EditableTableRow::load_json(json);
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;

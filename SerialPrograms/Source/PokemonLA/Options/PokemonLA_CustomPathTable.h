@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"
 
 namespace PokemonAutomation{
@@ -80,10 +80,10 @@ public:
     SimpleIntegerOption<uint16_t> wait_ticks;
 };
 
-class CustomPathTableRow2 : public EditableTableRow2{
+class CustomPathTableRow2 : public EditableTableRow{
 public:
     CustomPathTableRow2();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -99,7 +99,7 @@ public:
     virtual std::vector<std::string> make_header() const override;
 
 private:
-    std::vector<std::unique_ptr<EditableTableRow2>> make_defaults() const;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 };
 
 

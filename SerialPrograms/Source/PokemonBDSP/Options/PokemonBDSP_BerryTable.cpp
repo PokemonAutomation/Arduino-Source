@@ -20,7 +20,7 @@ BerrySelectorRow2::BerrySelectorRow2()
 {
     PA_ADD_OPTION(berry);
 }
-std::unique_ptr<EditableTableRow2> BerrySelectorRow2::clone() const{
+std::unique_ptr<EditableTableRow> BerrySelectorRow2::clone() const{
     std::unique_ptr<BerrySelectorRow2> ret(new BerrySelectorRow2());
     ret->berry.set_by_index(berry.index());
     return ret;
@@ -67,8 +67,8 @@ std::vector<std::string> BerryTable::make_header() const{
     };
 }
 
-std::vector<std::unique_ptr<EditableTableRow2>> BerryTable::make_defaults(){
-    std::vector<std::unique_ptr<EditableTableRow2>> ret;
+std::vector<std::unique_ptr<EditableTableRow>> BerryTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
     ret.emplace_back(std::make_unique<BerrySelectorRow2>());
     return ret;
 }

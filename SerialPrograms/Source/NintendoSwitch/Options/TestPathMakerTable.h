@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -60,10 +60,10 @@ public:
 };
 
 
-class PathMakerRow2 : public EditableTableRow2{
+class PathMakerRow2 : public EditableTableRow{
 public:
     PathMakerRow2();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

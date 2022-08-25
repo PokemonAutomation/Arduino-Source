@@ -31,7 +31,7 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     add_option(allow_commands, "Commands");
     add_option(channel_id, "Channel");
 }
-std::unique_ptr<EditableTableRow2> DiscordIntegrationChannel::clone() const{
+std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
     std::unique_ptr<DiscordIntegrationChannel> ret(new DiscordIntegrationChannel());
     ret->enabled = (bool)enabled;
     ret->label.set(label);
@@ -42,7 +42,7 @@ std::unique_ptr<EditableTableRow2> DiscordIntegrationChannel::clone() const{
     return ret;
 }
 void DiscordIntegrationChannel::load_json(const JsonValue& json){
-    EditableTableRow2::load_json(json);
+    EditableTableRow::load_json(json);
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;

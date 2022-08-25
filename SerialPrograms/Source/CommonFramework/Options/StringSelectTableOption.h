@@ -9,20 +9,20 @@
 #ifndef PokemonAutomation_Options_StringSelectTableOption_H
 #define PokemonAutomation_Options_StringSelectTableOption_H
 
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "StringSelectOption.h"
 
 namespace PokemonAutomation{
 
 
-class StringSelectTableRow : public EditableTableRow2{
+class StringSelectTableRow : public EditableTableRow{
 public:
     StringSelectTableRow(const StringSelectDatabase& database, const std::string& default_slug)
         : cell(database, default_slug)
     {
         PA_ADD_OPTION(cell);
     }
-    virtual std::unique_ptr<EditableTableRow2> clone() const{
+    virtual std::unique_ptr<EditableTableRow> clone() const{
         std::unique_ptr<StringSelectTableRow> ret(new StringSelectTableRow(cell.database(), cell.default_slug()));
         ret->cell.set_by_index(cell.default_index());
         return ret;
@@ -33,13 +33,13 @@ public:
 };
 
 
-class StringSelectTableOption : public EditableTableOption2{
+class StringSelectTableOption : public EditableTableOption{
 public:
     StringSelectTableOption(
         std::string label,
         std::string header, const StringSelectDatabase& database, std::string default_slug
     )
-        : EditableTableOption2(std::move(label))
+        : EditableTableOption(std::move(label))
         , m_header(std::move(header))
         , m_database(database)
         , m_default_slug(std::move(default_slug))
@@ -56,7 +56,7 @@ public:
     virtual std::vector<std::string> make_header() const{
         return {m_header};
     }
-    virtual std::unique_ptr<EditableTableRow2> make_row() const{
+    virtual std::unique_ptr<EditableTableRow> make_row() const{
         return std::make_unique<StringSelectTableRow>(m_database, m_default_slug);
     }
 

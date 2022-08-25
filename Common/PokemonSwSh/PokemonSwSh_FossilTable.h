@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ enum class Fossil{
 };
 
 
-class FossilGame : public EditableTableRow2{
+class FossilGame : public EditableTableRow{
 private:
     static const EnumDatabase<Fossil>& Fossil_Database(){
         static const EnumDatabase<Fossil> database({
@@ -57,7 +57,7 @@ public:
         fossil.set(p_fossil);
         revives.set(p_revives);
     }
-    virtual std::unique_ptr<EditableTableRow2> clone() const override{
+    virtual std::unique_ptr<EditableTableRow> clone() const override{
         std::unique_ptr<FossilGame> ret(new FossilGame());
         ret->game_slot.set_value(game_slot.current_value());
         ret->user_slot.set_value(user_slot.current_value());
@@ -88,8 +88,8 @@ public:
         };
     }
 
-    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults(){
-        std::vector<std::unique_ptr<EditableTableRow2>> ret;
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults(){
+        std::vector<std::unique_ptr<EditableTableRow>> ret;
         ret.emplace_back(new FossilGame(1, 1, Fossil::Dracovish, 960));
         return ret;
     }

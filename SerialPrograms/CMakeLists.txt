@@ -119,8 +119,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
     ../Common/Cpp/Options/DateOption.h
-    ../Common/Cpp/Options/EditableTableOption2.cpp
-    ../Common/Cpp/Options/EditableTableOption2.h
+    ../Common/Cpp/Options/EditableTableOption.cpp
+    ../Common/Cpp/Options/EditableTableOption.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
@@ -191,8 +191,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
     ../Common/Qt/Options/DateWidget.h
-    ../Common/Qt/Options/EditableTableWidget2.cpp
-    ../Common/Qt/Options/EditableTableWidget2.h
+    ../Common/Qt/Options/EditableTableWidget.cpp
+    ../Common/Qt/Options/EditableTableWidget.h
     ../Common/Qt/Options/EnumDropdownWidget.cpp
     ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp

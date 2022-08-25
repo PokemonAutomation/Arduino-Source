@@ -128,7 +128,7 @@ PathMakerRow2::PathMakerRow2()
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(parameters);
 }
-std::unique_ptr<EditableTableRow2> PathMakerRow2::clone() const{
+std::unique_ptr<EditableTableRow> PathMakerRow2::clone() const{
     std::unique_ptr<PathMakerRow2> ret(new PathMakerRow2());
     ret->action.set(action);
     ret->parameters = parameters;

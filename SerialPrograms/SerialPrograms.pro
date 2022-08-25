@@ -97,7 +97,7 @@ SOURCES += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
-    ../Common/Cpp/Options/EditableTableOption2.cpp \
+    ../Common/Cpp/Options/EditableTableOption.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
@@ -124,7 +124,7 @@ SOURCES += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
-    ../Common/Qt/Options/EditableTableWidget2.cpp \
+    ../Common/Qt/Options/EditableTableWidget.cpp \
     ../Common/Qt/Options/EnumDropdownWidget.cpp \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
@@ -793,7 +793,7 @@ HEADERS += \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
-    ../Common/Cpp/Options/EditableTableOption2.h \
+    ../Common/Cpp/Options/EditableTableOption.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
@@ -838,7 +838,7 @@ HEADERS += \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
-    ../Common/Qt/Options/EditableTableWidget2.h \
+    ../Common/Qt/Options/EditableTableWidget.h \
     ../Common/Qt/Options/EnumDropdownWidget.h \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \

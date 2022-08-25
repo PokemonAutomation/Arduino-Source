@@ -9,17 +9,17 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 
 namespace PokemonAutomation{
 namespace Integration{
 
 
-class DiscordWebhookUrl : public EditableTableRow2{
+class DiscordWebhookUrl : public EditableTableRow{
 public:
     DiscordWebhookUrl();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void load_json(const JsonValue& json) override;
 
 public:

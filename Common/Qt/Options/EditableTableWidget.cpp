@@ -10,7 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include "Common/Qt/AutoHeightTable.h"
-#include "EditableTableWidget2.h"
+#include "EditableTableWidget.h"
 
 #include <iostream>
 using std::cout;
@@ -19,17 +19,17 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-ConfigWidget* EditableTableOption2::make_ui(QWidget& parent){
-    return new EditableTableWidget2(parent, *this);
+ConfigWidget* EditableTableOption::make_ui(QWidget& parent){
+    return new EditableTableWidget(parent, *this);
 }
 
 
 
-EditableTableWidget2::~EditableTableWidget2(){
+EditableTableWidget::~EditableTableWidget(){
     m_value.remove_listener(*this);
     delete m_table;
 }
-EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOption2& value)
+EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -76,7 +76,7 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOption2
         );
     }
 
-    EditableTableWidget2::update();
+    EditableTableWidget::update();
     m_table->update_height();
 //    EditableTableWidget2::value_changed();
 
@@ -86,9 +86,9 @@ EditableTableWidget2::EditableTableWidget2(QWidget& parent, EditableTableOption2
     value.add_listener(*this);
 }
 
-void EditableTableWidget2::update(){
+void EditableTableWidget::update(){
     ConfigWidget::update();
-    std::vector<std::shared_ptr<EditableTableRow2>> latest = m_value.current_refs();
+    std::vector<std::shared_ptr<EditableTableRow>> latest = m_value.current_refs();
 //    cout << "latest.size() = " << latest.size() << endl;
 
     //  Iterate the old and new rows and resolve only the differences.
@@ -132,7 +132,7 @@ void EditableTableWidget2::update(){
 
         //  Populate widgets.
         {
-            EditableTableRow2& row = *latest[index_new];
+            EditableTableRow& row = *latest[index_new];
             std::vector<ConfigOption*> cells = row.make_cells();
             int c = 0;
             int stop = (int)cells.size();
@@ -161,18 +161,18 @@ void EditableTableWidget2::update(){
     m_table->resizeColumnsToContents();
     m_table->resizeRowsToContents();
 }
-void EditableTableWidget2::value_changed(){
+void EditableTableWidget::value_changed(){
     QMetaObject::invokeMethod(m_table, [=]{
         update();
     }, Qt::QueuedConnection);
 }
-void EditableTableWidget2::update_sizes(){
+void EditableTableWidget::update_sizes(){
     m_table->resizeColumnsToContents();
     m_table->resizeRowsToContents();
 }
 
 
-QWidget* EditableTableWidget2::make_clone_button(EditableTableRow2& row){
+QWidget* EditableTableWidget::make_clone_button(EditableTableRow& row){
     QPushButton* button = new QPushButton(m_table);
 
     QFont font;
@@ -190,7 +190,7 @@ QWidget* EditableTableWidget2::make_clone_button(EditableTableRow2& row){
 
     return button;
 }
-QWidget* EditableTableWidget2::make_insert_button(EditableTableRow2& row){
+QWidget* EditableTableWidget::make_insert_button(EditableTableRow& row){
     QPushButton* button = new QPushButton(m_table);
 
     QFont font;
@@ -208,7 +208,7 @@ QWidget* EditableTableWidget2::make_insert_button(EditableTableRow2& row){
 
     return button;
 }
-QWidget* EditableTableWidget2::make_delete_button(EditableTableRow2& row){
+QWidget* EditableTableWidget::make_delete_button(EditableTableRow& row){
     QPushButton* button = new QPushButton(m_table);
 
     QFont font;

@@ -166,7 +166,7 @@ CustomPathTableRow2::CustomPathTableRow2()
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(parameters);
 }
-std::unique_ptr<EditableTableRow2> CustomPathTableRow2::clone() const{
+std::unique_ptr<EditableTableRow> CustomPathTableRow2::clone() const{
     std::unique_ptr<CustomPathTableRow2> ret(new CustomPathTableRow2());
     ret->action.set(action);
     ret->parameters = parameters;
@@ -278,8 +278,8 @@ std::vector<std::string> CustomPathTable2::make_header() const{
         "Parameters",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow2>> CustomPathTable2::make_defaults() const{
-    std::vector<std::unique_ptr<EditableTableRow2>> ret;
+std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults() const{
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
     auto row = std::make_unique<CustomPathTableRow2>();
     row->action.set(PathAction::START_LISTEN);
     ret.emplace_back(std::move(row));
