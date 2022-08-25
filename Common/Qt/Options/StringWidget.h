@@ -39,7 +39,7 @@ public:
 
 private:
     StringOption& m_value;
-    QLineEdit * m_box;
+    QLineEdit* m_box;
 };
 
 
