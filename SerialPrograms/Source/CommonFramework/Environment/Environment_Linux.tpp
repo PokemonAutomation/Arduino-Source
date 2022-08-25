@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sched.h>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
 
 namespace PokemonAutomation{

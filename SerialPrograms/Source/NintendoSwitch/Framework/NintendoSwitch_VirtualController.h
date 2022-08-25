@@ -72,7 +72,7 @@ private:
     void thread_loop();
 
 private:
-    // LoggerQt& m_logger;
+    // Logger& m_logger;
     BotBaseHandle& m_botbase;
     const bool m_allow_commands_while_running;
 

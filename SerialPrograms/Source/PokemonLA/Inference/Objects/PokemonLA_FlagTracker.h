@@ -40,7 +40,7 @@ private:
     };
 
 private:
-    // LoggerQt& m_logger;
+    // Logger& m_logger;
 
     SpinLock m_lock;
     FlagDetector m_flags;
