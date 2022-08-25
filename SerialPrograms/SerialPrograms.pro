@@ -389,7 +389,6 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
-    Source/Pokemon/Options/Pokemon_NameListOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
@@ -1158,7 +1157,6 @@ HEADERS += \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
-    Source/Pokemon/Options/Pokemon_NameListOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
     Source/Pokemon/Pokemon_DataTypes.h \

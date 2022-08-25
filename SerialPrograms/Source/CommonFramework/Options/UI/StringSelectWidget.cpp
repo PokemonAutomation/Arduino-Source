@@ -41,6 +41,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
+    this->setIconSize(QSize(25, 25));
 
     const StringSelectEntry& entry = value.entry();
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());

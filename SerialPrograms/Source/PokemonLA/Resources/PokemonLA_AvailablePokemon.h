@@ -11,8 +11,6 @@
 #include <vector>
 #include <array>
 
-#include "Pokemon/Options/Pokemon_NameListOption.h"
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -28,9 +26,6 @@ const std::vector<std::string>& MMO_FIRST_WAVE_SPRITE_SLUGS();
 
 // List of pokemon sprite slugs in Hisui dex order that appear in first MMO waves of each of the five regions.
 const std::array<std::vector<std::string>, 5>& MMO_FIRST_WAVE_REGION_SPRITE_SLUGS();
-
-// Mapping between the sprite slugs in first MMO waves and their display names.
-const Pokemon::DisplayNameMapping& MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING();
 
 }
 }
