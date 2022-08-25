@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"
 

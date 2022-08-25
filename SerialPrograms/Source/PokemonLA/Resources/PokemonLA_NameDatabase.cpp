@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonLA_PokemonSprites.h"
 #include "PokemonLA_NameDatabase.h"

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_BattleMenu_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"

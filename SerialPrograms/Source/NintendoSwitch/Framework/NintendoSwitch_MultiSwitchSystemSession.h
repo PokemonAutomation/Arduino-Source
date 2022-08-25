@@ -16,7 +16,7 @@
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 

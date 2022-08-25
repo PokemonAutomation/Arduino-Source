@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "StatAccumulator.h"
 
 #include <iostream>

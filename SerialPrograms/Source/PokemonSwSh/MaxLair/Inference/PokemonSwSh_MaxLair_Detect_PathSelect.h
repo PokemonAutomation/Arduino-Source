@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

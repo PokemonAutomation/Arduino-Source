@@ -19,7 +19,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"

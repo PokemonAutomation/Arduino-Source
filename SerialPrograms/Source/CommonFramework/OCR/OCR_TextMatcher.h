@@ -12,7 +12,7 @@
 #include <set>
 #include <map>
 #include <QString>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_OCR_NumberReader_H
 #define PokemonAutomation_OCR_NumberReader_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;

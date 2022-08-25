@@ -6,7 +6,7 @@
 
 #include <QString>
 #include "ClientSource/Libraries/Logging.h"
-#include "LoggerQt.h"
+#include "Logger.h"
 
 #include <iostream>
 

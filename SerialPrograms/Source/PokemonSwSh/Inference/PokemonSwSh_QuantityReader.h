@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <string>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;

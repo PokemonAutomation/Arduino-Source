@@ -56,9 +56,6 @@ void FileWindowLogger::log(const std::string& msg, Color color){
         m_file.flush();
     }
 }
-void FileWindowLogger::log(const QString& msg, Color color){
-    log(msg.toUtf8().toStdString(), color);
-}
 
 
 std::string FileWindowLogger::normalize_newlines(const std::string& msg){

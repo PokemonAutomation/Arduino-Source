@@ -12,14 +12,14 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "LoggerQt.h"
+#include "Logger.h"
 
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
 
 
-class FileWindowLogger : public LoggerQt{
+class FileWindowLogger : public Logger{
 public:
     FileWindowLogger(const std::string& path);
 
@@ -28,7 +28,6 @@ public:
 
     virtual void log(const char* msg, Color color = Color()) override;
     virtual void log(const std::string& msg, Color color = Color()) override;
-    virtual void log(const QString& msg, Color color = Color()) override;
 
 private:
     static std::string normalize_newlines(const std::string& msg);

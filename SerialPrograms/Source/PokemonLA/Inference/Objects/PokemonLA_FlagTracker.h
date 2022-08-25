@@ -9,7 +9,7 @@
 
 #include <deque>
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 #include "PokemonLA_FlagDetector.h"
 

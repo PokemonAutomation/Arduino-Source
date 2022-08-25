@@ -11,7 +11,7 @@
 #include <vector>
 #include <set>
 #include <map>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 namespace OCR{

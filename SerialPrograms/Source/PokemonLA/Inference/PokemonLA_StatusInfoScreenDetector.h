@@ -9,7 +9,7 @@
 #define PokemonAutomation_PokemonLA_StatusInfoScreenDetector_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
 

@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonLA_BattleSpriteWatcher_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleStartDetector.h"

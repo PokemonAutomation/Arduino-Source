@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "MultiConsoleErrors.h"
 
 namespace PokemonAutomation{

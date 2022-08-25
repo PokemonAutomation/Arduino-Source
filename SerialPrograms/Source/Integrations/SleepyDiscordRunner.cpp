@@ -12,7 +12,7 @@
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "IntegrationsAPI.h"
 #include "SleepyDiscordRunner.h"

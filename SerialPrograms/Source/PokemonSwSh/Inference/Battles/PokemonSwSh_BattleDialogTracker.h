@@ -9,7 +9,7 @@
 
 #include <chrono>
 #include <atomic>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 

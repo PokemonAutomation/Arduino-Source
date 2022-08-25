@@ -6,7 +6,7 @@
 
 #include <QCompleter>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_NameSelectWidget.h"
 

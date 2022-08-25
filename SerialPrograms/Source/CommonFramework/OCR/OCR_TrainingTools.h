@@ -12,7 +12,7 @@
 #include <map>
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "OCR_Routines.h"
 
 namespace PokemonAutomation{

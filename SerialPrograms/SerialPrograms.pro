@@ -206,7 +206,7 @@ SOURCES += \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
-    Source/CommonFramework/Logging/LoggerQt.cpp \
+    Source/CommonFramework/Logging/Logger.cpp \
     Source/CommonFramework/Logging/OutputRedirector.cpp \
     Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
@@ -941,7 +941,7 @@ HEADERS += \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
-    Source/CommonFramework/Logging/LoggerQt.h \
+    Source/CommonFramework/Logging/Logger.h \
     Source/CommonFramework/Logging/OutputRedirector.h \
     Source/CommonFramework/Logging/QueuedLogger.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \

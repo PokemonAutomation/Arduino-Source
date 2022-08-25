@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_BerryNames.h"
 #include "Pokemon/Resources/Pokemon_BerrySprites.h"
 #include "PokemonBDSP_BerrySelectOption.h"

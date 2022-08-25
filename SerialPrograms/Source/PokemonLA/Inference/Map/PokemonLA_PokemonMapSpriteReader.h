@@ -17,7 +17,6 @@ struct ImagePixelBox;
 
 namespace PokemonAutomation{
 
-class LoggerQt;
 
 namespace NintendoSwitch{
 namespace PokemonLA{

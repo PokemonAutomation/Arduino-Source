@@ -15,7 +15,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 #include <iostream>

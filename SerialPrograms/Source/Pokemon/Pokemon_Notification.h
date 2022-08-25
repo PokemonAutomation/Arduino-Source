@@ -10,7 +10,7 @@
 #include <string>
 #include <set>
 #include <chrono>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

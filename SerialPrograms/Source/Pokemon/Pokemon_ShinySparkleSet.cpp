@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
