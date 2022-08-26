@@ -32,6 +32,8 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/OCR/OCR_NumberReader.h"
 
 #include <QVideoFrame>
 
@@ -122,8 +124,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    PokemonSwSh::StandardBattleMenuDetector detector(true);
-    cout << detector.detect(feed.snapshot()) << endl;
+    ImageRGB32 image("screenshot-20220824-195731986677.png");
+
+    InferenceBoxScope ore_quantity(console, 0.945, 0.010, 0.0525, 0.050);
+
+    image = to_blackwhite_rgb32_range(
+        extract_box_reference(image, ore_quantity),
+        0xff808080, 0xffffffff, true
+    );
+
+    image.save("test.png");
+
+    OCR::read_number(logger, image);
+
+
+
+//    PokemonSwSh::StandardBattleMenuDetector detector(true);
+//    cout << detector.detect(feed.snapshot()) << endl;
 
 #if 0
     ImageRGB32 image("screenshot-20220814-170240979105.png");
