@@ -20,6 +20,11 @@ namespace PokemonAutomation{
 
 
 AudioTemplate::~AudioTemplate(){}
+AudioTemplate::AudioTemplate(AudioTemplate&& x) = default;
+AudioTemplate& AudioTemplate::operator=(AudioTemplate&& x) = default;
+AudioTemplate::AudioTemplate(const AudioTemplate&) = default;
+AudioTemplate& AudioTemplate::operator=(const AudioTemplate&) = default;
+
 AudioTemplate::AudioTemplate(){}
 AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
     : m_numWindows(windows)

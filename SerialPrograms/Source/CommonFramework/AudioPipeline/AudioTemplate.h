@@ -20,6 +20,12 @@ namespace PokemonAutomation{
 class AudioTemplate{
 public:
     ~AudioTemplate();
+    AudioTemplate(AudioTemplate&& x);
+    AudioTemplate& operator=(AudioTemplate&& x);
+    AudioTemplate(const AudioTemplate&);
+    AudioTemplate& operator=(const AudioTemplate&);
+
+public:
     AudioTemplate();
     AudioTemplate(size_t frequencies, size_t windows);
 

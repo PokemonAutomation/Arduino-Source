@@ -103,18 +103,9 @@ const StringSelectDatabase& MMO_DATABASE(){
 namespace {
 
 
-struct ExtraNames{
-    // mapping from the slug of the extra names to their display names and icons
-    std::map<std::string, std::pair<std::string, QIcon>> names;
-    // list of extra name slugs to display on the widget, after all the pokemon names listed on the widget
-    std::vector<std::string> name_list;
-    // mapping from the display name of the extra names to their slugs.
-    std::map<std::string, std::string> display_name_to_slug;
-};
 
-
-ExtraNames load_mmo_names(){
-    ExtraNames names;
+std::vector<std::string> load_mmo_names(){
+    std::vector<std::string> names;
 
     const std::string slugs[5] = {
         "fieldlands-mmo",
@@ -138,9 +129,7 @@ ExtraNames load_mmo_names(){
 
 
     for(size_t i = 0; i < 5; i++){
-        names.name_list.emplace_back(slugs[i]);
-        names.names.emplace(slugs[i], std::make_pair(display_names[i], mmo_pixmap));
-        names.display_name_to_slug.emplace(display_names[i], slugs[i]);
+        names.emplace_back(slugs[i]);
     }
 
     return names;
@@ -152,8 +141,8 @@ ExtraNames load_mmo_names(){
 // - "coastlands-mmo"
 // - "highlands-mmo"
 // - "icelands-mmo"
-const ExtraNames& MMO_NAMES(){
-    const static ExtraNames mmo_names = load_mmo_names();
+const std::vector<std::string>& MMO_NAMES(){
+    const static std::vector<std::string> mmo_names = load_mmo_names();
     return mmo_names;
 }
 
@@ -294,10 +283,10 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
     const auto& mmo_names = MMO_NAMES();
     for (int i = 0; i < 5; i++){
         if (mmo_appears[i]){
-            auto iter = desired_events.find(mmo_names.name_list[i]);
+            auto iter = desired_events.find(mmo_names[i]);
             if (iter != desired_events.end()){
                 env.console.log("Found a match!", COLOR_BLUE);
-                found.insert(mmo_names.name_list[i]);
+                found.insert(mmo_names[i]);
             }
             stats.mmos++;
         }
@@ -452,7 +441,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     for(size_t i = 0; i < 5; i++){
-        if (mmo_name == MMO_NAMES().name_list[i]){
+        if (mmo_name == MMO_NAMES()[i]){
             switch (i){
             case 0:
                 region = MapRegion::FIELDLANDS;
@@ -764,7 +753,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             if (desired_MMO_pokemon.find(sprite_slug) != desired_MMO_pokemon.end()
                 || desired_star_MMO_pokemon.find(sprite_slug) != desired_star_MMO_pokemon.end()
             ){
-                MMO_targets[MMO_NAMES().name_list[i]]++;
+                MMO_targets[MMO_NAMES()[i]]++;
             }
         }
     }

@@ -77,11 +77,11 @@ struct StringSelectDatabase::Data{
 
 
 
+StringSelectDatabase::~StringSelectDatabase() = default;
 StringSelectDatabase::StringSelectDatabase(StringSelectDatabase&&) = default;
 StringSelectDatabase& StringSelectDatabase::operator=(StringSelectDatabase&&) = default;
 StringSelectDatabase::StringSelectDatabase(const StringSelectDatabase&) = default;
 StringSelectDatabase& StringSelectDatabase::operator=(const StringSelectDatabase&) = default;
-StringSelectDatabase::~StringSelectDatabase() = default;
 StringSelectDatabase::StringSelectDatabase()
     : m_data(CONSTRUCT_TOKEN)
 {}
@@ -176,6 +176,8 @@ struct StringSelectCell::Data{
 
 
 
+
+StringSelectCell::~StringSelectCell() = default;
 
 
 StringSelectCell::StringSelectCell(const StringSelectDatabase& database, size_t default_index)

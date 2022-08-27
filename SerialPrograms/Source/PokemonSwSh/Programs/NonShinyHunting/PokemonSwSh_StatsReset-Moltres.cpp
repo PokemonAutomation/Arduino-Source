@@ -139,7 +139,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         context.wait_for_all_requests();
         env.log("Check the stats.", COLOR_PURPLE);
         pbf_press_button(context, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 0.5 * TICKS_PER_SECOND);
+        pbf_press_dpad  (context, DPAD_UP  , 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_A , 10, 2   * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_R , 10, 3   * TICKS_PER_SECOND);
         pbf_press_dpad  (context, DPAD_LEFT, 10, 1   * TICKS_PER_SECOND);
