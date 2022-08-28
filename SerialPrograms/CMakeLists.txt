@@ -934,6 +934,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonHome/PokemonHome_Panels.cpp
+    Source/PokemonHome/PokemonHome_Panels.h
+    Source/PokemonHome/PokemonHome_Settings.cpp
+    Source/PokemonHome/PokemonHome_Settings.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp
