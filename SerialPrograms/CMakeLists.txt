@@ -93,6 +93,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId.h
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
+    ../Common/Cpp/EnumDatabase.cpp
+    ../Common/Cpp/EnumDatabase.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ImageResolution.cpp
@@ -107,12 +109,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
-    ../Common/Cpp/EnumDatabase.cpp
-    ../Common/Cpp/EnumDatabase.h
     ../Common/Cpp/Options/BatchOption.cpp
     ../Common/Cpp/Options/BatchOption.h
-    ../Common/Cpp/Options/GroupOption.cpp
-    ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -127,6 +125,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/FixedCodeOption.h
     ../Common/Cpp/Options/FloatingPointOption.cpp
     ../Common/Cpp/Options/FloatingPointOption.h
+    ../Common/Cpp/Options/GroupOption.cpp
+    ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -183,8 +183,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/NoWheelComboBox.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
-    ../Common/Qt/Options/GroupWidget.cpp
-    ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
@@ -199,6 +197,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
     ../Common/Qt/Options/FloatingPointWidget.h
+    ../Common/Qt/Options/GroupWidget.cpp
+    ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
