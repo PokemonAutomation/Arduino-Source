@@ -4,15 +4,18 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP_ShinyHunt-Overworld.h"
 
 namespace PokemonAutomation{
@@ -49,6 +52,7 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
 ShinyHuntOverworld::ShinyHuntOverworld()
     : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true)
+    , RESET_GAME_WHEN_ERROR("<b>Reset Game in Case of Error:</b><br>When the program encounters an error, whether to reset the game to fix it.", false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -74,6 +78,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
     PA_ADD_OPTION(TRIGGER_METHOD);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(RESET_GAME_WHEN_ERROR);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
@@ -104,34 +109,48 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env.console, context);
-        if (!battle){
+        try{
+            bool battle = TRIGGER_METHOD.find_encounter(env.console, context);
+            if (!battle){
+                stats.add_error();
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                continue;
+            }
+
+            //  Detect shiny.
+            DoublesShinyDetection result_wild;
+            ShinyDetectionResult result_own;
+            detect_shiny_battle(
+                env, env.console, context,
+                result_wild, result_own,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                WILD_POKEMON,
+                std::chrono::seconds(30),
+                ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
+            );
+
+    //        result_wild.shiny_type = ShinyType::UNKNOWN_SHINY;
+    //        result_wild.left_is_shiny = false;
+    //        result_wild.right_is_shiny = true;
+
+            bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+            if (stop){
+                break;
+            }
+            lead_tracker.report_result(result_own.shiny_type);
+
+        } catch(OperationFailedException& e){
+            if (!RESET_GAME_WHEN_ERROR){
+                throw e;
+            }
+
             stats.add_error();
-            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
-            continue;
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+                stats.add_error();
+                continue;
+            }
         }
-
-        //  Detect shiny.
-        DoublesShinyDetection result_wild;
-        ShinyDetectionResult result_own;
-        detect_shiny_battle(
-            env, env.console, context,
-            result_wild, result_own,
-            NOTIFICATION_ERROR_RECOVERABLE,
-            WILD_POKEMON,
-            std::chrono::seconds(30),
-            ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
-        );
-
-//        result_wild.shiny_type = ShinyType::UNKNOWN_SHINY;
-//        result_wild.left_is_shiny = false;
-//        result_wild.right_is_shiny = true;
-
-        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
-        if (stop){
-            break;
-        }
-        lead_tracker.report_result(result_own.shiny_type);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

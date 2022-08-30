@@ -7,10 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 #define PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 
-#include "Common/Cpp/Options/EditableTableOption2.h"
-#include "CommonFramework/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 
 namespace PokemonAutomation{
@@ -30,19 +28,19 @@ struct EncounterActionFull{
 
 
 
-class EncounterFilterOverride : public EditableTableRow2, private ConfigOption::Listener{
+class EncounterFilterOverride : public EditableTableRow, private ConfigOption::Listener{
 public:
     ~EncounterFilterOverride();
     EncounterFilterOverride();
     virtual void load_json(const JsonValue& json) override;
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void value_changed() override;
 
 public:
     EncounterActionCell action;
     PokemonSwSh::PokemonBallSelectCell pokeball;
-    PokemonSwSh::PokemonNameSelectCell pokemon;
+    StringSelectCell pokemon;
     ShinyFilterCell shininess;
 };
 

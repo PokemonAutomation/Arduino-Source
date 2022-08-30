@@ -50,7 +50,7 @@ BattlePokemonActionRow::BattlePokemonActionRow()
     PA_ADD_OPTION(stop_after_num_moves);
     PA_ADD_OPTION(num_moves_to_stop);
 }
-std::unique_ptr<EditableTableRow2> BattlePokemonActionRow::clone() const{
+std::unique_ptr<EditableTableRow> BattlePokemonActionRow::clone() const{
     std::unique_ptr<BattlePokemonActionRow> ret(new BattlePokemonActionRow());
     ret->style[0].set(style[0]);
     ret->style[1].set(style[1]);
@@ -64,8 +64,8 @@ std::unique_ptr<EditableTableRow2> BattlePokemonActionRow::clone() const{
 }
 
 
-std::vector<std::unique_ptr<EditableTableRow2>> BattlePokemonActionTable::make_defaults(){
-    std::vector<std::unique_ptr<EditableTableRow2>> ret;
+std::vector<std::unique_ptr<EditableTableRow>> BattlePokemonActionTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
     ret.emplace_back(std::make_unique<BattlePokemonActionRow>());
     return ret;
 }
@@ -135,14 +135,14 @@ bool BattlePokemonActionTable::stop_battle(size_t pokemon, size_t num_move_attem
 OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow(){
     PA_ADD_OPTION(style);
 }
-std::unique_ptr<EditableTableRow2> OneMoveBattlePokemonActionRow::clone() const{
+std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionRow::clone() const{
     std::unique_ptr<OneMoveBattlePokemonActionRow> ret(new OneMoveBattlePokemonActionRow());
     ret->style.set(style);
     return ret;
 }
 
-std::vector<std::unique_ptr<EditableTableRow2>> OneMoveBattlePokemonActionTable::make_defaults() const{
-    std::vector<std::unique_ptr<EditableTableRow2>> ret;
+std::vector<std::unique_ptr<EditableTableRow>> OneMoveBattlePokemonActionTable::make_defaults() const{
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
     ret.emplace_back(std::make_unique<OneMoveBattlePokemonActionRow>());
     return ret;
 }
@@ -206,7 +206,7 @@ MoveGrinderActionRow::MoveGrinderActionRow()
     PA_ADD_OPTION(style);
     PA_ADD_OPTION(attempts);
 }
-std::unique_ptr<EditableTableRow2> MoveGrinderActionRow::clone() const{
+std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
     std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow());
     ret->pokemon_index.set_value(pokemon_index.current_value());
     ret->move_index.set_value(move_index.current_value());

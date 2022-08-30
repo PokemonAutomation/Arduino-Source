@@ -19,7 +19,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
@@ -205,7 +205,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
             for(int ch = 0; ch < 3; ch++){
                 sum[ch] /= weights;
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
-                c[ch] = v;
+                c[ch] = (char)v;
             }
             result.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
         }
@@ -245,7 +245,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
             for(int ch = 0; ch < 3; ch++){
                 sum[ch] /= weights;
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
-                c[ch] = v;
+                c[ch] = (char)v;
             }
             result2.pixel(x, y) = combine_rgb(c[0], c[1], c[2]);
         }
@@ -270,8 +270,8 @@ ImageRGB32 compute_image_gradient(const ImageViewRGB32& image){
         int gx = (sum_x[0] + sum_x[1] + sum_x[2] + 1) / 3;
         int gy = (sum_y[0] + sum_y[1] + sum_y[2] + 1) / 3;
 
-        int gxc = std::min(std::abs(gx), 255);
-        int gyc = std::min(std::abs(gy), 255);
+        uint8_t gxc = (uint8_t)std::min(std::abs(gx), 255);
+        uint8_t gyc = (uint8_t)std::min(std::abs(gy), 255);
 
         result.pixel(x, y) = combine_rgb(gxc, gyc, 0);
     });
@@ -328,12 +328,12 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
     size_t height = image.height();
 
     // Set pixel outside the sprite circle to transparent:
-    float r = (width + height) / 4.0;
-    float center_x  = (width-1) / 2.0f;
-    float center_y = (height-1) / 2.0f;
-    float r2 = r * r;
-    for(size_t y = 0; y < height; y++){
-        for(size_t x = 0; x < width; x++){
+    double r = (width + height) / 4.0;
+    double center_x  = (width-1) / 2.0f;
+    double center_y = (height-1) / 2.0f;
+    double r2 = r * r;
+    for (size_t y = 0; y < height; y++){
+        for (size_t x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= r2){
                 image.pixel(x, y) = 0;
             }
@@ -344,7 +344,7 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
     // Note: we skip the upper right area because that area may overlap with
     // the berry or star (bonus wave) symbol.
     const int num_divisions = 2;
-    const float portion = 1.0 / (float)num_divisions;
+    const double portion = 1.0 / (double)num_divisions;
     FeatureVector result;
     for(int i = 0; i < num_divisions; i++){
         for(int j = 0; j < num_divisions; j++){
@@ -473,13 +473,13 @@ ImageHSV32 compute_MMO_sprite_color_hsv(const ImageViewRGB32& image_rgb){
     const size_t height = result.height();
     
     // Set all the pixels outside the sprite area transparent to avoid matching the template to background colors.
-    float r = (width + height) / 4.0;
-    float center_x  = (width-1) / 2.0f;
-    float center_y = (height-1) / 2.0f;
+    double r = (width + height) / 4.0;
+    double center_x  = (width-1) / 2.0f;
+    double center_y = (height-1) / 2.0f;
     // -r/12 to remove some boundary areas
-    float dist2_th = (r - r/12) * (r - r/12);
-    for(size_t y = 0; y < height; y++){
-        for(size_t x = 0; x < width; x++){
+    double dist2_th = (r - r/12) * (r - r/12);
+    for (size_t y = 0; y < height; y++){
+        for (size_t x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= dist2_th){
                 // color outside of the sprite circle is set to zero transparency
                 result.pixel(x, y) = uint32_t(0);
@@ -514,13 +514,13 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
     }
 
     // Remove gradients outside of the image area
-    float r = (width + height) / 4.0;
-    float center_x  = (width-1) / 2.0f;
-    float center_y = (height-1) / 2.0f;
+    double r = (width + height) / 4.0;
+    double center_x  = (width-1) / 2.0f;
+    double center_y = (height-1) / 2.0f;
     // -r/8 to remove some boundary areas
-    float dist2_th = (r - r/8) * (r - r/8);
-    for(size_t y = 0; y < height; y++){
-        for(size_t x = 0; x < width; x++){
+    double dist2_th = (r - r/8) * (r - r/8);
+    for (size_t y = 0; y < height; y++){
+        for (size_t x = 0; x < width; x++){
             if ((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y) >= dist2_th){
                 // gradients outside of the sprite circle is set to zero
                 result.pixel(x, y) = combine_argb(0,0,0,0);
@@ -545,11 +545,11 @@ ImageRGB32 compute_MMO_sprite_gradient(const ImageViewRGB32& image){
 
 
 
-float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_template, const ImageViewRGB32& gradient){
+double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_template, const ImageViewRGB32& gradient){
     int tempt_width = (int)gradient_template.width();
     int tempt_height = (int)gradient_template.height();
 
-    float score = 0.0f;
+    double score = 0.0f;
     int max_offset = 2;
 
     auto compute_pixel_dist = [](uint32_t t_g, uint32_t g){
@@ -557,7 +557,7 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
         int gy = uint32_t(0xff) & (g >> 8);
         int t_gx = uint32_t(0xff) & (t_g >> 16);
         int t_gy = uint32_t(0xff) & (t_g >> 8);
-        float pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
+        double pixel_score = std::max(t_gx, gx) * (gx - t_gx) * (gx - t_gx) + std::max(t_gy, gy) * (gy - t_gy) * (gy - t_gy);
         pixel_score /= 255;
         return pixel_score;
     };
@@ -683,11 +683,11 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
                 continue;
             }
 
-            float min_block_score = FLT_MAX;
+            double min_block_score = FLT_MAX;
             for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
                 for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
 
-                    float block_score = 0.0;
+                    double block_score = 0.0;
                     int block_size = 0;
                     for(int by = y - block_radius; by <= y + block_radius; by++){
                         for(int bx = x - block_radius; bx <= x + block_radius; bx++){
@@ -734,7 +734,7 @@ float compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templa
     return score;
 }
 
-float compute_hsv_dist2(uint32_t template_color, uint32_t color){
+double compute_hsv_dist2(uint32_t template_color, uint32_t color){
     int t_h = (uint32_t(0xff) & (template_color >> 16));
     int t_s = (uint32_t(0xff) & (template_color >> 8));
     int t_v = (uint32_t(0xff) & template_color);
@@ -751,15 +751,15 @@ float compute_hsv_dist2(uint32_t template_color, uint32_t color){
     return h_dif * h_dif + (t_s - s) * (t_s - s) + 0.5 * (t_v - v) * (t_v - v);
 }
 
-float compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, const ImageViewHSV32& query_image){
+double compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, const ImageViewHSV32& query_image){
     size_t tempt_width = image_template.width();
     size_t tempt_height = image_template.height();
 
     // cout << tempt_width << " " << tempt_height << " " << query_image.width() << " " << query_image.height() << endl;
-    float score = 0.0;
+    double score = 0.0;
     int num_pixels = 0;
-    for(size_t y = 0; y < query_image.height(); y++){
-        for(size_t x = 0; x < query_image.width(); x++){
+    for (size_t y = 0; y < query_image.height(); y++){
+        for (size_t x = 0; x < query_image.width(); x++){
             uint32_t p = query_image.pixel(x, y);
             if (is_transparent(p)){
                 // cout << "Skip query pixel " << x << " " << y << endl;
@@ -777,7 +777,7 @@ float compute_MMO_sprite_hsv_distance(const ImageViewHSV32& image_template, cons
 
             num_pixels++;
 
-            float pixel_score = compute_hsv_dist2(t_p, p);
+            double pixel_score = compute_hsv_dist2(t_p, p);
             score += pixel_score;
         }
     }
@@ -815,7 +815,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     // This map must be not empty for subsequent computation.
     const auto& feature_map = match_pokemon_map_sprite_feature(extract_box_reference(screen, box), region);
     
-    for(const auto& p : feature_map){
+    for (const auto& p : feature_map){
         result.candidates.push_back(p.second);
         if (result.candidates.size() >= num_feature_candidates){
             break;
@@ -846,11 +846,11 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
         
         for(const auto& slug: result.candidates){
             const ImageHSV32& candidate_template = sprite_map.find(slug)->second.hsv_image;
-            float score = FLT_MAX;
+            double score = FLT_MAX;
             for(size_t ox = 0; ox <= 4; ox++){
                 for(size_t oy = 0; oy <= 4; oy++){
                     ImagePixelBox shifted_box(ox, oy, box.width(), box.height());
-                    float match_score = compute_MMO_sprite_hsv_distance(
+                    double match_score = compute_MMO_sprite_hsv_distance(
                         candidate_template,
                         extract_box_reference(sprite_hsv, shifted_box)
                     );

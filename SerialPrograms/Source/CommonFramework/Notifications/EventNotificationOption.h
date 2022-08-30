@@ -10,7 +10,7 @@
 #include <vector>
 #include <atomic>
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 
 namespace PokemonAutomation{

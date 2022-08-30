@@ -161,10 +161,10 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     return result;
 }
 
-uint32_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling) {
+uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling) {
     uint8_t no_rustling = (rustling == Rustling::No) ? 1 : 0;
     Rustling current_rustling = rustling;
-    uint32_t attempts = 0;
+    uint16_t attempts = 0;
 
     while ((current_rustling == Rustling::Slow || current_rustling == Rustling::No) && no_rustling < 3) { 
         /* Slow or No rustling, not in Battle! */
@@ -233,8 +233,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             break;
         case Rustling::No:
         case Rustling::Slow:
-            uint32_t secondary_attempts = do_secondary_attempts(env, context, current_rustling);
-            iteration_attempts += secondary_attempts;
+            iteration_attempts += do_secondary_attempts(env, context, current_rustling);
             break;
         }
 

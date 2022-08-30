@@ -71,7 +71,7 @@ public:
         return set_value((size_t)value);
     }
 
-#if 0
+#if 1
     const std::string& current_slug() const{
         return database().find(current_value())->slug;
     }

@@ -17,24 +17,16 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_DexRecFinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-namespace{
-
-// All the pokemon in all three dexes (Galar, IoA, CT) in national dex order
-const std::vector<std::string>& DEX_SLUGS_COMBIMED(){
-    static const std::vector<std::string> database = Pokemon::load_pokemon_slug_json_list("PokemonSwSh/Pokedex-Combined.json");
-    return database;
-}
-
-}
 
 
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()
@@ -79,13 +71,12 @@ DexRecFilters::DexRecFilters()
     )
     , DESIRED(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when it finds this " + STRING_POKEMON + ". Requires the language be set.",
-        ""
+        COMBINED_DEX_NAMES(), "ralts"
     )
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "
         "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want.",
-        ALL_POKEMON_SPRITES(),
-        DEX_SLUGS_COMBIMED()
+        STRING_POKEMON, COMBINED_DEX_NAMES(), "grubbin"
     )
 {
     PA_ADD_OPTION(LANGUAGE);
@@ -176,8 +167,8 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     desired.insert(FILTERS.DESIRED.slug());
 
     std::set<std::string> exclusions;
-    for (size_t c = 0; c < FILTERS.EXCLUSIONS.size(); c++){
-        exclusions.insert(FILTERS.EXCLUSIONS[c]);
+    for (std::string& slug : FILTERS.EXCLUSIONS.all_slugs()){
+        exclusions.insert(std::move(slug));
     }
 
     DexRecFinder_Descriptor::Stats& stats = env.current_stats<DexRecFinder_Descriptor::Stats>();

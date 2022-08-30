@@ -13,13 +13,29 @@ namespace PokemonAutomation{
 
 
 struct ConfigOption::Data{
-    SpinLock lock;
+    mutable SpinLock lock;
     std::atomic<ConfigOptionState> visibility;
     std::set<Listener*> listeners;
 
     Data(ConfigOptionState p_visibility = ConfigOptionState::ENABLED)
         : visibility(p_visibility)
     {}
+
+    bool set_visibility(ConfigOptionState state){
+        while (true){
+            ConfigOptionState current = visibility.load(std::memory_order_acquire);
+
+            //  Already in that state. No change.
+            if (current == state){
+                return false;
+            }
+
+            //  Attempt to change.
+            if (visibility.compare_exchange_weak(current, state)){
+                return true;
+            }
+        }
+    }
 };
 
 
@@ -46,6 +62,11 @@ void ConfigOption::remove_listener(Listener& listener){
     SpinLockGuard lg(data.lock);
     data.listeners.erase(&listener);
 }
+size_t ConfigOption::total_listeners() const{
+    const Data& data = *m_data;
+    SpinLockGuard lg(data.lock);
+    return data.listeners.size();
+}
 void ConfigOption::push_update(){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
@@ -65,8 +86,9 @@ ConfigOptionState ConfigOption::visibility() const{
     return m_data->visibility.load(std::memory_order_relaxed);
 }
 void ConfigOption::set_visibility(ConfigOptionState visibility){
-    m_data->visibility.store(visibility, std::memory_order_relaxed);
-    push_update();
+    if (m_data->set_visibility(visibility)){
+        push_update();
+    }
 }
 
 

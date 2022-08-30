@@ -14,7 +14,7 @@
 #include <sched.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
 
 #ifndef cpuid_H

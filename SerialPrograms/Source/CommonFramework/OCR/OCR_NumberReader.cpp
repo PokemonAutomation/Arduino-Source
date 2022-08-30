@@ -18,6 +18,11 @@ int read_number(Logger& logger, const ImageViewRGB32& image){
     std::string normalized;
     bool has_digit = false;
     for (char ch : ocr_text){
+        //  4 is commonly misread as A.
+        if (ch == 'a' || ch == 'A'){
+            normalized += '4';
+            has_digit = true;
+        }
         if ('0' <= ch && ch <= '9'){
             normalized += ch;
             has_digit = true;

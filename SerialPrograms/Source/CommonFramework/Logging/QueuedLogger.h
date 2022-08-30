@@ -10,7 +10,7 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
-#include "LoggerQt.h"
+#include "Logger.h"
 
 namespace PokemonAutomation{
 

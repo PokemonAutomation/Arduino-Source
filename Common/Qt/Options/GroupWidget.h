@@ -4,11 +4,11 @@
  *
  */
 
-#include "BatchWidget.h"
-#include "GroupOption.h"
+#include "Common/Qt/Options/BatchWidget.h"
+#include "Common/Cpp/Options/GroupOption.h"
 
-#ifndef PokemonAutomation_GroupWidget_H
-#define PokemonAutomation_GroupWidget_H
+#ifndef PokemonAutomation_Options_GroupWidget_H
+#define PokemonAutomation_Options_GroupWidget_H
 
 class QVBoxLayout;
 class QGroupBox;
@@ -24,11 +24,6 @@ public:
     void set_options_enabled(bool enabled);
 
     virtual void update() override;
-
-
-public:
-    //  Callbacks
-    virtual void on_set_enabled(bool enabled);
 
 private:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;

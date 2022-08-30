@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <string>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ProgramInfo.h"
 #include "MessageAttachment.h"

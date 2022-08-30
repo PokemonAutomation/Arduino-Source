@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -26,86 +27,102 @@ namespace PokemonSwSh{
     using namespace Pokemon;
 
 
-
 namespace{
-    constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
-    constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::milliseconds(200);
 
-    std::tuple<uint16_t, uint16_t, uint16_t> get_location(uint16_t index){
-        uint16_t box = index / 30;
-        index = index % 30;
+constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
+constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::milliseconds(200);
 
-        uint16_t row = index / 6;
-        index = index % 6;
+// A location can be represented as a uint16_t, meaning the order of the location starting at the first box.
+// This function decodes this location into box ID and in-box 2D location.
+std::tuple<uint16_t, uint16_t, uint16_t> get_location(uint16_t index){
+    uint16_t box = index / 30;
+    index = index % 30;
 
-        uint16_t column = index;
-        return { box, row, column };
+    uint16_t row = index / 6;
+    index = index % 6;
+
+    uint16_t column = index;
+    return { box, row, column };
+}
+
+// Move cursor from one location to another
+// The location is represented as a uint16_t, meaning the order of the location starting at the first box.
+// Decode this location into box ID and in-box 2D location by `get_location()`
+uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from, uint16_t to){
+    auto [from_box, from_row, from_column] = get_location(from);
+    auto [to_box, to_row, to_column] = get_location(to);
+
+    std::ostringstream ss;
+    ss << "Moving from location index " << from << "(" << from_box << "/" << from_row << "/" << from_column << ")";
+    ss << " to location index " << to << "(" << to_box << "/" << to_row << "/" << to_column << ")";
+    logger.log(ss.str());
+
+    int difference_box = to_box - from_box;
+    int difference_row = to_row - from_row;
+    int difference_column = to_column - from_column;
+
+    // TODO: can make this more efficient by moving past grid boundary to appear at the other side
+
+    for (int i = 0; i < difference_box; ++i){
+        pbf_press_button(context, BUTTON_R, 10, k_wait_after_move);
     }
-    
-    uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from, uint16_t to){
-        auto [from_box, from_row, from_column] = get_location(from);
-        auto [to_box, to_row, to_column] = get_location(to);
-
-        std::ostringstream ss;
-        ss << "Moving from location index " << from << "(" << from_box << "/" << from_row << "/" << from_column << ")";
-        ss << " to location index " << to << "(" << to_box << "/" << to_row << "/" << to_column << ")";
-        logger.log(ss.str());
-
-        int difference_box = to_box - from_box;
-        int difference_row = to_row - from_row;
-        int difference_column = to_column - from_column;
-        for (int i = 0; i < difference_box; ++i){
-            pbf_press_button(context, BUTTON_R, 10, k_wait_after_move);
-        }
-        for (int i = 0; i > difference_box; --i){
-            pbf_press_button(context, BUTTON_L, 10, k_wait_after_move);
-        }
-
-        for (int i = 0; i < difference_row; ++i){
-            pbf_press_dpad(context, DPAD_DOWN, 10, k_wait_after_move);
-        }
-        for (int i = 0; i > difference_row; --i){
-            pbf_press_dpad(context, DPAD_UP, 10, k_wait_after_move);
-        }
-
-        for (int i = 0; i < difference_column; ++i){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, k_wait_after_move);
-        }
-        for (int i = 0; i > difference_column; --i){
-            pbf_press_dpad(context, DPAD_LEFT, 10, k_wait_after_move);
-        }
-        return to;
+    for (int i = 0; i > difference_box; --i){
+        pbf_press_button(context, BUTTON_L, 10, k_wait_after_move);
     }
 
-    std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& context, Language language){
-        context.wait_for_all_requests();
-        InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
-        context.wait_for(k_wait_after_read);
+    for (int i = 0; i < difference_row; ++i){
+        pbf_press_dpad(context, DPAD_DOWN, 10, k_wait_after_move);
+    }
+    for (int i = 0; i > difference_row; --i){
+        pbf_press_dpad(context, DPAD_UP, 10, k_wait_after_move);
+    }
 
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        ImageViewRGB32 frame = extract_box_reference(*screen, box);
+    for (int i = 0; i < difference_column; ++i){
+        pbf_press_dpad(context, DPAD_RIGHT, 10, k_wait_after_move);
+    }
+    for (int i = 0; i > difference_column; --i){
+        pbf_press_dpad(context, DPAD_LEFT, 10, k_wait_after_move);
+    }
+    return to;
+}
 
-        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-            console, language, frame,
-            OCR::BLACK_TEXT_FILTERS()
-        );
-        result.log(console, PokemonNameReader::MAX_LOG10P);
+// Read the current displayed pokemon name. Return the pokemon slug.
+//
+// A slug is a unique name used in a program, different than the name that is displayed to user on UI.
+// In most cases, a pokemon slug is the lower-case version of the Pokemon name, but there are some cases
+// like the slug of the Pokemon Mr. Mime is "mr-mime".
+std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& context, Language language){
+    context.wait_for_all_requests();
+    InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
+    context.wait_for(k_wait_after_read);
+
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    ImageViewRGB32 frame = extract_box_reference(*screen, box);
+
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        console, language, frame,
+        OCR::BLACK_TEXT_FILTERS()
+    );
+    result.log(console, PokemonNameReader::MAX_LOG10P);
 //        assert(result.results.size() == 1);
-        if (result.results.size() != 1){
-            return "";
-        }
-        return result.results.begin()->second.token;
+    if (result.results.size() != 1){
+        return "";
     }
+    return result.results.begin()->second.token;
+}
 
-    std::vector<std::string> read_all_pokemon(Logger& logger, ConsoleHandle& console, BotBaseContext& context, uint16_t pokemon_count, Language language){
-        std::vector<std::string> pokemons;
-        uint16_t current_location = 0;
-        for (uint16_t i = 0; i < pokemon_count; ++i){
-            current_location = move_to_location(logger, context, current_location, i);
-            pokemons.push_back(read_selected_pokemon(console, context, language));
-        }
-        return pokemons;
+// Move through some pokemon according to the box location order and read their names.
+// Return a list of pokemon slugs.
+std::vector<std::string> read_all_pokemon(Logger& logger, ConsoleHandle& console, BotBaseContext& context, uint16_t pokemon_count, Language language){
+    std::vector<std::string> pokemons;
+    uint16_t current_location = 0;
+    for (uint16_t i = 0; i < pokemon_count; ++i){
+        current_location = move_to_location(logger, context, current_location, i);
+        pokemons.push_back(read_selected_pokemon(console, context, language));
     }
+    return pokemons;
+}
+
 }
 
 BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
@@ -149,35 +166,67 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }
 
+    // Read all the pokemon and return a list of their slugs in the current box order.
     std::vector<std::string> current_order = read_all_pokemon(env.console, env.console, context, POKEMON_COUNT, LANGUAGE);
 
-    const std::vector<std::string>& slugs = NATIONAL_DEX_SLUGS();
+    // The list of pokemon slugs in national order.
+    const std::vector<std::string>& dex_slugs = NATIONAL_DEX_SLUGS();
+    // Build a map of slug -> national dex ID for fast lookup
+    std::map<std::string, size_t> dex_slug_order;
+    for(size_t i = 0; i < dex_slugs.size(); ++i){
+        dex_slug_order.emplace(dex_slugs[i], i);
+    }
+
+    // check if we have any pokemon name read failure.
+    for(size_t i = 0; i < current_order.size(); ++i){
+        const auto it = dex_slug_order.find(current_order[i]);
+        // If OCR gives a name that is not in the nation dex, throw an error:
+        if (it == dex_slug_order.end()){
+            const auto [box, row, col] = get_location(i);
+            std::stringstream os;
+            os << "Failed to read pokemon name at box " << box << " row " << row << " col " << col;
+            throw OperationFailedException(env.console, os.str());
+        }
+    }
+    
+    // Sort the read pokemon by the dex order.
     std::vector<std::string> sorted_order = current_order;
+
     std::sort(sorted_order.begin(), sorted_order.end(), [&](const std::string& str1, const std::string& str2){
-        auto it1 = std::find(slugs.cbegin(), slugs.cend(), str1);
-        auto it2 = std::find(slugs.cbegin(), slugs.cend(), str2);
-        return it1 < it2;
+        const size_t id1 = dex_slug_order.find(str1)->second;
+        const size_t id2 = dex_slug_order.find(str2)->second;
+        return id1 < id2;
     });
 
+    // Now the cursor is at the last pokemon:
     uint16_t current_location = POKEMON_COUNT - 1;
     for (uint16_t index = 0; index < current_order.size(); ++index){
         if (current_order[index] == sorted_order[index]){
             continue;
         }
 
-        auto it = std::find(current_order.begin() + index, current_order.end(), sorted_order[index]);
-        uint16_t unsorted_location = it - current_order.begin();
-        uint16_t sorted_location = index;
+        const auto it = std::find(current_order.begin() + index, current_order.end(), sorted_order[index]);
+        // Where the pokemon should be moved from
+        const uint16_t unsorted_location = it - current_order.begin();
+        // Where the pokemon should be moved to
+        const uint16_t sorted_location = index;
 
         std::ostringstream ss;
         ss << "Swapping " << current_order[unsorted_location] << " at location index " << unsorted_location << " and " << current_order[sorted_location] << " at location index " << sorted_location;
         env.console.log(ss.str());
+        // Move the cursor to the unsorted_location
         current_location = move_to_location(env.console, context, current_location, unsorted_location);
+        // Press A to grab the pokemon
         pbf_press_button(context, BUTTON_A, 10, k_wait_after_move);
+        // Move the cursor to the sorted_location
         current_location = move_to_location(env.console, context, current_location, sorted_location);
+        // Press A to finish swapping the pokemon
         pbf_press_button(context, BUTTON_A, 10, k_wait_after_move);
+        // Now the order in the box is changed, update `current_order` to reflect this change.
         std::swap(current_order[unsorted_location], current_order[sorted_location]);
     }
+
+    // Go to Switch home menu
     pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
 }
 

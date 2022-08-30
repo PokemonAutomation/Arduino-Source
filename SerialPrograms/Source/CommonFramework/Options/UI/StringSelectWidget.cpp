@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QCompleter>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "StringSelectWidget.h"
 
 #include <iostream>
@@ -41,6 +41,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
+    this->setIconSize(QSize(25, 25));
 
     const StringSelectEntry& entry = value.entry();
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());

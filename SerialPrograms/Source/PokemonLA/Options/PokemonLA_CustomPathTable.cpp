@@ -16,10 +16,8 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonTools.h"
-#include "CommonFramework/Options/EditableTableOption.h"
-#include "CommonFramework/Options/EditableTableWidget.h"
+#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "PokemonLA_CustomPathTable.h"
 
 #include <iostream>
@@ -31,162 +29,234 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const std::string PathAction_NAMES[] = {
-    "NO Action",
-    "Change Mount",
-//    "Rotate Camera",
-    "Move Forward",
-    "Move in Direction",
-    "Center Camera",
-    "Jump",
-    "Wait",
-    "Start Listen",
-    "End Listen",
-};
-
-const std::map<std::string, PathAction> PathAction_MAP{
-    {PathAction_NAMES[0], PathAction::NO_ACTION},
-    {PathAction_NAMES[1], PathAction::CHANGE_MOUNT},
-//    {PathAction_NAMES[2], PathAction::ROTATE_CAMERA},
-    {PathAction_NAMES[2], PathAction::MOVE_FORWARD},
-    {PathAction_NAMES[3], PathAction::MOVE_IN_DIRECTION},
-    {PathAction_NAMES[4], PathAction::CENTER_CAMERA},
-    {PathAction_NAMES[5], PathAction::JUMP},
-    {PathAction_NAMES[6], PathAction::WAIT},
-    {PathAction_NAMES[7], PathAction::START_LISTEN},
-    {PathAction_NAMES[8], PathAction::END_LISTEN},
-};
 
 
-const std::string PathMount_NAMES[] = {
-    "No Mount",
-    "Wrydeer",
-    "Ursaluna",
-    "Basculegion",
-    "Sneasler",
-    "Braviary",
-};
-
-const std::map<std::string, PathMount> PathMount_MAP{
-    {PathMount_NAMES[0], PathMount::NO_MOUNT},
-    {PathMount_NAMES[1], PathMount::WYRDEER},
-    {PathMount_NAMES[2], PathMount::URSALUNA},
-    {PathMount_NAMES[3], PathMount::BASCULEGION},
-    {PathMount_NAMES[4], PathMount::SNEASLER},
-    {PathMount_NAMES[5], PathMount::BRAVIARY},
-};
-
-
-const std::string PathSpeed_NAMES[] = {
-    "Normal Speed",
-    "Slow Speed",
-    "Run on Foot",
-    "Dash on Ride",
-    "Dash on Braviary B Spam",
-    "Dive on Braviary",
-};
-
-const std::map<std::string, PathSpeed> PathSpeed_MAP{
-    {PathSpeed_NAMES[0], PathSpeed::NORMAL_SPEED},
-    {PathSpeed_NAMES[1], PathSpeed::SLOW_SPEED},
-    {PathSpeed_NAMES[2], PathSpeed::RUN},
-    {PathSpeed_NAMES[3], PathSpeed::DASH},
-    {PathSpeed_NAMES[4], PathSpeed::DASH_B_SPAM},
-    {PathSpeed_NAMES[5], PathSpeed::DIVE},
-};
+const EnumDatabase<PathAction>& PathAction_Database(){
+    static const EnumDatabase<PathAction> database({
+        {PathAction::NO_ACTION,             "no-action",            "NO Action"},
+        {PathAction::CHANGE_MOUNT,          "change-mount",         "Change Mount"},
+        {PathAction::MOVE_FORWARD,          "move-forward",         "Move Forward"},
+        {PathAction::MOVE_IN_DIRECTION,     "move-in-direction",    "Move in Direction"},
+        {PathAction::CENTER_CAMERA,         "center-camera",        "Center Camera"},
+        {PathAction::JUMP,                  "jump",                 "Jump"},
+        {PathAction::WAIT,                  "wait",                 "Wait"},
+        {PathAction::START_LISTEN,          "start-listen",         "Start Listen"},
+        {PathAction::END_LISTEN,            "end-listen",           "End Listen"}
+    });
+    return database;
+}
+const EnumDatabase<PathMount>& PathMount_Database(){
+    static const EnumDatabase<PathMount> database({
+        {PathMount::NO_MOUNT,       "none",         "No Mount"},
+        {PathMount::WYRDEER,        "wrydeer",      "Wrydeer"},
+        {PathMount::URSALUNA,       "ursaluna",     "Ursaluna"},
+        {PathMount::BASCULEGION,    "basculegion",  "Basculegion"},
+        {PathMount::SNEASLER,       "sneasler",     "Sneasler"},
+        {PathMount::BRAVIARY,       "braviary",     "Braviary"},
+    });
+    return database;
+}
+const EnumDatabase<PathSpeed>& PathSpeed_Database(){
+    static const EnumDatabase<PathSpeed> database({
+        {PathSpeed::NORMAL_SPEED,   "normal",   "Normal Speed"},
+        {PathSpeed::SLOW_SPEED,     "slow",     "Slow Speed"},
+        {PathSpeed::RUN,            "run",      "Run on Foot"},
+        {PathSpeed::DASH,           "dash",     "Dash on Ride"},
+        {PathSpeed::DASH_B_SPAM,    "mash-b",   "Dash on Braviary B Spam"},
+        {PathSpeed::DIVE,           "dive",     "Dive on Braviary"},
+    });
+    return database;
+}
 
 
 
-CustomPathTableRow::CustomPathTableRow() {}
 
-void CustomPathTableRow::load_json(const JsonValue& json){
+
+CustomPathCell::~CustomPathCell(){
+    m_action.remove_listener(*this);
+}
+void CustomPathCell::operator=(const CustomPathCell& x){
+    text.set_text(x.text.text());
+    mount.set(x.mount);
+    move_forward_ticks.set(x.move_forward_ticks);
+    move_speed.set(x.move_speed);
+    left_x.set(x.left_x);
+    left_y.set(x.left_y);
+    jump_wait_ticks.set(x.jump_wait_ticks);
+    wait_ticks.set(x.wait_ticks);
+}
+CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
+    : BatchOption(true)
+    , m_action(action)
+    , text("", false)
+    , mount(PathMount_Database(), PathMount::NO_MOUNT)
+    , move_forward_ticks("Ticks to Move:", 0)
+    , move_speed(PathSpeed_Database(), PathSpeed::NORMAL_SPEED)
+    , left_x("x: [left: -1.0, right: 1.0]", 0, -1.0, 1.0)
+    , left_y("y: [forward: -1.0, backward: 1.0]", 0, -1.0, 1.0)
+    , jump_wait_ticks("Ticks after jump:", 0)
+    , wait_ticks("Ticks:", 0)
+{
+    PA_ADD_STATIC(text);
+    PA_ADD_OPTION(mount);
+    PA_ADD_OPTION(move_forward_ticks);
+    PA_ADD_OPTION(move_speed);
+    PA_ADD_OPTION(left_x);
+    PA_ADD_OPTION(left_y);
+    PA_ADD_OPTION(jump_wait_ticks);
+    PA_ADD_OPTION(wait_ticks);
+
+    CustomPathCell::value_changed();
+    action.add_listener(*this);
+}
+void CustomPathCell::value_changed(){
+    text.set_visibility(ConfigOptionState::HIDDEN);
+    mount.set_visibility(ConfigOptionState::HIDDEN);
+    move_forward_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    move_speed.set_visibility(ConfigOptionState::HIDDEN);
+    left_x.set_visibility(ConfigOptionState::HIDDEN);
+    left_y.set_visibility(ConfigOptionState::HIDDEN);
+    jump_wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    switch (m_action){
+    case PathAction::NO_ACTION:
+        break;
+    case PathAction::CHANGE_MOUNT:
+        mount.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::MOVE_FORWARD:
+        move_forward_ticks.set_visibility(ConfigOptionState::ENABLED);
+        move_speed.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::MOVE_IN_DIRECTION:
+        move_forward_ticks.set_visibility(ConfigOptionState::ENABLED);
+        left_x.set_visibility(ConfigOptionState::ENABLED);
+        left_y.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::CENTER_CAMERA:
+        text.set_text("Center the camera so that you can move straight forward.");
+        text.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::JUMP:
+        jump_wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::WAIT:
+        wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::START_LISTEN:
+        text.set_text("If shiny detected, use \"Destination Shiny Action\".");
+        text.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case PathAction::END_LISTEN:
+        text.set_text("If shiny detected, use \"Enroute Shiny Action\".");
+        text.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    default:
+        break;
+    }
+}
+
+
+
+
+CustomPathTableRow2::CustomPathTableRow2()
+    : action(PathAction_Database(), PathAction::NO_ACTION)
+    , parameters(action)
+{
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(parameters);
+}
+std::unique_ptr<EditableTableRow> CustomPathTableRow2::clone() const{
+    std::unique_ptr<CustomPathTableRow2> ret(new CustomPathTableRow2());
+    ret->action.set(action);
+    ret->parameters = parameters;
+    return ret;
+}
+void CustomPathTableRow2::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
 
-    const std::string* str = obj->get_string("Action");
-    if (str != nullptr){
-        const auto iter = PathAction_MAP.find(*str);
-        if (iter != PathAction_MAP.end()){
-            action = iter->second;
-        }
+    const JsonValue* value = obj->get_value("Action");
+    if (value == nullptr){
+        return;
     }
+    action.load_json(*value);
 
     switch(action){
     case PathAction::CHANGE_MOUNT:
-        str = obj->get_string("Mount");
-        if (str != nullptr){
-            const auto iter = PathMount_MAP.find(*str);
-            if (iter != PathMount_MAP.end()){
-                mount = iter->second;
-            }
+        value = obj->get_value("Mount");
+        if (value != nullptr){
+            parameters.mount.load_json(*value);
         }
         break;
     case PathAction::MOVE_FORWARD:
-        obj->read_integer(move_forward_ticks, "MoveForwardTicks");
-        str = obj->get_string("Speed");
-        if (str != nullptr){
-            const auto iter = PathSpeed_MAP.find(*str);
-            if (iter != PathSpeed_MAP.end()){
-                move_speed = iter->second;
-            }
+        value = obj->get_value("MoveForwardTicks");
+        if (value != nullptr){
+            parameters.move_forward_ticks.load_json(*value);
+        }
+        value = obj->get_value("Speed");
+        if (value != nullptr){
+            parameters.move_speed.load_json(*value);
         }
         break;
     case PathAction::MOVE_IN_DIRECTION:
-        obj->read_integer(move_forward_ticks, "MoveForwardTicks");
-        str = obj->get_string("Speed");
-        if (str != nullptr){
-            const auto iter = PathSpeed_MAP.find(*str);
-            if (iter != PathSpeed_MAP.end()){
-                move_speed = iter->second;
-            }
+        value = obj->get_value("MoveForwardTicks");
+        if (value != nullptr){
+            parameters.move_forward_ticks.load_json(*value);
         }
-        obj->read_float(left_x, "MoveDirectionX");
-        obj->read_float(left_y, "MoveDirectionY");
+//        value = obj->get_value("Speed");
+//        if (value != nullptr){
+//            parameters.move_speed.load_json(*value);
+//        }
+        value = obj->get_value("MoveDirectionX");
+        if (value != nullptr){
+            parameters.left_x.load_json(*value);
+        }
+        value = obj->get_value("MoveDirectionY");
+        if (value != nullptr){
+            parameters.left_y.load_json(*value);
+        }
         break;
     case PathAction::JUMP:
-        obj->read_integer(jump_wait_ticks, "JumpWaitTicks");
+        value = obj->get_value("JumpWaitTicks");
+        if (value != nullptr){
+            parameters.jump_wait_ticks.load_json(*value);
+        }
         break;
     case PathAction::WAIT:
-        obj->read_integer(wait_ticks, "WaitTicks");
+        value = obj->get_value("WaitTicks");
+        if (value != nullptr){
+            parameters.wait_ticks.load_json(*value);
+        }
         break;
     default:
         break;
     }
-
-
-    // json_get_bool(switch_pokemon, obj, "Switch");
-    // json_get_int(num_turns_to_switch, obj, "Turns", 0);
 }
-
-JsonValue CustomPathTableRow::to_json() const{
+JsonValue CustomPathTableRow2::to_json() const{
     JsonObject obj;
-    obj["Action"] = PathAction_NAMES[(size_t)action];
-    switch(action){
+    obj["Action"] = action.to_json();
+    switch (action){
     case PathAction::CHANGE_MOUNT:
-        obj["Mount"] = PathMount_NAMES[(size_t)mount];
+        obj["Mount"] = parameters.mount.to_json();
         break;
-#if 0
-    case PathAction::ROTATE_CAMERA:
-        obj["CameraTurnTicks"] = camera_turn_ticks);
-        break;
-#endif
     case PathAction::MOVE_FORWARD:
-        obj["MoveForwardTicks"] = move_forward_ticks;
-        obj["Speed"] = PathSpeed_NAMES[(size_t)move_speed];
+        obj["MoveForwardTicks"] = parameters.move_forward_ticks.to_json();
+        obj["Speed"] = parameters.move_speed.to_json();
         break;
     case PathAction::MOVE_IN_DIRECTION:
-        obj["MoveForwardTicks"] = move_forward_ticks;
-        obj["Speed"] = PathSpeed_NAMES[(size_t)move_speed];
-        obj["MoveDirectionX"] = left_x;
-        obj["MoveDirectionY"] = left_y;
+        obj["MoveForwardTicks"] = parameters.move_forward_ticks.to_json();
+//        obj["Speed"] = parameters.move_speed.to_json();
+        obj["MoveDirectionX"] = parameters.left_x.to_json();
+        obj["MoveDirectionY"] = parameters.left_y.to_json();
         break;
     case PathAction::JUMP:
-        obj["JumpWaitTicks"] = jump_wait_ticks;
+        obj["JumpWaitTicks"] = parameters.jump_wait_ticks.to_json();
         break;
     case PathAction::WAIT:
-        obj["WaitTicks"] = wait_ticks;
+        obj["WaitTicks"] = parameters.wait_ticks.to_json();
         break;
     default:
         break;
@@ -194,267 +264,66 @@ JsonValue CustomPathTableRow::to_json() const{
     return obj;
 }
 
-std::unique_ptr<EditableTableRow> CustomPathTableRow::clone() const{
-    return std::unique_ptr<EditableTableRow>(new CustomPathTableRow(*this));
-}
-
-// Each row of the custom path table UI is made by an action dropdown menu and the parameter widget for the chosen
-// action. This class is the parameter widget. Because different actions don't share parameters, this class will
-// house many different children widgets but only show the ones that related to the current chosen action.
-class ActionParameterWidget : public QWidget{
-public:
-    ActionParameterWidget(QWidget& parent, CustomPathTableRow& row);
-
-    void setParameter();
-
-private:
-    CustomPathTableRow& m_row;
-
-    QHBoxLayout* m_layout = nullptr;
-
-    QWidget* m_mounts_dropdown;
-
-    QWidget* m_camera_label;
-    QWidget* m_camera_duration;
-
-    QWidget* m_move_label;
-    QWidget* m_move_duration;
-    QWidget* m_move_space;
-    QWidget* m_move_speed;
-
-    QWidget* m_move_x_label;
-    QWidget* m_move_x_coord;
-    QWidget* m_move_y_label;
-    QWidget* m_move_y_coord;
-
-    QWidget* m_center_label;
-
-    QWidget* m_jump_label;
-    QWidget* m_jump_duration;
-
-    QWidget* m_wait_label;
-    QWidget* m_wait_duration;
-
-    QWidget* m_listen_start;
-    QWidget* m_listen_stop;
-};
-
-ActionParameterWidget::ActionParameterWidget(QWidget& parent, CustomPathTableRow& row)
-    : QWidget(&parent), m_row(row)
-{
-    //  TODO: Figure out why nesting a widget creates a vertical margin even
-    //  when the margins are set to zero.
-
-    this->setContentsMargins(0, 0, 0, 0);
-    m_layout = new QHBoxLayout(this);
-
-#if 0
-    m_layout->setContentsMargins(0, 0, 0, 0);
-    QWidget* widget(this);
-    widget->setContentsMargins(0, 0, 0, 0);
-    new QHBoxLayout(widget);
-     widget->layout()->setContentsMargins(0, 0, 0, 0);
-    widget->layout()->addWidget(new QPushButton("test", this));
-//    m_layout->addWidget(new QPushButton("test", this));
-    m_layout->addWidget(widget);
-#endif
-
-#if 1
-    m_layout->setContentsMargins(5, 0, 5, 0);
-
-    m_mounts_dropdown = make_enum_table_cell(*this, PathMount_MAP.size(), PathMount_NAMES, m_row.mount);
-    m_layout->addWidget(m_mounts_dropdown);
-
-    m_camera_label = new QLabel("Ticks to turn camera (right: +, left: -):", this);
-    m_camera_duration = make_integer_table_cell(*this, m_row.camera_turn_ticks);
-    m_layout->addWidget(m_camera_label);
-    m_layout->addWidget(m_camera_duration);
-
-    m_move_label = new QLabel("Ticks to move:", this);
-    m_move_duration = make_integer_table_cell(*this, m_row.move_forward_ticks);
-    m_move_space = new QLabel(" ", this);
-    m_move_speed = make_enum_table_cell(*this, PathSpeed_MAP.size(), PathSpeed_NAMES, m_row.move_speed);
-    m_layout->addWidget(m_move_label);
-    m_layout->addWidget(m_move_duration);
-    m_layout->addWidget(m_move_space);
-    m_layout->addWidget(m_move_speed);
-
-    m_move_x_label = new QLabel("x: [left: -1.0, right: 1.0]", this);
-    m_move_x_coord = make_double_table_cell(*this, m_row.left_x, -1.0, 1.0);
-    m_move_x_coord->setMaximumWidth(80);
-    m_move_y_label = new QLabel("y: [forward: 1.0, backward: -1.0]", this);
-    m_move_y_coord = make_double_table_cell(*this, m_row.left_y, -1.0, 1.0);
-    m_move_y_coord->setMaximumWidth(80);
-    m_layout->addWidget(m_move_x_label);
-    m_layout->addWidget(m_move_x_coord);
-    m_layout->addWidget(m_move_y_label);
-    m_layout->addWidget(m_move_y_coord);
-
-    m_center_label = new QLabel("Center the camera so that you can move straight forward.", this);
-    m_layout->addWidget(m_center_label);
-
-    m_jump_label = new QLabel("Ticks after jump:", this);
-    m_jump_duration = make_integer_table_cell(*this, m_row.jump_wait_ticks);
-    m_layout->addWidget(m_jump_label);
-    m_layout->addWidget(m_jump_duration);
-
-    m_wait_label = new QLabel("Ticks", this);
-    m_wait_duration = make_integer_table_cell(*this, m_row.wait_ticks);
-    m_layout->addWidget(m_wait_label);
-    m_layout->addWidget(m_wait_duration);
-
-    m_listen_start = new QLabel("If shiny detected, use \"Destination Shiny Action\".", this);
-    m_layout->addWidget(m_listen_start);
-    m_listen_stop = new QLabel("If shiny detected, use \"Enroute Shiny Action\".", this);
-    m_layout->addWidget(m_listen_stop);
-
-    setParameter();
-#endif
-}
-
-void ActionParameterWidget::setParameter(){
-    for(int i = 0; i < m_layout->count(); i++){
-        m_layout->itemAt(i)->widget()->hide();
-    }
-    switch(m_row.action){
-        case PathAction::CHANGE_MOUNT:
-            m_mounts_dropdown->show();
-            break;
-#if 0
-        case PathAction::ROTATE_CAMERA:
-            m_camera_label->show();
-            m_camera_duration->show();
-            break;
-#endif
-        case PathAction::MOVE_FORWARD:
-            m_move_label->show();
-            m_move_duration->show();
-            m_move_space->show();
-            m_move_speed->show();
-            break;
-        case PathAction::MOVE_IN_DIRECTION:
-            m_move_label->show();
-            m_move_duration->show();
-            m_move_x_label->show();
-            m_move_x_coord->show();
-            m_move_y_label->show();
-            m_move_y_coord->show();
-            break;
-        case PathAction::CENTER_CAMERA:
-            m_center_label->show();
-            break;
-        case PathAction::JUMP:
-            m_jump_label->show();
-            m_jump_duration->show();
-            break;
-        case PathAction::WAIT:
-            m_wait_label->show();
-            m_wait_duration->show();
-            break;
-        case PathAction::START_LISTEN:
-            m_listen_start->show();
-            break;
-        case PathAction::END_LISTEN:
-            m_listen_stop->show();
-            break;
-        default:
-            break;
-    }
-}
-
-
-std::vector<QWidget*> CustomPathTableRow::make_widgets(QWidget& parent){
-    std::vector<QWidget*> widgets;
-    auto parameterWidget = new ActionParameterWidget(parent, *this);
-    widgets.emplace_back(make_action_box(parent, action, parameterWidget));
-    widgets.emplace_back(parameterWidget);
-    return widgets;
-}
-
-QWidget* CustomPathTableRow::make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget){
-    QComboBox* box = new NoWheelComboBox(&parent);
-    for(size_t i = 0; i < PathAction_MAP.size(); i++){
-        box->addItem(QString::fromStdString(PathAction_NAMES[i]));
-    }
-    box->setCurrentIndex((int)action);
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&action, parameterWidget](int index){
-            if (index < 0){
-                index = 0;
-            }
-            action = (PathAction)index;
-            parameterWidget->setParameter();
-        }
-    );
-    return box;
-}
-
-
-
-std::vector<std::string> CustomPathTableTableFactory::make_header() const{
+CustomPathTable2::CustomPathTable2()
+    : EditableTableOption_t<CustomPathTableRow2>(
+        "<b>Custom Path Table:</b><br>"
+        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
+        "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
+        make_defaults()
+    )
+{}
+std::vector<std::string> CustomPathTable2::make_header() const{
     return std::vector<std::string>{
         "Action",
         "Parameters",
     };
 }
-
-std::unique_ptr<EditableTableRow> CustomPathTableTableFactory::make_row() const{
-    return std::unique_ptr<EditableTableRow>(new CustomPathTableRow());
-}
-
-
-
-
-std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults() const{
+std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    auto row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::START_LISTEN;
+    auto row = std::make_unique<CustomPathTableRow2>();
+    row->action.set(PathAction::START_LISTEN);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::CHANGE_MOUNT;
-    row->mount = PathMount::WYRDEER;
+    row = std::make_unique<CustomPathTableRow2>();
+    row->action.set(PathAction::CHANGE_MOUNT);
+    row->parameters.mount.set(PathMount::WYRDEER);
     ret.emplace_back(std::move(row));
 
-#if 0
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::ROTATE_CAMERA;
-    row->camera_turn_ticks = -100;
-    ret.emplace_back(std::move(row));
-#endif
-
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::MOVE_IN_DIRECTION;
-    row->move_forward_ticks = 400;
-    row->left_x = -1.0;
-    row->left_y = 1.0;
+    row = std::make_unique<CustomPathTableRow2>();
+    row->action.set(PathAction::MOVE_IN_DIRECTION);
+    row->parameters.move_forward_ticks.set(400);
+    row->parameters.left_x.set(-1.0);
+    row->parameters.left_y.set(1.0);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::CENTER_CAMERA;
+    row = std::make_unique<CustomPathTableRow2>();
+    row->action.set(PathAction::CENTER_CAMERA);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::MOVE_FORWARD;
-    row->move_speed = PathSpeed::DASH;
-    row->move_forward_ticks = 400;
+    row = std::make_unique<CustomPathTableRow2>();
+    row->action.set(PathAction::MOVE_FORWARD);
+    row->parameters.move_speed.set(PathSpeed::DASH);
+    row->parameters.move_forward_ticks.set(400);
     ret.emplace_back(std::move(row));
 
-//    row = std::make_unique<CustomPathTableRow>();
-//    row->action = PathAction::END_LISTEN;
-//    ret.emplace_back(std::move(row));
-    
     return ret;
 }
 
+
+
+
+
+
+
+
+
 CustomPathTable::CustomPathTable()
-    : PATH(
-        "<b>Custom Path Table:</b><br>"
-        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
-        "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
-        m_factory, make_defaults()
-    )
+//    : PATH(
+//        "<b>Custom Path Table:</b><br>"
+//        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
+//        "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
+//        m_factory, make_defaults()
+//    )
 {
     PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(PATH);
@@ -472,7 +341,7 @@ public:
         // Since it's a QWidget, we don't need to care about its memory ownership after its parent is set (as `this`).
 
         m_travel_location = value.TRAVEL_LOCATION.make_ui(*this);
-        m_table_widget = static_cast<EditableTableWidget*>(value.PATH.make_ui(*this));
+        m_table_widget = value.PATH.make_ui(*this);
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -502,8 +371,8 @@ public:
                 box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
                 return;
             }
-            m_travel_location->update();
-            m_table_widget->update_ui();
+//            m_travel_location->update();
+//            m_table_widget->update();
         });
 
         connect(save_button,  &QPushButton::clicked, this, [&value, this](bool){
@@ -525,13 +394,13 @@ public:
 
     virtual void update() override{
         ConfigWidget::update();
-        m_travel_location->update();
-        m_table_widget->update_ui();
+//        m_travel_location->update();
+//        m_table_widget->update();
     }
 
 private:
     ConfigWidget* m_travel_location = nullptr;
-    EditableTableWidget* m_table_widget = nullptr;
+    ConfigWidget* m_table_widget = nullptr;
 };
 
 ConfigWidget* CustomPathTable::make_ui(QWidget& parent){

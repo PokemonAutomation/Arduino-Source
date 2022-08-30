@@ -20,7 +20,6 @@ public:
     void insertRow(int row);
     void removeRow(int row);
 
-protected:
     void update_height();
 };
 

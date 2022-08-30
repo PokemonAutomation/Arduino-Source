@@ -126,7 +126,7 @@ void searchAlphaRoarFromAudioDump(){
         SpectrogramMatcher::Mode::RAW, SAMPLE_RATE,
         100.0
     );
-    
+
     // std::string fileListFile = "./scripts/short_audio_files.txt";
     std::string fileListFile = "1.txt";
     // std::string fileListFile = "./scripts/all_audio_files.txt";

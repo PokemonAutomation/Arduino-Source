@@ -4,12 +4,12 @@
  *
  */
 
-#ifndef PokemonAutomation_BatchWidget_H
-#define PokemonAutomation_BatchWidget_H
+#ifndef PokemonAutomation_Options_BatchWidget_H
+#define PokemonAutomation_Options_BatchWidget_H
 
 #include <QWidget>
-#include "Common/Qt/Options/ConfigWidget.h"
-#include "BatchOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
+#include "ConfigWidget.h"
 
 namespace PokemonAutomation{
 

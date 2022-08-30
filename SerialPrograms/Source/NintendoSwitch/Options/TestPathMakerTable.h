@@ -1,12 +1,20 @@
-#ifndef TESTPATHMAKERTABLE_H
-#define TESTPATHMAKERTABLE_H
+/*  Test Path Maker Table
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
 
-#include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
+#ifndef PokemonAutomation_NintendoSwitch_PathMakerTable_H
+#define PokemonAutomation_NintendoSwitch_PathMakerTable_H
+
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
 
 enum class PathAction{
     NO_ACTION,
@@ -28,61 +36,59 @@ enum class PathAction{
     DPADDOWN,
     WAIT
 };
+const EnumDatabase<PathAction>& PathAction_Database();
 
-extern const std::string PathAction_NAMES[];
 
-class ActionParameterWidget;
-
-class TestPathMakerTableRow : public EditableTableRow{
+class PathMakerCell : public BatchOption, private ConfigOption::Listener{
 public:
-    TestPathMakerTableRow();
+    ~PathMakerCell();
+    void operator=(const PathMakerCell& x);
+    PathMakerCell(EnumDropdownCell<PathAction>& action);
+
+    virtual void value_changed() override;
+
+private:
+    EnumDropdownCell<PathAction>& m_action;
+
+public:
+    SimpleIntegerOption<uint8_t> x_axis;
+    SimpleIntegerOption<uint8_t> y_axis;
+
+    SimpleIntegerOption<uint16_t> button_hold_ticks;
+    SimpleIntegerOption<uint16_t> button_release_ticks;
+    SimpleIntegerOption<uint16_t> wait_ticks;
+};
+
+
+class PathMakerRow2 : public EditableTableRow{
+public:
+    PathMakerRow2();
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
-
-private:
-    friend class ActionParameterWidget;
-    QWidget* make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget);
 
 public:
-    PathAction action = PathAction::NO_ACTION;
-
-    uint16_t button_hold_ticks = 0;
-    uint16_t button_release_ticks = 0;
-
-    uint16_t wait_ticks = 0;
-
-    uint8_t x_axis = 0;
-    uint8_t y_axis = 0;
+    EnumDropdownCell<PathAction> action;
+    PathMakerCell parameters;
 };
 
-class TestPathMakerTableFactory : public EditableTableFactory{
+
+class PathMakerTable : public EditableTableOption_t<PathMakerRow2>{
 public:
+    PathMakerTable();
     virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
-};
 
-// A program option to build a custom path to navigate the map
-class TestPathMakerTable : public BatchOption{
-public:
-    TestPathMakerTable();
-
-    size_t num_actions() const { return PATH.size(); }
-    const TestPathMakerTableRow& get_action(size_t action_index) const {
-        return static_cast<const TestPathMakerTableRow&>(PATH[action_index]);
-    }
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 
-private:
-    friend class TestPathMakerTableWidget;
-    TestPathMakerTableFactory m_factory;
-    EditableTableOption PATH;
 };
+
+
+
+
+
+
 
 }
 }

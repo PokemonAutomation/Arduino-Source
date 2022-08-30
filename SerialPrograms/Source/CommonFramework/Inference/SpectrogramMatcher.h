@@ -15,8 +15,6 @@
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 
-class QString;
-
 namespace PokemonAutomation{
 
 class AudioSpectrum;

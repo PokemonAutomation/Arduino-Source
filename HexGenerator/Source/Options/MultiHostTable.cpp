@@ -17,7 +17,6 @@
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "Common/Qt/ExpressionEvaluator.h"
-#include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"
 #include "MultiHostTable.h"
 

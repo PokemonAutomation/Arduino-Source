@@ -8,8 +8,8 @@
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

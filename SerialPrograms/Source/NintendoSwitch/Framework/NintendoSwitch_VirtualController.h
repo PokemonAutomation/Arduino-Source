@@ -15,7 +15,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 #include <iostream>
@@ -72,7 +72,7 @@ private:
     void thread_loop();
 
 private:
-    // LoggerQt& m_logger;
+    // Logger& m_logger;
     BotBaseHandle& m_botbase;
     const bool m_allow_commands_while_running;
 

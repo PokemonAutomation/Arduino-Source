@@ -10,7 +10,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 #define PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 
 namespace PokemonAutomation{

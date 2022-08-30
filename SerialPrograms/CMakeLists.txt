@@ -93,6 +93,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId.h
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
+    ../Common/Cpp/EnumDatabase.cpp
+    ../Common/Cpp/EnumDatabase.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ImageResolution.cpp
@@ -107,22 +109,24 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Json/JsonValue.h
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
-    ../Common/Cpp/EnumDatabase.cpp
-    ../Common/Cpp/EnumDatabase.h
+    ../Common/Cpp/Options/BatchOption.cpp
+    ../Common/Cpp/Options/BatchOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
     ../Common/Cpp/Options/DateOption.h
-    ../Common/Cpp/Options/EditableTableOption2.cpp
-    ../Common/Cpp/Options/EditableTableOption2.h
+    ../Common/Cpp/Options/EditableTableOption.cpp
+    ../Common/Cpp/Options/EditableTableOption.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
     ../Common/Cpp/Options/FixedCodeOption.h
     ../Common/Cpp/Options/FloatingPointOption.cpp
     ../Common/Cpp/Options/FloatingPointOption.h
+    ../Common/Cpp/Options/GroupOption.cpp
+    ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -177,24 +181,24 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/Options/BatchWidget.cpp
+    ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
     ../Common/Qt/Options/DateWidget.h
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
-    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
-    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
-    ../Common/Qt/Options/EditableTableWidget2.cpp
-    ../Common/Qt/Options/EditableTableWidget2.h
+    ../Common/Qt/Options/EditableTableWidget.cpp
+    ../Common/Qt/Options/EditableTableWidget.h
     ../Common/Qt/Options/EnumDropdownWidget.cpp
     ../Common/Qt/Options/EnumDropdownWidget.h
     ../Common/Qt/Options/FixedCodeWidget.cpp
     ../Common/Qt/Options/FixedCodeWidget.h
     ../Common/Qt/Options/FloatingPointWidget.cpp
     ../Common/Qt/Options/FloatingPointWidget.h
+    ../Common/Qt/Options/GroupWidget.cpp
+    ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
@@ -370,8 +374,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Language.h
     Source/CommonFramework/Logging/FileWindowLogger.cpp
     Source/CommonFramework/Logging/FileWindowLogger.h
-    Source/CommonFramework/Logging/LoggerQt.cpp
-    Source/CommonFramework/Logging/LoggerQt.h
+    Source/CommonFramework/Logging/Logger.cpp
+    Source/CommonFramework/Logging/Logger.h
     Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
@@ -410,16 +414,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
-    Source/CommonFramework/Options/BatchOption/BatchOption.cpp
-    Source/CommonFramework/Options/BatchOption/BatchOption.h
-    Source/CommonFramework/Options/BatchOption/BatchWidget.h
-    Source/CommonFramework/Options/BatchOption/GroupOption.cpp
-    Source/CommonFramework/Options/BatchOption/GroupOption.h
-    Source/CommonFramework/Options/BatchOption/GroupWidget.h
-    Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
-    Source/CommonFramework/Options/EditableTableOption.cpp
-    Source/CommonFramework/Options/EditableTableOption.h
-    Source/CommonFramework/Options/EditableTableWidget.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
@@ -430,6 +424,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
+    Source/CommonFramework/Options/StringSelectTableOption.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp
@@ -776,8 +771,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h
-    Source/Pokemon/Options/Pokemon_NameListOption.cpp
-    Source/Pokemon/Options/Pokemon_NameListOption.h
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
@@ -939,6 +932,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
+    Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
+    Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonHome/PokemonHome_Panels.cpp
+    Source/PokemonHome/PokemonHome_Panels.h
+    Source/PokemonHome/PokemonHome_Settings.cpp
+    Source/PokemonHome/PokemonHome_Settings.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp
@@ -1128,6 +1127,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp
+    Source/PokemonLA/Resources/PokemonLA_NameDatabase.h
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
@@ -1318,8 +1319,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.cpp
-    Source/PokemonSwSh/Options/PokemonSwSh_NameSelectOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h
@@ -1494,6 +1493,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.cpp
+    Source/PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp

@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 #define PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
 //#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 //#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"

@@ -45,6 +45,8 @@ private:
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
+    BooleanCheckBoxOption RESET_GAME_WHEN_ERROR;
+
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

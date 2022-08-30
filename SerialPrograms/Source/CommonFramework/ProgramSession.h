@@ -22,7 +22,7 @@
 #include <thread>
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{

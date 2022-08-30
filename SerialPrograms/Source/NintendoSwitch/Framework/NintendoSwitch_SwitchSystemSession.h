@@ -20,7 +20,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"

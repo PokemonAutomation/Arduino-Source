@@ -10,7 +10,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "Common/Qt/Options/BatchWidget.h"
 #include "SettingsPanelWidget.h"
 
 namespace PokemonAutomation{

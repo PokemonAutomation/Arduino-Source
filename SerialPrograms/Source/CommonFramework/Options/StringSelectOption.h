@@ -8,7 +8,6 @@
 #define PokemonAutomation_Options_StringSelectOption_H
 
 #include <vector>
-#include <QIcon>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -38,11 +37,11 @@ struct StringSelectEntry{
 
 class StringSelectDatabase{
 public:
-    StringSelectDatabase(const StringSelectDatabase&) = delete;
-    StringSelectDatabase& operator=(const StringSelectDatabase&) = delete;
+    ~StringSelectDatabase();
     StringSelectDatabase(StringSelectDatabase&&);
     StringSelectDatabase& operator=(StringSelectDatabase&&);
-    ~StringSelectDatabase();
+    StringSelectDatabase(const StringSelectDatabase&);
+    StringSelectDatabase& operator=(const StringSelectDatabase&);
 
 public:
     StringSelectDatabase();
@@ -63,6 +62,11 @@ private:
 
 
 class StringSelectCell : public ConfigOption{
+public:
+    ~StringSelectCell();
+    StringSelectCell(const StringSelectCell&) = delete;
+    void operator=(const StringSelectCell&) = delete;
+
 public:
     StringSelectCell(const StringSelectDatabase& database, size_t default_index);
     StringSelectCell(const StringSelectDatabase& database, const std::string& default_slug);

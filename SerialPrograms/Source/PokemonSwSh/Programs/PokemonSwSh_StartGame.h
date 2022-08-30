@@ -9,7 +9,7 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
@@ -41,11 +41,11 @@ enum class EggHatchGenderFilter{
 
 
 
-class EggHatchFilterRow : public EditableTableRow2{
+class EggHatchFilterRow : public EditableTableRow{
 public:
     EggHatchFilterRow();
     EggHatchFilterRow(EggHatchShinyFilter p_shiny);
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     EnumDropdownCell<EggHatchAction> action;
@@ -63,7 +63,7 @@ class EggHatchFilterTable : public EditableTableOption_t<EggHatchFilterRow>{
 public:
     EggHatchFilterTable();
     virtual std::vector<std::string> make_header() const override;
-    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults();
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
     EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const;
 };

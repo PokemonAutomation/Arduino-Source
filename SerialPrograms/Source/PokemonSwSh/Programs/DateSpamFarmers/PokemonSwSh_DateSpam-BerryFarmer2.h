@@ -41,7 +41,7 @@ public:
 
 private:
     Rustling check_rustling(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    uint32_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling last_rustling);
+    uint16_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling last_rustling);
 
 private:
     StaticTextOption REQUIRES_AUDIO;

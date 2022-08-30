@@ -6,7 +6,7 @@
 #include "Tests/CommandLineTests.h"
 #include "CrashDump.h"
 #include "Environment/HardwareValidation.h"
-#include "Logging/LoggerQt.h"
+#include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
 #include "Tools/StatsDatabase.h"
 #include "Integrations/SleepyDiscordRunner.h"

@@ -8,7 +8,7 @@
 #define PokemonAutomation_SettingsPanel_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 
 namespace PokemonAutomation{

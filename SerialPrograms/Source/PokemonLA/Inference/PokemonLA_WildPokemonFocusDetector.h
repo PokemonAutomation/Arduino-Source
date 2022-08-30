@@ -11,14 +11,13 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
 #include <utility>
 
 namespace PokemonAutomation{
 
-class LoggerQt;
 class VideoOverlay;
 
 namespace NintendoSwitch{

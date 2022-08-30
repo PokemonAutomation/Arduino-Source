@@ -12,6 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
+#include "PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "PokemonLA/PokemonLA_Panels.h"
 #include "PokemonSV/PokemonSV_Panels.h"
@@ -39,6 +40,10 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     add(new PanelList(*this, holder,
         "Switch",  "Nintendo Switch",
         NintendoSwitch::make_panels()
+    ));
+    add(new PanelList(*this, holder,
+        "Home", Pokemon::STRING_POKEMON + " Home",
+        NintendoSwitch::PokemonSV::make_panels()
     ));
     add(new PanelList(*this, holder,
         "SwSh", Pokemon::STRING_POKEMON + " Sword and Shield",

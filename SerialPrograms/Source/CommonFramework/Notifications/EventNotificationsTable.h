@@ -9,7 +9,7 @@
 
 #include <map>
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "EventNotificationOption.h"
 
 namespace PokemonAutomation{

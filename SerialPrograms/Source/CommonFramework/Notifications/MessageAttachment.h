@@ -9,7 +9,7 @@
 
 #include <atomic>
 #include <memory>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 

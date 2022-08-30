@@ -4,24 +4,15 @@
  *
  */
 
-#ifndef PokemonAutomation_Logging_LoggerQt_H
-#define PokemonAutomation_Logging_LoggerQt_H
+#ifndef PokemonAutomation_Logging_Logger_H
+#define PokemonAutomation_Logging_Logger_H
 
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/AbstractLogger.h"
 
-class QString;
-
 namespace PokemonAutomation{
 
-
-class LoggerQt : public Logger{
-public:
-    virtual void log(const char* msg, Color color = Color()) = 0;
-    virtual void log(const std::string& msg, Color color = Color()) = 0;
-    virtual void log(const QString& msg, Color color = Color()) = 0;
-};
 
 
 //  Print as is. Use this to build other loggers.

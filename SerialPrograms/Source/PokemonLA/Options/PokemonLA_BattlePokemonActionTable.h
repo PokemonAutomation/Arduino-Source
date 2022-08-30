@@ -12,7 +12,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -44,10 +44,10 @@ public:
 // battle.
 // The pokemon order is defined as the order they are sent onto the battle.
 
-class BattlePokemonActionRow : public EditableTableRow2{
+class BattlePokemonActionRow : public EditableTableRow{
 public:
     BattlePokemonActionRow();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     MoveStyleCell style[4];
@@ -78,7 +78,7 @@ public:
 
 private:
     virtual std::vector<std::string> make_header() const;
-    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults();
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 
@@ -94,10 +94,10 @@ private:
 // The pokemon order is defined as the order they are sent onto the battle.
 
 // Used by MagikarpMoveGrinder, for each pokemon, set what style the first move to use
-class OneMoveBattlePokemonActionRow : public EditableTableRow2{
+class OneMoveBattlePokemonActionRow : public EditableTableRow{
 public:
     OneMoveBattlePokemonActionRow();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     MoveStyleCell style;
@@ -115,7 +115,7 @@ public:
 
 private:
     virtual std::vector<std::string> make_header() const;
-    std::vector<std::unique_ptr<EditableTableRow2>> make_defaults() const;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 };
 
 
@@ -123,10 +123,10 @@ private:
 
 
 
-class MoveGrinderActionRow : public EditableTableRow2{
+class MoveGrinderActionRow : public EditableTableRow{
 public:
     MoveGrinderActionRow();
-    virtual std::unique_ptr<EditableTableRow2> clone() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     IntegerEnumDropdownCell pokemon_index;

@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
 
@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class MultiHostSlot : public EditableTableRow2{
+class MultiHostSlot : public EditableTableRow{
 public:
     MultiHostSlot(bool raid_code_option)
         : m_raid_code_option(raid_code_option)
@@ -51,7 +51,7 @@ public:
 
 
 
-    virtual std::unique_ptr<EditableTableRow2> clone() const override{
+    virtual std::unique_ptr<EditableTableRow> clone() const override{
         std::unique_ptr<MultiHostSlot> ret(new MultiHostSlot(m_raid_code_option));
         ret->game_slot.set_value(game_slot.current_value());
         ret->user_slot.set_value(user_slot.current_value());
@@ -83,14 +83,14 @@ public:
 
 
 
-class MultiHostTable : public EditableTableOption2{
+class MultiHostTable : public EditableTableOption{
 public:
     MultiHostTable(bool raid_code_option)
-        : EditableTableOption2("<b>Game List:</b>")
+        : EditableTableOption("<b>Game List:</b>")
         , m_raid_code_option(raid_code_option)
     {}
     std::vector<std::unique_ptr<MultiHostSlot>> copy_snapshot() const{
-        return EditableTableOption2::copy_snapshot<MultiHostSlot>();
+        return EditableTableOption::copy_snapshot<MultiHostSlot>();
     }
     virtual std::vector<std::string> make_header() const override{
         if (m_raid_code_option){
@@ -120,8 +120,8 @@ public:
             };
         }
     }
-    virtual std::unique_ptr<EditableTableRow2> make_row() const override{
-        return std::unique_ptr<EditableTableRow2>(new MultiHostSlot(m_raid_code_option));
+    virtual std::unique_ptr<EditableTableRow> make_row() const override{
+        return std::unique_ptr<EditableTableRow>(new MultiHostSlot(m_raid_code_option));
     }
 
 private:

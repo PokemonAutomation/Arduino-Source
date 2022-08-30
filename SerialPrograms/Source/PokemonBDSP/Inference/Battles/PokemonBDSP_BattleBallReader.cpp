@@ -112,7 +112,8 @@ uint16_t BattleBallReader::read_quantity(const ImageViewRGB32& screen) const{
         extract_box_reference(screen, m_box_quantity),
         0xff808080, 0xffffffff, true
     );
-    return OCR::read_number(m_console, image);
+    int qty = OCR::read_number(m_console, image);
+    return (uint16_t)std::max(qty, 0);
 }
 
 

@@ -16,6 +16,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
@@ -43,10 +44,68 @@ namespace PokemonLA{
 
 
 
+StringSelectDatabase make_mo_database(){
+    const SpriteDatabase& sprites = ALL_POKEMON_SPRITES();
+    const std::vector<std::string>& slugs = HISUI_OUTBREAK_SLUGS();
+
+    static const ImageRGB32 mmo_sprite(RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png");
+
+    StringSelectDatabase ret;
+    ret.add_entry(StringSelectEntry("fieldlands-mmo",   "Fieldlands MMO",   mmo_sprite));
+    ret.add_entry(StringSelectEntry("mirelands-mmo",    "Mirelands MMO",    mmo_sprite));
+    ret.add_entry(StringSelectEntry("coastlands-mmo",   "Coastlands MMO",   mmo_sprite));
+    ret.add_entry(StringSelectEntry("highlands-mmo",    "Highlands MMO",    mmo_sprite));
+    ret.add_entry(StringSelectEntry("icelands-mmo",     "Icelands MMO",     mmo_sprite));
+    for (const std::string& slug : slugs){
+        const PokemonNames& name = get_pokemon_name(slug);
+        const SpriteDatabase::Sprite& sprite = sprites.get_throw(slug);
+        ret.add_entry(StringSelectEntry(
+            slug, name.display_name(),
+            sprite.icon
+        ));
+    }
+    return ret;
+}
+const StringSelectDatabase& MO_DATABASE(){
+    static const StringSelectDatabase database = make_mo_database();
+    return database;
+}
+
+StringSelectDatabase make_mmo_database(){
+    const SpriteDatabase& sprites = ALL_MMO_SPRITES();
+    const std::vector<std::string>& slugs = MMO_FIRST_WAVE_SPRITE_SLUGS();
+    std::vector<std::string> displays = load_pokemon_slug_json_list("PokemonLA/MMOFirstWaveSpriteNameDisplay.json");
+
+    if (slugs.size() != displays.size()){
+        throw FileException(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Name and slug lists are not the same size.",
+            "PokemonLA/MMOFirstWaveSpriteNameDisplay.json"
+        );
+    }
+
+    StringSelectDatabase ret;
+    for (size_t c = 0; c < displays.size(); c++){
+        ret.add_entry(StringSelectEntry(
+            slugs[c], std::move(displays[c]),
+            sprites.get_throw(slugs[c]).icon
+        ));
+    }
+    return ret;
+}
+const StringSelectDatabase& MMO_DATABASE(){
+    static const StringSelectDatabase database = make_mmo_database();
+    return database;
+}
+
+
+
 namespace {
 
-Pokemon::ExtraNames load_mmo_names(){
-    Pokemon::ExtraNames names;
+
+
+std::vector<std::string> load_mmo_names(){
+    std::vector<std::string> names;
 
     const std::string slugs[5] = {
         "fieldlands-mmo",
@@ -70,9 +129,7 @@ Pokemon::ExtraNames load_mmo_names(){
 
 
     for(size_t i = 0; i < 5; i++){
-        names.name_list.emplace_back(slugs[i]);
-        names.names.emplace(slugs[i], std::make_pair(display_names[i], mmo_pixmap));
-        names.display_name_to_slug.emplace(display_names[i], slugs[i]);
+        names.emplace_back(slugs[i]);
     }
 
     return names;
@@ -84,8 +141,8 @@ Pokemon::ExtraNames load_mmo_names(){
 // - "coastlands-mmo"
 // - "highlands-mmo"
 // - "icelands-mmo"
-const Pokemon::ExtraNames& MMO_NAMES(){
-    const static Pokemon::ExtraNames mmo_names = load_mmo_names();
+const std::vector<std::string>& MMO_NAMES(){
+    const static std::vector<std::string> mmo_names = load_mmo_names();
     return mmo_names;
 }
 
@@ -144,22 +201,15 @@ OutbreakFinder::OutbreakFinder()
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , DESIRED_MO_SLUGS(
         "<b>Desired Outbreak " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
-        ALL_POKEMON_SPRITES(),
-        HISUI_OUTBREAK_SLUGS(),
-        nullptr,
-        &MMO_NAMES()
+        STRING_POKEMON, MO_DATABASE(), "cherubi"
     )
     , DESIRED_MMO_SLUGS(
         "<b>Desired first MMO wave " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
-        ALL_MMO_SPRITES(),
-        MMO_FIRST_WAVE_SPRITE_SLUGS(),
-        &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
+        STRING_POKEMON, MMO_DATABASE(), "rowlet"
     )
     , DESIRED_STAR_MMO_SLUGS(
         "<b>Desired first MMO wave " + STRING_POKEMON + " with shiny symbols:</b><br>Stop when anything on this list is found.",
-        ALL_MMO_SPRITES(),
-        MMO_FIRST_WAVE_SPRITE_SLUGS(),
-        &MMO_FIRST_WAVE_DISPLAY_NAME_MAPPING()
+        STRING_POKEMON, MMO_DATABASE(), "rowlet"
     )
     , DEBUG_MODE(
         "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.", false
@@ -233,10 +283,10 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
     const auto& mmo_names = MMO_NAMES();
     for (int i = 0; i < 5; i++){
         if (mmo_appears[i]){
-            auto iter = desired_events.find(mmo_names.name_list[i]);
+            auto iter = desired_events.find(mmo_names[i]);
             if (iter != desired_events.end()){
                 env.console.log("Found a match!", COLOR_BLUE);
-                found.insert(mmo_names.name_list[i]);
+                found.insert(mmo_names[i]);
             }
             stats.mmos++;
         }
@@ -391,7 +441,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     for(size_t i = 0; i < 5; i++){
-        if (mmo_name == MMO_NAMES().name_list[i]){
+        if (mmo_name == MMO_NAMES()[i]){
             switch (i){
             case 0:
                 region = MapRegion::FIELDLANDS;
@@ -669,21 +719,19 @@ bool OutbreakFinder::run_iteration(
 }
 
 
+std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& option){
+    std::set<std::string> ret;
+    for (std::string& slug : option.all_slugs()){
+        ret.insert(std::move(slug));
+    }
+    return ret;
+}
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);
     // return;
-
-    // Convert PokemonNameList to a set of slug strings
-    auto to_set = [&](const Pokemon::PokemonNameList& name_list) -> std::set<std::string>{
-        std::set<std::string> ret;
-        for (size_t c = 0; c < name_list.size(); c++){
-            ret.insert(name_list[c]);
-        }
-        return ret;
-    };
 
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
     std::set<std::string> desired_MMO_pokemon = to_set(DESIRED_MMO_SLUGS);
@@ -705,7 +753,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             if (desired_MMO_pokemon.find(sprite_slug) != desired_MMO_pokemon.end()
                 || desired_star_MMO_pokemon.find(sprite_slug) != desired_star_MMO_pokemon.end()
             ){
-                MMO_targets[MMO_NAMES().name_list[i]]++;
+                MMO_targets[MMO_NAMES()[i]]++;
             }
         }
     }

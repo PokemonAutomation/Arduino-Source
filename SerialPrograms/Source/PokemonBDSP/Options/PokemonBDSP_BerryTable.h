@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BerrySelector_H
 #define PokemonAutomation_PokemonBDSP_BerrySelector_H
 
-#include "Common/Cpp/Options/EditableTableOption2.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonBDSP_BerrySelectOption.h"
 
 namespace PokemonAutomation{
@@ -16,10 +16,10 @@ namespace PokemonBDSP{
 
 
 
-class BerrySelectorRow2 : public EditableTableRow2{
+class BerrySelectorRow2 : public EditableTableRow{
 public:
     BerrySelectorRow2();
-    virtual std::unique_ptr<EditableTableRow2> clone() const;
+    virtual std::unique_ptr<EditableTableRow> clone() const;
 
 public:
     BerrySelectCell berry;
@@ -39,7 +39,7 @@ public:
 
     virtual std::vector<std::string> make_header() const;
 
-    static std::vector<std::unique_ptr<EditableTableRow2>> make_defaults();
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 

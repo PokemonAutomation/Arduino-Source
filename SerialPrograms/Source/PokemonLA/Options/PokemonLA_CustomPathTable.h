@@ -8,8 +8,12 @@
 #define PokemonAutomation_PokemonLA_CustomPathTableTable_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"
 
 namespace PokemonAutomation{
@@ -21,7 +25,6 @@ namespace PokemonLA{
 enum class PathAction{
     NO_ACTION,
     CHANGE_MOUNT,
-//    ROTATE_CAMERA,
     MOVE_FORWARD,
     MOVE_IN_DIRECTION,
     CENTER_CAMERA,
@@ -30,8 +33,7 @@ enum class PathAction{
     START_LISTEN,
     END_LISTEN,
 };
-
-extern const std::string PathAction_NAMES[];
+const EnumDatabase<PathAction>& PathAction_Database();
 
 enum class PathMount{
     NO_MOUNT,
@@ -41,6 +43,7 @@ enum class PathMount{
     SNEASLER,
     BRAVIARY,
 };
+const EnumDatabase<PathMount>& PathMount_Database();
 
 enum class PathSpeed{
     NORMAL_SPEED,
@@ -50,41 +53,58 @@ enum class PathSpeed{
     DASH_B_SPAM,
     DIVE,
 };
+const EnumDatabase<PathSpeed>& PathSpeed_Database();
 
-class ActionParameterWidget;
 
-class CustomPathTableRow : public EditableTableRow{
+
+
+class CustomPathCell : public BatchOption, private ConfigOption::Listener{
 public:
-    CustomPathTableRow();
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
+    ~CustomPathCell();
+    void operator=(const CustomPathCell& x);
+    CustomPathCell(EnumDropdownCell<PathAction>& action);
+
+    virtual void value_changed() override;
 
 private:
-    friend class ActionParameterWidget;
-    QWidget* make_action_box(QWidget& parent, PathAction& action, ActionParameterWidget* parameterWidget);
+    EnumDropdownCell<PathAction>& m_action;
 
 public:
-    PathAction action = PathAction::NO_ACTION;
-    PathMount mount = PathMount::NO_MOUNT;
-
-    int16_t camera_turn_ticks = 0;
-
-    PathSpeed move_speed = PathSpeed::NORMAL_SPEED;
-    uint16_t move_forward_ticks = 0;
-    double left_x = 0;
-    double left_y = 0;
-
-    uint16_t jump_wait_ticks = 0;
-    uint16_t wait_ticks = 0;
+    StaticTextOption text;
+    EnumDropdownCell<PathMount> mount;
+    SimpleIntegerOption<uint16_t> move_forward_ticks;
+    EnumDropdownCell<PathSpeed> move_speed;
+    FloatingPointOption left_x;
+    FloatingPointOption left_y;
+    SimpleIntegerOption<uint16_t> jump_wait_ticks;
+    SimpleIntegerOption<uint16_t> wait_ticks;
 };
 
-class CustomPathTableTableFactory : public EditableTableFactory{
+class CustomPathTableRow2 : public EditableTableRow{
 public:
+    CustomPathTableRow2();
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+
+public:
+    EnumDropdownCell<PathAction> action;
+    CustomPathCell parameters;
+};
+
+class CustomPathTable2 : public EditableTableOption_t<CustomPathTableRow2>{
+public:
+    CustomPathTable2();
     virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
+
+private:
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 };
+
+
+
+
 
 // A program option to build a custom path to navigate the map
 class CustomPathTable : public BatchOption{
@@ -93,22 +113,13 @@ public:
 
     const TravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
 
-    size_t num_actions() const { return PATH.size(); }
-    const CustomPathTableRow& get_action(size_t action_index) const {
-        return static_cast<const CustomPathTableRow&>(PATH[action_index]);
-    }
-
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-
-private:
+public:
     friend class CustomPathTableWidget;
 
     TravelLocationOption TRAVEL_LOCATION;
-    CustomPathTableTableFactory m_factory;
-    EditableTableOption PATH;
+    CustomPathTable2 PATH;
 };
 
 

@@ -44,7 +44,7 @@ private:
     void run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // Do one action (while ignoring listen-related actions)
-    void do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index);
+    void do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, const CustomPathTableRow2& row);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

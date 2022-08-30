@@ -8,7 +8,7 @@
 #include "DebugDumper.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 

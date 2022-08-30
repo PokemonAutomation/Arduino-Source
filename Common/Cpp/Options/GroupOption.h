@@ -2,12 +2,10 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      "GroupOption::enabled" is thread-safe.
- *
  */
 
-#ifndef PokemonAutomation_GroupOption_H
-#define PokemonAutomation_GroupOption_H
+#ifndef PokemonAutomation_Options_GroupOption_H
+#define PokemonAutomation_Options_GroupOption_H
 
 #include <atomic>
 #include "BatchOption.h"

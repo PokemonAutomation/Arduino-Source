@@ -4,16 +4,10 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/NoWheelComboBox.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Resources/Pokemon_PokeballNames.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Options/Pokemon_BallSelectWidget.h"
-#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_NameDatabase.h"
 #include "PokemonSwSh_EncounterFilterOverride.h"
 
 //#include <iostream>
@@ -34,6 +28,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     : m_rare_stars(rare_stars)
+    , pokemon(COMBINED_DEX_NAMES(), "rookidee")
     , shininess(rare_stars)
 {
     PA_ADD_OPTION(action);
@@ -43,7 +38,7 @@ EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     action.add_listener(*this);
 }
 void EncounterFilterOverride::load_json(const JsonValue& json){
-    EditableTableRow2::load_json(json);
+    EditableTableRow::load_json(json);
 
     //  Parse old format for backwards compatibility.
     const JsonObject* obj = json.get_object();
@@ -69,7 +64,7 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
         shininess.load_json(*value);
     }
 }
-std::unique_ptr<EditableTableRow2> EncounterFilterOverride::clone() const{
+std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride(m_rare_stars));
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
@@ -93,7 +88,7 @@ void EncounterFilterOverride::value_changed(){
 
 
 EncounterFilterTable::EncounterFilterTable(bool rare_stars)
-    : EditableTableOption2(
+    : EditableTableOption(
         rare_stars
             ?   "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names. "
@@ -108,7 +103,7 @@ EncounterFilterTable::EncounterFilterTable(bool rare_stars)
     )
 {}
 std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy_snapshot() const{
-    return EditableTableOption2::copy_snapshot<EncounterFilterOverride>();
+    return EditableTableOption::copy_snapshot<EncounterFilterOverride>();
 }
 std::vector<std::string> EncounterFilterTable::make_header() const{
     return std::vector<std::string>{
@@ -118,8 +113,8 @@ std::vector<std::string> EncounterFilterTable::make_header() const{
         "Shininess",
     };
 }
-std::unique_ptr<EditableTableRow2> EncounterFilterTable::make_row() const{
-    return std::unique_ptr<EditableTableRow2>(new EncounterFilterOverride(m_rare_stars));
+std::unique_ptr<EditableTableRow> EncounterFilterTable::make_row() const{
+    return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(m_rare_stars));
 }
 
 

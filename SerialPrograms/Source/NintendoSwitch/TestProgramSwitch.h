@@ -7,11 +7,10 @@
 #ifndef PokemonAutomation_NintendoSwitch_TestProgram_H
 #define PokemonAutomation_NintendoSwitch_TestProgram_H
 
+#include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

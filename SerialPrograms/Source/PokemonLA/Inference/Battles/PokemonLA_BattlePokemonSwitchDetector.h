@@ -8,7 +8,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 #define PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"

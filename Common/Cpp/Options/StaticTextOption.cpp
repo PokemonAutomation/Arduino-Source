@@ -17,22 +17,27 @@ namespace PokemonAutomation{
 struct StaticTextOption::Data{
     mutable SpinLock m_lock;
     std::string m_text;
+    bool m_text_wrapping;
 
-    Data(std::string text)
+    Data(std::string text, bool text_wrapping)
         : m_text(std::move(text))
+        , m_text_wrapping(text_wrapping)
     {}
 };
 
 
 StaticTextOption::~StaticTextOption() = default;
-StaticTextOption::StaticTextOption(std::string label)
-    : m_data(CONSTRUCT_TOKEN, std::move(label))
+StaticTextOption::StaticTextOption(std::string label, bool text_wrapping)
+    : m_data(CONSTRUCT_TOKEN, std::move(label), text_wrapping)
 {}
 #if 0
 std::unique_ptr<ConfigOption> StaticTextOption::clone() const{
     return std::unique_ptr<ConfigOption>(new StaticTextOption(m_text));
 }
 #endif
+bool StaticTextOption::text_wrapping() const{
+    return m_data->m_text_wrapping;
+}
 std::string StaticTextOption::text() const{
     SpinLockGuard lg(m_data->m_lock);
     return m_data->m_text;
@@ -58,16 +63,21 @@ JsonValue StaticTextOption::to_json() const{
 struct SectionDividerOption::Data{
     mutable SpinLock m_lock;
     std::string m_text;
+    bool m_text_wrapping;
 
-    Data(std::string text)
+    Data(std::string text, bool text_wrapping)
         : m_text(std::move(text))
+        , m_text_wrapping(text_wrapping)
     {}
 };
 
 SectionDividerOption::~SectionDividerOption() = default;
-SectionDividerOption::SectionDividerOption(std::string label)
-    : m_data(CONSTRUCT_TOKEN, std::move(label))
+SectionDividerOption::SectionDividerOption(std::string label, bool text_wrapping)
+    : m_data(CONSTRUCT_TOKEN, std::move(label), text_wrapping)
 {}
+bool SectionDividerOption::text_wrapping() const{
+    return m_data->m_text_wrapping;
+}
 std::string SectionDividerOption::text() const{
     SpinLockGuard lg(m_data->m_lock);
     return m_data->m_text;

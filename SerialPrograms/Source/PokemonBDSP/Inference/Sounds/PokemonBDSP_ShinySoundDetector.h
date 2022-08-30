@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 
 #include <memory>

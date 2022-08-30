@@ -8,7 +8,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "EditableTableOption2.h"
+#include "EditableTableOption.h"
 
 #include <iostream>
 using std::cout;
@@ -17,13 +17,17 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-EditableTableRow2::EditableTableRow2()
+EditableTableRow::EditableTableRow()
     : m_index((size_t)0 - 1)
 {}
-void EditableTableRow2::add_option(ConfigOption& option, std::string serialization_string){
+void EditableTableRow::add_option(ConfigOption& option, std::string serialization_string){
     m_options.emplace_back(std::move(serialization_string), &option);
 }
-void EditableTableRow2::load_json(const JsonValue& json){
+void EditableTableRow::load_json(const JsonValue& json){
+    if (m_options.size() == 1){
+        m_options[0].second->load_json(json);
+        return;
+    }
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
@@ -37,7 +41,10 @@ void EditableTableRow2::load_json(const JsonValue& json){
         }
     }
 }
-JsonValue EditableTableRow2::to_json() const{
+JsonValue EditableTableRow::to_json() const{
+    if (m_options.size() == 1){
+        return m_options[0].second->to_json();
+    }
     JsonObject obj;
     for (auto& item : m_options){
         if (!item.first.empty()){
@@ -46,7 +53,7 @@ JsonValue EditableTableRow2::to_json() const{
     }
     return obj;
 }
-std::string EditableTableRow2::check_validity() const{
+std::string EditableTableRow::check_validity() const{
     for (const auto& item : m_options){
         std::string error = item.second->check_validity();
         if (!error.empty()){
@@ -55,7 +62,7 @@ std::string EditableTableRow2::check_validity() const{
     }
     return std::string();
 }
-std::vector<ConfigOption*> EditableTableRow2::make_cells(){
+std::vector<ConfigOption*> EditableTableRow::make_cells(){
     std::vector<ConfigOption*> ret;
     ret.reserve(m_options.size());
     for (const auto& item : m_options){
@@ -67,34 +74,34 @@ std::vector<ConfigOption*> EditableTableRow2::make_cells(){
 
 
 
-EditableTableOption2::EditableTableOption2(
+EditableTableOption::EditableTableOption(
     std::string label,
-    std::vector<std::unique_ptr<EditableTableRow2>> default_value
+    std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : m_label(std::move(label))
     , m_default(std::move(default_value))
 {
     restore_defaults();
 }
-size_t EditableTableOption2::current_rows() const{
+size_t EditableTableOption::current_rows() const{
     SpinLockGuard lg(m_lock);
     return m_current.size();
 }
-std::vector<std::shared_ptr<EditableTableRow2>> EditableTableOption2::current_refs() const{
+std::vector<std::shared_ptr<EditableTableRow>> EditableTableOption::current_refs() const{
     SpinLockGuard lg(m_lock);
     return m_current;
 }
 
-void EditableTableOption2::load_json(const JsonValue& json){
+void EditableTableOption::load_json(const JsonValue& json){
     const JsonArray* array = json.get_array();
     if (array == nullptr){
         return;
     }
     {
         SpinLockGuard lg(m_lock);
-        std::vector<std::shared_ptr<EditableTableRow2>> table;
+        std::vector<std::shared_ptr<EditableTableRow>> table;
         for (const auto& item : *array){
-            std::unique_ptr<EditableTableRow2> row = make_row();
+            std::unique_ptr<EditableTableRow> row = make_row();
             row->m_seqnum = m_seqnum++;
             row->m_index = table.size();
             table.emplace_back(std::move(row));
@@ -104,18 +111,18 @@ void EditableTableOption2::load_json(const JsonValue& json){
     }
     push_update();
 }
-JsonValue EditableTableOption2::to_json() const{
+JsonValue EditableTableOption::to_json() const{
     SpinLockGuard lg(m_lock);
     JsonArray array;
-    for (const std::shared_ptr<EditableTableRow2>& row : m_current){
+    for (const std::shared_ptr<EditableTableRow>& row : m_current){
         array.push_back(row->to_json());
     }
     return array;
 }
 
-std::string EditableTableOption2::check_validity() const{
+std::string EditableTableOption::check_validity() const{
     SpinLockGuard lg(m_lock);
-    for (const std::shared_ptr<EditableTableRow2>& item : m_current){
+    for (const std::shared_ptr<EditableTableRow>& item : m_current){
         std::string error = item->check_validity();
         if (!error.empty()){
             return error;
@@ -123,11 +130,11 @@ std::string EditableTableOption2::check_validity() const{
     }
     return std::string();
 }
-void EditableTableOption2::restore_defaults(){
+void EditableTableOption::restore_defaults(){
     {
-        std::vector<std::shared_ptr<EditableTableRow2>> tmp;
+        std::vector<std::shared_ptr<EditableTableRow>> tmp;
         SpinLockGuard lg(m_lock);
-        for (const std::unique_ptr<EditableTableRow2>& item : m_default){
+        for (const std::unique_ptr<EditableTableRow>& item : m_default){
             tmp.emplace_back(item->clone());
             tmp.back()->m_seqnum = m_seqnum++;
             tmp.back()->m_index = tmp.size() - 1;
@@ -139,7 +146,7 @@ void EditableTableOption2::restore_defaults(){
 
 
 
-void EditableTableOption2::insert_row(size_t index, std::unique_ptr<EditableTableRow2> row){
+void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTableRow> row){
     {
         SpinLockGuard lg(m_lock);
         index = std::min(index, m_current.size());
@@ -152,7 +159,7 @@ void EditableTableOption2::insert_row(size_t index, std::unique_ptr<EditableTabl
     }
     push_update();
 }
-void EditableTableOption2::clone_row(const EditableTableRow2& row){
+void EditableTableOption::clone_row(const EditableTableRow& row){
     {
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;
@@ -160,7 +167,7 @@ void EditableTableOption2::clone_row(const EditableTableRow2& row){
             cout << "EditableTableOptionCore::clone_row(): Orphaned row" << endl;
             return;
         }
-        std::unique_ptr<EditableTableRow2> new_row = row.clone();
+        std::unique_ptr<EditableTableRow> new_row = row.clone();
         new_row->m_seqnum = m_seqnum++;
         m_current.insert(m_current.begin() + index, std::move(new_row));
         size_t stop = m_current.size();
@@ -170,7 +177,7 @@ void EditableTableOption2::clone_row(const EditableTableRow2& row){
     }
     push_update();
 }
-void EditableTableOption2::remove_row(EditableTableRow2& row){
+void EditableTableOption::remove_row(EditableTableRow& row){
     {
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;

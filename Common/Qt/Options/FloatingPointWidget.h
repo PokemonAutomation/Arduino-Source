@@ -27,11 +27,13 @@ private:
 };
 
 
-class FloatingPointOptionWidget : public QWidget, public ConfigWidget{
+class FloatingPointOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~FloatingPointOptionWidget();
     FloatingPointOptionWidget(QWidget& parent, FloatingPointOption& value);
 
     virtual void update() override;
+    virtual void value_changed() override;
 
 private:
     FloatingPointCellWidget* m_cell;

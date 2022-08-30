@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -89,7 +90,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
 //    PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(PATH);
-    PA_ADD_STATIC(RESET_METHOD);
+    PA_ADD_OPTION(RESET_METHOD);
     PA_ADD_OPTION(TEST_PATH);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
@@ -97,105 +98,121 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 }
 
 
-void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index){
-    const auto& row = PATH.get_action(action_index);
-    console.log("Execute action " + PathAction_NAMES[(size_t)row.action]);
+void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, const CustomPathTableRow2& row){
+    console.log("Execute action " + row.action.current_display());
     switch(row.action){
-        case PathAction::CHANGE_MOUNT:
-        {
-            MountState mountState = MountState::NOTHING;
-            switch(row.mount){
-            case PathMount::WYRDEER:
-                mountState = MountState::WYRDEER_ON;
-                break;
-            case PathMount::URSALUNA:
-                mountState = MountState::URSALUNA_ON;
-                break;
-            case PathMount::BASCULEGION:
-                mountState = MountState::BASCULEGION_ON;
-                break;
-            case PathMount::SNEASLER:
-                mountState = MountState::SNEASLER_ON;
-                break;
-            case PathMount::BRAVIARY:
-                mountState = MountState::BRAVIARY_ON;
-                break;
-            default:
-                break;
-            }
+    case PathAction::CHANGE_MOUNT:
+    {
+        MountState mountState = MountState::NOTHING;
+        switch(row.parameters.mount){
+        case PathMount::WYRDEER:
+            mountState = MountState::WYRDEER_ON;
+            break;
+        case PathMount::URSALUNA:
+            mountState = MountState::URSALUNA_ON;
+            break;
+        case PathMount::BASCULEGION:
+            mountState = MountState::BASCULEGION_ON;
+            break;
+        case PathMount::SNEASLER:
+            mountState = MountState::SNEASLER_ON;
+            break;
+        case PathMount::BRAVIARY:
+            mountState = MountState::BRAVIARY_ON;
+            break;
+        default:
+            break;
+        }
 
-            if (mountState == MountState::NOTHING){
-                dismount(console, context);
-            } else{
-                change_mount(console, context, mountState);
-            }
-            break;
+        if (mountState == MountState::NOTHING){
+            dismount(console, context);
+        } else{
+            change_mount(console, context, mountState);
         }
+        break;
+    }
 #if 0
-        case PathAction::ROTATE_CAMERA:
-        {
-            if (row.camera_turn_ticks > 0){
-                pbf_move_right_joystick(context, 255, 128, uint16_t(row.camera_turn_ticks), 0);
-            } else if (row.camera_turn_ticks < 0){
-                pbf_move_right_joystick(context, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
-            }
-            break;
+    case PathAction::ROTATE_CAMERA:
+    {
+        if (row.camera_turn_ticks > 0){
+            pbf_move_right_joystick(context, 255, 128, uint16_t(row.camera_turn_ticks), 0);
+        } else if (row.camera_turn_ticks < 0){
+            pbf_move_right_joystick(context, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
         }
+        break;
+    }
 #endif
-        case PathAction::MOVE_FORWARD:
-        {
-            switch(row.move_speed){
-            case PathSpeed::NORMAL_SPEED:
-                pbf_move_left_joystick(context, 128, 0, row.move_forward_ticks, 0);
-                break;
-            case PathSpeed::SLOW_SPEED:
-                pbf_move_left_joystick(context, 128, 64, row.move_forward_ticks, 0);
-                break;
-            case PathSpeed::RUN:
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.move_forward_ticks);
-                break;
-            case PathSpeed::DASH:
-                pbf_press_button(context, BUTTON_B, row.move_forward_ticks, 0);
-                break;
-            case PathSpeed::DASH_B_SPAM:
-                pbf_mash_button(context, BUTTON_B, row.move_forward_ticks);
-                break;
-            case PathSpeed::DIVE:
-                pbf_press_button(context, BUTTON_Y, row.move_forward_ticks, 0);
-                break;
-            }
+    case PathAction::MOVE_FORWARD:
+    {
+        switch(row.parameters.move_speed){
+        case PathSpeed::NORMAL_SPEED:
+            pbf_move_left_joystick(context, 128, 0, row.parameters.move_forward_ticks, 0);
+            break;
+        case PathSpeed::SLOW_SPEED:
+            pbf_move_left_joystick(context, 128, 64, row.parameters.move_forward_ticks, 0);
+            break;
+        case PathSpeed::RUN:
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.parameters.move_forward_ticks);
+            break;
+        case PathSpeed::DASH:
+            pbf_press_button(context, BUTTON_B, row.parameters.move_forward_ticks, 0);
+            break;
+        case PathSpeed::DASH_B_SPAM:
+            pbf_mash_button(context, BUTTON_B, row.parameters.move_forward_ticks);
+            break;
+        case PathSpeed::DIVE:
+            pbf_press_button(context, BUTTON_Y, row.parameters.move_forward_ticks, 0);
             break;
         }
-        case PathAction::MOVE_IN_DIRECTION:
-        {
-            uint8_t x = (uint8_t)((row.left_x + 1.0) * 127.5 + 0.5);
-            uint8_t y = (uint8_t)((-row.left_y + 1.0) * 127.5 + 0.5);
-            pbf_move_left_joystick(context, x, y, row.move_forward_ticks, 0);
-            break;
-        }
-        case PathAction::CENTER_CAMERA:
-        {
-            pbf_mash_button(context, BUTTON_ZL, 200);
-            break;
-        }
-        case PathAction::JUMP:
-        {
-            pbf_press_button(context, BUTTON_Y, 10, row.jump_wait_ticks);
-            break;
-        }
-        case PathAction::WAIT:
-        {
-            pbf_wait(context, row.wait_ticks);
-            break;
-        }
-        default:   
-            break;
+        break;
+    }
+    case PathAction::MOVE_IN_DIRECTION:
+    {
+        uint8_t x = (uint8_t)((row.parameters.left_x + 1.0) * 127.5 + 0.5);
+        uint8_t y = (uint8_t)((-row.parameters.left_y + 1.0) * 127.5 + 0.5);
+        pbf_move_left_joystick(context, x, y, row.parameters.move_forward_ticks, 0);
+        break;
+    }
+    case PathAction::CENTER_CAMERA:
+    {
+        pbf_mash_button(context, BUTTON_ZL, 200);
+        break;
+    }
+    case PathAction::JUMP:
+    {
+        pbf_press_button(context, BUTTON_Y, 10, row.parameters.jump_wait_ticks);
+        break;
+    }
+    case PathAction::WAIT:
+    {
+        pbf_wait(context, row.parameters.wait_ticks);
+        break;
+    }
+    default:
+        break;
     } // end switch action
     context.wait_for_all_requests();
 }
 
 
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    std::vector<std::unique_ptr<CustomPathTableRow2>> table = PATH.PATH.copy_snapshot();
+
+    //  Check whether the user has set shiny sound listen action:
+    {
+        bool has_listen_action = false;
+        for (const std::unique_ptr<CustomPathTableRow2>& row : table){
+            if (row->action == PathAction::START_LISTEN){
+                has_listen_action = true;
+                break;
+            }
+        }
+        if (has_listen_action == false){
+            throw UserSetupError(env.console, "No START LISTEN action specified.");
+        }
+    }
+
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     std::atomic<bool> listen_for_shiny(false);
@@ -216,17 +233,16 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            for (size_t action_index = 0; action_index < PATH.num_actions(); action_index++){
-                const auto& row = PATH.get_action(action_index);
-                if (row.action == PathAction::START_LISTEN){
+            for (const std::unique_ptr<CustomPathTableRow2>& row : table){
+                if (row->action == PathAction::START_LISTEN){
                     listen_for_shiny.store(true, std::memory_order_release);
                     continue;
-                }else if (row.action == PathAction::END_LISTEN){
+                }else if (row->action == PathAction::END_LISTEN){
                     listen_for_shiny.store(false, std::memory_order_release);
                     continue;
                 }
 
-                do_non_listen_action(env.console, context, action_index);
+                do_non_listen_action(env.console, context, *row);
                 context.wait_for_all_requests();
             }
         },
@@ -250,20 +266,6 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         env.log("Testing path...");
         run_path(env, context);
         return;
-    }
-
-    //  Check whether the user has set shiny sound listen action:
-    {
-        bool has_listen_action = false;
-        for(size_t i = 0; i < PATH.num_actions(); i++){
-            if (PATH.get_action(i).action == PathAction::START_LISTEN){
-                has_listen_action = true;
-                break;
-            }
-        }
-        if (has_listen_action == false){
-            throw OperationFailedException(env.console, "No START LISTEN action specified.");
-        }
     }
 
     while (true){

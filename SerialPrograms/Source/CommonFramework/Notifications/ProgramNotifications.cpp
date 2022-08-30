@@ -204,7 +204,7 @@ void send_program_telemetry(
 
 #if 0
 void send_program_status_notification(
-    LoggerQt& logger, EventNotificationOption& settings,
+    Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
     const StatsTracker* current_stats,

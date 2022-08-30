@@ -7,11 +7,12 @@
 #ifndef PokemonAutomation_PokemonLA_OutbreakFinder_H
 #define PokemonAutomation_PokemonLA_OutbreakFinder_H
 
+#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonFramework/Options/StringSelectTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_NameListOption.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 
 namespace PokemonAutomation{
@@ -78,15 +79,17 @@ private:
         bool inside_map
     );
 
+    static std::set<std::string> to_set(const StringSelectTableOption& option);
+
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCR LANGUAGE;
 
-    Pokemon::PokemonNameList DESIRED_MO_SLUGS;
-    Pokemon::PokemonNameList DESIRED_MMO_SLUGS;
-    Pokemon::PokemonNameList DESIRED_STAR_MMO_SLUGS;
+    StringSelectTableOption DESIRED_MO_SLUGS;
+    StringSelectTableOption DESIRED_MMO_SLUGS;
+    StringSelectTableOption DESIRED_STAR_MMO_SLUGS;
 
     BooleanCheckBoxOption DEBUG_MODE;
 

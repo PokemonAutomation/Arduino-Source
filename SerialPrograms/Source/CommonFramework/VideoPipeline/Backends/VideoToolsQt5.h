@@ -14,7 +14,7 @@
 #include <QCamera>
 #include <QVideoFrame>
 #include <QCameraImageCapture>
-#include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
