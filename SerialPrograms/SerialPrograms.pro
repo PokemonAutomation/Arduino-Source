@@ -484,6 +484,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.cpp \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapWeatherAndTimeReader.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.cpp \
@@ -1266,6 +1267,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Map/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h \
+    Source/PokemonLA/Inference/Map/PokemonLA_MapWeatherAndTimeReader.h \
     Source/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h \
     Source/PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h \
     Source/PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h \

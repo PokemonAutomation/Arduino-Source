@@ -14,6 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 enum class Weather {
+    NONE = 0,
     SUNNY,
     CLOUDY,
     RAIN,

@@ -57,6 +57,8 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
 
 int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath);
 
+int test_pokemonLA_MapWeatherAndTimeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
+
 }
 
 #endif

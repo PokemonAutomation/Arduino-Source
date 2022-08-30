@@ -26,6 +26,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
+#include "PokemonLA/Inference/Map/PokemonLA_MapWeatherAndTimeReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameSave.h"
@@ -622,6 +623,14 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         return 1;
     }
     count++;
+    
+    return 0;
+}
+
+int test_pokemonLA_MapWeatherAndTimeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    auto& logger = global_logger_command_line();
+    detect_weather_on_map(logger, image);
+    detect_time_of_day_on_map(logger, image);
     
     return 0;
 }
