@@ -4,6 +4,7 @@
  * 
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -154,42 +155,47 @@ namespace PokemonAutomation {
                 pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
                 pbf_press_button(context, BUTTON_B, 10, 70);
 
-                pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_A, 300);
+                pbf_wait(context, 125);
             }
 
             void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport) {
+                pbf_press_button(context, BUTTON_A, 10, 25);
+                if (sport) {
+                    pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+                }
+                pbf_press_button(context, BUTTON_A, 10, 25);
                 pbf_press_button(context, BUTTON_A, 5, 30);
                 if (sport) {
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                    pbf_press_dpad(context, DPAD_UP, 20, 10);
                 }
-                pbf_press_button(context, BUTTON_A, 5, 30);
-                pbf_press_button(context, BUTTON_A, 5, 30);
-                if (sport) {
-                    pbf_press_dpad(context, DPAD_UP, 10, 10);
-                }
-                pbf_press_button(context, BUTTON_A, 5, 30);
+                pbf_press_button(context, BUTTON_A, 10, 25);
 
                 pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
             }
 
-            void CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+            bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
                 // receive ball and refuse to use the cram-o-matic again
                 VideoOverlaySet boxes(env.console);
                 SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
                 arrow_detector.make_overlays(boxes);
                 size_t presses = 0;
                 bool arrow_detected = false;
-                while (presses < 40 && !arrow_detected) {
+                while (presses < 30 && !arrow_detected) {
                     presses++;
                     pbf_press_button(context, BUTTON_B, 10, 165);
                     context.wait_for_all_requests();
 
                     std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+                    if (SAVE_SCREENSHOTS) {
+                        screen->save(now_to_filestring() + ".png");
+                    }
                     if (arrow_detector.detect(*screen)) {
                         arrow_detected = true;
                     }
                 }
                 pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+                return arrow_detected;
             }
 
 
@@ -226,7 +232,11 @@ namespace PokemonAutomation {
                     do_rng_advances(env.console, context, rng, advances);
                     leave_to_overworld_and_interact(env, context);
                     choose_apricorn(env, context, sport);
-                    receive_ball(env, context);
+
+                    bool did_refuse = receive_ball(env, context);
+                    if (!did_refuse) {
+                        is_state_valid = false;
+                    }
 
                     iteration++;
                 }
