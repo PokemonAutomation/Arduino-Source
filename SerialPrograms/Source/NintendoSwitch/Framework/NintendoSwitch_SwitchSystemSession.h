@@ -61,7 +61,6 @@ public:
     CameraSession& camera_session(){ return *m_camera; }
     AudioSession& audio_session(){ return m_audio; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
-    const SwitchSystemOption& option() const{ return m_option;  }
 
 public:
     void set_allow_user_commands(bool allow);
