@@ -75,8 +75,8 @@ public:
     // RMSD_scaled = RMSD_original / (template_stddev * `stddev_coefficient` + `offset`)
     // where template_stddev is the sum of the stddev on all three channels (RGB) of the template.
     struct InverseStddevWeight{
-        double stddev_coefficient;
-        double offset;
+        double stddev_coefficient = 0.0;
+        double offset = 1.0;
     };
 
     WeightedExactImageMatcher(ImageRGB32 image_template, const InverseStddevWeight& weight);

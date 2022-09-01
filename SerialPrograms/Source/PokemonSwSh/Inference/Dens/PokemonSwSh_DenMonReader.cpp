@@ -30,8 +30,10 @@ public:
 public:
     DenSpriteMatcher() = default;
     virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override{
+        // Find the bounding box of the silhouette.
         ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
             image,
+            // The filter is a lambda function that returns true on dark pixels.
             [](Color pixel){
                 return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 100;
             }
