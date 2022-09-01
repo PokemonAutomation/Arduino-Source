@@ -124,7 +124,7 @@ VideoFeed& SwitchSystemWidget::camera(){
     return m_session.camera_session();
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
-    return *m_video_display;
+    return m_session.overlay_session();
 }
 AudioFeed& SwitchSystemWidget::audio(){
     return m_session.audio_session();
