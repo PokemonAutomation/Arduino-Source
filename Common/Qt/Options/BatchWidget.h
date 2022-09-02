@@ -15,11 +15,13 @@ namespace PokemonAutomation{
 
 
 
-class BatchWidget : public QWidget, public ConfigWidget{
+class BatchWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~BatchWidget();
     BatchWidget(QWidget& parent, BatchOption& value);
 
     virtual void update() override;
+    virtual void value_changed() override;
 
 protected:
     BatchOption& m_value;

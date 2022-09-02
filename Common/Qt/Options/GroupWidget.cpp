@@ -19,6 +19,9 @@ ConfigWidget* GroupOption::make_ui(QWidget& parent){
 }
 
 
+GroupWidget::~GroupWidget(){
+    m_value.remove_listener(*this);
+}
 GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -73,6 +76,8 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
             m_value.on_set_enabled(on);
         }
     );
+
+    value.add_listener(*this);
 }
 void GroupWidget::set_options_enabled(bool enabled){
     for (ConfigWidget* item : m_options){
@@ -86,6 +91,11 @@ void GroupWidget::update(){
     for (ConfigWidget* item : m_options){
         item->update();
     }
+}
+void GroupWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
 }
 void GroupWidget::mouseDoubleClickEvent(QMouseEvent* event){
     m_expand_text->setVisible(m_expanded);

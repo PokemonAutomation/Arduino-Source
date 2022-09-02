@@ -11,7 +11,6 @@
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/Qt/Options/GroupWidget.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
@@ -27,13 +26,14 @@ enum class HostingMode{
     HOST_ONLINE,
 };
 
-class HostingSettings : public GroupOption{
+class HostingSettings : public GroupOption, private ConfigOption::Listener{
 public:
+    ~HostingSettings();
     HostingSettings();
     using GroupOption::check_validity;
     std::string check_validity(size_t consoles) const;
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual void value_changed() override;
 
     EnumDropdownOption<HostingMode> MODE;
     RandomCodeOption RAID_CODE;
@@ -42,17 +42,6 @@ public:
     TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
 
     AutoHostNotificationOption NOTIFICATIONS;
-};
-
-class HostingSettingsUI : public GroupWidget, private ConfigOption::Listener{
-public:
-    ~HostingSettingsUI();
-    HostingSettingsUI(QWidget& parent, HostingSettings& value);
-private:
-    void update_option_visibility();
-    virtual void value_changed() override;
-
-    HostingSettings& m_value;
 };
 
 
