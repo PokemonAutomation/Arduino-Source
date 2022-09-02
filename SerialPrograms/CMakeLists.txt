@@ -709,8 +709,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
-    Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp
-    Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp
@@ -744,8 +742,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
-    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp
-    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h
     Source/NintendoSwitch/TestPathMaker.cpp
     Source/NintendoSwitch/TestPathMaker.h
     Source/NintendoSwitch/TestProgramComputer.cpp
@@ -938,6 +934,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
     Source/PokemonHome/PokemonHome_Settings.h
+    Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp
+    Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h
+    Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp
+    Source/PokemonHome/Programs/PokemonHome_PageSwap.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp

@@ -356,7 +356,6 @@ SOURCES += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp \
-    Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -373,7 +372,6 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
-    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
     Source/NintendoSwitch/TestPathMaker.cpp \
     Source/NintendoSwitch/TestProgramComputer.cpp \
     Source/NintendoSwitch/TestProgramSwitch.cpp \
@@ -467,6 +465,8 @@ SOURCES += \
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp \
     Source/PokemonHome/PokemonHome_Panels.cpp \
     Source/PokemonHome/PokemonHome_Settings.cpp \
+    Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp \
+    Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
@@ -1120,7 +1120,6 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
-    Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
@@ -1138,7 +1137,6 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
-    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
     Source/NintendoSwitch/TestPathMaker.h \
     Source/NintendoSwitch/TestProgramComputer.h \
     Source/NintendoSwitch/TestProgramSwitch.h \
@@ -1236,6 +1234,8 @@ HEADERS += \
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h \
     Source/PokemonHome/PokemonHome_Panels.h \
     Source/PokemonHome/PokemonHome_Settings.h \
+    Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h \
+    Source/PokemonHome/Programs/PokemonHome_PageSwap.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
