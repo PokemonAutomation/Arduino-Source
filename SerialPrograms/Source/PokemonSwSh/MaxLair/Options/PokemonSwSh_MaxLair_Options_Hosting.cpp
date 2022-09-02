@@ -14,6 +14,9 @@ namespace MaxLairInternal{
 
 
 
+HostingSettings::~HostingSettings(){
+    MODE.remove_listener(*this);
+}
 HostingSettings::HostingSettings()
     : GroupOption("Hosting Options")
     , MODE(
@@ -57,6 +60,8 @@ HostingSettings::HostingSettings()
     PA_ADD_OPTION(START_DELAY);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    MODE.add_listener(*this);
 }
 std::string HostingSettings::check_validity(size_t consoles) const{
     if (consoles != 1 && !RAID_CODE.code_enabled()){
@@ -64,40 +69,20 @@ std::string HostingSettings::check_validity(size_t consoles) const{
     }
     return std::string();
 }
-ConfigWidget* HostingSettings::make_ui(QWidget& parent){
-    return new HostingSettingsUI(parent, *this);
-}
-
-HostingSettingsUI::~HostingSettingsUI(){
-    m_value.MODE.remove_listener(*this);
-}
-HostingSettingsUI::HostingSettingsUI(QWidget& parent, HostingSettings& value)
-    : GroupWidget(parent, value)
-    , m_value(value)
-{
-    update_option_visibility();
-    m_value.MODE.add_listener(*this);
-}
-void HostingSettingsUI::update_option_visibility(){
-    HostingSettings& value = static_cast<HostingSettings&>(m_value);
-    if (value.MODE == HostingMode::HOST_ONLINE){
-        value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);
+void HostingSettings::value_changed(){
+    HostingMode mode = MODE;
+    if (mode == HostingMode::HOST_ONLINE){
+        CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        value.CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::DISABLED);
+        CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::DISABLED);
     }
-    if (value.MODE != HostingMode::NOT_HOSTING){
-        value.START_DELAY.set_visibility(ConfigOptionState::ENABLED);
-        value.NOTIFICATIONS.set_visibility(ConfigOptionState::ENABLED);
+    if (mode != HostingMode::NOT_HOSTING){
+        START_DELAY.set_visibility(ConfigOptionState::ENABLED);
+        NOTIFICATIONS.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        value.START_DELAY.set_visibility(ConfigOptionState::DISABLED);
-        value.NOTIFICATIONS.set_visibility(ConfigOptionState::DISABLED);
+        START_DELAY.set_visibility(ConfigOptionState::DISABLED);
+        NOTIFICATIONS.set_visibility(ConfigOptionState::DISABLED);
     }
-}
-void HostingSettingsUI::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
-        update_option_visibility();
-        this->update();
-    }, Qt::QueuedConnection);
 }
 
 

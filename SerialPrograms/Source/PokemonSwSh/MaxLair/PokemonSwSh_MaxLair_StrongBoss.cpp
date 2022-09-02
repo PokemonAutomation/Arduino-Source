@@ -14,6 +14,10 @@
 #include "Program/PokemonSwSh_MaxLair_Run_Adventure.h"
 #include "PokemonSwSh_MaxLair_StrongBoss.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -39,11 +43,8 @@ std::unique_ptr<StatsTracker> MaxLairStrongBoss_Descriptor::make_stats() const{
 
 class MaxLairStrongBoss_ConsoleOptions : public ConsoleSpecificOptions{
 public:
-    MaxLairStrongBoss_ConsoleOptions(
-        std::string label,
-        const LanguageSet& languages
-    )
-        : ConsoleSpecificOptions(std::move(label), languages)
+    MaxLairStrongBoss_ConsoleOptions(std::string label, const LanguageSet& languages, bool host)
+        : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball("<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".", "poke-ball")
         , boss_ball("<b>Boss Ball:</b> Ball for catching the boss/legendary " + STRING_POKEMON + ".", "poke-ball")
         , actions_non_host(false, false)
@@ -54,6 +55,11 @@ public:
             CaughtScreenAction::STOP_PROGRAM
         )
     {
+        if (host){
+            actions_non_host.set_visibility(ConfigOptionState::HIDDEN);
+        }else{
+            actions_host.set_visibility(ConfigOptionState::ENABLED);
+        }
         PA_ADD_OPTION(normal_ball);
         PA_ADD_OPTION(boss_ball);
         PA_ADD_OPTION(actions_non_host);
@@ -81,8 +87,8 @@ public:
 };
 class MaxLairStrongBoss_ConsoleFactory : public ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const override{
-        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairStrongBoss_ConsoleOptions(std::move(label), languages));
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages, bool is_host) const override{
+        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairStrongBoss_ConsoleOptions(std::move(label), languages, is_host));
     }
 };
 

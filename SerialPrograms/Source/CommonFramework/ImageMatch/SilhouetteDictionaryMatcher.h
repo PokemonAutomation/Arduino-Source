@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
+// Match silhouette to several templates.
 class SilhouetteDictionaryMatcher{
 public:
     SilhouetteDictionaryMatcher(SilhouetteDictionaryMatcher&&) = default;

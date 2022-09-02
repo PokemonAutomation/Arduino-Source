@@ -9,6 +9,10 @@
 
 #include "PokemonHome_Settings.h"
 
+#include "Programs/PokemonHome_PageSwap.h"
+
+#include "Programs/PokemonHome_GenerateNameOCR.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
@@ -22,6 +26,7 @@ std::vector<PanelEntry> make_panels(){
 //    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
 //    ret.emplace_back("---- General ----");
+    ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
 
 //    ret.emplace_back("---- Trading ----");
 
@@ -30,7 +35,8 @@ std::vector<PanelEntry> make_panels(){
 //    ret.emplace_back("---- Shiny Hunting ----");
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>());
     }
 
     return ret;

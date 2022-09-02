@@ -17,13 +17,15 @@ namespace PokemonAutomation{
 
 
 
-class GroupWidget : public QWidget, public ConfigWidget{
+class GroupWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~GroupWidget();
     GroupWidget(QWidget& parent, GroupOption& value);
 
     void set_options_enabled(bool enabled);
 
     virtual void update() override;
+    virtual void value_changed() override;
 
 private:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;

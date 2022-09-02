@@ -7,9 +7,11 @@
 #include <QKeyEvent>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QFileDialog>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
@@ -99,6 +101,38 @@ SwitchSystemWidget::SwitchSystemWidget(
         }
     );
     connect(
+        m_command, &CommandRow::load_profile,
+        m_command, [=](){
+            std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file")).toStdString();
+            if (path.empty()){
+                return;
+            }
+
+            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+
+            //  Deserialize into this local option instance.
+            option.load_json(load_json_file(path));
+
+            m_session.set(option);
+        }
+    );
+    connect(
+        m_command, &CommandRow::save_profile,
+        m_command, [=]() {
+            std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file")).toStdString();
+            if (path.empty()) {
+                return;
+            }
+
+            // Create a copy of option, to be able to serialize it later on
+            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+
+            m_session.get(option);
+
+            option.to_json().dump(path);
+        }
+    );
+    connect(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [=](){
             global_dispatcher.dispatch([=]{
@@ -124,7 +158,7 @@ VideoFeed& SwitchSystemWidget::camera(){
     return m_session.camera_session();
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
-    return *m_video_display;
+    return m_session.overlay_session();
 }
 AudioFeed& SwitchSystemWidget::audio(){
     return m_session.audio_session();

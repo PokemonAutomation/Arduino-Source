@@ -47,6 +47,13 @@ public:
     AudioDisplayType display_type() const{ return m_display_type; }
     double volume() const{ return m_volume; }
 
+//    void set_input_file(std::string&& value){ m_input_file = std::move(value); }
+//    void set_input_device(AudioDeviceInfo&& value){ m_input_device = std::move(value); }
+//    void set_input_format(AudioChannelFormat value){ m_input_format = value; }
+//    void set_output_device(AudioDeviceInfo&& value){ m_output_device = std::move(value); }
+//    void set_volume(double value){ m_volume = value; }
+//    void set_display_type(AudioDisplayType value){ m_display_type = value; }
+
 public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;

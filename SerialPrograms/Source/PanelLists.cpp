@@ -25,14 +25,6 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-const std::string JSON_TAB = "ProgramTab";
-const std::array<std::string, 4> JSON_TAB_NAMES = {
-    "Switch",
-    "SwSh",
-    "BDSP",
-    "LA"
-};
-
 
 ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     : QTabWidget(&parent)
@@ -43,7 +35,7 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     ));
     add(new PanelList(*this, holder,
         "Home", Pokemon::STRING_POKEMON + " Home",
-        NintendoSwitch::PokemonSV::make_panels()
+        NintendoSwitch::PokemonHome::make_panels()
     ));
     add(new PanelList(*this, holder,
         "SwSh", Pokemon::STRING_POKEMON + " Sword and Shield",
@@ -63,23 +55,22 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     ));
 
     connect(this, &ProgramTabs::currentChanged, this, [&](int index){
-        if (index >= 0 && (size_t)index < JSON_TAB_NAMES.size()){
-            PERSISTENT_SETTINGS().panels[JSON_TAB] = JSON_TAB_NAMES[index];
+        if (index >= 0 && (size_t)index < m_lists.size()){
+            PERSISTENT_SETTINGS().panels["ProgramTab"] = m_lists[index]->label();
         }
     });
 }
 
 void ProgramTabs::load_persistent_panel(){
-    const std::string* str = PERSISTENT_SETTINGS().panels.get_string(JSON_TAB);
+    const std::string* str = PERSISTENT_SETTINGS().panels.get_string("ProgramTab");
     if (str == nullptr){
         return;
     }
-    for(size_t i = 0; i < JSON_TAB_NAMES.size(); i++){
-        if (*str == JSON_TAB_NAMES[i]){
-            setCurrentIndex((int)i);
-            break;
-        }
+    auto iter = m_tab_map.find(*str);
+    if (iter == m_tab_map.end()){
+        return;
     }
+    setCurrentIndex(iter->second);
     str = PERSISTENT_SETTINGS().panels.get_string(PanelList::JSON_PROGRAM_PANEL);
     if (str != nullptr){
         m_lists[currentIndex()]->set_panel(*str);
@@ -87,12 +78,17 @@ void ProgramTabs::load_persistent_panel(){
 }
 
 void ProgramTabs::add(PanelList* list){
+    int index = count();
     addTab(list, QString::fromStdString(list->label()));
-    setTabToolTip(count() - 1, QString::fromStdString(list->description()));
+    setTabToolTip(index, QString::fromStdString(list->description()));
     if (list->items() == 0){
         setTabEnabled((int)m_lists.size(), false);
     }
     m_lists.emplace_back(list);
+    if (!m_tab_map.emplace(list->label(), index).second){
+        m_lists.pop_back();
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Tab Name: " + list->label());
+    }
 }
 
 QSize ProgramTabs::sizeHint() const{

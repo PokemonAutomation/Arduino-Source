@@ -209,7 +209,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     if (error.empty()){
         m_state.store(State::CONNECTING, std::memory_order_release);
         m_label = "<font color=\"green\">Connecting...</font>";
-        emit on_connecting();
+        emit on_connecting(name);
     }else{
         m_label = html_color_text("Unable to open port.", COLOR_RED);
         emit on_not_connected(m_label);

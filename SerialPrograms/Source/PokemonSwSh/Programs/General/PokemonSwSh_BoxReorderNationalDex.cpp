@@ -34,14 +34,14 @@ constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::millisecond
 
 // A location can be represented as a uint16_t, meaning the order of the location starting at the first box.
 // This function decodes this location into box ID and in-box 2D location.
-std::tuple<uint16_t, uint16_t, uint16_t> get_location(uint16_t index){
-    uint16_t box = index / 30;
+std::tuple<uint16_t, uint16_t, uint16_t> get_location(size_t index){
+    uint16_t box = (uint16_t)(index / 30);
     index = index % 30;
 
-    uint16_t row = index / 6;
+    uint16_t row = (uint16_t)(index / 6);
     index = index % 6;
 
-    uint16_t column = index;
+    uint16_t column = (uint16_t)(index);
     return { box, row, column };
 }
 

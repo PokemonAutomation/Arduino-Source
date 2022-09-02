@@ -40,8 +40,8 @@ std::unique_ptr<StatsTracker> MaxLairBossFinder_Descriptor::make_stats() const{
 
 class MaxLairBossFinder_ConsoleOptions : public ConsoleSpecificOptions{
 public:
-    MaxLairBossFinder_ConsoleOptions(std::string label, const LanguageSet& languages)
-        : ConsoleSpecificOptions(std::move(label), languages)
+    MaxLairBossFinder_ConsoleOptions(std::string label, const LanguageSet& languages, bool host)
+        : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball("<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".", "poke-ball")
     {
         PA_ADD_OPTION(normal_ball);
@@ -52,8 +52,12 @@ public:
 
 class MaxLairBossFinder_ConsoleFactory : public ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const override{
-        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairBossFinder_ConsoleOptions(std::move(label), languages));
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(
+        std::string label,
+        const LanguageSet& languages,
+        bool host
+    ) const override{
+        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairBossFinder_ConsoleOptions(std::move(label), languages, host));
     }
 };
 

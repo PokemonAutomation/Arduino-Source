@@ -16,20 +16,23 @@
 
 namespace PokemonAutomation{
 
+struct OverlayText;
 
 class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener{
 public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
-    //  Add/remove inference boxes.
-    void add_box(const ImageFloatBox& box, Color color);
-    void remove_box(const ImageFloatBox& box);
-
     void update_size(const QSize& widget_size, const QSize& video_size);
 
 private:
+    // Override VideoOverlaySession::Listener::box_update().
+    // This function is called asynchronously when there is change of boxes in VideoOverlaySession.
     virtual void box_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
+    // Override VideoOverlaySession::Listener::box_update().
+    // This function is called asynchronously when there is change of boxes in VideoOverlaySession.
+    virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
+
     virtual void paintEvent(QPaintEvent*) override;
 
 private:
@@ -42,6 +45,7 @@ private:
 
     SpinLock m_lock;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;
+    std::shared_ptr<const std::vector<OverlayText>> m_texts;
 };
 
 

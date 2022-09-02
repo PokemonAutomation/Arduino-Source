@@ -58,6 +58,9 @@ public:
     virtual ~CameraSession();
     CameraSession(Logger& logger, Resolution default_resolution);
 
+    virtual void get(CameraOption& option) override;
+    virtual void set(const CameraOption& option) override;
+
     virtual void reset() override;
     virtual void set_source(CameraInfo device) override;
     virtual void set_resolution(Resolution resolution) override;

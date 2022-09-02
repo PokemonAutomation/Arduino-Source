@@ -12,7 +12,6 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Language.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
@@ -50,13 +49,11 @@ public:
 
 
 
-class ConsoleSpecificOptions : public GroupOption, private ConfigOption::Listener{
+class ConsoleSpecificOptions : public GroupOption{
 public:
-    ConsoleSpecificOptions(std::string label, const LanguageSet& languages);
+    ConsoleSpecificOptions(std::string label, const LanguageSet& languages, bool host);
 
     virtual void set_host(bool is_host);
-    virtual void value_changed() override{}
-
 
 
     bool is_host;
@@ -65,13 +62,18 @@ public:
 };
 class ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const = 0;
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(
+        std::string label,
+        const LanguageSet& languages,
+        bool is_host
+    ) const = 0;
 };
 
 
 
-class Consoles : public BatchOption{
+class Consoles : public BatchOption, private ConfigOption::Listener{
 public:
+    ~Consoles();
     Consoles(const ConsoleSpecificOptionsFactory& factory);
 
     size_t active_consoles() const;
@@ -81,7 +83,7 @@ public:
         return *PLAYERS[index];
     }
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual void value_changed() override;
 
 private:
     LanguageSet m_languages;
@@ -89,15 +91,6 @@ private:
 public:
     HostingSwitch HOST;
     std::unique_ptr<ConsoleSpecificOptions> PLAYERS[4];
-};
-class ConsolesUI final : public BatchWidget, private ConfigOption::Listener{
-public:
-    ~ConsolesUI();
-    ConsolesUI(QWidget& parent, Consoles& value);
-    virtual void update() override;
-    virtual void value_changed() override;
-private:
-    Consoles& m_value;
 };
 
 

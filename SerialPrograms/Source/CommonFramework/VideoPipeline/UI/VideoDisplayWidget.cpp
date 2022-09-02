@@ -27,14 +27,6 @@ VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& camera, V
 
 
 
-void VideoDisplayWidget::add_box(const ImageFloatBox& box, Color color){
-    m_overlay->add_box(box, color);
-}
-void VideoDisplayWidget::remove_box(const ImageFloatBox& box){
-    m_overlay->remove_box(box);
-}
-
-
 
 void VideoDisplayWidget::update_size(Resolution resolution){
     if (m_video == nullptr){

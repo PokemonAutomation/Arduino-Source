@@ -5,6 +5,7 @@
  */
 
 #include <QPainter>
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "VideoOverlayWidget.h"
 
 #include <iostream>
@@ -26,20 +27,14 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     : QWidget(&parent)
     , m_session(session)
     , m_offset_x(0)
-    , m_boxes(new std::vector<VideoOverlaySession::Box>(session.boxes()))
+    , m_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
+    , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
 //    m_boxes.insert(&ENTIRE_VIDEO);
     m_session.add_listener(*this);
-}
-
-void VideoOverlayWidget::add_box(const ImageFloatBox& box, Color color){
-    m_session.add_box(box, color);
-}
-void VideoOverlayWidget::remove_box(const ImageFloatBox& box){
-    m_session.remove_box(box);
 }
 
 void VideoOverlayWidget::update_size(const QSize& widget_size, const QSize& video_size){
@@ -61,6 +56,11 @@ void VideoOverlayWidget::update_size(const QSize& widget_size, const QSize& vide
 void VideoOverlayWidget::box_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes){
     SpinLockGuard lg(m_lock, "VideoOverlay::box_update()");
     m_boxes = boxes;
+}
+
+void VideoOverlayWidget::text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){
+    SpinLockGuard lg(m_lock, "VideoOverlay::text_update()");
+    m_texts = texts;
 }
 
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
@@ -100,6 +100,18 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
             xmax - xmin,
             ymax - ymin
         );
+    }
+
+    for (const auto& item: *m_texts){
+        painter.setPen(QColor((uint32_t)item.color));
+        QFont text_font = this->font();
+        text_font.setPointSizeF(item.font_size);
+        painter.setFont(text_font);
+
+        const int xmin = std::max((int)(width * item.x + 0.5), 1) + m_offset_x;
+        const int ymin = std::max((int)(height * item.y + 0.5), 1);
+
+        painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
     }
 }
 

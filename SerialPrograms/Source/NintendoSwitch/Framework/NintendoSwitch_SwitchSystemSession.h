@@ -46,6 +46,7 @@ public:
     );
 
 public:
+    PABotBaseLevel min_pabotbase() const{ return m_serial.min_pabotbase(); }
     size_t console_number() const{ return m_console_number; }
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 
@@ -56,6 +57,9 @@ public:
     VideoOverlay& overlay(){ return m_overlay; }
 
 public:
+    void get(SwitchSystemOption& option);
+    void set(const SwitchSystemOption& option);
+
     SerialPortSession& serial_session(){ return m_serial; }
     CameraSession& camera_session(){ return *m_camera; }
     AudioSession& audio_session(){ return m_audio; }

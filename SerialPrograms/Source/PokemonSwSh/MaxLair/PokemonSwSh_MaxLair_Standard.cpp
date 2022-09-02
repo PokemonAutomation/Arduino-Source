@@ -47,9 +47,10 @@ class MaxLairStandard_ConsoleOptions : public ConsoleSpecificOptions{
 public:
     MaxLairStandard_ConsoleOptions(
         std::string label,
-        const LanguageSet& languages
+        const LanguageSet& languages,
+        bool host
     )
-        : ConsoleSpecificOptions(std::move(label), languages)
+        : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball("<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".", "poke-ball")
         , boss_ball("<b>Boss Ball:</b> Ball for catching the boss/legendary " + STRING_POKEMON + ".", "poke-ball")
         , actions(true, false)
@@ -65,8 +66,12 @@ public:
 };
 class MaxLairStandard_ConsoleFactory : public ConsoleSpecificOptionsFactory{
 public:
-    virtual std::unique_ptr<ConsoleSpecificOptions> make(std::string label, const LanguageSet& languages) const override{
-        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairStandard_ConsoleOptions(std::move(label), languages));
+    virtual std::unique_ptr<ConsoleSpecificOptions> make(
+        std::string label,
+        const LanguageSet& languages,
+        bool is_host
+    ) const override{
+        return std::unique_ptr<ConsoleSpecificOptions>(new MaxLairStandard_ConsoleOptions(std::move(label), languages, is_host));
     }
 };
 

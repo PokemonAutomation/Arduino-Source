@@ -7,12 +7,9 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 #define PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 
-#include <functional>
 #include <deque>
 #include <set>
 #include "Common/Cpp/ImageResolution.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
@@ -24,7 +21,7 @@ namespace PokemonAutomation{
 //  content to visualize inferences when running programs.
 //  The VideoWidget is assigned by calling VideoDisplayWidget::set_video().
 //  This function is called by CameraSelectorWidget.
-class VideoDisplayWidget : public QWidget, public VideoOverlay{
+class VideoDisplayWidget : public QWidget{
 public:
     VideoDisplayWidget(QWidget& parent, CameraSession& camera, VideoOverlaySession& overlay);
 
@@ -34,9 +31,6 @@ public:
     void update_size(Resolution resolution = Resolution());
 
 private:
-    virtual void add_box(const ImageFloatBox& box, Color color) override;
-    virtual void remove_box(const ImageFloatBox& box) override;
-
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:

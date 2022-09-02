@@ -45,6 +45,9 @@ public:
     ~AudioSession();
     AudioSession(Logger& logger, AudioOption& option);
 
+    void get(AudioOption& option);
+    void set(const AudioOption& option);
+
     std::pair<std::string, AudioDeviceInfo> input_device() const;
     AudioChannelFormat input_format() const;
 

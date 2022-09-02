@@ -37,6 +37,17 @@ SwitchSystemSession::SwitchSystemSession(
     m_console_id = ProgramTracker::instance().add_console(program_id, *this);
 }
 
+void SwitchSystemSession::get(SwitchSystemOption& option){
+    option.m_serial.set_port(*m_serial.option().port());
+    m_camera->get(option.m_camera);
+    m_audio.get(option.m_audio);
+}
+void SwitchSystemSession::set(const SwitchSystemOption& option){
+    m_serial.botbase().reset(option.m_serial.port());
+    m_camera->set(option.m_camera);
+    m_audio.set(option.m_audio);
+}
+
 void SwitchSystemSession::set_allow_user_commands(bool allow){
     m_serial.botbase().set_allow_user_commands(allow);
 }

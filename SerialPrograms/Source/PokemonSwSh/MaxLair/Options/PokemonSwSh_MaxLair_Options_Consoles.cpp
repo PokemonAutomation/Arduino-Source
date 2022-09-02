@@ -85,11 +85,12 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
 
 
 
-ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const LanguageSet& languages)
+ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const LanguageSet& languages, bool host)
     : GroupOption(std::move(label))
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
     , language("<b>Game Language:</b>", languages, true)
 {
+    ConsoleSpecificOptions::set_host(host);
     PA_ADD_STATIC(is_host_label);
     PA_ADD_OPTION(language);
 }
@@ -102,13 +103,16 @@ void ConsoleSpecificOptions::set_host(bool is_host){
 
 
 
+Consoles::~Consoles(){
+    HOST.remove_listener(*this);
+}
 Consoles::Consoles(const ConsoleSpecificOptionsFactory& factory)
     : m_languages(PokemonNameReader::instance().languages())
 {
-    PLAYERS[0] = factory.make("Switch 0 (Top Left)", m_languages);
-    PLAYERS[1] = factory.make("Switch 1 (Top Right)", m_languages);
-    PLAYERS[2] = factory.make("Switch 2 (Bottom Left)", m_languages);
-    PLAYERS[3] = factory.make("Switch 3 (Bottom Right)", m_languages);
+    PLAYERS[0] = factory.make("Switch 0 (Top Left)", m_languages, true);
+    PLAYERS[1] = factory.make("Switch 1 (Top Right)", m_languages, false);
+    PLAYERS[2] = factory.make("Switch 2 (Bottom Left)", m_languages, false);
+    PLAYERS[3] = factory.make("Switch 3 (Bottom Right)", m_languages, false);
 
     PA_ADD_OPTION(HOST);
     add_option(*PLAYERS[0], "Console0");
@@ -117,6 +121,8 @@ Consoles::Consoles(const ConsoleSpecificOptionsFactory& factory)
     add_option(*PLAYERS[3], "Console3");
 
     set_active_consoles(1);
+
+    HOST.add_listener(*this);
 }
 size_t Consoles::active_consoles() const{
     return m_active_consoles;
@@ -132,33 +138,11 @@ void Consoles::set_active_consoles(size_t consoles){
     }
     m_active_consoles = consoles;
 }
-ConfigWidget* Consoles::make_ui(QWidget& parent){
-    return new ConsolesUI(parent, *this);
-}
-ConsolesUI::~ConsolesUI(){
-    m_value.HOST.remove_listener(*this);
-    m_value.remove_listener(*this);
-}
-ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
-    : BatchWidget(parent, value)
-    , m_value(value)
-{
-    ConsolesUI::update();
-    value.add_listener(*this);
-    value.HOST.add_listener(*this);
-}
-void ConsolesUI::update(){
-    BatchWidget::update();
-
-    size_t host_index = m_value.HOST.current_value();
+void Consoles::value_changed(){
+    size_t host_index = HOST.current_value();
     for (size_t c = 0; c < 4; c++){
-        m_value.PLAYERS[c]->set_host(c == host_index);
+        PLAYERS[c]->set_host(c == host_index);
     }
-}
-void ConsolesUI::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
-        update();
-    }, Qt::QueuedConnection);
 }
 
 

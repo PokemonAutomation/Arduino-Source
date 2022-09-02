@@ -17,6 +17,10 @@ ConfigWidget* BatchOption::make_ui(QWidget& parent){
 }
 
 
+
+BatchWidget::~BatchWidget(){
+    m_value.remove_listener(*this);
+}
 BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -42,12 +46,19 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
         }
         options_layout->addWidget(&m_options.back()->widget(), 0);
     }
+
+    value.add_listener(*this);
 }
 void BatchWidget::update(){
     ConfigWidget::update();
     for (ConfigWidget* item : m_options){
         item->update();
     }
+}
+void BatchWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        update();
+    }, Qt::QueuedConnection);
 }
 
 

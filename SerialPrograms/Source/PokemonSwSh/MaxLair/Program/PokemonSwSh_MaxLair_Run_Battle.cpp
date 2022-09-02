@@ -357,7 +357,7 @@ StateMachineAction throw_balls(
         : runtime.consoles[console_index].normal_balls;
 
     stat.update_with_ocr(balls, boss ? -1 : 1);
-    stat.quantity = std::max(stat.quantity - 1, 0);
+    stat.quantity = (uint16_t)std::max((int)stat.quantity - 1, 0);
 
     return StateMachineAction::KEEP_GOING;
 }

@@ -30,12 +30,12 @@ namespace PokemonAutomation{
 
 
 
-class EventNotificationsTableWidget : public QWidget, public ConfigWidget{
+class EventNotificationsTableWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
 public:
+    ~EventNotificationsTableWidget();
     EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value);
 
-    virtual void restore_defaults();
-    virtual void update_ui();
+    virtual void value_changed() override;
 
 private:
     void redraw_table();
@@ -87,6 +87,7 @@ void EventNotificationsTable::restore_defaults(){
     for (EventNotificationOption* option : m_options){
         option->restore_defaults();
     }
+    ConfigOption::push_update();
 }
 void EventNotificationsTable::reset_state(){
     for (EventNotificationOption* option : m_options){
@@ -105,6 +106,9 @@ void EventNotificationsTable::set_enabled(bool enabled){
 
 
 
+EventNotificationsTableWidget::~EventNotificationsTableWidget(){
+    m_value.remove_listener(*this);
+}
 EventNotificationsTableWidget::EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -128,13 +132,13 @@ EventNotificationsTableWidget::EventNotificationsTableWidget(QWidget& parent, Ev
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
     redraw_table();
+
+    value.add_listener(*this);
 }
-void EventNotificationsTableWidget::restore_defaults(){
-    m_value.restore_defaults();
-    update_ui();
-}
-void EventNotificationsTableWidget::update_ui(){
-    redraw_table();
+void EventNotificationsTableWidget::value_changed(){
+    QMetaObject::invokeMethod(this, [=]{
+        redraw_table();
+    }, Qt::QueuedConnection);
 }
 
 void EventNotificationsTableWidget::redraw_table(){
