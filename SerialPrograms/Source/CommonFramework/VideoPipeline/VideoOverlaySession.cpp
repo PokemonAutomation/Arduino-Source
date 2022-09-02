@@ -78,7 +78,7 @@ void VideoOverlaySession::remove_text(const OverlayText& text){
 }
 
 void VideoOverlaySession::add_shell_text(std::string message, Color color){
-    const float x = 0.03;
+    const float x = 0.03f;
     const size_t max_lines = 20;
     const float font_size = 30.0f;
 
@@ -88,10 +88,10 @@ void VideoOverlaySession::add_shell_text(std::string message, Color color){
         m_shell_texts.pop_back();
     }
 
-    float y = 0.95;
+    float y = 0.95f;
     for(auto& item : m_shell_texts){
         item.y = y;
-        y -= 0.04;
+        y -= 0.04f;
     }
     
     push_text_update();
