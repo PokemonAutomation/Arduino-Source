@@ -27,6 +27,7 @@ private:
 
 private:
     std::vector<PanelList*> m_lists;
+    std::map<std::string, int> m_tab_map;
 };
 
 
