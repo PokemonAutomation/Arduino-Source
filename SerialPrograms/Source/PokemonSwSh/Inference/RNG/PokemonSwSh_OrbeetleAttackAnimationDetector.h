@@ -14,33 +14,35 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation {
-    class BotBaseContext;
-    class ProgramEnvironment;
-    namespace NintendoSwitch {
-        namespace PokemonSwSh {
+class BotBaseContext;
+class ProgramEnvironment;
+namespace NintendoSwitch {
+namespace PokemonSwSh {
 
 
-            class OrbeetleAttackAnimationDetector {
-            public:
-                enum Detection {
-                    NO_DETECTION,
-                    SPECIAL,
-                    PHYSICAL,
-                };
+class OrbeetleAttackAnimationDetector {
+public:
+    enum Detection {
+        NO_DETECTION,
+        SPECIAL,
+        PHYSICAL,
+    };
 
-            public:
-                OrbeetleAttackAnimationDetector(ConsoleHandle& console, BotBaseContext& context);
+public:
+    OrbeetleAttackAnimationDetector(ConsoleHandle& console, BotBaseContext& context);
 
-                Detection run(bool save_screenshot, bool log_values);
+    Detection run(bool save_screenshot, bool log_values);
 
 
-            private:
-                ConsoleHandle& m_console;
-                BotBaseContext& m_context;
-                InferenceBoxScope m_box;
-            };
+private:
+    ConsoleHandle& m_console;
+    BotBaseContext& m_context;
+    InferenceBoxScope m_box;
+};
 
-        }
-    }
+
+
+}
+}
 }
 #endif
