@@ -48,7 +48,7 @@ namespace PokemonSwSh {
          m_context.wait_for_all_requests();
 
 
-         //  Grab the  image.
+         //  Grab the animation image.
          std::shared_ptr<const ImageRGB32> animation_image = m_console.video().snapshot();
          if (!*animation_image) {
              m_console.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);

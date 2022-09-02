@@ -74,8 +74,8 @@ namespace PokemonAutomation {
                 }
                 OrbeetleAttackAnimationDetector detector(console, context);
                 size_t possible_indices = SIZE_MAX;
-                std::vector<bool> seq = {};
-                std::vector<bool> last_bit_seq = rng.generate_last_bit_sequence(max_advances - min_advances);
+                std::vector<bool> sequence = {};
+                std::vector<bool> last_bit_sequence = rng.generate_last_bit_sequence(max_advances - min_advances);
                 size_t distance = 0;
 
                 while (possible_indices > 1) {
@@ -87,31 +87,31 @@ namespace PokemonAutomation {
                         throw OperationFailedException(console, "Attack animation could not be detected.");
                         break;
                     case OrbeetleAttackAnimationDetector::SPECIAL:
-                        seq.emplace_back(true);
+                        sequence.emplace_back(true);
                         break;
                     case OrbeetleAttackAnimationDetector::PHYSICAL:
-                        seq.emplace_back(false);
+                        sequence.emplace_back(false);
                         break;
                     }
                     pbf_wait(context, 180);
 
-                    std::vector<bool>::iterator last_bit_start = std::search(last_bit_seq.begin(), last_bit_seq.end(), seq.begin(), seq.end());
+                    std::vector<bool>::iterator last_bit_start = std::search(last_bit_sequence.begin(), last_bit_sequence.end(), sequence.begin(), sequence.end());
                     possible_indices = 0;
                     distance = 0;
-                    while (last_bit_start != last_bit_seq.end()) {
+                    while (last_bit_start != last_bit_sequence.end()) {
                         possible_indices++;
-                        distance = std::distance(last_bit_seq.begin(), last_bit_start);
+                        distance = std::distance(last_bit_sequence.begin(), last_bit_start);
 
                         last_bit_start++;
-                        last_bit_start = std::search(last_bit_start, last_bit_seq.end(), seq.begin(), seq.end());
+                        last_bit_start = std::search(last_bit_start, last_bit_sequence.end(), sequence.begin(), sequence.end());
                     }
                 }
                 if (possible_indices == 0) {
                     throw OperationFailedException(console, "Detected sequence of attack motions does not exist in expected range.");
                 }
 
-                distance += seq.size();
-                console.log("RNG: needed " + std::to_string(seq.size()) + " animations.");
+                distance += sequence.size();
+                console.log("RNG: needed " + std::to_string(sequence.size()) + " animations.");
                 console.log("RNG: new state is " + std::to_string(distance + min_advances) + " advances from last known state.");
                 for (size_t advance = 0; advance < distance; advance++) {
                     rng.next();

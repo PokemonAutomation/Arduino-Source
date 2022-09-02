@@ -2,6 +2,10 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
+ *  Credit goes to Anubis for discovering how the Cram-o-matic works 
+ *  and for the original code to calculate how many advances are needed 
+ *  to get the wanted balls.
+ * 
  */
 
 #include "Common/Cpp/PrettyPrint.h"
@@ -60,7 +64,7 @@ namespace PokemonAutomation {
                     300
                 )
                 , ONLY_BONUS(
-                    "<b>Only bonus frames:</b>",
+                    "<b>Only bonus:</b>",
                     false
                 )
                 , SAVE_SCREENSHOTS(

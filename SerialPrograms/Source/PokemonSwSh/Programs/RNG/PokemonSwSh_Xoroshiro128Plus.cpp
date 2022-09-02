@@ -58,9 +58,9 @@ namespace PokemonAutomation {
 
     uint64_t Xoroshiro128Plus::nextInt(uint64_t bound) {
         uint64_t power = nextPowerOfTwo(bound);
-        uint64_t result = this->next() & (power - 1);
+        uint64_t result = next() & (power - 1);
         while (result >= bound) {
-            result = this->next() & (power - 1);
+            result = next() & (power - 1);
         }
         return result;
     }
