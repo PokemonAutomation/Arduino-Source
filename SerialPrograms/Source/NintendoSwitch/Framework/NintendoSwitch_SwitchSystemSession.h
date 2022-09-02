@@ -46,6 +46,7 @@ public:
     );
 
 public:
+    PABotBaseLevel min_pabotbase() const{ return m_serial.min_pabotbase(); }
     size_t console_number() const{ return m_console_number; }
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 

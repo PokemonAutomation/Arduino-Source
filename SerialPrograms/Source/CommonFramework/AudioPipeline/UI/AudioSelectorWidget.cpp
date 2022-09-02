@@ -152,7 +152,7 @@ AudioSelectorWidget::AudioSelectorWidget(
         }
     );
     connect(
-        m_audio_vis_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_audio_vis_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
             if (index < 0 || index > 2){
                 index = 0;

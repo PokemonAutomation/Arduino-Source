@@ -61,6 +61,7 @@ public:
 
     std::string label() const;
     std::string status() const;
+    PABotBaseLevel min_pabotbase() const{ return m_minimum_pabotbase; }
 
 public:
     //  Async external requests. (typically from integration commands)
@@ -72,7 +73,7 @@ public:
 
 signals:
     void on_not_connected(std::string error);
-    void on_connecting();
+    void on_connecting(const std::string& port_name);
     void on_ready(std::string description);
     void on_stopped(std::string error);
 
