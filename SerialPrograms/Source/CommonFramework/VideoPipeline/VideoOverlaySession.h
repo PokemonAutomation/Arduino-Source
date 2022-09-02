@@ -17,6 +17,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <deque>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -37,23 +38,59 @@ public:
     };
 
 public:
+    // Video overlay UI class (e.g. VideoOverlayWidget) inherits this listener to listen
+    // to the overlay session.
     struct Listener{
+        // `VideoOverlaySession` will call this function to give the newest boxes to the listener.
         virtual void box_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
+
+        // `VideoOverlaySession` will call this function to give the newest texts to the listener.
+        virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
     };
+
+    // Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
+    // Must call `remove_listener()` before listener is destroyed.
     void add_listener(Listener& listener);
+    // remove a UI class that listens to the overlay change, added by `add_listener()`.
     void remove_listener(Listener& listener);
 
 public:
     std::vector<Box> boxes() const;
+
+    std::vector<OverlayText> texts() const;
+
+    // Override `VideoOverlay::add_box()`. See the overridden function for more comments.
     virtual void add_box(const ImageFloatBox& box, Color color) override;
+    // Override `VideoOverlay::remove_box()`. See the overridden function for more comments.
     virtual void remove_box(const ImageFloatBox& box) override;
 
+    // Override `VideoOverlay::add_text()`. See the overridden function for more comments.
+    virtual void add_text(const OverlayText& text) override;
+    // Override `VideoOverlay::remove_text()`. See the overridden function for more comments.
+    virtual void remove_text(const OverlayText& texxt) override;
+
+    virtual void add_shell_text(std::string message, Color color) override;
+
+    virtual void clear_shell_texts() override;
+
 private:
+    // Pass the current boxes to the listeners.
+    // Called by `add_box()` and `remove_box()` so that when boxes change, the listeners know the
+    // change.
     void push_box_update();
+    // Pass the current texts to the listeners.
+    // Called by `add_text()` and `remove_text()` so that when texts change, the listeners know the
+    // change.
+    void push_text_update();
 
 private:
     mutable SpinLock m_lock;
+
     std::map<const ImageFloatBox*, Color> m_boxes;
+
+    std::set<const OverlayText*> m_texts;
+
+    std::deque<OverlayText> m_shell_texts;
 
     std::set<Listener*> m_listeners;
 };

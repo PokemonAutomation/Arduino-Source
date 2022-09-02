@@ -8,21 +8,58 @@
 #define PokemonAutomation_VideoOverlaySet_H
 
 #include <deque>
+#include <string>
+#include <vector>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 
+struct OverlayText;
 
 
 class VideoOverlay{
 public:
-    //  Add/remove inference boxes.
+    
+    // Asychronously, add an inference box as part of the video overlay.
+    // Once added, `box` cannot be destroyed until after `VideoOverlay::remove_box()` is called to remove it.
+    // If a `box` with the same address is added, it will override the old box's position, shape and color. You only need to
+    // call `remove_box()` once to remove it.
+    //
+    // Can use `InferenceBoxScope: public ImageFloatBox` to handle box removal automatically when it's destroyed.
+    // Can also use `VideoOverlay.h:VideoOverlaySet` to manage multiple boxes.
     virtual void add_box(const ImageFloatBox& box, Color color) = 0;
+    
+    // Asychronously, remove an added inference box.
+    // The box must be already added.
+    // See `add_box()` for more info on managing boxes.
     virtual void remove_box(const ImageFloatBox& box) = 0;
+
+    // Asychronously, add a text, `OverlayText` as part of the video overlay.
+    // Once added, `text` cannot be destroyed until after `VideoOverlay::remove_text()` is called to remove it.
+    // If a `text` with the same address is added, it will override the old text's position, content and color. You only need
+    // to call `remove_text()` once to remove it.
+    //
+    // Can use `OverlayTextScope: public OverlayText` to handle text removal automatically when it's destroyed.
+    virtual void add_text(const OverlayText& text) = 0;
+
+    // Asychronously, remove an added `OverlayText`.
+    // The OverlayText must be already added.
+    // See `add_text()` for more info on managing texts.
+    virtual void remove_text(const OverlayText& text) = 0;
+
+    // Asynchronously, add a shell-output-like message to the screen. The older messages added via `add_shell_text()`
+    // will get pushed up.
+    // Use `OverlayShellTextScope` to remove shell-output-like messages automatically. 
+    virtual void add_shell_text(std::string message, Color color) = 0;
+    // Remove all messages added by `add_shell_text()`.
+    // Use `OverlayShellTextScope` to remove shell-output-like messages automatically.
+    virtual void clear_shell_texts() = 0;
 };
 
 
+// A box as part of the video overlay.
+// It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
 class InferenceBoxScope : public ImageFloatBox{
 public:
     ~InferenceBoxScope(){
@@ -30,7 +67,6 @@ public:
     }
     InferenceBoxScope(const InferenceBoxScope&) = delete;
     void operator=(const InferenceBoxScope&) = delete;
-
 
 public:
     InferenceBoxScope(
@@ -70,6 +106,8 @@ private:
 // automatically when VideoOverlaySet is destroyed.
 // In this way, the user will see the inference boxes on the video overlay UI
 // and those boxes will leave the UI after the session ends.
+//
+// TODO: shall we add text management to this class, or rename this class to BoxOverleySet?
 class VideoOverlaySet{
 public:
     VideoOverlaySet(VideoOverlay& overlay)
@@ -88,6 +126,81 @@ private:
     std::deque<InferenceBoxScope> m_boxes;
 };
 
+// A text as part of the video overlay.
+struct OverlayText {
+    // Text content.
+    // Note overlay cannot handle newline character "\n".
+    std::string message;
+    // x coordinate of the text start, range: 0.0-1.0.
+    float x;
+    // y coordinate of the text start, range: 0.0-1.0.
+    float y;
+    // Font point size.
+    float font_size;
+    // Text color.
+    Color color;
+
+public:
+    OverlayText(std::string message,
+        float x,
+        float y,
+        float font_size = 1.0f,
+        Color color = COLOR_BLUE
+    )
+        : message(std::move(message))
+        , x(x)
+        , y(y)
+        , font_size(font_size)
+        , color(color) {}
+    
+    OverlayText(const OverlayText& other) = default;
+    OverlayText(OverlayText&& other) = default;
+};
+
+// A text as part of the video overlay.
+// It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
+class OverlayTextScope : public OverlayText {
+public:
+    ~OverlayTextScope(){
+        m_overlay.remove_text(*this);
+    }
+    OverlayTextScope(const OverlayTextScope&) = delete;
+    void operator=(const OverlayTextScope&) = delete;
+
+public:
+    OverlayTextScope(
+        VideoOverlay& overlay,
+        std::string message,
+        float x,
+        float y,
+        float font_size = 1.0f,
+        Color color = COLOR_BLUE
+    )
+        : OverlayText(message, x, y, font_size, color)
+        , m_overlay(overlay)
+    {
+        overlay.add_text(*this);
+    }
+
+private:
+    VideoOverlay& m_overlay;
+};
+
+// Used to clear shell-output-like messages on video overlay automatically.
+class OverlayShellTextScope {
+public:
+    OverlayShellTextScope(
+        VideoOverlay& overlay
+    ) :m_overlay(overlay) {}
+    ~OverlayShellTextScope(){
+        m_overlay.clear_shell_texts();
+    }
+    OverlayShellTextScope(const OverlayShellTextScope&) = delete;
+    void operator=(const OverlayShellTextScope&) = delete;
+
+private:
+    VideoOverlay& m_overlay;
+};
 
 
 }
