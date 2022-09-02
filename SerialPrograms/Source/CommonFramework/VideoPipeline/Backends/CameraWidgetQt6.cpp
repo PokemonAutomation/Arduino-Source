@@ -12,6 +12,7 @@
 #include <QMediaDevices>
 #include <QVideoSink>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CameraWidgetQt6.h"
 
 #include <chrono>
@@ -85,6 +86,20 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {}
 
+void CameraSession::get(CameraOption& option){
+    std::lock_guard<std::mutex> lg(m_lock);
+    option.info = m_device;
+    option.current_resolution = m_resolution;
+}
+void CameraSession::set(const CameraOption& option){
+    QMetaObject::invokeMethod(this, [=]{
+        std::lock_guard<std::mutex> lg(m_lock);
+        shutdown();
+        m_device = option.info;
+        m_resolution = option.current_resolution;
+        startup();
+    });
+}
 void CameraSession::reset(){
     QMetaObject::invokeMethod(this, [=]{
         std::lock_guard<std::mutex> lg(m_lock);

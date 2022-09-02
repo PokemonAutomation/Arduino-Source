@@ -26,6 +26,7 @@ class QWidget;
 namespace PokemonAutomation{
 
 class VideoWidget;
+class CameraOption;
 
 
 class CameraSession : public VideoFeed{
@@ -44,6 +45,9 @@ public:
 
 public:
     virtual ~CameraSession() = default;
+
+    virtual void get(CameraOption& option) = 0;
+    virtual void set(const CameraOption& option) = 0;
 
     virtual void reset() = 0;
     virtual void set_source(CameraInfo device) = 0;

@@ -49,6 +49,42 @@ AudioSession::~AudioSession(){
 }
 
 
+void AudioSession::get(AudioOption& option){
+    std::lock_guard<std::mutex> lg(m_lock);
+    option.m_input_file     = m_option.m_input_file;
+    option.m_input_device   = m_option.m_input_device;
+    option.m_input_format   = m_option.m_input_format;
+    option.m_output_device  = m_option.m_output_device;
+    option.m_volume         = m_option.m_volume;
+    option.m_display_type   = m_option.m_display_type;
+}
+void AudioSession::set(const AudioOption& option){
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_option.m_input_file       = option.m_input_file;
+    m_option.m_input_device     = option.m_input_device;
+    m_option.m_input_format     = option.m_input_format;
+    m_option.m_output_device    = option.m_output_device;
+    m_option.m_volume           = option.m_volume;
+    m_option.m_display_type     = option.m_display_type;
+
+    if (!m_option.m_input_file.empty()){
+        sanitize_format();
+        m_devices->set_audio_source(m_option.m_input_file);
+    }else if (sanitize_format()){
+        m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_format);
+    }else{
+        m_devices->clear_audio_source();
+    }
+
+    m_devices->set_audio_sink(m_option.m_output_device, m_option.m_volume);
+
+    push_input_changed();
+    push_output_changed();
+    for (Listener* listener : m_listeners){
+        listener->volume_changed(m_option.volume());
+        listener->display_changed(m_option.m_display_type);
+    }
+}
 std::pair<std::string, AudioDeviceInfo> AudioSession::input_device() const{
     std::lock_guard<std::mutex> lg(m_lock);
     return {m_option.input_file(), m_option.m_input_device};

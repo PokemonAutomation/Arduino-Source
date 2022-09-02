@@ -57,6 +57,9 @@ public:
     VideoOverlay& overlay(){ return m_overlay; }
 
 public:
+    void get(SwitchSystemOption& option);
+    void set(const SwitchSystemOption& option);
+
     SerialPortSession& serial_session(){ return m_serial; }
     CameraSession& camera_session(){ return *m_camera; }
     AudioSession& audio_session(){ return m_audio; }
