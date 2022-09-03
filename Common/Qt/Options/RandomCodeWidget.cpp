@@ -64,7 +64,7 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
 
     connect(
         m_box_random, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this](const QString& text){
             int read = text.toInt();
             RaidCodeOption code = m_value;
             code.m_random_digits = read;
@@ -73,7 +73,7 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
     );
     connect(
         m_box_code, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this](const QString& text){
             RaidCodeOption code = m_value;
             code.m_code = text.toStdString();
             m_value.set(code);
@@ -127,7 +127,7 @@ void RandomCodeWidget::update(){
     update_labels();
 }
 void RandomCodeWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

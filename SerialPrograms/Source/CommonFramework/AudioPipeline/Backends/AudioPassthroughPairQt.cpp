@@ -97,7 +97,7 @@ void AudioPassthroughPairQt::reset(
     const std::string& file,
     const AudioDeviceInfo& output, double output_volume
 ){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, file, output, output_volume]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -122,7 +122,7 @@ void AudioPassthroughPairQt::reset(
     const AudioDeviceInfo& output, double output_volume
 ){
 //    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -145,7 +145,7 @@ void AudioPassthroughPairQt::reset(
     });
 }
 void AudioPassthroughPairQt::clear_audio_source(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -157,7 +157,7 @@ void AudioPassthroughPairQt::clear_audio_source(){
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const std::string& file){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, file]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -176,7 +176,7 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, format, device]{
         SpinLockGuard lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -198,14 +198,14 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
 }
 
 void AudioPassthroughPairQt::clear_audio_sink(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         SpinLockGuard lg(m_lock);
         m_writer.reset();
         m_output_device = AudioDeviceInfo();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, device, volume]{
         SpinLockGuard lg(m_lock);
         m_writer.reset();
         m_output_device = device;
@@ -215,7 +215,7 @@ void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, doubl
 }
 void AudioPassthroughPairQt::init_audio_sink(){
 //    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         if (!m_output_device){
 //            cout << "AudioPassthroughPairQt::init_audio_sink() - early out" << endl;
             return;
@@ -244,7 +244,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
 
 
 void AudioPassthroughPairQt::set_sink_volume(double volume){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, volume]{
         SpinLockGuard lg(m_lock);
         m_output_volume = volume;
         if (m_writer){

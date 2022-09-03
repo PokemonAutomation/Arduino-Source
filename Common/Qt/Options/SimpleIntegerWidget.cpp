@@ -31,7 +31,7 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
 {
     connect(
         this, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this](const QString& text){
             bool ok;
             Type current = (Type)text.toLong(&ok);
             QPalette palette;
@@ -45,7 +45,7 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
     );
     connect(
         this, &QLineEdit::editingFinished,
-        this, [=](){
+        this, [this](){
             bool ok;
             Type current = (Type)this->text().toLong(&ok);
             QPalette palette;
@@ -72,7 +72,7 @@ void SimpleIntegerCellWidget<Type>::update(){
 }
 template <typename Type>
 void SimpleIntegerCellWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -108,7 +108,7 @@ void SimpleIntegerOptionWidget<Type>::update(){
 }
 template <typename Type>
 void SimpleIntegerOptionWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

@@ -120,7 +120,7 @@ public:
 
         //  Start receiver thread.
         try{
-            m_listener = std::thread(run_with_catch, "SerialConnection::SerialConnection()", [=]{ recv_loop(); });
+            m_listener = std::thread(run_with_catch, "SerialConnection::SerialConnection()", []{ recv_loop(); });
         }catch (...){
             close(m_fd);
             throw;

@@ -74,7 +74,7 @@ QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
 
     connect(
         m_default_button, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             QMessageBox::StandardButton button = QMessageBox::question(
                 nullptr,
                 "Restore Defaults",

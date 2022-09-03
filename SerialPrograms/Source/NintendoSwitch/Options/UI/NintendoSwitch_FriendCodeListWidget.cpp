@@ -79,7 +79,7 @@ void FriendCodeListWidget::update(){
     m_box->redraw();
 }
 void FriendCodeListWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

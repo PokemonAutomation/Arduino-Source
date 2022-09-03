@@ -93,7 +93,7 @@ VirtualController::VirtualController(
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
-    , m_thread(run_with_catch, "VirtualController::thread_loop()", [=]{ thread_loop(); })
+    , m_thread(run_with_catch, "VirtualController::thread_loop()", [this]{ thread_loop(); })
 {}
 VirtualController::~VirtualController(){
     m_stop.store(true, std::memory_order_release);

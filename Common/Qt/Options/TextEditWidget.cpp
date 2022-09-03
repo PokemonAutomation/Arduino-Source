@@ -40,7 +40,7 @@ public:
 #if 0
         connect(
             this, &QTextEdit::textChanged,
-            [=]{
+            []{
                 style()->polish(this);
             }
         );
@@ -86,7 +86,7 @@ void TextEditWidget::update(){
     m_box->setText(QString::fromStdString(m_value));
 }
 void TextEditWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

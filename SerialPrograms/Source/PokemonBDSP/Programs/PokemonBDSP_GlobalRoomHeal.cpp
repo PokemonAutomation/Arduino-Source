@@ -30,7 +30,7 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
     int ret = run_until(
         console, context,
-        [=](BotBaseContext& context){
+        [](BotBaseContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }

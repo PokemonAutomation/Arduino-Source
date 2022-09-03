@@ -57,7 +57,7 @@ SerialPortWidget::SerialPortWidget(
 
     connect(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             SerialPortOption& option = m_session.option();
             const QSerialPortInfo* current_port = option.port();
             if (index <= 0 || (size_t)index > m_ports.size()){
@@ -74,7 +74,7 @@ SerialPortWidget::SerialPortWidget(
     );
     connect(
         &m_session.botbase(), &BotBaseHandle::on_not_connected,
-        this, [=](std::string error){
+        this, [this](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"red\">Not Connected</font>");
             }else{
@@ -85,7 +85,7 @@ SerialPortWidget::SerialPortWidget(
     );
     connect(
         &m_session.botbase(), &BotBaseHandle::on_connecting,
-        this, [=](const std::string& port_name){
+        this, [this](const std::string& port_name){
             for (size_t i = 0; i < m_ports.size(); i++) {
                 if (m_ports[i].systemLocation().toUtf8().data() == port_name) {
                     m_serial_box->setCurrentIndex(static_cast<int>(i + 1));
@@ -98,14 +98,14 @@ SerialPortWidget::SerialPortWidget(
     );
     connect(
         &m_session.botbase(), &BotBaseHandle::on_ready,
-        this, [=](std::string description){
+        this, [this](std::string description){
             m_serial_program->setText(QString::fromStdString(description));
             emit signal_on_ready(true);
         }
     );
     connect(
         &m_session.botbase(), &BotBaseHandle::on_stopped,
-        this, [=](std::string error){
+        this, [this](std::string error){
             if (error.size() <= 0){
                 m_serial_program->setText("<font color=\"orange\">Stopping...</font>");
             }else{
@@ -115,14 +115,14 @@ SerialPortWidget::SerialPortWidget(
     );
     connect(
         &m_session.botbase(), &BotBaseHandle::uptime_status,
-        this, [=](std::string status){
+        this, [this](std::string status){
             m_serial_uptime->setText(QString::fromStdString(status));
             m_serial_uptime->show();
         }
     );
     connect(
         m_reset_button, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             reset();
         }
     );

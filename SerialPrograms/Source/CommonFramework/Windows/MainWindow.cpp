@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget* parent)
     QMainWindow* keyboard_window = new ButtonDiagram(*support_box);
     connect(
         keyboard, &QPushButton::clicked,
-        this, [=](bool){
+        this, [keyboard_window](bool){
             keyboard_window->show();
         }
     );
@@ -144,7 +144,7 @@ MainWindow::MainWindow(QWidget* parent)
     buttons->addWidget(output);
     connect(
         output, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             m_output_window->show();
             m_output_window->raise(); // bring the window to front on macOS
             m_output_window->activateWindow(); // bring the window to front on Windows
@@ -156,7 +156,7 @@ MainWindow::MainWindow(QWidget* parent)
     buttons->addWidget(settings);
     connect(
         settings, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
                 load_panel(GlobalSettings_Descriptor::INSTANCE.make_panel());
             }

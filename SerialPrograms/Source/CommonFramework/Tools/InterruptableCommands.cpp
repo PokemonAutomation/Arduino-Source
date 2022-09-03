@@ -85,7 +85,7 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
     if (m_current){
         //  Already a task running. Cancel it.
         m_current->context.cancel_lazy();
-        m_cv.wait(lg, [=]{ return m_current == nullptr; });
+        m_cv.wait(lg, [this]{ return m_current == nullptr; });
     }
 
     m_current = std::move(pending);
@@ -109,7 +109,7 @@ void AsyncCommandSession::thread_loop(){
         CommandSet* current;
         {
             std::unique_lock<std::mutex> lg(m_lock);
-            m_cv.wait(lg, [=]{
+            m_cv.wait(lg, [this]{
                 return cancelled() || m_current != nullptr;
             });
             if (cancelled()){
@@ -151,7 +151,7 @@ void AsyncCommandSession::stop_commands(){
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
-    m_cv.wait(lg, [=]{
+    m_cv.wait(lg, [this]{
         return m_current == nullptr;
     });
 //    cout << "wait() - done" << endl;

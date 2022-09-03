@@ -34,7 +34,7 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
 {
     connect(
         this, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this](const QString& text){
             bool ok;
             double current = text.toDouble(&ok);
             QPalette palette;
@@ -48,7 +48,7 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
     );
     connect(
         this, &QLineEdit::editingFinished,
-        this, [=](){
+        this, [this](){
             bool ok;
             double current = this->text().toDouble(&ok);
             QPalette palette;
@@ -73,7 +73,7 @@ void FloatingPointCellWidget::update(){
     this->setText(QString::number(m_value, 'f'));
 }
 void FloatingPointCellWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -103,7 +103,7 @@ void FloatingPointOptionWidget::update(){
 //    m_cell->update();
 }
 void FloatingPointOptionWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

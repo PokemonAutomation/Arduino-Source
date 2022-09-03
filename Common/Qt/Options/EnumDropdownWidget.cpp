@@ -54,7 +54,7 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropd
 
     connect(
         this, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0 || (size_t)index >= m_index_to_value.size()){
                 m_value.restore_defaults();
                 return;
@@ -72,7 +72,7 @@ void EnumDropdownCellWidget::update(){
     this->setCurrentIndex(m_value_to_index[m_value.current_value()]);
 }
 void EnumDropdownCellWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

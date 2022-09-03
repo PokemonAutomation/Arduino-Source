@@ -56,7 +56,7 @@ void BatchWidget::update(){
     }
 }
 void BatchWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

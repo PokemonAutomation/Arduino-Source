@@ -90,25 +90,25 @@ SwitchSystemWidget::SwitchSystemWidget(
 
     connect(
         m_serial_widget, &SerialPortWidget::signal_on_ready,
-        m_command, [=](bool ready){
+        m_command, [this](bool ready){
             m_command->update_ui();
         }
     );
     connect(
         m_command, &CommandRow::set_log_text_overlay,
-        m_camera_widget, [=](bool enabled){
+        m_camera_widget, [this](bool enabled){
             m_camera_widget->set_log_overlay_enabled(enabled);
         }
     );
     connect(
         m_command, &CommandRow::set_inference_overlay,
-        m_camera_widget, [=](bool enabled){
+        m_camera_widget, [this](bool enabled){
             m_camera_widget->set_inference_overlay_enabled(enabled);
         }
     );
     connect(
         m_command, &CommandRow::load_profile,
-        m_command, [=](){
+        m_command, [this](){
             std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
             if (path.empty()){
                 return;
@@ -124,7 +124,7 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
     connect(
         m_command, &CommandRow::save_profile,
-        m_command, [=]() {
+        m_command, [this]() {
             std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
             if (path.empty()) {
                 return;
@@ -140,8 +140,8 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
     connect(
         m_command, &CommandRow::screenshot_requested,
-        m_video_display, [=](){
-            global_dispatcher.dispatch([=]{
+        m_video_display, [this](){
+            global_dispatcher.dispatch([this]{
                 std::shared_ptr<const ImageRGB32> image = m_session.camera_session().snapshot();
                 if (!*image){
                     return;

@@ -103,7 +103,7 @@ ComputerProgramWidget::ComputerProgramWidget(
 }
 
 void ComputerProgramWidget::state_change(ProgramState state){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, state]{
         m_options->widget().setEnabled(state == ProgramState::STOPPED);
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
@@ -114,7 +114,7 @@ void ComputerProgramWidget::state_change(ProgramState state){
     });
 }
 void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(),
             historical_stats == nullptr ? "" : historical_stats->to_str()
@@ -122,7 +122,7 @@ void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, cons
     });
 }
 void ComputerProgramWidget::error(const std::string& message){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     });

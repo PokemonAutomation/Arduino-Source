@@ -65,7 +65,7 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
 
     connect(
         m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0 || index > (int)(m_session.max_switches() - m_session.min_switches())){
                 return;
             }

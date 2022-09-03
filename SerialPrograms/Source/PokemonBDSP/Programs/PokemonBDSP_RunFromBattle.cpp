@@ -22,7 +22,7 @@ bool run_from_battle(
     BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
         console, context,
-        [=](BotBaseContext& context){
+        [exit_battle_time](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);

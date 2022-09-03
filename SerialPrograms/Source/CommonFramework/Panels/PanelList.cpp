@@ -62,7 +62,7 @@ PanelList::PanelList(
     }
     connect(
         this, &QListWidget::itemClicked,
-        this, [=](QListWidgetItem* item){
+        this, [this](QListWidgetItem* item){
             handle_panel_clicked(item->text().toStdString());
         }
     );

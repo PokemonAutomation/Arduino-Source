@@ -129,7 +129,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
                     env.console, context,
-                    [=](BotBaseContext& context){
+                    [](BotBaseContext& context){
                         while (true){
                             pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                         }

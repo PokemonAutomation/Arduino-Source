@@ -25,7 +25,7 @@ TimeExpressionCellWidget<Type>::TimeExpressionCellWidget(QWidget& parent, TimeEx
 {
     connect(
         this, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this](const QString& text){
             std::string error = m_value.set(text.toStdString());
         }
     );
@@ -39,7 +39,7 @@ void TimeExpressionCellWidget<Type>::update(){
 }
 template <typename Type>
 void TimeExpressionCellWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -81,7 +81,7 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
 
     connect(
         m_box, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this, seconds](const QString& text){
 //           cout << text.toStdString() << endl;
             std::string error = m_value.set(text.toStdString());
             if (error.empty()){
@@ -101,7 +101,7 @@ void TimeExpressionOptionWidget<Type>::update(){
 }
 template <typename Type>
 void TimeExpressionOptionWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

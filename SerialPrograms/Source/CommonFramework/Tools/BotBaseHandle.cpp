@@ -217,7 +217,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
         return;
     }
 
-    m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [=]{ thread_body(); });
+    m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [this]{ thread_body(); });
 }
 
 void BotBaseHandle::stop(){
@@ -313,7 +313,7 @@ void BotBaseHandle::thread_body(){
     //  Stop pending commands.
     m_botbase->stop_all_commands();
 
-    std::thread watchdog([=]{
+    std::thread watchdog([this]{
         while (true){
             if (m_state.load(std::memory_order_acquire) != State::READY){
                 break;

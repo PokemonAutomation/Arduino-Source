@@ -287,7 +287,7 @@ void AudioDecoderWorker::start(){
 #if QT_VERSION_MAJOR == 5
     connect(
         m_audioDecoder, &QAudioDecoder::stateChanged,
-        this, [=](QAudioDecoder::State state){
+        this, [](QAudioDecoder::State state){
             std::cout << "QAudioDecoder::stateChanged(): " << (int)state << std::endl;
             emit this->finished();
         }

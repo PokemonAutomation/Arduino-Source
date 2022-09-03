@@ -36,69 +36,69 @@ EscapeFromAttack::EscapeFromAttack(
 
     const std::chrono::milliseconds GET_ON_BRAVIARY_TIME_MILLIS(GET_ON_BRAVIARY_TIME * 1000 / TICKS_PER_SECOND);
 
-    register_state_command(State::UNKNOWN, [=](){
+    register_state_command(State::UNKNOWN, [this](){
         m_console.log("Unknown state. Moving foward...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;
     });
-    register_state_command(State::WYRDEER_BASCULEGION_OFF, [=](){
+    register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
         m_console.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::WYRDEER_BASCULEGION_ON, [=](){
+    register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
         m_console.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::URSALUNA_OFF, [=](){
+    register_state_command(State::URSALUNA_OFF, [this](){
         m_console.log("Switching from Ursaluna (off) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::URSALUNA_ON, [=](){
+    register_state_command(State::URSALUNA_ON, [this](){
         m_console.log("Switching from Ursaluna (on) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::SNEASLER_OFF, [=](){
+    register_state_command(State::SNEASLER_OFF, [this](){
         m_console.log("Switching from Sneasler (off) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::SNEASLER_ON, [=](){
+    register_state_command(State::SNEASLER_ON, [this](){
         m_console.log("Switching from Sneasler (on) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::BRAVIARY_OFF, [=](){
+    register_state_command(State::BRAVIARY_OFF, [this](){
         m_console.log("Switching from Braviary (off) to Braviary (on)...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
-    register_state_command(State::DASH_FORWARD, [=](){
+    register_state_command(State::DASH_FORWARD, [this, GET_ON_BRAVIARY_TIME_MILLIS](){
         bool delay_dash =
             current_time() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
         if (delay_dash){
@@ -106,7 +106,7 @@ EscapeFromAttack::EscapeFromAttack(
         }else{
             m_console.log("Dashing forward...");
         }
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([delay_dash](BotBaseContext& context){
             if (delay_dash){
                 pbf_move_left_joystick(context, 128, 0, 125, 0);
             }
@@ -114,17 +114,17 @@ EscapeFromAttack::EscapeFromAttack(
         });
         return false;
     });
-    register_state_command(State::GET_ON_SNEASLER, [=](){
+    register_state_command(State::GET_ON_SNEASLER, [this](){
         m_console.log("Getting on Sneasler...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
         m_get_on_sneasler_time = current_time();
         return false;
     });
-    register_state_command(State::CLIMBING, [=](){
+    register_state_command(State::CLIMBING, [this](){
         m_console.log("Climbing wall...");
-        m_active_command->dispatch([=](BotBaseContext& context){
+        m_active_command->dispatch([](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;

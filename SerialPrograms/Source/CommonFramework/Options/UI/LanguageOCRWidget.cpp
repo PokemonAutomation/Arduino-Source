@@ -77,7 +77,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
 
     connect(
         m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0){
                 m_value.restore_defaults();
                 return;
@@ -108,7 +108,7 @@ void LanguageOCRWidget::update(){
     }
 }
 void LanguageOCRWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

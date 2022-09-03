@@ -52,7 +52,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 
     connect(
         this, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0){
                 m_value.restore_defaults();
                 return;
@@ -128,7 +128,7 @@ void StringSelectCellWidget::update(){
     }
 }
 void StringSelectCellWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

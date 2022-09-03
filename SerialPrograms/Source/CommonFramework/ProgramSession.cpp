@@ -175,7 +175,7 @@ std::string ProgramSession::start_program(){
         m_thread = std::thread(
             run_with_catch,
             "ProgramSession::start_program()",
-            [=]{ run_program(); }
+            [this]{ run_program(); }
         );
 
         return "";

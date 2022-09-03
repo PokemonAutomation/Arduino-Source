@@ -158,7 +158,7 @@ ButtonDetector::ButtonDetector(
     , m_watcher(overlay, m_box, { {m_tracker, false} })
     , m_debouncer(
         false, min_streak,
-        [=](bool value){
+        [this, type](bool value){
             if (value){
                 m_logger.log(std::string("Detected (") + button_name(type) + ") Button.", COLOR_PURPLE);
             }else{

@@ -120,7 +120,7 @@ class SleepyDiscordSender {
 private:
     SleepyDiscordSender()
         : m_stopping(false)
-        , m_thread(run_with_catch, "SleepyDiscordSender::thread_loop()", [=]{ thread_loop(); })
+        , m_thread(run_with_catch, "SleepyDiscordSender::thread_loop()", [this]{ thread_loop(); })
     {}
     ~SleepyDiscordSender() {
         {

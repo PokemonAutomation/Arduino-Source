@@ -117,7 +117,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [this](BotBaseContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {

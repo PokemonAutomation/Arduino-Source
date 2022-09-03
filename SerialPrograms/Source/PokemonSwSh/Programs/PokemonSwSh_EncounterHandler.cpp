@@ -35,7 +35,7 @@ void run_away(
     BlackScreenOverWatcher black_screen_detector;
     run_until(
         console, context,
-        [=](BotBaseContext& context){
+        [exit_battle_time](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_UP, 10, 0);
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
@@ -101,7 +101,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
     BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
         m_console, m_context,
-        [=](BotBaseContext& context){
+        [exit_battle_time](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);

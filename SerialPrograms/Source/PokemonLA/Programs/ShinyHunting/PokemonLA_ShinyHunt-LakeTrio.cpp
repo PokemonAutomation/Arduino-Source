@@ -151,7 +151,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             );
             int ret = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
                 {{watcher}}
@@ -188,7 +188,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
             int ret = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },
                 {

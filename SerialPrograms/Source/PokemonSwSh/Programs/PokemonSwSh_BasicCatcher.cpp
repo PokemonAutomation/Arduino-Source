@@ -169,7 +169,7 @@ CatchResults basic_catcher(
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}
@@ -182,7 +182,7 @@ CatchResults basic_catcher(
 
         int result = run_until(
             console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
             {{caught_detector}}
@@ -204,7 +204,7 @@ CatchResults basic_catcher(
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}

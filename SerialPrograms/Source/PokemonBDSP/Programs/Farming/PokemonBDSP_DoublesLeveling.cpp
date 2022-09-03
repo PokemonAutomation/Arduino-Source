@@ -104,7 +104,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
             env.console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {

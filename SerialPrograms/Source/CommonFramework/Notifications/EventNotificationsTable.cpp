@@ -136,7 +136,7 @@ EventNotificationsTableWidget::EventNotificationsTableWidget(QWidget& parent, Ev
     value.add_listener(*this);
 }
 void EventNotificationsTableWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         redraw_table();
     }, Qt::QueuedConnection);
 }
