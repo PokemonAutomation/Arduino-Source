@@ -92,6 +92,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
 
 
 void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    OverlayShellTextScope overlay_shell_text_scope(env.console.overlay());
     ShinyHuntOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntOverworld_Descriptor::Stats>();
     env.update_stats();
 
@@ -116,6 +117,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             }
+            env.console.overlay().add_shell_text("Battle started", COLOR_GREEN);
 
             //  Detect shiny.
             DoublesShinyDetection result_wild;
@@ -134,6 +136,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     //        result_wild.right_is_shiny = true;
 
             bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+
             if (stop){
                 break;
             }

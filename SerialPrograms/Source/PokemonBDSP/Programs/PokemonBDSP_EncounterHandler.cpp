@@ -15,6 +15,7 @@
 #include "PokemonBDSP_RunFromBattle.h"
 
 #include <iostream>
+#include <sstream>
 using std::cout;
 using std::endl;
 
@@ -194,6 +195,32 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     bool enable_names = m_language != Language::None;
     std::vector<EncounterResult> encounter_results = results(encounter);
+    std::ostringstream os;
+    if (encounter_results.size() > 0){
+        os << "Pokemon: (";
+        bool first_slug = true;
+        for(const auto& name: encounter_results[0].slug_candidates){
+            if (first_slug == false){
+                os << ",";
+            }
+            os << name;
+            first_slug = false;
+        }
+        os << ")";
+    }
+    if (encounter_results.size() > 1){
+        os << "(";
+        bool first_slug = true;
+        for(const auto& name: encounter_results[1].slug_candidates){
+            if (first_slug == false){
+                os << ",";
+            }
+            os << name;
+            first_slug = false;
+        }
+        os << ")";
+    }
+    m_console.overlay().add_shell_text(os.str(), COLOR_WHITE);
 
     update_frequencies(encounter);
     send_encounter_notification(

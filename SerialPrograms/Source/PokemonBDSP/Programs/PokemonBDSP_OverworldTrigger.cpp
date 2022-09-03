@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
@@ -113,6 +114,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
             }
         );
     }else{
+        console.overlay().add_shell_text("Using Sweet Scent", COLOR_CYAN);
         //  Use Sweet Scent to trigger encounter.
         overworld_to_menu(console, context);
 
