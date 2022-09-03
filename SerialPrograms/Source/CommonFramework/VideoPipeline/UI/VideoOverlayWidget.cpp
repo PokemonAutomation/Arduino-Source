@@ -30,6 +30,8 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
     , m_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
+    , m_inference_hidden(false)
+    , m_log_hidden(true)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -77,54 +79,59 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
 
-    for (const auto& item : *m_text_bg_boxes){
-        QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
-        painter.setPen(box_color);
-        const int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
-        const int ymin = std::max((int)(height * item.box.y + 0.5), 1);
-        const int box_width = (int)(width * item.box.width + 0.5);
-        const int box_height = (int)(height * item.box.height + 0.5);
-        painter.fillRect(xmin, ymin, box_width, box_height, box_color);
+    if (!m_log_hidden){
+        for (const auto& item : *m_text_bg_boxes){
+            QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
+            painter.setPen(box_color);
+            const int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
+            const int ymin = std::max((int)(height * item.box.y + 0.5), 1);
+            const int box_width = (int)(width * item.box.width + 0.5);
+            const int box_height = (int)(height * item.box.height + 0.5);
+            painter.fillRect(xmin, ymin, box_width, box_height, box_color);
+        }
     }
 
-//    cout << "paint: " << m_boxes.size() << endl;
-    for (const auto& item : *m_boxes){
-        painter.setPen(QColor((uint32_t)item.color));
-//        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
-//        cout << (int)(width * box->x + m_offset_x + 0.5)
-//             << " " << (int)(height * box->y + 0.5)
-//             << ", " << (int)(width * box->width + 0.5)
-//             << " x " << (int)(height * box->height + 0.5) << endl;
-//        cout << painter.pen().width() << endl;
+    if (!m_inference_hidden){
+        for (const auto& item : *m_boxes){
+            painter.setPen(QColor((uint32_t)item.color));
+    //        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
+    //        cout << (int)(width * box->x + m_offset_x + 0.5)
+    //             << " " << (int)(height * box->y + 0.5)
+    //             << ", " << (int)(width * box->width + 0.5)
+    //             << " x " << (int)(height * box->height + 0.5) << endl;
+    //        cout << painter.pen().width() << endl;
 
-        //  Compute coordinates. Clip so that it stays in-bounds.
-        int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
-        int ymin = std::max((int)(height * item.box.y + 0.5), 1);
-//        int xmax = std::min(xmin + (int)(width * box->width + 0.5), m_display_size.width() - painter.pen().width());
-//        int ymax = std::min(ymin + (int)(height * box->height + 0.5), m_display_size.height() - painter.pen().width());
-        int xmax = std::min(xmin + (int)(width * item.box.width + 0.5), m_display_size.width() - 1);
-        int ymax = std::min(ymin + (int)(height * item.box.height + 0.5), m_display_size.height() - 1);
+            //  Compute coordinates. Clip so that it stays in-bounds.
+            int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
+            int ymin = std::max((int)(height * item.box.y + 0.5), 1);
+    //        int xmax = std::min(xmin + (int)(width * box->width + 0.5), m_display_size.width() - painter.pen().width());
+    //        int ymax = std::min(ymin + (int)(height * box->height + 0.5), m_display_size.height() - painter.pen().width());
+            int xmax = std::min(xmin + (int)(width * item.box.width + 0.5), m_display_size.width() - 1);
+            int ymax = std::min(ymin + (int)(height * item.box.height + 0.5), m_display_size.height() - 1);
 
-//        cout << "m_video_size.width() = " << m_widget_size.width() << ", xmax = " << xmax << endl;
+    //        cout << "m_video_size.width() = " << m_widget_size.width() << ", xmax = " << xmax << endl;
 
-        painter.drawRect(
-            xmin,
-            ymin,
-            xmax - xmin,
-            ymax - ymin
-        );
+            painter.drawRect(
+                xmin,
+                ymin,
+                xmax - xmin,
+                ymax - ymin
+            );
+        }
     }
 
-    for (const auto& item: *m_texts){
-        painter.setPen(QColor((uint32_t)item.color));
-        QFont text_font = this->font();
-        text_font.setPointSizeF(item.font_size);
-        painter.setFont(text_font);
+    if (!m_log_hidden){
+        for (const auto& item: *m_texts){
+            painter.setPen(QColor((uint32_t)item.color));
+            QFont text_font = this->font();
+            text_font.setPointSizeF(item.font_size);
+            painter.setFont(text_font);
 
-        const int xmin = std::max((int)(width * item.x + 0.5), 1) + m_offset_x;
-        const int ymin = std::max((int)(height * item.y + 0.5), 1);
+            const int xmin = std::max((int)(width * item.x + 0.5), 1) + m_offset_x;
+            const int ymin = std::max((int)(height * item.y + 0.5), 1);
 
-        painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
+            painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
+        }
     }
 }
 

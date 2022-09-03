@@ -25,6 +25,11 @@ public:
 
     void update_size(const QSize& widget_size, const QSize& video_size);
 
+    // Whether to hide inference visualization
+    void set_inference_hidden(bool hidden) { m_inference_hidden = hidden;}
+    // Whether to hide log text visualization
+    void set_log_text_hidden(bool hidden) {m_log_hidden = hidden;}
+
 private:
     // Override VideoOverlaySession::Listener::box_update().
     // This function is called asynchronously when there is change of boxes in VideoOverlaySession.
@@ -50,6 +55,9 @@ private:
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_text_bg_boxes;
+
+    bool m_inference_hidden;
+    bool m_log_hidden;
 };
 
 

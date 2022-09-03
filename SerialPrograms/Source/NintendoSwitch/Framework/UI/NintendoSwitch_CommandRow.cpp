@@ -33,9 +33,14 @@ CommandRow::CommandRow(
     command_row->addWidget(m_status, 12);
     command_row->addSpacing(5);
 
-    m_overlay_box = new QCheckBox("Inference Boxes", this);
-    m_overlay_box->setChecked(true);
-    command_row->addWidget(m_overlay_box, 4);
+    m_log_overlay_box = new QCheckBox("Log Overlay", this);
+    m_log_overlay_box->setChecked(false);
+    command_row->addWidget(m_log_overlay_box, 4);
+    command_row->addSpacing(5);
+
+    m_inference_box = new QCheckBox("Inference Overlay", this);
+    m_inference_box->setChecked(true);
+    command_row->addWidget(m_inference_box, 4);
     command_row->addSpacing(5);
 
     m_load_profile_button = new QPushButton("Load Profile", this);
@@ -54,8 +59,12 @@ CommandRow::CommandRow(
     update_ui();
 
     connect(
-        m_overlay_box, &QCheckBox::stateChanged,
-        this, [=](int){ emit set_inference_boxes(m_overlay_box->isChecked()); }
+        m_log_overlay_box, &QCheckBox::stateChanged,
+        this, [=](int){ emit set_log_text_overlay(m_log_overlay_box->isChecked()); }
+    );
+    connect(
+        m_inference_box, &QCheckBox::stateChanged,
+        this, [=](int){ emit set_inference_overlay(m_inference_box->isChecked()); }
     );
     connect(
         m_load_profile_button, &QPushButton::clicked,

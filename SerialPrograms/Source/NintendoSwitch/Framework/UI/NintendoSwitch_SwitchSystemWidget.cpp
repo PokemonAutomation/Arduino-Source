@@ -95,9 +95,15 @@ SwitchSystemWidget::SwitchSystemWidget(
         }
     );
     connect(
-        m_command, &CommandRow::set_inference_boxes,
+        m_command, &CommandRow::set_log_text_overlay,
         m_camera_widget, [=](bool enabled){
-            m_camera_widget->set_overlay_enabled(enabled);
+            m_camera_widget->set_log_overlay_enabled(enabled);
+        }
+    );
+    connect(
+        m_command, &CommandRow::set_inference_overlay,
+        m_camera_widget, [=](bool enabled){
+            m_camera_widget->set_inference_overlay_enabled(enabled);
         }
     );
     connect(
