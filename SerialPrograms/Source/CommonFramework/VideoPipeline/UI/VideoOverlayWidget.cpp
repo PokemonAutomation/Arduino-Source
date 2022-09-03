@@ -29,7 +29,8 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_offset_x(0)
     , m_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
-    , m_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
+    , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
+    , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
     , m_inference_hidden(false)
     , m_log_hidden(true)
 {
@@ -66,9 +67,14 @@ void VideoOverlayWidget::text_update(const std::shared_ptr<const std::vector<Ove
     m_texts = texts;
 }
 
-void VideoOverlayWidget::text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
-    SpinLockGuard lg(m_lock, "VideoOverlay::text_background_update()");
-    m_text_bg_boxes = bg_boxes;
+void VideoOverlayWidget::log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){
+    SpinLockGuard lg(m_lock, "VideoOverlay::log_text_update()");
+    m_log_texts = texts;
+}
+
+void VideoOverlayWidget::log_text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
+    SpinLockGuard lg(m_lock, "VideoOverlay::log_text_background_update()");
+    m_log_text_bg_boxes = bg_boxes;
 }
 
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
@@ -78,18 +84,6 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     double height = m_scale * m_video_size.height();
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
-
-    if (!m_log_hidden){
-        for (const auto& item : *m_text_bg_boxes){
-            QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
-            painter.setPen(box_color);
-            const int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
-            const int ymin = std::max((int)(height * item.box.y + 0.5), 1);
-            const int box_width = (int)(width * item.box.width + 0.5);
-            const int box_height = (int)(height * item.box.height + 0.5);
-            painter.fillRect(xmin, ymin, box_width, box_height, box_color);
-        }
-    }
 
     if (!m_inference_hidden){
         for (const auto& item : *m_boxes){
@@ -118,10 +112,32 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
                 ymax - ymin
             );
         }
+
+        for (const auto& item: *m_texts){
+            painter.setPen(QColor((uint32_t)item.color));
+            QFont text_font = this->font();
+            text_font.setPointSizeF(item.font_size);
+            painter.setFont(text_font);
+
+            const int xmin = std::max((int)(width * item.x + 0.5), 1) + m_offset_x;
+            const int ymin = std::max((int)(height * item.y + 0.5), 1);
+
+            painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
+        }
     }
 
     if (!m_log_hidden){
-        for (const auto& item: *m_texts){
+        for (const auto& item : *m_log_text_bg_boxes){
+            QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
+            painter.setPen(box_color);
+            const int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
+            const int ymin = std::max((int)(height * item.box.y + 0.5), 1);
+            const int box_width = (int)(width * item.box.width + 0.5);
+            const int box_height = (int)(height * item.box.height + 0.5);
+            painter.fillRect(xmin, ymin, box_width, box_height, box_color);
+        }
+
+        for (const auto& item: *m_log_texts){
             painter.setPen(QColor((uint32_t)item.color));
             QFont text_font = this->font();
             text_font.setPointSizeF(item.font_size);

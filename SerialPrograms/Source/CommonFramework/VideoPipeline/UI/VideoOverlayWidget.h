@@ -37,9 +37,12 @@ private:
     // Override VideoOverlaySession::Listener::text_update().
     // This function is called asynchronously when there is change of texts in VideoOverlaySession.
     virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
-    // Override VideoOverlaySession::Listener::text_background_update().
-    // This function is called asynchronously when there is change of text background in VideoOverlaySession.
-    virtual void text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
+    // Override VideoOverlaySession::Listener::log_text_update().
+    // This function is called asynchronously when there is change of log texts in VideoOverlaySession.
+    virtual void log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
+    // Override VideoOverlaySession::Listener::log_text_background_update().
+    // This function is called asynchronously when there is change of log text background in VideoOverlaySession.
+    virtual void log_text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
 
     virtual void paintEvent(QPaintEvent*) override;
 
@@ -54,7 +57,8 @@ private:
     SpinLock m_lock;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
-    std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_text_bg_boxes;
+    std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
+    std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
 
     bool m_inference_hidden;
     bool m_log_hidden;

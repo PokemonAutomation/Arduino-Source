@@ -48,13 +48,13 @@ public:
     // See `add_text()` for more info on managing texts.
     virtual void remove_text(const OverlayText& text) = 0;
 
-    // Asynchronously, add a shell-output-like message to the screen. The older messages added via `add_shell_text()`
-    // will get pushed up.
-    // Use `OverlayShellTextScope` to remove shell-output-like messages automatically. 
-    virtual void add_shell_text(std::string message, Color color) = 0;
-    // Remove all messages added by `add_shell_text()`.
-    // Use `OverlayShellTextScope` to remove shell-output-like messages automatically.
-    virtual void clear_shell_texts() = 0;
+    // Asynchronously, add a log message to the screen. The older messages added via `add_log_text()`
+    // will be placed higher like in the logging window.
+    // Use `OverlayLogTextScope` to remove the log messages automatically. 
+    virtual void add_log_text(std::string message, Color color) = 0;
+    // Remove all messages added by `add_log_text()`.
+    // Use `OverlayLogTextScope` to remove log messages automatically.
+    virtual void clear_log_texts() = 0;
 };
 
 
@@ -186,17 +186,19 @@ private:
     VideoOverlay& m_overlay;
 };
 
-// Used to clear shell-output-like messages on video overlay automatically.
-class OverlayShellTextScope {
+// Used to clear log messages on video overlay automatically.
+// Place this at the beginning of a program, so that when the program exits, it will
+// clear the log messages from the overlay automatically.
+class OverlayLogTextScope {
 public:
-    OverlayShellTextScope(
+    OverlayLogTextScope(
         VideoOverlay& overlay
     ) :m_overlay(overlay) {}
-    ~OverlayShellTextScope(){
-        m_overlay.clear_shell_texts();
+    ~OverlayLogTextScope(){
+        m_overlay.clear_log_texts();
     }
-    OverlayShellTextScope(const OverlayShellTextScope&) = delete;
-    void operator=(const OverlayShellTextScope&) = delete;
+    OverlayLogTextScope(const OverlayLogTextScope&) = delete;
+    void operator=(const OverlayLogTextScope&) = delete;
 
 private:
     VideoOverlay& m_overlay;

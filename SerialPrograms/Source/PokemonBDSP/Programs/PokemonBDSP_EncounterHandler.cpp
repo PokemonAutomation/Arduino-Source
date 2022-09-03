@@ -220,7 +220,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         }
         os << ")";
     }
-    m_console.overlay().add_shell_text(os.str(), COLOR_WHITE);
+    m_console.overlay().add_log_text(os.str(), COLOR_WHITE);
 
     update_frequencies(encounter);
     send_encounter_notification(

@@ -48,9 +48,12 @@ public:
         virtual void box_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
 
         // `VideoOverlaySession` will call this function to give the newest texts to the listener.
-        virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
+        virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
 
-        virtual void text_background_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        // `VideoOverlaySession` will call this function to give the newest log texts to the listener.
+        virtual void log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
+        // `VideoOverlaySession` will call this function to give the newest log text background to the listener.
+        virtual void log_text_background_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
     };
 
     // Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
@@ -64,6 +67,10 @@ public:
 
     std::vector<OverlayText> texts() const;
 
+    std::vector<OverlayText> log_texts() const;
+
+    std::vector<Box> log_text_background() const;
+
     // Override `VideoOverlay::add_box()`. See the overridden function for more comments.
     virtual void add_box(const ImageFloatBox& box, Color color) override;
     // Override `VideoOverlay::remove_box()`. See the overridden function for more comments.
@@ -73,10 +80,10 @@ public:
     virtual void add_text(const OverlayText& text) override;
     // Override `VideoOverlay::remove_text()`. See the overridden function for more comments.
     virtual void remove_text(const OverlayText& texxt) override;
-    // Override `VideoOverlay::add_shell_text()`. See the overridden function for more comments.
-    virtual void add_shell_text(std::string message, Color color) override;
-    // Override `VideoOverlay::clear_shell_texts()`. See the overridden function for more comments.
-    virtual void clear_shell_texts() override;
+    // Override `VideoOverlay::add_log_text()`. See the overridden function for more comments.
+    virtual void add_log_text(std::string message, Color color) override;
+    // Override `VideoOverlay::clear_log_texts()`. See the overridden function for more comments.
+    virtual void clear_log_texts() override;
 
 private:
     // Pass the current boxes to the listeners.
@@ -84,12 +91,16 @@ private:
     // change.
     void push_box_update();
     // Pass the current texts to the listeners.
-    // Called by `add_text()`, `remove_text()`, `add_shell_text()` and `clear_shell_texts()` so that
-    // when texts change, the listeners know the change.
+    // Called by `add_text()`, `remove_text()` so that when texts change, the listeners know the
+    // change.
     void push_text_update();
-    // Pass the shell text background box to the listeners.
-    // Called by `add_shell_text()` and `clear_shell_texts()` to notify listeners of updating text
-    // background.
+    // Pass the log texts to the listeners.
+    // Called by `add_log_text()` and `clear_log_texts()` to notify listeners of updating the log
+    // texts.
+    void push_log_text_update();
+    // Pass the log text background box to the listeners.
+    // Called by `add_log_text()` and `clear_log_texts()` to notify listeners of updating the log
+    // texts background.
     void push_text_background_update();
 
 private:
@@ -99,7 +110,7 @@ private:
 
     std::set<const OverlayText*> m_texts;
 
-    std::deque<OverlayText> m_shell_texts;
+    std::deque<OverlayText> m_log_texts;
 
     std::set<Listener*> m_listeners;
 };

@@ -107,9 +107,9 @@ public:
 
     virtual void remove_text(const OverlayText& text) override {}
 
-    virtual void add_shell_text(std::string message, Color color) override {}
+    virtual void add_log_text(std::string message, Color color) override {}
 
-    virtual void clear_shell_texts() override {}
+    virtual void clear_log_texts() override {}
 };
 
 // Implement the dummy interface of AudioFeed so that we can test
