@@ -4,12 +4,8 @@ cmake_minimum_required(VERSION 3.16.0)
 #set the name of the project
 project(SerialPrograms)
 
-#enable c++17 or c++ 20 depending on compiler
-if (MSVC)
-    set(CMAKE_CXX_STANDARD 20)
-else()
-    set(CMAKE_CXX_STANDARD 17)
-endif()
+#enable c++ 20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #produce clang tidy file
