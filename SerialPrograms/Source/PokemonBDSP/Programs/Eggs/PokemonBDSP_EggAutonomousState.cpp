@@ -322,7 +322,7 @@ void EggAutonomousState::fetch_egg(){
         ShortDialogWatcher dialog;
         int ret = run_until(
             m_console, m_context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
             },
             {{dialog}}
@@ -345,7 +345,7 @@ void EggAutonomousState::fetch_egg(){
         ShortDialogWatcher dialog;
         int ret = run_until(
             m_console, m_context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 30, 0);
                 pbf_move_left_joystick(context, 128, 0, 35, 0);
                 pbf_move_left_joystick(context, 255, 128, 60, 125);
@@ -362,7 +362,7 @@ void EggAutonomousState::fetch_egg(){
         ShortDialogWatcher dialog;
         int ret = run_until(
             m_console, m_context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
             },
             {{dialog}}
@@ -377,7 +377,7 @@ void EggAutonomousState::fetch_egg(){
         EggReceivedDetector received;
         run_until(
             m_console, m_context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 500);
                 pbf_mash_button(context, BUTTON_B, 500);
             },

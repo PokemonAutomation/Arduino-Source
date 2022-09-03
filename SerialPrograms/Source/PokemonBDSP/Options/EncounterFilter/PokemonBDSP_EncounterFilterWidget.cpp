@@ -48,7 +48,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
         }
         connect(
             m_shininess, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index){
+            this, [this](int index){
                 if (index < 0){
                     return;
                 }

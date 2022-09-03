@@ -118,7 +118,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             BlackScreenOverWatcher detector;
             int result = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [this](BotBaseContext& context){
                     if (POKEMON == GiftPokemon::TypeNull){
                         pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
                     }else{

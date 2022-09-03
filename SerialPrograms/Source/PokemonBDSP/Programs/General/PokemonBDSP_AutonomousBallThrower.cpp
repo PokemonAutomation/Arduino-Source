@@ -114,7 +114,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
             int result = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);

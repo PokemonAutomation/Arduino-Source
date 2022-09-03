@@ -39,7 +39,7 @@ void FireForgetDispatcher::dispatch(std::function<void()>&& func){
 
     //  Lazy create thread.
     if (!m_thread.joinable()){
-        m_thread = std::thread(run_with_catch, "FireForgetDispatcher::thread_loop()", [=]{ thread_loop(); });
+        m_thread = std::thread(run_with_catch, "FireForgetDispatcher::thread_loop()", [this]{ thread_loop(); });
     }
 }
 

@@ -180,7 +180,7 @@ QLineEdit* TradeCountTableWidget::make_count_box(QWidget& parent, int row, int c
     box->setAlignment(Qt::AlignHCenter);
     box->connect(
         box, &QLineEdit::textChanged,
-        box, [=](const QString& text){
+        box, [this, box, row](const QString& text){
             int raw = text.toInt();
             int fixed = raw;
             fixed = std::max(fixed, 0);

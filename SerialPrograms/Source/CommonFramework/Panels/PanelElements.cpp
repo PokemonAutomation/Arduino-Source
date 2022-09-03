@@ -193,11 +193,11 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
 
     connect(
         m_start_button, &QPushButton::clicked,
-        this, [=](bool){ emit start_clicked(m_last_known_state); }
+        this, [this](bool){ emit start_clicked(m_last_known_state); }
     );
     connect(
         m_default_button, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             QMessageBox::StandardButton button = QMessageBox::question(
                 nullptr,
                 "Restore Defaults",

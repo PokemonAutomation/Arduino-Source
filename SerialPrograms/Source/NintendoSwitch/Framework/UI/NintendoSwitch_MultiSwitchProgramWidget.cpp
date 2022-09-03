@@ -124,7 +124,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
 
 
 void MultiSwitchProgramWidget2::state_change(ProgramState state){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, state]{
         m_system->update_ui(state);
         m_options->widget().setEnabled(state == ProgramState::STOPPED);
         m_actions_bar->set_state(state);
@@ -136,7 +136,7 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
     });
 }
 void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(),
             historical_stats == nullptr ? "" : historical_stats->to_str()
@@ -144,14 +144,14 @@ void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, 
     });
 }
 void MultiSwitchProgramWidget2::error(const std::string& message){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
     });
 }
 
 void MultiSwitchProgramWidget2::redraw_options(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         m_options->update();
     });
 }

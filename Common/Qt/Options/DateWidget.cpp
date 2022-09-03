@@ -41,7 +41,7 @@ DateWidget::DateWidget(QWidget& parent, DateOption& value)
 
     connect(
         m_date_edit, &QDateEdit::dateChanged,
-        this, [=](const QDate& date){
+        this, [this](const QDate& date){
             m_value.set(date);
         }
     );
@@ -53,7 +53,7 @@ void DateWidget::update(){
     m_date_edit->setDate(m_value.get());
 }
 void DateWidget::value_changed(){
-    QMetaObject::invokeMethod(m_date_edit, [=]{
+    QMetaObject::invokeMethod(m_date_edit, [this]{
         update();
     }, Qt::QueuedConnection);
 }

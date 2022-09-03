@@ -60,23 +60,23 @@ CommandRow::CommandRow(
 
     connect(
         m_log_overlay_box, &QCheckBox::stateChanged,
-        this, [=](int){ emit set_log_text_overlay(m_log_overlay_box->isChecked()); }
+        this, [this](int){ emit set_log_text_overlay(m_log_overlay_box->isChecked()); }
     );
     connect(
         m_inference_box, &QCheckBox::stateChanged,
-        this, [=](int){ emit set_inference_overlay(m_inference_box->isChecked()); }
+        this, [this](int){ emit set_inference_overlay(m_inference_box->isChecked()); }
     );
     connect(
         m_load_profile_button, &QPushButton::clicked,
-        this, [=](bool) { emit load_profile(); }
+        this, [this](bool) { emit load_profile(); }
     );
     connect(
         m_save_profile_button, &QPushButton::clicked,
-        this, [=](bool) { emit save_profile(); }
+        this, [this](bool) { emit save_profile(); }
     );
     connect(
         m_screenshot_button, &QPushButton::clicked,
-        this, [=](bool){ emit screenshot_requested(); }
+        this, [this](bool){ emit screenshot_requested(); }
     );
 }
 

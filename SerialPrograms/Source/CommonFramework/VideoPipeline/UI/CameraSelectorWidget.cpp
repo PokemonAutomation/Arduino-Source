@@ -60,7 +60,7 @@ CameraSelectorWidget::CameraSelectorWidget(
 
     connect(
         m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
 //            cout << "m_camera_box" << endl;
             if (index <= 0 || index > (int)m_cameras.size()){
                 m_session.set_source(CameraInfo());
@@ -71,7 +71,7 @@ CameraSelectorWidget::CameraSelectorWidget(
     );
     connect(
         m_resolution_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
 //            cout << "m_resolution_box" << endl;
             if (!m_display){
                 return;
@@ -86,7 +86,7 @@ CameraSelectorWidget::CameraSelectorWidget(
     );
     connect(
         m_reset_button, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             m_session.reset();
         }
     );

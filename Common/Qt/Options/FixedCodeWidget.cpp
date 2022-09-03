@@ -56,7 +56,7 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
 
     connect(
         m_box, &QLineEdit::textChanged,
-        this, [=](const QString& text){
+        this, [this, under_text](const QString& text){
             std::string str = text.toStdString();
             under_text->setText(QString::fromStdString(sanitized_code(str)));
 //            m_value.set(str);
@@ -64,7 +64,7 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     );
     connect(
         m_box, &QLineEdit::editingFinished,
-        m_box, [=](){
+        m_box, [this, under_text](){
             std::string current = m_box->text().toStdString();
             under_text->setText(QString::fromStdString(sanitized_code(current)));
 //            m_box->setText(QString::fromStdString(current));
@@ -78,7 +78,7 @@ void FixedCodeWidget::update(){
     m_box->setText(QString::fromStdString(m_value));
 }
 void FixedCodeWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

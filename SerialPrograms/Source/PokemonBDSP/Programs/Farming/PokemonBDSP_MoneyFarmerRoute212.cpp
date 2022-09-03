@@ -127,7 +127,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
             env.console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {
@@ -315,7 +315,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [this](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },

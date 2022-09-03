@@ -110,7 +110,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index <= 0 || index >= (int)m_input_audios.size() + 2){
                 m_session.clear_audio_input();
             }else if (index == 1){
@@ -127,7 +127,7 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
     connect(
         m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0 || index >= (int)m_input_formats.size()){
                 return;
             }
@@ -136,7 +136,7 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
     connect(
         m_audio_output_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index <= 0 || index >= (int)m_output_audios.size() + 1){
                 m_session.clear_audio_output();
             }else{
@@ -146,14 +146,14 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
     connect(
         m_reset_button, &QPushButton::clicked,
-        this, [=](bool){
+        this, [this](bool){
             m_session.reset();
             refresh_all();
         }
     );
     connect(
         m_audio_vis_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [=](int index){
+        this, [this](int index){
             if (index < 0 || index > 2){
                 index = 0;
             }
@@ -162,17 +162,17 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
 
     connect(
-        m_volume_slider, &QSlider::sliderMoved, this, [=](){
+        m_volume_slider, &QSlider::sliderMoved, this, [this](){
             m_session.set_volume(m_volume_slider->value() / 100.);
         }
     );
     connect(
-        m_volume_slider, &QSlider::sliderPressed, this, [=](){
+        m_volume_slider, &QSlider::sliderPressed, this, [this](){
             m_slider_active.store(true, std::memory_order_release);
         }
     );
     connect(
-        m_volume_slider, &QSlider::sliderReleased, this, [=](){
+        m_volume_slider, &QSlider::sliderReleased, this, [this](){
             m_slider_active.store(false, std::memory_order_release);
         }
     );
@@ -180,7 +180,7 @@ AudioSelectorWidget::AudioSelectorWidget(
     // only in developer mode:
     // record audio
     if (GlobalSettings::instance().SHOW_RECORD_FREQUENCIES){
-        connect(m_record_button, &QPushButton::clicked, this, [=](bool){
+        connect(m_record_button, &QPushButton::clicked, this, [this](bool){
             m_record_is_on = !m_record_is_on;
             m_session.spectrums().saveAudioFrequenciesToDisk(m_record_is_on);
             if (m_record_is_on){
@@ -313,13 +313,13 @@ void AudioSelectorWidget::refresh_display(AudioOption::AudioDisplayType display)
 
 void AudioSelectorWidget::input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
 //    cout << "AudioSelectorWidget::input_changed()" << endl;
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, device, file, format]{
         refresh_input_device(file, device);
         refresh_formats(file, device, format);
     });
 }
 void AudioSelectorWidget::output_changed(const AudioDeviceInfo& device){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, device]{
         refresh_output_device(device);
     });
 }
@@ -327,12 +327,12 @@ void AudioSelectorWidget::volume_changed(double volume){
     if (m_slider_active.load(std::memory_order_acquire)){
         return;
     }
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, volume]{
         refresh_volume(volume);
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::display_changed(AudioOption::AudioDisplayType display){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this, display]{
         refresh_display(display);
     });
 }

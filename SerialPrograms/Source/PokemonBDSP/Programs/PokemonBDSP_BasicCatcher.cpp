@@ -213,7 +213,7 @@ CatchResults basic_catcher(
         ReceivePokemonDetector caught_detector;
         int ret = run_until(
             console, context,
-            [=](BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {

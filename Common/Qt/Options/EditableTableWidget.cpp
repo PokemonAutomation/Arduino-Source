@@ -69,7 +69,7 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         m_table->setCellWidget(row, 0, button);
         connect(
             button, &QPushButton::clicked,
-            this, [=](bool){
+            this, [this](bool){
                 int index = (int)m_current.size();
                 m_value.insert_row(index, m_value.make_row());
             }
@@ -162,7 +162,7 @@ void EditableTableWidget::update(){
     m_table->resizeRowsToContents();
 }
 void EditableTableWidget::value_changed(){
-    QMetaObject::invokeMethod(m_table, [=]{
+    QMetaObject::invokeMethod(m_table, [this]{
         update();
     }, Qt::QueuedConnection);
 }

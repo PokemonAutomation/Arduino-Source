@@ -65,7 +65,7 @@ void CameraSession::get(CameraOption& option){
     option.current_resolution = m_resolution;
 }
 void CameraSession::set(const CameraOption& option){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, []{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
         m_device = option.info;
@@ -74,7 +74,7 @@ void CameraSession::set(const CameraOption& option){
     });
 }
 void CameraSession::reset(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, []{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
         startup();
@@ -82,7 +82,7 @@ void CameraSession::reset(){
 }
 void CameraSession::set_source(CameraInfo device){
 //    cout << "CameraSession::set_source()" << endl;
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, []{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
         m_device = std::move(device);
@@ -90,7 +90,7 @@ void CameraSession::set_source(CameraInfo device){
     });
 }
 void CameraSession::set_resolution(Resolution resolution){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, []{
         std::lock_guard<std::mutex> lg(m_lock);
         if (!m_camera){
             m_resolution = resolution;
@@ -360,7 +360,7 @@ void CameraSession::startup(){
     if (m_probe){
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
-            this, [=](const QVideoFrame& frame){
+            this, [](const QVideoFrame& frame){
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
                 if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){

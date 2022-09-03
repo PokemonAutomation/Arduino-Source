@@ -132,7 +132,7 @@ void MultiSwitchProgramSession::internal_stop_program(){
         return;
     }
     m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
-    m_cv.wait(lg, [=]{ return m_scope == nullptr; });
+    m_cv.wait(lg, [this]{ return m_scope == nullptr; });
 }
 void MultiSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();

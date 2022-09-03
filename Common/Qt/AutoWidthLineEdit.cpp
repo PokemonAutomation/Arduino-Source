@@ -16,7 +16,7 @@ AutoWidthLineEdit::AutoWidthLineEdit(QWidget* parent)
 {
     connect(
         this, &QLineEdit::textChanged,
-        this, [=](const QString& line){
+        this, [this](const QString& line){
             resize_to_content();
         }
     );

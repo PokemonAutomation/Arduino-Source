@@ -47,7 +47,7 @@ void StaticTextWidget::update(){
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void StaticTextWidget::value_changed(){
-    QMetaObject::invokeMethod(m_text, [=]{
+    QMetaObject::invokeMethod(m_text, [this]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -81,7 +81,7 @@ void SectionDividerWidget::update(){
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void SectionDividerWidget::value_changed(){
-    QMetaObject::invokeMethod(m_text, [=]{
+    QMetaObject::invokeMethod(m_text, [this]{
         update();
     }, Qt::QueuedConnection);
 }

@@ -111,7 +111,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
                 env.console, context,
-                [=](BotBaseContext& context){
+                [](BotBaseContext& context){
                     while (true){
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
@@ -174,7 +174,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 StandardBattleMenuWatcher fight_detector(false);
                 int ret = run_until(
                     env.console, context,
-                    [=](BotBaseContext& context){
+                    [](BotBaseContext& context){
                         while (true){
                             pbf_wait(context, 1 * TICKS_PER_SECOND);
                         }

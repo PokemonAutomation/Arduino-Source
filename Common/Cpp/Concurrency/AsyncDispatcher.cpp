@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 
 AsyncTask::~AsyncTask(){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [=]{ return m_finished; });
+    m_cv.wait(lg, [this]{ return m_finished; });
 }
 void AsyncTask::rethrow_exceptions(){
     if (!m_stopped_with_error.load(std::memory_order_acquire)){
@@ -25,7 +25,7 @@ void AsyncTask::rethrow_exceptions(){
 }
 void AsyncTask::wait_and_rethrow_exceptions(){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [=]{ return m_finished; });
+    m_cv.wait(lg, [this]{ return m_finished; });
     if (m_exception){
         std::rethrow_exception(m_exception);
     }
@@ -48,7 +48,7 @@ AsyncDispatcher::AsyncDispatcher(std::function<void()>&& new_thread_callback, si
     , m_busy_count(0)
 {
     for (size_t c = 0; c < starting_threads; c++){
-        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [=]{ thread_loop(); });
+        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
     }
 }
 AsyncDispatcher::~AsyncDispatcher(){
@@ -73,7 +73,7 @@ void AsyncDispatcher::dispatch_task(AsyncTask& task){
 
     //  Make sure a thread is ready for it.
     if (m_queue.size() > m_threads.size() - m_busy_count){
-        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [=]{ thread_loop(); });
+        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
     }
 
     m_cv.notify_one();
@@ -113,7 +113,7 @@ void AsyncDispatcher::run_in_parallel(
 
         //  Make sure there are enough threads.
         while (m_queue.size() > m_threads.size() - m_busy_count){
-            m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [=]{ thread_loop(); });
+            m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
         }
 
         for (size_t c = 0; c < tasks.size(); c++){

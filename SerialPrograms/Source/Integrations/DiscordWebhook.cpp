@@ -45,7 +45,7 @@ DiscordWebhookRequest::DiscordWebhookRequest( QUrl p_url, std::shared_ptr<Pendin
 DiscordWebhookSender::DiscordWebhookSender()
     : m_logger(global_logger_raw(), "DiscordWebhookSender")
     , m_stopping(false)
-    , m_thread(run_with_catch, "DiscordWebhookSender::thread_loop()", [=]{ thread_loop(); })
+    , m_thread(run_with_catch, "DiscordWebhookSender::thread_loop()", [this]{ thread_loop(); })
 {}
 
 DiscordWebhookSender::~DiscordWebhookSender(){

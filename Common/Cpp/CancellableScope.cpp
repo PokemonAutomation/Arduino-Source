@@ -139,7 +139,7 @@ void CancellableScope::wait_until(WallClock stop){
         std::unique_lock<std::mutex> lg(data.lock);
         data.cv.wait_until(
             lg, stop,
-            [=]{
+            [this, stop]{
                 return current_time() >= stop || cancelled();
             }
         );
@@ -154,7 +154,7 @@ void CancellableScope::wait_until_cancel(){
         std::unique_lock<std::mutex> lg(data.lock);
         data.cv.wait(
             lg,
-            [=]{
+            [this]{
                 return cancelled();
             }
         );

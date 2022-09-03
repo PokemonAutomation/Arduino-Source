@@ -38,7 +38,7 @@ AudioDisplayWidget::~AudioDisplayWidget(){
 void AudioDisplayWidget::state_changed(){
 //    cout << "AudioDisplayWidget::state_changed()" << endl;
     QMetaObject::invokeMethod(
-        this, [=]{
+        this, [this]{
             m_sanitizer.check_usage();
             update_size();
             QWidget::update();
@@ -48,7 +48,7 @@ void AudioDisplayWidget::state_changed(){
 void AudioDisplayWidget::display_changed(AudioOption::AudioDisplayType display){
 //    cout << "AudioDisplayWidget::display_changed()" << endl;
     QMetaObject::invokeMethod(
-        this, [=]{
+        this, [this, display]{
             m_sanitizer.check_usage();
             m_display_type = display;
             update_size();

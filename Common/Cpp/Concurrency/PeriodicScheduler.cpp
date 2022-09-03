@@ -115,7 +115,7 @@ bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, Wa
 
     //  Thread not started yet. Do this first for strong exception safety.
     if (!m_task){
-        m_task = m_dispatcher.dispatch([=]{ thread_loop(); });
+        m_task = m_dispatcher.dispatch([this]{ thread_loop(); });
     }
 
     bool ret = m_scheduler.add_event(event, period, start);
@@ -147,7 +147,7 @@ void PeriodicRunner::thread_loop(){
 
         //  If anyone is trying to get the lock, yield now.
         if (m_pending_waits.load(std::memory_order_acquire) != 0){
-            m_cv.wait(lg, [=]{ return m_pending_waits.load(std::memory_order_acquire) == 0; });
+            m_cv.wait(lg, [this]{ return m_pending_waits.load(std::memory_order_acquire) == 0; });
         }
 
         WallClock now = current_time();

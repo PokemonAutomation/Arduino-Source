@@ -95,7 +95,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         int ret = run_until(
             env.console, context,
-            [=](BotBaseContext& context){
+            [this](BotBaseContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){

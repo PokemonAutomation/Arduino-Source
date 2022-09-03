@@ -27,7 +27,7 @@ CollapsibleGroupBox::CollapsibleGroupBox(QWidget& parent, const QString& title, 
 
     connect(
         this, &QGroupBox::toggled,
-        this, [=](bool on){
+        this, [this](bool on){
             set_expanded(on);
         }
     );
@@ -80,7 +80,7 @@ CollapsibleGroupBox::CollapsibleGroupBox(QWidget& parent, const QString& title)
 
     connect(
         m_arrow, &QToolButton::toggled,
-        this, [=](bool on){
+        this, [](bool on){
             m_arrow->setArrowType(on ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
             m_box->setVisible(on);
         }

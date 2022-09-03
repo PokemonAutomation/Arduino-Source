@@ -33,7 +33,7 @@ PABotBase::PABotBase(
     , m_last_ack(current_time())
     , m_state(State::RUNNING)
     , m_error(false)
-    , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [=]{ retransmit_thread(); })
+    , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [this]{ retransmit_thread(); })
 {
     set_sniffer(message_logger);
 }

@@ -71,7 +71,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
 
     connect(
         m_group_box, &QGroupBox::toggled,
-        this, [=](bool on){
+        this, [this](bool on){
             m_value.m_enabled.store(on, std::memory_order_relaxed);
             m_value.on_set_enabled(on);
         }
@@ -93,7 +93,7 @@ void GroupWidget::update(){
     }
 }
 void GroupWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }

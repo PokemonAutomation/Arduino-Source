@@ -40,7 +40,7 @@ BooleanCheckBoxCellWidget::BooleanCheckBoxCellWidget(QWidget& parent, BooleanChe
     layout->addWidget(m_box);
     connect(
         m_box, &QCheckBox::stateChanged,
-        this, [=](int){
+        this, [this](int){
             m_value = m_box->isChecked();
         }
     );
@@ -53,7 +53,7 @@ void BooleanCheckBoxCellWidget::update(){
     }
 }
 void BooleanCheckBoxCellWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [=]{
+    QMetaObject::invokeMethod(this, [this]{
         update();
     }, Qt::QueuedConnection);
 }
@@ -81,7 +81,7 @@ BooleanCheckBoxOptionWidget::BooleanCheckBoxOptionWidget(QWidget& parent, Boolea
     layout->addWidget(m_box, 1);
     connect(
         m_box, &QCheckBox::stateChanged,
-        this, [=](int){
+        this, [this](int){
             m_value = m_box->isChecked();
         }
     );
@@ -94,7 +94,7 @@ void BooleanCheckBoxOptionWidget::update(){
     }
 }
 void BooleanCheckBoxOptionWidget::value_changed(){
-    QMetaObject::invokeMethod(m_box, [=]{
+    QMetaObject::invokeMethod(m_box, [this]{
         update();
     }, Qt::QueuedConnection);
 }

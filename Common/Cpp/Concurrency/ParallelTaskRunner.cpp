@@ -25,7 +25,7 @@ ParallelTaskRunner::ParallelTaskRunner(
     , m_busy_count(0)
 {
     for (size_t c = 0; c < starting_threads; c++){
-        m_threads.emplace_back(run_with_catch, "ParallelTaskRunner::thread_loop()", [=]{ thread_loop(); });
+        m_threads.emplace_back(run_with_catch, "ParallelTaskRunner::thread_loop()", [this]{ thread_loop(); });
     }
 }
 ParallelTaskRunner::~ParallelTaskRunner(){
@@ -45,7 +45,7 @@ ParallelTaskRunner::~ParallelTaskRunner(){
 
 void ParallelTaskRunner::wait_for_everything(){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_dispatch_cv.wait(lg, [=]{
+    m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count == 0;
     });
 }
@@ -55,7 +55,7 @@ std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& 
 
     std::unique_lock<std::mutex> lg(m_lock);
 
-    m_dispatch_cv.wait(lg, [=]{
+    m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count < m_max_threads;
     });
 
@@ -63,7 +63,7 @@ std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& 
     m_queue.emplace_back(task);
 
     if (m_queue.size() + m_busy_count > m_threads.size()){
-        m_threads.emplace_back(run_with_catch, "ParallelTaskRunner::thread_loop()", [=]{ thread_loop(); });
+        m_threads.emplace_back(run_with_catch, "ParallelTaskRunner::thread_loop()", [this]{ thread_loop(); });
     }
 
     m_thread_cv.notify_one();
