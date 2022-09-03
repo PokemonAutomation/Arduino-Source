@@ -65,7 +65,7 @@ void CameraSession::get(CameraOption& option){
     option.current_resolution = m_resolution;
 }
 void CameraSession::set(const CameraOption& option){
-    QMetaObject::invokeMethod(this, [this]{
+    QMetaObject::invokeMethod(this, [this, option]{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
         m_device = option.info;
@@ -82,7 +82,7 @@ void CameraSession::reset(){
 }
 void CameraSession::set_source(CameraInfo device){
 //    cout << "CameraSession::set_source()" << endl;
-    QMetaObject::invokeMethod(this, [this]{
+    QMetaObject::invokeMethod(this, [this, device]{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
         m_device = std::move(device);
@@ -90,7 +90,7 @@ void CameraSession::set_source(CameraInfo device){
     });
 }
 void CameraSession::set_resolution(Resolution resolution){
-    QMetaObject::invokeMethod(this, [this]{
+    QMetaObject::invokeMethod(this, [this, resolution]{
         std::lock_guard<std::mutex> lg(m_lock);
         if (!m_camera){
             m_resolution = resolution;
