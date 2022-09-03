@@ -26,9 +26,25 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+class MyTabBar : public QTabBar{
+public:
+    using QTabBar::QTabBar;
+#if 0
+    virtual QSize tabSizeHint(int index) const{
+        QSize ret = QTabBar::tabSizeHint(index);
+        cout << ret.width() << " x " << ret.height() << endl;
+        return QSize(ret.width() * 0.8, ret.height());
+    }
+#endif
+};
+
+
+
 ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
     : QTabWidget(&parent)
 {
+    setTabBar(new MyTabBar(this));
+
     add(new PanelList(*this, holder,
         "Switch",  "Nintendo Switch",
         NintendoSwitch::make_panels()
@@ -53,6 +69,20 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
         "SV", Pokemon::STRING_POKEMON + " Scarlet and Violet",
         NintendoSwitch::PokemonSV::make_panels()
     ));
+
+#if 0
+    QTabBar* bar = this->tabBar();
+    for (int c = 0; c < bar->count(); c++){
+//        cout << "asdf" << endl;
+        const char* name = bar->tabData(c).typeName();
+        if (name){
+            cout << name << endl;
+        }else{
+            cout << "(null)" << endl;
+        }
+//        bar->tabButton(c, QTabBar::RightSide)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    }
+#endif
 
     connect(this, &ProgramTabs::currentChanged, this, [&](int index){
         if (index >= 0 && (size_t)index < m_lists.size()){
