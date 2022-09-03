@@ -35,6 +35,9 @@ public:
     struct Box{
         ImageFloatBox box;
         Color color;
+        Box(const ImageFloatBox& box, Color color) : box(box), color(color) {}
+        Box(const Box&) = default;
+        Box(Box&&) = default;
     };
 
 public:
@@ -46,6 +49,8 @@ public:
 
         // `VideoOverlaySession` will call this function to give the newest texts to the listener.
         virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
+
+        virtual void text_background_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
     };
 
     // Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
@@ -68,9 +73,9 @@ public:
     virtual void add_text(const OverlayText& text) override;
     // Override `VideoOverlay::remove_text()`. See the overridden function for more comments.
     virtual void remove_text(const OverlayText& texxt) override;
-
+    // Override `VideoOverlay::add_shell_text()`. See the overridden function for more comments.
     virtual void add_shell_text(std::string message, Color color) override;
-
+    // Override `VideoOverlay::clear_shell_texts()`. See the overridden function for more comments.
     virtual void clear_shell_texts() override;
 
 private:
@@ -79,9 +84,13 @@ private:
     // change.
     void push_box_update();
     // Pass the current texts to the listeners.
-    // Called by `add_text()` and `remove_text()` so that when texts change, the listeners know the
-    // change.
+    // Called by `add_text()`, `remove_text()`, `add_shell_text()` and `clear_shell_texts()` so that
+    // when texts change, the listeners know the change.
     void push_text_update();
+    // Pass the shell text background box to the listeners.
+    // Called by `add_shell_text()` and `clear_shell_texts()` to notify listeners of updating text
+    // background.
+    void push_text_background_update();
 
 private:
     mutable SpinLock m_lock;

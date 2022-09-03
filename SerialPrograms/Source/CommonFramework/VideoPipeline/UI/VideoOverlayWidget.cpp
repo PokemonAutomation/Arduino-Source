@@ -29,6 +29,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_offset_x(0)
     , m_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
+    , m_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -63,6 +64,11 @@ void VideoOverlayWidget::text_update(const std::shared_ptr<const std::vector<Ove
     m_texts = texts;
 }
 
+void VideoOverlayWidget::text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
+    SpinLockGuard lg(m_lock, "VideoOverlay::text_background_update()");
+    m_text_bg_boxes = bg_boxes;
+}
+
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);
 
@@ -70,9 +76,16 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     double height = m_scale * m_video_size.height();
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
-//    if (m_boxes == nullptr){
-//        return;
-//    }
+
+    for (const auto& item : *m_text_bg_boxes){
+        QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
+        painter.setPen(box_color);
+        const int xmin = std::max((int)(width * item.box.x + 0.5), 1) + m_offset_x;
+        const int ymin = std::max((int)(height * item.box.y + 0.5), 1);
+        const int box_width = (int)(width * item.box.width + 0.5);
+        const int box_height = (int)(height * item.box.height + 0.5);
+        painter.fillRect(xmin, ymin, box_width, box_height, box_color);
+    }
 
 //    cout << "paint: " << m_boxes.size() << endl;
     for (const auto& item : *m_boxes){
