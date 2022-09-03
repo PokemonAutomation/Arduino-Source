@@ -40,7 +40,7 @@ public:
 #if 0
         connect(
             this, &QTextEdit::textChanged,
-            []{
+            [this]{
                 style()->polish(this);
             }
         );
