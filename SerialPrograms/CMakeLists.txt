@@ -1193,6 +1193,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
+    Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.cpp
+    Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp
@@ -1443,6 +1445,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h
     Source/PokemonSwSh/Programs/ReleaseHelpers.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp

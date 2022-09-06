@@ -46,6 +46,8 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h"
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
+#include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
@@ -168,6 +170,9 @@ std::vector<PanelEntry> make_panels(){
     if (PreloadSettings::instance().NAUGHTY_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
     }
+
+    ret.emplace_back("---- RNG ----");
+    ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
