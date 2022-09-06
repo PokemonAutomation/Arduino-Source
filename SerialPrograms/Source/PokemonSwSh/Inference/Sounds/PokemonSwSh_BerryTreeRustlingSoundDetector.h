@@ -21,7 +21,11 @@ namespace PokemonSwSh{
 class BerryTreeRustlingSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
-    BerryTreeRustlingSoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    BerryTreeRustlingSoundDetector(
+        Logger& logger, ConsoleHandle& console,
+        OnShinyCallback on_shiny_callback,
+        float threshold
+    );
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;
@@ -29,6 +33,8 @@ public:
 protected:
     // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
     virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
+
+    float m_threshold;
 };
 
 

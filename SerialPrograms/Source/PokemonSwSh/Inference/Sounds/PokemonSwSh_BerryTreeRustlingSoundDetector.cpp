@@ -14,14 +14,19 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-BerryTreeRustlingSoundDetector::BerryTreeRustlingSoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
+BerryTreeRustlingSoundDetector::BerryTreeRustlingSoundDetector(
+    Logger& logger, ConsoleHandle& console,
+    OnShinyCallback on_shiny_callback,
+    float threshold
+)
     // Use a red as the detection color because the Levelball is made using red apricorns.
     : AudioPerSpectrumDetectorBase(logger, "BerryTreeRustlingSoundDetector", "Berry tree rustling sound", COLOR_RED, console, on_shiny_callback)
+    , m_threshold(threshold)
 {}
 
 
 float BerryTreeRustlingSoundDetector::get_score_threshold() const{
-    return 0.68f;
+    return m_threshold;
 }
 
 std::unique_ptr<SpectrogramMatcher> BerryTreeRustlingSoundDetector::build_spectrogram_matcher(size_t sampleRate){

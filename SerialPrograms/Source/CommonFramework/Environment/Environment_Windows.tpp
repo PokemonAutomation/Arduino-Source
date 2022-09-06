@@ -68,8 +68,8 @@ bool set_thread_priority(ThreadPriority priority){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority: " + std::to_string((int)priority));
     }
     if (SetPriorityClass(GetCurrentProcess(), native_priority)){
-//        cout << "Process priority set to: " + PRIORITY_DATABASE().find(priority)->display << endl;
-        global_logger_tagged().log("Process priority set to: " + PRIORITY_DATABASE().find(priority)->display, COLOR_BLUE);
+//        cout << "Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display << endl;
+        global_logger_tagged().log("Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display, COLOR_BLUE);
         return true;
     }
     DWORD error = GetLastError();

@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_BerryFarmer2_H
 #define PokemonAutomation_PokemonSwSh_BerryFarmer2_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
@@ -56,6 +57,7 @@ private:
     SimpleIntegerOption<uint16_t> RUSTLING_INTERVAL;
     TimeExpressionOption<uint16_t> RUSTLING_TIMEOUT;
     TimeExpressionOption<uint16_t> SECONDARY_ATTEMPT_MASH_TIME;
+    FloatingPointOption SOUND_THRESHOLD;
 };
 
 

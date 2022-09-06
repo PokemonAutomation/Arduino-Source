@@ -78,6 +78,9 @@ BerryFarmer2::BerryFarmer2()
         TICKS_PER_SECOND,
         "240"
     )
+    , SOUND_THRESHOLD(
+        "<b>Maximum Sound Error Coefficient", 0.68, 0, 1.0
+    )
 {
     PA_ADD_OPTION(REQUIRES_AUDIO);
     PA_ADD_OPTION(START_LOCATION);
@@ -90,6 +93,7 @@ BerryFarmer2::BerryFarmer2()
     PA_ADD_OPTION(RUSTLING_INTERVAL);
     PA_ADD_OPTION(RUSTLING_TIMEOUT);
     PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME);
+    PA_ADD_OPTION(SOUND_THRESHOLD);
 }
 
 
@@ -98,15 +102,21 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     pbf_wait(context, 80);
     context.wait_for_all_requests();
 
-    BerryTreeRustlingSoundDetector initial_rustling_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool {
-        //  Warning: This callback will be run from a different thread than this function.
-        return true;
-        });
+    BerryTreeRustlingSoundDetector initial_rustling_detector(
+        env.console.logger(), env.console, [&](float error_coefficient) -> bool {
+            //  Warning: This callback will be run from a different thread than this function.
+            return true;
+        },
+        (float)SOUND_THRESHOLD
+    );
 
-    BerryTreeRustlingSoundDetector secondary_rustling_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool {
-        //  Warning: This callback will be run from a different thread than this function.
-        return true;
-        });
+    BerryTreeRustlingSoundDetector secondary_rustling_detector(
+        env.console.logger(), env.console, [&](float error_coefficient) -> bool {
+            //  Warning: This callback will be run from a different thread than this function.
+            return true;
+        },
+        (float)SOUND_THRESHOLD
+    );
 
     StandardBattleMenuWatcher battle_menu_detector(false);
     StartBattleWatcher start_battle_detector;
