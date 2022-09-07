@@ -9,12 +9,14 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_BeamSetter.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_PurpleBeamFinder.h"
@@ -38,6 +40,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
 struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{
     Stats()
         : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
         , timeouts(m_stats["Timeouts"])
         , red_detected(m_stats["Red Detected"])
         , red_presumed(m_stats["Red Presumed"])
@@ -45,6 +48,7 @@ struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{
         , purple(m_stats["Purple"])
     {
         m_display_order.emplace_back(Stat("Attempts"));
+        m_display_order.emplace_back(Stat("Errors"));
         m_display_order.emplace_back(Stat("Timeouts"));
 //        m_display_order.emplace_back(Stat("Red Detected"));
 //        m_display_order.emplace_back(Stat("Red Presumed"));
@@ -54,6 +58,7 @@ struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{
         m_aliases["Red Presumed"] = "Red";
     }
     std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& timeouts;
     std::atomic<uint64_t>& red_detected;
     std::atomic<uint64_t>& red_presumed;
@@ -67,11 +72,7 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder_Descriptor::make_stats() const{
 
 
 PurpleBeamFinder::PurpleBeamFinder()
-    : EXTRA_LINE(
-        "<b>Extra Line:</b><br>(German has an extra line of text.)",
-        false
-    )
-    , NOTIFICATION_RED_BEAM("Red Beam", false, false)
+    : NOTIFICATION_RED_BEAM("Red Beam", false, false)
     , NOTIFICATION_PURPLE_BEAM("Purple Beam", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_RED_BEAM,
@@ -112,7 +113,6 @@ PurpleBeamFinder::PurpleBeamFinder()
     )
 {
     PA_ADD_OPTION(START_LOCATION);
-    PA_ADD_OPTION(EXTRA_LINE);
     PA_ADD_OPTION(NOTIFICATIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
@@ -127,6 +127,76 @@ PurpleBeamFinder::PurpleBeamFinder()
 
 
 
+bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
+
+    SelectionArrowFinder arrow_detector(env.console.overlay(), {0.5, 0.5, 0.3, 0.3});
+    int ret = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_A, 1000);
+        },
+        { arrow_detector }
+    );
+    if (ret < 0){
+        env.log("Failed to detect cursor.", COLOR_RED);
+        stats.errors++;
+        return false;
+    }
+    env.log("Detected initial prompt.");
+
+    pbf_mash_button(context, BUTTON_A, 50);
+    pbf_wait(context, 100);
+    context.wait_for_all_requests();
+
+    ret = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            pbf_press_button(context, BUTTON_A, 10, 300);
+        },
+        { arrow_detector }
+    );
+    if (ret < 0){
+        env.log("Failed to detect save confirmation.", COLOR_RED);
+        stats.errors++;
+        return false;
+    }
+    env.log("Detected save confirmation.");
+
+    BeamSetter::Detection detection;
+    {
+        BeamSetter setter(env, env.console, context);
+        detection = setter.run(
+            SAVE_SCREENSHOT,
+            TIMEOUT_DELAY,
+            MIN_BRIGHTNESS,
+            MIN_EUCLIDEAN,
+            MIN_DELTA_STDDEV_RATIO,
+            MIN_SIGMA_STDDEV_RATIO
+        );
+        stats.attempts++;
+    }
+    switch (detection){
+    case BeamSetter::NO_DETECTION:
+        stats.timeouts++;
+        send_program_status_notification(env, NOTIFICATION_RED_BEAM, "Red Beam...");
+        return false;
+    case BeamSetter::RED_DETECTED:
+        stats.red_detected++;
+        send_program_status_notification(env, NOTIFICATION_RED_BEAM, "Red Beam...");
+        return false;
+    case BeamSetter::RED_ASSUMED:
+        stats.red_presumed++;
+        send_program_status_notification(env, NOTIFICATION_RED_BEAM, "Red Beam...");
+        return false;
+    case BeamSetter::PURPLE:
+        stats.purple++;
+        return true;
+    }
+
+    return false;
+}
+
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
@@ -137,54 +207,12 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     }
     context.wait_for_all_requests();
 
-
-    PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
-
-
-    bool exit = false;
     while (true){
-        //  Talk to den.
-        pbf_press_button(context, BUTTON_A, 10, 450);
-        if (EXTRA_LINE){
-            pbf_press_button(context, BUTTON_A, 10, 300);
-        }
-        pbf_press_button(context, BUTTON_A, 10, 300);
-        context.wait_for_all_requests();
-
-        BeamSetter::Detection detection;
-        {
-            BeamSetter setter(env, env.console, context);
-            detection = setter.run(
-                SAVE_SCREENSHOT,
-                TIMEOUT_DELAY,
-                MIN_BRIGHTNESS,
-                MIN_EUCLIDEAN,
-                MIN_DELTA_STDDEV_RATIO,
-                MIN_SIGMA_STDDEV_RATIO
-            );
-            stats.attempts++;
-        }
-        switch (detection){
-        case BeamSetter::NO_DETECTION:
-            stats.timeouts++;
-            break;
-        case BeamSetter::RED_DETECTED:
-            stats.red_detected++;
-            break;
-        case BeamSetter::RED_ASSUMED:
-            stats.red_presumed++;
-            break;
-        case BeamSetter::PURPLE:
-            stats.purple++;
-            exit = true;
-            break;
-        }
+        bool exit = run(env, context);
         env.update_stats();
         if (exit){
             break;
         }
-
-        send_program_status_notification(env, NOTIFICATION_RED_BEAM, "Red Beam...");
 
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(

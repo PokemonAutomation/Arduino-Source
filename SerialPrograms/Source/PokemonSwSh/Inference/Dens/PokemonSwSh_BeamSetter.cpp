@@ -33,7 +33,8 @@ BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, ConsoleHandle& console, BotB
     // : m_env(env)
     : m_console(console)
     , m_context(context)
-    , m_text_box(console, 0.400, 0.825, 0.05, 0.05, COLOR_RED)
+    , m_text_box0(console, 0.400, 0.825, 0.05, 0.05, COLOR_RED)
+    , m_text_box1(console, 0.250, 0.900, 0.05, 0.05, COLOR_RED)
     , m_box(console, 0.10, 0.005, 0.8, 0.470, COLOR_RED)
 {
     for (size_t c = 0; c < 32; c++){
@@ -92,7 +93,8 @@ BeamSetter::Detection BeamSetter::run(
         }
 
         //  Text detection.
-        double text_stddev = image_stddev(extract_box_reference(*current_screenshot, m_text_box)).sum();
+        double text_stddev = image_stddev(extract_box_reference(*current_screenshot, m_text_box0)).sum();
+        text_stddev = std::max(text_stddev, image_stddev(extract_box_reference(*current_screenshot, m_text_box1)).sum());
         if (text_stddev < 10){
             low_stddev_flag = true;
         }

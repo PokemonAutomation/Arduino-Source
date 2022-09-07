@@ -47,7 +47,8 @@ private:
     // ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
     BotBaseContext& m_context;
-    InferenceBoxScope m_text_box;
+    InferenceBoxScope m_text_box0;
+    InferenceBoxScope m_text_box1;
     InferenceBoxScope m_box;
     std::vector<ImageFloatBox> m_boxes;
 };
