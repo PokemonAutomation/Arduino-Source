@@ -8,22 +8,20 @@
 #define PokemonAutomation_MainWindow_H
 
 #include <QMainWindow>
-#include <QVBoxLayout>
-#include "CommonFramework/Logging/FileWindowLogger.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "PanelLists.h"
 
+class QVBoxLayout;
+
 namespace PokemonAutomation{
+
+class FileWindowLoggerWindow;
 
 
 class MainWindow : public QMainWindow, public PanelHolder{
 public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
-
-//    OutputWindow& output_window() const{ return *m_output_window; }
-
-    void open_output_window();
 
 private:
     virtual void closeEvent(QCloseEvent* event) override;

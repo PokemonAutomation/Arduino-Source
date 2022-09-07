@@ -9,6 +9,8 @@
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
+#include <QVBoxLayout>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 

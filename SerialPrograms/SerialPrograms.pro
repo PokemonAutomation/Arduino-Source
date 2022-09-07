@@ -261,6 +261,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraOption.cpp \
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp \
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
@@ -1006,6 +1007,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraSession.h \
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h \
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.h \
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h \
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h \
     Source/CommonFramework/VideoPipeline/VideoFeed.h \
@@ -1350,6 +1352,7 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
+    Source/PokemonSwSh/Imference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \
@@ -1371,7 +1374,6 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h \
-    Source/PokemonSwSh/Imference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h \
@@ -1498,10 +1500,10 @@ HEADERS += \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
-    Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h \
+    Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h \

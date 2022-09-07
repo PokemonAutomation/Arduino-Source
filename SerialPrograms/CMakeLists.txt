@@ -486,6 +486,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.cpp
+    Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.h
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
@@ -1444,13 +1446,13 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h
-    Source/PokemonSwSh/Programs/ReleaseHelpers.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.h
+    Source/PokemonSwSh/Programs/ReleaseHelpers.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp

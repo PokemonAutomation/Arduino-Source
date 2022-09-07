@@ -7,6 +7,7 @@
 #include <QMenuBar>
 //#include <QStatusBar>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
@@ -15,6 +16,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/FileWindowLogger.h"
 #include "PanelLists.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
@@ -115,7 +117,7 @@ MainWindow::MainWindow(QWidget* parent)
                     "About",
                     QString::fromStdString(
                         PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
-                        "Copyright: 2020 - 2021<br>" +
+                        "Copyright: 2020 - 2022<br>" +
                         "<br>"
                         "Made by the " + PROGRAM_NAME + " Discord Server.<br>"
                         "<br>"
@@ -177,11 +179,6 @@ MainWindow::~MainWindow(){
     close_panel();
 }
 
-
-
-void MainWindow::open_output_window(){
-    m_output_window->show();
-}
 
 void MainWindow::closeEvent(QCloseEvent* event){
     m_output_window->close();

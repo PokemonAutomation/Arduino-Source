@@ -17,7 +17,10 @@ namespace PokemonAutomation{
 class JsonValue;
 struct PanelHolder;
 
-
+// Class to represent one instance of a pokemon automation program.
+// Since programs are listed in the program panels, so this class is called PanelInstance.
+// Its derived classes hold all the program data and program logic. It also calls
+// `make_widget()` to generate the UI for the program.
 class PanelInstance{
 public:
     explicit PanelInstance(const PanelDescriptor& descriptor);

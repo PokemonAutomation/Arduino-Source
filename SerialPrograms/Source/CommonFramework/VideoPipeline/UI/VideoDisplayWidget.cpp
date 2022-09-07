@@ -6,6 +6,7 @@
 
 #include <QResizeEvent>
 #include "VideoDisplayWidget.h"
+#include "VideoDisplayWindow.h"
 
 #include <iostream>
 using std::cout;
@@ -74,6 +75,15 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 
+void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent *event){
+    move_to_new_window();
+}
 
+void VideoDisplayWidget::move_to_new_window(){
+    // The constructor of VideoDisplayWindow handles the transfer of this VideoDisplayWidget to the new window.
+    // The constructor also displays the window.
+    // So there is nothing else to do in VideoDisplayWidget::move_to_new_window() besides building VideoDisplayWindow.
+    new VideoDisplayWindow(this);
+}
 
 }
