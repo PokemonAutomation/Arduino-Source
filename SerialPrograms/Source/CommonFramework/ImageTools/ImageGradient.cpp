@@ -71,20 +71,19 @@ size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, c
         num_border_pixels += !has_non_border_channel;
     }
     
-    int16_t min_color[3] = {255, 255, 255}; 
-    for(size_t i = 0; i < image.width(); i++){
-        if (is_zero[3*i] == false || is_zero[3*i+1] == false || is_zero[3*i+2] == false){
-            // cout << i << ": (" << gradients[3*i] << (is_zero[3*i] ? "*" : "");
-            // cout << ", " << gradients[3*i+1] << (is_zero[3*i+1] ? "*" : "");
-            // cout << ", " << gradients[3*i+2] << (is_zero[3*i+2] ? "*" : "") << ")\n";
-
-            for(int j = 0; j < 3; j++){
-                if (is_zero[3*i+j] == false){
-                    min_color[j] = std::min(min_color[j], gradients[3*i + j]);
-                }
-            }
-        }
-    }
+    // int16_t min_color[3] = {255, 255, 255}; 
+    // for(size_t i = 0; i < image.width(); i++){
+    //     if (is_zero[3*i] == false || is_zero[3*i+1] == false || is_zero[3*i+2] == false){
+    //         cout << i << ": (" << gradients[3*i] << (is_zero[3*i] ? "*" : "");
+    //         cout << ", " << gradients[3*i+1] << (is_zero[3*i+1] ? "*" : "");
+    //         cout << ", " << gradients[3*i+2] << (is_zero[3*i+2] ? "*" : "") << ")\n";
+    //         for(int j = 0; j < 3; j++){
+    //             if (is_zero[3*i+j] == false){
+    //                 min_color[j] = std::min(min_color[j], gradients[3*i + j]);
+    //             }
+    //         }
+    //     }
+    // }
     // cout << "min non-0 color " << min_color[0] << " " << min_color[1] << " " << min_color[2] << endl;
     // cout << "num border pixels proportion: " << num_border_pixels / (float)image.width() << endl;
 
