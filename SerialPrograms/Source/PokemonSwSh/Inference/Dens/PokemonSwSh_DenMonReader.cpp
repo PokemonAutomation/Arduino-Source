@@ -40,6 +40,7 @@ public:
         );
         background = Color();
         ImageRGB32 ret = extract_box_reference(image, box).copy();
+        // Set black pixels to have 255 alpha while other pixels 0 alpha.
         ImageMatch::set_alpha_black(ret);
         return ret;
     }

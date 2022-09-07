@@ -53,12 +53,14 @@ void set_alpha_black(ImageRGB32& image, uint32_t max_rgb_sum){
 #endif
         while (c < width){
             uint32_t pixel = row[c];
+            // Set alpha channel to 0.
             pixel &= 0x00ffffff;
 
             uint32_t sum = pixel & 0xff;
             sum += (pixel >>  8) & 0xff;
             sum += (pixel >> 16) & 0xff;
             if (sum <= max_rgb_sum){
+                // If dark, set alpha channel to 255.
                 pixel |= 0xff000000;
             }
             row[c] = pixel;
