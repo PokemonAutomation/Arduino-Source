@@ -27,6 +27,8 @@ std::string set_to_str(const std::set<std::string>& set);
 
 std::string duration_to_string(std::chrono::milliseconds milliseconds);
 
+std::string tostr_hex(uint64_t x);
+
 }
 #endif
 

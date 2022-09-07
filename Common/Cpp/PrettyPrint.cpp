@@ -142,6 +142,13 @@ std::string duration_to_string(std::chrono::milliseconds milliseconds){
 }
 
 
+// After C++20 format or fmt::format is adopted, we can use:
+// std::format("{:x}", value));
+std::string tostr_hex(uint64_t x){
+    std::ostringstream ss;
+    ss << std::hex << x;
+    return ss.str();
+}
 
 
 

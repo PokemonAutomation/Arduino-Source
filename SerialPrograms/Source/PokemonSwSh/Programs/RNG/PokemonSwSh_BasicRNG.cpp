@@ -5,11 +5,10 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
-
-#include <format>
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -55,8 +54,8 @@ Xoroshiro128PlusState find_rng_state(
     for (size_t j = 0; j < 128; j++) {
         rng.next();
     }
-    console.log("RNG: state[0] = " + std::format("{:x}", rng.get_state().s0));
-    console.log("RNG: state[1] = " + std::format("{:x}", rng.get_state().s1));
+    console.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
+    console.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
     return rng.get_state();
 }
 
@@ -118,8 +117,8 @@ Xoroshiro128PlusState refind_rng_state(
     for (size_t advance = 0; advance < distance; advance++) {
         rng.next();
     }
-    console.log("RNG: state[0] = " + std::format("{:x}", rng.get_state().s0));
-    console.log("RNG: state[1] = " + std::format("{:x}", rng.get_state().s1));
+    console.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
+    console.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
 
     return rng.get_state();
 }
