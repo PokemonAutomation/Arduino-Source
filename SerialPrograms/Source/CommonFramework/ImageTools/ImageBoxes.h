@@ -24,7 +24,15 @@ namespace Waterfill{
 //  Deprecated
 using pxint_t = size_t;
 
-
+// An axis aligned box in the image pixel space. Used for getting a crop from an image for various
+// visual detection.
+// The box is measured in pixel units. Image coordinate system is:
+// - x axis from left to right, range: [0, image_width)
+// - y axis from top to bottom, range: [0, image_height)
+// min_x: leftmost pixel coordinate of the box
+// min_y: topmost pixel coordinate of the box
+// max_x: 1 + rightmost pixel coordinate of the box
+// max_y: 1 + bottommost pixel coordinate of the box
 struct ImagePixelBox{
     size_t min_x;
     size_t min_y;
@@ -73,7 +81,17 @@ struct ImagePixelBox{
     size_t distance_y(const ImagePixelBox& box) const;
 };
 
-
+// An axis aligned box in the normalized image space. Used for getting a crop from an image for various
+// visual detection.
+// The box is measured relative to the original image size. The coordinate system is:
+// - x axis from left to right, range: [0.0, 1.0)
+// - y axis from top to bottom, range: [0.0, 1.0)
+// In this way, the box can be defined independent of the original image's resolution, allowing visual
+// inference code to work on all video stream and image resolutions.
+// x: leftmost coordinate of the box, range: [0.0, 1.0)
+// y: topmost coordinate of the box, range: [0.0, 1.0)
+// width: width of the box relative to the image width, range: [0.0, 1.0)
+// height: height of the box relative to the image height, range: [0.0, 1.0)
 struct ImageFloatBox{
     double x;
     double y;
