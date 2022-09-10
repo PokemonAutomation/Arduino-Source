@@ -189,17 +189,37 @@ void SwitchSystemWidget::update_ui(ProgramState state){
     m_command->on_state_changed(state);
 }
 
-void SwitchSystemWidget::keyPressEvent(QKeyEvent* event){
+void SwitchSystemWidget::key_press(QKeyEvent* event){
     m_command->on_key_press((Qt::Key)event->key());
 }
-void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
+
+void SwitchSystemWidget::key_release(QKeyEvent* event){
     m_command->on_key_release((Qt::Key)event->key());
 }
-void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
+
+void SwitchSystemWidget::focus_in(QFocusEvent* event){
     m_command->set_focus(true);
 }
-void SwitchSystemWidget::focusOutEvent(QFocusEvent* event){
+
+void SwitchSystemWidget::focus_out(QFocusEvent* event){
     m_command->set_focus(false);
+}
+
+void SwitchSystemWidget::keyPressEvent(QKeyEvent* event){
+    key_press(event);
+    QWidget::keyPressEvent(event);
+}
+void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
+    key_release(event);
+    QWidget::keyReleaseEvent(event);
+}
+void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
+    focus_in(event);
+    QWidget::focusInEvent(event);
+}
+void SwitchSystemWidget::focusOutEvent(QFocusEvent* event){
+    focus_out(event);
+    QWidget::focusOutEvent(event);
 }
 
 

@@ -76,7 +76,11 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent *event){
-    move_to_new_window();
+    // If this widget is not already inside a VideoDisplayWindow, move it
+    // into a VideoDisplayWindow
+    if (dynamic_cast<VideoDisplayWindow*>(parentWidget()) == nullptr){
+        move_to_new_window();
+    }
 }
 
 void VideoDisplayWidget::move_to_new_window(){

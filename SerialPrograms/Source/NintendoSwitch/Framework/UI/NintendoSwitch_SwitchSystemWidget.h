@@ -51,6 +51,13 @@ public:
     AudioFeed& audio();
     void update_ui(ProgramState state);
 
+    // The public versions of the private QWidget key and focus event handling functions.
+    // They are needed to accept key and focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
+    void key_press(QKeyEvent* event);
+    void key_release(QKeyEvent* event);
+    void focus_in(QFocusEvent* event);
+    void focus_out(QFocusEvent* event);
+
 private:
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
