@@ -42,6 +42,8 @@ private:
     ImageFloatBox m_left0_status;
     ImageFloatBox m_left1_status;
     ImageFloatBox m_right_status;
+    ImageFloatBox m_opponent_left;
+    ImageFloatBox m_opponent_right;
     ImageFloatBox m_ball_left;
     ImageFloatBox m_ball_right;
     ImageFloatBox m_menu_battle;

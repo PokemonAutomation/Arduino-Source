@@ -22,20 +22,24 @@ namespace PokemonBDSP{
 BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color)
     : m_color(color)
     , m_battle_type(battle_type)
-    , m_left0_status(0.140, 0.922, 0.100, 0.010)
-    , m_left1_status(0.140, 0.910, 0.100, 0.010)
-    , m_right_status(0.405, 0.925, 0.100, 0.010)
-    , m_ball_left   (0.890, 0.475, 0.02, 0.03)
-    , m_ball_right  (0.960, 0.475, 0.03, 0.03)
-    , m_menu_battle (0.817, 0.585 + 0 * 0.1075, 0.150, 0.070)
-    , m_menu_pokemon(0.817, 0.585 + 1 * 0.1075, 0.150, 0.070)
-    , m_menu_bag    (0.817, 0.585 + 2 * 0.1075, 0.150, 0.070)
-    , m_menu_run    (0.817, 0.585 + 3 * 0.1075, 0.150, 0.070)
+    , m_left0_status    (0.140, 0.922, 0.100, 0.010)
+    , m_left1_status    (0.140, 0.910, 0.100, 0.010)
+    , m_right_status    (0.405, 0.925, 0.100, 0.010)
+    , m_opponent_left   (0.685, 0.065, 0.020, 0.030)
+    , m_opponent_right  (0.960, 0.065, 0.020, 0.030)
+    , m_ball_left       (0.890, 0.475, 0.02, 0.03)
+    , m_ball_right      (0.960, 0.475, 0.03, 0.03)
+    , m_menu_battle     (0.817, 0.585 + 0 * 0.1075, 0.150, 0.070)
+    , m_menu_pokemon    (0.817, 0.585 + 1 * 0.1075, 0.150, 0.070)
+    , m_menu_bag        (0.817, 0.585 + 2 * 0.1075, 0.150, 0.070)
+    , m_menu_run        (0.817, 0.585 + 3 * 0.1075, 0.150, 0.070)
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left0_status);
     items.add(m_color, m_left1_status);
     items.add(m_color, m_right_status);
+    items.add(m_color, m_opponent_left);
+    items.add(m_color, m_opponent_right);
     items.add(m_color, m_ball_left);
     items.add(m_color, m_ball_right);
     items.add(m_color, m_menu_battle);
@@ -58,6 +62,13 @@ bool BattleMenuDetector::is_battle_button(const ImageViewRGB32& screen) const{
     return true;
 }
 bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+    {
+        bool left = is_white(extract_box_reference(screen, m_opponent_left));
+        bool right = is_white(extract_box_reference(screen, m_opponent_right));
+        if (!left && !right){
+            return false;
+        }
+    }
     {
         bool left0 = is_white(extract_box_reference(screen, m_left0_status));
         bool left1 = is_white(extract_box_reference(screen, m_left1_status));

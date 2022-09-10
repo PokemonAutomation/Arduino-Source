@@ -35,6 +35,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 
+
 #include <QVideoFrame>
 
 //#include <Windows.h>
@@ -114,8 +115,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+    using namespace PokemonBDSP;
+//    using namespace PokemonLA;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -123,7 +124,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
+    BattleMenuDetector detector(BattleType::STARTER);
 
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+
+    cout << detector.detect(feed.snapshot()) << endl;
+
+
+
+
+#if 0
     ImageRGB32 image("screenshot-20220824-195731986677.png");
 
     InferenceBoxScope ore_quantity(console, 0.945, 0.010, 0.0525, 0.050);
@@ -136,7 +147,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     image.save("test.png");
 
     OCR::read_number(logger, image);
-
+#endif
 
 
 //    PokemonSwSh::StandardBattleMenuDetector detector(true);
