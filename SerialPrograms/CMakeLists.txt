@@ -28,8 +28,6 @@ if(NOT QT_MAJOR)
     set(QT_MAJOR 6)
 endif()
 find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
-#disable deprecated Qt APIs
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
 #add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
@@ -1553,8 +1551,12 @@ if (MSVC)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
-    target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
+    target_compile_options(SerialPrograms PRIVATE /wd4100)  # Unreferenced Formal Parameter
+    target_compile_options(SerialPrograms PRIVATE /wd4127)  # Conditional expression is constant
+    target_compile_options(SerialPrograms PRIVATE /wd4324)  # structure was padded due to alignment specifier
+    target_compile_options(SerialPrograms PRIVATE /wd4458)  # Hiding of class members
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
+    target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
 
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
@@ -1600,6 +1602,11 @@ else()
     # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
     # when compiling OpenCV
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+
+    target_compile_options(SerialPrograms PRIVATE -Wno-unused-parameter)
+    target_compile_options(SerialPrograms PRIVATE -Wno-unused-function)
+    target_compile_options(SerialPrograms PRIVATE -Wno-missing-field-initializers)
+    target_compile_options(SerialPrograms PRIVATE -Wno-overloaded-virtual)
 
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
