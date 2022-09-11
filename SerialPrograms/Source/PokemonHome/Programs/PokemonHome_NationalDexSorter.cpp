@@ -407,7 +407,9 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
             env.console.log("Found shiny Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
         }
     }
-
+    else{
+        pbf_wait(context, 15);
+    }
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_B, 5, 50);
     context.wait_for_all_requests();
@@ -430,7 +432,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
 
     context.wait_for_all_requests();
 
-    int boxPage = read_number(env.console,env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.023, 0.06));                            //recognizes the number of the page
+    int boxPage = read_number(env.console,env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.022, 0.06));                            //recognizes the number of the page
     if((boxPage < 0)||(boxPage > 7)){
         env.console.log("I cannot read the box page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
         return;
@@ -554,9 +556,10 @@ void NationalDexSorter::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     descriptorEndDexNo = GET_TO_DEX_NO;
     descriptorStartPage = START_FROM_PAGE;
 
-    if ((descriptorStartPage > 5)||(descriptorStartPage < 1))
+    if ((descriptorStartPage > 6)||(descriptorStartPage < 1))
     {
         env.console.log("Impossible start box page. Will start from page 5.",COLOR_RED);
+        descriptorStartPage = 5;
     }
     if ((descriptorStartDexNo > 905)||(descriptorStartDexNo < 1))
     {
