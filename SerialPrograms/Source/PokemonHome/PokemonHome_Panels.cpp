@@ -13,6 +13,8 @@
 
 #include "Programs/PokemonHome_GenerateNameOCR.h"
 
+#include "Programs/PokemonHome_NationalDexSorter.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
@@ -27,6 +29,7 @@ std::vector<PanelEntry> make_panels(){
 
 //    ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
+    ret.emplace_back(make_single_switch_program<PokemonHome::NationalDexSorter_Descriptor, PokemonHome::NationalDexSorter>());
 
 //    ret.emplace_back("---- Trading ----");
 
