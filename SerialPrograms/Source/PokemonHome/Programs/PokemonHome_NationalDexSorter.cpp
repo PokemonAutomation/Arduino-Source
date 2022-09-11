@@ -415,6 +415,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
     context.wait_for_all_requests();
     if(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000,2) != PokemonLA::ItemCompatibility::COMPATIBLE){    //first visual check, code goes on only if it can see a selection arrow
         env.console.log("No Pokémon #" + std::to_string(pokedexNo) + " found!",COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 35);
         return;                  //if there's no pokémon with this name in your pokémon home jump to next pokémon
     }
 
@@ -426,6 +427,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
     bool goOn = FindBoxSpaces(env,context);     //FindBoxSpaces is all about getting the selected pokèmon to a known position in the pokemon boxes menu. From there the code will take care of where to put it.
     if(!goOn){
         env.console.log("I cannot find the cursor in this page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 35);
         return;
     }
     pbf_wait(context, 35);
@@ -435,6 +437,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
     int boxPage = read_number(env.console,env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.022, 0.06));                            //recognizes the number of the page
     if((boxPage < 0)||(boxPage > 7)){
         env.console.log("I cannot read the box page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 35);
         return;
     }
     int boxDistance = 0;
