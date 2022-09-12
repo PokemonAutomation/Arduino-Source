@@ -10,6 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_OrbeetleAttackAnimationDetector.h"
@@ -36,7 +37,8 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
     }
 
     if (save_screenshot) {
-        baseline_image->save("orbeetle-baseline-" + now_to_filestring() + ".png");
+        //baseline_image->save("orbeetle-baseline-" + now_to_filestring() + ".png");
+        dump_debug_image(m_console.logger(), "rng", "orbeetle-baseline", *baseline_image);
     }
 
     FloatPixel baseline_values = image_average(extract_box_reference(*baseline_image, m_box));
@@ -80,13 +82,15 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
         )
     {
         if (save_screenshot) {
-            animation_image->save("orbeetle-attack-special-" + now_to_filestring() + ".png");
+            //animation_image->save("orbeetle-attack-special-" + now_to_filestring() + ".png");
+            dump_debug_image(m_console.logger(), "rng", "orbeetle-special", *animation_image);
         }
         m_console.log("Orbeetle Attack Animation: Special animation detected.");
         return Detection::SPECIAL;
     }
     if (save_screenshot) {
         animation_image->save("orbeetle-attack-physical-" + now_to_filestring() + ".png");
+        dump_debug_image(m_console.logger(), "rng", "orbeetle-physical", *animation_image);
     }
     m_console.log("Orbeetle Attack Animation: Physical animation detected.");
     return Detection::PHYSICAL;
