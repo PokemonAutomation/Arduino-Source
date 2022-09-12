@@ -48,8 +48,6 @@ private:
     VideoDisplayWidget* m_display_widget;
 
     NintendoSwitch::SwitchSystemWidget* m_parent_switch_system_widget;
-
-    bool m_full_screen = false;
 };
 
 
