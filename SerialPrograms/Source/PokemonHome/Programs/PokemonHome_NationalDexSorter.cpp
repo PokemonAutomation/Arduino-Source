@@ -83,9 +83,9 @@ namespace PokemonHome{
     const uint lineCol1 =0xf44336;          // the red to check for in the name bar
     const uint lineCol2 =0xf44336;          // the red to check for in the name bar
     int eCount = 0;                         // if at any point you make too many moves before getting to the next step give up on the pokémon
-    const int eCountMax = 35;               // this is the max steps I allow before giving up on a given task
+    const int eCountMax = 7;               // this is the max steps I allow before giving up on a given task
 
-    PokemonLA::ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen,const ImageFloatBox& box,const uint& col1,const uint& col2,const int& superCheck){
+PokemonLA::ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen,const ImageFloatBox& box,const uint& col1,const uint& col2,const int& superCheck){
     // This is copied from the SkipToFullMoon code, I use it as a solid color check.
     // I use it in various ways in order to reach my goals, not all of them make sense, but all work.
 
@@ -114,6 +114,7 @@ namespace PokemonHome{
 }
 
 int read_number(Logger& logger, const ImageViewRGB32& image2,const ImageFloatBox& box){
+    // This is the OCR read_number function, I only changed the log so that it says which BoxPage it's reading
     ImageViewRGB32 image = extract_box_reference(image2, box);
     std::string ocr_text = OCR::ocr_read(Language::English, image);
     std::string normalized;
@@ -145,6 +146,35 @@ int read_number(Logger& logger, const ImageViewRGB32& image2,const ImageFloatBox
     logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> Box Page #" + std::to_string(number),COLOR_RED);
 
     return number;
+}
+
+int GetBoxSpacesButton(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
+{
+    //This finds the orange buttons inside the box view in order to get the Pokémon out to the box pages.
+    eCount = 0;
+    int foundButton = 0;
+    while(foundButton == 0){
+        if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.456, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+            pbf_press_dpad(context, DPAD_RIGHT, 5, leSpeed);
+            foundButton = 1;
+            break;
+        }
+        else if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.276, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+            foundButton = 1;
+            break;
+        }
+        eCount ++; // if up is pressed too many times the recognition failed and the program gives up on the pokémon.
+        if (eCount > eCountMax){
+            return 0;
+            break;
+        }
+        pbf_press_dpad(context, DPAD_UP, 5, 30);
+        context.wait_for_all_requests();
+    }
+    if(foundButton>0){
+        env.console.log("Found orange button",COLOR_RED);
+    }
+    return foundButton;
 }
 
 int GetPokemonX(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
@@ -180,23 +210,11 @@ int GetPokemonX(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
             startPositionX = 6;
             break;
         }
-        else if(startPositionX == 0){
-            pbf_press_dpad(context, DPAD_UP, 5, 25);
-            context.wait_for_all_requests();
-            if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.456, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
-                pbf_press_dpad(context, DPAD_RIGHT, 5, leSpeed);
-                startPositionX = 7;
-                break;
-            }
-            else if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.276, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
-                startPositionX = 7;
-                break;
-            }
-        }
-        eCount ++;
-        if (eCount > 7){
+        eCount ++; // if up is pressed too many times the recognition failed and the program gives up on the pokémon.
+        if (eCount > eCountMax){
             return 0;
         }
+        pbf_press_dpad(context, DPAD_UP, 5, 30);
         context.wait_for_all_requests();
     }
     if(startPositionX>6){
@@ -210,24 +228,13 @@ int GetPokemonX(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 
 bool FindBoxSpaces(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.console.log("Sorting...",COLOR_RED);
-    int pokemonX = GetPokemonX(env, context);
-    if (pokemonX == 0){
+    //Gets the pokémon out to the correct place in the box spaces.
+    if (GetBoxSpacesButton(env, context) == 0){
         return false;
-    }
-    else if(pokemonX <= 4)
-    {
-        pbf_press_dpad(context, DPAD_UP, 5, leSpeed);
-        pbf_press_dpad(context, DPAD_UP, 5, 30);
-    }
-    else if(pokemonX <= 6)
-    {
-        pbf_press_dpad(context, DPAD_UP, 5, leSpeed);
-        pbf_press_dpad(context, DPAD_UP, 5, leSpeed);
-        pbf_press_dpad(context, DPAD_RIGHT, 5, 30);
     }
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 5, 50);
-    pokemonX = GetPokemonX(env, context);
+    int pokemonX = GetPokemonX(env, context);
     int i = 0;
     if (pokemonX == 0){
         return false;
@@ -322,6 +329,22 @@ void NavigateMenuFast(int itemNo, int totalItems, int midPosition, BotBaseContex
     context.wait_for_all_requests();
 }
 
+bool IsCursorRed(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
+{
+    context.wait_for_all_requests();
+    for(int i = 0;i<3;i++){
+        if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.47, 0, 0.052, 0.012),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+             return true;
+             break;
+        }
+        else{
+            pbf_press_button(context, BUTTON_ZR, 5, 150);
+        }
+        context.wait_for_all_requests();
+    }
+    return false;
+}
+
 void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int upOrDown,int getShiny,int startBoxPage,int startBoxNo,BotBaseContext& context,SingleSwitchProgramEnvironment& env,int type1 = 0, int type2 = 0){
     /* PokemonHomeSort is the main function here.
      *
@@ -366,7 +389,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
         NavigateMenuFast(movesDown, 0, movesDown+1,context,env);    // if it's faster to move down in the pokemon list this function activates
     }
 
-    if(type1 > 0){                                                      //if type1 is more than 0 it means we're looking for a regional/original variant by finding pokèmon only with the correct type, basculin is not found this way
+    if(type1 > 0){                                                  //if type1 is more than 0 it means we're looking for a regional/original variant by finding pokèmon only with the correct type, basculin is not found this way
         env.console.log("Looking for correct Pokémon variant.",COLOR_RED);
         pbf_press_dpad(context, DPAD_DOWN, 5, leSpeed);
         pbf_press_dpad(context, DPAD_DOWN, 5, leSpeed);
@@ -385,7 +408,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
         pbf_press_dpad(context, DPAD_LEFT, 5, 50);
     }
 
-    if(getShiny){                                           //if getShiny flag is 1 try to find shinies and if it fails get nonShiny. if value is 2 it will soon make it so this part of the code only selects available shinies
+    if(getShiny){                                           //if getShiny flag is true try to find shinies and if it fails get nonShiny. might add another flag so it only selects available shinies.
         env.console.log("Looking for shiny form.",COLOR_RED);
         pbf_press_dpad(context, DPAD_UP, 5, leSpeed);
         context.wait_for_all_requests();
@@ -408,26 +431,27 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
         }
     }
     else{
-        pbf_wait(context, 15);
+        context.wait_for_all_requests();
+        pbf_wait(context, 20);          //this wait is important because it may mess up if it's too fast
     }
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_B, 5, 50);
     context.wait_for_all_requests();
     if(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000,2) != PokemonLA::ItemCompatibility::COMPATIBLE){    //first visual check, code goes on only if it can see a selection arrow
         env.console.log("No Pokémon #" + std::to_string(pokedexNo) + " found!",COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 35);
-        return;                  //if there's no pokémon with this name in your pokémon home jump to next pokémon
+        pbf_mash_button(context, BUTTON_B, 40);
+        return;                                                 //if there's no pokémon with this name in your pokémon home jump to next pokémon
     }
 
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 5, 75);
     pbf_press_button(context, BUTTON_A, 5, 75);
-    pbf_press_button(context, BUTTON_Y, 5, 20);                //pick up pokémon and start moving it around
+    pbf_press_button(context, BUTTON_Y, 5, 20);                 //pick up pokémon and start moving it around
     context.wait_for_all_requests();
-    bool goOn = FindBoxSpaces(env,context);     //FindBoxSpaces is all about getting the selected pokèmon to a known position in the pokemon boxes menu. From there the code will take care of where to put it.
+    bool goOn = FindBoxSpaces(env,context);                     //FindBoxSpaces is all about getting the selected pokèmon to a known position in the pokemon boxes menu. From there the code will take care of where to put it.
     if(!goOn){
         env.console.log("I cannot find the cursor in this page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 35);
+        pbf_mash_button(context, BUTTON_B, 40);
         return;
     }
     pbf_wait(context, 35);
@@ -437,7 +461,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
     int boxPage = read_number(env.console,env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.022, 0.06));                            //recognizes the number of the page
     if((boxPage < 0)||(boxPage > 7)){
         env.console.log("I cannot read the box page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 35);
+        pbf_mash_button(context, BUTTON_B, 40);
         return;
     }
     int boxDistance = 0;
@@ -559,7 +583,7 @@ void NationalDexSorter::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     descriptorEndDexNo = GET_TO_DEX_NO;
     descriptorStartPage = START_FROM_PAGE;
 
-    if ((descriptorStartPage > 6)||(descriptorStartPage < 1))
+    if ((descriptorStartPage > 6)||(descriptorStartPage < 1))    //first of all it checks if descriptors have correct values
     {
         env.console.log("Impossible start box page. Will start from page 5.",COLOR_RED);
         descriptorStartPage = 5;
@@ -580,7 +604,13 @@ void NationalDexSorter::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         return;
     }
 
-    pbf_mash_button(context, BUTTON_B, 2.5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 2.5 * TICKS_PER_SECOND);    //mashes B to get to the correct view
+
+    if(!IsCursorRed(env,context)){              //this check is important since if the cursor isn't red the program won't read it correctly.
+        env.console.log("Impossible to read cursor color. Program will terminate.",COLOR_RED);
+        return;
+    }
+
     PokemonHomeSort(1,2,43,6,0,CHOOSE_SHINY_FIRST,descriptorStartPage,1,context,env);      //I have a database with the needed data to populate the function to move correctly all 905 pokémon, will move to json whenever I understand it
     PokemonHomeSort(2,9,8,1,0,CHOOSE_SHINY_FIRST,descriptorStartPage,1,context,env);
     PokemonHomeSort(3,22,7,16,1,CHOOSE_SHINY_FIRST,descriptorStartPage,1,context,env);
