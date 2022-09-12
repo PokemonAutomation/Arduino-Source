@@ -228,6 +228,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         else {
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
         }
+        Xoroshiro128PlusState rng_state = rng.get_state();
+        if (rng_state.s0 == 0 && rng_state.s1 == 0) {
+            throw OperationFailedException(console, "Invalid RNG state detected.");
+        }
 
         size_t advances = needed_advances(env, rng.get_state(), BALL_TYPE);
         env.console.log("Needed advances: " + std::to_string(advances));
