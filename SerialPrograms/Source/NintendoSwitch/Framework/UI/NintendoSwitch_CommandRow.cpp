@@ -80,15 +80,17 @@ CommandRow::CommandRow(
     );
 }
 
-void CommandRow::on_key_press(Qt::Key key){
+bool CommandRow::on_key_press(Qt::Key key){
     if (m_last_known_focus){
-        VirtualController::on_key_press(key);
+        return VirtualController::on_key_press(key);
     }
+    return false;
 }
-void CommandRow::on_key_release(Qt::Key key){
+bool CommandRow::on_key_release(Qt::Key key){
     if (m_last_known_focus){
-        VirtualController::on_key_release(key);
+        return VirtualController::on_key_release(key);
     }
+    return false;
 }
 
 void CommandRow::set_focus(bool focused){

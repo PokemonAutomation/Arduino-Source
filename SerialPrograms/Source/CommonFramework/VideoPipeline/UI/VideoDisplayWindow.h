@@ -35,6 +35,8 @@ private:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+
     // Override key and focus event handlers to pass those events back to the parent widget.
     // The parent widget is SwitchSystemWidget. It needs to listen to key and focus events to
     // realize virtual keyboard functionality.

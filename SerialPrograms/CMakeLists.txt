@@ -1452,8 +1452,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
-    Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.cpp
-    Source/PokemonSwSh/Programs/RNG/PokemonSwsh_Xoroshiro128Plus.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h
     Source/PokemonSwSh/Programs/ReleaseHelpers.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h
