@@ -8,8 +8,10 @@
  * 
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -191,7 +193,7 @@ bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseCon
 
         std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
         if (SAVE_SCREENSHOTS) {
-            screen->save(now_to_filestring() + ".png");
+            dump_debug_image(env.logger(), "cramomatic-rng", "receive", *screen);
         }
         if (arrow_detector.detect(*screen)) {
             arrow_detected = true;
@@ -230,7 +232,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         Xoroshiro128PlusState rng_state = rng.get_state();
         if (rng_state.s0 == 0 && rng_state.s1 == 0) {
-            throw OperationFailedException(console, "Invalid RNG state detected.");
+            throw OperationFailedException(env.console, "Invalid RNG state detected.");
         }
 
         size_t advances = needed_advances(env, rng.get_state(), BALL_TYPE);
