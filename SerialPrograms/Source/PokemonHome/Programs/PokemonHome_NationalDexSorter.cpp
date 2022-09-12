@@ -60,7 +60,7 @@ namespace PokemonHome{
             905
         )
         , START_FROM_PAGE(
-            "<b>Box Page to use for the sorted Pokémon:</b>",
+            "<b>Store Pokémon starting from this Box Page:</b>",
             5
         )
         , CHOOSE_SHINY_FIRST(
@@ -75,17 +75,16 @@ namespace PokemonHome{
         PA_ADD_OPTION(CHOOSE_SHINY_FIRST);
     }
 
-    int descriptorStartDexNo = 1;
-    int descriptorEndDexNo = 905;
-    int descriptorStartPage = 5;       // first box to populate
+    int descriptorStartDexNo;
+    int descriptorEndDexNo;
+    int descriptorStartPage;       // first box to populate
     const int leSpeed = 11;                 // ticks to wait after most of the button presses, seems like this is good enough for most presses.
     const double lineWidth = 0.024;         // how big is the width of the line we're going to check (it works but I have no idea how big this actually is)
     const uint lineCol1 =0xf44336;          // the red to check for in the name bar
     const uint lineCol2 =0xf44336;          // the red to check for in the name bar
-    int eCount = 0;                         // if at any point you make too many moves before getting to the next step give up on the pokémon
     const int eCountMax = 7;               // this is the max steps I allow before giving up on a given task
 
-PokemonLA::ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen,const ImageFloatBox& box,const uint& col1,const uint& col2,const int& superCheck){
+PokemonLA::ItemCompatibility DetectSelectionArrow(const ImageViewRGB32& screen,const ImageFloatBox& box,const uint& col1,const uint& col2){
     // This is copied from the SkipToFullMoon code, I use it as a solid color check.
     // I use it in various ways in order to reach my goals, not all of them make sense, but all work.
 
@@ -103,75 +102,33 @@ PokemonLA::ItemCompatibility detect_item_compatibility(const ImageViewRGB32& scr
     if (stats.average.b > stats.average.r + 50.0){
         return PokemonLA::ItemCompatibility::INCOMPATIBLE;
     }
-    //I created these 2 checks for more specific colors, no idea how it works, just know it works :P
-    if (stats.average.b > 254.5 && stats.average.r > 252.5 && superCheck == 1){
-        return PokemonLA::ItemCompatibility::COMPATIBLE;
-    }
-    if (stats.average.r >  250 && superCheck == 2){
-        return PokemonLA::ItemCompatibility::COMPATIBLE;
-    }
     return PokemonLA::ItemCompatibility::NONE;
-}
-
-int read_number(Logger& logger, const ImageViewRGB32& image2,const ImageFloatBox& box){
-    // This is the OCR read_number function, I only changed the log so that it says which BoxPage it's reading
-    ImageViewRGB32 image = extract_box_reference(image2, box);
-    std::string ocr_text = OCR::ocr_read(Language::English, image);
-    std::string normalized;
-    bool has_digit = false;
-    for (char ch : ocr_text){
-        //  4 is commonly misread as A.
-        if (ch == 'a' || ch == 'A'){
-            normalized += '4';
-            has_digit = true;
-        }
-        if ('0' <= ch && ch <= '9'){
-            normalized += ch;
-            has_digit = true;
-        }
-    }
-
-    if (!has_digit){
-        return -1;
-    }
-
-    int number = std::atoi(normalized.c_str());
-
-    std::string str;
-    for (char ch : ocr_text){
-        if (ch != '\r' && ch != '\n'){
-            str += ch;
-        }
-    }
-    logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> Box Page #" + std::to_string(number),COLOR_RED);
-
-    return number;
 }
 
 int GetBoxSpacesButton(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 {
     //This finds the orange buttons inside the box view in order to get the Pokémon out to the box pages.
-    eCount = 0;
-    int foundButton = 0;
-    while(foundButton == 0){
-        if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.456, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+    int eCount = 0;
+    bool foundButton = false;
+    while(foundButton == false){
+        if(!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.456, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             pbf_press_dpad(context, DPAD_RIGHT, 5, leSpeed);
-            foundButton = 1;
+            foundButton = true;
             break;
         }
-        else if(!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.276, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
-            foundButton = 1;
+        else if(!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.276, .7245, 0.011, 0.038),0xffff4600,0xffe3d26c) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+            foundButton = true;
             break;
         }
         eCount ++; // if up is pressed too many times the recognition failed and the program gives up on the pokémon.
         if (eCount > eCountMax){
-            return 0;
+            return false;
             break;
         }
         pbf_press_dpad(context, DPAD_UP, 5, 30);
         context.wait_for_all_requests();
     }
-    if(foundButton>0){
+    if(foundButton){
         env.console.log("Found orange button",COLOR_RED);
     }
     return foundButton;
@@ -181,32 +138,32 @@ int GetPokemonX(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 {
     pbf_wait(context,15);
     context.wait_for_all_requests();
-    eCount = 0;
+    int eCount = 0;
     int startPositionX = 0;
     // this while tries to find the red bar under the name of the selected pokémon in the first row and returns the column where the bar is found.
     // if it doesn't find it tries to push the pokemon up one row, and it also checks for the "Box Spaces" or "Newest 30" button highlight.
     while(startPositionX == 0){
-        if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.065, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.065, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
                 startPositionX = 1;
                 break;
         }
-        else if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.09, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        else if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.09, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             startPositionX = 2;
             break;
         }
-        else if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.115, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        else if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.115, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             startPositionX = 3;
             break;
         }
-        else if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.195, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        else if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.195, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             startPositionX = 4;
             break;
         }
-        else if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.270, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        else if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.270, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             startPositionX = 5;
             break;
         }
-        else if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.333, .139, lineWidth, 0.005),lineCol1,lineCol2,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        else if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.333, .139, lineWidth, 0.005),lineCol1,lineCol2) != PokemonLA::ItemCompatibility::COMPATIBLE)){
             startPositionX = 6;
             break;
         }
@@ -229,7 +186,7 @@ int GetPokemonX(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 bool FindBoxSpaces(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.console.log("Sorting...",COLOR_RED);
     //Gets the pokémon out to the correct place in the box spaces.
-    if (GetBoxSpacesButton(env, context) == 0){
+    if (!(GetBoxSpacesButton(env, context))){
         return false;
     }
     context.wait_for_all_requests();
@@ -333,7 +290,7 @@ bool IsCursorRed(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 {
     context.wait_for_all_requests();
     for(int i = 0;i<3;i++){
-        if (!(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.47, 0, 0.052, 0.012),0xffff4600,0xffe3d26c,0) != PokemonLA::ItemCompatibility::COMPATIBLE)){
+        if (!(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.47, 0, 0.052, 0.012),0xffff4600,0xffe3d26c) != PokemonLA::ItemCompatibility::COMPATIBLE)){
              return true;
              break;
         }
@@ -417,7 +374,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
         pbf_press_button(context, BUTTON_A, 5, leSpeed);
         pbf_press_dpad(context, DPAD_DOWN, 5, 125);
         context.wait_for_all_requests();
-        if(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000,2) != PokemonLA::ItemCompatibility::COMPATIBLE){
+        if(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000) != PokemonLA::ItemCompatibility::COMPATIBLE){
             pbf_press_dpad(context, DPAD_UP, 5, leSpeed);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_B, 5, 25);
@@ -437,7 +394,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_B, 5, 50);
     context.wait_for_all_requests();
-    if(detect_item_compatibility(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000,2) != PokemonLA::ItemCompatibility::COMPATIBLE){    //first visual check, code goes on only if it can see a selection arrow
+    if(DetectSelectionArrow(env.console.video().snapshot(),ImageFloatBox (.059, .157, 0.009, 0.005),0xff000000,0xff000000) != PokemonLA::ItemCompatibility::COMPATIBLE){    //first visual check, code goes on only if it can see a selection arrow
         env.console.log("No Pokémon #" + std::to_string(pokedexNo) + " found!",COLOR_RED);
         pbf_mash_button(context, BUTTON_B, 40);
         return;                                                 //if there's no pokémon with this name in your pokémon home jump to next pokémon
@@ -458,7 +415,7 @@ void PokemonHomeSort(int pokedexNo,int letterNo,int movesDown,int movesUp,int up
 
     context.wait_for_all_requests();
 
-    int boxPage = read_number(env.console,env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.022, 0.06));                            //recognizes the number of the page
+    int boxPage = OCR::read_number(env.console, extract_box_reference(env.console.video().snapshot(),ImageFloatBox (.269, .1083, 0.022, 0.06)));                            //recognizes the number of the page
     if((boxPage < 0)||(boxPage > 7)){
         env.console.log("I cannot read the box page, giving up on Pokémon #" + std::to_string(pokedexNo),COLOR_RED);
         pbf_mash_button(context, BUTTON_B, 40);
