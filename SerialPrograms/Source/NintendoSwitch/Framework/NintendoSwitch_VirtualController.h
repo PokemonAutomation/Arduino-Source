@@ -62,8 +62,9 @@ public:
 
     void clear_state();
 
-    void on_key_press(Qt::Key key);
-    void on_key_release(Qt::Key key);
+    //  Returns false if key is not handled. (pass it up to next handler)
+    bool on_key_press(Qt::Key key);
+    bool on_key_release(Qt::Key key);
 
     ProgramState last_known_state() const;
     void on_state_changed(ProgramState state);
