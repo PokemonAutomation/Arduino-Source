@@ -28,8 +28,9 @@ public:
         bool allow_commands_while_running
     );
 
-    void on_key_press(Qt::Key key);
-    void on_key_release(Qt::Key key);
+    //  Returns false if key is not handled. (pass it up to next handler)
+    bool on_key_press(Qt::Key key);
+    bool on_key_release(Qt::Key key);
 
 signals:
     void set_inference_overlay(bool enabled);

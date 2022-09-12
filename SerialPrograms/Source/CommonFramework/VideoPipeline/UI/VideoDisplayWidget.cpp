@@ -31,6 +31,8 @@ VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& camera, V
 
 
 void VideoDisplayWidget::update_size(Resolution resolution){
+//    static int c = 0;
+//    cout << "update_size(): " << c++ << endl;
     if (m_video == nullptr){
         this->setFixedHeight(45);
         return;
@@ -50,6 +52,8 @@ void VideoDisplayWidget::update_size(Resolution resolution){
     m_video->setFixedSize(this->size());
     m_overlay->setFixedSize(this->size());
     m_overlay->update_size(this->size(), this->size());
+
+//    cout << "VideoDisplayWidget: " << this->width() << " x " << this->height() << endl;
 }
 void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
@@ -77,7 +81,6 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
-    QWidget::mouseDoubleClickEvent(event);
     if (!PreloadSettings::instance().DEVELOPER_MODE){
         return;
     }
@@ -85,7 +88,9 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
     // into a VideoDisplayWindow
     if (dynamic_cast<VideoDisplayWindow*>(parentWidget()) == nullptr){
         move_to_new_window();
-    }
+    }else{
+        QWidget::mouseDoubleClickEvent(event);
+    };
 }
 
 void VideoDisplayWidget::move_to_new_window(){
