@@ -19,6 +19,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
 
 #include <QWidget>
+#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 
@@ -34,7 +35,7 @@ namespace NintendoSwitch{
 
 class CommandRow;
 
-class SwitchSystemWidget final : public QWidget{
+class SwitchSystemWidget final : public QWidget, public CommandReceiver{
 public:
     virtual ~SwitchSystemWidget();
     SwitchSystemWidget(
@@ -55,11 +56,11 @@ public:
     //  They are needed to accept key and focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
 
     //  Returns false if key is not handled. (pass it up to next handler)
-    bool key_press(QKeyEvent* event);
-    bool key_release(QKeyEvent* event);
+    virtual bool key_press(QKeyEvent* event) override;
+    virtual bool key_release(QKeyEvent* event) override;
 
-    void focus_in(QFocusEvent* event);
-    void focus_out(QFocusEvent* event);
+    virtual void focus_in(QFocusEvent* event) override;
+    virtual void focus_out(QFocusEvent* event) override;
 
 private:
     virtual void keyPressEvent(QKeyEvent* event) override;
