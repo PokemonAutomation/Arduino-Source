@@ -472,6 +472,7 @@ SOURCES += \
     Source/PokemonHome/PokemonHome_Settings.cpp \
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp \
     Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp \
+    Source/PokemonHome/Porgrams/PokemonHome_BoxSorting.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
@@ -1250,6 +1251,7 @@ HEADERS += \
     Source/PokemonHome/PokemonHome_Settings.h \
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h \
     Source/PokemonHome/Programs/PokemonHome_PageSwap.h \
+    Source/PokemonHome/Programs/PokemonHome_BoxSorting.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
