@@ -5,6 +5,7 @@
  */
 
 #include <QResizeEvent>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
@@ -75,7 +76,11 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 
-void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent *event){
+void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
+    QWidget::mouseDoubleClickEvent(event);
+    if (!PreloadSettings::instance().DEVELOPER_MODE){
+        return;
+    }
     // If this widget is not already inside a VideoDisplayWindow, move it
     // into a VideoDisplayWindow
     if (dynamic_cast<VideoDisplayWindow*>(parentWidget()) == nullptr){
