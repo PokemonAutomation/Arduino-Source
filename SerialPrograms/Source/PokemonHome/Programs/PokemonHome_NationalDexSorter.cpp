@@ -41,7 +41,7 @@ namespace PokemonHome{
         : SingleSwitchProgramDescriptor(
             "PokemonHome:NationalDexSorter",
             STRING_POKEMON + " Home", STRING_POKEMON + " Home: National Dex Sorter",
-            "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PokemonHome-PageSwap.md",
+            "ComputerControl/blob/master/Wiki/Programs/PokemonHome/NationalDexSorter.md",
             "Sort available " + STRING_POKEMON + " according to the National Dex number.",
             FeedbackType::REQUIRED, true,
             PABotBaseLevel::PABOTBASE_12KB
