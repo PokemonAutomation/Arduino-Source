@@ -108,18 +108,18 @@ void VirtualController::clear_state(){
     m_pressed_buttons.clear();
 }
 
-void VirtualController::on_key_press(Qt::Key key){
+bool VirtualController::on_key_press(Qt::Key key){
 //    cout << "press: " << key << endl;
 
     const ControllerButton* button = button_lookup(key);
     if (button == nullptr){
-        return;
+        return false;
     }
 
     //  Suppress if key is already pressed.
     auto iter = m_pressed_buttons.find(button);
     if (iter != m_pressed_buttons.end()){
-        return;
+        return true;
     }
     button->press(m_controller_state);
 
@@ -128,19 +128,20 @@ void VirtualController::on_key_press(Qt::Key key){
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
+    return true;
 }
-void VirtualController::on_key_release(Qt::Key key){
+bool VirtualController::on_key_release(Qt::Key key){
 //    cout << "release" << endl;
 
     const ControllerButton* button = button_lookup(key);
     if (button == nullptr){
-        return;
+        return false;
     }
 
     //  Suppress if key is not pressed.
     auto iter = m_pressed_buttons.find(button);
     if (iter == m_pressed_buttons.end()){
-        return;
+        return true;
     }
     button->release(m_controller_state);
 
@@ -149,6 +150,7 @@ void VirtualController::on_key_release(Qt::Key key){
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
+    return true;
 }
 
 
