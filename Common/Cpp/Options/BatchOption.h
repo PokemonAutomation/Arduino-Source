@@ -36,7 +36,7 @@ public:
     virtual void restore_defaults() override;
     virtual void reset_state() override;
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool horizontal() const;
     FixedLimitVector<ConfigOption*> options() const;

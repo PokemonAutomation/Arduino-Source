@@ -25,7 +25,7 @@ VideoDisplayWidget::VideoDisplayWidget(
     : QWidget(&parent)
     , m_id(id)
     , m_command_receiver(command_receiver)
-    , m_video(camera.make_QWidget(this))
+    , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
 {
     m_overlay->setVisible(true);

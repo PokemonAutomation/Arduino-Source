@@ -74,7 +74,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
 
     if (m_value.m_enable_overrides){
         layout->addSpacing(5);
-        m_table = value.m_table.make_ui(*this);
+        m_table = value.m_table.make_QtWidget(*this);
         layout->addWidget(&m_table->widget());
     }
 }

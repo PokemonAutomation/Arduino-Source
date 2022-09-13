@@ -73,7 +73,7 @@ public:
 
     QVideoFrame latest_frame();
 
-    virtual VideoWidget* make_QWidget(QWidget* parent) override;
+    virtual VideoWidget* make_QtWidget(QWidget* parent) override;
 
 
 private:

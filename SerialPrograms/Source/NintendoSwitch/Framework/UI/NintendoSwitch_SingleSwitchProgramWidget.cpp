@@ -70,7 +70,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         m_system = new SwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
         scroll_layout->addWidget(m_system);
 
-        m_options = option.options().make_ui(*this);
+        m_options = option.options().make_QtWidget(*this);
         scroll_layout->addWidget(&m_options->widget());
 
         scroll_layout->addStretch(1);

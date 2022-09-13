@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* RandomCodeOption::make_ui(QWidget& parent){
+ConfigWidget* RandomCodeOption::make_QtWidget(QWidget& parent){
     return new RandomCodeWidget(parent, *this);
 }
 

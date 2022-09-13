@@ -18,11 +18,11 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-ConfigWidget* SimpleIntegerCell<Type>::make_ui(QWidget& parent){
+ConfigWidget* SimpleIntegerCell<Type>::make_QtWidget(QWidget& parent){
     return new SimpleIntegerCellWidget<Type>(parent, *this);
 }
 template <typename Type>
-ConfigWidget* SimpleIntegerOption<Type>::make_ui(QWidget& parent){
+ConfigWidget* SimpleIntegerOption<Type>::make_QtWidget(QWidget& parent){
     return new SimpleIntegerOptionWidget<Type>(parent, *this);
 }
 

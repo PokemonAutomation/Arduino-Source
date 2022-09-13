@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* GroupOption::make_ui(QWidget& parent){
+ConfigWidget* GroupOption::make_QtWidget(QWidget& parent){
     return new GroupWidget(parent, *this);
 }
 
@@ -64,7 +64,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     m_options_layout->setContentsMargins(0, 0, 0, 0);
 
     for (auto& item : value.options()){
-        m_options.emplace_back(item->make_ui(parent));
+        m_options.emplace_back(item->make_QtWidget(parent));
         m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
         m_options_layout->addWidget(&m_options.back()->widget());
     }

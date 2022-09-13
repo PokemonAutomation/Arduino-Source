@@ -67,7 +67,7 @@ public:
 
 
 public:
-    virtual VideoWidget* make_QWidget(QWidget* parent){ return nullptr; };
+    virtual VideoWidget* make_QtWidget(QWidget* parent){ return nullptr; };
 };
 
 

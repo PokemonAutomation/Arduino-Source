@@ -20,7 +20,7 @@ namespace Integration{
 class DiscordIntegrationSettingsOption : public GroupOption{
 public:
     DiscordIntegrationSettingsOption();
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     StringOption token;
     StringOption command_prefix;
@@ -35,7 +35,7 @@ class DiscordIntegrationSettingsOptionUI : public GroupWidget{
 public:
     DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value);
 };
-inline ConfigWidget* DiscordIntegrationSettingsOption::make_ui(QWidget& parent){
+inline ConfigWidget* DiscordIntegrationSettingsOption::make_QtWidget(QWidget& parent){
     return new DiscordIntegrationSettingsOptionUI(parent, *this);
 }
 

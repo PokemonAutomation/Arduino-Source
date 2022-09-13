@@ -67,7 +67,7 @@ public:
 
     QVideoFrame latest_frame();
 
-    virtual PokemonAutomation::VideoWidget* make_QWidget(QWidget* parent) override;
+    virtual PokemonAutomation::VideoWidget* make_QtWidget(QWidget* parent) override;
 
 
 private:

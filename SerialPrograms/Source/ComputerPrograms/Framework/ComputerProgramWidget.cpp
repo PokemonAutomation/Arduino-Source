@@ -59,7 +59,7 @@ ComputerProgramWidget::ComputerProgramWidget(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-        m_options = option.options().make_ui(*this);
+        m_options = option.options().make_QtWidget(*this);
         scroll_layout->addWidget(&m_options->widget());
 
         scroll_layout->addStretch(1);

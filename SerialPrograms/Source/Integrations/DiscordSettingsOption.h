@@ -19,7 +19,7 @@ namespace Integration{
 class DiscordMessageSettingsOption : public BatchOption{
 public:
     DiscordMessageSettingsOption();
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     StringOption instance_name;
     StringOption user_id;
@@ -29,7 +29,7 @@ class DiscordMessageSettingsOptionUI : public BatchWidget{
 public:
     DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value);
 };
-inline ConfigWidget* DiscordMessageSettingsOption::make_ui(QWidget& parent){
+inline ConfigWidget* DiscordMessageSettingsOption::make_QtWidget(QWidget& parent){
     return new DiscordMessageSettingsOptionUI(parent, *this);
 }
 

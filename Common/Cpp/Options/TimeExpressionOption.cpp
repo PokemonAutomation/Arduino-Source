@@ -334,12 +334,12 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 
 
 template <typename Type>
-ConfigWidget* TimeExpressionCell<Type>::make_ui(QWidget& parent){
+ConfigWidget* TimeExpressionCell<Type>::make_QtWidget(QWidget& parent){
     return new TimeExpressionCellWidget<Type>(parent, *this);
 }
 
 template <typename Type>
-ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
+ConfigWidget* TimeExpressionOption<Type>::make_QtWidget(QWidget& parent){
     return new TimeExpressionOptionWidget<Type>(parent, *this);
 }
 

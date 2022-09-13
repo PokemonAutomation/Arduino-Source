@@ -72,7 +72,7 @@ public:
 
 
 public:
-    virtual ConfigWidget* make_ui(QWidget& parent) = 0;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
 
 protected:
     void push_update();

@@ -19,7 +19,7 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* EditableTableOption::make_ui(QWidget& parent){
+ConfigWidget* EditableTableOption::make_QtWidget(QWidget& parent){
     return new EditableTableWidget(parent, *this);
 }
 
@@ -137,7 +137,7 @@ void EditableTableWidget::update(){
             int c = 0;
             int stop = (int)cells.size();
             for (; c < stop; c++){
-                m_table->setCellWidget((int)index_new, c, &cells[c]->make_ui(*m_table)->widget());
+                m_table->setCellWidget((int)index_new, c, &cells[c]->make_QtWidget(*m_table)->widget());
             }
             m_table->setCellWidget((int)index_new, c++, make_clone_button(row));
             m_table->setCellWidget((int)index_new, c++, make_insert_button(row));

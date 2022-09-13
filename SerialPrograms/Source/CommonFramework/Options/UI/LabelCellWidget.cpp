@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* LabelCellOption::make_ui(QWidget& parent){
+ConfigWidget* LabelCellOption::make_QtWidget(QWidget& parent){
     return new LabelCellWidget(parent, *this);
 }
 

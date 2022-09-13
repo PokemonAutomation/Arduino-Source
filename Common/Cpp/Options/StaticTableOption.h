@@ -79,7 +79,7 @@ public:
     virtual std::vector<std::string> make_header() const = 0;
 
 public:
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 
 

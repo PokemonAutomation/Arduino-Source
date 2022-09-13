@@ -321,7 +321,7 @@ void CameraSession::startup(){
     }
 }
 
-PokemonAutomation::VideoWidget* CameraSession::make_QWidget(QWidget* parent){
+PokemonAutomation::VideoWidget* CameraSession::make_QtWidget(QWidget* parent){
     return new VideoWidget(parent, *this);
 }
 

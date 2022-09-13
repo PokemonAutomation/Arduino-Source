@@ -94,7 +94,7 @@ void EventNotificationsTable::reset_state(){
         option->reset_rate_limit();
     }
 }
-ConfigWidget* EventNotificationsTable::make_ui(QWidget& parent){
+ConfigWidget* EventNotificationsTable::make_QtWidget(QWidget& parent){
     return new EventNotificationsTableWidget(parent, *this);
 }
 void EventNotificationsTable::set_enabled(bool enabled){

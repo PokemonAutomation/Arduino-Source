@@ -96,7 +96,7 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;
@@ -125,7 +125,7 @@ public:
     {}
 
     const std::string& label() const{ return m_label; }
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     std::string m_label;

@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* DateOption::make_ui(QWidget& parent){
+ConfigWidget* DateOption::make_QtWidget(QWidget& parent){
     return new DateWidget(parent, *this);
 }
 

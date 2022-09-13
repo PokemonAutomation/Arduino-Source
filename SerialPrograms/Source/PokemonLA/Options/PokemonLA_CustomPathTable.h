@@ -113,7 +113,7 @@ public:
 
     const TravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 public:
     friend class CustomPathTableWidget;

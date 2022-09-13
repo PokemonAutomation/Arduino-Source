@@ -109,7 +109,7 @@ public:
     void remove_row(EditableTableRow& row);
 
 public:
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;
