@@ -12,9 +12,9 @@
 #include "Common/Qt/AutoHeightTable.h"
 #include "EditableTableWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -77,11 +77,11 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     }
 
     EditableTableWidget::update();
-    m_table->update_height();
 //    EditableTableWidget2::value_changed();
 
 //    m_table->resizeColumnsToContents();
 //    m_table->resizeRowsToContents();
+    m_table->update_height();
 
     value.add_listener(*this);
 }
@@ -158,8 +158,7 @@ void EditableTableWidget::update(){
 
 //    cout << "latest.size() = " << latest.size() << endl;
     m_current = std::move(latest);
-    m_table->resizeColumnsToContents();
-    m_table->resizeRowsToContents();
+    EditableTableWidget::update_sizes();
 }
 void EditableTableWidget::value_changed(){
     QMetaObject::invokeMethod(m_table, [this]{
@@ -169,6 +168,7 @@ void EditableTableWidget::value_changed(){
 void EditableTableWidget::update_sizes(){
     m_table->resizeColumnsToContents();
     m_table->resizeRowsToContents();
+    m_table->update_height();
 }
 
 

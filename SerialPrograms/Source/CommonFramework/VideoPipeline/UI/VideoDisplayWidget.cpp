@@ -97,7 +97,7 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
         move_to_new_window();
     }else{
         QWidget::mouseDoubleClickEvent(event);
-    };
+    }
 }
 
 void VideoDisplayWidget::move_to_new_window(){

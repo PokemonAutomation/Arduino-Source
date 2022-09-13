@@ -19,6 +19,10 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options_BossAction.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -38,6 +42,52 @@ const std::map<std::string, BossAction> BossAction_MAP{
 
 
 
+const EnumDatabase<BossAction>& BossAction_Database(){
+    static const EnumDatabase<BossAction> database({
+        {BossAction::CATCH_AND_STOP_PROGRAM, "always-stop", "Always stop program."},
+        {BossAction::CATCH_AND_STOP_IF_SHINY, "stop-if-shiny", "Stop if shiny."},
+    });
+    return database;
+}
+
+BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug)
+    : StaticTableRow(std::move(slug))
+    , pokemon(get_pokemon_name(name_slug).display_name(), ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon)
+    , action(BossAction_Database(), BossAction::CATCH_AND_STOP_IF_SHINY)
+    , ball("poke-ball")
+{
+    PA_ADD_STATIC(pokemon);
+    add_option(action, "Action");
+    add_option(ball, "Ball");
+}
+
+
+BossActionTable::BossActionTable()
+    : StaticTableOption("<b>Boss Actions:</b>")
+{
+    for (const auto& item : all_bosses_by_dex()){
+//        cout << item.second << endl;
+        const MaxLairSlugs& slugs = get_maxlair_slugs(item.second);
+        const std::string& sprite_slug = *slugs.sprite_slugs.begin();
+        const std::string& name_slug = slugs.name_slug;
+        add_row(std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug));
+    }
+    finish_construction();
+}
+std::vector<std::string> BossActionTable::make_header() const{
+    std::vector<std::string> ret{
+        STRING_POKEMON,
+        "Action",
+        STRING_POKEBALL
+    };
+    return ret;
+}
+
+
+
+
+
+#if 0
 BossActionOption::BossActionOption()
     : m_label("<b>Boss Actions:</b>")
 {
@@ -205,6 +255,7 @@ BallSelectWidget* BossActionWidget::make_ball_select(QWidget& parent, int row, c
     );
     return box;
 }
+#endif
 
 
 

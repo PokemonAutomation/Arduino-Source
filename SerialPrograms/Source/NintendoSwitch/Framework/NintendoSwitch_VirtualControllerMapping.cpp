@@ -216,6 +216,7 @@ std::vector<std::pair<Qt::Key, const ControllerButton&>> keyboard_mapping{
 
     {Qt::Key::Key_Home,         CONTROLLER_BUTTON_HOME},
     {Qt::Key::Key_Escape,       CONTROLLER_BUTTON_HOME},
+    {Qt::Key::Key_H,            CONTROLLER_BUTTON_HOME},
 
     {Qt::Key::Key_Insert,       CONTROLLER_BUTTON_CAPTURE},
 
