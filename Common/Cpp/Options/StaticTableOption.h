@@ -61,13 +61,14 @@ protected:
 
     //  Call this to populate the rows.
     void add_row(std::unique_ptr<StaticTableRow> row);
+    void add_row(StaticTableRow* row);
 
     //  You must call this when done populating rows. Afterwards, you cannot add more.
     void finish_construction();
 
 public:
     const std::string& label() const{ return m_label; }
-    const std::vector<std::unique_ptr<StaticTableRow>>& table() const{ return m_table; }
+    const std::vector<StaticTableRow*>& table() const{ return m_table; }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -86,7 +87,8 @@ public:
 
 private:
     const std::string m_label;
-    std::vector<std::unique_ptr<StaticTableRow>> m_table;
+    std::vector<std::unique_ptr<StaticTableRow>> m_owners;
+    std::vector<StaticTableRow*> m_table;
 
     bool m_finished = false;
     std::map<std::string, size_t> m_index_map;

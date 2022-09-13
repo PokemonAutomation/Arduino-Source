@@ -6,6 +6,7 @@
 
 #include <set>
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
@@ -79,9 +80,14 @@ void ConfigOption::push_update(){
 
 
 
+void ConfigOption::load_json(const JsonValue& json){}
+JsonValue ConfigOption::to_json() const{
+    return JsonValue();
+}
 std::string ConfigOption::check_validity() const{
     return std::string();
 }
+void ConfigOption::restore_defaults(){}
 ConfigOptionState ConfigOption::visibility() const{
     return m_data->visibility.load(std::memory_order_relaxed);
 }

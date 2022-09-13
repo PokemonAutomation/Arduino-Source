@@ -147,7 +147,7 @@ bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t&
 void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Build list of what's needed.
     std::map<std::string, uint8_t> trades_left;
-    for (const std::unique_ptr<StaticTableRow>& item : TRADE_COUNTS.table()){
+    for (const StaticTableRow* item : TRADE_COUNTS.table()){
         trades_left[item->slug()] = static_cast<const TradeCountTableRow&>(*item).count;
     }
 

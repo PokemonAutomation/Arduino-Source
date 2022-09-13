@@ -36,14 +36,16 @@ StaticTableWidget::StaticTableWidget(QWidget& parent, StaticTableOption& value)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
-    label->setWordWrap(true);
-    layout->addWidget(label);
+    if (!value.label().empty()){
+        QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
+        label->setWordWrap(true);
+        layout->addWidget(label);
+    }
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
 
-    const std::vector<std::unique_ptr<StaticTableRow>>& table = value.table();
+    const std::vector<StaticTableRow*>& table = value.table();
 //    cout << "table = " << table.size() << endl;
 
     QStringList header;

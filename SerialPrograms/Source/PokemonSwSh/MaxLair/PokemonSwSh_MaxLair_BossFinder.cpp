@@ -148,7 +148,7 @@ public:
 
 private:
     const BossActionRow& get_filter(const std::string& boss_slug) const{
-        for (const std::unique_ptr<StaticTableRow>& row : m_boss_list.table()){
+        for (const StaticTableRow* row : m_boss_list.table()){
             const BossActionRow& filter = static_cast<const BossActionRow&>(*row);
             if (boss_slug == filter.slug()){
                 return filter;

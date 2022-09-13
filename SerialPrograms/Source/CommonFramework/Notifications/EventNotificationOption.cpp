@@ -4,17 +4,65 @@
  *
  */
 
-#include <QStringList>
+#include <atomic>
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/StringOption.h"
+#include "CommonFramework/Options/LabelCellOption.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "EventNotificationOption.h"
+
+#include <QFont>
+#include <QPushButton>
+#include "Common/Qt/Options/ConfigWidget.h"
 
 namespace PokemonAutomation{
 
 
+class TestButtonWidget : public ConfigWidget{
+public:
+    TestButtonWidget(QWidget& parent, TestMessageButton& value)
+        : ConfigWidget(value)
+    {
+        QPushButton* button = new QPushButton(&parent);
+        m_widget = button;
 
-std::string EventNotificationSettings::sanitize_tag(const std::string& token){
+        QFont font;
+        font.setBold(true);
+        button->setFont(font);
+        button->setText("Send Test Message");
+
+        button->connect(
+            button, &QPushButton::clicked,
+            button, [&](bool){
+                send_program_notification(
+                    global_logger_tagged(), value.option,
+                    COLOR_GREEN,
+                    ProgramInfo("Notification Test"),
+                    "Notification Test",
+                    {
+                        {"Event Type", value.option.label()},
+                    }
+                );
+            }
+        );
+    }
+};
+TestMessageButton::TestMessageButton(EventNotificationOption& p_option)
+    : option(p_option)
+{}
+ConfigWidget* TestMessageButton::make_QtWidget(QWidget& parent){
+    return new TestButtonWidget(parent, *this);
+}
+
+
+
+
+std::string EventNotificationOption::sanitize_tag(const std::string& token){
     std::string str;
     for (unsigned char ch : token){
         if (ch < 32) continue;
@@ -23,7 +71,7 @@ std::string EventNotificationSettings::sanitize_tag(const std::string& token){
     }
     return str;
 }
-std::string EventNotificationSettings::tags_to_str(const std::vector<std::string>& tags){
+std::string EventNotificationOption::tags_to_str(const std::vector<std::string>& tags){
     std::string text;
     bool first = true;
     for (const std::string& tag : tags){
@@ -35,8 +83,10 @@ std::string EventNotificationSettings::tags_to_str(const std::vector<std::string
     }
     return text;
 }
-std::vector<std::string> EventNotificationSettings::parse_tags(const std::string& str){
+std::vector<std::string> EventNotificationOption::parse_tags(const std::string& str){
     std::vector<std::string> tags;
+
+    //  TODO: Don't use Qt here.
     for (QString token : QString::fromStdString(str).split(",")){
         std::string cstr = token.toStdString();
         cstr = sanitize_tag(cstr);
@@ -48,70 +98,91 @@ std::vector<std::string> EventNotificationSettings::parse_tags(const std::string
 }
 
 
-
-void EventNotificationSettings::load_json(bool enable_screenshot, const JsonValue& json){
-    const JsonObject* obj = json.get_object();
-    if (obj == nullptr){
-        return;
-    }
-    obj->read_boolean(enabled, "Enabled");
-    obj->read_boolean(ping, "Ping");
-    if (enable_screenshot){
-        const JsonValue* value = obj->get_value("Screenshot");
-        if (value){
-            ScreenshotOption screenshot_option("");
-            screenshot_option.load_json(*value);
-            screenshot = screenshot_option;
-        }
-    }
-    const JsonArray* array = obj->get_array("Tags");
-    if (array){
-        tags.clear();
-        for (const auto& tag : *array){
-            const std::string* token = tag.get_string();
-            if (token){
-                tags.emplace_back(*token);
-            }
-        }
-    }
-    int rate_limit_seconds = 0;
-    obj->read_integer(rate_limit_seconds, "RateLimitSeconds");
-    rate_limit = std::chrono::seconds(rate_limit_seconds);
-}
-JsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
-    JsonObject obj;
-    obj["Enabled"] = enabled;
-    obj["Ping"] = ping;
-    if (enable_screenshot){
-        ScreenshotOption screenshot_option("");
-        screenshot_option.set(screenshot);
-        obj["Screenshot"] = screenshot_option.to_json();
-    }
-    JsonArray array;
-    for (const std::string& tag : tags){
-//        cout << tag.toStdString() << endl;
-        array.push_back(tag);
-    }
-    obj["Tags"] = std::move(array);
-    obj["RateLimitSeconds"] = rate_limit.count();
-    return obj;
-}
-
-
-
+struct EventNotificationOption::Data{
+    Data(
+        std::string label,
+        bool enabled, bool ping,
+        std::chrono::seconds rate_limit
+    )
+        : screenshot_supported(false)
+        , m_enabled(enabled)
+        , m_label(std::move(label))
+        , m_ping(ping)
+        , m_null_screenshot("---")
+        , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
+        , m_tags(false, "Notifs", "")
+        , m_rate_limit_seconds(rate_limit.count())
+        , m_last_sent(WallClock::min())
+    {}
+    Data(
+        std::string label,
+        bool enabled, bool ping,
+        std::vector<std::string> tags,
+        std::chrono::seconds rate_limit
+    )
+        : screenshot_supported(false)
+        , m_enabled(enabled)
+        , m_label(std::move(label))
+        , m_ping(ping)
+        , m_null_screenshot("---")
+        , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
+        , m_tags(false, tags_to_str(tags), "")
+        , m_rate_limit_seconds(rate_limit.count())
+        , m_last_sent(WallClock::min())
+    {}
+    Data(
+        std::string label,
+        bool enabled, bool ping,
+        ImageAttachmentMode screenshot,
+        std::vector<std::string> tags,
+        std::chrono::seconds rate_limit
+        )
+        : screenshot_supported(true)
+        , m_enabled(enabled)
+        , m_label(std::move(label))
+        , m_ping(ping)
+        , m_null_screenshot("---")
+        , m_screenshot(screenshot)
+        , m_tags(false, tags_to_str(tags), "")
+        , m_rate_limit_seconds(rate_limit.count())
+        , m_last_sent(WallClock::min())
+    {}
 
 
+    bool screenshot_supported;
+
+    BooleanCheckBoxCell m_enabled;
+    LabelCellOption m_label;
+    BooleanCheckBoxCell m_ping;
+    LabelCellOption m_null_screenshot;
+    ScreenshotCell m_screenshot;
+    StringCell m_tags;
+    SimpleIntegerCell<uint32_t> m_rate_limit_seconds;
+
+    std::atomic<WallClock> m_last_sent;
+    std::atomic<bool> m_global_enable;
+};
+
+
+
+EventNotificationOption::~EventNotificationOption(){}
 EventNotificationOption::EventNotificationOption(
     std::string label,
     bool enabled, bool ping,
     std::chrono::seconds rate_limit
 )
-    : m_label(std::move(label))
-    , screenshot_supported(false)
-    , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, {"Notifs"}, rate_limit})
-    , m_current(m_default)
-    , m_last_sent(WallClock::min())
+    : StaticTableRow(label)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), enabled, ping, rate_limit)
+    , m_test_button(*this)
 {
+    add_option(m_data->m_enabled, "Enabled");
+    add_option(m_data->m_label, "");
+    add_option(m_data->m_ping, "Ping");
+    add_option(m_data->m_null_screenshot, "");
+    add_option(m_data->m_tags, "Tags");
+    add_option(m_data->m_rate_limit_seconds, "RateLimitSeconds");
+    add_option(m_test_button, "");
+
     reset_rate_limit();
 }
 EventNotificationOption::EventNotificationOption(
@@ -120,12 +191,18 @@ EventNotificationOption::EventNotificationOption(
     std::vector<std::string> tags,
     std::chrono::seconds rate_limit
 )
-    : m_label(std::move(label))
-    , screenshot_supported(false)
-    , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, std::move(tags), rate_limit})
-    , m_current(m_default)
-    , m_last_sent(WallClock::min())
+    : StaticTableRow(label)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), enabled, ping, std::move(tags), rate_limit)
+    , m_test_button(*this)
 {
+    add_option(m_data->m_enabled, "Enabled");
+    add_option(m_data->m_label, "");
+    add_option(m_data->m_ping, "Ping");
+    add_option(m_data->m_null_screenshot, "");
+    add_option(m_data->m_tags, "Tags");
+    add_option(m_data->m_rate_limit_seconds, "RateLimitSeconds");
+    add_option(m_test_button, "");
+
     reset_rate_limit();
 }
 EventNotificationOption::EventNotificationOption(
@@ -135,35 +212,50 @@ EventNotificationOption::EventNotificationOption(
     std::vector<std::string> tags,
     std::chrono::seconds rate_limit
 )
-    : m_label(std::move(label))
-    , screenshot_supported(true)
-    , m_default({enabled, ping, screenshot, std::move(tags), rate_limit})
-    , m_current(m_default)
-    , m_last_sent(WallClock::min())
+    : StaticTableRow(label)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), enabled, ping, screenshot, std::move(tags), rate_limit)
+    , m_test_button(*this)
 {
+    add_option(m_data->m_enabled, "Enabled");
+    add_option(m_data->m_label, "");
+    add_option(m_data->m_ping, "Ping");
+    add_option(m_data->m_screenshot, "Screenshot");
+    add_option(m_data->m_tags, "Tags");
+    add_option(m_data->m_rate_limit_seconds, "RateLimitSeconds");
+    add_option(m_test_button, "");
+
     reset_rate_limit();
 }
 
+const std::string& EventNotificationOption::label() const{
+    return m_data->m_label.text();
+}
+bool EventNotificationOption::ping() const{
+    return m_data->m_ping;
+}
+ImageAttachmentMode EventNotificationOption::screenshot() const{
+    return m_data->m_screenshot;
+}
+std::vector<std::string> EventNotificationOption::tags() const{
+    return parse_tags(m_data->m_tags);
+}
 
-void EventNotificationOption::load_json(const JsonValue& json){
-    m_current.load_json(screenshot_supported, json);
-}
-JsonValue EventNotificationOption::to_json() const{
-    return m_current.to_json(screenshot_supported);
-}
-void EventNotificationOption::restore_defaults(){
-    m_current = m_default;
+
+void EventNotificationOption::set_global_enable(bool enabled){
+    m_data->m_global_enable.store(enabled, std::memory_order_release);
 }
 void EventNotificationOption::reset_rate_limit(){
-    m_last_sent.store(WallClock::min(), std::memory_order_release);
+    m_data->m_last_sent.store(WallClock::min(), std::memory_order_release);
 }
 bool EventNotificationOption::ok_to_send_now(Logger& logger){
-    if (!m_enabled){
-        logger.log("EventNotification(" + m_label + "): Notifications not enabled.", COLOR_PURPLE);
+    const std::string& label = m_data->m_label.text();
+
+    if (!m_data->m_global_enable.load(std::memory_order_relaxed)){
+        logger.log("EventNotification(" + label + "): Notifications not enabled.", COLOR_PURPLE);
         return false;
     }
-    if (!m_current.enabled){
-        logger.log("EventNotification(" + m_label + "): Notifications disabled for this event type.", COLOR_PURPLE);
+    if (!m_data->m_enabled){
+        logger.log("EventNotification(" + label + "): Notifications disabled for this event type.", COLOR_PURPLE);
         return false;
     }
 //    if (m_current.rate_limit == std::chrono::seconds(0)){
@@ -174,16 +266,16 @@ bool EventNotificationOption::ok_to_send_now(Logger& logger){
     WallClock last;
     do{
         now = current_time();
-        last = m_last_sent.load(std::memory_order_acquire);
+        last = m_data->m_last_sent.load(std::memory_order_acquire);
 
-        if (now < last + m_current.rate_limit){
-            logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
+        if (now < last + std::chrono::seconds(m_data->m_rate_limit_seconds)){
+            logger.log("EventNotification(" + label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
             return false;
         }
 
-    }while (!m_last_sent.compare_exchange_weak(last, now));
+    }while (!m_data->m_last_sent.compare_exchange_weak(last, now));
 
-    logger.log("EventNotification(" + m_label + "): Sending notification.", COLOR_BLUE);
+    logger.log("EventNotification(" + label + "): Sending notification.", COLOR_BLUE);
     return true;
 }
 

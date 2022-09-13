@@ -82,18 +82,51 @@ void StaticTableOption::add_row(std::unique_ptr<StaticTableRow> row){
     }
 
     const std::string& slug = row->slug();
-    m_table.emplace_back(std::move(row));
 
+    bool owners_pushed = false;
+    bool table_pushed = false;
     try{
+        m_owners.emplace_back(std::move(row));
+        owners_pushed = true;
+        m_table.emplace_back(m_owners.back().get());
+        table_pushed = true;
+
         auto ret = m_index_map.emplace(slug, m_index_map.size());
         if (!ret.second){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Slug: " + slug);
         }
     }catch (...){
-        m_table.pop_back();
+        if (owners_pushed){
+            m_owners.pop_back();
+        }
+        if (table_pushed){
+            m_table.pop_back();
+        }
         throw;
     }
+}
+void StaticTableOption::add_row(StaticTableRow* row){
+    if (m_finished){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to add row to finalized table.");
+    }
 
+    const std::string& slug = row->slug();
+
+    bool table_pushed = false;
+    try{
+        m_table.emplace_back(row);
+        table_pushed = true;
+
+        auto ret = m_index_map.emplace(slug, m_index_map.size());
+        if (!ret.second){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Slug: " + slug);
+        }
+    }catch (...){
+        if (table_pushed){
+            m_table.pop_back();
+        }
+        throw;
+    }
 }
 void StaticTableOption::finish_construction(){
     if (m_finished){
@@ -134,7 +167,7 @@ void StaticTableOption::load_json(const JsonValue& json){
 }
 JsonValue StaticTableOption::to_json() const{
     JsonArray array;
-    for (const std::unique_ptr<StaticTableRow>& row : m_table){
+    for (const StaticTableRow* row : m_table){
         JsonValue val = row->to_json();
         val.get_object_throw()["slug"] = row->slug();
         array.push_back(std::move(val));
@@ -142,8 +175,8 @@ JsonValue StaticTableOption::to_json() const{
     return array;
 }
 std::string StaticTableOption::check_validity() const{
-    for (const std::unique_ptr<StaticTableRow>& item : m_table){
-        std::string error = item->check_validity();
+    for (const StaticTableRow* row : m_table){
+        std::string error = row->check_validity();
         if (!error.empty()){
             return error;
         }
@@ -151,8 +184,8 @@ std::string StaticTableOption::check_validity() const{
     return std::string();
 }
 void StaticTableOption::restore_defaults(){
-    for (const std::unique_ptr<StaticTableRow>& item : m_table){
-        item->restore_defaults();
+    for (StaticTableRow* row : m_table){
+        row->restore_defaults();
     }
 }
 
