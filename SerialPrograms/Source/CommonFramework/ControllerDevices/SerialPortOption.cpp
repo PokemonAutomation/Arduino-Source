@@ -46,6 +46,17 @@ void SerialPortOption::set_port(QSerialPortInfo port){
         *m_port = std::move(port);
     }
 }
+void SerialPortOption::set_port(const QSerialPortInfo* port){
+    if (port == nullptr){
+        m_port.clear();
+        return;
+    }
+    if (!m_port){
+        m_port.reset(*port);
+    }else{
+        *m_port = *port;
+    }
+}
 
 
 

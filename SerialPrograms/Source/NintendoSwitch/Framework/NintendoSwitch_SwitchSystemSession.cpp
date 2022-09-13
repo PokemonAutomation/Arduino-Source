@@ -10,6 +10,10 @@
 #include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -38,12 +42,13 @@ SwitchSystemSession::SwitchSystemSession(
 }
 
 void SwitchSystemSession::get(SwitchSystemOption& option){
-    option.m_serial.set_port(*m_serial.option().port());
+    option.m_serial.set_port(m_serial.get());
     m_camera->get(option.m_camera);
     m_audio.get(option.m_audio);
 }
 void SwitchSystemSession::set(const SwitchSystemOption& option){
-    m_serial.botbase().reset(option.m_serial.port());
+    m_serial.set(option.m_serial.port());
+//    m_serial.botbase().reset(option.m_serial.port());
     m_camera->set(option.m_camera);
     m_audio.set(option.m_audio);
 }
