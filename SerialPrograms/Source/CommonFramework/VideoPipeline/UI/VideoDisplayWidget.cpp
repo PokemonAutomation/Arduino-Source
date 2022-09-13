@@ -88,9 +88,9 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
-        return;
-    }
+//    if (!PreloadSettings::instance().DEVELOPER_MODE){
+//        return;
+//    }
     // If this widget is not already inside a VideoDisplayWindow, move it
     // into a VideoDisplayWindow
     if (dynamic_cast<VideoDisplayWindow*>(parentWidget()) == nullptr){
