@@ -9,6 +9,10 @@
 #include <QLabel>
 #include "LabelCellWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -23,7 +27,7 @@ LabelCellWidget::~LabelCellWidget(){
 LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-    , m_value(value)
+//    , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -31,15 +35,21 @@ LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
 
     if (value.icon()){
         m_icon = new QLabel(this);
-        QPixmap pixmap = QPixmap::fromImage(value.icon().to_QImage_ref());
-//        QPixmap pixmap = QPixmap::fromImage(value.icon().scaled_to_QImage(25, 25));
+        Resolution resolution = value.resolution();
+//        cout << resolution.width << " x " << resolution.height << endl;
+        QPixmap pixmap;
+        if (resolution.width == 0 || resolution.height == 0){
+            pixmap = QPixmap::fromImage(value.icon().to_QImage_ref());
+        }else{
+            pixmap = QPixmap::fromImage(value.icon().scaled_to_QImage(resolution.width, resolution.height));
+        }
         m_icon->setPixmap(pixmap);
         m_icon->setAlignment(Qt::AlignCenter);
         layout->addWidget(m_icon);
     }
 
     m_text = new QLabel(QString::fromStdString(value.text()), this);
-    layout->addWidget(m_text);
+    layout->addWidget(m_text, 1);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
 //    m_text->setOpenExternalLinks(true);
 }

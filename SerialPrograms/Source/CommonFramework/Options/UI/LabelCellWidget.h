@@ -23,7 +23,7 @@ public:
     LabelCellWidget(QWidget& parent, LabelCellOption& value);
 
 private:
-    LabelCellOption& m_value;
+//    LabelCellOption& m_value;
     QLabel* m_icon = nullptr;
     QLabel* m_text;
 };

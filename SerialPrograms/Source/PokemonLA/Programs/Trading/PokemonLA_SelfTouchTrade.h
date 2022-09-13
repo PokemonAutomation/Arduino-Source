@@ -35,7 +35,7 @@ public:
 private:
     bool trade_one(
         MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-        std::map<std::string, int>& trades_left
+        std::map<std::string, uint8_t>& trades_left
     );
     bool move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col);
 
@@ -49,7 +49,7 @@ private:
     EnumDropdownOption<HostingSwitch> HOSTING_SWITCH;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
-    TradeCountTableOption TRADE_COUNTS;
+    TradeCountTable TRADE_COUNTS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

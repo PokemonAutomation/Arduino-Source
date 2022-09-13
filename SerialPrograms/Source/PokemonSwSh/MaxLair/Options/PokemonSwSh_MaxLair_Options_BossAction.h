@@ -9,18 +9,13 @@
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
-#include "Common/Qt/AutoHeightTable.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Options/LabelCellOption.h"
-#include "Pokemon/Options/Pokemon_BallSelectWidget.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
-
-using namespace Pokemon;
 
 
 enum class BossAction{
