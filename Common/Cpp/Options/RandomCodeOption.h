@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_RandomCodeOption_H
 #define PokemonAutomation_Options_RandomCodeOption_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 
 class RaidCodeOption{
 public:
+    ~RaidCodeOption();
     RaidCodeOption(size_t total_digits);
     RaidCodeOption(size_t total_digits, size_t random_digits, std::string code_string);
 
@@ -43,6 +44,8 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    const std::string& label() const;
+
     operator RaidCodeOption() const;
     std::string set(RaidCodeOption code);
 
@@ -55,12 +58,8 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
-    friend class RandomCodeWidget;
-    const std::string m_label;
-    const RaidCodeOption m_default;
-
-    mutable SpinLock m_lock;
-    RaidCodeOption m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

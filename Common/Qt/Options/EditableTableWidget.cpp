@@ -4,11 +4,13 @@
  *
  */
 
+#include <QFileDialog>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QLabel>
 #include <QPushButton>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/AutoHeightTable.h"
 #include "EditableTableWidget.h"
 
@@ -82,6 +84,48 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
 //    m_table->resizeColumnsToContents();
 //    m_table->resizeRowsToContents();
     m_table->update_height();
+
+
+    if (value.saveload_enabled()){
+        QHBoxLayout* buttons = new QHBoxLayout();
+        layout->addLayout(buttons);
+        {
+            QPushButton* load_button = new QPushButton("Load Table", this);
+            buttons->addWidget(load_button, 1);
+            connect(
+                load_button, &QPushButton::clicked,
+                this, [this, &value](bool){
+                    std::string path = QFileDialog::getOpenFileName(
+                        this,
+                        tr("Select a file to load."), "", tr("JSON files (*.json)")
+                    ).toStdString();
+                    if (path.empty()){
+                        return;
+                    }
+                    value.load_json(load_json_file(path));
+                }
+            );
+        }
+        {
+            QPushButton* save_button = new QPushButton("Save Table", this);
+            buttons->addWidget(save_button, 1);
+            connect(
+                save_button, &QPushButton::clicked,
+                this, [this, &value](bool){
+                    std::string path = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Select a file name to save to."), "", tr("JSON files (*.json)")
+                    ).toStdString();
+                    if (path.empty()){
+                        return;
+                    }
+                    JsonValue json = value.to_json();
+                    json.dump(path);
+                }
+            );
+        }
+        buttons->addStretch(2);
+    }
 
     value.add_listener(*this);
 }

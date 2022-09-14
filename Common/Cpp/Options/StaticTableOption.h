@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <vector>
-#include <map>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -55,7 +55,7 @@ private:
 //  This is the table itself.
 class StaticTableOption : public ConfigOption{
 public:
-    StaticTableOption(std::string label);
+    StaticTableOption(std::string label, bool enable_saveload = true);
 protected:
     //  Construction Steps:
 
@@ -67,8 +67,8 @@ protected:
     void finish_construction();
 
 public:
-    const std::string& label() const{ return m_label; }
-    const std::vector<StaticTableRow*>& table() const{ return m_table; }
+    const std::string& label() const;
+    const std::vector<StaticTableRow*>& table() const;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -77,21 +77,15 @@ public:
     virtual void restore_defaults() override final;
 
 public:
+    bool saveload_enabled() const;
     virtual std::vector<std::string> make_header() const = 0;
 
 public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
-
-
-
 private:
-    const std::string m_label;
-    std::vector<std::unique_ptr<StaticTableRow>> m_owners;
-    std::vector<StaticTableRow*> m_table;
-
-    bool m_finished = false;
-    std::map<std::string, size_t> m_index_map;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

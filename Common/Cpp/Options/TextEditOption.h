@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_TextEditOption_H
 #define PokemonAutomation_Options_TextEditOption_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 
 class TextEditOption : public ConfigOption{
 public:
+    ~TextEditOption();
     TextEditOption(
         std::string label,
         std::string default_value,
@@ -22,10 +23,10 @@ public:
     );
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
 
-    const std::string& label() const{ return m_label; }
-    const std::string& placeholder_text() const{ return m_placeholder_text; }
+    const std::string& label() const;
+    const std::string& placeholder_text() const;
 
-    operator const std::string&() const;
+    operator std::string() const;
     void set(std::string x);
 
     virtual void load_json(const JsonValue& json) override;
@@ -36,12 +37,8 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
-    const std::string m_label;
-    const std::string m_default;
-    const std::string m_placeholder_text;
-
-    mutable SpinLock m_lock;
-    std::string m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

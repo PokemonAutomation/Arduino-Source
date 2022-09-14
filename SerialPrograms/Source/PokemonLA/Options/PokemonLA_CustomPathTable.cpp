@@ -269,6 +269,7 @@ CustomPathTable2::CustomPathTable2()
         "<b>Custom Path Table:</b><br>"
         "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
         "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
+        false,  //  Disable the save/load buttons since we have our own.
         make_defaults()
     )
 {}
@@ -351,10 +352,11 @@ public:
         QHBoxLayout* button_layout = new QHBoxLayout();
         button_layout->setContentsMargins(0, 0, 0, 0);
         layout->addLayout(button_layout);
-        auto load_button = new QPushButton("Load Options", this);
-        button_layout->addWidget(load_button);
-        auto save_button = new QPushButton("Save Options", this);
-        button_layout->addWidget(save_button);
+        auto load_button = new QPushButton("Load Path", this);
+        button_layout->addWidget(load_button, 1);
+        auto save_button = new QPushButton("Save Path", this);
+        button_layout->addWidget(save_button, 1);
+        button_layout->addStretch(2);
 
         connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
             std::string path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json").toStdString();

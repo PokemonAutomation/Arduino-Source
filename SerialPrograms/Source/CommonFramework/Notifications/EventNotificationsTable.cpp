@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOption*> options)
-    : StaticTableOption("")
+    : StaticTableOption("", false)
 {
     for (EventNotificationOption* option : options){
         add_row(option);

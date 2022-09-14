@@ -67,6 +67,10 @@ public:
         std::string label,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
+    EditableTableOption(
+        std::string label, bool enable_saveload,
+        std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
+    );
 
     const std::string& label() const{ return m_label; }
 
@@ -100,6 +104,7 @@ public:
     virtual void restore_defaults() override final;
 
 public:
+    bool saveload_enabled() const{ return m_enable_saveload; }
     virtual std::vector<std::string> make_header() const = 0;
     virtual std::unique_ptr<EditableTableRow> make_row() const = 0;
 
@@ -113,6 +118,7 @@ public:
 
 private:
     const std::string m_label;
+    const bool m_enable_saveload;
     const std::vector<std::unique_ptr<EditableTableRow>> m_default;
 
     mutable SpinLock m_lock;

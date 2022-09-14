@@ -94,7 +94,6 @@ void VideoDisplayWindow::keyPressEvent(QKeyEvent* event){
         return;
     }
 
-
     if (m_display_widget->command_receiver().key_press(event)){
         return;
     }

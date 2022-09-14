@@ -30,8 +30,8 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
-    m_group_box = new QGroupBox(QString::fromStdString(value.m_label), this);
-    m_group_box->setCheckable(value.m_toggleable);
+    m_group_box = new QGroupBox(QString::fromStdString(value.label()), this);
+    m_group_box->setCheckable(value.toggleable());
     m_group_box->setChecked(value.enabled());
     layout->addWidget(m_group_box);
 
@@ -72,7 +72,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     connect(
         m_group_box, &QGroupBox::toggled,
         this, [this](bool on){
-            m_value.m_enabled.store(on, std::memory_order_relaxed);
+            m_value.set_enabled(on);
             m_value.on_set_enabled(on);
         }
     );
@@ -86,7 +86,7 @@ void GroupWidget::set_options_enabled(bool enabled){
 }
 void GroupWidget::update(){
     ConfigWidget::update();
-    bool on = m_value.m_enabled.load(std::memory_order_acquire);
+    bool on = m_value.enabled();
     m_group_box->setChecked(on);
     for (ConfigWidget* item : m_options){
         item->update();

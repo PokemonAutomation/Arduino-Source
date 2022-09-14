@@ -7,11 +7,8 @@
 #ifndef PokemonAutomation_EventNotificationsTable_H
 #define PokemonAutomation_EventNotificationsTable_H
 
-#include <map>
-#include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
-#include "CommonFramework/Options/LabelCellOption.h"
 #include "EventNotificationOption.h"
 
 namespace PokemonAutomation{

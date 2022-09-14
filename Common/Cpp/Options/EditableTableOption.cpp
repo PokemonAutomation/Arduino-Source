@@ -79,6 +79,17 @@ EditableTableOption::EditableTableOption(
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : m_label(std::move(label))
+    , m_enable_saveload(true)
+    , m_default(std::move(default_value))
+{
+    restore_defaults();
+}
+EditableTableOption::EditableTableOption(
+    std::string label, bool enable_saveload,
+    std::vector<std::unique_ptr<EditableTableRow>> default_value
+)
+    : m_label(std::move(label))
+    , m_enable_saveload(enable_saveload)
     , m_default(std::move(default_value))
 {
     restore_defaults();
