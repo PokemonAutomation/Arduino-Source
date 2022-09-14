@@ -79,7 +79,7 @@ std::string FossilTable::to_cpp() const{
     return str;
 }
 QWidget* FossilTable::make_ui(QWidget& parent){
-    return &m_table.make_ui(parent)->widget();
+    return &m_table.make_QtWidget(parent)->widget();
 }
 
 

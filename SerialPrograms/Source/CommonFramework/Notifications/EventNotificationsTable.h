@@ -7,32 +7,22 @@
 #ifndef PokemonAutomation_EventNotificationsTable_H
 #define PokemonAutomation_EventNotificationsTable_H
 
-#include <map>
-#include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
+#include "Common/Cpp/Options/StaticTableOption.h"
 #include "EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
 
-class EventNotificationsTable : public ConfigOption{
+
+class EventNotificationsTable : public StaticTableOption{
 public:
     EventNotificationsTable(std::vector<EventNotificationOption*> options);
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-    virtual void reset_state() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
     void set_enabled(bool enabled);
 
-private:
-    friend class EventNotificationsTableWidget;
-    std::vector<EventNotificationOption*> m_options;
-    std::map<std::string, EventNotificationOption*> m_name_map;
+    virtual std::vector<std::string> make_header() const override;
+
 };
 
 

@@ -65,7 +65,13 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_serial_widget = new SerialPortWidget(*this, m_session.serial_session(), m_session.logger());
         group_layout->addWidget(m_serial_widget);
 
-        m_video_display = new VideoDisplayWidget(*this, m_session.camera_session(), m_session.overlay_session());
+        m_video_display = new VideoDisplayWidget(
+            *this,
+            m_session.console_number(),
+            *this,
+            m_session.camera_session(),
+            m_session.overlay_session()
+        );
         m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
 
         m_camera_widget = new CameraSelectorWidget(m_session.camera_session(), m_session.logger(), *m_video_display);

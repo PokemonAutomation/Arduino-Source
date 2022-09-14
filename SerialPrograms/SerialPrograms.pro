@@ -104,6 +104,7 @@ SOURCES += \
     ../Common/Cpp/Options/GroupOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
+    ../Common/Cpp/Options/StaticTableOption.cpp \
     ../Common/Cpp/Options/StaticTextOption.cpp \
     ../Common/Cpp/Options/StringOption.cpp \
     ../Common/Cpp/Options/TextEditOption.cpp \
@@ -131,6 +132,7 @@ SOURCES += \
     ../Common/Qt/Options/GroupWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
+    ../Common/Qt/Options/StaticTableWidget.cpp \
     ../Common/Qt/Options/StaticTextWidget.cpp \
     ../Common/Qt/Options/StringWidget.cpp \
     ../Common/Qt/Options/TextEditWidget.cpp \
@@ -228,8 +230,10 @@ SOURCES += \
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
+    Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
+    Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
@@ -808,6 +812,7 @@ HEADERS += \
     ../Common/Cpp/Options/GroupOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
+    ../Common/Cpp/Options/StaticTableOption.h \
     ../Common/Cpp/Options/StaticTextOption.h \
     ../Common/Cpp/Options/StringOption.h \
     ../Common/Cpp/Options/TextEditOption.h \
@@ -853,6 +858,7 @@ HEADERS += \
     ../Common/Qt/Options/GroupWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
+    ../Common/Qt/Options/StaticTableWidget.h \
     ../Common/Qt/Options/StaticTextWidget.h \
     ../Common/Qt/Options/StringWidget.h \
     ../Common/Qt/Options/TextEditWidget.h \
@@ -971,9 +977,11 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
+    Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
+    Source/CommonFramework/Options/UI/LabelCellWidget.h \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
     Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \

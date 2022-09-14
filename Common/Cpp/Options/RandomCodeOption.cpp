@@ -5,6 +5,8 @@
  */
 
 #include <time.h>
+#include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/CodeValidator.h"
@@ -15,6 +17,7 @@ namespace PokemonAutomation{
 
 
 
+RaidCodeOption::~RaidCodeOption() = default;
 RaidCodeOption::RaidCodeOption(size_t total_digits)
     : m_digits(total_digits)
     , m_random_digits(0)
@@ -65,17 +68,34 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
 }
 
 
+struct RandomCodeOption::Data{
+    const std::string m_label;
+    const RaidCodeOption m_default;
+
+    mutable SpinLock m_lock;
+    RaidCodeOption m_current;
+
+    Data(size_t total_digits)
+        : m_label(
+            "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits."
+        )
+        , m_default(total_digits)
+        , m_current(m_default)
+    {}
+    Data(std::string label, size_t total_digits, size_t random_digits, std::string code_string)
+        : m_label(std::move(label))
+        , m_default(total_digits, random_digits, std::move(code_string))
+        , m_current(m_default)
+    {}
+};
+
+
+
 RandomCodeOption::RandomCodeOption(size_t total_digits)
-    : m_label(
-        "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits."
-    )
-    , m_default(total_digits)
-    , m_current(m_default)
+    : m_data(CONSTRUCT_TOKEN, total_digits)
 {}
 RandomCodeOption::RandomCodeOption(std::string label, size_t total_digits, size_t random_digits, std::string code_string)
-    : m_label(std::move(label))
-    , m_default(total_digits, random_digits, std::move(code_string))
-    , m_current(m_default)
+    : m_data(CONSTRUCT_TOKEN, std::move(label), total_digits, random_digits, std::move(code_string))
 {}
 #if 0
 std::unique_ptr<ConfigOption> RandomCodeOption::clone() const{
@@ -89,14 +109,20 @@ std::unique_ptr<ConfigOption> RandomCodeOption::clone() const{
     return ret;
 }
 #endif
+
+const std::string& RandomCodeOption::label() const{
+    return m_data->m_label;
+}
+
 void RandomCodeOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
         return;
     }
 
-    RaidCodeOption code(m_default.total_digits());
-    obj->read_integer(m_current.m_random_digits, "RandomDigits");
+    RaidCodeOption code(m_data->m_default.total_digits());
+
+    obj->read_integer(code.m_random_digits, "RandomDigits");
 
     std::string str;
     if (obj->read_string(str, "RaidCode")){
@@ -104,23 +130,24 @@ void RandomCodeOption::load_json(const JsonValue& json){
     }
 
     {
-        SpinLockGuard lg(m_lock);
-        m_current = code;
+        SpinLockGuard lg(m_data->m_lock);
+        m_data->m_current = code;
     }
     push_update();
 }
 JsonValue RandomCodeOption::to_json() const{
+    SpinLockGuard lg(m_data->m_lock);
     JsonObject obj;
-    obj["RandomDigits"] = m_current.m_random_digits;
-    obj["RaidCode"] = m_current.m_code;
+    obj["RandomDigits"] = m_data->m_current.m_random_digits;
+    obj["RaidCode"] = m_data->m_current.m_code;
     return obj;
 }
 
 
 
 RandomCodeOption::operator RaidCodeOption() const{
-    SpinLockGuard lg(m_lock);
-    return m_current;
+    SpinLockGuard lg(m_data->m_lock);
+    return m_data->m_current;
 }
 std::string RandomCodeOption::set(RaidCodeOption code){
 //    std::string error = code.check_validity();
@@ -128,28 +155,28 @@ std::string RandomCodeOption::set(RaidCodeOption code){
 //        return error;
 //    }
     {
-        SpinLockGuard lg(m_lock);
-        m_current = code;
+        SpinLockGuard lg(m_data->m_lock);
+        m_data->m_current = code;
     }
     push_update();
     return std::string();
 }
 bool RandomCodeOption::code_enabled() const{
-    SpinLockGuard lg(m_lock);
-    return m_current.code_enabled();
+    SpinLockGuard lg(m_data->m_lock);
+    return m_data->m_current.code_enabled();
 }
 bool RandomCodeOption::get_code(uint8_t* code) const{
-    SpinLockGuard lg(m_lock);
-    return m_current.get_code(code);
+    SpinLockGuard lg(m_data->m_lock);
+    return m_data->m_current.get_code(code);
 }
 
 std::string RandomCodeOption::check_validity() const{
-    return m_current.check_validity();
+    return m_data->m_current.check_validity();
 }
 void RandomCodeOption::restore_defaults(){
     {
-        SpinLockGuard lg(m_lock);
-        m_current = m_default;
+        SpinLockGuard lg(m_data->m_lock);
+        m_data->m_current = m_data->m_default;
     }
     push_update();
 }

@@ -19,10 +19,10 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* StringSelectCell::make_ui(QWidget& parent){
+ConfigWidget* StringSelectCell::make_QtWidget(QWidget& parent){
     return new StringSelectCellWidget(parent, *this);
 }
-ConfigWidget* StringSelectOption::make_ui(QWidget& parent){
+ConfigWidget* StringSelectOption::make_QtWidget(QWidget& parent){
     return new StringSelectOptionWidget(parent, *this);
 }
 

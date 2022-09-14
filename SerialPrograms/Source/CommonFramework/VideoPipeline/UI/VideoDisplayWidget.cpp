@@ -16,9 +16,16 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-VideoDisplayWidget::VideoDisplayWidget(QWidget& parent, CameraSession& camera, VideoOverlaySession& overlay)
+VideoDisplayWidget::VideoDisplayWidget(
+    QWidget& parent, size_t id,
+    CommandReceiver& command_receiver,
+    CameraSession& camera,
+    VideoOverlaySession& overlay
+)
     : QWidget(&parent)
-    , m_video(camera.make_QWidget(this))
+    , m_id(id)
+    , m_command_receiver(command_receiver)
+    , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
 {
     m_overlay->setVisible(true);
@@ -81,16 +88,16 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
-        return;
-    }
+//    if (!PreloadSettings::instance().DEVELOPER_MODE){
+//        return;
+//    }
     // If this widget is not already inside a VideoDisplayWindow, move it
     // into a VideoDisplayWindow
     if (dynamic_cast<VideoDisplayWindow*>(parentWidget()) == nullptr){
         move_to_new_window();
     }else{
         QWidget::mouseDoubleClickEvent(event);
-    };
+    }
 }
 
 void VideoDisplayWidget::move_to_new_window(){

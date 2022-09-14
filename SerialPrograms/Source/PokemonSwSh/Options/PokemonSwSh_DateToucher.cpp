@@ -51,8 +51,8 @@ void TouchDateIntervalOption::reset_state(){
     SpinLockGuard lg(m_lock);
     m_last_touch = WallClock::min();
 }
-ConfigWidget* TouchDateIntervalOption::make_ui(QWidget& parent){
-    return m_hours.make_ui(parent);
+ConfigWidget* TouchDateIntervalOption::make_QtWidget(QWidget& parent){
+    return m_hours.make_QtWidget(parent);
 }
 
 

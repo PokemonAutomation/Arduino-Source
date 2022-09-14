@@ -67,7 +67,7 @@ std::string FloatingPoint::to_cpp() const{
     return str;
 }
 QWidget* FloatingPoint::make_ui(QWidget& parent){
-    return &m_option.make_ui(parent)->widget();
+    return &m_option.make_QtWidget(parent)->widget();
 }
 
 

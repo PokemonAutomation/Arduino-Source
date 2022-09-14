@@ -53,7 +53,7 @@ std::string BooleanCheckBox::to_cpp() const{
     return str;
 }
 QWidget* BooleanCheckBox::make_ui(QWidget& parent){
-    return &m_option.make_ui(parent)->widget();
+    return &m_option.make_QtWidget(parent)->widget();
 }
 
 

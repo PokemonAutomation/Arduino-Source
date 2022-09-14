@@ -22,7 +22,7 @@ namespace OCR{
 
 
 
-ConfigWidget* LanguageOCR::make_ui(QWidget& parent){
+ConfigWidget* LanguageOCR::make_QtWidget(QWidget& parent){
     return new LanguageOCRWidget(parent, *this);
 }
 

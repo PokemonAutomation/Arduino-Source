@@ -35,6 +35,7 @@ public:
 
     const QSerialPortInfo* port() const;
     void set_port(QSerialPortInfo port);
+    void set_port(const QSerialPortInfo* port);
 
 
 private:

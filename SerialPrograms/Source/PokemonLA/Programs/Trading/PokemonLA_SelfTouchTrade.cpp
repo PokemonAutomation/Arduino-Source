@@ -4,7 +4,6 @@
  *
  */
 
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -13,7 +12,6 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Options/Pokemon_NameSelectWidget.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA_TradeRoutines.h"
@@ -76,7 +74,7 @@ SelfTouchTrade::SelfTouchTrade()
 
 bool SelfTouchTrade::trade_one(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-    std::map<std::string, int>& trades_left
+    std::map<std::string, uint8_t>& trades_left
 ){
     TradeStats& stats = env.current_stats<TradeStats>();
 
@@ -148,9 +146,9 @@ bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t&
 
 void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Build list of what's needed.
-    std::map<std::string, int> trades_left;
-    for (const std::pair<std::string, int>& item : TRADE_COUNTS.list()){
-        trades_left[item.first] = item.second;
+    std::map<std::string, uint8_t> trades_left;
+    for (const StaticTableRow* item : TRADE_COUNTS.table()){
+        trades_left[item->slug()] = static_cast<const TradeCountTableRow&>(*item).count;
     }
 
     //  Connect both controllers.

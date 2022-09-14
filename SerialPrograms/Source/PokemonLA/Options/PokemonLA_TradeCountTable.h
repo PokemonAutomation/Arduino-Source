@@ -9,52 +9,34 @@
 
 #include <string>
 #include <vector>
-#include "Common/Qt/AutoHeightTable.h"
 #include "Common/Cpp/Options/ConfigOption.h"
-#include "Common/Qt/Options/ConfigWidget.h"
-
-class QLineEdit;
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/StaticTableOption.h"
+#include "CommonFramework/Options/LabelCellOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class TradeCountTableOption : public ConfigOption{
+class TradeCountTableRow : public StaticTableRow{
 public:
-    TradeCountTableOption();
+    TradeCountTableRow(const std::string& slug, const ImageViewRGB32& icon);
 
-    const std::vector<std::pair<std::string, int>>& list() const { return m_list; }
+    const uint8_t default_value;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
-
-private:
-    friend class TradeCountTableWidget;
-
-    std::string m_label;
-    std::vector<std::pair<std::string, int>> m_list;
+    LabelCellOption pokemon;
+    SimpleIntegerCell<uint8_t> count;
+    LabelCellOption default_label;
 };
 
 
-class TradeCountTableWidget : public QWidget, public ConfigWidget{
+class TradeCountTable : public StaticTableOption{
 public:
-    TradeCountTableWidget(QWidget& parent, TradeCountTableOption& value);
-
-    virtual void update() override;
-
-private:
-    QLineEdit* make_count_box(QWidget& parent, int row, int count);
-
-private:
-    TradeCountTableOption& m_value;
-    AutoHeightTableWidget* m_table;
-    std::vector<QLineEdit*> m_entries;
+    TradeCountTable();
+    virtual std::vector<std::string> make_header() const;
 };
+
 
 
 

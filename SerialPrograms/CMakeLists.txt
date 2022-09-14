@@ -127,6 +127,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
+    ../Common/Cpp/Options/StaticTableOption.cpp
+    ../Common/Cpp/Options/StaticTableOption.h
     ../Common/Cpp/Options/StaticTextOption.cpp
     ../Common/Cpp/Options/StaticTextOption.h
     ../Common/Cpp/Options/StringOption.cpp
@@ -199,6 +201,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
     ../Common/Qt/Options/SimpleIntegerWidget.h
+    ../Common/Qt/Options/StaticTableWidget.cpp
+    ../Common/Qt/Options/StaticTableWidget.h
     ../Common/Qt/Options/StaticTextWidget.cpp
     ../Common/Qt/Options/StaticTextWidget.h
     ../Common/Qt/Options/StringWidget.cpp
@@ -415,12 +419,16 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
+    Source/CommonFramework/Options/LabelCellOption.cpp
+    Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/StringSelectTableOption.h
+    Source/CommonFramework/Options/UI/LabelCellWidget.cpp
+    Source/CommonFramework/Options/UI/LabelCellWidget.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp

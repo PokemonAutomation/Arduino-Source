@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
+ConfigWidget* FixedCodeOption::make_QtWidget(QWidget& parent){
     return new FixedCodeWidget(parent, *this);
 }
 
@@ -24,7 +24,7 @@ ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
 std::string FixedCodeWidget::sanitized_code(const std::string& text) const{
     std::string message;
     try{
-        message = "Code: " + sanitize_code(m_value.m_digits, text);
+        message = "Code: " + sanitize_code(m_value.digits(), text);
     }catch (const ParseException& e){
         message = "<font color=\"red\">" + e.message() + "</font>";
     }
@@ -40,7 +40,7 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(value.m_label), this);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
     layout->addWidget(text, 1);
 

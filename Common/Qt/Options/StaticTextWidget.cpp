@@ -13,10 +13,10 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
+ConfigWidget* StaticTextOption::make_QtWidget(QWidget& parent){
     return new StaticTextWidget(parent, *this);
 }
-ConfigWidget* SectionDividerOption::make_ui(QWidget& parent){
+ConfigWidget* SectionDividerOption::make_QtWidget(QWidget& parent){
     return new SectionDividerWidget(parent, *this);
 }
 

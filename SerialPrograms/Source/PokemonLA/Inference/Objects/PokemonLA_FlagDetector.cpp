@@ -100,6 +100,8 @@ FlagDetector::FlagDetector()
             Color(0xffb0b0b0),
             Color(0xffc0c0c0),
             Color(0xffd0d0d0),
+            Color(0xffe0e0e0),
+            Color(0xfff0f0f0),
         }
     )
 {}

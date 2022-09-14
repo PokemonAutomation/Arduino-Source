@@ -45,7 +45,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     MaxLairInternal::Consoles CONSOLES;
-    MaxLairInternal::BossActionOption BOSS_LIST;
+    MaxLairInternal::BossActionTable BOSS_LIST;
     MaxLairInternal::HostingSettings HOSTING;
 
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;

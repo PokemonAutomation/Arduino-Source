@@ -58,16 +58,19 @@ SerialPortWidget::SerialPortWidget(
     connect(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
-            SerialPortOption& option = m_session.option();
-            const QSerialPortInfo* current_port = option.port();
+            QSerialPortInfo current_port = m_session.get();
+//            SerialPortOption& option = m_session.option();
+//            const QSerialPortInfo* current_port = option.port();
             if (index <= 0 || (size_t)index > m_ports.size()){
-                option.clear();
+//                option.clear();
+                m_session.set(QSerialPortInfo());
             }else{
                 const QSerialPortInfo& port = m_ports[index - 1];
-                if (current_port && current_port->systemLocation() == port.systemLocation()){
+                if (!current_port.isNull() && current_port.systemLocation() == port.systemLocation()){
                     return;
                 }
-                option.set_port(port);
+                m_session.set(port);
+//                option.set_port(port);
             }
             reset();
         }
@@ -148,22 +151,24 @@ void SerialPortWidget::refresh(){
         m_ports.emplace_back(std::move(port));
     }
 
-    SerialPortOption& option = m_session.option();
-    const QSerialPortInfo* current_port = option.port();
+    QSerialPortInfo current_port = m_session.get();
+//    SerialPortOption& option = m_session.option();
+//    const QSerialPortInfo* current_port = option.port();
 
     size_t index = 0;
     for (size_t c = 0; c < m_ports.size(); c++){
         const QSerialPortInfo& port = m_ports[c];
         m_serial_box->addItem(port.portName() + " - " + port.description());
 
-        if (current_port && current_port->systemLocation() == port.systemLocation()){
+        if (!current_port.isNull() && current_port.systemLocation() == port.systemLocation()){
             index = c + 1;
         }
     }
     if (index != 0){
         m_serial_box->setCurrentIndex((int)index);
     }else{
-        option.clear();
+//        option.clear();
+        m_session.set(QSerialPortInfo());
         m_serial_box->setCurrentIndex(0);
     }
 }

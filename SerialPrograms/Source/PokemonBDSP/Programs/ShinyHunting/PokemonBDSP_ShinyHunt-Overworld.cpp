@@ -52,7 +52,12 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
 ShinyHuntOverworld::ShinyHuntOverworld()
     : GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true)
-    , RESET_GAME_WHEN_ERROR("<b>Reset Game in Case of Error:</b><br>When the program encounters an error, whether to reset the game to fix it.", false)
+    , RESET_GAME_WHEN_ERROR(
+        "<b>Reset Game in Case of Error:</b><br>"
+        "When the program encounters an error, whether to reset the game to fix it.<br>"
+        "<b>Make sure you have set \"Throw balls. Save if caught.\" in Option Overrides if you don't stop when finding a shiny.</b>"
+        , false
+    )
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-ConfigWidget* FriendCodeListOption::make_ui(QWidget& parent){
+ConfigWidget* FriendCodeListOption::make_QtWidget(QWidget& parent){
     return new FriendCodeListWidget(parent, *this);
 }
 

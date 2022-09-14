@@ -112,7 +112,7 @@ void MaxLairBossFinder::update_active_consoles(size_t switch_count){
 
 class EndBattleDecider_BossFinder : public EndBattleDecider{
 public:
-    EndBattleDecider_BossFinder(const Consoles& consoles, const BossActionOption& boss_list)
+    EndBattleDecider_BossFinder(const Consoles& consoles, const BossActionTable& boss_list)
         : m_consoles(consoles)
         , m_boss_list(boss_list)
     {}
@@ -124,7 +124,7 @@ public:
     virtual const std::string& boss_ball(
         size_t console_index, const std::string& boss_slug
     ) const override{
-        return get_filter(boss_slug).ball;
+        return get_filter(boss_slug).ball.slug();
     }
     virtual CaughtScreenAction end_adventure_action(
         size_t console_index, const std::string& boss_slug,
@@ -147,9 +147,10 @@ public:
 
 
 private:
-    const BossFilter& get_filter(const std::string& boss_slug) const{
-        for (const BossFilter& filter : m_boss_list.list()){
-            if (boss_slug == filter.slug){
+    const BossActionRow& get_filter(const std::string& boss_slug) const{
+        for (const StaticTableRow* row : m_boss_list.table()){
+            const BossActionRow& filter = static_cast<const BossActionRow&>(*row);
+            if (boss_slug == filter.slug()){
                 return filter;
             }
         }
@@ -162,7 +163,7 @@ private:
     }
 
     const Consoles& m_consoles;
-    const BossActionOption& m_boss_list;
+    const BossActionTable& m_boss_list;
 
 };
 

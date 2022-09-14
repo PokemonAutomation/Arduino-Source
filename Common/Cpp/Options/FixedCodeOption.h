@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_FixedCodeOption_H
 #define PokemonAutomation_Options_FixedCodeOption_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -15,12 +15,16 @@ namespace PokemonAutomation{
 
 class FixedCodeOption : public ConfigOption{
 public:
+    ~FixedCodeOption();
     FixedCodeOption(
         std::string label,
         size_t digits,
         std::string default_value
     );
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
+
+    const std::string& label() const;
+    size_t digits() const;
 
     operator const std::string&() const;
     const std::string& get() const;
@@ -34,16 +38,11 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual ConfigWidget* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
-    friend class FixedCodeWidget;
-    std::string m_label;
-    const size_t m_digits;
-    const std::string m_default;
-
-    mutable SpinLock m_lock;
-    std::string m_current;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

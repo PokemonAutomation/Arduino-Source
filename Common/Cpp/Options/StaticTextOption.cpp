@@ -7,7 +7,6 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "StaticTextOption.h"
 
 namespace PokemonAutomation{
@@ -50,6 +49,7 @@ void StaticTextOption::set_text(std::string label){
     push_update();
 }
 void StaticTextOption::load_json(const JsonValue&){
+    push_update();
 }
 JsonValue StaticTextOption::to_json() const{
     return JsonValue();
@@ -90,6 +90,7 @@ void SectionDividerOption::set_text(std::string label){
     push_update();
 }
 void SectionDividerOption::load_json(const JsonValue&){
+    push_update();
 }
 JsonValue SectionDividerOption::to_json() const{
     return JsonValue();

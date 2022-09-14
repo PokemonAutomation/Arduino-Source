@@ -4,22 +4,24 @@
  *
  */
 
+#include <QFileDialog>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QLabel>
 #include <QPushButton>
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/AutoHeightTable.h"
 #include "EditableTableWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
-ConfigWidget* EditableTableOption::make_ui(QWidget& parent){
+ConfigWidget* EditableTableOption::make_QtWidget(QWidget& parent){
     return new EditableTableWidget(parent, *this);
 }
 
@@ -77,11 +79,53 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     }
 
     EditableTableWidget::update();
-    m_table->update_height();
 //    EditableTableWidget2::value_changed();
 
 //    m_table->resizeColumnsToContents();
 //    m_table->resizeRowsToContents();
+    m_table->update_height();
+
+
+    if (value.saveload_enabled()){
+        QHBoxLayout* buttons = new QHBoxLayout();
+        layout->addLayout(buttons);
+        {
+            QPushButton* load_button = new QPushButton("Load Table", this);
+            buttons->addWidget(load_button, 1);
+            connect(
+                load_button, &QPushButton::clicked,
+                this, [this, &value](bool){
+                    std::string path = QFileDialog::getOpenFileName(
+                        this,
+                        tr("Select a file to load."), "", tr("JSON files (*.json)")
+                    ).toStdString();
+                    if (path.empty()){
+                        return;
+                    }
+                    value.load_json(load_json_file(path));
+                }
+            );
+        }
+        {
+            QPushButton* save_button = new QPushButton("Save Table", this);
+            buttons->addWidget(save_button, 1);
+            connect(
+                save_button, &QPushButton::clicked,
+                this, [this, &value](bool){
+                    std::string path = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Select a file name to save to."), "", tr("JSON files (*.json)")
+                    ).toStdString();
+                    if (path.empty()){
+                        return;
+                    }
+                    JsonValue json = value.to_json();
+                    json.dump(path);
+                }
+            );
+        }
+        buttons->addStretch(2);
+    }
 
     value.add_listener(*this);
 }
@@ -137,7 +181,7 @@ void EditableTableWidget::update(){
             int c = 0;
             int stop = (int)cells.size();
             for (; c < stop; c++){
-                m_table->setCellWidget((int)index_new, c, &cells[c]->make_ui(*m_table)->widget());
+                m_table->setCellWidget((int)index_new, c, &cells[c]->make_QtWidget(*m_table)->widget());
             }
             m_table->setCellWidget((int)index_new, c++, make_clone_button(row));
             m_table->setCellWidget((int)index_new, c++, make_insert_button(row));
@@ -158,8 +202,7 @@ void EditableTableWidget::update(){
 
 //    cout << "latest.size() = " << latest.size() << endl;
     m_current = std::move(latest);
-    m_table->resizeColumnsToContents();
-    m_table->resizeRowsToContents();
+    EditableTableWidget::update_sizes();
 }
 void EditableTableWidget::value_changed(){
     QMetaObject::invokeMethod(m_table, [this]{
@@ -169,6 +212,7 @@ void EditableTableWidget::value_changed(){
 void EditableTableWidget::update_sizes(){
     m_table->resizeColumnsToContents();
     m_table->resizeRowsToContents();
+    m_table->update_height();
 }
 
 

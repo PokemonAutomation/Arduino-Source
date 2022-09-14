@@ -8,6 +8,7 @@
 #define PokemonAutomation_VideoPipeline_VideoDisplayWindow_H
 
 #include <QMainWindow>
+#include "VideoDisplayWidget.h"
 
 namespace PokemonAutomation{
 
@@ -32,6 +33,7 @@ public:
     virtual ~VideoDisplayWindow() = default;
 
 private:
+    virtual void changeEvent(QEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
@@ -45,9 +47,11 @@ private:
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 
+    void exit_full_screen();
+
     VideoDisplayWidget* m_display_widget;
 
-    NintendoSwitch::SwitchSystemWidget* m_parent_switch_system_widget;
+    QSize m_normal_size;
 };
 
 

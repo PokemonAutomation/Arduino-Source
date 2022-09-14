@@ -40,13 +40,16 @@ public:
 
 
 public:
-    SerialPortSession(Logger& logger, SerialPortOption& option);
     ~SerialPortSession();
+    SerialPortSession(Logger& logger, SerialPortOption& option);
 
+    QSerialPortInfo get() const;
+    void set(QSerialPortInfo port);
+    void set(const QSerialPortInfo* port);
 
 public:
-    SerialPortOption* operator->(){ return &m_option; }
-    SerialPortOption& option(){ return m_option; }
+//    SerialPortOption* operator->(){ return &m_option; }
+//    SerialPortOption& option(){ return m_option; }
 
     bool is_ready() const{ return m_connection.state() == BotBaseHandle::State::READY; }
     BotBaseHandle& botbase(){ return m_connection; }
@@ -65,7 +68,7 @@ private:
     SerialLogger m_logger;
     BotBaseHandle m_connection;
 
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     std::set<Listener*> m_listeners;
 
     LifetimeSanitizer m_sanitizer;

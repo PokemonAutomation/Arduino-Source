@@ -30,10 +30,10 @@ inline const EnumDatabase<ImageAttachmentMode>& ImageAttachmentMode_Database(){
 
 class ScreenshotCell : public EnumDropdownCell<ImageAttachmentMode>{
 public:
-    ScreenshotCell()
+    ScreenshotCell(ImageAttachmentMode default_mode = ImageAttachmentMode::JPG)
         : EnumDropdownCell<ImageAttachmentMode>(
             ImageAttachmentMode_Database(),
-            ImageAttachmentMode::JPG
+            default_mode
         )
     {}
 };

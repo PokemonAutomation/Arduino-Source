@@ -10,9 +10,9 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "EditableTableOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -79,6 +79,17 @@ EditableTableOption::EditableTableOption(
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : m_label(std::move(label))
+    , m_enable_saveload(true)
+    , m_default(std::move(default_value))
+{
+    restore_defaults();
+}
+EditableTableOption::EditableTableOption(
+    std::string label, bool enable_saveload,
+    std::vector<std::unique_ptr<EditableTableRow>> default_value
+)
+    : m_label(std::move(label))
+    , m_enable_saveload(enable_saveload)
     , m_default(std::move(default_value))
 {
     restore_defaults();
@@ -164,7 +175,7 @@ void EditableTableOption::clone_row(const EditableTableRow& row){
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
-            cout << "EditableTableOptionCore::clone_row(): Orphaned row" << endl;
+//            cout << "EditableTableOptionCore::clone_row(): Orphaned row" << endl;
             return;
         }
         std::unique_ptr<EditableTableRow> new_row = row.clone();
@@ -182,7 +193,7 @@ void EditableTableOption::remove_row(EditableTableRow& row){
         SpinLockGuard lg(m_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
-            cout << "EditableTableOptionCore::remove_row(): Orphaned row" << endl;
+//            cout << "EditableTableOptionCore::remove_row(): Orphaned row" << endl;
             return;
         }
         auto iter = m_current.begin() + index;

@@ -515,7 +515,7 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
             }
 
             bool send = false;
-            for (const std::string& tag : EventNotificationSettings::parse_tags(channel.tags_text)){
+            for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)){
                 auto iter = tag_set.find(to_lower(tag));
                 if (iter != tag_set.end()){
                     channel_vector.emplace_back(channel.channel_id);

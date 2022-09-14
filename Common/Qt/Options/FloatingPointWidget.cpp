@@ -14,10 +14,10 @@ namespace PokemonAutomation{
 
 
 
-ConfigWidget* FloatingPointCell::make_ui(QWidget& parent){
+ConfigWidget* FloatingPointCell::make_QtWidget(QWidget& parent){
     return new FloatingPointCellWidget(parent, *this);
 }
-ConfigWidget* FloatingPointOption::make_ui(QWidget& parent){
+ConfigWidget* FloatingPointOption::make_QtWidget(QWidget& parent){
     return new FloatingPointOptionWidget(parent, *this);
 }
 

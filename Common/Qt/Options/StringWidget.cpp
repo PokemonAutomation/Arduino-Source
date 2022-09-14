@@ -12,11 +12,11 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* StringCell::make_ui(QWidget& parent){
+ConfigWidget* StringCell::make_QtWidget(QWidget& parent){
     return new StringCellWidget(parent, *this);
 }
 
-ConfigWidget* StringOption::make_ui(QWidget& parent){
+ConfigWidget* StringOption::make_QtWidget(QWidget& parent){
     return new StringOptionWidget(parent, *this);
 }
 

@@ -54,7 +54,7 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
             if (str == nullptr){
                 continue;
             }
-            std::string token = EventNotificationSettings::sanitize_tag(*str);
+            std::string token = EventNotificationOption::sanitize_tag(*str);
             if (!token.empty()){
                 if (!tags.empty()){
                     tags += ", ";

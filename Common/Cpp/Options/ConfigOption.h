@@ -55,13 +55,13 @@ public:
 //    //  Returns null if config cannot be copied.
 //    virtual std::unique_ptr<ConfigOption> clone() const = 0;
 
-    virtual void load_json(const JsonValue& json) = 0;
-    virtual JsonValue to_json() const = 0;
+    virtual void load_json(const JsonValue& json);
+    virtual JsonValue to_json() const;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual std::string check_validity() const;
 
-    virtual void restore_defaults() = 0;
+    virtual void restore_defaults();
 
     //  This is called by the framework at the start of a program to reset any
     //  transient state that the option object may have.
@@ -72,7 +72,7 @@ public:
 
 
 public:
-    virtual ConfigWidget* make_ui(QWidget& parent) = 0;
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
 
 protected:
     void push_update();

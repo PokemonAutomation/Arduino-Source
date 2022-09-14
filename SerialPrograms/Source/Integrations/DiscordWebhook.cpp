@@ -251,7 +251,7 @@ void send_message(
 
         //  See if a tag matches.
         bool send = false;
-        for (const std::string& tag : EventNotificationSettings::parse_tags(url.tags_text)){
+        for (const std::string& tag : EventNotificationOption::parse_tags(url.tags_text)){
 //            cout << "find tag: " << tag.toStdString() << endl;
             auto iter = tag_set.find(to_lower(tag));
             if (iter != tag_set.end()){

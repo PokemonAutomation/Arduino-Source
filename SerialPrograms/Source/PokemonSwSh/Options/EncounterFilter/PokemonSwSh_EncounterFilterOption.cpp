@@ -58,7 +58,7 @@ void EncounterFilterOption::restore_defaults(){
     m_shiny_filter_current = m_shiny_filter_default;
     m_table.restore_defaults();
 }
-ConfigWidget* EncounterFilterOption::make_ui(QWidget& parent){
+ConfigWidget* EncounterFilterOption::make_QtWidget(QWidget& parent){
     return new EncounterFilterWidget(parent, *this);
 }
 
