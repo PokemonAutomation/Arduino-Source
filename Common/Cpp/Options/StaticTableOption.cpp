@@ -206,6 +206,7 @@ struct StaticTableOption::Data{
 };
 
 
+StaticTableOption::~StaticTableOption() = default;
 StaticTableOption::StaticTableOption(std::string label, bool enable_saveload)
     : m_data(CONSTRUCT_TOKEN, std::move(label), enable_saveload)
 {}

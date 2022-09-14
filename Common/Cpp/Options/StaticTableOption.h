@@ -55,6 +55,7 @@ private:
 //  This is the table itself.
 class StaticTableOption : public ConfigOption{
 public:
+    ~StaticTableOption();
     StaticTableOption(std::string label, bool enable_saveload = true);
 protected:
     //  Construction Steps:
