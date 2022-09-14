@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -110,7 +111,7 @@ bool on_shiny_callback(
         embeds.emplace_back("Session Stats", current_stats->to_str());
     }
     const StatsTracker* historical_stats = env.historical_stats();
-    if (historical_stats){
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
         embeds.emplace_back("Historical Stats", historical_stats->to_str());
     }
     send_program_notification(
@@ -140,7 +141,7 @@ void on_shiny_sound(
         embeds.emplace_back("Session Stats", current_stats->to_str());
     }
     const StatsTracker* historical_stats = env.historical_stats();
-    if (historical_stats){
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
         embeds.emplace_back("Historical Stats", historical_stats->to_str());
     }
 

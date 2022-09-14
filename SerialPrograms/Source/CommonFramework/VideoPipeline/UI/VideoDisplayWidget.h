@@ -34,6 +34,8 @@ struct CommandReceiver{
 //  It consists of a VideoWidget that loads the video content from Switch and a VideoOverlayWidget
 //  that renders inference boxes and other visualizations on top of the video content.
 class VideoDisplayWidget : public QWidget{
+    Q_OBJECT
+
 public:
     VideoDisplayWidget(
         QWidget& parent, size_t id,
@@ -61,6 +63,9 @@ protected:
 
 private:
     virtual void resizeEvent(QResizeEvent* event) override;
+
+signals:
+    void on_size_change(QSize size);
 
 private:
     const size_t m_id;

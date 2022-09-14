@@ -24,7 +24,7 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     m_display_widget->setParent(this);
     setWindowTitle("Console: " + QString::number(m_display_widget->id()));
 
-//    this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->setCentralWidget(m_display_widget);
 //    m_display_widget->setAlignment(Qt::AlignCenter);
 
@@ -41,6 +41,19 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     setFocusPolicy(Qt::StrongFocus);
 
 //    this->showFullScreen();
+
+#if 0
+    connect(
+        m_display_widget, &VideoDisplayWidget::on_size_change,
+        this, [this](QSize size){
+            cout << size.width() << " x " << size.height() << endl;
+//            if (size.height() < this->height()){
+//                this->resize(size);
+//            }
+        },
+        Qt::QueuedConnection
+    );
+#endif
 }
 
 void VideoDisplayWindow::changeEvent(QEvent* event){
@@ -66,16 +79,26 @@ void VideoDisplayWindow::closeEvent(QCloseEvent* event){
 
 void VideoDisplayWindow::resizeEvent(QResizeEvent* event){
     QMainWindow::resizeEvent(event);
-    this->resize(m_display_widget->size());
+//    this->resize(m_display_widget->size());
+//    cout << this->width() << " x " << this->height() << endl;
+#if 1
+    QMetaObject::invokeMethod(this, [this]{
+        this->resize(m_display_widget->size());
+//        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
+//        cout << "Window Widget: " << this->width() << " x " << this->height() << endl;
+    }, Qt::QueuedConnection);
+#endif
 }
 
 void VideoDisplayWindow::exit_full_screen(){
     this->showNormal();
+#if 0
     QMetaObject::invokeMethod(this, [this]{
         this->resize(m_normal_size);
 //        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
 //        cout << "Window Widget: " << this->width() << " x " << this->height() << endl;
     }, Qt::QueuedConnection);
+#endif
 }
 
 void VideoDisplayWindow::mouseDoubleClickEvent(QMouseEvent* event){

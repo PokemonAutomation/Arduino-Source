@@ -61,6 +61,7 @@ void VideoDisplayWidget::update_size(Resolution resolution){
     m_overlay->update_size(this->size(), this->size());
 
 //    cout << "VideoDisplayWidget: " << this->width() << " x " << this->height() << endl;
+    emit on_size_change(this->size());
 }
 void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
