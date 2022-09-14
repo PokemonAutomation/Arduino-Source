@@ -44,7 +44,24 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
     )
 {}
 
-BoxSorting::BoxSorting(){}
+BoxSorting::BoxSorting()
+        : BOX_NUMBER(
+            "<b>Number of boxes to order:</b>",
+            1
+        ),
+        VIDEO_DELAY(
+            "<b>Delay of your capture card (you probably have to increase this):</b>",
+            20
+        ),
+        GAME_DELAY(
+            "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
+            10
+        )
+    {
+        PA_ADD_OPTION(BOX_NUMBER);
+        PA_ADD_OPTION(VIDEO_DELAY);
+        PA_ADD_OPTION(GAME_DELAY);
+    }
 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t video_delay){
 
@@ -130,13 +147,18 @@ void quickSort(std::vector<uint16_t>* arr, int low, int high){
 
 void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t box_number_to, uint16_t colomn_to, uint16_t line_to, Cursor* cur_cursor, uint16_t uni_delay){
 
+    std::ostringstream ss;
+    ss << "The program think the cursor is at: " << cur_cursor->box << " " << cur_cursor->colomn << " " << cur_cursor->line;
+    env.console.log(ss.str());
+    ss.str("");
+
     if(box_number_to > cur_cursor->box){
         for (int i = 0; i < box_number_to-cur_cursor->box; ++i) {
-            pbf_press_button(context, BUTTON_R, 10, uni_delay+70);
+            pbf_press_button(context, BUTTON_R, 10, uni_delay+30);
         }
     }else{
         for (int i = 0; i < cur_cursor->box-box_number_to; ++i) {
-            pbf_press_button(context, BUTTON_L, 10, uni_delay+70);
+            pbf_press_button(context, BUTTON_L, 10, uni_delay+30);
         }
     }
 
@@ -169,7 +191,7 @@ void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     PokemonAutomation::ImageFloatBox Select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    PokemonAutomation::ImageFloatBox Dex_number_box(0.4475, 0.255, 0.035, 0.028); //pokemon national dex number pos
+    PokemonAutomation::ImageFloatBox Dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
 
 
     //3 dimensions vector that will store pokedex number of each slot
@@ -223,11 +245,11 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
     };
 
-    uint16_t video_delay = 20; //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
+    uint16_t video_delay = VIDEO_DELAY; //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
 
-    uint16_t uni_delay = 10; //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
+    uint16_t uni_delay = GAME_DELAY; //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
 
-    uint16_t nb_box_choosen = 19;
+    uint16_t nb_box_choosen = BOX_NUMBER;
 
     Cursor cur_cursor{static_cast<uint16_t>(nb_box_choosen-1), 0, 0};
 
@@ -421,12 +443,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                                 env.console.log(ss.str());
                                 ss.str("");
                                 move_cursor_to(env, context, box_nb_s, colomn_s, line_s, &cur_cursor, uni_delay);
-                                pbf_press_button(context, BUTTON_Y, 10, uni_delay+20);
+                                pbf_press_button(context, BUTTON_Y, 10, uni_delay+30);
                                 ss << "Moving "<< box_data[box_nb_s][colomn_s][line_s] <<" to " << box_nb <<" "<< colomn <<" "<< line;
                                 env.console.log(ss.str());
                                 ss.str("");
                                 move_cursor_to(env, context, box_nb, colomn, line, &cur_cursor, uni_delay);
-                                pbf_press_button(context, BUTTON_Y, 10, uni_delay+20);
+                                pbf_press_button(context, BUTTON_Y, 10, uni_delay+30);
                                 context.wait_for_all_requests();
                                 box_data[box_nb_s][colomn_s][line_s] = box_data[box_nb][colomn][line];
                                 box_data[box_nb][colomn][line] = 0;

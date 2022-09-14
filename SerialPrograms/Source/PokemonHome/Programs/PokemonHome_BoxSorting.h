@@ -7,7 +7,10 @@
 #ifndef BOXSORTING_H
 #define BOXSORTING_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,6 +26,12 @@ public:
     BoxSorting();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+
+private:
+    SimpleIntegerOption<uint16_t> BOX_NUMBER;
+    SimpleIntegerOption<uint16_t> VIDEO_DELAY;
+    SimpleIntegerOption<uint16_t> GAME_DELAY;
+
 };
 
 }
