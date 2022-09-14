@@ -657,6 +657,7 @@ SOURCES += \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterWidget.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp \
+    Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.cpp \
@@ -1438,6 +1439,7 @@ HEADERS += \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h \
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h \
+    Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h \

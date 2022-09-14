@@ -1,11 +1,11 @@
 /*  Cram-o-matic RNG Manipulation
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
- * 
- *  Credit goes to Anubis for discovering how the Cram-o-matic works 
- *  and for the original code to calculate how many advances are needed 
+ *
+ *  Credit goes to Anubis for discovering how the Cram-o-matic works
+ *  and for the original code to calculate how many advances are needed
  *  to get the wanted balls.
- * 
+ *
  */
 
 #include "Common/Cpp/Exceptions.h"
@@ -19,6 +19,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -37,37 +38,27 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
 {}
 
 CramomaticRNG::CramomaticRNG()
-    : NUM_ITERATIONS(
-        "<b>Iterations:</b><br>How often should the Cram-o-matic be used. Four apricorns are used per iteration.</b>",
-        240
+    : NUM_APRICORN_ONE(
+        "<b>Primary Apricorns:</b><br>Number of Apricorns in the selected slot.",
+        0
+    )
+    , NUM_APRICORN_TWO(
+        "<b>Secondary Apricorns:</b><br>Number of Apricorns in the slot below the selected one.",
+        0
     )
     , NUM_NPCS(
         "<b>NPCs:</b><br>Number of NPCs in the dojo, including " + STRING_POKEMON + ".",
         22
     )
-    , BALL_TYPE(
-        "<b>Wanted Ball:</b><br>Exact kind depends on the currently selected apricorn.",
-        {
-            {BallType::Poke, "poke", "Poke Ball"},
-            {BallType::Great, "great", "Great Ball"},
-            {BallType::Shop1, "shop1", "Ultra Ball, Net Ball, Dusk Ball, Premier Ball"},
-            {BallType::Shop2, "shop2", "Repeat Ball, Dive Ball, Quick Ball, Nest Ball, Heal Ball, Timer Ball, Luxury Ball"},
-            {BallType::Apricorn, "apricorn", "Level Ball, Lure Ball, Moon Ball, Friend Ball, Love Ball, Fast Ball, Heavy Ball"},
-            {BallType::Safari, "safari", "Safari Ball"},
-            {BallType::Sport, "sport", "Sport Ball (uses two different Apricorn colors)"},
-        },
-        BallType::Apricorn
-        )
+    , BALL_TABLE(
+        "<b>Wanted Balls:</b><br>Exact kind depends on the currently selected apricorn."
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , MAX_UNKNOWN_ADVANCES(
         "<b>Max unknown advances:</b><br>How many advances to check when updating the rng state.",
         300
-    )
-    , ONLY_BONUS(
-        "<b>Only bonus:</b>",
-        false
     )
     , SAVE_SCREENSHOTS(
         "<b>Save debug screenshots:</b>",
@@ -80,13 +71,13 @@ CramomaticRNG::CramomaticRNG()
 
 {
     PA_ADD_OPTION(START_LOCATION);
-    PA_ADD_OPTION(NUM_ITERATIONS);
+    PA_ADD_OPTION(NUM_APRICORN_ONE);
+    PA_ADD_OPTION(NUM_APRICORN_TWO);
     PA_ADD_OPTION(NUM_NPCS);
-    PA_ADD_OPTION(BALL_TYPE);
+    PA_ADD_OPTION(BALL_TABLE);
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
-    PA_ADD_OPTION(ONLY_BONUS);
     PA_ADD_OPTION(SAVE_SCREENSHOTS);
     PA_ADD_OPTION(LOG_VALUES);
 }
@@ -97,12 +88,13 @@ void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBa
     pbf_wait(context, 2 * TICKS_PER_SECOND);
 }
 
-size_t CramomaticRNG::needed_advances(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, BallType wanted_type) {
-    bool is_wanted_type = false;
+CramomaticTarget CramomaticRNG::needed_advances(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> selected_balls) {
+    bool is_selected = false;
     Xoroshiro128Plus rng(state);
     size_t advances = 0;
+    CramomaticTarget target;
 
-    while (!is_wanted_type) {
+    while (!is_selected) {
         Xoroshiro128Plus temp_rng(rng.get_state());
 
         for (size_t i = 0; i < NUM_NPCS; i++) {
@@ -123,37 +115,50 @@ size_t CramomaticRNG::needed_advances(SingleSwitchProgramEnvironment& env, Xoros
             is_bonus = temp_rng.nextInt(100) == 0;
         }
 
-        if (ONLY_BONUS && !is_bonus) {
-            continue;
-        }
 
-        switch (wanted_type)
-        {
-        case BallType::Poke:
-            is_wanted_type = ball_roll < 25 && !is_safari_sport;
-            break;
-        case BallType::Great:
-            is_wanted_type = ball_roll >= 25 && ball_roll < 50 && !is_safari_sport;
-            break;
-        case BallType::Shop1:
-            is_wanted_type = ball_roll >= 50 && ball_roll < 75 && !is_safari_sport;
-            break;
-        case BallType::Shop2:
-            is_wanted_type = ball_roll >= 75 && ball_roll < 99 && !is_safari_sport;
-            break;
-        case BallType::Apricorn:
-            is_wanted_type = ball_roll == 99 && !is_safari_sport;
-            break;
-        case BallType::Safari:
-        case BallType::Sport:
-            is_wanted_type = is_safari_sport;
-            break;
+        for (const CramomaticSelection& selection : selected_balls) {
+            if (!selection.is_bonus || is_bonus) {
+                target.is_bonus = is_bonus;
+                if (is_safari_sport) {
+                    if (selection.ball_type == CramomaticBallType::Safari) {
+                        target.ball_type = CramomaticBallType::Safari;
+                        is_selected = true;
+                    }
+                    else if (selection.ball_type == CramomaticBallType::Sport) {
+                        target.ball_type = CramomaticBallType::Sport;
+                        is_selected = true;
+                    }
+                }
+                else {
+                    CramomaticBallType type;
+                    if (ball_roll < 25) {
+                        type = CramomaticBallType::Poke;
+                    }
+                    else if (ball_roll < 50) {
+                        type = CramomaticBallType::Great;
+                    }
+                    else if (ball_roll < 75) {
+                        type = CramomaticBallType::Shop1;
+                    }
+                    else if (ball_roll < 99) {
+                        type = CramomaticBallType::Shop2;
+                    }
+                    else {
+                        type = CramomaticBallType::Apricorn;
+                    }
+                    if (selection.ball_type == type) {
+                        target.ball_type = type;
+                        is_selected = true;
+                    }
+                }
+            }
         }
 
         rng.next();
         advances++;
     }
-    return advances - 1;
+    target.needed_advances = advances - 1;
+    return target;
 }
 
 void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -215,10 +220,11 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     Xoroshiro128Plus rng(0, 0);
     bool is_state_valid = false;
-    bool sport = BALL_TYPE == BallType::Sport;
+    uint32_t num_apricorn_one = NUM_APRICORN_ONE;
+    uint32_t num_apricorn_two = NUM_APRICORN_TWO;
 
     size_t iteration = 0;
-    while (iteration < NUM_ITERATIONS) {
+    while (num_apricorn_one > 4 && num_apricorn_two > 2) {
         env.console.log("Cram-o-matic RNG iteration: " + std::to_string(iteration));
         navigate_to_party(env, context);
         context.wait_for_all_requests();
@@ -235,10 +241,13 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             throw OperationFailedException(env.console, "Invalid RNG state detected.");
         }
 
-        size_t advances = needed_advances(env, rng.get_state(), BALL_TYPE);
-        env.console.log("Needed advances: " + std::to_string(advances));
+        CramomaticTarget target = needed_advances(env, rng.get_state(), BALL_TABLE.selected_balls());
+        bool sport = target.ball_type == CramomaticBallType::Sport;
+        env.console.log("Needed advances: " + std::to_string(target.needed_advances));
+        num_apricorn_one -= sport ? 2 : 4;
+        num_apricorn_two -= sport ? 2 : 0;
 
-        do_rng_advances(env.console, context, rng, advances);
+        do_rng_advances(env.console, context, rng, target.needed_advances);
         leave_to_overworld_and_interact(env, context);
         choose_apricorn(env, context, sport);
 

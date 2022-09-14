@@ -1,0 +1,98 @@
+/*  Cram-o-matic Table
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "PokemonSwSh_CramomaticTable.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+
+const EnumDatabase<CramomaticBallType>& BallType_Database() {
+    static const EnumDatabase<CramomaticBallType> database({
+        {CramomaticBallType::Poke,     "poke",     "Poké Ball"},
+        {CramomaticBallType::Great,    "great",    "Great Ball"},
+        {CramomaticBallType::Shop1,    "shop1",    "Shop 1 (Ultra Ball, Net Ball, Dusk Ball, Premier Ball)"},
+        {CramomaticBallType::Shop2,    "shop2",    "Shop 2 (Repeat Ball, Dive Ball, Quick Ball, Nest Ball, Heal Ball, Timer Ball, Luxury Ball)"},
+        {CramomaticBallType::Apricorn, "apricorn", "Apricorn (Level Ball, Lure Ball, Moon Ball, Friend Ball, Love Ball, Fast Ball, Heavy Ball)"},
+        {CramomaticBallType::Safari,   "safari",   "Safari Ball"},
+        {CramomaticBallType::Sport,    "sport",    "Sport Ball (uses two different Apricorn colors)"},
+        });
+    return database;
+}
+
+
+
+CramomaticRow::CramomaticRow()
+    : ball_type(BallType_Database(), CramomaticBallType::Apricorn)
+    , is_bonus(false)
+{
+    PA_ADD_OPTION(ball_type);
+    PA_ADD_OPTION(is_bonus);
+}
+std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
+    std::unique_ptr<CramomaticRow> ret(new CramomaticRow());
+    ret->ball_type.set_value(ball_type.current_value());
+    ret->is_bonus = is_bonus.current_value();
+    return ret;
+}
+
+
+CramomaticTable::CramomaticTable(std::string label)
+    : EditableTableOption_t<CramomaticRow>(
+        std::move(label),
+        make_defaults()
+    )
+{}
+
+
+std::vector<CramomaticSelection> CramomaticTable::selected_balls() const{
+    std::vector<std::unique_ptr<CramomaticRow>> table = copy_snapshot();
+    std::vector<CramomaticSelection> selections;
+    for (const std::unique_ptr<CramomaticRow>& row : table){
+        CramomaticSelection selection;
+        selection.ball_type = CramomaticBallType(row->ball_type.current_value());
+        selection.is_bonus = row->is_bonus.current_value();
+
+        selections.emplace_back(selection);
+    }
+    return selections;
+}
+
+
+
+
+std::vector<std::string> CramomaticTable::make_header() const{
+    return std::vector<std::string>{
+        "Ball", "Only Bonus",
+    };
+}
+
+std::vector<std::unique_ptr<EditableTableRow>> CramomaticTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
+    ret.emplace_back(std::make_unique<CramomaticRow>());
+    return ret;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+}
+}

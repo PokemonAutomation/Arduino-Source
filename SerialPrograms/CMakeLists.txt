@@ -1321,6 +1321,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h
+    Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.cpp
+    Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
