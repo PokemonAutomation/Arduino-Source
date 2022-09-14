@@ -1,4 +1,4 @@
-/*  Box Reorder National Dex
+/*  Home Box Sorting
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,18 +8,12 @@
 #include <map>
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonHome_BoxSorting.h"
@@ -112,12 +106,16 @@ struct Cursor{
   uint16_t line;
 };
 
+
+
 void swap(std::vector<uint16_t>* arr, int pos1, int pos2){
     int temp;
     temp = (*arr)[pos1];
     (*arr)[pos1] = (*arr)[pos2];
     (*arr)[pos2] = temp;
 }
+
+
 
 int partition(std::vector<uint16_t>* arr, int low, int high, int pivot){
     int i = low;
@@ -135,6 +133,8 @@ int partition(std::vector<uint16_t>* arr, int low, int high, int pivot){
     return j-1;
 }
 
+
+
 void quickSort(std::vector<uint16_t>* arr, int low, int high){
     if(low < high){
     int pivot = (*arr)[high];
@@ -145,6 +145,8 @@ void quickSort(std::vector<uint16_t>* arr, int low, int high){
     }
 }
 
+
+//Move the cursor to the given coordinates, knowing current pos via the cursor struct
 void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t box_number_to, uint16_t colomn_to, uint16_t line_to, Cursor* cur_cursor, uint16_t uni_delay){
 
     std::ostringstream ss;
@@ -181,6 +183,7 @@ void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context
             pbf_press_dpad(context, DPAD_LEFT, 1, uni_delay);
         }
     }
+
     cur_cursor->box = box_number_to;
     cur_cursor->colomn = colomn_to;
     cur_cursor->line = line_to;
@@ -249,7 +252,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     uint16_t uni_delay = GAME_DELAY; //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
 
-    uint16_t nb_box_choosen = BOX_NUMBER;
+    uint16_t nb_box_choosen = BOX_NUMBER; //number of box to check and sort
 
     Cursor cur_cursor{static_cast<uint16_t>(nb_box_choosen-1), 0, 0};
 
@@ -276,6 +279,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
     BoxRender.clear();
 
+
+    //cycle through each box
     for (int box_nb = 0; box_nb < nb_box_choosen; ++box_nb) {
 
         if(box_nb != 0){
@@ -293,7 +298,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         // Box grid to find empty slots (red boxes) and fill box_data with value to check or not for pokemon dex number
         box_data.push_back(std::vector<std::vector<int16_t>>());
+
         ss << "\n";
+
         for (uint8_t i = 0; i < slot_list.size(); i++) {
 
             box_data[box_nb].push_back(std::vector<int16_t>());
@@ -302,13 +309,14 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
                 FloatPixel current_box_value = image_stats(extract_box_reference(*screen, slot_list[i][j])).average;
 
+                //checking color to know if a pokemon is on the slot or not
                 if(current_box_value.r >= 239 && current_box_value.g == 255 && current_box_value.b == 255){
                     BoxRender.add(COLOR_RED, slot_list[i][j]);
-                    box_data[box_nb][i].push_back(9999);
+                    box_data[box_nb][i].push_back(9999); //huge value to make sorting easier later
                     ss << "❌ " ;
                 }else{
                     BoxRender.add(COLOR_GREEN, slot_list[i][j]);
-                    box_data[box_nb][i].push_back(0);
+                    box_data[box_nb][i].push_back(0); //0 value to know there is a pokemon here that needs a value
                     ss << "✅ " ;
                 }
             }
@@ -320,6 +328,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         bool find_first_poke = false;
 
+
+        //cycling though each slot of the box in order to find the first pokemon to enter the summary
         for (int colomn = 0; colomn < 5; ++colomn) {
             for (int line = 0; line < 6; ++line) {
                 if(box_data[box_nb][colomn][line] != 9999){
@@ -334,6 +344,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
         }
 
+        //enter the summary screen
         pbf_press_button(context, BUTTON_A, 10, uni_delay);
         context.wait_for_all_requests();
         BoxRender.clear();
@@ -343,6 +354,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         BoxRender.add(COLOR_RED, Dex_number_box);
 
+
+        //cycle through each summary of the current box and fill pokemon dex number in
         for (int colomn = 0; colomn < 5; ++colomn) {
             for (int line = 0; line < 6; ++line) {
 
@@ -363,6 +376,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         BoxRender.clear();
 
         ss << std::endl;
+
+        //a useless loop that I should move to the loop above to reduce useless iterations
         for (int colomn = 0; colomn < 5; ++colomn) {
             for (int line = 0; line < 6; ++line) {
                 ss << box_data[box_nb][colomn][line] << " ";
@@ -372,6 +387,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         env.console.log(ss.str());
         ss.str("");
+
+        //get out of summary with a lot of delay because it's slow for some reasons
         pbf_press_button(context, BUTTON_B, 10, video_delay+200);
         BoxRender.clear();
         context.wait_for_all_requests();
@@ -379,9 +396,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         go_to_first_slot(env, context, video_delay);
         context.wait_for_all_requests();
     }
-    move_cursor_to(env, context, 0, 0, 0, &cur_cursor, uni_delay);
-    context.wait_for_all_requests();
 
+
+    //making a flat list of the pokemons because turns out my original idea of 3d data is turning into a pain to use for sorting
     std::vector<uint16_t> flat_box;
 
     for (int box_nb = 0; box_nb < int(box_data.size()); ++box_nb) {
@@ -392,6 +409,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
     }
 
+
+    //using quicksort to sort the flat copy of box data
     quickSort(&flat_box, 0, int(flat_box.size()-1));
 
     for (auto const var : flat_box) {
@@ -400,8 +419,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     env.console.log(ss.str());
     ss.str("");
 
-    //move_cursor_to(env, context, 7, 3, 4, 0, 0, 0, uni_delay);
 
+    //make the flat sorted list 3d box grid again because why not now that I'm here
     std::vector<std::vector<std::vector<int16_t>>> box_sorted;
 
     for (int i = 0; i < int(flat_box.size()); ++i) {
@@ -416,6 +435,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     ss << std::endl;
 
+    /*
+     * this part was for debugging but I don't think it will be useful ever again I might just delete it
+     *
     for (auto const &box : box_sorted) {
         for (auto const &colomn : box) {
             for (auto const line : colomn) {
@@ -427,9 +449,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
     env.console.log(ss.str());
     ss.str("");
+    */
 
 
-    //this need to be separated into functions
+    //this need to be separated into functions when I will redo the whole thing but I just wanted it to work
+
+    //going thru the sorted list one by one and for each one go through the current pokemon layout to find the closest possible match to fill the slot
 
     for (int box_nb = 0; box_nb < int(box_sorted.size()); ++box_nb) {
         for (int colomn = 0; colomn < 5; ++colomn) {
@@ -438,20 +463,24 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 for (int box_nb_s = 0; box_nb_s < int(box_data.size()); ++box_nb_s) {
                     for (int colomn_s = 0; colomn_s < 5; ++colomn_s) {
                         for (int line_s = 0; line_s < 6; ++line_s) {
+                            //check for a match and also check if the pokemon is not already in the slot
                             if(box_sorted[box_nb][colomn][line] == box_data[box_nb_s][colomn_s][line_s] && box_data[box_nb_s][colomn_s][line_s] != box_data[box_nb][colomn][line]){
+
+                                //moving cursor to the pokemon to pick it up
                                 ss << "Moving cursor to " << box_nb_s <<" "<< colomn_s <<" "<< line_s;
                                 env.console.log(ss.str());
                                 ss.str("");
                                 move_cursor_to(env, context, box_nb_s, colomn_s, line_s, &cur_cursor, uni_delay);
                                 pbf_press_button(context, BUTTON_Y, 10, uni_delay+30);
+                                //moving to destination to place it or swap it
                                 ss << "Moving "<< box_data[box_nb_s][colomn_s][line_s] <<" to " << box_nb <<" "<< colomn <<" "<< line;
                                 env.console.log(ss.str());
                                 ss.str("");
                                 move_cursor_to(env, context, box_nb, colomn, line, &cur_cursor, uni_delay);
                                 pbf_press_button(context, BUTTON_Y, 10, uni_delay+30);
                                 context.wait_for_all_requests();
-                                box_data[box_nb_s][colomn_s][line_s] = box_data[box_nb][colomn][line];
-                                box_data[box_nb][colomn][line] = 0;
+                                box_data[box_nb_s][colomn_s][line_s] = box_data[box_nb][colomn][line]; //update the list in case of a pokemon swap
+                                box_data[box_nb][colomn][line] = 0; //delete pokemon data to make sure it does not match again
                                 found_pkmn = true;
                                 break;
                             }
