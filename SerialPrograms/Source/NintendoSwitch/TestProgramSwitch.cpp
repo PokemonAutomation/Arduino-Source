@@ -115,8 +115,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
-    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
+//    using namespace PokemonBDSP;
+    using namespace PokemonLA;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -124,12 +124,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
-    BattleMenuDetector detector(BattleType::STARTER);
 
-    VideoOverlaySet overlays(overlay);
-    detector.make_overlays(overlays);
+    ImageRGB32 image("screenshot-20220914-071542161921.png");
 
-    cout << detector.detect(feed.snapshot()) << endl;
+    MountDetector detector;
+    cout << MOUNT_STATE_STRINGS[(int)detector.detect(image)] << endl;
+
+//    BattleMenuDetector detector(BattleType::STARTER);
+
+//    VideoOverlaySet overlays(overlay);
+//    detector.make_overlays(overlays);
+
+//    cout << detector.detect(feed.snapshot()) << endl;
 
 
 

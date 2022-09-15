@@ -341,7 +341,7 @@ struct MountCandiateTracker{
         m_state = state;
     }
     void add_button_crop(double rmsd, MountState state){
-        if (rmsd > 80 || m_rmsd <= rmsd){
+        if (rmsd > 90 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
