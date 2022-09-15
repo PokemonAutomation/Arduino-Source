@@ -48,7 +48,7 @@ CramomaticRNG::CramomaticRNG()
     )
     , NUM_NPCS(
         "<b>NPCs:</b><br>Number of NPCs in the dojo, including " + STRING_POKEMON + ".",
-        22
+        21
     )
     , BALL_TABLE(
         "<b>Wanted Balls:</b><br>Exact kind depends on the currently selected apricorn."
@@ -223,8 +223,18 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint32_t num_apricorn_one = NUM_APRICORN_ONE;
     uint32_t num_apricorn_two = NUM_APRICORN_TWO;
 
+    // if there is no Sport Ball in the selected balls we want to ignore num_apricorn_two
+    std::vector<CramomaticSelection> selections = BALL_TABLE.selected_balls();
+    bool sport_wanted = false;
+    for (CramomaticSelection selection : selections) {
+        if (selection.ball_type == CramomaticBallType::Sport) {
+            sport_wanted = true;
+            break;
+        }
+    }
+
     size_t iteration = 0;
-    while (num_apricorn_one > 4 && num_apricorn_two > 2) {
+    while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
         env.console.log("Cram-o-matic RNG iteration: " + std::to_string(iteration));
         navigate_to_party(env, context);
         context.wait_for_all_requests();
