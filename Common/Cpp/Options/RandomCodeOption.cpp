@@ -91,6 +91,7 @@ struct RandomCodeOption::Data{
 
 
 
+RandomCodeOption::~RandomCodeOption() = default;
 RandomCodeOption::RandomCodeOption(size_t total_digits)
     : m_data(CONSTRUCT_TOKEN, total_digits)
 {}
