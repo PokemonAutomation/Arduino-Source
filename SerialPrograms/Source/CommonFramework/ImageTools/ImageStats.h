@@ -12,10 +12,14 @@
 namespace PokemonAutomation{
     class ImageViewRGB32;
 
-
+// Store basic stats of a group of pixels
 struct ImageStats{
+    // Average color among the pixels.
     FloatPixel average;
+    // Stddev of the color for each color channel.
+    // The smaller the stddev on one channel, the closer the pixel values are on this channel.
     FloatPixel stddev;
+    // How many pixels in the group.
     uint64_t count;
     ImageStats() : count(0) {}
     ImageStats(FloatPixel a, FloatPixel s, uint64_t c) : average(a), stddev(s), count(c) {}
