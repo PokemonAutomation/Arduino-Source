@@ -29,14 +29,17 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
 CramomaticRow::CramomaticRow()
     : ball_type(BallType_Database(), CramomaticBallType::Apricorn)
     , is_bonus(false)
+    , priority(0)
 {
     PA_ADD_OPTION(ball_type);
     PA_ADD_OPTION(is_bonus);
+    PA_ADD_OPTION(priority);
 }
 std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
     std::unique_ptr<CramomaticRow> ret(new CramomaticRow());
     ret->ball_type.set_value(ball_type.current_value());
     ret->is_bonus = is_bonus.current_value();
+    ret->priority.set(priority.current_value());
     return ret;
 }
 
@@ -56,6 +59,7 @@ std::vector<CramomaticSelection> CramomaticTable::selected_balls() const{
         CramomaticSelection selection;
         selection.ball_type = CramomaticBallType(row->ball_type.current_value());
         selection.is_bonus = row->is_bonus.current_value();
+        selection.priority = row->priority.current_value();
 
         selections.emplace_back(selection);
     }
@@ -67,7 +71,7 @@ std::vector<CramomaticSelection> CramomaticTable::selected_balls() const{
 
 std::vector<std::string> CramomaticTable::make_header() const{
     return std::vector<std::string>{
-        "Ball", "Only Bonus",
+        "Ball", "Only Bonus", "Priority",
     };
 }
 

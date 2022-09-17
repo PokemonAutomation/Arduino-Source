@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_CramomaticTable_H
 
 #include "Common/Cpp/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
@@ -32,6 +33,7 @@ struct CramomaticSelection
 {
     CramomaticBallType ball_type;
     bool is_bonus;
+    uint16_t priority;
 };
 
 class CramomaticRow : public EditableTableRow{
@@ -42,6 +44,7 @@ public:
 public:
     EnumDropdownCell<CramomaticBallType> ball_type;
     BooleanCheckBoxCell is_bonus;
+    SimpleIntegerCell<uint16_t> priority;
 };
 
 
