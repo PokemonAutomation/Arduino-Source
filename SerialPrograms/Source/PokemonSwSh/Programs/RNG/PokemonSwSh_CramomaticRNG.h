@@ -46,12 +46,13 @@ private:
 
 
     SectionDividerOption m_advanced_options;
+    SimpleIntegerOption<uint16_t> MAX_PRIORITY_ADVANCES;
     SimpleIntegerOption<uint16_t> MAX_UNKNOWN_ADVANCES;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
     void navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    CramomaticTarget needed_advances(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> wanted_balls);
+    CramomaticTarget calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> wanted_balls);
     void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport);
     bool receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
