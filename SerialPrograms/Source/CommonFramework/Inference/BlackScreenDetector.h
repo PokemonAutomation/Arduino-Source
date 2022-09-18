@@ -52,7 +52,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 };
 
-
+// Detect when a perido of black screen is over
 class BlackScreenOverWatcher : public VisualInferenceCallback{
 public:
     BlackScreenOverWatcher(
@@ -65,6 +65,7 @@ public:
     bool black_is_over(const ImageViewRGB32& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
+
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:

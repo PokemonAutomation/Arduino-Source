@@ -16,7 +16,8 @@ namespace PokemonAutomation{
 class AudioSpectrum;
 class AudioFeed;
 
-
+//  Base class for an audio inference object to be called perioridically by
+//  inference routines in InferenceRoutines.h.
 class AudioInferenceCallback : public InferenceCallback{
 public:
     AudioInferenceCallback(std::string label)
