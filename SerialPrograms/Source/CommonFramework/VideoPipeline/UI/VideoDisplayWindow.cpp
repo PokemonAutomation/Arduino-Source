@@ -24,7 +24,7 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     m_display_widget->setParent(this);
     setWindowTitle("Console: " + QString::number(m_display_widget->id()));
 
-    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+//    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->setCentralWidget(m_display_widget);
 //    m_display_widget->setAlignment(Qt::AlignCenter);
 
@@ -56,6 +56,9 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
 #endif
 }
 
+//QSize VideoDisplayWindow::sizeHint() const{
+//    return m_display_widget->size();
+//}
 void VideoDisplayWindow::changeEvent(QEvent* event){
     QMainWindow::changeEvent(event);
 //    if (event->type() != QEvent::WindowStateChange){
@@ -74,14 +77,16 @@ void VideoDisplayWindow::closeEvent(QCloseEvent* event){
     if (parent->layout()){
         parent->layout()->addWidget(m_display_widget);
     }
+    m_display_widget->move_back_from_window();
     QMainWindow::closeEvent(event);
 }
 
 void VideoDisplayWindow::resizeEvent(QResizeEvent* event){
     QMainWindow::resizeEvent(event);
+//    m_display_widget->resize_to_box(this->size());
 //    this->resize(m_display_widget->size());
 //    cout << this->width() << " x " << this->height() << endl;
-#if 1
+#if 0
     QMetaObject::invokeMethod(this, [this]{
         this->resize(m_display_widget->size());
 //        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;

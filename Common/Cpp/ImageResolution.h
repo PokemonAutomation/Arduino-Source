@@ -23,6 +23,7 @@ struct Resolution{
     {}
 
     explicit operator bool() const{ return width != 0 && height != 0; }
+    double aspect_ratio() const{ return (double)width / height; }
 
     bool operator==(const Resolution& x) const{
         return width == x.width && height == x.height;

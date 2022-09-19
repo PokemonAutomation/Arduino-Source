@@ -30,12 +30,47 @@ struct CommandReceiver{
 
 
 
+class WidgetStackFixedAspectRatio : public QWidget{
+public:
+    enum SizePolicy{
+        EXPAND_TO_BOX,
+        ADJUST_HEIGHT_TO_WIDTH,
+    };
+
+public:
+    WidgetStackFixedAspectRatio(QWidget& parent, SizePolicy size_policy, double aspect_ratio = 16 / 9.);
+
+    void set_size_policy(SizePolicy size_policy);
+    void set_aspect_ratio(double aspect_ratio);
+    void add_widget(QWidget& widget);
+
+    virtual void resizeEvent(QResizeEvent* event) override;
+
+private:
+    void clear_fixed_dimensions();
+    void resize_to_box(QSize enclosing_box);
+    void resize_to_width(int width);
+
+    void update_size(QSize size);
+
+private:
+    SizePolicy m_size_policy;
+    double m_aspect_ratio;
+    std::set<QWidget*> m_widgets;
+
+    QWidget* m_detached_internal;
+    QWidget* m_stack_holder;
+
+    std::deque<int> m_width_history;
+    std::set<int> m_recent_widths;
+};
+
+
+
 //  The widget that owns the video window.
 //  It consists of a VideoWidget that loads the video content from Switch and a VideoOverlayWidget
 //  that renders inference boxes and other visualizations on top of the video content.
-class VideoDisplayWidget : public QWidget{
-    Q_OBJECT
-
+class VideoDisplayWidget : public WidgetStackFixedAspectRatio{
 public:
     VideoDisplayWidget(
         QWidget& parent, size_t id,
@@ -49,12 +84,12 @@ public:
 
     VideoOverlayWidget& overlay(){ return *m_overlay; }
     CommandReceiver& command_receiver(){ return m_command_receiver; }
-    void update_size(Resolution resolution = Resolution());
 
     // Move the video display widget to a new Qt window, so that we can make it full screen.
     // We need to go to a new window to do fullscreen because Qt cannot fullscreen a widget unless
     // it's a window.
     void move_to_new_window();
+    void move_back_from_window();
 
 protected:
     // Override QWidget::mouseDoubleClickEvent().
@@ -62,19 +97,12 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    virtual void resizeEvent(QResizeEvent* event) override;
-
-signals:
-    void on_size_change(QSize size);
-
-private:
     const size_t m_id;
     CommandReceiver& m_command_receiver;
     VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay = nullptr;
 
-    std::deque<int> m_width_history;
-    std::set<int> m_recent_widths;
+    bool m_popped_out;
 };
 
 

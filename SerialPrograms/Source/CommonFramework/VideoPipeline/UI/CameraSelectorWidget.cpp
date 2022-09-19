@@ -81,7 +81,7 @@ CameraSelectorWidget::CameraSelectorWidget(
             }
             Resolution resolution = m_resolutions[index];
             m_session.set_resolution(resolution);
-            m_display.update_size(resolution);
+            m_display.set_aspect_ratio(resolution.aspect_ratio());
         }
     );
     connect(

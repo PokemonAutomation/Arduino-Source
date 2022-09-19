@@ -401,6 +401,7 @@ VideoWidget::VideoWidget(QWidget* parent, CameraSession& session)
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);
     m_camera_view->setMinimumSize(80, 45);
+    m_camera_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     if (session.m_camera){
         session.m_camera->setViewfinder(m_camera_view);
@@ -430,7 +431,10 @@ void VideoWidget::new_source(const CameraInfo& device, Resolution resolution){
 void VideoWidget::resolution_change(Resolution resolution){
 
 }
-
+//void VideoWidget::resizeEvent(QResizeEvent* event){
+//    cout << "VideoWidget: " << this->width() << " x " << this->height() << endl;
+//    cout << "Viewfinder: " << m_camera_view->width() << " x " << m_camera_view->height() << endl;
+//}
 
 
 

@@ -145,6 +145,8 @@ private:
     virtual void new_source(const CameraInfo& device, Resolution resolution) override;
     virtual void resolution_change(Resolution resolution) override;
 
+//    virtual void resizeEvent(QResizeEvent* event) override;
+
 private:
     CameraSession& m_session;
     QCameraViewfinder* m_camera_view = nullptr;

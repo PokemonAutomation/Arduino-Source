@@ -9,9 +9,7 @@
 
 #include <map>
 #include <QWidget>
-#include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
 namespace PokemonAutomation{
@@ -22,8 +20,6 @@ class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener
 public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
-
-    void update_size(const QSize& widget_size, const QSize& video_size);
 
     // Whether to hide inference visualization
     void set_inference_hidden(bool hidden) { m_inference_hidden = hidden;}
@@ -44,15 +40,11 @@ private:
     // This function is called asynchronously when there is change of log text background in VideoOverlaySession.
     virtual void log_text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
 
+    virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent*) override;
 
 private:
     VideoOverlaySession& m_session;
-
-    QSize m_video_size;
-    QSize m_display_size;
-    int m_offset_x;
-    double m_scale;
 
     SpinLock m_lock;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;

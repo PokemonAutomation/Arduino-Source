@@ -33,6 +33,8 @@ public:
     virtual ~VideoDisplayWindow() = default;
 
 private:
+//    virtual QSize sizeHint() const override;
+
     virtual void changeEvent(QEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
