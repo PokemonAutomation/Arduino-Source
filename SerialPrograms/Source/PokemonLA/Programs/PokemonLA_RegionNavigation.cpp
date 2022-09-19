@@ -489,7 +489,7 @@ void goto_Mai_from_camp(
         return;
     case Camp::HIGHLANDS_HIGHLANDS:
         // 255, 150 - 170
-        pbf_move_left_joystick(context, 255, 165, 360, 0);
+        pbf_move_left_joystick(context, 255, 165, 370, 0);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
         pbf_move_left_joystick(context, 255, 124, 250, 0);
