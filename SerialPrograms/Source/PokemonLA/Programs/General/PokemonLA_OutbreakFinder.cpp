@@ -736,6 +736,20 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
     std::set<std::string> desired_MMO_pokemon = to_set(DESIRED_MMO_SLUGS);
     std::set<std::string> desired_star_MMO_pokemon = to_set(DESIRED_STAR_MMO_SLUGS);
+    {
+        std::ostringstream os;
+        os << "Desired outbreaks: ";
+        std::copy(desired_outbreaks.begin(), desired_outbreaks.end(), std::ostream_iterator<std::string>(os, ", "));
+        env.log(os.str());
+        os = std::ostringstream();
+        os << "Desired first-wave MMO pokemon: ";
+        std::copy(desired_MMO_pokemon.begin(), desired_MMO_pokemon.end(), std::ostream_iterator<std::string>(os, ", "));
+        env.log(os.str());
+        os = std::ostringstream();
+        os << "Desired MMO pokemon with star: ";
+        std::copy(desired_star_MMO_pokemon.begin(), desired_star_MMO_pokemon.end(), std::ostream_iterator<std::string>(os, ", "));
+        env.log(os.str());
+    }
 
     // desired_hisui_map_events: the slugs of travel map event. This includes
     // - Massive Outbreak pokemon
@@ -759,7 +773,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 
     std::ostringstream os;
-    os << "User requires MMO pokemon. Need to visit (<map MMO name>, <how many desired MMO pokemon on the map>): ";
+    os << "User requires MMO pokemon. Need to visit (\"map MMO name\", \"how many desired MMO pokemon on the map\"): ";
     for(const auto& p : MMO_targets){
         os << "(" << p.first << ", " << p.second << ") ";
     }

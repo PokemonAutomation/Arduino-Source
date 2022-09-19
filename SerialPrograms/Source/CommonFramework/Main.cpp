@@ -74,6 +74,7 @@ int main(int argc, char *argv[]){
     {
         MainWindow w;
         w.show();
+        w.raise(); // bring the window to front on macOS
         ret = application.exec();
     }
 

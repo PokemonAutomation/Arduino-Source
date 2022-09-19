@@ -45,8 +45,7 @@
  *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "IGNORE_LIST" as a list of strings to skip the paths to those tests.
  *  Each string in the list serves as a prefix to the test path that the test framework uses to filter out paths.
  *  
- *  Filenames starting with "_" are considered "hidden" files. The test framework will not run tests on them. Those "hidden" files are useful
- *  for storing extra information in the folder, or serving as a golden file to store non-image info like texts.
+ * Those "hidden" files are useful for storing some metadata in the folder, or serving as an extra file in case some tests need more than one test files.
  * 
  *  How to add new test code:
  * 
@@ -63,12 +62,11 @@
  *    checks for audio files). If the file is not desired, simply return a negative integer to tell the caller that this file is skipped.
  *  - Run the test code on the file, if the the file format is desired. If test succeeds, return 0, otherwise return a positive integer to tell the caller
  *    the test failed.
- *  - While running the test code, we also need to know the target test code output (or the content in gold files) so that we can know whether the test is
+ *  - While running the test code, we also need to know the target test code output (or the content in golden files) so that we can know whether the test is
  *    successful or not. For simple tasks like testing battle menu detector, the target of each test image is a single bool, indicating whether the current
  *    image represents a screenshot with battle menu. So we can embed the target output into the test file name: IngoBattleDayTime_True.png.
  *    For more complex outputs, like detecting how many or where some objects are on the screen, or where the shiny sound is in the audio file, it would
- *    need a very long filename to store them. So we chose to store those outputs in a gold file.
- *    TODO: currently we haven't implemented this complex-output testing yet.
+ *    need a very long filename to store them. So we chose to store those outputs in a golden file.
  * 
  *  To avoid implementing the above logic of skipping files and finding target outputs in every TestFunction, we add helper functions like
  *  TestMap.h:int screen_bool_detector_helper(ScreenBoolDetectorFunction test_func, const std::string& test_path)
