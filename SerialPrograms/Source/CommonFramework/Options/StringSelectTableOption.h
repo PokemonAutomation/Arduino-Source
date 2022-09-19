@@ -24,7 +24,7 @@ public:
     }
     virtual std::unique_ptr<EditableTableRow> clone() const{
         std::unique_ptr<StringSelectTableRow> ret(new StringSelectTableRow(cell.database(), cell.default_slug()));
-        ret->cell.set_by_index(cell.default_index());
+        ret->cell.set_by_index(cell.index());
         return ret;
     }
 

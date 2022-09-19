@@ -27,6 +27,7 @@ private:
     void load_options();
     void hide_options();
 
+    virtual QSize sizeHint() const override;
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 

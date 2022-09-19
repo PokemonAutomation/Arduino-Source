@@ -109,6 +109,18 @@ void StringSelectCellWidget::hide_options(){
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 }
+QSize StringSelectCellWidget::sizeHint() const{
+    QSize ret = NoWheelComboBox::sizeHint();
+//    cout << ret.width() << " x " << ret.height() << endl;
+
+    double width = ret.width();
+    double height = ret.height();
+
+    width *= 1.25;
+    height *= 1.25;
+
+    return QSize((int)width, (int)height);
+}
 void StringSelectCellWidget::focusInEvent(QFocusEvent* event){
 //    cout << "focusInEvent()" << endl;
     update();
