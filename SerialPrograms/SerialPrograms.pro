@@ -472,7 +472,7 @@ SOURCES += \
     Source/PokemonHome/PokemonHome_Settings.cpp \
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp \
     Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp \
-    Source/PokemonHome/Porgrams/PokemonHome_BoxSorting.cpp \
+    Source/PokemonHome/Programs/PokemonHome_BoxSorting.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \

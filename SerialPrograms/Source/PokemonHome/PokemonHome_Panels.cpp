@@ -26,8 +26,10 @@ std::vector<PanelEntry> make_panels(){
 //    ret.emplace_back("---- Settings ----");
 //    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorting_Descriptor, PokemonHome::BoxSorting>());
     ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorting_Descriptor, PokemonHome::BoxSorting>());
+    }
 
 //    ret.emplace_back("---- Trading ----");
 
