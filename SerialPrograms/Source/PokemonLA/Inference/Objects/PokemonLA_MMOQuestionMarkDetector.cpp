@@ -104,12 +104,11 @@ bool detect_template_by_single_pass_waterfill(
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
     const std::pair<size_t, size_t> &area_thresholds,
     double rmsd_threshold,
-    std::function<bool(WaterfillObject& object)> stop_search,
+    std::function<bool(WaterfillObject& object)> check_object,
     const WaterfillTemplateDetectionDebugParams* debug_params)
 {
     auto matrix = compress_rgb32_to_binary_multirange(image, filters);
 
-    static int debug_count = 0;
     ImageRGB32 debug_image;
     if (debug_params){
         debug_image = image.copy();
@@ -139,13 +138,14 @@ bool detect_template_by_single_pass_waterfill(
             }
             detected = true;
             
-            if (stop_search(object)){
+            if (check_object(object)){
                 break;
             }
         }
     }
 
     if (debug_params){
+        static int debug_count = 0;
         std::ostringstream os;
         os << debug_params->base_filename << std::setfill('0') << std::setw(3) << debug_count << ".png";
         debug_image.save(os.str());

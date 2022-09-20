@@ -6,8 +6,12 @@
 
 #include <map>
 #include "Common/Cpp/Color.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "WaterfillUtilities.h"
 
 namespace PokemonAutomation{
@@ -59,6 +63,48 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
     }
 
     return std::pair<PackedBinaryMatrix2, size_t>(std::move(matrix), distance_sqr_th);
+}
+
+bool match_template_by_waterfill(
+    const ImageViewRGB32 &image,
+    const ImageMatch::WaterfillTemplateMatcher &matcher,
+    const std::vector<std::pair<uint32_t, uint32_t>> &filters,
+    const std::pair<size_t, size_t> &area_thresholds,
+    double rmsd_threshold,
+    std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
+{
+    auto matrices = compress_rgb32_to_binary_range(image, filters);
+
+    bool detected = false;
+    bool stop_match = false;
+    for(PokemonAutomation::PackedBinaryMatrix2 &matrix : matrices){
+        std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
+        Kernels::Waterfill::WaterfillObject object;
+        const size_t min_area = area_thresholds.first;
+        session->set_source(matrix);
+        auto finder = session->make_iterator(min_area);
+        const bool keep_object_matrix = false;
+        while (finder->find_next(object, keep_object_matrix)){
+            if (object.area > area_thresholds.second){
+                continue;
+            }
+            double rmsd = matcher.rmsd_original(image, object);
+            
+            if (rmsd < rmsd_threshold){
+                detected = true;
+                
+                if (check_matched_object(object)){
+                    stop_match = true;
+                    break;
+                }
+            }
+        }
+
+        if (stop_match){
+            break;
+        }
+    }
+    return detected;
 }
 
 
