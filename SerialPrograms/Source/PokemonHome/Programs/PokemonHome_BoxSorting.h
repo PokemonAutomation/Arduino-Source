@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 
@@ -31,6 +32,7 @@ private:
     SimpleIntegerOption<uint16_t> BOX_NUMBER;
     SimpleIntegerOption<uint16_t> VIDEO_DELAY;
     SimpleIntegerOption<uint16_t> GAME_DELAY;
+    EventNotificationsOption NOTIFICATIONS;
 
 };
 
