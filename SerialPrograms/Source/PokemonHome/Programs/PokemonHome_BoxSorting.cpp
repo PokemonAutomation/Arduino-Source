@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -55,16 +56,19 @@ BoxSorting::BoxSorting()
         PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
         PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
         PA_ADD_OPTION(GAME_DELAY);  //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
+        //PA_ADD_OPTION(NOTIFICATIONS);
     }
 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t VIDEO_DELAY){
 
     PokemonAutomation::ImageFloatBox Cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+    PokemonAutomation::FloatPixel image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+    env.console.log("Cursor color detection: " + image_value.to_string());
     VideoOverlaySet BoxRender(env.console);
 
     BoxRender.add(COLOR_BLUE, Cursor_check);
-    if(image_stats(extract_box_reference(*screen, Cursor_check)).average.r != 255){
+    if(image_value.r <= image_value.g + image_value.b){
 
         bool cursor_found = false;
 
@@ -73,8 +77,10 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_LEFT, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
+                image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+                env.console.log("Cursor color detection: " + image_value.to_string());
 
-                if(image_stats(extract_box_reference(*screen, Cursor_check)).average.r == 255){
+                if(image_value.r > image_value.g + image_value.b){
                     cursor_found = true;
                     break;
                 }
@@ -83,8 +89,10 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_UP, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
+                image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+                env.console.log("Cursor color detection: " + image_value.to_string());
 
-                if(image_stats(extract_box_reference(*screen, Cursor_check)).average.r == 255){
+                if(image_value.r > image_value.g + image_value.b){
                     cursor_found = true;
                     break;
                 }
@@ -181,12 +189,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         },
 
         {
-            PokemonAutomation::ImageFloatBox(0.06, 0.303, 0.03, 0.057),
-            PokemonAutomation::ImageFloatBox(0.132, 0.303, 0.03, 0.057),
-            PokemonAutomation::ImageFloatBox(0.204, 0.303, 0.03, 0.057),
-            PokemonAutomation::ImageFloatBox(0.276, 0.303, 0.03, 0.057),
-            PokemonAutomation::ImageFloatBox(0.348, 0.303, 0.03, 0.057),
-            PokemonAutomation::ImageFloatBox(0.42, 0.303, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.06, 0.3035, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.132, 0.3035, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.204, 0.3035, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.276, 0.3035, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.348, 0.3035, 0.03, 0.057),
+            PokemonAutomation::ImageFloatBox(0.42, 0.3035, 0.03, 0.057),
         },
 
         {
@@ -225,21 +233,50 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     std::ostringstream ss;
 
-    //getting out of every possible menu to make sure the program work no matter where you start it in your pokemon home
-    if(image_stats(extract_box_reference(*screen, Select_check)).average.r != 255){
+    PokemonAutomation::FloatPixel image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+
+    env.console.log("Color detected from the select square: " + image_value.to_string());
+
+    //if the correct color is not detected, getting out of every possible menu to make sure the program work no matter where you start it in your pokemon home
+    BoxRender.add(COLOR_BLUE, Select_check);
+    if(image_value.r <= image_value.g + image_value.b){
         for (int var = 0; var < 5; ++var) {
             pbf_press_button(context, BUTTON_B, 10, GAME_DELAY+10);
         }
         context.wait_for_all_requests();
+        context.wait_for(std::chrono::milliseconds(20));
+        screen = env.console.video().snapshot();
+        image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+        env.console.log("Color detected from the select square: " + image_value.to_string());
+        if(image_value.r <= image_value.g + image_value.b){
+            for (int i = 0; i < 2; ++i) {
+                pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+20); //additional delay because this animation is slower than the rest
+                context.wait_for_all_requests();
+                screen = env.console.video().snapshot();
+                image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+                env.console.log("Color detected from the select square: " + image_value.to_string());
+                if(image_value.r > image_value.g + image_value.b){
+                    break;
+                }else if(i==1){
+                    env.console.log("ERROR: Could not find correct color mode please check color logs and timings\n", COLOR_RED);
+                    return;
+                }
+            }
+        }
     }
 
-    // switching cursor mode to be able to select summary and to make next detection easier
+    // old menu detection
+    /*
     BoxRender.add(COLOR_BLUE, Select_check);
-    while(image_stats(extract_box_reference(*screen, Select_check)).average.r != 255){
+    while(image_value.r <= image_value.g + image_value.b){
         pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+20); //additional delay because this animation is slower than the rest
         context.wait_for_all_requests();
         screen = env.console.video().snapshot();
+        image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+        env.console.log("Color detected from the select square: " + image_value.to_string());
     }
+    */
+
     BoxRender.clear();
 
 
@@ -270,10 +307,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             for (uint8_t j = 0; j < slot_list.at(i).size(); j++) {
 
-                FloatPixel current_box_value = image_stats(extract_box_reference(*screen, slot_list[i][j])).average;
+                int current_box_value = image_stddev(extract_box_reference(*screen, slot_list[i][j])).sum();
+
+                ss << current_box_value;
 
                 //checking color to know if a pokemon is on the slot or not
-                if(current_box_value.r >= 239 && current_box_value.g == 255 && current_box_value.b == 255){
+                if(current_box_value < 15){
                     BoxRender.add(COLOR_RED, slot_list[i][j]);
                     box_data[box_nb][i].push_back(9999); //huge value to make sorting easier later
                     ss << "❌ " ;
@@ -442,6 +481,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
         }
     }
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
 }
 
