@@ -940,6 +940,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
     Source/PokemonHome/PokemonHome_Settings.h
+    Source/PokemonHome/Programs/PokemonHome_BoxSorting.cpp
+    Source/PokemonHome/Programs/PokemonHome_BoxSorting.h
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h
     Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp
@@ -1513,8 +1515,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
-    Source/PokemonHome/Programs/PokemonHome_BoxSorting.cpp
-    Source/PokemonHome/Programs/PokemonHome_BoxSorting.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/PokemonLA_Tests.cpp
