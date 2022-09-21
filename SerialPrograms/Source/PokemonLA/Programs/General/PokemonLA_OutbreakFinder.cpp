@@ -27,6 +27,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MMOSpriteStarSymbolDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonSprites.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"

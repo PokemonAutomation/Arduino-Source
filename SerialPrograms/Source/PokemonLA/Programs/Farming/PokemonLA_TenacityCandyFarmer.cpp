@@ -18,6 +18,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA_TenacityCandyFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"

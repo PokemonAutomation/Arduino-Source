@@ -18,6 +18,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_NuggetFarmerHighlands.h"

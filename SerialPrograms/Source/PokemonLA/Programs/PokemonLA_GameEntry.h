@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_GameEntry_H
 #define PokemonAutomation_PokemonLA_GameEntry_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
-
 namespace PokemonAutomation{
+    class ConsoleHandle;
     class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
@@ -36,9 +35,6 @@ bool reset_game_from_home(
     bool tolerate_update_menu,
     uint16_t post_wait_time = 125
 );
-
-
-void save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 
 

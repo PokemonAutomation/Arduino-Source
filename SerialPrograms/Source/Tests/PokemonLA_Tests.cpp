@@ -28,6 +28,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
 #include <QFileInfo>
@@ -448,6 +449,33 @@ void test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image){
     BerryTreeDetector detector;
 
     detector.process_frame(image, current_time());
+}
+
+int test_pokemonLA_SaveScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    // two keywords: <True/False> <True/False>
+    if (keywords.size() < 2){
+        cerr << "Error: not enough number of keywords in the filename. Found only " << keywords.size() << "." << endl;
+        return 1;
+    }
+
+    bool target_save_tab = false;
+    if (parse_bool(keywords[keywords.size()-2], target_save_tab) == false){
+        cerr << "Error: True/False keyword " << keywords[keywords.size()-2] << " is wrong. Must be \"True\" or \"False\"." << endl;
+        return 1;
+    }
+    bool target_save_disabled = false;
+    if (parse_bool(keywords[keywords.size()-1], target_save_disabled) == false){
+        cerr << "Error: True/False keyword " << keywords[keywords.size()-1] << " is wrong. Must be \"True\" or \"False\"." << endl;
+        return 1;
+    }
+
+    bool save_tab = save_tab_selected(image);
+    bool save_disabled = save_tab_disabled(image);
+    
+    TEST_RESULT_COMPONENT_EQUAL(save_tab, target_save_tab, "save tab");
+    TEST_RESULT_COMPONENT_EQUAL(save_disabled, target_save_disabled, "save disabled");
+
+    return 0;
 }
 
 

@@ -1091,6 +1091,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h
+    Source/PokemonLA/Programs/PokemonLA_GameSave.cpp
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.cpp
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.h
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp

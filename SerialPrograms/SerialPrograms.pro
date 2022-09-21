@@ -544,6 +544,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
+    Source/PokemonLA/Programs/PokemonLA_GameSave.cpp \
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.cpp \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
