@@ -4,21 +4,49 @@
  *
  */
 
-#include <sstream>
+/* TODO ideas
+break into smaller functions
+use "flat" vector instead of 3D (it's easier to manipulate and avoid "translation")
+read pokemon name and store the slug (easier to detect missread than reading a number)
+optimize the search for fitting pokemon by starting from box_nb, column and line instead of 0
+Optimise the swapping algo
+Add enum for ball ? Also, BDSP is reading from swsh data. Worth refactoring ?
+Find a way to let the user customize the sorting algo based on their preference
+
+ideas for more checks :
+gender
+ability
+nature
+type
+original game
+OT
+ID OT
+moves
+stats
+level
+surname
+language
+"stamps"
+*/
+
 #include <map>
+#include <optional>
+#include <sstream>
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonFramework/OCR/OCR_TextMatcher.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonHome_BoxSorting.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,13 +92,13 @@ BoxSorting::BoxSorting()
 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t VIDEO_DELAY){
 
-    PokemonAutomation::ImageFloatBox Cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
+    ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-    PokemonAutomation::FloatPixel image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+    FloatPixel image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
     env.console.log("Cursor color detection: " + image_value.to_string());
     VideoOverlaySet BoxRender(env.console);
 
-    BoxRender.add(COLOR_BLUE, Cursor_check);
+    BoxRender.add(COLOR_BLUE, cursor_check);
     if(image_value.r <= image_value.g + image_value.b){
 
         bool cursor_found = false;
@@ -80,7 +108,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_LEFT, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+                image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
                 env.console.log("Cursor color detection: " + image_value.to_string());
 
                 if(image_value.r > image_value.g + image_value.b){
@@ -92,7 +120,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_UP, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, Cursor_check)).average;
+                image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
                 env.console.log("Cursor color detection: " + image_value.to_string());
 
                 if(image_value.r > image_value.g + image_value.b){
@@ -117,13 +145,58 @@ struct Cursor{
   uint16_t line;
 };
 
+struct Pokemon{
+    // When adding any new member here, do not forget to modify the three operators below
+    uint16_t dex_number = 0;
+    bool shiny = false;
+    bool gmax = false;
+    std::string ball_slug = "";
+};
 
+bool operator==(const Pokemon& lhs, const Pokemon& rhs){
+    return lhs.dex_number == rhs.dex_number &&
+        lhs.shiny == rhs.shiny &&
+        lhs.gmax == rhs.gmax &&
+        lhs.ball_slug == rhs.ball_slug;
+}
 
-void swap(std::vector<uint16_t>* arr, int pos1, int pos2){
-    int temp;
-    temp = (*arr)[pos1];
-    (*arr)[pos1] = (*arr)[pos2];
-    (*arr)[pos2] = temp;
+bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
+    if (!lhs.has_value()){
+        return false;
+    }
+    if (!rhs.has_value()){
+        return true;
+    }
+    // For example, we could imagine that people want to sort first by ball type, then by dex number.
+    // if (lhs->ball_slug < rhs->ball_slug){
+    //     return true;
+    // }
+    // if (lhs->ball_slug > rhs->ball_slug){
+    //     return false;
+    // }
+    // if (lhs->shiny != rhs->shiny){
+    //     return lhs->shiny;
+    // }
+    // if (lhs->gmax != rhs->gmax){
+    //     return lhs->gmax;
+    // }
+    return lhs->dex_number < rhs->dex_number;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon)
+{
+    if (pokemon.has_value()){
+        os << "(";
+        os << "dex_number:" << pokemon->dex_number << " ";
+        os << "shiny:" << pokemon->shiny << " ";
+        os << "gmax:" << pokemon->gmax << " ";
+        os << "ball_slug: " << pokemon->ball_slug;
+        os << ")";
+    }
+    else{
+        os << "(empty)";
+    }
+    return os;
 }
 
 //Move the cursor to the given coordinates, knowing current pos via the cursor struct
@@ -173,27 +246,28 @@ void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context
 
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    PokemonAutomation::ImageFloatBox Select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    PokemonAutomation::ImageFloatBox Dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
+    ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
+    ImageFloatBox dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
+    ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
+    ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
 
-
-    //3 dimensions vector that will store pokedex number of each slot
-    std::vector<std::vector<std::vector<int16_t>>> box_data;
+    //3 dimensions vector that will store data for each slot
+    std::vector<std::vector<std::vector<std::optional<Pokemon>>>> box_data;
 
     Cursor cur_cursor{static_cast<uint16_t>(BOX_NUMBER-1), 0, 0};
 
     std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
 
-    VideoOverlaySet BoxRender(env.console);
+    VideoOverlaySet box_render(env.console);
 
     std::ostringstream ss;
 
-    PokemonAutomation::FloatPixel image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+    FloatPixel image_value = image_stats(extract_box_reference(*screen, select_check)).average;
 
     env.console.log("Color detected from the select square: " + image_value.to_string());
 
     //if the correct color is not detected, getting out of every possible menu to make sure the program work no matter where you start it in your pokemon home
-    BoxRender.add(COLOR_BLUE, Select_check);
+    box_render.add(COLOR_BLUE, select_check);
     if(image_value.r <= image_value.g + image_value.b){
         for (int var = 0; var < 5; ++var) {
             pbf_press_button(context, BUTTON_B, 10, GAME_DELAY+10);
@@ -201,18 +275,19 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(VIDEO_DELAY));
         screen = env.console.video().snapshot();
-        image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+        image_value = image_stats(extract_box_reference(*screen, select_check)).average;
         env.console.log("Color detected from the select square: " + image_value.to_string());
         if(image_value.r <= image_value.g + image_value.b){
             for (int i = 0; i < 2; ++i) {
                 pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+20); //additional delay because this animation is slower than the rest
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, Select_check)).average;
+                image_value = image_stats(extract_box_reference(*screen, select_check)).average;
                 env.console.log("Color detected from the select square: " + image_value.to_string());
                 if(image_value.r > image_value.g + image_value.b){
                     break;
                 }else if(i==1){
+                    dump_image(env.console, ProgramInfo(), "SelectSquare", *screen);
                     env.console.log("ERROR: Could not find correct color mode please check color logs and timings\n", COLOR_RED);
                     return;
                 }
@@ -220,7 +295,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
     }
 
-    BoxRender.clear();
+    box_render.clear();
 
     //cycle through each box
     for (int box_nb = 0; box_nb < BOX_NUMBER; ++box_nb) {
@@ -239,28 +314,29 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         screen = env.console.video().snapshot();
 
         // Box grid to find empty slots (red boxes) and fill box_data with value to check or not for pokemon dex number
-        box_data.push_back(std::vector<std::vector<int16_t>>());
+        box_data.push_back(std::vector<std::vector<std::optional<Pokemon>>>());
 
         ss << "\n";
 
         for (uint8_t i = 0; i < 5; i++) {
 
-            box_data[box_nb].push_back(std::vector<int16_t>());
+            box_data[box_nb].push_back(std::vector<std::optional<Pokemon>>());
 
             for (uint8_t j = 0; j < 6; j++) {
 
-                int current_box_value = image_stddev(extract_box_reference(*screen,  PokemonAutomation::ImageFloatBox(0.06+(0.072*j), 0.2+(0.1035*i), 0.03, 0.057))).sum();
+                ImageFloatBox slot_box(0.06 + (0.072 * j), 0.2 + (0.1035 * i), 0.03, 0.057);
+                int current_box_value = image_stddev(extract_box_reference(*screen, slot_box)).sum();
 
                 ss << current_box_value;
 
                 //checking color to know if a pokemon is on the slot or not
                 if(current_box_value < 15){
-                    BoxRender.add(COLOR_RED, PokemonAutomation::ImageFloatBox(0.06+(0.072*j), 0.2+(0.1035*i), 0.03, 0.057));
-                    box_data[box_nb][i].push_back(9999); //huge value to make sorting easier later
+                    box_render.add(COLOR_RED, slot_box);
+                    box_data[box_nb][i].push_back(std::nullopt); //empty optional to make sorting easier later
                     ss << "❌ " ;
                 }else{
-                    BoxRender.add(COLOR_GREEN, PokemonAutomation::ImageFloatBox(0.06+(0.072*j), 0.2+(0.1035*i), 0.03, 0.057));
-                    box_data[box_nb][i].push_back(0); //0 value to know there is a pokemon here that needs a value
+                    box_render.add(COLOR_GREEN, slot_box);
+                    box_data[box_nb][i].push_back(Pokemon{}); //default initialised pokemon to know there is a pokemon here that needs a value
                     ss << "✅ " ;
                 }
             }
@@ -275,7 +351,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         //cycling though each slot of the box in order to find the first pokemon to enter the summary
         for (int column = 0; column < 5; ++column) {
             for (int line = 0; line < 6; ++line) {
-                if(box_data[box_nb][column][line] != 9999){
+                if(box_data[box_nb][column][line].has_value()){
                     find_first_poke = true;
                 }
                 if(!find_first_poke){
@@ -290,32 +366,52 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         //enter the summary screen
         pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
         context.wait_for_all_requests();
-        BoxRender.clear();
+        box_render.clear();
         pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
         pbf_press_button(context, BUTTON_A, 10, VIDEO_DELAY+150);
         context.wait_for_all_requests();
 
-        BoxRender.add(COLOR_RED, Dex_number_box);
+        box_render.add(COLOR_RED, dex_number_box);
+        box_render.add(COLOR_BLUE, shiny_symbol_box);
+        box_render.add(COLOR_GREEN, gmax_symbol_box);
 
         //cycle through each summary of the current box and fill pokemon dex number in
         for (int column = 0; column < 5; ++column) {
             for (int line = 0; line < 6; ++line) {
 
-                if(box_data[box_nb][column][line] == 0){
+                if(box_data[box_nb][column][line].has_value()){
                     screen = env.console.video().snapshot();
                     ImageRGB32 image = to_blackwhite_rgb32_range(
-                        extract_box_reference(*screen, Dex_number_box),
+                        extract_box_reference(*screen, dex_number_box),
                         0xff808080, 0xffffffff, true
                     );
-                    int DexNumber = OCR::read_number(env.console, image);
-                    box_data[box_nb][column][line] = DexNumber;
+
+                    int dex_number = OCR::read_number(env.console, image);
+                    if (dex_number == -1){
+                        dump_image(env.console, ProgramInfo(), "ReadSummary", *screen);
+                    }
+                    box_data[box_nb][column][line]->dex_number = dex_number;
+
+                    int shiny_stddev_value = image_stddev(extract_box_reference(*screen, shiny_symbol_box)).sum();
+                    bool is_shiny = shiny_stddev_value > 30;
+                    box_data[box_nb][column][line]->shiny = is_shiny;
+                    env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
+
+                    int gmax_stddev_value = image_stddev(extract_box_reference(*screen, gmax_symbol_box)).sum();
+                    bool is_gmax = gmax_stddev_value > 30;
+                    box_data[box_nb][column][line]->gmax = is_gmax;
+                    env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
+
+                    BallReader ball_reader(env.console);
+                    box_data[box_nb][column][line]->ball_slug = ball_reader.read_ball(*screen);
+
                     pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
                     context.wait_for_all_requests();
                 }
             }
         }
 
-        BoxRender.clear();
+        box_render.clear();
 
         ss << std::endl;
 
@@ -332,7 +428,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         //get out of summary with a lot of delay because it's slow for some reasons
         pbf_press_button(context, BUTTON_B, 10, VIDEO_DELAY+200);
-        BoxRender.clear();
+        box_render.clear();
         context.wait_for_all_requests();
 
         go_to_first_slot(env, context, VIDEO_DELAY);
@@ -340,7 +436,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
     //making a flat list of the pokemons because turns out my original idea of 3d data is turning into a pain to use for sorting
-    std::vector<uint16_t> flat_box;
+    std::vector<std::optional<Pokemon>> flat_box;
 
     for (int box_nb = 0; box_nb < int(box_data.size()); ++box_nb) {
         for (int column = 0; column < 5; ++column) {
@@ -353,21 +449,21 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     //using sort to sort the flat copy of box data
     std::sort(flat_box.begin(), flat_box.end());
 
-    for (auto const var : flat_box) {
+    for (const std::optional<Pokemon>& var : flat_box) {
         ss << var << " ";
     }
     env.console.log(ss.str());
     ss.str("");
 
     //make the flat sorted list 3d box grid again because why not now that I'm here
-    std::vector<std::vector<std::vector<int16_t>>> box_sorted;
+    std::vector<std::vector<std::vector<std::optional<Pokemon>>>> box_sorted;
 
     for (int i = 0; i < int(flat_box.size()); ++i) {
         if(i%30==0){
-            box_sorted.push_back(std::vector<std::vector<int16_t>>());
+            box_sorted.push_back(std::vector<std::vector<std::optional<Pokemon>>>());
         }
         if(i%6==0){
-            box_sorted[i/30].push_back(std::vector<int16_t>());
+            box_sorted[i/30].push_back(std::vector<std::optional<Pokemon>>());
         }
         box_sorted[i/30][(i-((i/30)*30))/6].push_back(flat_box[i]);
     }
@@ -401,7 +497,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                                 pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
                                 context.wait_for_all_requests();
                                 box_data[box_nb_s][column_s][line_s] = box_data[box_nb][column][line]; //update the list in case of a pokemon swap
-                                box_data[box_nb][column][line] = 0; //delete pokemon data to make sure it does not match again
+                                box_data[box_nb][column][line] = std::nullopt; //delete pokemon data to make sure it does not match again
                                 found_pkmn = true;
                                 break;
                             }
