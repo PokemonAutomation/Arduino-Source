@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_CommonFramework_WaterfillUtilities_H
 #define PokemonAutomation_CommonFramework_WaterfillUtilities_H
 
+#include <functional>
 #include <utility>
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
