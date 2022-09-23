@@ -41,9 +41,12 @@ bool is_grey(
     double max_stddev_sum
 ){
     double sum = stats.average.sum();
-//    cout << stats.average << stats.stddev << endl;
     if (sum < min_rgb_sum || sum > max_rgb_sum){
         return false;
+    }
+    //  If it's too dark, color ratios will be unstable.
+    if (sum < 50){
+        return true;
     }
     return is_solid(stats, {0.333333, 0.333333, 0.333333}, 0.1, max_stddev_sum);
 }
