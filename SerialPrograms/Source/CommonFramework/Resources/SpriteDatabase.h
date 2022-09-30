@@ -36,8 +36,8 @@ public:
 
 public:
     struct Sprite{
-        ImageViewRGB32 sprite;
-        ImageViewRGB32 icon;    //  Cropped sprite for better viewing.
+        ImageViewRGB32 sprite;  //  The original sprite.
+        ImageViewRGB32 icon;    //  Sprite with 0-alpha boundaries cropped for better viewing.
     };
     const Sprite& get_throw(const std::string& slug) const;
     const Sprite* get_nothrow(const std::string& slug) const;

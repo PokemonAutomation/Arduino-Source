@@ -1146,6 +1146,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
+    Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
+    Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp

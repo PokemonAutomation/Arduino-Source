@@ -31,6 +31,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA/PokemonLA_Locations.h"
+#include "PokemonLA/PokemonLA_WeatherAndTime.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -628,9 +629,22 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
 }
 
 int test_pokemonLA_MapWeatherAndTimeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    // two keywords: <Weather name> <Time of day name>
+    if (keywords.size() < 2){
+        cerr << "Error: not enough number of keywords in the filename. Found only " << keywords.size() << "." << endl;
+        return 1;
+    }
+
+    const auto& target_weather = keywords[keywords.size()-2];
+    const auto& target_time = keywords[keywords.size()-1];
+
     auto& logger = global_logger_command_line();
-    detect_weather_on_map(logger, image);
-    detect_time_of_day_on_map(logger, image);
+    const std::string weather_result = WEATHER_NAMES[(int)detect_weather_on_map(logger, image)];
+    const std::string time_result = TIME_OF_DAY_NAMES[(int)detect_time_of_day_on_map(logger, image)];
+    
+    TEST_RESULT_COMPONENT_EQUAL(weather_result, target_weather, "weather");
+    TEST_RESULT_COMPONENT_EQUAL(time_result, target_time, "time of day");
+
     
     return 0;
 }

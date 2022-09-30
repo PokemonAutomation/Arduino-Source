@@ -571,6 +571,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
+    Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
@@ -1354,6 +1355,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
+    Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \

@@ -50,14 +50,17 @@ using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpect
 // Helper for testing code that reads an image and uses filename to get the target outcome for the code.
 // test_func: reads an image and the image filename base and returns an int code.
 int image_filename_detector_helper(ImageFilenameFunction test_func, const std::string& test_path){
+    ImageRGB32 image;
+    std::string basename;
     try{
-        ImageRGB32 image(test_path);
+        image = ImageRGB32(test_path);
         QFileInfo file_info(QString::fromStdString(test_path));
-        return test_func(image, file_info.baseName().toStdString());
+        basename = file_info.baseName().toStdString();
     }catch (FileException&){
         cout << "Skip " << test_path << " as it cannot be read as image" << endl;
         return -1;
     }
+    return test_func(image, basename);
 }
 
 
