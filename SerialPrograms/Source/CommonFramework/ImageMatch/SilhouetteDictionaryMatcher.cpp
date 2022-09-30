@@ -46,14 +46,11 @@ ImageMatchResult SilhouetteDictionaryMatcher::match(
         return results;
     }
 
-    Color background;
-    ImageRGB32 processed = process_image(image, background);
-
     for (const auto& item : m_database){
 //        if (item.first != "solosis"){
 //            continue;
 //        }
-        double alpha = item.second.rmsd_masked(processed);
+        double alpha = item.second.rmsd_masked(image);
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);
     }

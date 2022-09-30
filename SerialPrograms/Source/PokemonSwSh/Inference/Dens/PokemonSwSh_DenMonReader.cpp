@@ -8,6 +8,7 @@
 #include "CommonFramework/ImageMatch/FilterToAlpha.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_DenMonReader.h"
 
@@ -20,42 +21,15 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-
-
-
-class DenSpriteMatcher : public ImageMatch::SilhouetteDictionaryMatcher{
-public:
-    DenSpriteMatcher(DenSpriteMatcher&&) = default;
-    DenSpriteMatcher& operator=(DenSpriteMatcher&&) = default;
-public:
-    DenSpriteMatcher() = default;
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override{
-        // Find the bounding box of the silhouette.
-        ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
-            image,
-            // The filter is a lambda function that returns true on dark pixels.
-            [](Color pixel){
-                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 100;
-            }
-        );
-        background = Color();
-        ImageRGB32 ret = extract_box_reference(image, box).copy();
-        // Set black pixels to have 255 alpha while other pixels 0 alpha.
-        ImageMatch::set_alpha_black(ret);
-        return ret;
-    }
-};
-
-
-DenSpriteMatcher make_DEN_SPRITE_MATCHER(){
-    DenSpriteMatcher matcher;
+ImageMatch::SilhouetteDictionaryMatcher make_DEN_SPRITE_MATCHER(){
+    ImageMatch::SilhouetteDictionaryMatcher matcher;
     for (const auto& item : ALL_POKEMON_SILHOUETTES()){
         matcher.add(item.first, item.second.sprite);
     }
     return matcher;
 }
-const DenSpriteMatcher& DEN_SPRITE_MATCHER(){
-    static DenSpriteMatcher matcher = make_DEN_SPRITE_MATCHER();
+const ImageMatch::SilhouetteDictionaryMatcher& DEN_SPRITE_MATCHER(){
+    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_DEN_SPRITE_MATCHER();
     return matcher;
 }
 
@@ -109,9 +83,23 @@ DenMonReadResults DenMonReader::read(const ImageViewRGB32& screen) const{
     }while (false);
 
 
-    ImageViewRGB32 processed = extract_box_reference(screen, m_sprite);
-//    processed.save("processed.png");
-//    processed = ImageMatch::black_filter_to_alpha(processed);
+    ImageViewRGB32 cropped = extract_box_reference(screen, m_sprite);
+//    cropped.save("processed.png");
+//    cropped = ImageMatch::black_filter_to_alpha(cropped);
+
+    // Find the bounding box of the silhouette.
+    const ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+        cropped,
+        // The filter is a lambda function that returns true on silhouette pixels.
+        // We treat dark pixels as silhouette pixels.
+        [](Color pixel){
+            return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 100;
+        }
+    );
+    ImageRGB32 processed = extract_box_reference(cropped, box).copy();
+    // Set black pixels to have 255 alpha while other pixels 0 alpha.
+    ImageMatch::set_alpha_black(processed);
+
     results.slugs = m_matcher.match(processed, ALPHA_SPREAD);
     results.slugs.log(m_logger, MAX_ALPHA);
 

@@ -8,11 +8,16 @@
 #define PokemonAutomation_PokemonSwSh_DenMonReader_H
 
 #include <string>
+#include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 
 namespace PokemonAutomation{
+    namespace ImageMatch{
+        class SilhouetteDictionaryMatcher;
+    };
+    class Logger;
+    class VideoOverlay;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

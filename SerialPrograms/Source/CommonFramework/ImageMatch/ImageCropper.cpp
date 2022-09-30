@@ -14,21 +14,23 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-
-bool scan_row(const ImageViewRGB32& image, size_t row, const std::function<bool(Color)>& filter){
+// Scan one row to find if all pixels in the row are from background
+bool is_background_row(const ImageViewRGB32& image, size_t row, const std::function<bool(Color)>& is_foreground){
     for (size_t c = 0; c < image.width(); c++){
         Color pixel(image.pixel(c, row));
-        if (filter(pixel)){
+        if (is_foreground(pixel)){
 //            cout << "{" << c << "," << row << "}" << endl;
             return false;
         }
     }
     return true;
 }
-bool scan_col(const ImageViewRGB32& image, size_t col, const std::function<bool(Color)>& filter){
+
+// Scan one col to find if all pixels in the col are from background
+bool is_background_col(const ImageViewRGB32& image, size_t col, const std::function<bool(Color)>& is_foreground){
     for (size_t r = 0; r < image.height(); r++){
         Color pixel(image.pixel(col, r));
-        if (filter(pixel)){
+        if (is_foreground(pixel)){
 //            cout << "{" << col << "," << r << "}" << endl;
             return false;
         }
@@ -37,29 +39,25 @@ bool scan_col(const ImageViewRGB32& image, size_t col, const std::function<bool(
 }
 
 ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image){
-    size_t rs = 0;
-    size_t re = image.height();
-    size_t cs = 0;
-    size_t ce = image.width();
-    auto filter = [](Color pixel){
+    auto is_foreground = [](Color pixel){
         return (pixel.alpha()) != 0;
     };
-    while (rs < re && scan_row(image, rs    , filter)) rs++;
-    while (re > rs && scan_row(image, re - 1, filter)) re--;
-    while (cs < ce && scan_col(image, cs    , filter)) cs++;
-    while (ce > cs && scan_col(image, ce - 1, filter)) ce--;
-    return image.sub_image(cs, rs, ce - cs, re - rs);
+    const auto box = enclosing_rectangle_with_pixel_filter(image, is_foreground);
+
+    return extract_box_reference(image, box);
 }
 
-ImagePixelBox enclosing_rectangle_with_pixel_filter(const ImageViewRGB32& image, const std::function<bool(Color)>& filter){
+ImagePixelBox enclosing_rectangle_with_pixel_filter(const ImageViewRGB32& image, const std::function<bool(Color)>& is_foreground){
     size_t rs = 0;
     size_t re = image.height();
     size_t cs = 0;
     size_t ce = image.width();
-    while (rs < re && scan_row(image, rs    , filter)) rs++;
-    while (re > rs && scan_row(image, re - 1, filter)) re--;
-    while (cs < ce && scan_col(image, cs    , filter)) cs++;
-    while (ce > cs && scan_col(image, ce - 1, filter)) ce--;
+
+    // If we cannot find a foreground (aka, alpha != 0) pixel on one row or column, we trim it, until hitting a foreground pixel.
+    while (rs < re && is_background_row(image, rs    , is_foreground)) rs++;
+    while (re > rs && is_background_row(image, re - 1, is_foreground)) re--;
+    while (cs < ce && is_background_col(image, cs    , is_foreground)) cs++;
+    while (ce > cs && is_background_col(image, ce - 1, is_foreground)) ce--;
     return ImagePixelBox(cs, rs, ce, re);
 }
 

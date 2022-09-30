@@ -19,6 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+
 Weather detect_weather_on_map(Logger& logger, const ImageViewRGB32& screen){
     const ImageFloatBox box{0.0285, 0.069, 0.025, 0.044};
     
