@@ -34,7 +34,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
     detector.make_overlays(set);
 
     if (detector.detect(*screen)){
-        throw UserSetupError(console, "Black border detected! Please set your screen size to 100%.");
+        throw UserSetupError(console, "Black border detected! Please set your screen size to 100% on your Nintendo Switch setting.");
     }
 }
 void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback){
