@@ -7,16 +7,17 @@
 #ifndef PokemonAutomation_PokemonBDSP_BoxGenderDetector_H
 #define PokemonAutomation_PokemonBDSP_BoxGenderDetector_H
 
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
-#include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 
 namespace PokemonAutomation{
+class Logger;
+class VideoOverlay;
+class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-EggHatchGenderFilter read_gender_from_box(
+Pokemon::EggHatchGenderFilter read_gender_from_box(
     Logger& logger, VideoOverlay& overlay,
     const ImageViewRGB32& frame
 );

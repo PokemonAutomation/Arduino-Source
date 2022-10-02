@@ -14,13 +14,17 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-
+// Hold button for `hold` ticks, then release `duration - hold` ticks.
+// If `duration` is smaller than `hold`, release 0 tick.
 inline void ssf_press_button2(BotBaseContext& context, Button button, uint16_t duration, uint16_t hold){
     pbf_press_button(context, button, hold, duration < hold ? 0 : duration - hold);
 }
+// Hold button for 5 ticks, then release for `duration` ticks.
 inline void ssf_press_button1(BotBaseContext& context, Button button, uint16_t duration){
     ssf_press_button2(context, button, duration, 5);
 }
+// Hold D-PAD button for `hold` ticks, then release `duration - hold` ticks.
+// If `duration` is smaller than `hold`, release 0 tick.
 inline void ssf_press_dpad2(BotBaseContext& context, DpadPosition dpad, uint16_t duration, uint16_t hold){
     pbf_press_dpad(context, dpad, hold, duration < hold ? 0 : duration - hold);
 }

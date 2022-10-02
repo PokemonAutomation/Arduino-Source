@@ -215,6 +215,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
+    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp
+    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -772,6 +774,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h
+    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp
+    Source/Pokemon/Options/Pokemon_EggHatchFilter.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h
@@ -854,8 +858,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.h
-    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp
-    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
@@ -1192,6 +1194,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.cpp
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp
@@ -1200,8 +1208,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h
-    Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.cpp
-    Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.cpp
@@ -1386,6 +1392,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.h
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.cpp
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.cpp
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h
@@ -1457,6 +1465,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.cpp
+    Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp

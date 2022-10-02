@@ -27,10 +27,10 @@ ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen){
     // Replacing white background with zero-alpha color so that they won't be counted in
     // the following image_stats()
     // The white background is defined as the color between 0xffa0a0a0 and 0xffffffff.
-    const bool replace_background = true;
+    const bool replace_color_within_range = true;
     ImageRGB32 region = filter_rgb32_range(
         extract_box_reference(screen, box),
-        0xffa0a0a0, 0xffffffff, Color(0), replace_background
+        0xffa0a0a0, 0xffffffff, Color(0), replace_color_within_range
     );
 
     ImageStats stats = image_stats(region);

@@ -51,6 +51,10 @@ PreloadSettings& PreloadSettings::instance(){
     static PreloadSettings settings;
     return settings;
 }
+DebugSettings& PreloadSettings::debug(){
+    return PreloadSettings::instance().DEBUG;
+}
+
 void PreloadSettings::load(const JsonValue& json){
     const JsonObject* obj = json.get_object();
     if (obj == nullptr){
@@ -66,6 +70,12 @@ void PreloadSettings::load(const JsonValue& json){
         QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
         hash.addData(dev_token->c_str(), (int)dev_token->size());
         DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
+    }
+
+    const JsonObject* debug_obj = obj->get_object("DEBUG");
+    if (debug_obj){
+        debug_obj->read_boolean(DEBUG.COLOR_CHECK, "COLOR_CHECK");
+        debug_obj->read_boolean(DEBUG.IMAGE_TEMPLATE_MATCHING, "IMAGE_TEMPLATE_MATCHING");
     }
 }
 

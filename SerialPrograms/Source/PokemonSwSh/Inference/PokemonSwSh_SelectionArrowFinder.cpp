@@ -129,6 +129,46 @@ int8_t BattleMoveArrowFinder::arrow_slot(double y_center){
 }
 
 
+
+RetrieveEggArrowFinder::RetrieveEggArrowFinder(VideoOverlay& overlay)
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.639, 0.607, 0.066, 0.121))
+{}
+
+
+CheckNurseryArrowFinder::CheckNurseryArrowFinder(VideoOverlay& overlay)
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.429, 0.537, 0.121, 0.150))
+{}
+
+
+StoragePokemonMenuArrowFinder::StoragePokemonMenuArrowFinder(VideoOverlay& overlay)
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.597, 0.382, 0.068, 0.119))
+{}
+
+
+RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
+    : m_overlay_set(overlay)
+{
+    for(size_t i_row = 0; i_row < 2; i_row++){
+        for(size_t j_col = 0; j_col < 5; j_col++){
+		    ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
+            m_overlay_set.add(COLOR_YELLOW, box);
+        }
+    }
+}
+
+int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
+    for(size_t i_row = 0; i_row < 2; i_row++){
+        for(size_t j_col = 0; j_col < 5; j_col++){
+		    ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
+            std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, box));
+            if (arrows.size() > 0){
+                return i_row * 5 + j_col;
+            }
+        }
+    }
+    return -1;
+}
+
 }
 }
 }

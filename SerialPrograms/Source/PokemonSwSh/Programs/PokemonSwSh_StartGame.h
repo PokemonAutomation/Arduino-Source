@@ -8,10 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_StartGame_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{

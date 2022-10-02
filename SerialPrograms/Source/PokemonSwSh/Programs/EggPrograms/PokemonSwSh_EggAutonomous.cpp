@@ -1,0 +1,761 @@
+/*  Egg Autonomous
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <cmath>
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "Pokemon/Pokemon_Notification.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh_EggHelpers.h"
+#include "PokemonSwSh_EggCombinedShared.h"
+#include "PokemonSwSh_EggAutonomous.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+using namespace Pokemon;
+
+namespace {
+
+// We assume Pokemon app is always at row 0, col 1
+const size_t POKEMON_APP_INDEX = 1;
+// We assume Town Map app is always at row 1, col 0
+const size_t TOWN_MAP_APP_INDEX = 5;
+
+}
+
+
+EggAutonomous_Descriptor::EggAutonomous_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonSwSh:EggAutonomous",
+        STRING_POKEMON + " SwSh", "Egg Autonomous",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggAutonomous.md",
+        "Automatically fetch+hatch eggs and keep all shinies.",
+        FeedbackType::REQUIRED, false,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+
+class EggAutonomous_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+    : m_hatched(m_stats["Eggs Hatched"])
+    , m_errors(m_stats["Errors"])
+    , m_fetch_attempts(m_stats["Fetch Attempts"])
+    , m_fetch_success(m_stats["Fetch Success"])
+    , m_shinies(m_stats["Shinies"])
+{
+    m_display_order.emplace_back("Eggs Hatched");
+    m_display_order.emplace_back("Errors", true);
+    m_display_order.emplace_back("Fetch Attempts");
+    m_display_order.emplace_back("Fetch Success");
+    m_display_order.emplace_back("Shinies");
+}
+
+    std::atomic<uint64_t>& m_hatched;
+    std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_fetch_attempts;
+    std::atomic<uint64_t>& m_fetch_success;
+    std::atomic<uint64_t>& m_shinies;
+};
+std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
+EggAutonomous::EggAutonomous()
+    : GO_HOME_WHEN_DONE(false)
+    , LANGUAGE(
+        "<b>Game Language:</b><br>Required to read IVs.",
+        IVCheckerReader::instance().languages(),
+        false
+    )
+    , MAX_KEEPERS(
+        "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
+        "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
+        "Otherwise, the program will break when that box is full.",
+        10, 1, 30
+    )
+    , LOOPS_PER_FETCH(
+        "<b>Loops Per Fetch:</b><br>Fetch an egg after traveling this many loops on Route 5.",
+        2, 1
+    )
+    , NUM_EGGS_IN_COLUMN(
+        "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
+        {
+            {0, "0", "0"},
+            {1, "1", "1"},
+            {2, "2", "2"},
+            {3, "3", "3"},
+            {4, "4", "4"},
+            {5, "5", "5"},
+        },
+        0
+    )
+    , AUTO_SAVING(
+        "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
+        "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
+        "To collect (unhatched) eggs with the desired stats, set this option to \"Save after every batch\". "
+        "Then set the Action Table below to \"Stop Program\" on the desired stats. "
+        "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
+        {
+            {AutoSave::NoAutoSave, "none", "No auto-saving. (No error/crash recovery.)"},
+            {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
+            {AutoSave::EveryBatch, "every-batch", "Save after every batch. (Allows you to unhatch eggs.)"},
+        },
+        AutoSave::AfterStartAndKeep
+    )
+    , DEBUG_PROCESSING_HATCHED("Debug the part of program after all eggs hatched", false)
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_NONSHINY_KEEP(
+        "Non-Shiny Keep",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs"}
+    )
+    , NOTIFICATION_SHINY(
+        "Shiny Hatch",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+    )
+    , m_notification_noop("", false, false)
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_NONSHINY_KEEP,
+        &NOTIFICATION_SHINY,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , SCROLL_TO_READ_DELAY(
+        "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
+        "Increase this if your video has high latency.",
+        TICKS_PER_SECOND,
+        "125"
+    )
+{
+    PA_ADD_OPTION(START_LOCATION);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
+    PA_ADD_OPTION(STEPS_TO_HATCH);
+
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(MAX_KEEPERS);
+    PA_ADD_OPTION(LOOPS_PER_FETCH);
+    PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
+    PA_ADD_OPTION(AUTO_SAVING);
+    PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(SCROLL_TO_READ_DELAY);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(DEBUG_PROCESSING_HATCHED);
+    }
+}
+
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
+    env.update_stats();
+
+    if (START_LOCATION.start_in_grip_menu()){
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    }else{
+        pbf_press_button(context, BUTTON_B, 5, 5);
+    }
+
+    if (DEBUG_PROCESSING_HATCHED){ // only for debugging
+        const bool need_taxi = true;
+        process_hatched_pokemon(env, context, stats, need_taxi);
+        return;
+    }
+
+
+    if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
+        save_game(env, context);
+    }
+
+    m_num_pokemon_kept = 0;
+
+    m_num_eggs_in_storage_when_game_saved = static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value());
+
+    m_player_at_loop_start = false;
+
+    // while(run_batch(env, context, stats)){}
+
+    size_t consecutive_failures = 0;
+    while(m_num_pokemon_kept < MAX_KEEPERS){
+        try{
+            if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
+                env.log("Touching date to prevent rollover.");
+                env.console.overlay().add_log_text("Touching date", COLOR_WHITE);
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            }
+
+            // Hatch one batch of eggs. If run_batch() returns true, stop the egg loop.
+            if (run_batch(env, context, stats)){
+                break;
+            }
+            // We successfully finish one egg loop iteration without any error thrown.
+            // So we reset the failure counter.
+            consecutive_failures = 0;
+        }catch (OperationFailedException& e){
+            stats.m_errors++;
+            env.update_stats();
+            // If there is no auto save, then we shouldn't reset to game to lose previous progress.
+            if (AUTO_SAVING == AutoSave::NoAutoSave){
+                throw e;
+            }
+
+            consecutive_failures++;
+            if (consecutive_failures >= 3){
+                throw OperationFailedException(env.console, "Failed 3 batches in the row.");
+            }
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            env.console.overlay().add_log_text("Reset game", COLOR_WHITE);
+            reset_game_from_home_with_inference(
+                env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
+
+            m_player_at_loop_start = false;
+        }
+    }
+
+    env.update_stats();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
+}
+
+// Run one iteration of the egg loop:
+// - Hatch five eggs while fetch five eggs.
+// - Check if pokemon needs to be kept. Keep them if needed.
+// - Put five eggs from storage to party. Save game if needed.
+// Return true if the egg loop should stop.
+bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats){
+    env.update_stats();
+    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+    if (m_player_at_loop_start){
+        const bool fly_from_overworld = true; // fly from menu
+        call_flying_taxi(env, context, fly_from_overworld);
+    }
+
+    size_t bike_loop_count = 0;
+    const size_t MAX_BIKE_LOOP_COUNT = 100;
+    size_t num_eggs_retrieved = m_num_eggs_in_storage_when_game_saved;
+    size_t num_eggs_hatched = 0;
+    m_player_at_loop_start = false;
+
+    // Each iteration in the while-loop is made by:
+    // - bike loops of LOOPS_PER_FETCH times. Bike loops begin at lady or nursery front door, end at lady.
+    // - if not enough eggs fetched, talk to lady to try fetching an egg.
+    while(num_eggs_hatched < 5 || num_eggs_retrieved < 5){
+        // Detect when Y-Comm icon disappears. This is the time an egg is hatching
+        const bool y_comm_visible_when_egg_hatching = false;
+        YCommIconDetector egg_hatching_detector(y_comm_visible_when_egg_hatching);
+
+        bool restart_bike_loop = false;
+        for(size_t i_bike_loop = 0; i_bike_loop < this->LOOPS_PER_FETCH && bike_loop_count < MAX_BIKE_LOOP_COUNT;){
+            context.wait_for_all_requests();
+            // +1 here because video overlay is for general users. Genearl users start counts at 1, while us programmers start count at 0.
+            if (restart_bike_loop){
+                env.console.overlay().add_log_text("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
+                restart_bike_loop = false;
+            } else {
+                env.console.overlay().add_log_text("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
+            }
+            int ret = run_until(
+                env.console, context,
+                [](BotBaseContext& context){
+                    travel_to_spin_location(context);
+                    travel_back_to_lady(context);
+                },
+                {{egg_hatching_detector}}
+            );
+
+            if (ret < 0){ // we are at nursery lady; no egg hatching detected
+                ++i_bike_loop;
+                ++bike_loop_count;
+                continue;
+            }
+
+            // Egg hatching
+            do {
+                ++num_eggs_hatched;
+                stats.m_hatched++;
+                env.update_stats();
+                wait_for_egg_hatched(env, context, stats, num_eggs_hatched);
+                if (num_eggs_hatched == 5){
+                    // We hatched all five eggs. No more eggs can hatch. Go to next loop
+                    break;
+                }
+                // Now we see if we can hatch one more egg.
+                ret = run_until(
+                    env.console, context,
+                    [](BotBaseContext& context){
+                        // Try move a little to hatch more:
+                        // We move toward lower-left so that it wont hit the lady or enter the Nursory.
+                        pbf_move_left_joystick(context, 0, 255, 100, 10);
+                    },
+                    {{egg_hatching_detector}}
+                );
+            } while(ret == 0);
+            // now no more hatching in this bike loop
+            // We either cannot find a consecutive hatch any more or we already hatch five of them
+
+            if (num_eggs_hatched == 5 && num_eggs_retrieved == 5){
+                m_player_at_loop_start = false;
+                break;
+            }
+
+            // Now we either cannot find a consecutive hatch any more, or we already hatch five for them, but
+            // we still need to fetch more eggs
+
+            // Use fly to reset the location because now we don't know where the player character is.
+            const bool fly_from_overworld = true;
+            call_flying_taxi(env, context, fly_from_overworld);
+            restart_bike_loop = true;
+            // We don't update i_bike_loop here because we haven't finished one full bike loop due to egg hatching
+        } // end one bike loop
+
+        if (bike_loop_count >= MAX_BIKE_LOOP_COUNT){
+            env.log("Reached max number of bike loops " + std::to_string(MAX_BIKE_LOOP_COUNT));
+            env.console.overlay().add_log_text("Error: max loops " + std::to_string(MAX_BIKE_LOOP_COUNT), COLOR_WHITE);
+            env.log("Take a screenshot of party to debug.");
+            // Now take a photo at the player's party for dumping debug info:
+            // Enter Rotom Phone menu
+            pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+            // Select Pokemon App
+            navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+            // From menu enter Pokemon App
+            ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+            context.wait_for_all_requests();
+            dump_image(
+                env.logger(),
+                env.program_info(),
+                "Reached max number of bike loops " + std::to_string(MAX_BIKE_LOOP_COUNT),
+                env.console.video().snapshot()
+            );
+
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Max number of loops reached. Not enough eggs in party?");
+        }
+        
+        context.wait_for_all_requests();
+        if (num_eggs_retrieved < 5){
+            // Update num_eggs_retrieved
+            num_eggs_retrieved = talk_to_lady_to_fetch_egg(env, context, stats, num_eggs_retrieved);
+            if (num_eggs_hatched == 5 && num_eggs_retrieved == 5){
+                m_player_at_loop_start = true;
+                break;
+            }
+        }
+    }
+
+    // - Go to pokemon storage.
+    // - Check the hatched pokemon, keep shiny pokemon and those that match the stats requirements. Release the rest.
+    // - Retrieve the stored egg column to the party.
+    // - Call flying taxi to reset player location if needed
+    // Return true if the program should stop
+    size_t last_num_pokemon_kept = m_num_pokemon_kept;
+    if (process_hatched_pokemon(env, context, stats, !m_player_at_loop_start)){
+        // While checking hatched pokemon, we find that We need to stop the program:
+        return true;
+    }
+    // after process_hatched_pokemon(), the player location is at the start of bike loop
+    m_player_at_loop_start = true;
+
+    bool save = false;
+    switch (AUTO_SAVING){
+    case AutoSave::NoAutoSave:
+        break;
+    case AutoSave::AfterStartAndKeep:
+        save = (last_num_pokemon_kept != m_num_pokemon_kept);
+        break;
+    case AutoSave::EveryBatch:
+        save = true;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid saving option.");
+    }
+
+    if (save){
+        save_game(env, context);
+        m_num_eggs_in_storage_when_game_saved = 0;
+    }
+    
+    context.wait_for_all_requests();
+    return false;
+}
+
+void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    context.wait_for_all_requests();
+    env.log("Save game.");
+    env.console.overlay().add_log_text("Save game", COLOR_WHITE);
+    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
+}
+
+void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool fly_from_overworld){
+    context.wait_for_all_requests();
+    env.log("Fly to reset position");
+    env.console.overlay().add_log_text("Call Flying Taxi", COLOR_WHITE);
+    if (fly_from_overworld){
+        // Open menu
+        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    }
+
+    navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
+
+    fly_home(context, false);
+}
+
+void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
+    env.console.overlay().add_log_text("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
+    const bool y_comm_visible_at_end_of_egg_hatching = true;
+    YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
+    const int ret = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
+        },
+        {{end_egg_hatching_detector}}
+    );
+    if (ret > 0){
+        env.console.overlay().add_log_text("Error detecting egg hatching ends", COLOR_WHITE);
+        throw OperationFailedException(env.console, "Cannot detect egg hatching ends.");
+    }
+}
+
+size_t EggAutonomous::talk_to_lady_to_fetch_egg(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    size_t num_eggs_retrieved
+){
+    env.log("Fetching egg");
+    stats.m_fetch_attempts++;
+    env.update_stats();
+    // collect_egg(context);
+    RetrieveEggArrowFinder egg_arrow_detector(env.console);
+    CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
+
+    int ret = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
+                pbf_press_button(context, BUTTON_A, 20, 150);
+            }
+            pbf_wait(context, 200);
+        },
+        {
+            {egg_arrow_detector},
+            {no_egg_arrow_detector},
+        }
+    );
+    
+    const bool y_comm_visible_at_end_of_dialog = true;
+    YCommIconDetector dialog_over_detector(y_comm_visible_at_end_of_dialog);
+    if (ret == 0){
+        ++num_eggs_retrieved;
+        env.log("Found agg");
+        env.console.overlay().add_log_text("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
+        stats.m_fetch_success++;
+        env.update_stats();
+        // Press A to get the egg
+        ssf_press_button1(context, BUTTON_A, 10);
+
+        run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                collect_egg_mash_out(context, GameSettings::instance().AUTO_DEPOSIT);
+            },
+            {{dialog_over_detector}}
+        );
+    } else if (ret == 1){
+        env.log("No agg");
+        env.console.overlay().add_log_text("No egg", COLOR_WHITE);
+        run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 300);
+            },
+            {{dialog_over_detector}}
+        );
+    } else {
+        env.console.overlay().add_log_text("Error detecting Nursery dialog", COLOR_WHITE);
+        throw OperationFailedException(env.console, "Cannot detect dialog selection arrow when talking to Nursery lady.");
+    }
+
+    return num_eggs_retrieved;
+}
+
+// After all five eggs hatched and another five eggs deposit into the first column of the box,
+// call this function to:
+// - Go to pokemon storage.
+// - Check the hatched pokemon, keep shiny pokemon and those that match the stats requirements. Release the rest.
+// - Retrieve the stored egg column to the party.
+// - Call flying taxi to reset player location if needed
+// Return true if the program should stop
+bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi){
+    env.log("Checking hatched pokemon.");
+    env.console.overlay().add_log_text("Checking hatched pokemon", COLOR_WHITE);
+
+    // Press X to open menu
+    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+
+    navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+
+    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+    const uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY;
+    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+
+    // From menu enter Pokemon App
+    ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    // From Pokemon App to storage box
+    ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
+    // Move left down to the first hatched pokemon in the party
+    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+    context.wait_for_all_requests();
+    {
+        // Define the scope of video overlay rendering for various checks:
+        VideoOverlaySet overlay_set(env.console.overlay());
+        BoxShinySymbolDetector::make_overlays(overlay_set);
+        BoxGenderDetector::make_overlays(overlay_set);
+        IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
+
+        for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
+            pbf_wait(context, SCROLL_TO_READ_DELAY);
+            context.wait_for_all_requests();
+            auto screen = env.console.video().snapshot();
+
+            bool shiny = BoxShinySymbolDetector::detect(screen);
+            if (shiny){
+                env.log("Pokemon " + std::to_string(i_hatched) + " is shiny!", COLOR_BLUE);
+                env.console.overlay().add_log_text("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
+                stats.m_shinies++;
+                env.update_stats();
+                send_encounter_notification(
+                    env,
+                    m_notification_noop,
+                    NOTIFICATION_SHINY,
+                    false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                    screen
+                );
+            }else{
+                env.log("Pokemon " + std::to_string(i_hatched) + " is not shiny.", COLOR_PURPLE);
+                env.console.overlay().add_log_text("Pokemon " + std::to_string(i_hatched+1) + "/5 not shiny", COLOR_WHITE);
+            }
+            // Note: we assume the pokemon storage UI is in the state of judging pokemon stats.
+            //   In this way we can detect pokemon stats.
+
+            IVCheckerReader::Results IVs = iv_reader.read(env.console, screen);
+            EggHatchGenderFilter gender = BoxGenderDetector::detect(screen);
+            env.log(IVs.to_string(), COLOR_GREEN);
+            env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+
+            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender);
+
+            switch (action){
+            case EggHatchAction::StopProgram:
+                env.log("Program stop requested...");
+                env.console.overlay().add_log_text("Request program stop", COLOR_WHITE);
+                if (!shiny){
+                    send_encounter_notification(
+                        env,
+                        NOTIFICATION_NONSHINY_KEEP,
+                        NOTIFICATION_SHINY,
+                        false, false, {}, std::nan(""),
+                        screen
+                    );
+                }
+                return true;
+            case EggHatchAction::Keep:
+                env.log("Moving Pokemon to keep box...", COLOR_BLUE);
+                m_num_pokemon_kept++;
+                env.console.overlay().add_log_text("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
+                if (!shiny){
+                    send_encounter_notification(
+                        env,
+                        NOTIFICATION_NONSHINY_KEEP,
+                        NOTIFICATION_SHINY,
+                        false, false, {}, std::nan(""),
+                        screen
+                    );
+                }
+
+                // Press A twice to pick the pokemon
+                ssf_press_button2(context, BUTTON_A, 60, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+                // Move it rightward, so that it stays on top of the box area
+                ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Press Button L to change to the box on the left
+                ssf_press_button2(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+                // Because we don't know which place in the box to place the pokemon, we will
+                // throw the pokemon in the all-box view. So it automatically sit in the first empty slot
+                // in the box:
+                
+                // Move it three times upward, so that it stays on top of the "Box List" button
+                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                
+                // Press the button to go to box list view
+                ssf_press_button2(context, BUTTON_A, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Press button A to drop the pokemon into the box
+                ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Press button B to go back to the last box
+                ssf_press_button2(context, BUTTON_B, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Press button R to change to the box on the right, the box with the next batch of eggs
+                ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Move cursor left to point to the last slot in the party
+                ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // Move cursor downward three times so that it goes to the original place (second slot in the party)
+                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                
+                if (m_num_pokemon_kept >= MAX_KEEPERS){
+                    env.log("Max keepers reached. Stopping program...");
+                    env.console.overlay().add_log_text("Max Keepers reached.", COLOR_WHITE);
+                    return true;
+                }
+                break;
+            case EggHatchAction::Release:
+                env.log("Releasing Pokemon...", COLOR_PURPLE);
+                env.console.overlay().add_log_text("Release Pokemon", COLOR_WHITE);
+
+                // ssf_press_button2(context, BUTTON_A, 60, 10);
+                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // ssf_press_button2(context, BUTTON_A, 125, 10);
+                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                // pbf_mash_button(context, BUTTON_A, 180);
+
+                // Press A to open pokemon menu
+                pbf_press_button(context, BUTTON_A, 20, 50);
+                context.wait_for_all_requests();
+                StoragePokemonMenuArrowFinder pokemon_menu_detector(env.console.overlay());
+                int ret = wait_until(
+                    env.console, context, std::chrono::seconds(10),
+                    {{pokemon_menu_detector}}
+                );
+                if (ret != 0){
+                    throw OperationFailedException(env.console, "Cannot detect pokemon menu in storage box.");
+                }
+
+                const bool stop_on_detected = true;
+                BlackDialogBoxDetector dialog_detector(stop_on_detected);
+                VideoOverlaySet dialog_overlay_set(env.console);
+                dialog_detector.make_overlays(dialog_overlay_set);
+
+                // Move cursor upward two times to point to "Release" menu item
+                pbf_press_dpad(context, DPAD_UP, 20, 10);
+                pbf_press_dpad(context, DPAD_UP, 20, 10);
+
+                // Press A to release
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                // Move cursor from "Not release" to "release".
+                pbf_press_dpad(context, DPAD_UP, 20, 30);
+                // Press A to confirm release, wait for a while to let the next dialog box pop up.
+                pbf_press_button(context, BUTTON_A, 20, 200);
+                
+                size_t dialog_count = 0;
+                const size_t max_dialog_count = 6;
+                for (; dialog_count < max_dialog_count; dialog_count++){
+                    context.wait_for_all_requests();
+                    if (!dialog_detector.process_frame(env.console.video().snapshot(), current_time())){
+                        break;
+                    }
+                    pbf_press_button(context, BUTTON_A, 20, 100);
+                }
+                if (dialog_count == max_dialog_count){
+                    throw OperationFailedException(env.console, "Unexpected dialogs when releasing pokemon.");
+                }
+                break;
+            }
+        }
+    }
+
+    // Get eggs to party:
+
+    // Move cursor to the first slot in the box
+    ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+    // Press Y twice to change selection method to group selection
+    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 50);
+    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 50);
+
+    // Press A to start selection
+    pbf_press_button(context, BUTTON_A, EGG_BUTTON_HOLD_DELAY, 50);
+    // Move down to selection the entire column
+    for (size_t c = 0; c < 4; c++){
+        ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    }
+    // Press A to finish the selection
+    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+    
+    // Move cursor to the second slot in the party
+    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+    // Press A to finish dropping the egg column 
+    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+    // leave pokemon box, back to pokemon app
+    ssf_press_button2(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    //  Back out to menu.
+    ssf_press_button2(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
+
+    if (need_taxi){
+        bool fly_from_overworld = false; // fly from menu
+        call_flying_taxi(env, context, fly_from_overworld);
+    } else {
+        // // Move from Pokemon App to Town Map app
+        ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
+    }
+
+    return false;
+}
+
+
+
+
+}
+}
+}
+

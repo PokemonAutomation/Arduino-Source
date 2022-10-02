@@ -2,9 +2,6 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *
- *      Determine if a raid is full and ready to start early.
- *
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"

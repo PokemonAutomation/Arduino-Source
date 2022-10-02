@@ -28,6 +28,8 @@ public:
         IVCheckerValue spatk    = IVCheckerValue::UnableToDetect;
         IVCheckerValue spdef    = IVCheckerValue::UnableToDetect;
         IVCheckerValue speed    = IVCheckerValue::UnableToDetect;
+
+        std::string to_string() const;
     };
 
     static const IVCheckerReader& instance();

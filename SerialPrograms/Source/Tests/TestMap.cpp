@@ -119,17 +119,17 @@ int image_non_negative_float_detector_helper(ImageFloatDetectorFunction test_fun
     return image_words_detector_helper(parse_filename_and_run_test, test_path);
 }
 
-int image_unsigned_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
+int image_int_detector_helper(ImageIntDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const ImageViewRGB32& image, const std::vector<std::string>& words) -> int{
         if (words.size() == 0){
-            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image_5.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have an int (e.g image_5.png) set in the filename." << endl;
             return 1;
         }
 
         int target_number = 0;
 
         if (parse_int(words[words.size()-1], target_number) == false){
-            cerr << "Error: image test file " << test_path << " does not have an unsigned int (e.g image_5.png) set in the filename." << endl;
+            cerr << "Error: image test file " << test_path << " does not have an int (e.g image_5.png) set in the filename." << endl;
             return 1;
         }
 
@@ -208,6 +208,13 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
     {"PokemonSwSh_MaxLair_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_MaxLair_BattleMenuDetector, _1)},
+    {"PokemonSwSh_DialogTriangleDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_DialogTriangleDetector, _1)},
+    {"PokemonSwSh_RetrieveEggArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_RetrieveEggArrowFinder, _1)},
+    {"PokemonSwSh_YCommIconDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommIconDetector, _1)},
+    {"PokemonSwSh_RotomPhoneMenuArrowFinder", std::bind(image_int_detector_helper, test_pokemonSwSh_RotomPhoneMenuArrowFinder, _1)},
+    {"PokemonSwSh_BlackDialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BlackDialogBoxDetector, _1)},
+    {"PokemonSwSh_BoxShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BoxShinySymbolDetector, _1)},
+    {"PokemonSwSh_BoxGenderDetector", std::bind(image_int_detector_helper, test_pokemonSwSh_BoxGenderDetector, _1)},
     {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
     {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
     {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},
@@ -222,8 +229,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_BattleSpriteWatcher", std::bind(image_words_detector_helper, test_pokemonLA_BattleSpriteWatcher, _1)},
     {"PokemonLA_SaveScreenDetector", std::bind(image_words_detector_helper, test_pokemonLA_SaveScreenDetector, _1)},
     {"PokemonLA_MapMarkerLocator", std::bind(image_non_negative_float_detector_helper, test_pokemonLA_MapMarkerLocator, _1)},
-    {"PokemonLA_MapZoomLevelReader", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
-    {"PokemonLA_BattleSpriteArrowDetector", std::bind(image_unsigned_int_detector_helper, test_pokemonLA_BattleSpriteArrowDetector, _1)},
+    {"PokemonLA_MapZoomLevelReader", std::bind(image_int_detector_helper, test_pokemonLA_MapZoomLevelReader, _1)},
+    {"PokemonLA_BattleSpriteArrowDetector", std::bind(image_int_detector_helper, test_pokemonLA_BattleSpriteArrowDetector, _1)},
     {"PokemonLA_MapMissionTabReader", std::bind(image_bool_detector_helper, test_pokemonLA_MapMissionTabReader, _1)},
     {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)},
     {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},

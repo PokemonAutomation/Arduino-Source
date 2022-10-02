@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
@@ -13,7 +14,8 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
-#include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "PokemonBDSP_BoxGenderDetector.h"
 
 #include <iostream>
@@ -26,6 +28,7 @@ namespace PokemonBDSP{
 
 using namespace Kernels;
 using namespace Kernels::Waterfill;
+using namespace Pokemon;
 
 
 

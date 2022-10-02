@@ -34,12 +34,7 @@ protected:
 
 
 
-
-
 class BattleMoveArrowFinder : public SelectionArrowFinder{
-public:
-//    static const ImageFloatBox BATTLE_MOVE_SELECTION;
-
 public:
     BattleMoveArrowFinder(VideoOverlay& overlay);
 
@@ -58,6 +53,41 @@ private:
     std::atomic<int8_t> m_arrow_slot;
 };
 
+
+// Selection arrow for the dialog of the egg lady when you would like to retrieve an egg.
+class RetrieveEggArrowFinder : public SelectionArrowFinder{
+public:
+    RetrieveEggArrowFinder(VideoOverlay& overlay);
+};
+
+
+// Selection arrow for the dialog of the egg lady when you check the condition of the pokemon
+// in the Pokemon Nursery, where there is no egg.
+class CheckNurseryArrowFinder : public SelectionArrowFinder{
+public:
+    CheckNurseryArrowFinder(VideoOverlay& overlay);
+};
+
+
+// Selection arrow for the menu of the pokemon in a pokemon storage box
+class StoragePokemonMenuArrowFinder : public SelectionArrowFinder{
+public:
+    StoragePokemonMenuArrowFinder(VideoOverlay& overlay);
+};
+
+// The arrow that points to one of the ten apps on Rotom Phone menu
+class RotomPhoneMenuArrowFinder {
+public:
+    RotomPhoneMenuArrowFinder(VideoOverlay& overlay);
+
+    // Detect which app is selected by the arrow. Return the index of the app
+    // The order is: from top to bottom, from left to right.
+    // If no arrow found, return -1.
+    int detect(const ImageViewRGB32& screen);
+
+private:
+    VideoOverlaySet m_overlay_set;
+};
 
 
 }

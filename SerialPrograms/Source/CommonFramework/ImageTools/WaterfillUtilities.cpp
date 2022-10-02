@@ -6,6 +6,7 @@
 
 #include <map>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
@@ -13,6 +14,9 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "WaterfillUtilities.h"
+
+#include <iostream>
+
 
 namespace PokemonAutomation{
 
@@ -85,10 +89,17 @@ bool match_template_by_waterfill(
         auto finder = session->make_iterator(min_area);
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
+            if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+                std::cout << "Object area: " << object.area << std::endl;
+            }
+            
             if (object.area > area_thresholds.second){
                 continue;
             }
             double rmsd = matcher.rmsd_original(image, object);
+            if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+                std::cout << "Object rmsd: " << rmsd << std::endl;
+            }
             
             if (rmsd < rmsd_threshold){
                 detected = true;

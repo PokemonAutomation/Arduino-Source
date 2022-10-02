@@ -9,7 +9,24 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
+namespace {
 
+std::string iv_checker_value_to_string(IVCheckerValue value){
+    const char* names[] = {
+        "UnableToDetect",
+        "NoGood",
+        "Decent",
+        "PrettyGood",
+        "VeryGood",
+        "Fantastic",
+        "Best",
+        "HyperTrained",
+    };
+
+    return names[int(value)];
+}
+
+}
 
 const IVCheckerReader& IVCheckerReader::instance(){
     static IVCheckerReader reader;
@@ -35,6 +52,15 @@ OCR::StringMatchResult IVCheckerReader::read_substring(
 }
 
 
+
+std::string IVCheckerReader::Results::to_string() const{
+    return  "HP: " + iv_checker_value_to_string(hp)
+         + ", Att: " + iv_checker_value_to_string(attack)
+         + ", Def: " + iv_checker_value_to_string(defense)
+         + ", S.Att: " + iv_checker_value_to_string(spatk)
+         + ", S.Def: " + iv_checker_value_to_string(spdef)
+         + ", Spd: " + iv_checker_value_to_string(speed);
+}
 
 
 }

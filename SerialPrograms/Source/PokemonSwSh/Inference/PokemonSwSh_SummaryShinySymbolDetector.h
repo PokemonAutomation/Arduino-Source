@@ -3,7 +3,7 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *
- *      Determine if a raid is full and ready to start early.
+ *      Check shiny symbol in the party pokemon info screen.
  *
  */
 

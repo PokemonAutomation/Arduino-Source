@@ -5,18 +5,25 @@
  */
 
 #include "Common/Compiler.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
-#include "PokemonBDSP_EggHatchFilter.h"
+// #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
+#include "Pokemon_EggHatchFilter.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace Pokemon{
 
-
+std::string gender_to_string(EggHatchGenderFilter gender){
+    const char * names[] = {
+        "Any",
+        "Male",
+        "Female",
+        "Genderless",
+    };
+    return names[int(gender)];
+}
 
 
 const EnumDatabase<EggHatchAction>& EggHatchAction_Database(){
@@ -177,7 +184,5 @@ EggHatchAction EggHatchFilterTable::get_action(bool shiny, const IVCheckerReader
 
 
 
-
-}
 }
 }

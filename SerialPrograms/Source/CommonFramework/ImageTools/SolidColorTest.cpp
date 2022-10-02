@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ImageBoxes.h"
 #include "SolidColorTest.h"
 
@@ -32,6 +33,10 @@ bool is_black(
 ){
     double average = stats.average.sum();
     double stddev = stats.stddev.sum();
+    if (PreloadSettings::debug().COLOR_CHECK){
+        cout << "is_black(): stats.average " << stats.average.to_string() << "(sum " << average << ") stats.stddev " << stats.stddev.to_string()
+             << "(sum " << stddev << ") max_rgb_sum " << max_rgb_sum << " max_stddev_sum " << max_stddev_sum << endl;
+    }
 //    cout << stats.average << stats.stddev << endl;
     return average <= max_rgb_sum && stddev <= max_stddev_sum;
 }

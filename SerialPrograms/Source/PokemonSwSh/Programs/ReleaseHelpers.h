@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+// Release one pokemon in box
 static void release(BotBaseContext& context){
     ssf_press_button2(context, BUTTON_A, 60, 10);
     ssf_press_dpad1(context, DPAD_UP, 15);

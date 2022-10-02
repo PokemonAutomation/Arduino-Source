@@ -44,16 +44,25 @@ public:
 
 
 
+struct DebugSettings{
+    bool COLOR_CHECK = false;
+    bool IMAGE_TEMPLATE_MATCHING = false;
+};
+
+
 
 class PreloadSettings{
     PreloadSettings();
 public:
     static PreloadSettings& instance();
+    static DebugSettings& debug();
 
     void load(const JsonValue& json);
 
     bool NAUGHTY_MODE = false;
     bool DEVELOPER_MODE = false;
+
+    DebugSettings DEBUG;
 };
 
 

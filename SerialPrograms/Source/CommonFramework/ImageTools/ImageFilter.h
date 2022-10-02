@@ -17,17 +17,17 @@ class ImageViewRGB32;
 class ImageRGB32;
 
 
-//  If `invert` is false, replace the color outside of the range [mins, maxs] with the color `replace_with`.
-//  If `invert` is true, replace the color range [mins, maxs] with `replace_with`.
+//  If `replace_color_within_range` is true, replace the color range [mins, maxs] with the color `replace_with`.
+//  If `replace_color_within_range` is false, replace the color outside of the range [mins, maxs] with the color `replace_with`.
 //  Returns the # of pixels inside the range [mins, maxs].
 ImageRGB32 filter_rgb32_range(
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, Color replace_with, bool invert
+    uint32_t mins, uint32_t maxs, Color replace_with, bool replace_color_within_range
 );
 ImageRGB32 filter_rgb32_range(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, Color replace_with, bool invert
+    uint32_t mins, uint32_t maxs, Color replace_with, bool replace_color_within_range
 );
 
 
@@ -38,7 +38,7 @@ struct FilterRgb32Range{
     uint32_t mins;
     uint32_t maxs;
     Color replace_with;
-    bool invert;
+    bool replace_color_within_range;
 };
 std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
     const ImageViewRGB32& image,

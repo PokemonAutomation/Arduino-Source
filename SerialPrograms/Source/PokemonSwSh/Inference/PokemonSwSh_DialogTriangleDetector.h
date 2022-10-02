@@ -1,29 +1,25 @@
-/*  Dialogue Yellow Arrow Detector
+/*  Dialog Triangle Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  The yellow marker pointing to the button to advance dialogue boxes.
- *  For different types of dialogue boxes, the locations of the yellow arrow is different.
- *  This detector covers all possible locations of the yellow arrow.
  */
 
-#ifndef PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
-#define PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
+#ifndef PokemonAutomation_PokemonSwSh_DialogTriangleDetector_H
+#define PokemonAutomation_PokemonSwSh_DialogTriangleDetector_H
 
 #include <atomic>
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
-    class Logger;
-    class VideoOverlay;
 namespace NintendoSwitch{
-namespace PokemonLA{
+namespace PokemonSwSh{
 
 
-
-class DialogueYellowArrowDetector : public VisualInferenceCallback{
+// Detect the black triangle arrow in the lower right portion of the white dialog box.
+// The dialog box shows up when talking to npcs.
+class DialogTriangleDetector : public VisualInferenceCallback{
 public:
-    DialogueYellowArrowDetector(
+    DialogTriangleDetector(
         Logger& logger, VideoOverlay& overlay,
         bool stop_on_detected
     );
@@ -42,6 +38,8 @@ private:
 
     std::atomic<bool> m_detected;
 };
+
+
 
 
 

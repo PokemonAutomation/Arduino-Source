@@ -139,6 +139,7 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
+    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioOption.cpp \
     Source/CommonFramework/AudioPipeline/AudioSession.cpp \
@@ -389,6 +390,7 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
+    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
@@ -429,7 +431,6 @@ SOURCES += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.cpp \
-    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/PokemonBDSP_Panels.cpp \
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp \
@@ -591,11 +592,13 @@ SOURCES += \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.cpp \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.cpp \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp \
-    Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.cpp \
@@ -688,6 +691,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.cpp \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.cpp \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.cpp \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.cpp \
@@ -722,6 +726,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
@@ -871,6 +876,7 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
+    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
@@ -1170,6 +1176,7 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
+    Source/Pokemon/Options/Pokemon_EggHatchFilter.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
@@ -1212,7 +1219,6 @@ HEADERS += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.h \
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.h \
-    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
@@ -1383,11 +1389,13 @@ HEADERS += \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h \
-    Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h \
@@ -1479,6 +1487,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.h \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h \
@@ -1516,6 +1525,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \

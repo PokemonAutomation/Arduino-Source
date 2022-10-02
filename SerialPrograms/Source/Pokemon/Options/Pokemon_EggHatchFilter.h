@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
-#define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
+#ifndef PokemonAutomation_Pokemon_EggHatchFilter_H
+#define PokemonAutomation_Pokemon_EggHatchFilter_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
@@ -14,9 +14,7 @@
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
-using namespace Pokemon;
+namespace Pokemon{
 
 
 enum class EggHatchAction{
@@ -37,6 +35,8 @@ enum class EggHatchGenderFilter{
     Female,
     Genderless
 };
+
+std::string gender_to_string(EggHatchGenderFilter gender);
 
 
 
@@ -77,7 +77,6 @@ public:
 
 
 
-}
 }
 }
 #endif

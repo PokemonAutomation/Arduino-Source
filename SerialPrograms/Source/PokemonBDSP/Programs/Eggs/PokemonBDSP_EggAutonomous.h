@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_EggAutonomous_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
@@ -16,7 +15,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
-#include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "PokemonBDSP_EggAutonomousState.h"
 
 namespace PokemonAutomation{
@@ -61,7 +60,7 @@ private:
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
 
-    EggHatchFilterTable FILTERS;
+    Pokemon::EggHatchFilterTable FILTERS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;

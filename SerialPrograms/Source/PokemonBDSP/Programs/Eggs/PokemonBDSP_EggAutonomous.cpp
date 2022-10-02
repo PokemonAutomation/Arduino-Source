@@ -142,7 +142,6 @@ bool EggAutonomous::run_batch(
     bool save = false;
     switch (AUTO_SAVING){
     case AutoSave::NoAutoSave:
-        save = false;
         break;
     case AutoSave::AfterStartAndKeep:
         save = saved_state.babies_saved() != current_state.babies_saved();
@@ -200,18 +199,17 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     size_t consecutive_failures = 0;
     while (current_state.babies_saved() < MAX_KEEPERS){
-        if (AUTO_SAVING == AutoSave::NoAutoSave){
-            if (run_batch(env, context, saved_state, current_state)){
-                break;
-            }
-            continue;
-        }
         try{
             if (run_batch(env, context, saved_state, current_state)){
                 break;
             }
             consecutive_failures = 0;
-        }catch (OperationFailedException&){
+        }catch (OperationFailedException& e){
+            // If there is no auto save, then we shouldn't reset to game to lose previous progress.
+            if (AUTO_SAVING == AutoSave::NoAutoSave){
+                throw e;
+            }
+
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 throw OperationFailedException(env.console, "Failed 3 batches in the row.");

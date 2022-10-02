@@ -5,9 +5,13 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSwSh_YCommDetector.h"
 
 #include <iostream>
@@ -17,6 +21,7 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
 
 
 YCommMenuDetector::YCommMenuDetector(bool is_on)
@@ -49,6 +54,69 @@ bool YCommMenuDetector::detect(const ImageViewRGB32& screen){
 bool YCommMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return m_is_on ? detect(frame) : !detect(frame);
 }
+
+
+namespace {
+
+ImageFloatBox YCOMM_ICON_BOX{0.007, 0.944, 0.032, 0.054};
+
+}
+
+class YCommIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    YCommIconMatcher();
+    static const YCommIconMatcher& instance();
+};
+
+
+YCommIconMatcher::YCommIconMatcher()
+    : WaterfillTemplateMatcher(
+        "PokemonSwSh/YComm.png",
+        Color(0,0,255), Color(100, 100, 255), 50
+    )
+{
+    m_aspect_ratio_lower = 0.9;
+    m_aspect_ratio_upper = 1.1;
+    m_area_ratio_lower = 0.9;
+    m_area_ratio_upper = 1.1;
+}
+
+const YCommIconMatcher& YCommIconMatcher::instance(){
+    static YCommIconMatcher matcher;
+    return matcher;
+}
+
+
+YCommIconDetector::YCommIconDetector(bool is_on)
+    : VisualInferenceCallback("YCommIconDetector")
+    , m_is_on(is_on)
+{}
+
+void YCommIconDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, YCOMM_ICON_BOX);
+}
+
+bool YCommIconDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {combine_rgb(0, 0, 255), combine_rgb(100, 100, 255)}
+    };
+
+    const double screen_rel_size = (frame.height() / 1080.0);
+    const size_t min_size = size_t(screen_rel_size * screen_rel_size * 350.0);
+    
+    const bool detected = match_template_by_waterfill(
+        extract_box_reference(frame, YCOMM_ICON_BOX), 
+        YCommIconMatcher::instance(),
+        filters,
+        {min_size, SIZE_MAX},
+        80,
+        [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
+    );
+
+    return m_is_on ? detected : !detected;
+}
+
 
 
 }

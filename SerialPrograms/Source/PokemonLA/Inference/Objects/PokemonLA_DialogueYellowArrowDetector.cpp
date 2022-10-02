@@ -4,9 +4,12 @@
  *
  */
 
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include <stdint.h>
+
+#include "Common/Cpp/AbstractLogger.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonLA_DialogueYellowArrowDetector.h"
 
@@ -18,7 +21,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-using Kernels::Waterfill::WaterfillObject;
+namespace {
+    // This box covers all possible locations of the yellow arrow
+    ImageFloatBox YELLOW_ARROW_BOX{0.720, 0.759, 0.049, 0.128};
+}
+
+class DialogueYellowArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    DialogueYellowArrowMatcher();
+    static const DialogueYellowArrowMatcher& instance();
+};
 
 
 DialogueYellowArrowMatcher::DialogueYellowArrowMatcher()
@@ -46,53 +58,28 @@ DialogueYellowArrowDetector::DialogueYellowArrowDetector(
 )
     : VisualInferenceCallback("DialogueYellowArrowDetector")
     , m_logger(logger)
-    , m_box(0.720, 0.759, 0.049, 0.128)  // This box covers all possible locations of the yellow arrow
     , m_stop_on_detected(stop_on_detected)
 {}
 
 
 void DialogueYellowArrowDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box);
+    items.add(COLOR_RED, YELLOW_ARROW_BOX);
 }
 bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    auto cropped_frame = extract_box_reference(frame, m_box);
-
-    auto matrices = compress_rgb32_to_binary_range(cropped_frame,{
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(160, 160, 0), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 180)},
-    });
-
-    // int count = 0;
-    // for(const auto& matrix : matrices){
-    //     ImageRGB32 output = cropped_frame.copy();
-    //     Kernels::Waterfill::draw_matrix_on_image(matrix, combine_rgb(255, 0, 0), output, 0, 0);
-    //     output.save("test_yellow_arrow_" + std::to_string(count) + ".png");
-    //     count++;
-    // }
-
-    std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
-    Kernels::Waterfill::WaterfillObject object;
-
-    const size_t arrow_min_area = 200;
-    bool detected = false;
-    for(auto& matrix : matrices){
-        session->set_source(matrix);
-        auto finder = session->make_iterator(arrow_min_area);
-        const bool keep_object_matrix = false;
-        while (finder->find_next(object, keep_object_matrix)){
-            double rmsd = DialogueYellowArrowMatcher::instance().rmsd_original(cropped_frame, object);
-            // cout << "rmsd " << rmsd << " area " << object.area << endl;
-            if (rmsd < 80){
-                detected = true;
-                break;
-            }
-        }
-
-        if (detected){
-            break;
-        }
-    }
+    };
+    
+    const bool detected = match_template_by_waterfill(
+        extract_box_reference(frame, YELLOW_ARROW_BOX), 
+        DialogueYellowArrowMatcher::instance(),
+        filters,
+        {200, SIZE_MAX},
+        80,
+        [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
+    );
 
     if (detected){
         m_logger.log("Detected yellow arrow in transparent dialogue box.", COLOR_PURPLE);

@@ -41,6 +41,7 @@ static void collect_egg_mash_out(BotBaseContext& context, bool deposit_automatic
 
 
 //  Fly Home: Used by everything.
+//  Assume the selected app in the menu is Twon Map.
 static void fly_home(BotBaseContext& context, char from_overworld){
     if (from_overworld){
         ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
@@ -49,6 +50,8 @@ static void fly_home(BotBaseContext& context, char from_overworld){
     ssf_press_dpad2(context, DPAD_UP_RIGHT, 25, 5);
     pbf_mash_button(context, BUTTON_A, 480);
 }
+
+//  Assume the selected app in the menu is Twon Map.
 static void fly_home_goto_lady(BotBaseContext& context, char from_overworld){
     fly_home(context, from_overworld);
 
@@ -57,6 +60,8 @@ static void fly_home_goto_lady(BotBaseContext& context, char from_overworld){
     ssf_press_joystick2(context, true, STICK_MIN, STICK_CENTER, 16, 6);
     ssf_press_joystick2(context, true, STICK_CENTER, STICK_MIN, 90, 45);
 }
+
+//  Assume the selected app in the menu is Twon Map.
 static void fly_home_collect_egg(BotBaseContext& context, char from_overworld){
     fly_home_goto_lady(context, from_overworld);
     collect_egg(context);
@@ -68,6 +73,9 @@ static void fly_home_collect_egg(BotBaseContext& context, char from_overworld){
 
 #define EGG_BUTTON_HOLD_DELAY   10
 
+// - From game menu to pokemon storage box
+// - Move cursor to the second pokemon in the party, aka first hatched pokemon in the party
+// - Press button Y two times to change pokemon selection to group selection
 static void menu_to_box(BotBaseContext& context, bool from_map){
     uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
     if (from_map){
