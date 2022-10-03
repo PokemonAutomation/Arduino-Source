@@ -333,11 +333,11 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 if(current_box_value < 15){
                     box_render.add(COLOR_RED, slot_box);
                     box_data[box_nb][i].push_back(std::nullopt); //empty optional to make sorting easier later
-                    ss << "❌ " ;
+                    ss << "\u274c " ;    //  "X"
                 }else{
                     box_render.add(COLOR_GREEN, slot_box);
                     box_data[box_nb][i].push_back(Pokemon{}); //default initialised pokemon to know there is a pokemon here that needs a value
-                    ss << "✅ " ;
+                    ss << "\u2705 " ;    //  checkbox
                 }
             }
             ss << "\n";

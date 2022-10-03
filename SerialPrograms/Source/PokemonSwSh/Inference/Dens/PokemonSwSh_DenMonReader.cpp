@@ -7,7 +7,6 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageMatch/FilterToAlpha.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_DenMonReader.h"

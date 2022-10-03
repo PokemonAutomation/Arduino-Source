@@ -78,8 +78,10 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "Common/Cpp/EnumDatabase.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 
 //#include <opencv2/core.hpp>
 
@@ -122,39 +124,16 @@ using namespace Kernels;
 
 
 
-
-
-//using EnumType = int;
-
-
-
-using ShinyFilter = NintendoSwitch::PokemonSwSh::ShinyFilter;
-
-const EnumDatabase<ShinyFilter>& ShinyFilterDatabase(){
-    static EnumDatabase<ShinyFilter> database({
-        {ShinyFilter::ANYTHING,     "ANYTHING",    "Anything"},
-        {ShinyFilter::NOT_SHINY,    "NOT_SHINY",   "Not Shiny"},
-        {ShinyFilter::ANY_SHINY,    "ANY_SHINY",   "Any Shiny"},
-        {ShinyFilter::STAR_ONLY,    "STAR_ONLY",   "Star Shiny"},
-        {ShinyFilter::SQUARE_ONLY,  "SQUARE_ONLY", "Square Shiny"},
-        {ShinyFilter::NOTHING,      "NOTHING",     "Nothing"},
-    });
-    return database;
-}
-
-
-
-
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
     using namespace Pokemon;
 
-    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+//    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-//    ImageRGB32 image("screenshot-20220814-164611520622.png");
+
+    cout << "\u274c\u2705" << endl;
+
 
 //    SummaryShinySymbolDetector detector;
 
