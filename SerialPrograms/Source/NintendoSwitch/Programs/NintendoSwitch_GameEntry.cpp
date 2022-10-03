@@ -8,11 +8,13 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch_GameEntry.h"
 
 //#include <iostream>
@@ -35,14 +37,85 @@ void move_to_user(BotBaseContext& context, uint8_t user_slot){
     }
 }
 
+
+void open_game_from_home_with_inference(
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    uint16_t start_game_wait
+){
+    context.wait_for_all_requests();
+    {
+        HomeWatcher detector;
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            },
+            { detector }
+        );
+        if (ret == 0){
+            console.log("Detected Home screen.");
+        }else{
+            console.log("Failed to detect Home screen after 10 seconds.", COLOR_RED);
+        }
+        context.wait_for(std::chrono::milliseconds(100));
+    }
+
+    if (game_slot != 0){
+        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
+        for (uint8_t c = 1; c < game_slot; c++){
+            pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
+        }
+        context.wait_for_all_requests();
+    }
+
+    while (true){
+        StartGameUserSelectWatcher detector;
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_A, 20, 3 * TICKS_PER_SECOND);
+            },
+            { detector }
+        );
+        if (ret == 0){
+            console.log("Detected user-select screen.");
+            break;
+        }
+        console.log("Failed to detect user-select screen after 3 seconds. Attempting to dodge possible update window.", COLOR_RED);
+
+        //  Skip the update window and try again.
+        pbf_press_dpad(context, DPAD_UP, 5, 0);
+        context.wait_for_all_requests();
+    }
+
+    //  Wait for screen to stabilize.
+    context.wait_for(std::chrono::milliseconds(100));
+
+    //  Move to user and enter game.
+    move_to_user(context, user_slot);
+    pbf_press_button(context, BUTTON_A, 10, start_game_wait);
+}
+
+
 void open_game_from_home(
-    Logger& logger,
+    ConsoleHandle& console,
     BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
     uint16_t start_game_mash
 ){
+    if (console.video().snapshot()){
+        console.log("open_game_from_home(): Video capture available. Using inference...");
+        open_game_from_home_with_inference(console, context, game_slot, user_slot, start_game_mash);
+        return;
+    }else{
+        console.log("open_game_from_home(): Video capture not available.", COLOR_RED);
+    }
+
     if (game_slot != 0){
         pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
         for (uint8_t c = 1; c < game_slot; c++){
@@ -53,8 +126,8 @@ void open_game_from_home(
     if (tolerate_update_menu){
         if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             throw UserSetupError(
-                logger,
-                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time."
+                console.logger(),
+                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time without video feedback."
             );
         }
 

@@ -34,6 +34,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 
 
 #include <QVideoFrame>
@@ -113,6 +114,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;
+    using namespace NintendoSwitch;
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
@@ -125,10 +127,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    HomeDetector detector;
+    VideoOverlaySet set(overlay);
+    detector.make_overlays(set);
+
+    while (true){
+        cout << detector.detect(feed.snapshot()) << endl;
+        scope.wait_for(std::chrono::milliseconds(200));
+    }
+
+
+
+#if 0
     ImageRGB32 image("screenshot-20220914-071542161921.png");
 
     MountDetector detector;
     cout << MOUNT_STATE_STRINGS[(int)detector.detect(image)] << endl;
+#endif
 
 //    BattleMenuDetector detector(BattleType::STARTER);
 

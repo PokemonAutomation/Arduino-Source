@@ -100,7 +100,8 @@ void reset_game_from_home_with_inference(
     bool backup_save,
     uint16_t post_wait_time
 ){
-    if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
+    bool video_available = console.video().snapshot();
+    if (video_available || ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(context);
         start_game_from_home_with_inference(
             console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
