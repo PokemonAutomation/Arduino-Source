@@ -16,6 +16,8 @@
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
+class QEventLoop;
+
 namespace PokemonAutomation{
     class JsonArray;
     class JsonObject;
@@ -28,6 +30,7 @@ struct DiscordWebhookRequest{
     DiscordWebhookRequest(QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> file);
     DiscordWebhookRequest(QUrl p_url, std::shared_ptr<PendingFileSend> p_file);
 
+    WallClock timestamp = current_time();
     QUrl url;
 
     QByteArray data;
@@ -35,6 +38,8 @@ struct DiscordWebhookRequest{
 };
 
 class DiscordWebhookSender : public QObject{
+    Q_OBJECT
+
     static constexpr auto THROTTLE_DURATION = std::chrono::seconds(1);
     static constexpr size_t MAX_IN_WINDOW = 2;
 
@@ -51,13 +56,16 @@ public:
 
 
 private:
+    void cleanup_stuck_requests();
     void thread_loop();
 
     void process_reply(QNetworkReply* reply);
-    void internal_send_json(const QUrl& url, const QByteArray& data);
-    void internal_send_file(const QUrl& url, const std::string& filename);
-    void internal_send_image_embed(const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename);
+    void internal_send_json(QEventLoop& event_loop, const QUrl& url, const QByteArray& data);
+    void internal_send_file(QEventLoop& event_loop, const QUrl& url, const std::string& filename);
+    void internal_send_image_embed(QEventLoop& event_loop, const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename);
 
+signals:
+    void stop_event_loop();
 
 private:
     TaggedLogger m_logger;
