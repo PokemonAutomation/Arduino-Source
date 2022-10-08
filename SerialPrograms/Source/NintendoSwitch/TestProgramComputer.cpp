@@ -78,8 +78,10 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "Common/Cpp/EnumDatabase.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 
 //#include <opencv2/core.hpp>
 
@@ -144,6 +146,38 @@ const EnumDatabase<ShinyFilter>& ShinyFilterDatabase(){
 
 
 
+class GreyDialogDetector : public VisualInferenceCallback{
+public:
+    GreyDialogDetector()
+        : VisualInferenceCallback("GreyDialogDetector")
+        , m_box0(0.180, 0.815, 0.015, 0.030)
+        , m_box1(0.785, 0.840, 0.030, 0.050)
+    {}
+
+    bool detect(const ImageViewRGB32& screen){
+        extract_box_reference(screen, m_box0).save("test.png");
+        ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
+        if (!is_grey(stats0, 0, 200, 10)){
+            return false;
+        }
+        ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
+        if (!is_grey(stats1, 0, 200, 10)){
+            return false;
+        }
+        return true;
+    }
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        items.add(COLOR_RED, m_box0);
+        items.add(COLOR_RED, m_box1);
+    }
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        return detect(frame);
+    }
+
+private:
+    ImageFloatBox m_box0;
+    ImageFloatBox m_box1;
+};
 
 
 
@@ -154,7 +188,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-//    ImageRGB32 image("screenshot-20220814-164611520622.png");
+
+    {
+        ImageRGB32 image("screenshot-20220922-124058280030.png");
+        GreyDialogDetector detector;
+        cout << detector.detect(image) << endl;
+    }
+
 
 //    SummaryShinySymbolDetector detector;
 

@@ -6,9 +6,6 @@
 
 #include <atomic>
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
-#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
@@ -113,6 +110,7 @@ struct EventNotificationOption::Data{
         , m_tags(false, "Notifs", "")
         , m_rate_limit_seconds(rate_limit.count())
         , m_last_sent(WallClock::min())
+        , m_global_enable(true)
     {}
     Data(
         std::string label,
@@ -129,6 +127,7 @@ struct EventNotificationOption::Data{
         , m_tags(false, tags_to_str(tags), "")
         , m_rate_limit_seconds(rate_limit.count())
         , m_last_sent(WallClock::min())
+        , m_global_enable(true)
     {}
     Data(
         std::string label,
@@ -146,6 +145,7 @@ struct EventNotificationOption::Data{
         , m_tags(false, tags_to_str(tags), "")
         , m_rate_limit_seconds(rate_limit.count())
         , m_last_sent(WallClock::min())
+        , m_global_enable(true)
     {}
 
 
