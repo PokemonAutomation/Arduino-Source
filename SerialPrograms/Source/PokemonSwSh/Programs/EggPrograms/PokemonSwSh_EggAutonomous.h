@@ -9,8 +9,6 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -18,7 +16,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
+// #include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -74,7 +72,7 @@ private:
 
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
-    EggStepCountOption STEPS_TO_HATCH;
+    // EggStepCountOption STEPS_TO_HATCH;
     
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
@@ -100,9 +98,6 @@ private:
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption m_notification_noop;
     EventNotificationsOption NOTIFICATIONS;
-
-    SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SCROLL_TO_READ_DELAY;
 
     // How many pokemon have been kept so far
     size_t m_num_pokemon_kept = 0;

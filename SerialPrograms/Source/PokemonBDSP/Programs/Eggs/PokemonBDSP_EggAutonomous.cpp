@@ -75,13 +75,13 @@ EggAutonomous::EggAutonomous()
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
-        "To collect (unhatched) eggs with the desired stats, set this option to \"Save after every batch\". "
+        "To collect (unhatched) eggs with the desired stats, set this option to \"Save before every batch\". "
         "Then set the Action Table below to \"Stop Program\" on the desired stats. "
         "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
         {
             {AutoSave::NoAutoSave, "none", "No auto-saving. (No error/crash recovery.)"},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
-            {AutoSave::EveryBatch, "every-batch", "Save after every batch. (Allows you to unhatch eggs.)"},
+            {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
         AutoSave::AfterStartAndKeep
     )

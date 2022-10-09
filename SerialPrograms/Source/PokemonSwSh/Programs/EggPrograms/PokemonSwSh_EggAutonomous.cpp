@@ -99,7 +99,7 @@ EggAutonomous::EggAutonomous()
         10, 1, 30
     )
     , LOOPS_PER_FETCH(
-        "<b>Loops Per Fetch:</b><br>Fetch an egg after traveling this many loops on Route 5.",
+        "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
         2, 1
     )
     , NUM_EGGS_IN_COLUMN(
@@ -117,13 +117,13 @@ EggAutonomous::EggAutonomous()
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
-        "To collect (unhatched) eggs with the desired stats, set this option to \"Save after every batch\". "
+        "To collect (unhatched) eggs with the desired stats, set this option to \"Save before every batch\". "
         "Then set the Action Table below to \"Stop Program\" on the desired stats. "
         "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
         {
             {AutoSave::NoAutoSave, "none", "No auto-saving. (No error/crash recovery.)"},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
-            {AutoSave::EveryBatch, "every-batch", "Save after every batch. (Allows you to unhatch eggs.)"},
+            {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
         AutoSave::AfterStartAndKeep
     )
@@ -148,19 +148,10 @@ EggAutonomous::EggAutonomous()
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
-    )
-    , SCROLL_TO_READ_DELAY(
-        "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
-        "Increase this if your video has high latency.",
-        TICKS_PER_SECOND,
-        "125"
-    )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
-    PA_ADD_OPTION(STEPS_TO_HATCH);
+    // PA_ADD_OPTION(STEPS_TO_HATCH);
 
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
@@ -170,8 +161,6 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(NOTIFICATIONS);
-    PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SCROLL_TO_READ_DELAY);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(DEBUG_PROCESSING_HATCHED);
@@ -556,7 +545,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
-            pbf_wait(context, SCROLL_TO_READ_DELAY);
+            pbf_wait(context, 50); // wait for a while to make sure the pokemon stats are loaded.
             context.wait_for_all_requests();
             auto screen = env.console.video().snapshot();
 
