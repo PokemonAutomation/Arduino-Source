@@ -54,6 +54,7 @@ Pokemon::EggHatchGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& sc
         cout << "num_red_pixels: " << num_red_pixels << ", num_blue_pixels: " << num_blue_pixels
              << ", region " << region.width() << " x " << region.height() << endl;
 
+        cout << "Save images to ./red_only.png and ./blue_only.png" << endl;
         red_region.save("./red_only.png");
         blue_region.save("./blue_only.png");
     }
