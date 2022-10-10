@@ -9,12 +9,13 @@
 
 #include <deque>
 #include <set>
-#include "Common/Cpp/ImageResolution.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
 
 namespace PokemonAutomation{
+
+class VideoDisplayWindow;
 
 
 //  Interface for forwarding keyboard commands from the VideoDisplayWidget to
@@ -73,11 +74,13 @@ private:
 class VideoDisplayWidget : public WidgetStackFixedAspectRatio{
 public:
     VideoDisplayWidget(
-        QWidget& parent, size_t id,
+        QWidget& parent, QLayout& holder,
+        size_t id,
         CommandReceiver& command_receiver,
         CameraSession& camera,
         VideoOverlaySession& overlay
     );
+    ~VideoDisplayWidget();
 
     operator bool() const{ return m_video != nullptr; }
     size_t id() const{ return m_id; }
@@ -94,15 +97,15 @@ public:
 protected:
     // Override QWidget::mouseDoubleClickEvent().
     // When double click, call move_to_new_window() to move to a new window to be ready for full screen.
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
+    QLayout& m_holder;
     const size_t m_id;
     CommandReceiver& m_command_receiver;
     VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay = nullptr;
-
-    bool m_popped_out;
+    std::unique_ptr<VideoDisplayWindow> m_window;
 };
 
 

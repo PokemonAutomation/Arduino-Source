@@ -9,9 +9,9 @@
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -119,17 +119,18 @@ void WidgetStackFixedAspectRatio::resizeEvent(QResizeEvent* event){
 
 
 VideoDisplayWidget::VideoDisplayWidget(
-    QWidget& parent, size_t id,
+    QWidget& parent, QLayout& holder,
+    size_t id,
     CommandReceiver& command_receiver,
     CameraSession& camera,
     VideoOverlaySession& overlay
 )
     : WidgetStackFixedAspectRatio(parent, WidgetStackFixedAspectRatio::ADJUST_HEIGHT_TO_WIDTH)
+    , m_holder(holder)
     , m_id(id)
     , m_command_receiver(command_receiver)
     , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
-    , m_popped_out(false)
 {
     this->add_widget(*m_video);
     this->add_widget(*m_overlay);
@@ -143,6 +144,10 @@ VideoDisplayWidget::VideoDisplayWidget(
     m_overlay->setHidden(false);
     m_overlay->raise();
 }
+VideoDisplayWidget::~VideoDisplayWidget(){
+    //  Close the window popout first since it holds references to this class.
+    m_window.reset();
+}
 
 
 
@@ -152,7 +157,7 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
 //    }
     // If this widget is not already inside a VideoDisplayWindow, move it
     // into a VideoDisplayWindow
-    if (!m_popped_out){
+    if (!m_window){
         move_to_new_window();
     }else{
         QWidget::mouseDoubleClickEvent(event);
@@ -160,18 +165,22 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
 }
 
 void VideoDisplayWidget::move_to_new_window(){
+    if (m_window){
+        return;
+    }
     // The constructor of VideoDisplayWindow handles the transfer of this VideoDisplayWidget to the new window.
     // The constructor also displays the window.
     // So there is nothing else to do in VideoDisplayWidget::move_to_new_window() besides building VideoDisplayWindow.
-    m_popped_out = true;
-//    this->setMinimumHeight(0);
-//    this->setMaximumHeight(QWIDGETSIZE_MAX);
     this->set_size_policy(EXPAND_TO_BOX);
-    new VideoDisplayWindow(this);
+    m_window.reset(new VideoDisplayWindow(this));
 }
 void VideoDisplayWidget::move_back_from_window(){
-    m_popped_out = false;
+    if (!m_window){
+        return;
+    }
     this->set_size_policy(ADJUST_HEIGHT_TO_WIDTH);
+    m_holder.addWidget(this);
+    m_window.reset();
 }
 
 

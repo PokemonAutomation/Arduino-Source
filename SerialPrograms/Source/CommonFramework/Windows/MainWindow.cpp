@@ -18,6 +18,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
 #include "PanelLists.h"
+#include "WindowTracker.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
 
@@ -181,7 +182,7 @@ MainWindow::~MainWindow(){
 
 
 void MainWindow::closeEvent(QCloseEvent* event){
-    m_output_window->close();
+    close_all_windows();
     QMainWindow::closeEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
@@ -247,6 +248,8 @@ void MainWindow::on_idle(){
         m_settings->setEnabled(true);
     }
 }
+
+
 
 
 

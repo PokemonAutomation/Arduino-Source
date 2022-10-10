@@ -7,6 +7,7 @@
 #include <QLayout>
 #include <QMainWindow>
 #include <QResizeEvent>
+#include "CommonFramework/Windows/WindowTracker.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
@@ -18,10 +19,9 @@ namespace PokemonAutomation{
 
 
 VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
-    : QMainWindow(display_widget->parentWidget())
-    , m_display_widget(display_widget)
+    : m_display_widget(display_widget)
 {
-    m_display_widget->setParent(this);
+//    m_display_widget->setParent(this);
     setWindowTitle("Console: " + QString::number(m_display_widget->id()));
 
 //    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -39,71 +39,38 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     this->activateWindow(); // bring the window to front on Windows
 
     setFocusPolicy(Qt::StrongFocus);
-
-//    this->showFullScreen();
-
-#if 0
-    connect(
-        m_display_widget, &VideoDisplayWidget::on_size_change,
-        this, [this](QSize size){
-            cout << size.width() << " x " << size.height() << endl;
-//            if (size.height() < this->height()){
-//                this->resize(size);
-//            }
-        },
-        Qt::QueuedConnection
-    );
-#endif
+    add_window(*this);
+}
+VideoDisplayWindow::~VideoDisplayWindow(){
+    remove_window(*this);
+    close();
 }
 
-//QSize VideoDisplayWindow::sizeHint() const{
-//    return m_display_widget->size();
-//}
 void VideoDisplayWindow::changeEvent(QEvent* event){
     QMainWindow::changeEvent(event);
-//    if (event->type() != QEvent::WindowStateChange){
-//        QMainWindow::changeEvent(event);
-//        return;
-//    }
-//    QWindowStateChangeEvent* change_event = static_cast<QWindowStateChangeEvent*>(event);
     if (this->windowState() == Qt::WindowMaximized){
         this->showFullScreen();
 //        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
     }
 }
 void VideoDisplayWindow::closeEvent(QCloseEvent* event){
-    QWidget* parent = this->parentWidget();
-    m_display_widget->setParent(parent);
-    if (parent->layout()){
-        parent->layout()->addWidget(m_display_widget);
-    }
-    m_display_widget->move_back_from_window();
+    close();
     QMainWindow::closeEvent(event);
 }
 
 void VideoDisplayWindow::resizeEvent(QResizeEvent* event){
     QMainWindow::resizeEvent(event);
-//    m_display_widget->resize_to_box(this->size());
-//    this->resize(m_display_widget->size());
-//    cout << this->width() << " x " << this->height() << endl;
-#if 0
-    QMetaObject::invokeMethod(this, [this]{
-        this->resize(m_display_widget->size());
-//        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
-//        cout << "Window Widget: " << this->width() << " x " << this->height() << endl;
-    }, Qt::QueuedConnection);
-#endif
 }
 
+void VideoDisplayWindow::close(){
+    if (m_display_widget == nullptr){
+        return;
+    }
+    m_display_widget->move_back_from_window();
+    m_display_widget = nullptr;
+}
 void VideoDisplayWindow::exit_full_screen(){
     this->showNormal();
-#if 0
-    QMetaObject::invokeMethod(this, [this]{
-        this->resize(m_normal_size);
-//        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
-//        cout << "Window Widget: " << this->width() << " x " << this->height() << endl;
-    }, Qt::QueuedConnection);
-#endif
 }
 
 void VideoDisplayWindow::mouseDoubleClickEvent(QMouseEvent* event){
@@ -121,24 +88,27 @@ void VideoDisplayWindow::keyPressEvent(QKeyEvent* event){
         exit_full_screen();
         return;
     }
-
-    if (m_display_widget->command_receiver().key_press(event)){
+    if (m_display_widget && m_display_widget->command_receiver().key_press(event)){
         return;
     }
     QWidget::keyPressEvent(event);
 }
 void VideoDisplayWindow::keyReleaseEvent(QKeyEvent* event){
-    if (m_display_widget->command_receiver().key_release(event)){
+    if (m_display_widget && m_display_widget->command_receiver().key_release(event)){
         return;
     }
     QWidget::keyReleaseEvent(event);
 }
 void VideoDisplayWindow::focusInEvent(QFocusEvent* event){
-    m_display_widget->command_receiver().focus_in(event);
+    if (m_display_widget){
+        m_display_widget->command_receiver().focus_in(event);
+    }
     QWidget::focusInEvent(event);
 }
 void VideoDisplayWindow::focusOutEvent(QFocusEvent* event){
-    m_display_widget->command_receiver().focus_out(event);
+    if (m_display_widget){
+        m_display_widget->command_receiver().focus_out(event);
+    }
     QWidget::focusOutEvent(event);
 }
 

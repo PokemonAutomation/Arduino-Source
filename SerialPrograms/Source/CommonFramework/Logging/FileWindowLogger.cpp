@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include "CommonFramework/Windows/DpiScaler.h"
+#include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
 
 namespace PokemonAutomation{
@@ -158,8 +159,10 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     m_logger += *this;
     log("================================================================================");
     log("<b>Window Startup...</b>");
+    add_window(*this);
 }
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
+    remove_window(*this);
     m_logger -= *this;
 }
 

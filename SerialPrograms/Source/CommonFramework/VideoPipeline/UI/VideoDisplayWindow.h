@@ -12,8 +12,6 @@
 
 namespace PokemonAutomation{
 
-class VideoDisplayWidget;
-
 namespace NintendoSwitch{
     class SwitchSystemWidget;
 }
@@ -30,7 +28,7 @@ public:
     // VideoDisplayWindow.
     // The constructor then displays the window.
     VideoDisplayWindow(VideoDisplayWidget* display_widget);
-    virtual ~VideoDisplayWindow() = default;
+    ~VideoDisplayWindow();
 
 private:
 //    virtual QSize sizeHint() const override;
@@ -49,6 +47,7 @@ private:
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 
+    void close();
     void exit_full_screen();
 
     VideoDisplayWidget* m_display_widget;

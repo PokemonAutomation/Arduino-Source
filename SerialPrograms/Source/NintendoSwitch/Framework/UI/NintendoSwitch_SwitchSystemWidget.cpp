@@ -57,22 +57,28 @@ SwitchSystemWidget::SwitchSystemWidget(
 
     QWidget* widget = new QWidget(m_group_box);
     m_group_box->set_widget(widget);
-    QVBoxLayout* group_layout = new QVBoxLayout(widget);
-    group_layout->setAlignment(Qt::AlignTop);
-    group_layout->setContentsMargins(0, 0, 0, 0);
-
     {
+        QVBoxLayout* group_layout = new QVBoxLayout(widget);
+        group_layout->setAlignment(Qt::AlignTop);
+        group_layout->setContentsMargins(0, 0, 0, 0);
+
         m_serial_widget = new SerialPortWidget(*this, m_session.serial_session(), m_session.logger());
         group_layout->addWidget(m_serial_widget);
 
+        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
+        layout->addWidget(m_audio_display);
+
+        QVBoxLayout* video_holder = new QVBoxLayout();
+        layout->addLayout(video_holder);
+        video_holder->setContentsMargins(0, 0, 0, 0);
         m_video_display = new VideoDisplayWidget(
-            *this,
+            *this, *video_holder,
             m_session.console_number(),
             *this,
             m_session.camera_session(),
             m_session.overlay_session()
         );
-        m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
+        video_holder->addWidget(m_video_display);
 
         m_camera_widget = new CameraSelectorWidget(m_session.camera_session(), m_session.logger(), *m_video_display);
         group_layout->addWidget(m_camera_widget);
@@ -87,9 +93,6 @@ SwitchSystemWidget::SwitchSystemWidget(
         );
         group_layout->addWidget(m_command);
     }
-
-    layout->addWidget(m_audio_display);
-    layout->addWidget(m_video_display);
 
     setFocusPolicy(Qt::StrongFocus);
 

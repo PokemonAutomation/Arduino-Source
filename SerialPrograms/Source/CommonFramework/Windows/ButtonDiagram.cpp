@@ -11,6 +11,7 @@
 //#include <QGraphicsView>
 //#include <QGraphicsPixmapItem>
 #include "CommonFramework/Globals.h"
+#include "WindowTracker.h"
 #include "ButtonDiagram.h"
 
 #include <iostream>
@@ -40,6 +41,10 @@ ButtonDiagram::ButtonDiagram(QWidget& parent)
 //    image_label->setFixedSize(800, 600);
 
     resize(800, 600);
+    add_window(*this);
+}
+ButtonDiagram::~ButtonDiagram(){
+    remove_window(*this);
 }
 
 void ButtonDiagram::resizeEvent(QResizeEvent*){

@@ -272,6 +272,7 @@ SOURCES += \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/DpiScaler.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
+    Source/CommonFramework/Windows/WindowTracker.cpp \
     Source/ComputerPrograms/ComputerProgram.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
@@ -1037,6 +1038,7 @@ HEADERS += \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \
+    Source/CommonFramework/Windows/WindowTracker.h \
     Source/ComputerPrograms/ComputerProgram.h \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \

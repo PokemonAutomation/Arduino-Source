@@ -12,6 +12,7 @@ namespace PokemonAutomation{
 class ButtonDiagram : public QMainWindow{
 public:
     ButtonDiagram(QWidget& parent);
+    ~ButtonDiagram();
 
 private:
     void resizeEvent(QResizeEvent*);

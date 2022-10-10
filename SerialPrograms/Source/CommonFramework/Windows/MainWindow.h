@@ -8,6 +8,7 @@
 #define PokemonAutomation_MainWindow_H
 
 #include <QMainWindow>
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "PanelLists.h"
 
@@ -31,7 +32,6 @@ private:
 
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) override;
     virtual void load_panel(std::unique_ptr<PanelInstance> panel) override;
-public: //  Make private.
     virtual Logger& raw_logger() override{ return global_logger_raw(); }
 private:
     virtual void on_busy() override;
@@ -52,6 +52,8 @@ private:
 
     std::unique_ptr<FileWindowLoggerWindow> m_output_window;
 };
+
+
 
 
 }

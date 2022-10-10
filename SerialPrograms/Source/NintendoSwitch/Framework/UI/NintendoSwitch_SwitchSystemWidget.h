@@ -75,7 +75,7 @@ private:
 
     SerialPortWidget* m_serial_widget = nullptr;
 
-    VideoDisplayWidget* m_video_display;
+    VideoDisplayWidget* m_video_display = nullptr;
     AudioDisplayWidget* m_audio_display;
 
     CommandRow* m_command;
