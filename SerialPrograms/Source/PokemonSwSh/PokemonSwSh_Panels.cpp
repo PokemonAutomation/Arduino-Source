@@ -47,6 +47,7 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+#include "Programs/RNG/PokemonSwSh_Seedfinder.h"
 
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
@@ -180,6 +181,7 @@ std::vector<PanelEntry> make_panels(){
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- RNG ----");
         ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
+        ret.emplace_back(make_single_switch_program<Seedfinder_Descriptor, Seedfinder>());
     }
 
     ret.emplace_back("---- Multi-Switch Programs ----");
