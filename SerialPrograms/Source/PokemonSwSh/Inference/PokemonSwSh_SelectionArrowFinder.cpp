@@ -131,17 +131,17 @@ int8_t BattleMoveArrowFinder::arrow_slot(double y_center){
 
 
 RetrieveEggArrowFinder::RetrieveEggArrowFinder(VideoOverlay& overlay)
-    : SelectionArrowFinder(overlay, ImageFloatBox(0.639, 0.607, 0.066, 0.121))
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.597, 0.640, 0.166, 0.071))
 {}
 
 
 CheckNurseryArrowFinder::CheckNurseryArrowFinder(VideoOverlay& overlay)
-    : SelectionArrowFinder(overlay, ImageFloatBox(0.429, 0.537, 0.121, 0.150))
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.419, 0.570, 0.260, 0.084))
 {}
 
 
 StoragePokemonMenuArrowFinder::StoragePokemonMenuArrowFinder(VideoOverlay& overlay)
-    : SelectionArrowFinder(overlay, ImageFloatBox(0.597, 0.382, 0.068, 0.119))
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.555, 0.413, 0.177, 0.078))
 {}
 
 
