@@ -1380,7 +1380,7 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
-    Source/PokemonSwSh/Imference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
+    Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \

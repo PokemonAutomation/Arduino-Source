@@ -157,12 +157,12 @@ RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
 }
 
 int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
-    for(size_t i_row = 0; i_row < 2; i_row++){
-        for(size_t j_col = 0; j_col < 5; j_col++){
+    for (size_t i_row = 0; i_row < 2; i_row++){
+        for (size_t j_col = 0; j_col < 5; j_col++){
 		    ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
             std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, box));
             if (arrows.size() > 0){
-                return i_row * 5 + j_col;
+                return (int)(i_row * 5 + j_col);
             }
         }
     }
