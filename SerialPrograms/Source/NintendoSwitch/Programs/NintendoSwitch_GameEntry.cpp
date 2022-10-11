@@ -106,15 +106,20 @@ void start_game_from_home_with_inference(
     }
 
     while (true){
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        context.wait_for_all_requests();
+
         StartGameUserSelectWatcher detector;
         UpdateMenuWatcher update_menu(false);
-        int ret = run_until(
+        int ret = wait_until(
             console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_A, 20, 3 * TICKS_PER_SECOND);
-            },
+            std::chrono::seconds(3),
             { detector, update_menu }
         );
+
+        //  Wait for screen to stabilize.
+        context.wait_for(std::chrono::milliseconds(100));
+
         if (ret == 0){
             console.log("Detected user-select screen.");
             break;
@@ -129,9 +134,6 @@ void start_game_from_home_with_inference(
         pbf_press_dpad(context, DPAD_UP, 5, 0);
         context.wait_for_all_requests();
     }
-
-    //  Wait for screen to stabilize.
-    context.wait_for(std::chrono::milliseconds(100));
 
     //  Move to user and enter game.
     move_to_user(context, user_slot);

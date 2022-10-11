@@ -172,7 +172,13 @@ void StartGameUserSelectWatcher::make_overlays(VideoOverlaySet& items) const{
     StartGameUserSelectDetector::make_overlays(items);
 }
 bool StartGameUserSelectWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return StartGameUserSelectDetector::detect(frame);
+    if (StartGameUserSelectDetector::detect(frame)){
+        m_consecutive_detections++;
+        return m_consecutive_detections >= 5;
+    }else{
+        m_consecutive_detections = 0;
+        return false;
+    }
 }
 
 
