@@ -6,15 +6,16 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_BoxShinySymbolDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -30,6 +31,9 @@ void BoxShinySymbolDetector::make_overlays(VideoOverlaySet& items){
 
 bool BoxShinySymbolDetector::detect(const ImageViewRGB32& screen){
     const ImageStats symbol = image_stats(extract_box_reference(screen, SHINY_BOX));
+    if (PreloadSettings::debug().COLOR_CHECK){
+        cout << "Symbol region stddev " << symbol.stddev.to_string() << " (sum " << symbol.stddev.sum() << "), threshold: 50" << endl;
+    }
     return symbol.stddev.sum() > 50;
 }
 
