@@ -156,7 +156,7 @@ void run_autohost(
     AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
     roll_den(
-        context,
+        console, context,
         enter_online_den_delay,
         open_online_den_lobby_delay,
         skips,
@@ -223,7 +223,7 @@ void run_autohost(
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        context, console,
+        console, context,
         host_online,
         accept_FR_slot,
         lobby_wait_delay

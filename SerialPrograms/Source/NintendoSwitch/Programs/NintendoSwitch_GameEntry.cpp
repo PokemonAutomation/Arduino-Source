@@ -25,6 +25,40 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+void resume_game_from_home(ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_HOME, 10, 10);
+    context.wait_for_all_requests();
+
+    while (true){
+        UpdateMenuWatcher detector(false);
+        int ret = wait_until(
+            console, context,
+            std::chrono::milliseconds(500),
+            { detector }
+        );
+        if (ret < 0){
+            return;
+        }
+
+        console.log("Detected update window.", COLOR_RED);
+
+        pbf_press_dpad(context, DPAD_UP, 5, 0);
+        pbf_press_button(context, BUTTON_A, 10, 500);
+        context.wait_for_all_requests();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 void move_to_user(BotBaseContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
@@ -38,7 +72,7 @@ void move_to_user(BotBaseContext& context, uint8_t user_slot){
 }
 
 
-void open_game_from_home_with_inference(
+void start_game_from_home_with_inference(
     ConsoleHandle& console,
     BotBaseContext& context,
     uint8_t game_slot,
@@ -73,18 +107,23 @@ void open_game_from_home_with_inference(
 
     while (true){
         StartGameUserSelectWatcher detector;
+        UpdateMenuWatcher update_menu(false);
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_A, 20, 3 * TICKS_PER_SECOND);
             },
-            { detector }
+            { detector, update_menu }
         );
         if (ret == 0){
             console.log("Detected user-select screen.");
             break;
         }
-        console.log("Failed to detect user-select screen after 3 seconds. Attempting to dodge possible update window.", COLOR_RED);
+        if (ret == 1){
+            console.log("Detected update menu.", COLOR_RED);
+        }else{
+            console.log("Failed to detect user-select screen after 3 seconds. Attempting to dodge possible update window.", COLOR_RED);
+        }
 
         //  Skip the update window and try again.
         pbf_press_dpad(context, DPAD_UP, 5, 0);
@@ -100,7 +139,7 @@ void open_game_from_home_with_inference(
 }
 
 
-void open_game_from_home(
+void start_game_from_home(
     ConsoleHandle& console,
     BotBaseContext& context,
     bool tolerate_update_menu,
@@ -110,7 +149,7 @@ void open_game_from_home(
 ){
     if (console.video().snapshot()){
         console.log("open_game_from_home(): Video capture available. Using inference...");
-        open_game_from_home_with_inference(console, context, game_slot, user_slot, start_game_mash);
+        start_game_from_home_with_inference(console, context, game_slot, user_slot, start_game_mash);
         return;
     }else{
         console.log("open_game_from_home(): Video capture not available.", COLOR_RED);
@@ -162,9 +201,9 @@ void open_game_from_home(
 
 
 
-class LoadingDetector : public VisualInferenceCallback{
+class GameLoadingDetector : public VisualInferenceCallback{
 public:
-    LoadingDetector(bool invert)
+    GameLoadingDetector(bool invert)
         : VisualInferenceCallback("LoadingDetector")
         , m_box0(0.2, 0.2, 0.6, 0.1)
         , m_box1(0.2, 0.7, 0.6, 0.1)
@@ -199,7 +238,7 @@ bool openedgame_to_gamemenu(
 ){
     {
         console.log("Waiting to load game...");
-        LoadingDetector detector(false);
+        GameLoadingDetector detector(false);
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
@@ -212,7 +251,7 @@ bool openedgame_to_gamemenu(
     }
     {
         console.log("Waiting for game menu...");
-        LoadingDetector detector(true);
+        GameLoadingDetector detector(true);
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),

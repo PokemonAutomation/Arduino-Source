@@ -50,6 +50,7 @@ private:
     ImageFloatBox m_bottom_row;
     ImageFloatBox m_bottom_icons;
     ImageFloatBox m_top_row;
+    ImageFloatBox m_mid_row;
     ImageFloatBox m_user_slot;
 };
 class StartGameUserSelectWatcher : public StartGameUserSelectDetector, public VisualInferenceCallback{
@@ -58,6 +59,37 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 };
+
+
+
+class UpdateMenuDetector : public StaticScreenDetector{
+public:
+    UpdateMenuDetector();
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_mid;
+    ImageFloatBox m_top;
+    ImageFloatBox m_left;
+    ImageFloatBox m_bottom_solid;
+    ImageFloatBox m_bottom_buttons;
+};
+class UpdateMenuWatcher : public UpdateMenuDetector, public VisualInferenceCallback{
+public:
+    UpdateMenuWatcher(bool invert);
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    bool m_invert;
+};
+
+
+
+
 
 
 

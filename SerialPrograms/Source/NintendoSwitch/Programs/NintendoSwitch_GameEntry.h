@@ -14,7 +14,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void open_game_from_home(
+void resume_game_from_home(ConsoleHandle& console, BotBaseContext& context);
+
+
+void start_game_from_home(
     ConsoleHandle& console,
     BotBaseContext& context,
     bool tolerate_update_menu,

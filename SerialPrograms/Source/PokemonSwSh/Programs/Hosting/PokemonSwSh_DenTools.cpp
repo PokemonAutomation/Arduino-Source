@@ -7,8 +7,10 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -87,7 +89,7 @@ void enter_lobby(BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, 
 
 
 void roll_den(
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
@@ -105,11 +107,18 @@ void roll_den(
         roll_date_forward_1(context, false);
 
         //  Enter game
-        settings_to_enter_game_den_lobby(
-            context,
-            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
-            GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
-        );
+        if (console.video().snapshot()){
+            console.log("Entering game using inference...");
+            pbf_press_button(context, BUTTON_HOME, 10, 90);
+            NintendoSwitch::resume_game_from_home(console, context);
+        }else{
+            console.log("Entering game without inference...", COLOR_RED);
+            settings_to_enter_game_den_lobby(
+                context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
+                GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
+            );
+        }
 
         //  Exit Raid
         ssf_press_button2(context, BUTTON_B, 120, 50);

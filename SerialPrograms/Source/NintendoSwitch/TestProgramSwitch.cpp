@@ -127,7 +127,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    HomeDetector detector;
+    StartGameUserSelectDetector detector;
+    VideoOverlaySet set(overlay);
+    detector.make_overlays(set);
+    cout << detector.detect(ImageRGB32("test.png")) << endl;
+
+#if 0
     VideoOverlaySet set(overlay);
     detector.make_overlays(set);
 
@@ -135,6 +140,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         cout << detector.detect(feed.snapshot()) << endl;
         scope.wait_for(std::chrono::milliseconds(200));
     }
+#endif
 
 
 

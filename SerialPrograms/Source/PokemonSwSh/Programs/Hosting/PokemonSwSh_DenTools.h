@@ -20,7 +20,7 @@ void enter_den(BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool wa
 void enter_lobby(BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability);
 
 void roll_den(
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability

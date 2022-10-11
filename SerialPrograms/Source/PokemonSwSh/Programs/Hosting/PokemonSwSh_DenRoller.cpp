@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
@@ -120,12 +121,16 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     }
 
     rollback_date_from_home(context, SKIPS);
-    resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    if (env.console.video().snapshot()){
+        NintendoSwitch::resume_game_from_home(env.console, context);
+    }else{
+        resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    }
 
 
     std::shared_ptr<const ImageRGB32> screen;
     while (true){
-        roll_den(context, 0, 0, SKIPS, CATCHABILITY);
+        roll_den(env.console, context, 0, 0, SKIPS, CATCHABILITY);
 
         size_t desired_index = FILTER.index();
         std::string desired_slug = FILTER.slug();

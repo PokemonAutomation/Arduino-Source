@@ -82,7 +82,7 @@ void start_game_from_home_with_inference(
     bool backup_save,
     uint16_t post_wait_time
 ){
-    open_game_from_home(
+    NintendoSwitch::start_game_from_home(
         console,
         context,
         tolerate_update_menu,

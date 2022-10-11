@@ -6,7 +6,10 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_Commands_AutoHosts.h"
@@ -37,7 +40,7 @@ void home_to_add_friends(
     );
 }
 void accept_FRs(
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
@@ -56,11 +59,18 @@ void accept_FRs(
     pbf_mash_button(context, BUTTON_A, auto_fr_duration);
 
     //  Return to Switch Home menu. (or game)
-    settings_to_enter_game_den_lobby(
-        context,
-        tolerate_system_update_window_slow, false,
-        GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
-    );
+    if (console.video().snapshot()){
+        console.log("Entering game using inference...");
+        pbf_press_button(context, BUTTON_HOME, 10, 190);
+        NintendoSwitch::resume_game_from_home(console, context);
+    }else{
+        console.log("Entering game without inference...", COLOR_RED);
+        settings_to_enter_game_den_lobby(
+            context,
+            tolerate_system_update_window_slow, false,
+            GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
+        );
+    }
     pbf_wait(context, 300);
 }
 

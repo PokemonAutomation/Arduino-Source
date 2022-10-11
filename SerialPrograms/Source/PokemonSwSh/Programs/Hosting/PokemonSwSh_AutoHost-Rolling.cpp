@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -157,7 +159,11 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
     }
     rollback_date_from_home(context, SKIPS);
-    resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    if (env.console.video().snapshot()){
+        NintendoSwitch::resume_game_from_home(env.console, context);
+    }else{
+        resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    }
 
     for (uint32_t raids = 0;; raids++){
         env.log("Raids Attempted: " + tostr_u_commas(raids));

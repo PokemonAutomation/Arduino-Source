@@ -22,8 +22,7 @@ namespace PokemonSwSh{
 
 
 static RaidLobbyState raid_lobby_wait(
-    BotBaseContext& context,
-    ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay
@@ -40,7 +39,7 @@ static RaidLobbyState raid_lobby_wait(
 
     if (HOST_ONLINE && accept_FR_slot > 0){
         accept_FRs(
-            context,
+            console, context,
             accept_FR_slot - 1, true,
             GAME_TO_HOME_DELAY_SAFE,
             AUTO_FR_DURATION,
@@ -60,7 +59,7 @@ static RaidLobbyState raid_lobby_wait(
                 break;
             }
             accept_FRs(
-                context,
+                console, context,
                 accept_FR_slot - 1, false,
                 GAME_TO_HOME_DELAY_SAFE,
                 AUTO_FR_DURATION,

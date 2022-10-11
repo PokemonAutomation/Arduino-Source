@@ -10,6 +10,7 @@
 #include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -26,7 +27,7 @@ void home_to_add_friends(
     bool fix_cursor
 );
 void accept_FRs(
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
