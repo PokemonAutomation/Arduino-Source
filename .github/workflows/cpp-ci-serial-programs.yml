@@ -72,10 +72,10 @@ jobs:
           qt_arch_path: gcc_64
           qt_modules: '-m qtmultimedia qtserialport'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: Arduino-Source
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         repository: 'PokemonAutomation/Packages'
         path: Packages
