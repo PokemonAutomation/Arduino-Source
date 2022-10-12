@@ -119,7 +119,7 @@ jobs:
         robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries libcrypto-1_1-x64.dll libssl-1_1-x64.dll Sleepy.dll tesseractPA.dll
         robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
         exit 0
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs for windows (${{ matrix.qt_version }})
