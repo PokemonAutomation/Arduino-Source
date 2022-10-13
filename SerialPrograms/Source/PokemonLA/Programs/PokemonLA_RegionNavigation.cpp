@@ -13,9 +13,10 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
 #include "PokemonLA_RegionNavigation.h"
 
@@ -510,29 +511,7 @@ void goto_Mai_from_camp(
 }
 
 void goto_professor(Logger& logger, BotBaseContext& context, const TravelLocation& location){
-
-    Camp camp = Camp::FIELDLANDS_FIELDLANDS;
-
-    switch (location.region){
-    case MapRegion::FIELDLANDS:
-        camp = Camp::FIELDLANDS_FIELDLANDS;
-        break;
-    case MapRegion::MIRELANDS:
-        camp = Camp::MIRELANDS_MIRELANDS;
-        break;
-    case MapRegion::COASTLANDS:
-        camp = Camp::COASTLANDS_BEACHSIDE;
-        break;
-    case MapRegion::HIGHLANDS:
-        camp = Camp::HIGHLANDS_HIGHLANDS;
-        break;
-    case MapRegion::ICELANDS:
-        camp = Camp::ICELANDS_SNOWFIELDS;
-        break;
-    default:
-        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Invalid region.");
-    }
-
+    Camp camp = map_region_default_camp(location.region);
     goto_professor(logger, context, camp);
 }
 

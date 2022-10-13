@@ -7,6 +7,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
@@ -22,6 +23,7 @@ namespace PokemonLA{
 
 
 void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context, TimeOfDay target_time, Camp camp){
+    console.overlay().add_log_text("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
     // Move to the tent
     switch (camp)
     {
@@ -92,8 +94,15 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
     console.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time
-    for(int i = 0; i < (int)target_time; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 30, 70);
+
+    int num_movements = (int)target_time;
+    DpadPosition dpad_dir = DPAD_DOWN;
+    if (target_time == TimeOfDay::MIDNIGHT){
+        num_movements = 2;
+        dpad_dir = DPAD_UP;
+    }
+    for(int i = 0; i < num_movements; i++){
+        pbf_press_dpad(context, dpad_dir, 30, 70);
     }
 
     // Press A to start resting

@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"

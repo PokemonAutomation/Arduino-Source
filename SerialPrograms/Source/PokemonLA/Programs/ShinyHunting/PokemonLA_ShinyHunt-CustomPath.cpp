@@ -16,6 +16,7 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
+#include "PokemonLA/Programs/PokemonLA_TimeOfDayChange.h"
 #include "PokemonLA_ShinyHunt-CustomPath.h"
 
 //#include <iostream>
@@ -63,7 +64,15 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath_Descriptor::make_stats() const
 
 
 ShinyHuntCustomPath::ShinyHuntCustomPath()
-    : TEST_PATH(
+    : TIME_OF_DAY(
+        "<b>Time of Day:</b>Reset time of day if <b>Reset Method</b> is Soft Reset. Use this to only hunt " + STRING_POKEMON
+        + " at day or night, or to avoid visual inference errors on white snow at daytime."
+    )
+    , RUNS_PER_TIME_RESET(
+        "<b>How Many Runs Before Resetting Time of Day:</b>To avoid too much time spent on resetting time of day, reset only every several runs.",
+        5, 1
+    )
+    , TEST_PATH(
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
@@ -91,6 +100,8 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 //    PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(PATH);
     PA_ADD_OPTION(RESET_METHOD);
+    PA_ADD_OPTION(TIME_OF_DAY);
+    PA_ADD_OPTION(RUNS_PER_TIME_RESET);
     PA_ADD_OPTION(TEST_PATH);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
@@ -268,14 +279,19 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         return;
     }
 
+    // How many runs so far after last time reset
+    uint32_t time_reset_run_count = 0;
+
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             stats.attempts++;
 
-            goto_camp_from_jubilife(env, env.console, context, PATH.travel_location());
+            const TravelLocation location = PATH.travel_location();
+            goto_camp_from_jubilife(env, env.console, context, location);
             run_path(env, context);
+            ++time_reset_run_count;
 
             if(RESET_METHOD == ResetMethod::SoftReset){
                 env.console.log("Resetting by closing the game.");
@@ -284,12 +300,23 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             }else{
                 env.console.log("Resetting by going to village.");
                 goto_camp_from_overworld(env, env.console, context);
-                goto_professor(env.console.logger(), context, PATH.travel_location());
+
+                // Now we are at this camp
+                const Camp camp = map_region_default_camp(location.region);
+                TimeOfDay target_time = TIME_OF_DAY;
+                if (target_time != TimeOfDay::NONE && time_reset_run_count >= RUNS_PER_TIME_RESET){
+                    env.log("Reset time to " + TIME_OF_DAY_NAMES[int(target_time)]);
+                    change_time_of_day_at_tent(env.console, context, target_time, camp);
+                    // Reset location again since we now are at the tent, not the camp warp spot
+                    goto_camp_from_overworld(env, env.console, context);
+                }
+                goto_professor(env.console.logger(), context, camp);
                 from_professor_return_to_jubilife(env, env.console, context);
             }
 
         }catch (OperationFailedException&){
             stats.errors++;
+            time_reset_run_count = 0;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }

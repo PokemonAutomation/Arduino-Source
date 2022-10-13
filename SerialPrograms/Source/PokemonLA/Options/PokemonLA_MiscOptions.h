@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_MiscOptions_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "PokemonLA/PokemonLA_WeatherAndTime.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -77,6 +78,24 @@ public:
                 {ExitBattleMethod::MashAToKill, "mash-a-to-kill", "Mash A to Kill"},
             },
             ExitBattleMethod::RunAway
+        )
+    {}
+};
+
+
+class TimeOfDayOption : public EnumDropdownOption<TimeOfDay>{
+public:
+    TimeOfDayOption(std::string label = "<b>Time of Day:</b>")
+        : EnumDropdownOption<TimeOfDay>(
+            label,
+            {
+                {TimeOfDay::NONE,     TIME_OF_DAY_NAMES[int(TimeOfDay::NONE)], "None"},
+                {TimeOfDay::MORNING,  TIME_OF_DAY_NAMES[int(TimeOfDay::MORNING)], "Morning"},
+                {TimeOfDay::MIDDAY,   TIME_OF_DAY_NAMES[int(TimeOfDay::MIDDAY)], "Midday"},
+                {TimeOfDay::EVENING,  TIME_OF_DAY_NAMES[int(TimeOfDay::EVENING)], "Evening"},
+                {TimeOfDay::MIDNIGHT, TIME_OF_DAY_NAMES[int(TimeOfDay::MIDNIGHT)], "Midnight"},
+            },
+            TimeOfDay::NONE
         )
     {}
 };

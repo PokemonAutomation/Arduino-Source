@@ -12,6 +12,7 @@
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA_MountChange.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA_RegionNavigation.h"
 #include "PokemonLA_BattleRoutines.h"
 #include "PokemonLA_LeapPokemonActions.h"

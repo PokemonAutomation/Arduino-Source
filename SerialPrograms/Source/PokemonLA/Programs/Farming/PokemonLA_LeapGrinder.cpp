@@ -4,11 +4,13 @@
  *
  */
 
+#include "ClientSource/Connection/BotBase.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"

@@ -48,6 +48,9 @@ enum class Camp{
 // Return true if the region is fieldlands, mirelands, coastlands, highlands or icelands.
 bool is_wild_land(MapRegion region);
 
+// Get the first camp of the region, which is the default camp when warping on the region map.
+Camp map_region_default_camp(MapRegion region);
+
 
 
 

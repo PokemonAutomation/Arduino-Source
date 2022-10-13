@@ -55,6 +55,9 @@ private:
 
     ResetMethodOption RESET_METHOD;
 
+    TimeOfDayOption TIME_OF_DAY;
+    SimpleIntegerOption<uint32_t> RUNS_PER_TIME_RESET;
+
     BooleanCheckBoxOption TEST_PATH;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
