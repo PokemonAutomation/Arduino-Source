@@ -136,7 +136,7 @@ RetrieveEggArrowFinder::RetrieveEggArrowFinder(VideoOverlay& overlay)
 
 
 CheckNurseryArrowFinder::CheckNurseryArrowFinder(VideoOverlay& overlay)
-    : SelectionArrowFinder(overlay, ImageFloatBox(0.419, 0.570, 0.260, 0.084))
+    : SelectionArrowFinder(overlay, ImageFloatBox(0.419, 0.570, 0.290, 0.084))
 {}
 
 
