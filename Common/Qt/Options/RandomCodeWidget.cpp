@@ -70,6 +70,7 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
             int read = text.toInt();
             RaidCodeOption code = m_value;
             code.m_random_digits = read;
+            m_under_text->setText(QString::fromStdString(sanitized_code(text.toStdString())));
             m_value.set(code);
         }
     );
@@ -78,6 +79,7 @@ RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
         this, [this](const QString& text){
             RaidCodeOption code = m_value;
             code.m_code = text.toStdString();
+            m_under_text->setText(QString::fromStdString(sanitized_code(text.toStdString())));
             m_value.set(code);
         }
     );

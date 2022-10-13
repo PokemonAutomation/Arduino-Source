@@ -63,6 +63,9 @@ TextEditOption::operator std::string() const{
 void TextEditOption::set(std::string x){
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (m_data->m_current == x){
+            return;
+        }
         m_data->m_current = std::move(x);
     }
     push_update();

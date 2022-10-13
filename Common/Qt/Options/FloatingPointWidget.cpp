@@ -58,11 +58,6 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
                 palette.setColor(QPalette::Text, Qt::red);
             }
             this->setPalette(palette);
-
-            if (current == m_value){
-                return;
-            }
-
             m_value.set(current);
         }
     );

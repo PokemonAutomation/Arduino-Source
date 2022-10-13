@@ -76,6 +76,9 @@ std::string FixedCodeOption::set(std::string x){
     }
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (m_data->m_current == x){
+            return std::string();
+        }
         m_data->m_current = std::move(x);
     }
     push_update();

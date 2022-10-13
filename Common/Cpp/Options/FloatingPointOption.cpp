@@ -74,6 +74,9 @@ FloatingPointCell::operator double() const{
 
 std::string FloatingPointCell::set(double x){
     std::string err = check_validity(x);
+    if ((double)*this == x){
+        return err;
+    }
     if (err.empty()){
         m_data->m_current.store(x, std::memory_order_relaxed);
         push_update();

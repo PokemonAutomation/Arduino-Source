@@ -27,6 +27,8 @@ public:
     bool code_enabled() const;
     bool get_code(uint8_t* code) const;
 
+    bool operator==(const RaidCodeOption& x) const;
+
 //private:
     size_t m_digits;
     size_t m_random_digits;

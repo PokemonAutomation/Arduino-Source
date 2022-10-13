@@ -66,6 +66,12 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
     }
     return true;
 }
+bool RaidCodeOption::operator==(const RaidCodeOption& x) const{
+    return
+        m_digits == x.m_digits &&
+        m_random_digits == x.m_random_digits &&
+        m_code == x.m_code;
+}
 
 
 struct RandomCodeOption::Data{
@@ -151,12 +157,15 @@ RandomCodeOption::operator RaidCodeOption() const{
     return m_data->m_current;
 }
 std::string RandomCodeOption::set(RaidCodeOption code){
-//    std::string error = code.check_validity();
-//    if (!error.empty()){
-//        return error;
-//    }
+    std::string error = code.check_validity();
+    if (!error.empty()){
+        return error;
+    }
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (m_data->m_current == code){
+            return std::string();
+        }
         m_data->m_current = code;
     }
     push_update();
