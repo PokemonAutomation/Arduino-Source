@@ -306,6 +306,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
                 TimeOfDay target_time = TIME_OF_DAY;
                 if (target_time != TimeOfDay::NONE && time_reset_run_count >= RUNS_PER_TIME_RESET){
                     env.log("Reset time to " + TIME_OF_DAY_NAMES[int(target_time)]);
+                    time_reset_run_count = 0;
                     change_time_of_day_at_tent(env.console, context, target_time, camp);
                     // Reset location again since we now are at the tent, not the camp warp spot
                     goto_camp_from_overworld(env, env.console, context);
