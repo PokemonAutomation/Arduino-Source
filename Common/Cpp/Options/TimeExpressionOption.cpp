@@ -210,9 +210,13 @@ template <typename Type>
 std::string TimeExpressionCell<Type>::set(std::string text){
     Data& data = *m_data;
     Type value = 0;
-    std::string error = data.process(text, value);
+    std::string error;
     {
         SpinLockGuard lg(data.m_lock);
+        if (data.m_current == text){
+            return std::string();
+        }
+        error = data.process(text, value);
         data.m_current = std::move(text);
         data.m_value = value;
         data.m_error.clear();

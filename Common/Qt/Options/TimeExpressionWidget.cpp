@@ -79,11 +79,24 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
     seconds->setAlignment(Qt::AlignHCenter);
     row1->addWidget(seconds);
 
+#if 0
     connect(
         m_box, &QLineEdit::textChanged,
         this, [this, seconds](const QString& text){
 //           cout << text.toStdString() << endl;
             std::string error = m_value.set(text.toStdString());
+            if (error.empty()){
+                seconds->setText(QString::fromStdString(m_value.time_string()));
+            }else{
+                seconds->setText(QString::fromStdString("<font color=\"red\">" + error + "</font>"));
+            }
+        }
+    );
+#endif
+    connect(
+        m_box, &QLineEdit::editingFinished,
+        this, [this, seconds](){
+            std::string error = m_value.set(m_box->text().toStdString());
             if (error.empty()){
                 seconds->setText(QString::fromStdString(m_value.time_string()));
             }else{

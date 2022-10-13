@@ -169,7 +169,9 @@ std::vector<PanelEntry> make_panels(){
     ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
     ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
-    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    }
     ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
     if (PreloadSettings::instance().NAUGHTY_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());

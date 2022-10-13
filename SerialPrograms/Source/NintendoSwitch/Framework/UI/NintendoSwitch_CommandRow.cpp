@@ -94,14 +94,14 @@ bool CommandRow::on_key_release(Qt::Key key){
 }
 
 void CommandRow::set_focus(bool focused){
+    if (!focused){
+        clear_state();
+    }
     if (m_last_known_focus == focused){
         return;
     }
     m_last_known_focus = focused;
     update_ui();
-    if (!focused){
-        clear_state();
-    }
 }
 
 void CommandRow::update_ui(){
