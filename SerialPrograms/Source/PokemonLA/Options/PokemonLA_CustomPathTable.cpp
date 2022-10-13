@@ -93,7 +93,7 @@ CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
     , move_forward_ticks("Ticks to Move:", 0)
     , move_speed(PathSpeed_Database(), PathSpeed::NORMAL_SPEED)
     , left_x("x: [left: -1.0, right: 1.0]", 0, -1.0, 1.0)
-    , left_y("y: [forward: -1.0, backward: 1.0]", 0, -1.0, 1.0)
+    , left_y("y: [backward: -1.0, forward: 1.0]", 0, -1.0, 1.0)
     , jump_wait_ticks("Ticks after jump:", 0)
     , wait_ticks("Ticks:", 0)
 {
