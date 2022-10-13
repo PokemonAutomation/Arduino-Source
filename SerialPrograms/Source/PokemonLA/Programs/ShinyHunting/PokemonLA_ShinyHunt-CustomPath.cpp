@@ -65,11 +65,11 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath_Descriptor::make_stats() const
 
 ShinyHuntCustomPath::ShinyHuntCustomPath()
     : TIME_OF_DAY(
-        "<b>Time of Day:</b>Reset time of day if <b>Reset Method</b> is Soft Reset. Use this to only hunt " + STRING_POKEMON
+        "<b>Time of Day:</b><br>Reset time of day if <b>Reset Method</b> is Soft Reset. Use this to only hunt " + STRING_POKEMON
         + " at day or night, or to avoid visual inference errors on white snow at daytime."
     )
     , RUNS_PER_TIME_RESET(
-        "<b>How Many Runs Before Resetting Time of Day:</b>To avoid too much time spent on resetting time of day, reset only every several runs.",
+        "<b>How Many Runs Before Resetting Time of Day:</b><br>To avoid too much time spent on resetting time of day, reset only every several runs.",
         5, 1
     )
     , TEST_PATH(
