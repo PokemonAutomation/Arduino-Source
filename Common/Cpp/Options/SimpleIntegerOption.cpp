@@ -101,11 +101,15 @@ SimpleIntegerCell<Type>::operator Type() const{
 template <typename Type>
 std::string SimpleIntegerCell<Type>::set(Type x){
     std::string err = check_validity(x);
-    if (err.empty()){
-        m_data->m_current.store(x, std::memory_order_relaxed);
-        push_update();
+    if (!err.empty()){
+        return err;
     }
-    return err;
+    if ((Type)*this == x){
+        return std::string();
+    }
+    m_data->m_current.store(x, std::memory_order_relaxed);
+    push_update();
+    return std::string();
 }
 template <typename Type>
 void SimpleIntegerCell<Type>::load_json(const JsonValue& json){
