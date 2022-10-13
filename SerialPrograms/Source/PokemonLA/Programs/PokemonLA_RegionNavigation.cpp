@@ -237,8 +237,13 @@ void goto_camp_from_jubilife(
     mash_A_to_change_region(env, console, context);
 
     if (location.warp_sub_slot == 0){
+        // The destination is a camp.
+        // No need to do a warp in the region.
         return;
     }
+
+    // The destination is not a camp.
+    // It's a settlement or arena that requires another warp:
 
     //  Open the map.
     pbf_press_button(context, BUTTON_MINUS, 20, 30);
@@ -277,7 +282,8 @@ void goto_camp_from_jubilife(
     }
     pbf_wait(context, 50);
     for (size_t c = 0; c < location.warp_sub_slot; c++){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+        const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
+        pbf_press_dpad(context, dir, 20, 30);
     }
     pbf_mash_button(context, BUTTON_A, 125);
 
@@ -446,7 +452,8 @@ void goto_any_camp_from_overworld(
                     }
                 }
                 for (size_t c = 0; c < location.warp_sub_slot; c++){
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                    const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
+                    pbf_press_dpad(context, dir, 20, 30);
                 }
                 pbf_mash_button(context, BUTTON_A, 125);
                 break;

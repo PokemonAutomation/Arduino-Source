@@ -20,13 +20,15 @@ TravelLocation::TravelLocation(
     const char* p_slug, const char* p_display,
     MapRegion p_region,
     uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-    std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver
+    std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver,
+    bool p_reverse_sub_menu_direction
 )
     : slug(p_slug)
     , display(p_display)
     , region(p_region)
     , warp_slot(p_warp_slot)
     , warp_sub_slot(p_warp_sub_slot)
+    , reverse_sub_menu_direction(p_reverse_sub_menu_direction)
     , post_arrival_maneuver(std::move(p_post_arrival_maneuver))
 {}
 
@@ -85,7 +87,7 @@ TravelLocations::TravelLocations()
     , Mirelands_Arena(
         "mirelands-arena",
         "Crimson Mirelands - Brava Arena",
-        MapRegion::MIRELANDS, 0, 3, nullptr
+        MapRegion::MIRELANDS, 0, 2, nullptr, true
     )
 
     , Coastlands_Beachside(
@@ -131,7 +133,7 @@ TravelLocations::TravelLocations()
     , Highlands_Arena(
         "highlands-arena",
         "Coronet Highlands - Moonview Arena",
-        MapRegion::HIGHLANDS, 0, 3, nullptr
+        MapRegion::HIGHLANDS, 0, 2, nullptr, true
     )
 
     , Icelands_Snowfields(
@@ -152,7 +154,7 @@ TravelLocations::TravelLocations()
     , Icelands_Arena(
         "icelands-arena",
         "Alabaster Icelands - Icepeak Arena",
-        MapRegion::ICELANDS, 0, 3, nullptr
+        MapRegion::ICELANDS, 0, 2, nullptr, true
     )
 {
     add_location(Fieldlands_Fieldlands);
