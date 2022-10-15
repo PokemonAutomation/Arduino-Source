@@ -86,7 +86,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.log("Rolling back!");
             pbf_press_button(context, BUTTON_B, 5, 5);
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
-            home_roll_date_enter_game_autorollback(context, &year);
+            home_roll_date_enter_game_autorollback(env.console, context, year);
             pbf_mash_button(context, BUTTON_B, MASH_B_DURATION);
 
             // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
@@ -130,7 +130,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         // Skip frame
         env.log("#### Skip frame");
-        home_roll_date_enter_game_autorollback(context, &year);
+        home_roll_date_enter_game_autorollback(env.console, context, year);
         pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
 
         // Get rid of new jobs notification by entering Poke Jobs and leaving immediately

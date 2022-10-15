@@ -20,6 +20,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+using namespace Pokemon;
+
 
 class ShinyHuntAutonomousBerryTree_Descriptor : public SingleSwitchProgramDescriptor{
 public:

@@ -279,6 +279,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/Environment_x86_Windows.tpp
     Source/CommonFramework/Environment/HardwareValidation.cpp
     Source/CommonFramework/Environment/HardwareValidation.h
+    Source/CommonFramework/Environment/HardwareValidation_x86.tpp
     Source/CommonFramework/GlobalSettingsPanel.cpp
     Source/CommonFramework/GlobalSettingsPanel.h
     Source/CommonFramework/Globals.cpp

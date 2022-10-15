@@ -6,6 +6,8 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_Messages_DateSpam.h"
 
@@ -33,20 +35,21 @@ void roll_date_backward_N(BotBaseContext& context, uint8_t skips, bool fast){
         DeviceRequest_roll_date_backward_N(skips, fast)
     );
 }
-void home_roll_date_enter_game_autorollback(BotBaseContext& context, uint8_t* year){
+void home_roll_date_enter_game_autorollback(ConsoleHandle& console, BotBaseContext& context, uint8_t& year){
     //  This version automatically handles the 2060 roll-back.
-    if (*year >= MAX_YEAR){
-        home_roll_date_enter_game(context, true);
-        *year = 0;
+    if (year >= MAX_YEAR){
+        home_roll_date_enter_game(console, context, true);
+        year = 0;
     }else{
-        home_roll_date_enter_game(context, false);
+        home_roll_date_enter_game(console, context, false);
     }
-    (*year)++;
+    year++;
 }
-void home_roll_date_enter_game(BotBaseContext& context, bool rollback_year){
+void home_roll_date_enter_game(ConsoleHandle& console, BotBaseContext& context, bool rollback_year){
     context.issue_request(
         DeviceRequest_home_roll_date_enter_game(rollback_year)
     );
+    resume_game_from_home(console, context, true);
 }
 void touch_date_from_home(BotBaseContext& context, uint16_t settings_to_home_delay){
     context.issue_request(

@@ -11,17 +11,25 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+using namespace Pokemon;
+
 
 class BerryFarmer2_Descriptor : public SingleSwitchProgramDescriptor {
 public:
     BerryFarmer2_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
@@ -32,8 +40,7 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
-    enum Rustling
-    {
+    enum Rustling{
         No,
         Slow,
         Fast,
@@ -50,6 +57,11 @@ private:
 
     SimpleIntegerOption<uint32_t> FETCH_ATTEMPTS;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
+
+    EncounterBotLanguage LANGUAGE;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
+
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;

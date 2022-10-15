@@ -26,8 +26,14 @@ namespace NintendoSwitch{
 
 
 
-void resume_game_from_home(ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_HOME, 10, 10);
+void resume_game_from_home(
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    bool skip_home_press
+){
+    if (!skip_home_press){
+        pbf_press_button(context, BUTTON_HOME, 10, 10);
+    }
     context.wait_for_all_requests();
 
     while (true){

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -34,6 +35,25 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+class BerryFarmer2_Descriptor::Stats : public ShinyHuntTracker{
+public:
+    Stats()
+        : ShinyHuntTracker(true)
+        , attempts(m_stats["Attempts"])
+        , shakes(m_stats["Shakes"])
+    {
+        m_display_order.insert(m_display_order.begin() + 0, Stat("Attempts"));
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Shakes"));
+    }
+
+public:
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& shakes;
+};
+
+std::unique_ptr<StatsTracker> BerryFarmer2_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 
 
@@ -52,6 +72,15 @@ BerryFarmer2::BerryFarmer2()
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
         0
     )
+    , ENCOUNTER_BOT_OPTIONS(false, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -87,6 +116,10 @@ BerryFarmer2::BerryFarmer2()
     PA_ADD_OPTION(FETCH_ATTEMPTS);
     PA_ADD_OPTION(SAVE_ITERATIONS);
 
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
+
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(START_BATTLE_TIMEOUT);
@@ -97,7 +130,9 @@ BerryFarmer2::BerryFarmer2()
 }
 
 
-BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
+
     // wait some time in order to not detect rustling from previous fetch attempt
     pbf_wait(context, 80);
     context.wait_for_all_requests();
@@ -124,18 +159,18 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     Rustling result = Rustling::No;
     int ret = run_until(
         env.console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             pbf_wait(context, RUSTLING_TIMEOUT);
             context.wait_for_all_requests();
         },
         { {initial_rustling_detector}, {battle_menu_detector}, {start_battle_detector} }
-        );
-
-    if (ret == 0) {
+    );
+    switch (ret){
+    case 0:{
         env.console.log("BerryFarmer: Initial Rustling detected.");
         WallClock initial_rustling_time = current_time();
         result = Rustling::Slow;
-        
+
         int ret1 = run_until(
             env.console, context,
             [&](BotBaseContext& context) {
@@ -143,27 +178,52 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
                 context.wait_for_all_requests();
             },
             { {secondary_rustling_detector} }
-            );
+        );
 
-        if (ret1 == 0) {
+        if (ret1 == 0){
             env.console.log("BerryFarmer: Secondary Rustling detected.");
             WallClock secondary_rustling_time = current_time();
-            if (std::chrono::duration_cast<Milliseconds>(secondary_rustling_time - initial_rustling_time).count() <= RUSTLING_INTERVAL) {
+            if (std::chrono::duration_cast<Milliseconds>(secondary_rustling_time - initial_rustling_time).count() <= RUSTLING_INTERVAL){
                 result = Rustling::Fast;
             }
         }
-
+        break;
     }
-    else if (ret == 1) {
-        env.console.log("BerryFarmer: Battle Menu detected!");
+    case 1:
+        env.log("Unexpected battle menu.", COLOR_RED);
+        stats.add_error();
+        env.update_stats();
+        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
         result = Rustling::Battle;
-    } 
-    else if (ret == 2) {
+        break;
+    case 2:{
         env.console.log("BerryFarmer: Battle Start detected.");
-        wait_until(env.console, context, std::chrono::seconds(START_BATTLE_TIMEOUT), { battle_menu_detector });
+//        wait_until(env.console, context, std::chrono::seconds(START_BATTLE_TIMEOUT), { battle_menu_detector });
+
+        //  Detect shiny.
+        ShinyDetectionResult encounter_result = detect_shiny_battle(
+            env.console, context,
+            SHINY_BATTLE_REGULAR,
+            std::chrono::seconds(30)
+        );
+
+        StandardEncounterHandler handler(
+            env, env.console, context,
+            LANGUAGE,
+            ENCOUNTER_BOT_OPTIONS,
+            stats
+        );
+
+        bool stop = handler.handle_standard_encounter_end_battle(encounter_result, EXIT_BATTLE_TIMEOUT);
+        if (stop){
+            throw ProgramFinishedException();
+        }
+
         result = Rustling::Battle;
+        break;
     }
-    else {
+    default:
         result = Rustling::No;
     }
         
@@ -171,7 +231,9 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     return result;
 }
 
-uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling) {
+uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling){
+    BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
+
     uint8_t no_rustling = (rustling == Rustling::No) ? 1 : 0;
     Rustling current_rustling = rustling;
     uint16_t attempts = 0;
@@ -181,6 +243,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
         pbf_mash_button(context, BUTTON_ZL, 240);
         pbf_mash_button(context, BUTTON_B, 10);
         attempts++;
+        stats.shakes++;
 
         current_rustling = check_rustling(env, context);
 
@@ -201,9 +264,9 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     }
     if (current_rustling == Rustling::Battle) {
         pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-        env.console.log("BerryFarmer: Running away!");
-        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
-        context.wait_for_all_requests();
+        env.console.log("Clearing dialog boxes...");
+//        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+//        context.wait_for_all_requests();
     }
     return attempts;
 }
@@ -211,29 +274,32 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
 void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-    }
-    else {
+    }else {
         pbf_press_button(context, BUTTON_B, 5, 5);
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
+    BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
+
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
     uint32_t c = 0;
-    while (c < FETCH_ATTEMPTS) {
+    while (c < FETCH_ATTEMPTS){
+        env.update_stats();
         uint16_t iteration_attempts = 1;
+        stats.attempts++;
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         
-        home_roll_date_enter_game_autorollback(context, &year);
+        home_roll_date_enter_game_autorollback(env.console, context, year);
         // Interact with the tree
         pbf_mash_button(context, BUTTON_ZL, 375);
         pbf_mash_button(context, BUTTON_B, 10);
+        stats.shakes++;
 
         // Rustling after the first fetch attempt
         Rustling current_rustling = check_rustling(env, context);
         
-        switch (current_rustling)
-        {
+        switch (current_rustling){
         case Rustling::Battle:
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
@@ -252,7 +318,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         c += iteration_attempts;
 
-        if (SAVE_ITERATIONS != 0) {
+        if (SAVE_ITERATIONS != 0){
             save_count += iteration_attempts;
             if (save_count >= SAVE_ITERATIONS){
                 save_count = 0;

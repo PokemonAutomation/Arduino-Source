@@ -67,7 +67,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     for (uint32_t c = 0; c < SKIPS; c++){
         env.log("Fetch Attempts: " + tostr_u_commas(c));
 
-        home_roll_date_enter_game_autorollback(context, &year);
+        home_roll_date_enter_game_autorollback(env.console, context, year);
         pbf_mash_button(context, BUTTON_B, 90);
 
         pbf_press_button(context, BUTTON_A, 5, 5);
