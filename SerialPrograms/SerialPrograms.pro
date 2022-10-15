@@ -347,6 +347,10 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
+    Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
+    Source/NintendoSwitch/DevPrograms/PathMaker.cpp \
+    Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
+    Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp \
@@ -380,9 +384,6 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
-    Source/NintendoSwitch/TestPathMaker.cpp \
-    Source/NintendoSwitch/TestProgramComputer.cpp \
-    Source/NintendoSwitch/TestProgramSwitch.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
@@ -1132,6 +1133,10 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
+    Source/NintendoSwitch/DevPrograms/BoxDraw.h \
+    Source/NintendoSwitch/DevPrograms/PathMaker.h \
+    Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
+    Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/FixedInterval.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
@@ -1167,9 +1172,6 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
-    Source/NintendoSwitch/TestPathMaker.h \
-    Source/NintendoSwitch/TestProgramComputer.h \
-    Source/NintendoSwitch/TestProgramSwitch.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \

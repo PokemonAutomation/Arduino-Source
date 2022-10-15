@@ -18,11 +18,12 @@
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
 #include "Programs/NintendoSwitch_FriendDelete.h"
 
-#include "TestProgramComputer.h"
-#include "TestProgramSwitch.h"
+#include "DevPrograms/BoxDraw.h"
+#include "DevPrograms/PathMaker.h"
+#include "DevPrograms/TestProgramComputer.h"
+#include "DevPrograms/TestProgramSwitch.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
-#include "NintendoSwitch/TestPathMaker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -49,11 +50,12 @@ std::vector<PanelEntry> make_panels(){
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<BoxDraw_Descriptor, BoxDraw>());
+        ret.emplace_back(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
-        ret.emplace_back(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
     }
 
     return ret;

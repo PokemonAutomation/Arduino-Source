@@ -687,6 +687,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
+    Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
+    Source/NintendoSwitch/DevPrograms/BoxDraw.h
+    Source/NintendoSwitch/DevPrograms/PathMaker.cpp
+    Source/NintendoSwitch/DevPrograms/PathMaker.h
+    Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
+    Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
+    Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
+    Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h
     Source/NintendoSwitch/FixedInterval.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
@@ -755,12 +763,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
-    Source/NintendoSwitch/TestPathMaker.cpp
-    Source/NintendoSwitch/TestPathMaker.h
-    Source/NintendoSwitch/TestProgramComputer.cpp
-    Source/NintendoSwitch/TestProgramComputer.h
-    Source/NintendoSwitch/TestProgramSwitch.cpp
-    Source/NintendoSwitch/TestProgramSwitch.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp

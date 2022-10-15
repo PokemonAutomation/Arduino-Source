@@ -6,7 +6,7 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Options/TestPathMakerTable.h"
-#include "TestPathMaker.h"
+#include "PathMaker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -14,8 +14,8 @@ namespace NintendoSwitch{
 
 TestPathMaker_Descriptor::TestPathMaker_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "Path Maker Test",
-        "Test", "Path Maker Test",
+        "NintendoSwitch:PathMaker",
+        "Nintendo Switch", "Path Maker",
         "",
         "Create paths to test routes",
         FeedbackType::NONE, false,
