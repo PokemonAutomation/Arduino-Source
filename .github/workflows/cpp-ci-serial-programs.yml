@@ -9,11 +9,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-22.04]
+        os: [windows-2022, macos-12, ubuntu-22.04]
         qt_version: ['5.12.12', '6.3.2']
         include:
         # Windows / Qt 5.12.12
-        - os: windows-latest
+        - os: windows-2022
           qt_version: '5.12.12'
           qt_version_major: '5'
           host: 'windows'
@@ -23,7 +23,7 @@ jobs:
           qt_modules: ''
 
         # Windows / Qt 6.3.2
-        - os: windows-latest
+        - os: windows-2022
           qt_version: '6.3.2'
           qt_version_major: '6'
           host: 'windows'
@@ -33,7 +33,7 @@ jobs:
           qt_modules: '-m qtmultimedia qtserialport'
           
         # Mac / Qt 5.12.12
-        - os: macos-latest
+        - os: macos-12
           qt_version: '5.12.12'
           qt_version_major: '5'
           host: 'mac'
@@ -43,7 +43,7 @@ jobs:
           qt_modules: ''
           
         # Mac / Qt 6.3.2
-        - os: macos-latest
+        - os: macos-12
           qt_version: '6.3.2'
           qt_version_major: '6'
           host: 'mac'
@@ -119,7 +119,7 @@ jobs:
         robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries libcrypto-1_1-x64.dll libssl-1_1-x64.dll Sleepy.dll tesseractPA.dll
         robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
         exit 0
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs for windows (${{ matrix.qt_version }})
