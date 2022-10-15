@@ -54,25 +54,25 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggAutonomous.md",
         "Automatically fetch+hatch eggs and keep all shinies.",
         FeedbackType::REQUIRED, false,
-        PABotBaseLevel::PABOTBASE_12KB
+        PABotBaseLevel::PABOTBASE_31KB
     )
 {}
 
 class EggAutonomous_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-    : m_hatched(m_stats["Eggs Hatched"])
-    , m_errors(m_stats["Errors"])
-    , m_fetch_attempts(m_stats["Fetch Attempts"])
-    , m_fetch_success(m_stats["Fetch Success"])
-    , m_shinies(m_stats["Shinies"])
-{
-    m_display_order.emplace_back("Eggs Hatched");
-    m_display_order.emplace_back("Errors", true);
-    m_display_order.emplace_back("Fetch Attempts");
-    m_display_order.emplace_back("Fetch Success");
-    m_display_order.emplace_back("Shinies");
-}
+        : m_hatched(m_stats["Eggs Hatched"])
+        , m_errors(m_stats["Errors"])
+        , m_fetch_attempts(m_stats["Fetch Attempts"])
+        , m_fetch_success(m_stats["Fetch Success"])
+        , m_shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Eggs Hatched");
+        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Fetch Attempts");
+        m_display_order.emplace_back("Fetch Success");
+        m_display_order.emplace_back("Shinies");
+    }
 
     std::atomic<uint64_t>& m_hatched;
     std::atomic<uint64_t>& m_errors;
