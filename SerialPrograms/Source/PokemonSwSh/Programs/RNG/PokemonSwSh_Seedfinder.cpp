@@ -91,10 +91,10 @@ void Seedfinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             state.s0 = std::stoull(STATE_0, nullptr, 16);
             state.s1 = std::stoull(STATE_1, nullptr, 16);
         }
-        catch (std::invalid_argument) {
+        catch (std::invalid_argument&) {
             throw UserSetupError(env.console, "State is invalid.");
         }
-        catch (std::out_of_range) {
+        catch (std::out_of_range&) {
             throw UserSetupError(env.console, "State is invalid. Are there any extra characters?");
         }
 
