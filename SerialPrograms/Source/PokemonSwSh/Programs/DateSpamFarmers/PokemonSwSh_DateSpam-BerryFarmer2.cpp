@@ -39,15 +39,15 @@ class BerryFarmer2_Descriptor::Stats : public ShinyHuntTracker{
 public:
     Stats()
         : ShinyHuntTracker(true)
-        , attempts(m_stats["Attempts"])
+        , days(m_stats["Days"])
         , shakes(m_stats["Shakes"])
     {
-        m_display_order.insert(m_display_order.begin() + 0, Stat("Attempts"));
+        m_display_order.insert(m_display_order.begin() + 0, Stat("Days"));
         m_display_order.insert(m_display_order.begin() + 1, Stat("Shakes"));
     }
 
 public:
-    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& days;
     std::atomic<uint64_t>& shakes;
 };
 
@@ -260,6 +260,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
         pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME);
         pbf_mash_button(context, BUTTON_B, 10);
         attempts++;
+        stats.shakes++;
         current_rustling = check_rustling(env, context);
     }
     if (current_rustling == Rustling::Battle) {
@@ -287,10 +288,10 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     while (c < FETCH_ATTEMPTS){
         env.update_stats();
         uint16_t iteration_attempts = 1;
-        stats.attempts++;
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         
         home_roll_date_enter_game_autorollback(env.console, context, year);
+        stats.days++;
         // Interact with the tree
         pbf_mash_button(context, BUTTON_ZL, 375);
         pbf_mash_button(context, BUTTON_B, 10);
