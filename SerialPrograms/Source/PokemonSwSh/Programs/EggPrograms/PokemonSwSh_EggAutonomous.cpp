@@ -476,7 +476,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     YCommIconDetector dialog_over_detector(y_comm_visible_at_end_of_dialog);
     if (ret == 0){
         ++num_eggs_retrieved;
-        env.log("Found agg");
+        env.log("Found egg");
         env.console.overlay().add_log_text("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
         stats.m_fetch_success++;
         env.update_stats();
@@ -491,7 +491,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             {{dialog_over_detector}}
         );
     } else if (ret == 1){
-        env.log("No agg");
+        env.log("No egg");
         env.console.overlay().add_log_text("No egg", COLOR_WHITE);
         run_until(
             env.console, context,
