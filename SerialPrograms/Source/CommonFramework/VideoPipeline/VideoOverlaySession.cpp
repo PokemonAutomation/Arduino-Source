@@ -13,7 +13,7 @@ namespace {
 const float log_xmin = 0.025f;
 const float log_width = 0.35f;
 const size_t log_max_lines = 20;
-const float log_font_size = 30.0f;
+const float log_font_size = 4.0f;
 const float log_line_spacing = 0.04f;
 const float log_x_border = 0.009f;
 const float log_y_border = 0.016f;

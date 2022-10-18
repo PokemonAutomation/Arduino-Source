@@ -135,7 +135,9 @@ struct OverlayText {
     float x;
     // y coordinate of the text start, range: 0.0-1.0.
     float y;
-    // Font point size.
+    // Font point size. This value is relative to the video overlay widget height. So you can
+    // set it without considering overlay widget resolution.
+    // Value of 4.0 gives a large, comfortable font size while not too large to clutter the screen.
     float font_size;
     // Text color.
     Color color;
