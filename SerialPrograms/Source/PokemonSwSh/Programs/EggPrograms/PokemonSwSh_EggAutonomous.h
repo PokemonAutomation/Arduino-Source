@@ -92,6 +92,7 @@ private:
     Pokemon::EggHatchFilterTable FILTERS;
 
     BooleanCheckBoxOption DEBUG_PROCESSING_HATCHED;
+    BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;
@@ -99,12 +100,14 @@ private:
     EventNotificationOption m_notification_noop;
     EventNotificationsOption NOTIFICATIONS;
 
-    // How many pokemon have been kept so far
+    // How many pokemon have been kept so far. These pokemon are shiny or met certain stats requirement.
     size_t m_num_pokemon_kept = 0;
 
     // How many eggs have been placed behind a game save.
     // This is used so that if we recover from an error, we know how many eggs are in storage.
     size_t m_num_eggs_in_storage_when_game_saved = 0;
+    // How many eggs are already deposited to storage so far.
+    size_t m_num_eggs_retrieved = 0;
 
     // Is player's location at the bike loop start
     bool m_player_at_loop_start = false;
