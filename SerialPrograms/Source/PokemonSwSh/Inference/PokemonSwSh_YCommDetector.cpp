@@ -99,7 +99,7 @@ void YCommIconDetector::make_overlays(VideoOverlaySet& items) const{
 bool YCommIconDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
 
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(0, 0, 255), combine_rgb(100, 100, 255)}
+        {combine_rgb(0, 0, 150), combine_rgb(100, 100, 255)}
     };
 
     const double screen_rel_size = (frame.height() / 1080.0);
@@ -110,7 +110,7 @@ bool YCommIconDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
         YCommIconMatcher::instance(),
         filters,
         {min_size, SIZE_MAX},
-        80,
+        120,
         [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
     );
 

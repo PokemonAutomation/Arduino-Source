@@ -44,6 +44,20 @@ const size_t POKEMON_APP_INDEX = 1;
 // We assume Town Map app is always at row 1, col 0
 const size_t TOWN_MAP_APP_INDEX = 5;
 
+
+void wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
+    context.wait_for_all_requests();
+    const bool y_comm_visible = true;
+    YCommIconDetector end_egg_hatching_detector(y_comm_visible);
+    int ret = wait_until(
+        env.console, context, std::chrono::seconds(10),
+        {{end_egg_hatching_detector}}
+    );
+    if (ret != 0){
+        throw OperationFailedException(env.console, error_msg + " No Y-Comm mark found.");
+    }
+}
+
 }
 
 
@@ -427,7 +441,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
-    context.wait_for_all_requests();
+    wait_for_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
 void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool fly_from_overworld){
@@ -442,6 +456,7 @@ void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBas
     navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
 
     fly_home(context, false);
+    wait_for_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
 }
 
 void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
@@ -755,8 +770,19 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         bool fly_from_overworld = false; // fly from menu
         call_flying_taxi(env, context, fly_from_overworld);
     } else {
-        // // Move from Pokemon App to Town Map app
-        ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
+        // Leave menu, go back to overworld
+        const bool y_comm_visible = true;
+        YCommIconDetector y_comm_detector(y_comm_visible);
+        const int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+            },
+            {{y_comm_detector}}
+        );
+        if (ret > 0){
+            throw OperationFailedException(env.console, "Cannot detect menu from overworld. No Y-Comm mark found.");
+        }
     }
 
     return false;
