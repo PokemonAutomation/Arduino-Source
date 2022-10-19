@@ -30,10 +30,6 @@
 
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h"
-#include "Kernels/Kernels_x64_SSE41.h"
-//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
@@ -51,13 +47,6 @@
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 #include "Kernels/Kernels_Alignment.h"
-//#include "Kernels/Kernels_x64_SSE41.h"
-//#include "Kernels/Kernels_x64_AVX2.h"
-//#include "Kernels/Kernels_x64_AVX512.h"
-//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
-//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
@@ -82,6 +71,20 @@
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+
+#ifdef PA_ARCH_x86
+// #include "Kernels/Kernels_x64_SSE41.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
+// #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
+// #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
+//#include "Kernels/Kernels_x64_SSE41.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
+#endif
 
 //#include <opencv2/core.hpp>
 

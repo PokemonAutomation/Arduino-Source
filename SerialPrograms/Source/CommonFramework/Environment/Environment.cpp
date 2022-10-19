@@ -23,6 +23,8 @@
 #include "Environment_Linux.tpp"
 #ifdef PA_ARCH_x86
 #include "Environment_x86_Linux.tpp"
+#elif PA_ARCH_arm64
+#include "Environment_arm64_Linux.tpp"
 #endif
 #endif
 

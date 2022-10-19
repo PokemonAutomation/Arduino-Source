@@ -8,6 +8,8 @@
 
 #ifdef PA_ARCH_x86
 #include "HardwareValidation_x86.tpp"
+#elif PA_ARCH_arm64
+#include "HardwareValidation_arm64.tpp"
 #else
 #warning "No hardware validation for this architecture."
 namespace PokemonAutomation{

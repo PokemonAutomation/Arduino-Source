@@ -1628,6 +1628,10 @@ else()
     # when compiling OpenCV
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
 
+    IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
+
+    else()
+
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
     set(ARCH_FLAGS_13_Haswell       -march=haswell)
@@ -1639,6 +1643,8 @@ else()
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
+
+    endif()
 endif()
 
 

@@ -16,6 +16,7 @@ namespace Kernels{
 
 
 BinaryMatrixType get_BinaryMatrixType(){
+#ifdef PA_ARCH_x86
 #if 1
     if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
         return BinaryMatrixType::i64x32_AVX512;
@@ -31,6 +32,7 @@ BinaryMatrixType get_BinaryMatrixType(){
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return BinaryMatrixType::i64x8_SSE42;
     }
+#endif
     return BinaryMatrixType::i64x4_Default;
 }
 

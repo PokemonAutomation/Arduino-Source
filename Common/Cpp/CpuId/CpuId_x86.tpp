@@ -337,8 +337,6 @@ CPU_Features make_19_IceLake(){
 }
 const CPU_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();
 
-CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
-
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
     static const std::vector<CpuCapabilityOption> LIST{
         {

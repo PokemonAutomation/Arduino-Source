@@ -9,6 +9,8 @@
 #if 0
 #elif defined PokemonAutomation_CpuId_x86_H
 #include "CpuId_x86.tpp"
+#elif defined PokemonAutomation_CpuId_arm64_H
+#include "CpuId_arm64.tpp"
 #else
 
 namespace PokemonAutomation {
@@ -16,11 +18,10 @@ namespace PokemonAutomation {
 const char* PA_ARCH_STRING = "Unknown";
 
 const CPU_Features CPU_CAPABILITY_NATIVE;
-CPU_Features CPU_CAPABILITY_CURRENT;
 
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
     static const std::vector<CpuCapabilityOption> LIST{
-        {"Nothing (C++ Only)",             CPU_CAPABILITY_NOTHING,     true},
+        {"none", "Nothing (C++ Only)",             CPU_CAPABILITY_NATIVE,     true},
     };
     return LIST;
 }
@@ -30,6 +31,8 @@ const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
 #endif
 
 namespace PokemonAutomation {
+
+CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
 
 IntegerEnumDatabase make_CAPABILITIES_DATABASE(){
     IntegerEnumDatabase ret;

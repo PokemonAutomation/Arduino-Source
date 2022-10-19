@@ -7,7 +7,6 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/SIMDDebuggers.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
