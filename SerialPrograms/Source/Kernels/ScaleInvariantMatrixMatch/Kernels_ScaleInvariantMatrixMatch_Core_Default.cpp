@@ -4,8 +4,6 @@
  *
  */
 
-// #include <immintrin.h>
-// #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels_ScaleInvariantMatrixMatch_Routines.h"
 
 namespace PokemonAutomation{
