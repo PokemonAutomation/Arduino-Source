@@ -373,19 +373,6 @@ const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
     return LIST;
 }
 
-IntegerEnumDatabase make_CAPABILITIES_DATABASE(){
-    IntegerEnumDatabase ret;
-    size_t c = 0;
-    for (const CpuCapabilityOption& item : AVAILABLE_CAPABILITIES()){
-        ret.add(c, item.slug, item.display, item.available);
-        c++;
-    }
-    return ret;
-};
-const IntegerEnumDatabase& CAPABILITIES_DATABASE(){
-    static const IntegerEnumDatabase database = make_CAPABILITIES_DATABASE();
-    return database;
-}
 
 
 

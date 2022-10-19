@@ -46,14 +46,16 @@ public:
         size_t min_area
     );
 
-    //  Compute RMSD of the current image against the template as-is.
+    //  Compute RMSD of the current image against the template as-is, using `ExactImageMatcher`.
+    // `ExactImageMatcher` will resize the image to match template size and scale template brightness to match the image
+    //  before computing RMSD.
     //  In case the image is invalid, return a large value.
     //  It also calls the virtual function `check_image()` on the image.
-    //  If it returns false, then return a large value. 
+    //  If the function returns false, then return a large value. 
     double rmsd(const ImageViewRGB32& image) const;
 
     //  Compute RMSD of the object on the image against the template.
-    //  The input `cropped_image` is pre-cropped from a full image using the bounding box of the input waterfill `object`.
+    //  The input `cropped_image` is already cropped from a full image using the bounding box of the input waterfill `object`.
     //  This cropped image is compared against the template as-is.
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.

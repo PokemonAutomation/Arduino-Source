@@ -24,15 +24,25 @@ namespace PokemonAutomation{
 
 namespace PokemonAutomation{
 
-
+// CPU arch name, for Intel CPU it is "x64" or x86
 extern const char* PA_ARCH_STRING;
 
-
+// The running machine's CPU capability
 extern const CPU_Features CPU_CAPABILITY_NATIVE;
+// The CPU capability used to determine what Pokemon Automation code to run.
+// e.g. to run with or without Intel AVX instructions.
+// This capability is intialized to be the same as `CPU_CAPABILITY_NATIVE`.
+// The reason we define two capability, native and current, is that at runtime
+// we can chagne the values in current to test the code that runs with weaker capability.
 extern CPU_Features CPU_CAPABILITY_CURRENT;
 
-
-
+// Struct for a set of CPU features.
+// This struct is used to build UI that lets user set different CPU features
+// to test the code that runs with weaker capability.
+// For example, on a machine with Intel AVX and AVX2 instructions, there can be three
+// `CpuCapabilityOption`, representing non-AVX (pure C++), AVX and AVX2 implementations
+// of some computation. The user can choose between those options to test the implementations,
+// profile and compare their performance.
 struct CpuCapabilityOption{
     const char* slug;
     const char* display;
@@ -49,7 +59,11 @@ struct CpuCapabilityOption{
         , available(p_available)
     {}
 };
+
+// The available CPU instruction choices. See comments of `CpuCapabilityOption` for more details.
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES();
+// An enum database to select `CpuCapabilityOption`.
+// This database is built by `AVAILABLE_CAPABILITIES()`, used for UI of choosing CPU instructions.
 const IntegerEnumDatabase& CAPABILITIES_DATABASE();
 
 
