@@ -19,8 +19,16 @@ from typing import List, Tuple
 
 # Target path for the new flie, like 
 target_path = ""
-if len(sys.argv) > 1:
+if len (sys.argv) > 1:
 	target_path = sys.argv[1]
+
+# Sanitize target path:
+SerialPrograms_prefix = "SerialPrograms/"
+if target_path.startswith(SerialPrograms_prefix):
+	target_path = target_path[len(SerialPrograms_prefix):]
+Common_prefix = "Common/"
+if target_path.startswith(Common_prefix) or target_path.startswith("ClientSource") or target_path.startswith("3rdParty"):
+	target_path = "../" + target_path
 
 cur_folder_path = os.path.abspath(os.getcwd())
 
@@ -125,7 +133,7 @@ def process_pro_lines(file_lines: List[str], starting_line: str, new_path: str) 
 
 if target_path.endswith(".cpp"):
 	file_lines = process_pro_lines(file_lines, "SOURCES += \\", target_path)
-elif target_path.endswith(".h"):
+elif target_path.endswith(".h") or target_path.endswith(".tpp"):
 	file_lines = process_pro_lines(file_lines, "HEADERS += \\", target_path)
 else:
 	file_lines = process_pro_lines(file_lines, "SOURCES += \\", "")

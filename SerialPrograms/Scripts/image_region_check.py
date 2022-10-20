@@ -54,11 +54,13 @@ def _get_region(image: np.ndarray, x: float, y: float, w: float, h: float) -> Tu
 	return start_x, start_y, end_x, end_y
 
 
-def add_rect(image: np.ndarray, x: float, y: float, w: float, h: float) -> np.ndarray:
-	"""Add a red rectangle around a region, where (x, y, w, h) denoting a resolution-independent region."""
+def add_rect(image: np.ndarray, x: float, y: float, w: float, h: float, color=(0, 0, 255)) -> np.ndarray:
+	"""
+	Add a red rectangle around a region, where (x, y, w, h) denoting a resolution-independent region.
+	"""
 	start_x, start_y, end_x, end_y = _get_region(image, x, y, w, h)
 	# print(start_x, start_y, end_x, end_y)
-	image = cv2.rectangle(image, (start_x, start_y), (end_x, end_y), (0,0,255), 2)
+	image = cv2.rectangle(image, (start_x, start_y), (end_x, end_y), color, 2)
 	return image
 
 def _get_stats(image: np.ndarray, x: float, y: float, w: float, h: float) -> Stats:
@@ -88,11 +90,16 @@ def _get_stats(image: np.ndarray, x: float, y: float, w: float, h: float) -> Sta
 		crop_size=(end_x - start_x, end_y - start_y),
 	)
 
-def add_infer_box_to_image(image: np.ndarray, x: float, y: float, w: float, h: float, rendered_image: np.ndarray) -> np.ndarray:
+def add_infer_box_to_image(
+	image: np.ndarray,
+	x: float, y: float, w: float, h: float,
+	rendered_image: np.ndarray,
+	color=(0,0,255)
+) -> np.ndarray:
 	stats = _get_stats(image, x, y, w, h)
 	ratio = stats.color_ratio
 	print(f"Add infer box: ({x:0.4f}, {y:0.4f}, {w:0.4f}, {h:0.4f}), {stats.to_str()}")
-	return add_rect(rendered_image, x, y, w, h)
+	return add_rect(rendered_image, x, y, w, h, color)
 
 def _color_matched(
 	crop_color_ratio: np.ndarray,
