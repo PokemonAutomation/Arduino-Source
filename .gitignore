@@ -47,3 +47,6 @@ build*/
 .vs
 Resources/*
 SerialPrograms/CMakeLists.txt.user
+
+# Python cache
+__pycache__
