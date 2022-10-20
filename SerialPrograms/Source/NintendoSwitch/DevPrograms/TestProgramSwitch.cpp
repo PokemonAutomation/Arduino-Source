@@ -35,6 +35,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 
 
 #include <QVideoFrame>
@@ -127,10 +128,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    ImageRGB32 image("Braviary_Fly_10.png");
+
+    FlagTracker tracker(logger, overlay);
+
+    auto start = current_time();
+    for (size_t c = 0; c < 10; c++){
+        tracker.process_frame(image, current_time());
+    }
+    auto end = current_time();
+
+    cout << std::chrono::duration_cast<std::chrono::microseconds>((end - start) / 10).count() << endl;
+
+
+#if 0
     StartGameUserSelectDetector detector;
     VideoOverlaySet set(overlay);
     detector.make_overlays(set);
     cout << detector.detect(ImageRGB32("test.png")) << endl;
+#endif
 
 #if 0
     VideoOverlaySet set(overlay);

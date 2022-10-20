@@ -1542,7 +1542,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h \
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Seedfinder.h \
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \

@@ -1490,8 +1490,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Seedfinder.cpp
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Seedfinder.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h
     Source/PokemonSwSh/Programs/ReleaseHelpers.h

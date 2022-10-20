@@ -1,4 +1,4 @@
-/*  RNG Manipulation Seedfinder
+/*  RNG Manipulation SeedFinder
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -11,7 +11,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
-#include "PokemonSwSh/Programs/RNG/PokemonSwSh_Seedfinder.h"
+#include "PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h"
 
 #include <string>
 
@@ -20,18 +20,18 @@ namespace NintendoSwitch {
 namespace PokemonSwSh {
 using namespace Pokemon;
 
-Seedfinder_Descriptor::Seedfinder_Descriptor()
+SeedFinder_Descriptor::SeedFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSwSh:Seedfinder",
-        STRING_POKEMON + " SwSh", "Seedfinder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/Seedfinder.md",
+        "PokemonSwSh:SeedFinder",
+        STRING_POKEMON + " SwSh", "Seed Finder",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SeedFinder.md",
         "Finds the current state to be used for manual RNG manipulation.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
-Seedfinder::Seedfinder()
+SeedFinder::SeedFinder()
     : STATE_0(
         false, 
         "<b>state[0]:</b>",
@@ -45,26 +45,26 @@ Seedfinder::Seedfinder()
         ""
     )
     , UPDATE_STATE(
-        "<b>Update state</b>:<br>Use the last known state to update the rng state.",
+        "<b>Update State</b>:<br>Use the last known state to update the rng state.",
         false
     )
     , MIN_ADVANCES(
-        "<b>Min advances:</b>",
+        "<b>Min Advances:</b>",
         0
     )
     , MAX_ADVANCES(
-        "<b>Max advances:</b>",
+        "<b>Max Advances:</b>",
         10000
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , SAVE_SCREENSHOTS(
-        "<b>Save debug screenshots:</b>",
+        "<b>Save Debug Screenshots:</b>",
         false
     )
     , LOG_VALUES(
-        "<b>Log animation values:</br>",
+        "<b>Log Animation Values:</br>",
         false
     )
 
@@ -83,7 +83,7 @@ Seedfinder::Seedfinder()
 
 
 
-void Seedfinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     Xoroshiro128PlusState state(0, 0);
     // sanitize STATE_0 and STATE_1 and make ints
     if (UPDATE_STATE) {

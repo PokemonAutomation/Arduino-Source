@@ -1,11 +1,11 @@
-/*  RNG Manipulation Seedfinder
+/*  RNG Manipulation SeedFinder
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_Seedfinder_H
-#define PokemonAutomation_PokemonSwSh_Seedfinder_H
+#ifndef PokemonAutomation_PokemonSwSh_SeedFinder_H
+#define PokemonAutomation_PokemonSwSh_SeedFinder_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
@@ -19,15 +19,15 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonSwSh {
 
-class Seedfinder_Descriptor : public SingleSwitchProgramDescriptor {
+class SeedFinder_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    Seedfinder_Descriptor();
+    SeedFinder_Descriptor();
 };
 
 
-class Seedfinder : public SingleSwitchProgramInstance {
+class SeedFinder : public SingleSwitchProgramInstance {
 public:
-    Seedfinder();
+    SeedFinder();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 

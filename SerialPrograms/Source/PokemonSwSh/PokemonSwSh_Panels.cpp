@@ -47,7 +47,7 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
-#include "Programs/RNG/PokemonSwSh_Seedfinder.h"
+#include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
@@ -116,9 +116,9 @@ std::vector<PanelEntry> make_panels(){
     ret.emplace_back("---- Date-Spam Farmers ----");
     ret.emplace_back(make_single_switch_program<WattFarmer_Descriptor, WattFarmer>());
     ret.emplace_back(make_single_switch_program<BerryFarmer_Descriptor, BerryFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BerryFarmer2_Descriptor, BerryFarmer2>());
-    }
+//    }
     ret.emplace_back(make_single_switch_program<LotoFarmer_Descriptor, LotoFarmer>());
     ret.emplace_back(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
     ret.emplace_back(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
@@ -170,19 +170,19 @@ std::vector<PanelEntry> make_panels(){
     ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
     ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
-    }
+//    }
     ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
     if (PreloadSettings::instance().NAUGHTY_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
     }
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- RNG ----");
-        ret.emplace_back(make_single_switch_program<Seedfinder_Descriptor, Seedfinder>());
+        ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
         ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
-    }
+//    }
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());

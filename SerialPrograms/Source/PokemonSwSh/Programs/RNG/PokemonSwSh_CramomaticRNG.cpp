@@ -57,19 +57,19 @@ CramomaticRNG::CramomaticRNG()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , MAX_PRIORITY_ADVANCES(
-        "<b>Priority advances:</b><br>How many advances to check when checking for higher priority selections.",
+        "<b>Priority Advances:</b><br>How many advances to check when checking for higher priority selections.",
         300
     )
     , MAX_UNKNOWN_ADVANCES(
-        "<b>Max unknown advances:</b><br>How many advances to check when updating the rng state.",
+        "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
         300
     )
     , SAVE_SCREENSHOTS(
-        "<b>Save debug screenshots:</b>",
+        "<b>Save Debug Screenshots:</b>",
         false
     )
     , LOG_VALUES(
-        "<b>Log animation values:</br>",
+        "<b>Log Animation Values:</br>",
         false
     )
 
