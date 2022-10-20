@@ -87,6 +87,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Containers/Pimpl.tpp
     ../Common/Cpp/CpuId/CpuId.cpp
     ../Common/Cpp/CpuId/CpuId.h
+    ../Common/Cpp/CpuId/CpuId_arm64.h
+    ../Common/Cpp/CpuId/CpuId_arm64.tpp
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
     ../Common/Cpp/EnumDatabase.cpp
@@ -215,8 +217,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
-    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp
-    ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -274,11 +274,13 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/Environment_Linux.tpp
     Source/CommonFramework/Environment/Environment_Windows.h
     Source/CommonFramework/Environment/Environment_Windows.tpp
+    Source/CommonFramework/Environment/Environment_arm64_Linux.tpp
     Source/CommonFramework/Environment/Environment_x86.tpp
     Source/CommonFramework/Environment/Environment_x86_Linux.tpp
     Source/CommonFramework/Environment/Environment_x86_Windows.tpp
     Source/CommonFramework/Environment/HardwareValidation.cpp
     Source/CommonFramework/Environment/HardwareValidation.h
+    Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
     Source/CommonFramework/GlobalSettingsPanel.cpp
     Source/CommonFramework/GlobalSettingsPanel.h
@@ -1205,6 +1207,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp
@@ -1628,7 +1632,7 @@ else()
     # when compiling OpenCV
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
 
-    IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
+    IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
 
     else()
 

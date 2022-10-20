@@ -805,6 +805,8 @@ HEADERS += \
     ../Common/Cpp/Containers/Pimpl.h \
     ../Common/Cpp/Containers/Pimpl.tpp \
     ../Common/Cpp/CpuId/CpuId.h \
+    ../Common/Cpp/CpuId/CpuId_arm64.h \
+    ../Common/Cpp/CpuId/CpuId_arm64.tpp \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/EnumDatabase.h \
@@ -913,10 +915,12 @@ HEADERS += \
     Source/CommonFramework/Environment/Environment_Linux.tpp \
     Source/CommonFramework/Environment/Environment_Windows.h \
     Source/CommonFramework/Environment/Environment_Windows.tpp \
+    Source/CommonFramework/Environment/Environment_arm64_Linux.tpp \
     Source/CommonFramework/Environment/Environment_x86.tpp \
     Source/CommonFramework/Environment/Environment_x86_Linux.tpp \
     Source/CommonFramework/Environment/Environment_x86_Windows.tpp \
     Source/CommonFramework/Environment/HardwareValidation.h \
+    Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
@@ -1383,7 +1387,6 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
-    Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \
@@ -1407,6 +1410,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h \
+    Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h \
