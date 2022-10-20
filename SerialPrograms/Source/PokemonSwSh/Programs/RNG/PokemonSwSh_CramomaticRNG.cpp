@@ -9,6 +9,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -206,11 +207,23 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_A, 320);
     pbf_wait(context, 125);
 }
 
 void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport) {
+    // check whether the bag is open
+    context.wait_for_all_requests();
+    VideoOverlaySet boxes(env.console);
+    SelectionArrowFinder bag_arrow_detector(env.console, ImageFloatBox(0.465, 0.195, 0.054, 0.57));
+    bag_arrow_detector.make_overlays(boxes);
+
+    int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
+    if (ret < 0) {
+        throw OperationFailedException(env.console, "Could not detect bag.");
+    }
+
+    // select the apricorn(s)
     pbf_wait(context, 1 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 30);
     if (sport) {
