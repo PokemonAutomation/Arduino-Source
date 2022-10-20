@@ -59,6 +59,8 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath);
 
 int test_pokemonLA_MapWeatherAndTimeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
+int test_pokemonLA_FlagTracker_performance(const ImageViewRGB32& image, int num_iterations);
+
 }
 
 #endif

@@ -28,6 +28,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_MapMissionTabReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapWeatherAndTimeReader.h"
 #include "PokemonLA/Inference/Map/PokemonLA_PokemonMapSpriteReader.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "PokemonLA/PokemonLA_Locations.h"
@@ -646,6 +647,24 @@ int test_pokemonLA_MapWeatherAndTimeReader(const ImageViewRGB32& image, const st
     TEST_RESULT_COMPONENT_EQUAL(time_result, target_time, "time of day");
 
     
+    return 0;
+}
+
+int test_pokemonLA_FlagTracker_performance(const ImageViewRGB32& image, int num_iterations){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+    FlagTracker tracker(logger, overlay);
+
+    auto time_start = current_time();
+    for(int i = 0; i < num_iterations; i++){
+        tracker.process_frame(image, current_time());
+    }
+    auto time_end = current_time();
+
+    const double ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count() / num_iterations;
+
+    cout << "Time: " << ms << " ms, " << ms / 1000. << " s" << endl;
+
     return 0;
 }
 
