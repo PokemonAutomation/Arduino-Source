@@ -68,7 +68,7 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
         break;
 
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick(context, 110, 0, 180, 20);
+        pbf_move_left_joystick(context, 110, 0, 220, 20);
         break;
     }
 
