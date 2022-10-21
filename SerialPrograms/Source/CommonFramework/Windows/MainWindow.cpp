@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText(QString::fromStdString(make_text_url(ONLINE_DOC_URL, "Online Documentation")));
+        github->setText(QString::fromStdString(make_text_url(ONLINE_DOC_URL + "ComputerControl/", "Online Documentation")));
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
