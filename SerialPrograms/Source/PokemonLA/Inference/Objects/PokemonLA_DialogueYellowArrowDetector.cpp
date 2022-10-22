@@ -73,7 +73,7 @@ bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, Wal
     };
 
     // We found 200 to be a good minimal yellow arrow pixel count on a 1920x1080 resolution screenshot.
-    const float screen_scale = frame.height() / 1080.0;
+    const double screen_scale = frame.height() / 1080.0;
     const size_t min_size = size_t(200 * screen_scale * screen_scale);
     
     const bool detected = match_template_by_waterfill(
