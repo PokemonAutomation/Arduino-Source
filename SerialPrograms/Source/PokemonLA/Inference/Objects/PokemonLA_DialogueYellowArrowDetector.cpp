@@ -71,12 +71,16 @@ bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, Wal
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 180)},
     };
+
+    // We found 200 to be a good minimal yellow arrow pixel count on a 1920x1080 resolution screenshot.
+    const float screen_scale = frame.height() / 1080.0;
+    const size_t min_size = size_t(200 * screen_scale * screen_scale);
     
     const bool detected = match_template_by_waterfill(
         extract_box_reference(frame, YELLOW_ARROW_BOX), 
         DialogueYellowArrowMatcher::instance(),
         filters,
-        {200, SIZE_MAX},
+        {min_size, SIZE_MAX},
         80,
         [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
     );

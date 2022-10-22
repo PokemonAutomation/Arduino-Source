@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageBoxes.h"
 #include "ImageStats.h"
@@ -70,6 +71,12 @@ ImageStats image_stats(const ImageViewRGB32& image){
     );
 
     ImageStats stats(average, stddev, sums.count);
+
+    if (PreloadSettings::debug().COLOR_CHECK){
+        std::cout << "Compute imageStats: avg " << stats.average.to_string() << " (sum " << stats.average.sum()
+                  << ") stddev " << stats.stddev.to_string() << " (sum " << stats.stddev.sum()
+                  << ") count " << stats.count << std::endl;
+    }
 
     return stats;
 }

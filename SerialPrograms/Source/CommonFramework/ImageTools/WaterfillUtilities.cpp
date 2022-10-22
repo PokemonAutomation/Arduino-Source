@@ -77,6 +77,10 @@ bool match_template_by_waterfill(
     double rmsd_threshold,
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
 {
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "Match template by waterfill, " << filters.size() << " filter(s), size range ("
+                  << area_thresholds.first << ", " << area_thresholds.second << ")" << std::endl;
+    }
     auto matrices = compress_rgb32_to_binary_range(image, filters);
 
     bool detected = false;
@@ -114,6 +118,9 @@ bool match_template_by_waterfill(
         if (stop_match){
             break;
         }
+    }
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "End match template by waterfill" << std::endl;
     }
     return detected;
 }

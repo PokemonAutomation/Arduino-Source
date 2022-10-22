@@ -309,11 +309,14 @@ JsonValue GlobalSettings::to_json() const{
 
     obj["COMMAND_LINE_TESTS"] = std::move(command_line_test_obj);
 
+    JsonObject debug_obj;
+    const auto& debug_settings = PreloadSettings::instance().DEBUG;
+    debug_obj["COLOR_CHECK"] = debug_settings.COLOR_CHECK;
+    debug_obj["IMAGE_TEMPLATE_MATCHING"] = debug_settings.IMAGE_TEMPLATE_MATCHING;
+    obj["DEBUG"] = std::move(debug_obj);
+
     return obj;
 }
-
-
-
 
 
 
