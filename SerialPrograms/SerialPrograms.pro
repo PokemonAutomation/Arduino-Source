@@ -311,6 +311,7 @@ SOURCES += \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_arm64_NEON.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp \
@@ -764,6 +765,7 @@ SOURCES += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
     Source/PokemonSwSh/ShinyHuntTracker.cpp \
     Source/Tests/CommandLineTests.cpp \
+    Source/Tests/Kernels_Tests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
@@ -1571,6 +1573,7 @@ HEADERS += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
     Source/PokemonSwSh/ShinyHuntTracker.h \
     Source/Tests/CommandLineTests.h \
+    Source/Tests/Kernels_Tests.h \
     Source/Tests/PokemonLA_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \

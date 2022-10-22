@@ -660,9 +660,7 @@ int test_pokemonLA_FlagTracker_performance(const ImageViewRGB32& image, int num_
         tracker.process_frame(image, current_time());
     }
     auto time_end = current_time();
-
-    const double ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count() / num_iterations;
-
+    const double ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count() / (double)num_iterations;
     cout << "Time: " << ms << " ms, " << ms / 1000. << " s" << endl;
 
     return 0;

@@ -48,6 +48,10 @@ template <typename type> using r_ref  = type &__restrict__;
 template <typename type> using c_ref  = type const&__restrict__;
 template <typename type> using r_rref = type &&__restrict__;
 
+// Align a struct on x-byte boundary.
+// It's the minimum alignment for a struct or a struct member.
+#define PA_ALIGN_STRUCT(x) __attribute__((aligned(x)))
+
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"

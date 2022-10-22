@@ -12,9 +12,11 @@
 
 namespace PokemonAutomation{
 
-// Currently we assume Apple M1 as the only arm64 we support, so no CPU feature variety.
+// Currently we assume Apple M1 as the only arm64 we support, so not much CPU feature variety.
 struct CPU_Features{
+    CPU_Features& set_to_current();
 
+    bool OK_M1 = false;
 };
 
 

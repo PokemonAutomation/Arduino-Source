@@ -25,17 +25,14 @@ PA_FORCE_INLINE void scale_brightness_Default(
         g *= scaleG;
         b *= scaleB;
 
-        r = std::max(r, 0.f);
-        g = std::max(g, 0.f);
-        b = std::max(b, 0.f);
-        r = std::min(r, 255.f);
-        g = std::min(g, 255.f);
-        b = std::min(b, 255.f);
+        uint32_t r_u32 = std::min((uint32_t)r, (uint32_t)255);
+        uint32_t g_u32 = std::min((uint32_t)g, (uint32_t)255);
+        uint32_t b_u32 = std::min((uint32_t)b, (uint32_t)255);
 
         pixel &= 0xff000000;
-        pixel |= (uint32_t)r << 16;
-        pixel |= (uint32_t)g << 8;
-        pixel |= (uint32_t)b;
+        pixel |= r_u32 << 16;
+        pixel |= g_u32 << 8;
+        pixel |= b_u32;
 
         image[c] = pixel;
     }
@@ -48,6 +45,9 @@ void scale_brightness_Default(
     if (width == 0 || height == 0){
         return;
     }
+    scaleR = std::max(scaleR, 0.0f);
+    scaleG = std::max(scaleG, 0.0f);
+    scaleB = std::max(scaleB, 0.0f);
     for (uint16_t r = 0; r < height; r++){
         scale_brightness_Default(width, image, scaleR, scaleG, scaleB);
         image = (uint32_t*)((char*)image + bytes_per_row);

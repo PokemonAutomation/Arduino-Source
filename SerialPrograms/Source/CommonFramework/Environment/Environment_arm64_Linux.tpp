@@ -2,12 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  Currently only used for M-series Apple environment
  */
 
 
 #include <stdio.h>
 #include <stdint.h>
-#include <sys/types.h>
 #include <sys/sysctl.h>
 
 #include "Environment.h"

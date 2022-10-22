@@ -617,6 +617,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_arm64_NEON.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
@@ -1547,6 +1548,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/ShinyHuntTracker.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
+    Source/Tests/Kernels_Tests.cpp
+    Source/Tests/Kernels_Tests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
     Source/Tests/PokemonSwSh_Tests.cpp
@@ -1633,8 +1636,13 @@ else()
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
 
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    # Arm CPU
+
+    #   Run-time ISA dispatching
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_arm64_20_M1)
 
     else()
+    # Intel CPU
 
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
