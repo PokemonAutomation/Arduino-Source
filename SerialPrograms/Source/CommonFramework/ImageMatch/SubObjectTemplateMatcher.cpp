@@ -63,7 +63,7 @@ double SubObjectTemplateMatcher::rmsd(
 }
 double SubObjectTemplateMatcher::rmsd_with_background_replace(
     ImagePixelBox& object_box,
-    const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
+    const ImageViewRGB32& image, const PackedBinaryMatrix& binary_image,
     const ImagePixelBox& subobject_in_image
 ) const{
     object_box = object_from_subobject(image.width(), image.height(), subobject_in_image);
@@ -146,7 +146,7 @@ bool SubObjectTemplateMatcher::matches(
 }
 bool SubObjectTemplateMatcher::matches_with_background_replace(
     ImagePixelBox& object_box,
-    const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
+    const ImageViewRGB32& image, const PackedBinaryMatrix& binary_image,
     const WaterfillObject& subobject_in_image
 ) const{
     if (!check_aspect_ratio(subobject_in_image.width(), subobject_in_image.height())){

@@ -45,7 +45,7 @@ bool is_pokemon_selection(VideoOverlay& overlay, const ImageViewRGB32& frame){
 
     InferenceBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
 
-    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
         extract_box_reference(frame, box),
         {
             {0xff008000, 0xff40ffc0},
@@ -54,7 +54,7 @@ bool is_pokemon_selection(VideoOverlay& overlay, const ImageViewRGB32& frame){
 //    cout << matrices[0].dump() << endl;
 
     std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
-    for (PackedBinaryMatrix2& matrix : matrices){
+    for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
         auto iter = session->make_iterator(200);
         WaterfillObject object;

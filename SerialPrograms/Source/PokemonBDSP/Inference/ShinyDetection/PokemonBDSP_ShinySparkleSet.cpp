@@ -109,7 +109,7 @@ void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
         return;
     }
 
-    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
         image,
         {
             {0xff606000, 0xffffffff},
@@ -121,7 +121,7 @@ void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
     auto session = make_WaterfillSession();
 
     double best_alpha = 0;
-    for (PackedBinaryMatrix2& matrix : matrices){
+    for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
         ShinySparkleSetBDSP sparkles = find_sparkles(*session);
         sparkles.update_alphas();

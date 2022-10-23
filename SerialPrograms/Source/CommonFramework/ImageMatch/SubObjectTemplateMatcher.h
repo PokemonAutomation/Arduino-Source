@@ -49,7 +49,7 @@ public:
     //  The background is defined by zero-bits in the binary matrix in "binary_image".
     double rmsd_with_background_replace(
         ImagePixelBox& object_box,
-        const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
+        const ImageViewRGB32& image, const PackedBinaryMatrix& binary_image,
         const ImagePixelBox& subobject_in_image
     ) const;
 
@@ -60,7 +60,7 @@ public:
     ) const;
     virtual bool matches_with_background_replace(
         ImagePixelBox& object_box,
-        const ImageViewRGB32& image, const PackedBinaryMatrix2& binary_image,
+        const ImageViewRGB32& image, const PackedBinaryMatrix& binary_image,
         const WaterfillObject& subobject_in_image
     ) const;
 

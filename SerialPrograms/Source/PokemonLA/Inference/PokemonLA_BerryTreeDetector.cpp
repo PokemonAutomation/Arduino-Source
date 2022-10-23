@@ -88,7 +88,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
 
 
 bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, ImageRGB32* image, size_t offset_x, size_t offset_y){
-    PackedBinaryMatrix2 matrix = object.packed_matrix();
+    PackedBinaryMatrix matrix = object.packed_matrix();
 
     cout << "Object area in detection sphere: " << object.area << endl;
     double threshold = 0.3;
@@ -101,7 +101,7 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, ImageRGB32
     }
     const size_t stop = (size_t)(threshold * object.area);
 
-    PackedBinaryMatrix2 matrix2 = remove_center_pixels(object, stop).first;
+    PackedBinaryMatrix matrix2 = remove_center_pixels(object, stop).first;
 
     auto session = Kernels::Waterfill::make_WaterfillSession(matrix2);
     auto finder = session->make_iterator(1);
@@ -205,7 +205,7 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 
     // Run waterfill:
     // pixels within the color range are marked as 1 in matrices:
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_multirange(frame, {
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_multirange(frame, {
             // light color:
             {combine_rgb(110, 60, 25), combine_rgb(190, 130, 105)},
             // dark color

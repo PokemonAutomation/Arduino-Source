@@ -31,7 +31,7 @@ public:
 
 private:
     const WaterfillObject& m_object;
-    PackedBinaryMatrix2 m_matrix;
+    PackedBinaryMatrix m_matrix;
 
     uint64_t m_radius_sqr;
     std::multimap<int64_t, WaterfillObject> m_regions;

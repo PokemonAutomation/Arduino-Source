@@ -41,7 +41,7 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
     std::tie(m_matrix, m_radius_sqr) = remove_center_pixels(object, stop);
 
     //  Find new regions.
-    PackedBinaryMatrix2 matrix = m_matrix.copy();
+    PackedBinaryMatrix matrix = m_matrix.copy();
     auto session = make_WaterfillSession(matrix);
     auto finder = session->make_iterator(1);
     WaterfillObject obj;

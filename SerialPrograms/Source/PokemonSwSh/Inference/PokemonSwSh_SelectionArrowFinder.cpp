@@ -51,7 +51,7 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     return rmsd <= 110;
 }
 std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image){
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
     auto session = make_WaterfillSession(matrix);
     auto finder = session->make_iterator(200);
     std::vector<ImagePixelBox> ret;

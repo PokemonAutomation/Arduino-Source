@@ -32,7 +32,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     std::string full_path = RESOURCE_PATH() + path;
     ImageRGB32 reference(full_path);
 
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
     if (objects.empty()){
         throw FileException(

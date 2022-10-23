@@ -35,7 +35,7 @@ namespace ImageMatch{
 // auto std::tie(matrix, distance) = remove_center_pixels(object, (size_t)(0.85 * object.area));
 // auto session = make_WaterfillSession(matrix);
 // ...
-std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
+std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
     const Kernels::Waterfill::WaterfillObject& object,
     size_t num_removed_pixels_threshold
 );
@@ -65,7 +65,7 @@ bool match_template_by_waterfill(
 // color: color of the pixels from the matrix to render on the image.
 // offset_x, offset_y: the offset of the matrix when rendered on the image.
 void draw_matrix_on_image(
-    const PackedBinaryMatrix2& matrix,
+    const PackedBinaryMatrix& matrix,
     uint32_t color, ImageRGB32& image, size_t offset_x, size_t offset_y
 );
 

@@ -18,32 +18,32 @@
 namespace PokemonAutomation{
 
 
-PackedBinaryMatrix2 compress_rgb32_to_binary_min(
+PackedBinaryMatrix compress_rgb32_to_binary_min(
     const ImageViewRGB32& image,
     uint8_t min_red,
     uint8_t min_green,
     uint8_t min_blue
 );
-PackedBinaryMatrix2 compress_rgb32_to_binary_max(
+PackedBinaryMatrix compress_rgb32_to_binary_max(
     const ImageViewRGB32& image,
     uint8_t max_red,
     uint8_t max_green,
     uint8_t max_blue
 );
-PackedBinaryMatrix2 compress_rgb32_to_binary_range(
+PackedBinaryMatrix compress_rgb32_to_binary_range(
     const ImageViewRGB32& image,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
-PackedBinaryMatrix2 compress_rgb32_to_binary_range(
+PackedBinaryMatrix compress_rgb32_to_binary_range(
     const ImageViewRGB32& image,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
-PackedBinaryMatrix2 compress_rgb32_to_binary_range(
+PackedBinaryMatrix compress_rgb32_to_binary_range(
     const ImageViewRGB32& image,
     uint32_t mins, uint32_t maxs
 );
@@ -54,7 +54,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
 //  multiple calls to one filter at a time.
 //  Pixels Within filter color ranges are marked as 1 in the corresponding binary matrices,
 //  while those output of range are 0.
-std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
+std::vector<PackedBinaryMatrix> compress_rgb32_to_binary_range(
     const ImageViewRGB32& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters
 );
@@ -62,7 +62,7 @@ std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
 
 
 //  Run multiple filters and OR them all together. (experimental)
-PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
+PackedBinaryMatrix compress_rgb32_to_binary_multirange(
     const ImageViewRGB32& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters
 );
@@ -70,7 +70,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
 
 
 void filter_rgb32(
-    const PackedBinaryMatrix2& matrix,
+    const PackedBinaryMatrix& matrix,
     ImageRGB32& image,
     Color replace_with,
     bool replace_if_zero    //  If false, replace if one.

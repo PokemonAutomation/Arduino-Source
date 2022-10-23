@@ -49,7 +49,7 @@ bool is_exclamation_mark(const ImageViewRGB32& image, const WaterfillObject& obj
 
 
 std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image){
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400);
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){

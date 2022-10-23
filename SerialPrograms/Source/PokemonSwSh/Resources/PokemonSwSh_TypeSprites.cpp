@@ -71,7 +71,7 @@ TypeSprite::TypeSprite(const std::string& slug)
     }
 
     //  Compute white objects.
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(sprite, 224, 224, 224);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(sprite, 224, 224, 224);
 
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10);
 

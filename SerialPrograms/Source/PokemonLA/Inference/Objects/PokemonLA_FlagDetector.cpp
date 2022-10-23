@@ -55,7 +55,7 @@ public:
     FlagMatcher(bool left)
         : SubObjectTemplateMatcher("PokemonLA/Flag-Template.png", 100)
     {
-        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
             m_matcher.image_template(),
             128, 255,
             128, 255,
@@ -274,7 +274,7 @@ int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_
     std::multimap<size_t, Hit> hits;
 
     {
-        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+        std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             image,
             {
                 {0xff808080, 0xffffffff},
@@ -291,7 +291,7 @@ int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_
         double inv_width = 0.5 / width;
 
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
-        for (PackedBinaryMatrix2& matrix : matrices){
+        for (PackedBinaryMatrix& matrix : matrices){
 //            cout << (int)filters[c].matrix.type() << endl;
             session->set_source(matrix);
             auto finder = session->make_iterator(30);

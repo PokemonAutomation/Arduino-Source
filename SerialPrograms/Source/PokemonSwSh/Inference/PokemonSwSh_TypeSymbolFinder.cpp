@@ -112,7 +112,7 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
     const ImageViewRGB32& image,
-    PackedBinaryMatrix2& matrix, double max_area_ratio
+    PackedBinaryMatrix& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
@@ -186,7 +186,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
     {
-        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+        std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             image,
             {
                 {0xff909090, 0xffffffff},
@@ -197,7 +197,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
                 {0xffe0e0e0, 0xffffffff},
             }
         );
-        for (PackedBinaryMatrix2& matrix : matrices){
+        for (PackedBinaryMatrix& matrix : matrices){
             find_symbol_candidates(candidates, image, matrix, max_area_ratio);
         }
     }

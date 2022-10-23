@@ -42,7 +42,7 @@ public:
             100
         )
     {
-        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
             m_matcher.image_template(), 0xff7f7f7f, 0xffffffff
         );
         std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
@@ -103,7 +103,7 @@ EggHatchGenderFilter read_gender_from_box(Logger& logger, VideoOverlay& overlay,
     InferenceBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
     ImageViewRGB32 name_and_gender = extract_box_reference(frame, gender_box);
 
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(name_and_gender, 0xff7f7f7f, 0xffffffff);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(name_and_gender, 0xff7f7f7f, 0xffffffff);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
     for (WaterfillObject& object : objects){
         if (is_male(name_and_gender, object)){

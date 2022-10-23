@@ -30,8 +30,8 @@ using namespace Kernels::Waterfill;
 const double ARROW_MAX_DISTANCE = 0.04;
 
 bool is_arrow_pointed_up(
-    const PackedBinaryMatrix2& matrix,
-    PackedBinaryMatrix2& inverted,
+    const PackedBinaryMatrix& matrix,
+    PackedBinaryMatrix& inverted,
     const WaterfillObject& object
 ){
     size_t width = matrix.width();
@@ -172,8 +172,8 @@ bool is_arrow_pointed_up(
     return true;
 }
 bool is_arrow_pointed_corner(
-    const PackedBinaryMatrix2& matrix,
-    PackedBinaryMatrix2& inverted
+    const PackedBinaryMatrix& matrix,
+    PackedBinaryMatrix& inverted
 ){
     size_t width = matrix.width();
     size_t height = matrix.height();
@@ -284,7 +284,7 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
 
     ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
-    PackedBinaryMatrix2 matrix = object.packed_matrix();
+    PackedBinaryMatrix matrix = object.packed_matrix();
     filter_rgb32(matrix, cropped, Color(0), true);
 
 
@@ -293,7 +293,7 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
         return false;
     }
 
-    PackedBinaryMatrix2 inverted = matrix.copy();
+    PackedBinaryMatrix inverted = matrix.copy();
     inverted.invert();
 
 //    static int c = 0;
@@ -319,7 +319,7 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
 
 
 int8_t read_side(WaterfillSession& session, const ImageViewRGB32& image, uint8_t pixel_threshold){
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(
         image, pixel_threshold, pixel_threshold, pixel_threshold
     );
 

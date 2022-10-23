@@ -45,7 +45,7 @@ void find_overworld_white_objects(
         for (Color filter : threshold_set){
             filters.emplace_back((uint32_t)filter, 0xffffffff);
         }
-        std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
+        std::vector<PackedBinaryMatrix> matrix = compress_rgb32_to_binary_range(image, filters);
 
 #if 1
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession();

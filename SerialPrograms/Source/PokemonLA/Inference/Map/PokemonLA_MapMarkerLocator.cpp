@@ -31,7 +31,7 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
     const ImageViewRGB32 region = extract_box_reference(screen, box);
 
     // Find the red pixels that form the red arrow
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_multirange(region,
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_multirange(region,
     {
         {combine_rgb(200, 0, 0), combine_rgb(255, 180, 180)},
         {combine_rgb(180, 0, 0), combine_rgb(255, 160, 160)},
@@ -73,7 +73,7 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
 
     const size_t stop = (size_t)(0.85 * red_marker_obj.area);
     // matrix2 stores pixels that are at the end points of the red marker.
-    PackedBinaryMatrix2 matrix2 = remove_center_pixels(red_marker_obj, stop).first;
+    PackedBinaryMatrix matrix2 = remove_center_pixels(red_marker_obj, stop).first;
 
     draw_matrix_on_image(matrix2, combine_rgb(0, 0, 255), output, red_marker_obj.min_x, red_marker_obj.min_y);
 

@@ -40,7 +40,7 @@ public:
 ImageRGB32 make_MountMatcher2Image(const char* path){
     ImageRGB32 image(RESOURCE_PATH() + path);
 
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
     auto session = make_WaterfillSession(matrix);
     auto finder = session->make_iterator(50);
 
@@ -356,7 +356,7 @@ void MountDetector::make_overlays(VideoOverlaySet& items) const{
 
 struct MountDetectorFilteredImage{
     ImageRGB32 image;
-    PackedBinaryMatrix2 matrix;
+    PackedBinaryMatrix matrix;
 };
 
 std::vector<MountDetectorFilteredImage> run_filters(const ImageViewRGB32& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
@@ -365,7 +365,7 @@ std::vector<MountDetectorFilteredImage> run_filters(const ImageViewRGB32& image,
         filters.emplace_back(FilterRgb32Range{range[c].first, range[c].second, COLOR_BLACK, false});
     }
 
-    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(image, range);
+    std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image, range);
     std::vector<std::pair<ImageRGB32, size_t>> filtered = filter_rgb32_range(image, filters);
 
     std::vector<MountDetectorFilteredImage> ret(range.size());

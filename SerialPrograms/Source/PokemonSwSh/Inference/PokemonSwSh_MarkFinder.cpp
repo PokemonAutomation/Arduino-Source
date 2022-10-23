@@ -55,7 +55,7 @@ public:
     ExclamationMatcher()
         : SubObjectTemplateMatcher("PokemonSwSh/ExclamationMark1-Template.png", 80)
     {
-        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
             m_matcher.image_template(),
             160, 255,
             0, 160,
@@ -109,7 +109,7 @@ bool is_question_mark(const ImageViewRGB32& image, const WaterfillObject& object
 }
 
 std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image){
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
         160, 255,
         0, 160,
@@ -135,7 +135,7 @@ std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image){
     return ret;
 }
 std::vector<ImagePixelBox> find_question_marks(const ImageViewRGB32& image){
-    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
         0, 128,
         0, 255,

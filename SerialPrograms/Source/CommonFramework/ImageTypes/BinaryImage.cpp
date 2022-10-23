@@ -10,10 +10,10 @@ namespace PokemonAutomation{
 
 
 
-PackedBinaryMatrix2::PackedBinaryMatrix2(){
+PackedBinaryMatrix::PackedBinaryMatrix(){
     m_matrix = Kernels::make_PackedBinaryMatrix(Kernels::get_BinaryMatrixType());
 }
-PackedBinaryMatrix2::PackedBinaryMatrix2(size_t width, size_t height){
+PackedBinaryMatrix::PackedBinaryMatrix(size_t width, size_t height){
     m_matrix = Kernels::make_PackedBinaryMatrix(Kernels::get_BinaryMatrixType(), width, height);
 }
 

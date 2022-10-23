@@ -17,21 +17,21 @@ namespace PokemonAutomation{
 // This wrapper is useful in making the usage of matrix as a class. Otherwise, because of
 // `PackedBinaryMatrix_IB` being polymorphic, we have to write explictly
 // `std::unique_ptr<Kernels::PackedBinaryMatrix_IB>` to define a matrix.
-class PackedBinaryMatrix2{
+class PackedBinaryMatrix{
 public:
     //  Rule of 5
-    PackedBinaryMatrix2(PackedBinaryMatrix2&& x) : m_matrix(std::move(x.m_matrix)) {}
-    void operator=(PackedBinaryMatrix2&& x){ m_matrix = std::move(x.m_matrix); }
-//    PackedBinaryMatrix2(const PackedBinaryMatrix2& x) : m_matrix(x.m_matrix->clone()) {}
-//    void operator=(const PackedBinaryMatrix2& x){ m_matrix = x.m_matrix->clone(); }
+    PackedBinaryMatrix(PackedBinaryMatrix&& x) : m_matrix(std::move(x.m_matrix)) {}
+    void operator=(PackedBinaryMatrix&& x){ m_matrix = std::move(x.m_matrix); }
+//    PackedBinaryMatrix(const PackedBinaryMatrix& x) : m_matrix(x.m_matrix->clone()) {}
+//    void operator=(const PackedBinaryMatrix& x){ m_matrix = x.m_matrix->clone(); }
 
     //  Don't allow implicit copying.
-    PackedBinaryMatrix2 copy() const{ return m_matrix->clone(); };
+    PackedBinaryMatrix copy() const{ return m_matrix->clone(); };
 
 public:
     //  Construction
-    PackedBinaryMatrix2();
-    PackedBinaryMatrix2(size_t width, size_t height);
+    PackedBinaryMatrix();
+    PackedBinaryMatrix(size_t width, size_t height);
 
     Kernels::BinaryMatrixType type() const{ return m_matrix->type(); }
 
@@ -47,9 +47,9 @@ public:
     void invert(){ return m_matrix->invert(); }
 
     //  Bitwise with another matrix. Dimensions must be the same!
-    void operator^=(const PackedBinaryMatrix2& x){ *m_matrix ^= *x.m_matrix; }
-    void operator|=(const PackedBinaryMatrix2& x){ *m_matrix |= *x.m_matrix; }
-    void operator&=(const PackedBinaryMatrix2& x){ *m_matrix &= *x.m_matrix; }
+    void operator^=(const PackedBinaryMatrix& x){ *m_matrix ^= *x.m_matrix; }
+    void operator|=(const PackedBinaryMatrix& x){ *m_matrix |= *x.m_matrix; }
+    void operator&=(const PackedBinaryMatrix& x){ *m_matrix &= *x.m_matrix; }
 
     std::string dump() const{ return m_matrix->dump(); }
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{ return m_matrix->dump(min_x, min_y, max_x, max_y); }
@@ -62,10 +62,10 @@ public:
     bool get(size_t x, size_t y) const{ return m_matrix->get(x, y); }
     void set(size_t x, size_t y, bool set){ m_matrix->set(x, y, set); }
 
-    PackedBinaryMatrix2 submatrix(size_t x, size_t y, size_t width, size_t height) const{ return m_matrix->submatrix(x, y, width, height); }
+    PackedBinaryMatrix submatrix(size_t x, size_t y, size_t width, size_t height) const{ return m_matrix->submatrix(x, y, width, height); }
 
 public:
-    PackedBinaryMatrix2(std::unique_ptr<Kernels::PackedBinaryMatrix_IB> native)
+    PackedBinaryMatrix(std::unique_ptr<Kernels::PackedBinaryMatrix_IB> native)
         : m_matrix(std::move(native))
     {}
 

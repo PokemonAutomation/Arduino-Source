@@ -71,7 +71,7 @@ Notification NotificationReader::detect(const ImageViewRGB32& screen) const{
     //  Check if there anything that looks like text.
     size_t objects = 0;
     {
-        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
         auto session = make_WaterfillSession(matrix);
         auto finder = session->make_iterator(20);
         WaterfillObject object;

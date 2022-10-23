@@ -21,11 +21,11 @@
 namespace PokemonAutomation{
 
 
-std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
+std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
     const Kernels::Waterfill::WaterfillObject& object,
     size_t num_pixels_to_remove
 ){
-    PackedBinaryMatrix2 matrix = object.packed_matrix();
+    PackedBinaryMatrix matrix = object.packed_matrix();
     size_t width = matrix.width();
     size_t height = matrix.height();
 //    cout << matrix.dump() << endl;
@@ -66,7 +66,7 @@ std::pair<PackedBinaryMatrix2, size_t> remove_center_pixels(
         }
     }
 
-    return std::pair<PackedBinaryMatrix2, size_t>(std::move(matrix), distance_sqr_th);
+    return std::pair<PackedBinaryMatrix, size_t>(std::move(matrix), distance_sqr_th);
 }
 
 bool match_template_by_waterfill(
@@ -85,7 +85,7 @@ bool match_template_by_waterfill(
 
     bool detected = false;
     bool stop_match = false;
-    for(PokemonAutomation::PackedBinaryMatrix2 &matrix : matrices){
+    for(PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
         std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
         Kernels::Waterfill::WaterfillObject object;
         const size_t min_area = area_thresholds.first;
@@ -127,7 +127,7 @@ bool match_template_by_waterfill(
 
 
 void draw_matrix_on_image(
-    const PackedBinaryMatrix2& matrix,
+    const PackedBinaryMatrix& matrix,
     uint32_t color, ImageRGB32& image, size_t offset_x, size_t offset_y
 ){
     for (size_t x = 0; x < matrix.width(); x++){
