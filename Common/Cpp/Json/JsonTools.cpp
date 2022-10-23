@@ -146,7 +146,7 @@ JsonValue from_QJson(const QJsonValue& json){
     }
     if (json.isArray()){
         JsonArray array;
-        for (const auto& item : json.toArray()){
+        for (QJsonValueRef item : json.toArray()){
             array.push_back(from_QJson(item));
         }
         return array;
