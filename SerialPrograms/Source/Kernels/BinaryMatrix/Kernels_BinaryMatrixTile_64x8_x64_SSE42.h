@@ -17,7 +17,7 @@ namespace Kernels{
 
 
 struct BinaryTile_64x8_x64_SSE42{
-    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x8_SSE42;
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x8_x64_SSE42;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 8;
 

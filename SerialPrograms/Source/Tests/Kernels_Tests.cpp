@@ -32,7 +32,7 @@ int test_kernels_ImageScaleBrightness(const ImageViewRGB32& image){
         // break;
     }
     auto time_end = current_time();
-    const double ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    const auto ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
     cout << "Time: " << ms << " ms, " << ms / 1000. << " s" << endl;
 
     // new_image.save("./output.png");

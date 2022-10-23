@@ -17,7 +17,7 @@ namespace Kernels{
 
 
 struct BinaryTile_64x32_x64_AVX512{
-    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x32_AVX512;
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x32_x64_AVX512;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 32;
 

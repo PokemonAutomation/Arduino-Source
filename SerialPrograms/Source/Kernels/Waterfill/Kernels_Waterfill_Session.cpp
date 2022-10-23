@@ -24,13 +24,13 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
     BinaryMatrixType type = get_BinaryMatrixType();
     switch (type){
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    case BinaryMatrixType::i64x64_AVX512:
+    case BinaryMatrixType::i64x64_x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(nullptr);
         }else{
             return make_WaterfillSession_64x64_x64_AVX512(nullptr);
         }
-    case BinaryMatrixType::i64x32_AVX512:
+    case BinaryMatrixType::i64x32_x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x32_x64_AVX512GF(nullptr);
         }else{
@@ -38,11 +38,11 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
         }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    case BinaryMatrixType::i64x16_AVX2:
+    case BinaryMatrixType::i64x16_x64_AVX2:
         return make_WaterfillSession_64x16_x64_AVX2(nullptr);
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    case BinaryMatrixType::i64x8_SSE42:
+    case BinaryMatrixType::i64x8_x64_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(nullptr);
 #endif
     default:
@@ -52,13 +52,13 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
 std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& matrix){
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    case BinaryMatrixType::i64x64_AVX512:
+    case BinaryMatrixType::i64x64_x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(&matrix);
         }else{
             return make_WaterfillSession_64x64_x64_AVX512(&matrix);
         }
-    case BinaryMatrixType::i64x32_AVX512:
+    case BinaryMatrixType::i64x32_x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x32_x64_AVX512GF(&matrix);
         }else{
@@ -66,11 +66,11 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& m
         }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    case BinaryMatrixType::i64x16_AVX2:
+    case BinaryMatrixType::i64x16_x64_AVX2:
         return make_WaterfillSession_64x16_x64_AVX2(&matrix);
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    case BinaryMatrixType::i64x8_SSE42:
+    case BinaryMatrixType::i64x8_x64_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(&matrix);
 #endif
     default:
