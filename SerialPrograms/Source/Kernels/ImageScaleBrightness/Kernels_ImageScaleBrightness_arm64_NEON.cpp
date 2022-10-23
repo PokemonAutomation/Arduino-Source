@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 // #define CHECK_ACCURACY
-
+namespace {
 
 PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
     size_t width, uint32_t* image,
@@ -108,6 +108,8 @@ PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
         cout << std::dec << "After: r g b " << r << " " << g << " " << b << endl;
     }
     #endif
+
+}
 
 }
 

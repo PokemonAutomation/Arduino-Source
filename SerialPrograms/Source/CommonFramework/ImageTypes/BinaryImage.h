@@ -11,7 +11,12 @@
 
 namespace PokemonAutomation{
 
-
+// A wrapper class of the packed binary matrix base class `Kernels::PackedBinaryMatrix_IB`.
+// See the comments of `PackedBinaryMatrix_IB` for details on its usage.
+//
+// This wrapper is useful in making the usage of matrix as a class. Otherwise, because of
+// `PackedBinaryMatrix_IB` being polymorphic, we have to write explictly
+// `std::unique_ptr<Kernels::PackedBinaryMatrix_IB>` to define a matrix.
 class PackedBinaryMatrix2{
 public:
     //  Rule of 5

@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *      This class represents a memory-efficient binary matrix where each bit
+ *  This class represents a memory-efficient binary matrix where each bit
  *  is stored as just one bit in memory.
  *
  *  The representation uses "tiles". So instead of having each row contiguous
@@ -23,7 +23,9 @@
 namespace PokemonAutomation{
 namespace Kernels{
 
-
+// The binary matrix type, which is just what tile shape the matrix uses.
+// The shape of the tile is associated with what CPU feature to use.
+// For example, for AVX2 feature, the optimized shape is 64x16.
 enum class BinaryMatrixType{
     i64x4_Default,
     i64x8_x64_SSE42,
@@ -32,9 +34,25 @@ enum class BinaryMatrixType{
     i64x32_x64_AVX512,
 };
 
+// Get the current active binary matrix type that will be used or is being used
+// by waterfill functions and others.
 BinaryMatrixType get_BinaryMatrixType();
 
-
+// Abstract class for all implmentations of packed binary matrices.
+// Those binary matrices are memory-efficient: each binary element is stored as just one bit in memory.
+// The representation uses "tiles". So instead of having each row contiguous in memory, the space is
+// broken up into "tiles" that provide some vertical spatial locality.
+// This class is mainly used by the Waterfill algorithm which needs vertical locality in memory.
+//
+// Different implmenetations differ by using different shapes/sizes of tiles.
+// To avoid propagating header info of all the implementations and tiles to the code that calls the
+// matrices, we use this abstract base class to have minimum exposure to the caller code.
+// See "Kernels_BinaryMatrix_t.h" for its derived class, `PackedBinaryMatrix_t`, which is a template
+// (with the tile class as the template parameter) and implements some boilerplate matrix-related logic.
+// The tile-specific logic is written in each final derived classes, further derived from `PackedBinaryMatrix_t`.
+//
+// Suffix _IB stands for "internal base (class)".
+// Internal means inside the kernel namespace and Kernel/BinaryMatrix folder.
 class PackedBinaryMatrix_IB{
 public:
     virtual ~PackedBinaryMatrix_IB() = default;

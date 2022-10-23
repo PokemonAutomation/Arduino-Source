@@ -16,7 +16,18 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-
+// Templated packed binary matrix for efficient memory usage.
+// See base class `PackedBinaryMatrix_IB` for the goal of such matrices.
+// Different types of the packed binary matrices is by using different
+// template parameter `Tile`.
+// The shape of the tile is associated with what CPU feature to use.
+// For example, for AVX2 feature, the optimized shape is 64x16.
+// See Kernels_BinaryMatrix.h:BinaryMatrixType as enums of different matrix types.
+//
+// `PackedBinaryMatrix_t` serves as the base class for each different implmenentations
+// for each CPU feature set. It hosts a lot of boilerplate matrix related code that
+// are agonstic to actual tile difinition and tile processing.
+// Suffix _t stands for "template".
 template <typename Tile>
 class PackedBinaryMatrix_t final : public PackedBinaryMatrix_IB{
 public:
