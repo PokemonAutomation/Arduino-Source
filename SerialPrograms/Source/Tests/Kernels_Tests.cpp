@@ -28,7 +28,7 @@ int test_kernels_ImageScaleBrightness(const ImageViewRGB32& image){
     int num_iterations = 5000;
     auto time_start = current_time();
     for(int i = 0; i < num_iterations; i++){
-        scale_brightness(new_image.width(), new_image.height(), new_image.data(), new_image.bytes_per_row(), 1.2, 1.3, 0.5);
+        scale_brightness(new_image.width(), new_image.height(), new_image.data(), new_image.bytes_per_row(), 1.2f, 1.3f, 0.5f);
         // break;
     }
     auto time_end = current_time();
