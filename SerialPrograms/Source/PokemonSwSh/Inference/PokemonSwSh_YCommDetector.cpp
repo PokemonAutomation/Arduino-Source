@@ -78,7 +78,7 @@ YCommIconMatcher::YCommIconMatcher()
     m_aspect_ratio_lower = 0.9;
     m_aspect_ratio_upper = 1.1;
     m_area_ratio_lower = 0.9;
-    m_area_ratio_upper = 1.1;
+    m_area_ratio_upper = 1.2;
 }
 
 const YCommIconMatcher& YCommIconMatcher::instance(){

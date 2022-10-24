@@ -64,16 +64,31 @@ bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t
 
     double error = (double)image_template.width() * candidate_height;
     error /= (double)image_template.height() * candidate_width;
-    // cout << "ratio = " << error << endl;
-    return m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
+    
+    bool pass = m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
+
+    if (!pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        cout << "Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): "
+             << "expected: " << image_template.width() << " : " << image_template.height()
+             << " (" << (double)image_template.width()/image_template.height() << "), "
+             << "actual: " << candidate_width << " : " << candidate_height 
+             << " (" << (double)candidate_width/candidate_height << ") "
+             << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
+    }
+    return pass;
 }
 bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) const{
     if (m_area_ratio == 0){
         return true;
     }
     double error = candidate_area_ratio / m_area_ratio;
-    // cout << "template area ratio " << m_area_ratio << " candidate " << candidate_area_ratio << " area error = " << error << endl;
-    return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
+    bool pass = m_area_ratio_lower <= error && error <= m_area_ratio_upper;
+    if (!pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        cout << "Failed to pass WaterfillTemplateMatcher area ratio check: "
+             << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
+             << "error: " << error << " bound [" << m_area_ratio_lower << ", " << m_area_ratio_upper << "]" << endl;
+    }
+    return pass;
 }
 double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const{
 
@@ -105,15 +120,11 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_i
 }
 double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const{
 
-    // XXX
-    // dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_original_input", extract_box_reference(original_image, object));
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_original_input", extract_box_reference(original_image, object));
+    }
 
     if (!check_aspect_ratio(object.width(), object.height())){
-        // cout << "bad aspect ratio" << endl;
-        // double expected_aspect_ratio = (double)m_object.width() / m_object.height();
-        // double actual_aspect_ratio = (double)object.width() / object.height();
-        // cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
-        // cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){

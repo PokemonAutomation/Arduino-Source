@@ -75,6 +75,8 @@ protected:
     bool check_area_ratio(double candidate_area_ratio) const;
 
 protected:
+    // Below are thresholds of aspect ratio and area ratio to reject a candidate.
+    // They are ususally set by the derived class of `WaterfillTemplateMatcher`.
     double m_aspect_ratio_lower = 0.80;
     double m_aspect_ratio_upper = 1.25;
     double m_area_ratio_lower = 0.80;

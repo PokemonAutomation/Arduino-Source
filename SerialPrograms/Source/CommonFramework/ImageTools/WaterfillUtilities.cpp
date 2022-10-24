@@ -79,7 +79,14 @@ bool match_template_by_waterfill(
 {
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         std::cout << "Match template by waterfill, " << filters.size() << " filter(s), size range ("
-                  << area_thresholds.first << ", " << area_thresholds.second << ")" << std::endl;
+                  << area_thresholds.first << ", ";
+        if (area_thresholds.second == SIZE_MAX){
+            std::cout << "SIZE_MAX";
+        }
+        else{
+            std::cout << area_thresholds.second;
+        }
+        std::cout << ")" << std::endl;
     }
     auto matrices = compress_rgb32_to_binary_range(image, filters);
 
