@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 //#include <map>
-#include <iostream>
+//#include <iostream>
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{

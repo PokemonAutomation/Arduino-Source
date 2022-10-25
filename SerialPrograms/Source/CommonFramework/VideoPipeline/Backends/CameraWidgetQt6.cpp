@@ -180,6 +180,11 @@ VideoSnapshot CameraSession::snapshot(){
         frame_timestamp = m_last_frame_timestamp;
     }
 
+    if (!frame.isValid()){
+        global_logger_tagged().log("QVideoFrame is null.", COLOR_RED);
+        return VideoSnapshot();
+    }
+
     WallClock time0 = current_time();
 
     QImage image = frame.toImage();
