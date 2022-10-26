@@ -53,7 +53,6 @@ namespace PokemonHome{
 using namespace Pokemon;
 
 
-const int MAX_PAGES = 7;
 const int MAX_BOXES = 200;
 const int MAX_COLUMNS = 6;
 const int MAX_ROWS = 5;
