@@ -47,7 +47,6 @@ private:
 
 private:
     PanelHolder& m_holder;
-    MultiSwitchProgramOption& m_option;
     MultiSwitchProgramSession m_session;
     MultiSwitchSystemWidget* m_system;
     ConfigWidget* m_options;
