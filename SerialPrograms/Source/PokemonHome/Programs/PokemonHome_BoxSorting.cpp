@@ -6,9 +6,7 @@
 
 /* TODO ideas
 break into smaller functions
-use "flat" vector instead of 3D (it's easier to manipulate and avoid "translation")
 read pokemon name and store the slug (easier to detect missread than reading a number)
-optimize the search for fitting pokemon by starting from box_nb, column and row instead of 0
 Optimise the swapping algo
 Add enum for ball ? Also, BDSP is reading from swsh data. Worth refactoring ?
 Find a way to let the user customize the sorting algo based on their preference
@@ -472,7 +470,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     std::sort(boxes_sorted.begin(), boxes_sorted.end());
 
     for (const std::optional<Pokemon>& var : boxes_data) {
-        ss << var << " \n";
+        ss << var << "\n";
     }
     env.console.log(ss.str());
     ss.str("");
@@ -480,7 +478,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     ss << std::endl;
 
     for (const std::optional<Pokemon>& var : boxes_sorted) {
-        ss << var << " \n";
+        ss << var << "\n";
     }
     env.console.log(ss.str());
     ss.str("");
@@ -538,9 +536,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 move_cursor_to(env, context, box_nb_s, row_s, column_s, &cur_cursor, GAME_DELAY);
                 pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
                 context.wait_for_all_requests();
-                std::optional<Pokemon> tmp = boxes_data[poke_nb_s];
-                boxes_data[poke_nb_s] = boxes_data[poke_nb];
-                boxes_data[poke_nb] = tmp;
+                std::swap(boxes_data[poke_nb_s], boxes_data[poke_nb]);
                 stats.swaps++;
                 env.update_stats();
                 break;
