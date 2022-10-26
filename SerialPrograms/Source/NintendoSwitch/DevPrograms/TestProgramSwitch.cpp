@@ -42,6 +42,7 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 
 
 #include <QVideoFrame>
@@ -138,8 +139,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    ImageRGB32 image("SV-BattleMenu.png");
-    ImageRGB32 image("SV-Hair.png");
-    image = image.scale_to(1920, 1080);
+//    ImageRGB32 image("SV-Hair.png");
+//    image = image.scale_to(1920, 1080);
 
 
 //    extract_box_reference(image, ImageFloatBox({0.7, 0.6, 0.2, 0.1})).save("tmp.png");
@@ -154,8 +155,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     WhiteButtonFinder white_button_detector3(WhiteButton::ButtonMinus, overlay, box);
     DialogArrowFinder dialog_arrow_detector(overlay, box);
     GradientArrowFinder gradient_arrow_detector(overlay, box);
-    dialog_arrow_detector.make_overlays(set);
-    gradient_arrow_detector.make_overlays(set);
+ //   dialog_arrow_detector.make_overlays(set);
+ //   gradient_arrow_detector.make_overlays(set);
+    BattleMenuFinder battle_menu;
+    battle_menu.make_overlays(set);
 
     while (true){
         scope.wait_for(std::chrono::milliseconds(50));
@@ -167,6 +170,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         white_button_detector3.process_frame(snapshot, current_time());
         dialog_arrow_detector.process_frame(snapshot, current_time());
         gradient_arrow_detector.process_frame(snapshot, current_time());
+        battle_menu.process_frame(snapshot, current_time());
     }
 
 #if 0

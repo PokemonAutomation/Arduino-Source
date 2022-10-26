@@ -57,7 +57,7 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
     bool desired_on = get_mount_coordinates(desired_index, mount);
 
     MountDetector mount_detector;
-    for (size_t c = 0; c < 10; c++){
+    for (size_t c = 0; c < 20; c++){
         context.wait_for_all_requests();
 
         MountState current = mount_detector.detect(console.video().snapshot());

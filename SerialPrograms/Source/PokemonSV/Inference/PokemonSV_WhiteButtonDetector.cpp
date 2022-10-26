@@ -14,9 +14,9 @@
 //#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
