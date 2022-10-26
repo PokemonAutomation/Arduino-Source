@@ -45,7 +45,6 @@ private:
 
 private:
     PanelHolder& m_holder;
-    SingleSwitchProgramOption& m_option;
     SingleSwitchProgramSession m_session;
     SwitchSystemWidget* m_system;
     ConfigWidget* m_options;
