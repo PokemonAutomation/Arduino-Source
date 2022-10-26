@@ -23,7 +23,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " SwSh", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
         "Mass release boxes of " + STRING_POKEMON + ".",
-        FeedbackType::NONE, true, false,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

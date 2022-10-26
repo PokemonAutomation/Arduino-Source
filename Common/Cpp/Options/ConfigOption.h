@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Options_ConfigOption_H
 #define PokemonAutomation_Options_ConfigOption_H
 
-//#include <memory>
 #include <string>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 
 class QWidget;
@@ -19,6 +19,10 @@ class JsonValue;
 class ConfigWidget;
 
 
+enum class LockWhileRunning{
+    UNLOCK_WHILE_RUNNING,
+    LOCK_WHILE_RUNNING,
+};
 enum class ConfigOptionState{
     ENABLED,
     DISABLED,
@@ -34,7 +38,8 @@ enum class ConfigOptionState{
 class ConfigOption{
 public:
     struct Listener{
-        virtual void value_changed() = 0;
+        virtual void program_state_changed(bool program_is_running){};
+        virtual void value_changed(){};
     };
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
@@ -49,6 +54,7 @@ protected:
 
 public:
     ConfigOption();
+    ConfigOption(LockWhileRunning lock_while_program_is_running);
     ConfigOption(ConfigOptionState visibility);
 
 //    //  Deep copy this entire config. This will not copy listeners.
@@ -66,6 +72,9 @@ public:
     //  This is called by the framework at the start of a program to reset any
     //  transient state that the option object may have.
     virtual void reset_state(){};
+
+    bool lock_while_program_is_running() const;
+    void set_program_is_running(bool program_is_running);
 
     ConfigOptionState visibility() const;
     virtual void set_visibility(ConfigOptionState visibility);

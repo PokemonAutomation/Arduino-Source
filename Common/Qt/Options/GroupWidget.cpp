@@ -84,17 +84,24 @@ void GroupWidget::set_options_enabled(bool enabled){
         item->widget().setEnabled(enabled);
     }
 }
-void GroupWidget::update(){
-    ConfigWidget::update();
+void GroupWidget::update_value(){
     bool on = m_value.enabled();
     m_group_box->setChecked(on);
     for (ConfigWidget* item : m_options){
-        item->update();
+        item->update_value();
+    }
+}
+void GroupWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    bool on = m_value.enabled();
+    m_group_box->setChecked(on);
+    for (ConfigWidget* item : m_options){
+        item->update_visibility(program_is_running);
     }
 }
 void GroupWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 void GroupWidget::mouseDoubleClickEvent(QMouseEvent* event){

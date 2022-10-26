@@ -63,7 +63,8 @@ TradeCountTable::TradeCountTable()
         "<br>Trade each " + STRING_POKEMON + " of this species this many times.<br>"
         "The defaults here are the # of catches needed to max out research. "
         "Maxing out catches is sufficient to reach level 10 for everything except Unown, Spritomb, and legendaries. "
-        "Note that gen1 trade evolutions cannot be touch traded. The program will skip them. This applies to Kadabra, Haunter, Graveler, and Machoke."
+        "Note that gen1 trade evolutions cannot be touch traded. The program will skip them. This applies to Kadabra, Haunter, Graveler, and Machoke.",
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
 {
     for (const std::string& slug : HISUI_DEX_SLUGS()){

@@ -23,7 +23,8 @@ ConsoleSettings& ConsoleSettings::instance(){
     return settings;
 }
 ConsoleSettings::ConsoleSettings()
-    : CONNECT_CONTROLLER_DELAY(
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , CONNECT_CONTROLLER_DELAY(
         "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"

@@ -41,6 +41,7 @@ CaughtScreenActionOption::CaughtScreenActionOption(
                     : "Reset Game if win-rate is above the threshold. Otherwise continue running."
             },
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         default_action
     )
 {}
@@ -51,7 +52,7 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
     CaughtScreenAction default_shiny_nonboss,
     CaughtScreenAction default_shiny_boss
 )
-    : GroupOption("End Adventure Actions")
+    : GroupOption("End Adventure Actions", LockWhileRunning::LOCK_WHILE_RUNNING)
     , no_shinies(false, winrate_reset_tooltip, "<b>No Shinies:</b>", default_no_shinies)
     , shiny_nonboss(
         true, winrate_reset_tooltip,
@@ -86,7 +87,7 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
 
 
 ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const LanguageSet& languages, bool host)
-    : GroupOption(std::move(label))
+    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
     , language("<b>Game Language:</b>", languages, true)
 {
@@ -107,7 +108,8 @@ Consoles::~Consoles(){
     HOST.remove_listener(*this);
 }
 Consoles::Consoles(const ConsoleSpecificOptionsFactory& factory)
-    : m_languages(PokemonNameReader::instance().languages())
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_languages(PokemonNameReader::instance().languages())
 {
     PLAYERS[0] = factory.make("Switch 0 (Top Left)", m_languages, true);
     PLAYERS[1] = factory.make("Switch 1 (Top Right)", m_languages, false);

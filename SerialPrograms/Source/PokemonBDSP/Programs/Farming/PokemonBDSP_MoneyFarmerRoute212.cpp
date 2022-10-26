@@ -30,7 +30,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         STRING_POKEMON + " BDSP", "Money Farmer (Route 212)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute212.md",
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -70,6 +70,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
             {StartLocation::Hearthome, "hearthome", "In front of the Hearthome City " + STRING_POKEMON + " center."},
             {StartLocation::OldCouple, "old-couple", "In the row above the rich couple in Route 212."},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         StartLocation::Hearthome
     )
     , HEALING_METHOD(
@@ -78,6 +79,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
             {HealMethod::Hearthome, "hearthome", "Hearthome City " + STRING_POKEMON + " center."},
             {HealMethod::GlobalRoom, "global-room", "Use Global Room. (will force update your game)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HealMethod::Hearthome
     )
     , MOVE1_PP("<b>Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)

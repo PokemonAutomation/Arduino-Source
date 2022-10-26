@@ -16,12 +16,13 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
+class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget{
 public:
     ~SimpleIntegerCellWidget();
     SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -31,12 +32,12 @@ private:
 
 
 template <typename Type>
-class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
 public:
     ~SimpleIntegerOptionWidget();
     SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
 
-    virtual void update() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

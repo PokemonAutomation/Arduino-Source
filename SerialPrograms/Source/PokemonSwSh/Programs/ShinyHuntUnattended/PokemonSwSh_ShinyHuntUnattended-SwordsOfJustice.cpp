@@ -27,7 +27,7 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
         "Hunt for shiny SOJs. Stop when a shiny is found.",
-        FeedbackType::NONE, true, false,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

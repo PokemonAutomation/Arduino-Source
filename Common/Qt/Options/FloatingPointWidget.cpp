@@ -63,13 +63,16 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
     );
     value.add_listener(*this);
 }
-void FloatingPointCellWidget::update(){
-    ConfigWidget::update();
+void FloatingPointCellWidget::update_value(){
     this->setText(QString::number(m_value, 'f'));
+}
+void FloatingPointCellWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void FloatingPointCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -93,14 +96,14 @@ FloatingPointOptionWidget::FloatingPointOptionWidget(QWidget& parent, FloatingPo
     layout->addWidget(m_cell, 1);
     value.add_listener(*this);
 }
-void FloatingPointOptionWidget::update(){
-    ConfigWidget::update();
-//    m_cell->update();
+void FloatingPointOptionWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+//    m_cell->update_value();
 }
 void FloatingPointOptionWidget::value_changed(){
-    QMetaObject::invokeMethod(this, [this]{
-        update();
-    }, Qt::QueuedConnection);
+//    QMetaObject::invokeMethod(this, [this]{
+//        update_value();
+//    }, Qt::QueuedConnection);
 }
 
 

@@ -33,7 +33,7 @@ ResolutionOption::ResolutionOption(
     std::string label, std::string description,
     int default_width, int default_height
 )
-    : GroupOption(std::move(label))
+    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
     , DESCRIPTION(std::move(description))
     , WIDTH("<b>Width:</b>", scale_dpi_width(default_width))
     , HEIGHT("<b>Height:</b>", scale_dpi_height(default_height))
@@ -87,7 +87,8 @@ GlobalSettings& GlobalSettings::instance(){
     return settings;
 }
 GlobalSettings::GlobalSettings()
-    : SEND_ERROR_REPORTS(
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
         false
@@ -147,12 +148,14 @@ GlobalSettings::GlobalSettings()
     , AUDIO_FILE_VOLUME_SCALE(
         "<b>Audio File Input Volume Scale:</b><br>"
         "Multiply audio file playback by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.31622776601683793320, //  -10dB
         -10000, 10000
     )
     , AUDIO_DEVICE_VOLUME_SCALE(
         "<b>Audio Device Input Volume Scale:</b><br>"
         "Multiply audio device input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, -10000, 10000
     )
     , SHOW_ALL_AUDIO_DEVICES(

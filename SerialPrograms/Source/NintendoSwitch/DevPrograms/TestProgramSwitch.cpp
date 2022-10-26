@@ -82,7 +82,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Nintendo Switch", "Test Program (Switch)",
         "",
         "Test Program (Switch)",
-        FeedbackType::OPTIONAL_, false, true,
+        FeedbackType::OPTIONAL_, true,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

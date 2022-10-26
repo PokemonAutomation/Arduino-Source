@@ -37,7 +37,7 @@ IngoMoveGrinder_Descriptor::IngoMoveGrinder_Descriptor()
         STRING_POKEMON + " LA", "Ingo Move Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoMoveGrinder.md",
         "Attend Ingo's battles to grind move related " + STRING_POKEDEX + " research tasks. More effective than Ingo Battle Grinder for " + STRING_POKEDEX + " research tasks but less effective for everything else.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

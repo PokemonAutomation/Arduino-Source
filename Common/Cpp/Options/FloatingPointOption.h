@@ -19,12 +19,14 @@ public:
     ~FloatingPointCell();
     FloatingPointCell(const FloatingPointCell& x);
     FloatingPointCell(
+        LockWhileRunning lock_while_running,
         double min_value, double max_value,
         double default_value, double current_value
     );
 
 public:
     FloatingPointCell(
+        LockWhileRunning lock_while_running,
         double default_value,
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()
@@ -59,6 +61,7 @@ public:
 
     FloatingPointOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         double default_value,
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()

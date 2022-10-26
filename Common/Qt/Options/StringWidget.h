@@ -15,12 +15,13 @@ namespace PokemonAutomation{
 
 
 
-class StringCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
+class StringCellWidget : public QLineEdit, public ConfigWidget{
 public:
     ~StringCellWidget();
     StringCellWidget(QWidget& parent, StringCell& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -29,12 +30,13 @@ private:
 
 
 
-class StringOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class StringOptionWidget : public QWidget, public ConfigWidget{
 public:
     ~StringOptionWidget();
     StringOptionWidget(QWidget& parent, StringOption& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

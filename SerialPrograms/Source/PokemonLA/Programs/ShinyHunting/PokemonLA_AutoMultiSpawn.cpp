@@ -200,7 +200,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         STRING_POKEMON + " LA", "Auto Multi-Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AutoMultiSpawn.md",
         "Advance a path in MultiSpawn shiny hunting method.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -212,8 +212,10 @@ AutoMultiSpawn::AutoMultiSpawn()
         "<b>Spawn Point</b>:",
         {
             {MultiSpawn::MirelandsHippopotas, "mirelands-hippopotas", "Mirelands - Hippopotas"},
-        }, MultiSpawn::MirelandsHippopotas
-        )
+        },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        MultiSpawn::MirelandsHippopotas
+    )
     , PATH(false, "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".", "", "")
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,

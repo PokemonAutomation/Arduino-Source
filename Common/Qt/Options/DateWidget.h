@@ -17,12 +17,13 @@ namespace PokemonAutomation{
 
 
 
-class DateWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class DateWidget : public QWidget, public ConfigWidget{
 public:
     ~DateWidget();
     DateWidget(QWidget& parent, DateOption& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

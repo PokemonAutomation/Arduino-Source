@@ -18,7 +18,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Nintendo Switch", "Turbo Button",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboButton.md",
         "Mash a controller button. (similar to turbo controller)",
-        FeedbackType::NONE, true, false,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -44,6 +44,7 @@ TurboButton::TurboButton()
             {BUTTON_HOME,       "HOME", "Home"},
             {BUTTON_CAPTURE,    "CAPTURE", "Capture"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         BUTTON_A
     )
     , PRESS_DURATION(

@@ -30,7 +30,7 @@ MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
         STRING_POKEMON + " BDSP", "Money Farmer (Route 210)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute210.md",
         "Farm money by using VS Seeker to rebattle the Ace Trainer couple on Route 210.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -65,6 +65,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
             {StartLocation::CelesticTown, "celestic", "In front of the Celestic Town " + STRING_POKEMON + " center."},
             {StartLocation::AceTrainerPair, "trainer-pair", "Lower-most row of the platform the Ace Trainer pair in Route 210 is on."},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         StartLocation::CelesticTown
     )
     , HEALING_METHOD(
@@ -73,6 +74,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
             {HealMethod::CelesticTown, "celestic", "Celestic Town " + STRING_POKEMON + " center."},
             {HealMethod::GlobalRoom, "global-room", "Use Global Room. (will force update your game)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HealMethod::CelesticTown
     )
     , MON0_MOVE1_PP("<b>Lead " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)

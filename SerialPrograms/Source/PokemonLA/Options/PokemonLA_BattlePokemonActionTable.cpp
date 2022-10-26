@@ -197,8 +197,8 @@ const IntegerEnumDatabase& MoveIndex_Database(){
 
 
 MoveGrinderActionRow::MoveGrinderActionRow()
-    : pokemon_index(PokemonIndex_Database(), 0)
-    , move_index(MoveIndex_Database(), 0)
+    : pokemon_index(PokemonIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
+    , move_index(MoveIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
     , attempts(1, 1)
 {
     PA_ADD_OPTION(pokemon_index);

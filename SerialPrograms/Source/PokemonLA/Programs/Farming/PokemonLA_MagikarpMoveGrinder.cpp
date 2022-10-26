@@ -39,7 +39,7 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         STRING_POKEMON + " LA", "Magikarp Move Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/MagikarpMoveGrinder.md",
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

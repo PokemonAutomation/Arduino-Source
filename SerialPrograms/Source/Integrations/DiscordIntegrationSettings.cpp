@@ -16,7 +16,7 @@ namespace Integration{
 
 
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : GroupOption("Discord Integration Settings", true, false)
+    : GroupOption("Discord Integration Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
 //    , m_integration_enabled(integration_enabled)
     , token(
         true,

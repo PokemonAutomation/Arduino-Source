@@ -21,7 +21,8 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , OVERWORLD_TO_MENU_DELAY(
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
         TICKS_PER_SECOND,
@@ -99,34 +100,42 @@ GameSettings::GameSettings()
     )
     , SHINY_ALPHA_OVERALL_THRESHOLD(
         "<b>Shiny Threshold (overall):</b><br>Threshold to detect a shiny encounter.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         4.0, 0
     )
     , SHINY_ALPHA_SIDE_THRESHOLD(
         "<b>Shiny Threshold (left/right):</b><br>Threshold to detect a left/right shiny.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         3.0, 0
     )
     , BALL_SPARKLE_ALPHA(
         "<b>Ball Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, 0
     )
     , STAR_SPARKLE_ALPHA(
         "<b>Star Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, 0
     )
     , SHINY_DIALOG_ALPHA(
         "<b>Shiny Dialog Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         3.5, 0
     )
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.87, 0, 1.0
     )
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5000, 0, 48000
     )
     , SHINY_SOUND_ALPHA(
         "<b>Shiny Sound Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5.0, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")

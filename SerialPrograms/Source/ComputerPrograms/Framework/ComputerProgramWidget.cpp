@@ -95,7 +95,7 @@ ComputerProgramWidget::ComputerProgramWidget(
         this, [&]{
             std::lock_guard<std::mutex> lg(m_session.program_lock());
             option.restore_defaults();
-            m_options->update();
+            m_options->update_visibility(false);
         }
     );
 

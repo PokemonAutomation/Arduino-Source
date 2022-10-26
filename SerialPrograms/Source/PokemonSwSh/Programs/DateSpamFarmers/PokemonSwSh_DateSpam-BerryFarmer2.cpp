@@ -31,7 +31,7 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer2.md",
         "Farm berries using Feedback.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -108,7 +108,9 @@ BerryFarmer2::BerryFarmer2()
         "240"
     )
     , SOUND_THRESHOLD(
-        "<b>Maximum Sound Error Coefficient", 0.68, 0, 1.0
+        "<b>Maximum Sound Error Coefficient",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        0.68, 0, 1.0
     )
 {
     PA_ADD_OPTION(REQUIRES_AUDIO);

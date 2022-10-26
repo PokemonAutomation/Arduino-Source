@@ -67,14 +67,17 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropd
 }
 
 
-void EnumDropdownCellWidget::update(){
-    ConfigWidget::update();
-    this->setCurrentIndex(m_value_to_index[m_value.current_value()]);
-}
 void EnumDropdownCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
+}
+void EnumDropdownCellWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
+}
+void EnumDropdownCellWidget::update_value(){
+    this->setCurrentIndex(m_value_to_index[m_value.current_value()]);
 }
 
 
@@ -95,9 +98,9 @@ EnumDropdownOptionWidget::EnumDropdownOptionWidget(QWidget& parent, IntegerEnumD
 }
 
 
-void EnumDropdownOptionWidget::update(){
-    ConfigWidget::update();
-    m_cell->update();
+void EnumDropdownOptionWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    m_cell->update_value();
 }
 
 

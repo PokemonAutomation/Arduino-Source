@@ -17,12 +17,13 @@ namespace PokemonAutomation{
 
 
 
-class TextEditWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class TextEditWidget : public QWidget, public ConfigWidget{
 public:
     ~TextEditWidget();
     TextEditWidget(QWidget& parent, TextEditOption& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

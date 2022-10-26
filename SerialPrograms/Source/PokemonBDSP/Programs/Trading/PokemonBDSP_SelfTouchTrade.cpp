@@ -23,7 +23,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Touch Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/SelfTouchTrade.md",
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 2, 2
     )
@@ -40,6 +40,7 @@ SelfTouchTrade::SelfTouchTrade()
             {HostingSwitch::Switch0, "switch0", "Switch 0 (Left)"},
             {HostingSwitch::Switch1, "switch1", "Switch 1 (Right)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HostingSwitch::Switch0
     )
     , BOXES_TO_TRADE(

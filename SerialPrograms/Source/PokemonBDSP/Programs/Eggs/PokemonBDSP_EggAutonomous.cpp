@@ -32,7 +32,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggAutonomous.md",
         "Automatically fetch+hatch eggs and keep all shinies.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -70,6 +70,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , AUTO_SAVING(
@@ -83,6 +84,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

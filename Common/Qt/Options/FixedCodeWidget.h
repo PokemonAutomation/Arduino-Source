@@ -16,12 +16,13 @@ class QLineEdit;
 namespace PokemonAutomation{
 
 
-class FixedCodeWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class FixedCodeWidget : public QWidget, public ConfigWidget{
 public:
     ~FixedCodeWidget();
     FixedCodeWidget(QWidget& parent, FixedCodeOption& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

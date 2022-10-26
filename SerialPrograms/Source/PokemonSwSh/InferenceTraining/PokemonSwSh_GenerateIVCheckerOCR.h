@@ -26,6 +26,7 @@ public:
         : EnumDropdownOption<IVCheckerValue>(
             std::move(label),
             IVCheckerValue_Database(),
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             default_value
         )
     {}

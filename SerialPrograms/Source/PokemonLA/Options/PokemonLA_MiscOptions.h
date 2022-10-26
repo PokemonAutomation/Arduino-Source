@@ -29,6 +29,7 @@ public:
                 {ResetMethod::SoftReset,        "reset",                "Soft Reset"},
                 {ResetMethod::GoBackToVillage,  "return-to-village",    "Go back to village"},
             },
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             ResetMethod::SoftReset
         )
     {}
@@ -56,6 +57,7 @@ public:
                 {StopOn::ShinyOrAlpha,  "shiny-or-alpha",   "Shiny or Alpha"},
                 {StopOn::ShinyAndAlpha, "shiny-and-alpha",  "Shiny and Alpha"},
             },
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             StopOn::ShinyOrAlpha
         )
     {}
@@ -77,6 +79,7 @@ public:
                 {ExitBattleMethod::RunAway, "run", "Run Away"},
                 {ExitBattleMethod::MashAToKill, "mash-a-to-kill", "Mash A to Kill"},
             },
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             ExitBattleMethod::RunAway
         )
     {}
@@ -95,6 +98,7 @@ public:
                 {TimeOfDay::EVENING,  TIME_OF_DAY_NAMES[int(TimeOfDay::EVENING)], "Evening"},
                 {TimeOfDay::MIDNIGHT, TIME_OF_DAY_NAMES[int(TimeOfDay::MIDNIGHT)], "Midnight"},
             },
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             TimeOfDay::NONE
         )
     {}

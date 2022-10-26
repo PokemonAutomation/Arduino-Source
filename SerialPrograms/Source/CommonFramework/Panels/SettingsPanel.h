@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 class SettingsPanelInstance : public PanelInstance{
 public:
-    using PanelInstance::PanelInstance;
+    SettingsPanelInstance(const PanelDescriptor& descriptor);
 
     void add_option(ConfigOption& option, std::string serialization_string){
         m_options.add_option(option, std::move(serialization_string));

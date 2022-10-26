@@ -48,13 +48,16 @@ DateWidget::DateWidget(QWidget& parent, DateOption& value)
 
     value.add_listener(*this);
 }
-void DateWidget::update(){
-    ConfigWidget::update();
+void DateWidget::update_value(){
     m_date_edit->setDate(m_value.get());
+}
+void DateWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void DateWidget::value_changed(){
     QMetaObject::invokeMethod(m_date_edit, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

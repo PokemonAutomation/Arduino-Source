@@ -33,6 +33,7 @@ ProcessorLevelOption::ProcessorLevelOption()
         "<b>Processor Specific Optimization:</b><br>"
         "Note that this only applies to this binary. External dependencies may ignore this and use higher instructions anyway.",
         CAPABILITIES_DATABASE(),
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         get_default_ProcessorLevel_index()
     )
 {

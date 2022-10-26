@@ -15,11 +15,13 @@ namespace PokemonAutomation{
 
 struct ConfigOption::Data{
     mutable SpinLock lock;
+    bool lock_while_program_is_running;
     std::atomic<ConfigOptionState> visibility;
     std::set<Listener*> listeners;
 
-    Data(ConfigOptionState p_visibility = ConfigOptionState::ENABLED)
-        : visibility(p_visibility)
+    Data(bool p_lock_while_program_is_running, ConfigOptionState p_visibility)
+        : lock_while_program_is_running(p_lock_while_program_is_running)
+        , visibility(p_visibility)
     {}
 
     bool set_visibility(ConfigOptionState state){
@@ -43,14 +45,17 @@ struct ConfigOption::Data{
 
 ConfigOption::~ConfigOption() = default;
 ConfigOption::ConfigOption(const ConfigOption& x)
-    : m_data(CONSTRUCT_TOKEN, x.visibility())
+    : m_data(CONSTRUCT_TOKEN, x.lock_while_program_is_running(), x.visibility())
 {}
 
 ConfigOption::ConfigOption()
-    : m_data(CONSTRUCT_TOKEN)
+    : m_data(CONSTRUCT_TOKEN, true, ConfigOptionState::ENABLED)
+{}
+ConfigOption::ConfigOption(LockWhileRunning lock_while_program_is_running)
+    : m_data(CONSTRUCT_TOKEN, lock_while_program_is_running == LockWhileRunning::LOCK_WHILE_RUNNING, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(ConfigOptionState visibility)
-    : m_data(CONSTRUCT_TOKEN, visibility)
+    : m_data(CONSTRUCT_TOKEN, true, visibility)
 {}
 
 void ConfigOption::add_listener(Listener& listener){
@@ -88,6 +93,16 @@ std::string ConfigOption::check_validity() const{
     return std::string();
 }
 void ConfigOption::restore_defaults(){}
+bool ConfigOption::lock_while_program_is_running() const{
+    return m_data->lock_while_program_is_running;
+}
+void ConfigOption::set_program_is_running(bool program_is_running){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.lock);
+    for (Listener* listener : data.listeners){
+        listener->program_state_changed(program_is_running);
+    }
+}
 ConfigOptionState ConfigOption::visibility() const{
     return m_data->visibility.load(std::memory_order_relaxed);
 }

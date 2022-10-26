@@ -127,16 +127,19 @@ void RandomCodeWidget::update_labels(){
         m_under_text->setText(QString::fromStdString("Random Code: " + random_code_string()));
     }
 }
-void RandomCodeWidget::update(){
-    ConfigWidget::update();
+void RandomCodeWidget::update_value(){
     RaidCodeOption current = m_value;
     m_box_random->setText(QString::number(current.random_digits()));
     m_box_code->setText(QString::fromStdString(current.code_string()));
     update_labels();
 }
+void RandomCodeWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
+}
 void RandomCodeWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

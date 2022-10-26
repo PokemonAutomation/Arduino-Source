@@ -18,11 +18,12 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-class LanguageOCRWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class LanguageOCRWidget : public QWidget, public ConfigWidget{
 public:
     LanguageOCRWidget(QWidget& parent, LanguageOCR& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

@@ -19,7 +19,6 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string doc_link,
     std::string description,
     FeedbackType feedback,
-    bool lock_options_while_running,
     bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level
 )
@@ -32,7 +31,6 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
-    , m_lock_options_while_running(lock_options_while_running)
     , m_allow_commands_while_running(allow_commands_while_running)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
@@ -42,7 +40,8 @@ std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const
 
 
 SingleSwitchProgramInstance::SingleSwitchProgramInstance()
-    : NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    : m_options(LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
         true, false,

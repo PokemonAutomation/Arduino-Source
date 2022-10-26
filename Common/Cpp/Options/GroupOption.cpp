@@ -36,10 +36,12 @@ struct GroupOption::Data{
 GroupOption::~GroupOption() = default;
 GroupOption::GroupOption(
     std::string label,
+    LockWhileRunning lock_while_program_is_running,
     bool toggleable,
     bool enabled
 )
-    : m_data(CONSTRUCT_TOKEN, std::move(label), toggleable, enabled)
+    : BatchOption(lock_while_program_is_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), toggleable, enabled)
 {}
 
 const std::string GroupOption::label() const{

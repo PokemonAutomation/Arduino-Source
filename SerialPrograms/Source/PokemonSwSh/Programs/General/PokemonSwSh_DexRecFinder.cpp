@@ -35,7 +35,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
-        FeedbackType::OPTIONAL_, true, false,
+        FeedbackType::OPTIONAL_, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -64,7 +64,7 @@ std::unique_ptr<StatsTracker> DexRecFinder_Descriptor::make_stats() const{
 
 
 DexRecFilters::DexRecFilters()
-    : GroupOption("Stop Automatically (requires video feedback)", true, true)
+    : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCK_WHILE_RUNNING, true, true)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for stop filters to work correctly.",
         PokemonNameReader::instance().languages(), true

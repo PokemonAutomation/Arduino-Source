@@ -49,15 +49,20 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
 
     value.add_listener(*this);
 }
-void BatchWidget::update(){
-    ConfigWidget::update();
+void BatchWidget::update_value(){
     for (ConfigWidget* item : m_options){
-        item->update();
+        item->update_value();
+    }
+}
+void BatchWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    for (ConfigWidget* item : m_options){
+        item->update_visibility(program_is_running);
     }
 }
 void BatchWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

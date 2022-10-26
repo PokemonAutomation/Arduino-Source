@@ -207,8 +207,13 @@ struct StaticTableOption::Data{
 
 
 StaticTableOption::~StaticTableOption() = default;
-StaticTableOption::StaticTableOption(std::string label, bool enable_saveload)
-    : m_data(CONSTRUCT_TOKEN, std::move(label), enable_saveload)
+StaticTableOption::StaticTableOption(
+    std::string label,
+    LockWhileRunning lock_while_program_is_running,
+    bool enable_saveload
+)
+    : ConfigOption(lock_while_program_is_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), enable_saveload)
 {}
 void StaticTableOption::add_row(std::unique_ptr<StaticTableRow> row){
     m_data->add_row(std::move(row));

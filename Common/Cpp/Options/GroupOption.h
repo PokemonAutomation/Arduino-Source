@@ -18,6 +18,7 @@ public:
     ~GroupOption();
     GroupOption(
         std::string label,
+        LockWhileRunning lock_while_program_is_running,
         bool toggleable = false,
         bool enabled = true
     );

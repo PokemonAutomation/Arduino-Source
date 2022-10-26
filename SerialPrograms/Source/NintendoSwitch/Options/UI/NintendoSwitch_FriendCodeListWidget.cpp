@@ -74,13 +74,16 @@ FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption
     m_value.add_listener(*this);
 }
 
-void FriendCodeListWidget::update(){
-    ConfigWidget::update();
+void FriendCodeListWidget::update_value(){
     m_box->redraw();
+}
+void FriendCodeListWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void FriendCodeListWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

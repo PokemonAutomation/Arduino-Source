@@ -29,7 +29,7 @@ ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-Poketch.md",
         "Activate the menu glitch using the Pok\u00e9tch. "
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

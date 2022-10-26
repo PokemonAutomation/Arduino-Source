@@ -21,9 +21,11 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : m_general("<font size=4><b>General Settings:</b></font>")
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_general("<font size=4><b>General Settings:</b></font>")
     , POST_WARP_DELAY(
         "<b>Post-Warp Delay:</b><br>After warping, wait this many seconds before continuing.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, 0, 100
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
@@ -71,26 +73,32 @@ GameSettings::GameSettings()
     )
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.87, 0, 1.0
     )
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5000, 0, 48000
     )
     , ALPHA_ROAR_THRESHOLD(
         "<b>Alpha Roar Threshold:</b><br>Maximum error coefficient to trigger an alpha roar detection.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.65, 0, 1.0
     )
     , ALPHA_MUSIC_THRESHOLD(
         "<b>Alpha Music Threshold:</b><br>Maximum error coefficient to trigger an alpha music detection.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.81, 0, 1.0
     )
     , ITEM_DROP_SOUND_THRESHOLD(
         "<b>Item Drop Sound Threshold:</b><br>Maximum error coefficient to trigger an item drop sound detection.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.9, 0, 1.0
     )
     , ITEM_DROP_SOUND_LOW_FREQUENCY(
         "<b>Item Drop Sound Low Frequency (Hz):</b><br>High pass filter frequency for item drop sound.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5000, 0, 48000
     )
 {

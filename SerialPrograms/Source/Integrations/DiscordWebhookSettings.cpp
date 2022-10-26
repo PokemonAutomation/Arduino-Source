@@ -87,7 +87,7 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
 
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
-    : GroupOption("Discord Webhook Settings", true, false)
+    : GroupOption("Discord Webhook Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
 {
     PA_ADD_OPTION(urls);
 }

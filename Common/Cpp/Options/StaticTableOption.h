@@ -56,7 +56,11 @@ private:
 class StaticTableOption : public ConfigOption{
 public:
     ~StaticTableOption();
-    StaticTableOption(std::string label, bool enable_saveload = true);
+    StaticTableOption(
+        std::string label,
+        LockWhileRunning lock_while_program_is_running,
+        bool enable_saveload = true
+    );
 protected:
     //  Construction Steps:
 

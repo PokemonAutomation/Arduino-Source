@@ -26,12 +26,26 @@ public:
     IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x);
 
 public:
-    IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value, size_t current_value);
-    IntegerEnumDropdownCell(const IntegerEnumDatabase& database, size_t default_value);
+    IntegerEnumDropdownCell(
+        const IntegerEnumDatabase& database,
+        LockWhileRunning lock_while_running,
+        size_t default_value, size_t current_value
+    );
+    IntegerEnumDropdownCell(
+        const IntegerEnumDatabase& database,
+        LockWhileRunning lock_while_running,
+        size_t default_value
+    );
 
     //  Constructing from inlined database is not supported for cell.
-    IntegerEnumDropdownCell(IntegerEnumDatabase&& database, size_t default_value, size_t current_value) = delete;
-    IntegerEnumDropdownCell(IntegerEnumDatabase&& database, size_t default_value) = delete;
+    IntegerEnumDropdownCell(IntegerEnumDatabase&& database,
+        LockWhileRunning lock_while_running,
+        size_t default_value, size_t current_value
+    ) = delete;
+    IntegerEnumDropdownCell(IntegerEnumDatabase&& database,
+        LockWhileRunning lock_while_running,
+        size_t default_value
+    ) = delete;
 
     size_t default_value() const;
     size_t current_value() const;
@@ -57,12 +71,20 @@ private:
 template <typename EnumType>
 class EnumDropdownCell : public IntegerEnumDropdownCell{
 public:
-    EnumDropdownCell(const EnumDatabase<EnumType>& database, EnumType default_value)
-        : IntegerEnumDropdownCell(database, (size_t)default_value)
+    EnumDropdownCell(
+        const EnumDatabase<EnumType>& database,
+        LockWhileRunning lock_while_running,
+        EnumType default_value
+    )
+        : IntegerEnumDropdownCell(database, lock_while_running, (size_t)default_value)
     {}
 
     //  Constructing from inlined database is not supported for cell.
-    EnumDropdownCell(EnumDatabase<EnumType>&& database, EnumType default_value) = delete;
+    EnumDropdownCell(
+        EnumDatabase<EnumType>&& database,
+        LockWhileRunning lock_while_running,
+        EnumType default_value
+    ) = delete;
 
     operator EnumType() const{
         return (EnumType)current_value();
@@ -90,19 +112,21 @@ public:
     IntegerEnumDropdownOption(
         std::string label,
         const IntegerEnumDatabase& database,
+        LockWhileRunning lock_while_running,
         size_t default_value
     )
         : IntegerEnumDatabase(nullptr)
-        , IntegerEnumDropdownCell(database, default_value)
+        , IntegerEnumDropdownCell(database, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
     IntegerEnumDropdownOption(
         std::string label,
         IntegerEnumDatabase&& database,
+        LockWhileRunning lock_while_running,
         size_t default_value
     )
         : IntegerEnumDatabase(std::move(database))
-        , IntegerEnumDropdownCell(*this, default_value)
+        , IntegerEnumDropdownCell(*this, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
 
@@ -121,16 +145,18 @@ public:
     EnumDropdownOption(
         std::string label,
         const EnumDatabase<EnumType>& database,
+        LockWhileRunning lock_while_running,
         EnumType default_value
     )
-        : IntegerEnumDropdownOption(std::move(label), database, (size_t)default_value)
+        : IntegerEnumDropdownOption(std::move(label), database, lock_while_running, (size_t)default_value)
     {}
     EnumDropdownOption(
         std::string label,
         EnumDatabase<EnumType>&& database,
+        LockWhileRunning lock_while_running,
         EnumType default_value
     )
-        : IntegerEnumDropdownOption(std::move(label), std::move(database), (size_t)default_value)
+        : IntegerEnumDropdownOption(std::move(label), std::move(database), lock_while_running, (size_t)default_value)
     {}
 
     operator EnumType() const{

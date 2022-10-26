@@ -31,7 +31,11 @@ const EnumDatabase<MoveStyle>& MoveStyle_Database();
 class MoveStyleCell : public EnumDropdownCell<MoveStyle>{
 public:
     MoveStyleCell()
-        : EnumDropdownCell<MoveStyle>(MoveStyle_Database(), MoveStyle::NoStyle)
+        : EnumDropdownCell<MoveStyle>(
+            MoveStyle_Database(),
+            LockWhileRunning::LOCK_WHILE_RUNNING,
+            MoveStyle::NoStyle
+        )
     {}
 };
 

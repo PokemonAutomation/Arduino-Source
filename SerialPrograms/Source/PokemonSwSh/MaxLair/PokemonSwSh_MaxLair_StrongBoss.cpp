@@ -31,7 +31,7 @@ MaxLairStrongBoss_Descriptor::MaxLairStrongBoss_Descriptor()
         STRING_POKEMON + " SwSh", "Max Lair - Strong Boss",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MaxLair-StrongBoss.md",
         "Auto Max Lair 2.0 - Run Dynamax Adventures and intelligently reset to keep paths that have high win rates.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )
@@ -98,6 +98,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.75, 0, 1.0
     )
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())

@@ -12,7 +12,7 @@ namespace PokemonSwSh{
 
 
 AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool max_lair)
-    : GroupOption(std::move(label), true, false)
+    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
     , DESCRIPTION(
         "<b>Description:</b>", "",
         max_lair

@@ -21,7 +21,8 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : m_egg_options("<font size=4><b>Egg Options:</b></font>")
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_egg_options("<font size=4><b>Egg Options:</b></font>")
     , AUTO_DEPOSIT(
         "<b>Auto-Deposit:</b><br>true = Send " + STRING_POKEMON + " to boxes is \"Automatic\".<br>false = Send " + STRING_POKEMON + " to boxes is \"Manual\".",
         true
@@ -191,26 +192,32 @@ GameSettings::GameSettings()
     , m_shiny_detection("<font size=4><b>Shiny Detection:</b></font>")
     , SHINY_ALPHA_THRESHOLD(
         "<b>Shiny Threshold:</b><br>Threshold to detect a shiny encounter.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2.0, 0
     )
     , BALL_SPARKLE_ALPHA(
         "<b>Ball Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.4, 0
     )
     , STAR_SPARKLE_ALPHA(
         "<b>Star Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.5, 0
     )
     , SQUARE_SPARKLE_ALPHA(
         "<b>Ball Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.3, 0
     )
     , LINE_SPARKLE_ALPHA(
         "<b>Star Sparkle Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.3, 0
     )
     , SHINY_DIALOG_ALPHA(
         "<b>Shiny Dialog Alpha:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.2, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")

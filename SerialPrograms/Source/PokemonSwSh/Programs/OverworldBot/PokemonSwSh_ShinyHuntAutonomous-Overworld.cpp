@@ -36,7 +36,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -65,6 +65,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , MARK_OFFSET(
         "<b>Mark Offset:</b><br>Aim this far below the bottom of the exclamation/question mark. 1.0 is the height of the mark. "
         "Increase this value when the " + STRING_POKEMON + " are large.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.5, 0, 20
     )
     , MARK_PRIORITY(
@@ -76,6 +77,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
             {MarkPriority::PRIORITIZE_QUESTION,     "prioritize-question",      "Prioritize Question Marks"},
             {MarkPriority::QUESTION_ONLY,           "question-only",            "Question Marks Only (Ignore Exclamation Marks)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         MarkPriority::PRIORITIZE_EXCLAMATION
     )
     , TRIGGER_METHOD(
@@ -92,6 +94,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
             {TriggerMethod::Whistle3Vertical1,      "whistle3-vertical1",   "Whistle 3 times, then do vertical line once."},
             {TriggerMethod::Vertical3Whistle3,      "vertical3-whistle3",   "Do vertical line 3 times, then whistle 3 times."},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TriggerMethod::Whistle3Circle1
     )
     , MAX_MOVE_DURATION(
@@ -102,6 +105,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , MAX_TARGET_ALPHA(
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this. Set to zero to ignore all marks.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         70000, 0
     )
     , ENCOUNTER_BOT_OPTIONS(true, true)

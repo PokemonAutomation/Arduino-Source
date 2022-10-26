@@ -26,7 +26,7 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
           "Date Spam - " + STRING_POKEJOB + "s Farmer",
           "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.md",
           "Farm " + STRING_POKEJOB + "s.",
-          FeedbackType::NONE, true, false,
+          FeedbackType::NONE, false,
           PABotBaseLevel::PABOTBASE_12KB)
 {
 }

@@ -12,9 +12,9 @@
 namespace PokemonAutomation{
 
 
-class ConfigWidget{
+class ConfigWidget : protected ConfigOption::Listener{
 public:
-    virtual ~ConfigWidget() = default;
+    virtual ~ConfigWidget();
     ConfigWidget(ConfigOption& m_value);
     ConfigWidget(ConfigOption& m_value, QWidget& widget);
 
@@ -24,11 +24,16 @@ public:
     QWidget& widget(){ return *m_widget; }
 
     //  Needs to be called on the UI thread.
-    virtual void update();
+    virtual void update_value();
+    virtual void update_visibility(bool program_is_running);
+
+protected:
+    virtual void program_state_changed(bool program_is_running);
 
 protected:
     ConfigOption& m_value;
     QWidget* m_widget = nullptr;
+    bool m_program_is_running = false;
 };
 
 

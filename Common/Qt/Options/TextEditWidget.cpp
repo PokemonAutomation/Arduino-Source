@@ -81,13 +81,16 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
 
     m_value.add_listener(*this);
 }
-void TextEditWidget::update(){
-    ConfigWidget::update();
+void TextEditWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
+}
+void TextEditWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void TextEditWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

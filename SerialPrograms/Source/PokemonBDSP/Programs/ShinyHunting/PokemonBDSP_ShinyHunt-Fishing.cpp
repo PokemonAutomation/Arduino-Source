@@ -28,7 +28,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Fishing.md",
         "Shiny hunt fishing " + STRING_POKEMON + ".",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

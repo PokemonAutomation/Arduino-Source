@@ -33,14 +33,18 @@ TimeExpressionCellWidget<Type>::TimeExpressionCellWidget(QWidget& parent, TimeEx
     value.add_listener(*this);
 }
 template <typename Type>
-void TimeExpressionCellWidget<Type>::update(){
-    ConfigWidget::update();
+void TimeExpressionCellWidget<Type>::update_value(){
     this->setText(QString::fromStdString(m_value.current_text()));
+}
+template <typename Type>
+void TimeExpressionCellWidget<Type>::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    this->update_value();
 }
 template <typename Type>
 void TimeExpressionCellWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        this->update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -94,14 +98,18 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
     value.add_listener(*this);
 }
 template <typename Type>
-void TimeExpressionOptionWidget<Type>::update(){
-    ConfigWidget::update();
+void TimeExpressionOptionWidget<Type>::update_value(){
+    m_box->setText(QString::fromStdString(m_value.current_text()));
+}
+template <typename Type>
+void TimeExpressionOptionWidget<Type>::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
     m_box->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
 void TimeExpressionOptionWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
-        update();
+        this->update_value();
     }, Qt::QueuedConnection);
 }
 

@@ -30,7 +30,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset.md",
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -68,6 +68,7 @@ StatsReset::StatsReset()
             {GiftPokemon::Cosmog,   "cosmog",       "Cosmog"},
             {GiftPokemon::Poipole,  "poipole",      "Poipole"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         GiftPokemon::TypeNull
     )
     , HP("<b>HP:</b>")

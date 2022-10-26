@@ -30,7 +30,7 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FlagPin.md",
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -98,6 +98,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
     , FLAG_REACHED_DELAY(
         "<b>Target Reached Delay:</b><br>"
         "Once you have reached the flag, wait this many seconds to ensure everything loads and that any shinies are heard before resetting.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, 0, 60
     )
     , NAVIGATION_TIMEOUT(

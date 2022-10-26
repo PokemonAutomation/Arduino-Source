@@ -56,9 +56,9 @@ const EnumDatabase<EggHatchGenderFilter>& EggHatchGenderFilter_Database(){
 
 
 EggHatchFilterRow::EggHatchFilterRow()
-    : action(EggHatchAction_Database(), EggHatchAction::Keep)
-    , shiny(EggHatchShinyFilter_Database(), EggHatchShinyFilter::Anything)
-    , gender(EggHatchGenderFilter_Database(), EggHatchGenderFilter::Any)
+    : action(EggHatchAction_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, EggHatchAction::Keep)
+    , shiny(EggHatchShinyFilter_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, EggHatchShinyFilter::Anything)
+    , gender(EggHatchGenderFilter_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, EggHatchGenderFilter::Any)
     , iv_hp(IVCheckerFilter::Anything)
     , iv_atk(IVCheckerFilter::Anything)
     , iv_def(IVCheckerFilter::Anything)

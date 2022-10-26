@@ -88,8 +88,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
 }
 
 
-void LanguageOCRWidget::update(){
-    ConfigWidget::update();
+void LanguageOCRWidget::update_value(){
     size_t index = m_value;
     m_box->setCurrentIndex((int)index);
 
@@ -107,9 +106,13 @@ void LanguageOCRWidget::update(){
         m_status->setVisible(true);
     }
 }
+void LanguageOCRWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
+}
 void LanguageOCRWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

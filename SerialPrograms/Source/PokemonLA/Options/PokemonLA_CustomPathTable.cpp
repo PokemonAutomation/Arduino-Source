@@ -86,14 +86,14 @@ void CustomPathCell::operator=(const CustomPathCell& x){
     wait_ticks.set(x.wait_ticks);
 }
 CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
-    : BatchOption(true)
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , m_action(action)
     , text("", false)
-    , mount(PathMount_Database(), PathMount::NO_MOUNT)
+    , mount(PathMount_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathMount::NO_MOUNT)
     , move_forward_ticks("Ticks to Move:", 0)
-    , move_speed(PathSpeed_Database(), PathSpeed::NORMAL_SPEED)
-    , left_x("x: [left: -1.0, right: 1.0]", 0, -1.0, 1.0)
-    , left_y("y: [backward: -1.0, forward: 1.0]", 0, -1.0, 1.0)
+    , move_speed(PathSpeed_Database(), LockWhileRunning::LOCK_WHILE_RUNNING,PathSpeed::NORMAL_SPEED)
+    , left_x("x: [left: -1.0, right: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
+    , left_y("y: [backward: -1.0, forward: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
     , jump_wait_ticks("Ticks after jump:", 0)
     , wait_ticks("Ticks:", 0)
 {
@@ -160,7 +160,7 @@ void CustomPathCell::value_changed(){
 
 
 CustomPathTableRow2::CustomPathTableRow2()
-    : action(PathAction_Database(), PathAction::NO_ACTION)
+    : action(PathAction_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);
@@ -319,6 +319,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults()
 
 
 CustomPathTable::CustomPathTable()
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
 //    : PATH(
 //        "<b>Custom Path Table:</b><br>"
 //        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
@@ -394,8 +395,8 @@ public:
         });
     }
 
-    virtual void update() override{
-        ConfigWidget::update();
+    virtual void update_visibility(bool program_is_running) override{
+        ConfigWidget::update_visibility(program_is_running);
 //        m_travel_location->update();
 //        m_table_widget->update();
     }

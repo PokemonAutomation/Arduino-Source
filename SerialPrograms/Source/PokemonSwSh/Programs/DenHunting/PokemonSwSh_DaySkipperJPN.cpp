@@ -26,7 +26,7 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (JPN)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN.md",
         "A day skipper for Japanese date format. (7600 skips/hour)",
-        FeedbackType::NONE, true, false,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

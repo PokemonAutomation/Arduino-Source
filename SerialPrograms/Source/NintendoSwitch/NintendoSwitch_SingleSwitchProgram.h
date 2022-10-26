@@ -56,14 +56,12 @@ public:
         std::string doc_link,
         std::string description,
         FeedbackType feedback,
-        bool lock_options_while_running,
         bool allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level
     );
 
     FeedbackType feedback() const{ return m_feedback; }
     PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
-    bool lock_options_while_running() const{ return m_lock_options_while_running; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
@@ -72,7 +70,6 @@ public:
 private:
     const FeedbackType m_feedback;
     const PABotBaseLevel m_min_pabotbase_level;
-    const bool m_lock_options_while_running;
     const bool m_allow_commands_while_running;
 };
 
@@ -83,7 +80,7 @@ private:
 
 //
 //  As of this writing, this class will never be called in a manner where
-//  thread-safety is of concern. However, this may change in the future.
+//  thread-safety is of concern with one exception: config options
 //
 //  Here is the curent status:
 //
@@ -97,8 +94,10 @@ private:
 //
 //  Called from both UI and program threads:
 //    - check_validity()
+//    - All config options.
 //
-//  Calls to this class will never be concurrent from different threads.
+//  With the exception of the configs, nothing will be called concurrently from
+//  different threads.
 //
 class SingleSwitchProgramInstance{
 public:

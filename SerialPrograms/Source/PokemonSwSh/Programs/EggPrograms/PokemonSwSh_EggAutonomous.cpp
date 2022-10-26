@@ -54,7 +54,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggAutonomous.md",
         "Automatically fetch+hatch eggs and keep all shinies.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}
@@ -113,6 +113,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , AUTO_SAVING(
@@ -126,6 +127,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
     , DEBUG_PROCESSING_HATCHED("Debug the part of program after all eggs hatched", false)

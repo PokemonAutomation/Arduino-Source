@@ -123,25 +123,28 @@ QSize StringSelectCellWidget::sizeHint() const{
 }
 void StringSelectCellWidget::focusInEvent(QFocusEvent* event){
 //    cout << "focusInEvent()" << endl;
-    update();
+    update_value();
     NoWheelComboBox::focusInEvent(event);
 }
 void StringSelectCellWidget::focusOutEvent(QFocusEvent* event){
 //    cout << "focusOutEvent()" << endl;
     NoWheelComboBox::focusOutEvent(event);
-//    update();
+//    update_value();
 }
-void StringSelectCellWidget::update(){
-    ConfigWidget::update();
+void StringSelectCellWidget::update_value(){
     if (hasFocus()){
         load_options();
     }else{
         hide_options();
     }
 }
+void StringSelectCellWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
+}
 void StringSelectCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -161,9 +164,9 @@ StringSelectOptionWidget::StringSelectOptionWidget(QWidget& parent, StringSelect
     layout->addWidget(text, 1);
     layout->addWidget(m_cell, 1);
 }
-void StringSelectOptionWidget::update(){
-    ConfigWidget::update();
-    m_cell->update();
+void StringSelectOptionWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    m_cell->update_value();
 }
 
 

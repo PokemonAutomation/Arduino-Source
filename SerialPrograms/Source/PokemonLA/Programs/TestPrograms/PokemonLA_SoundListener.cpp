@@ -43,7 +43,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " LA", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
-        FeedbackType::REQUIRED, true, true,
+        FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -57,6 +57,7 @@ SoundListener::SoundListener()
             {SoundType::AlphaMusic, "alpha-music",  "Alpha Music"},
             {SoundType::ItemDrop,   "item-drop",    "Item Drop Sound"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         SoundType::Shiny
     )
     , STOP_ON_DETECTED_SOUND("<b>Stop on the detected sound</b><br>Stop program when the sound is detected.", false)

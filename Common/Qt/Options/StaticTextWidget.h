@@ -17,12 +17,12 @@ namespace PokemonAutomation{
 
 
 
-class StaticTextWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class StaticTextWidget : public QWidget, public ConfigWidget{
 public:
     ~StaticTextWidget();
     StaticTextWidget(QWidget& parent, StaticTextOption& value);
 
-    virtual void update() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -31,12 +31,12 @@ private:
 };
 
 
-class SectionDividerWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class SectionDividerWidget : public QWidget, public ConfigWidget{
 public:
     ~SectionDividerWidget();
     SectionDividerWidget(QWidget& parent, SectionDividerOption& value);
 
-    virtual void update() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

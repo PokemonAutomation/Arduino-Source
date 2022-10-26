@@ -39,7 +39,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Froslass Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaFroslassHunter.md",
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

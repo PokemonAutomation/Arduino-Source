@@ -28,6 +28,7 @@ public:
                 {8960,  "8960",     "8,960"},
                 {10240, "10240",    "10,240"},
             },
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             5120
         )
     {}

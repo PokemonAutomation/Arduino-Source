@@ -38,7 +38,11 @@ const EnumDatabase<ShinyFilter>& ShinyFilter_Database();
 class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
 public:
     ShinyFilterCell()
-        : EnumDropdownCell<ShinyFilter>(ShinyFilter_Database(), ShinyFilter::ANYTHING)
+        : EnumDropdownCell<ShinyFilter>(
+            ShinyFilter_Database(),
+            LockWhileRunning::LOCK_WHILE_RUNNING,
+            ShinyFilter::ANYTHING
+        )
     {}
 };
 

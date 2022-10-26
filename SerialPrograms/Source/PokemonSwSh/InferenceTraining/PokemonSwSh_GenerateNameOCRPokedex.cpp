@@ -33,7 +33,7 @@ GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
         STRING_POKEMON + " SwSh", "Generate " + STRING_POKEMON + " Name OCR Data",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the " + STRING_POKEDEX + ".",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -52,6 +52,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Pokedex::IsleOfArmor, "isle-of-armor", "Isle of Armor"},
             {Pokedex::CrownTundra, "crown-tundra", "Crown Tundra"},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Pokedex::Galar
     )
     , MODE(
@@ -60,6 +61,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Mode::SaveToJson, "save-to-json", "Read names and save to JSON."},
             {Mode::GenerateTrainingData, "generate-training-data", "Generate training data."},
         },
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Mode::GenerateTrainingData
     )
 {

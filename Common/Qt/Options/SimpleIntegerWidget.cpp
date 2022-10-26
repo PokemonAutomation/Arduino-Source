@@ -61,14 +61,18 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
     value.add_listener(*this);
 }
 template <typename Type>
-void SimpleIntegerCellWidget<Type>::update(){
-    ConfigWidget::update();
+void SimpleIntegerCellWidget<Type>::update_value(){
     this->setText(QString::number(m_value));
+}
+template <typename Type>
+void SimpleIntegerCellWidget<Type>::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 template <typename Type>
 void SimpleIntegerCellWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -97,15 +101,15 @@ SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, Simp
     value.add_listener(*this);
 }
 template <typename Type>
-void SimpleIntegerOptionWidget<Type>::update(){
-    ConfigWidget::update();
-//    m_cell->update();
+void SimpleIntegerOptionWidget<Type>::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+//    m_cell->update_value();
 }
 template <typename Type>
 void SimpleIntegerOptionWidget<Type>::value_changed(){
-    QMetaObject::invokeMethod(this, [this]{
-        update();
-    }, Qt::QueuedConnection);
+//    QMetaObject::invokeMethod(this, [this]{
+//        update_value();
+//    }, Qt::QueuedConnection);
 }
 
 

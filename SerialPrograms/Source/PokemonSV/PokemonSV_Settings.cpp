@@ -21,7 +21,8 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         TICKS_PER_SECOND,

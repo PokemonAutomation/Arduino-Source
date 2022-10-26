@@ -27,7 +27,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggHatcher.md",
         "Hatch eggs from boxes.",
-        FeedbackType::OPTIONAL_, true, false,
+        FeedbackType::OPTIONAL_, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

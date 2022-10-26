@@ -31,7 +31,7 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.md",
         "Hunt for shiny Isle of Armor trade using video feedback.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

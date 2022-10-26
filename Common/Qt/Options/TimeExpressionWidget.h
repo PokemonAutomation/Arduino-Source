@@ -16,12 +16,13 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class TimeExpressionCellWidget : public QLineEdit, public ConfigWidget, private ConfigOption::Listener{
+class TimeExpressionCellWidget : public QLineEdit, public ConfigWidget{
 public:
     ~TimeExpressionCellWidget();
     TimeExpressionCellWidget(QWidget& parent, TimeExpressionCell<Type>& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -31,12 +32,13 @@ private:
 
 
 template <typename Type>
-class TimeExpressionOptionWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class TimeExpressionOptionWidget : public QWidget, public ConfigWidget{
 public:
     ~TimeExpressionOptionWidget();
     TimeExpressionOptionWidget(QWidget& parent, TimeExpressionOption<Type>& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

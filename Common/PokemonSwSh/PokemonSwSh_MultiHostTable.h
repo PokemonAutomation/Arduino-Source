@@ -24,8 +24,8 @@ class MultiHostSlot : public EditableTableRow{
 public:
     MultiHostSlot(bool raid_code_option)
         : m_raid_code_option(raid_code_option)
-        , game_slot(GameSlot_Database(), 1)
-        , user_slot(UserSlot_Database(), 1)
+        , game_slot(GameSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
+        , user_slot(UserSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
         , skips(3, 0, 7)
         , backup_save(false)
         , always_catchable(true)

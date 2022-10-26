@@ -32,7 +32,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Gallade Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaGalladeHunter.md",
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

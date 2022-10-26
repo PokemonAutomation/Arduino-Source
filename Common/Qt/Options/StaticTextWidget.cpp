@@ -42,8 +42,8 @@ StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
 
     m_value.add_listener(*this);
 }
-void StaticTextWidget::update(){
-    ConfigWidget::update();
+void StaticTextWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void StaticTextWidget::value_changed(){
@@ -76,8 +76,8 @@ SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption
 
     m_value.add_listener(*this);
 }
-void SectionDividerWidget::update(){
-    ConfigWidget::update();
+void SectionDividerWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void SectionDividerWidget::value_changed(){

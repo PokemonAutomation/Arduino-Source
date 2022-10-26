@@ -22,7 +22,8 @@ namespace PokemonBDSP{
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions(bool enable_overrides)
-        : USE_SOUND_DETECTION(
+        : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+        , USE_SOUND_DETECTION(
             "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
             "<b>Make sure you have correct audio input set.</b>",
             true

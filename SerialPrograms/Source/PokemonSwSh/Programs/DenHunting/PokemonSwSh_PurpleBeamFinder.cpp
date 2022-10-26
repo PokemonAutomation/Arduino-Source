@@ -33,7 +33,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Purple Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
         "Automatically reset for a purple beam.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -97,18 +97,22 @@ PurpleBeamFinder::PurpleBeamFinder()
 //    )
     , MIN_BRIGHTNESS(
         "<b>Minimum Brightness:</b><br>Range: 0 - 768",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         500, 0, 768
     )
     , MIN_EUCLIDEAN(
         "<b>Minimum Euclidean Distance:</b><br>Range: 0 - 443",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         15, 0, 443
     )
     , MIN_DELTA_STDDEV_RATIO(
         "<b>Minimum Delta/Stddev Ratio:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5.0, 0
     )
     , MIN_SIGMA_STDDEV_RATIO(
         "<b>Minimum Sigma/Stddev Ratio:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5.0, 0
     )
 {

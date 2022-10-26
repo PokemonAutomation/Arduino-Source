@@ -15,12 +15,13 @@
 namespace PokemonAutomation{
 
 
-class StringSelectCellWidget : public NoWheelComboBox, public ConfigWidget, private ConfigOption::Listener{
+class StringSelectCellWidget : public NoWheelComboBox, public ConfigWidget{
 public:
     ~StringSelectCellWidget();
     StringSelectCellWidget(QWidget& parent, StringSelectCell& value);
 
-    virtual void update() override;
+    virtual void update_value() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -41,7 +42,7 @@ class StringSelectOptionWidget : public QWidget, public ConfigWidget{
 public:
     StringSelectOptionWidget(QWidget& parent, StringSelectOption& value);
 
-    virtual void update() override;
+    virtual void update_visibility(bool program_is_running) override;
 
 private:
     StringSelectCellWidget* m_cell;

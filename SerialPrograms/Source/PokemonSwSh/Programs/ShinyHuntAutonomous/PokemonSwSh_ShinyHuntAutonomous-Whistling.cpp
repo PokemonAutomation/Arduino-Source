@@ -31,7 +31,7 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Whistling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Whistling.md",
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

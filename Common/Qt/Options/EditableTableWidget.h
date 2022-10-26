@@ -16,17 +16,19 @@ namespace PokemonAutomation{
 class AutoHeightTableWidget;
 
 
-class EditableTableWidget : public QWidget, public ConfigWidget, private ConfigOption::Listener{
+class EditableTableWidget : public QWidget, public ConfigWidget{
 public:
     ~EditableTableWidget();
     EditableTableWidget(QWidget& parent, EditableTableOption& value);
 
-    virtual void update() override;
+    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
     void update_sizes();
 
 private:
+    void update_table();
+
     QWidget* make_clone_button(EditableTableRow& row);
     QWidget* make_insert_button(EditableTableRow& row);
     QWidget* make_delete_button(EditableTableRow& row);

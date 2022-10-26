@@ -30,7 +30,11 @@ const EnumDatabase<EncounterAction>& EncounterAction_Database();
 class EncounterActionCell : public EnumDropdownCell<EncounterAction>{
 public:
     EncounterActionCell()
-        : EnumDropdownCell<EncounterAction>(EncounterAction_Database(), EncounterAction::StopProgram)
+        : EnumDropdownCell<EncounterAction>(
+            EncounterAction_Database(),
+            LockWhileRunning::LOCK_WHILE_RUNNING,
+            EncounterAction::StopProgram
+        )
     {}
 };
 
@@ -52,6 +56,7 @@ public:
     ShinyFilterCell(bool rare_stars)
         : EnumDropdownCell<ShinyFilter>(
             rare_stars ? ShinyFilter_RareStars_Database() : ShinyFilter_Normal_Database(),
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             ShinyFilter::NOT_SHINY
         )
     {}

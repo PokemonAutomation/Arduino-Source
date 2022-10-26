@@ -107,7 +107,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         this, [&]{
             std::lock_guard<std::mutex> lg(m_session.program_lock());
             option.restore_defaults();
-            m_options->update();
+            m_options->update_visibility(false);
         }
     );
 
@@ -117,9 +117,11 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 void SingleSwitchProgramWidget2::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
         m_system->update_ui(state);
-        if (m_option.descriptor().lock_options_while_running()){
-            m_options->widget().setEnabled(state == ProgramState::STOPPED);
-        }
+        m_options->update_visibility(state != ProgramState::STOPPED);
+//        cout << "state = " << (state != ProgramState::STOPPED) << endl;
+//        if (m_option.descriptor().lock_options_while_running()){
+//            m_options->widget().setEnabled(state == ProgramState::STOPPED);
+//        }
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             m_holder.on_idle();

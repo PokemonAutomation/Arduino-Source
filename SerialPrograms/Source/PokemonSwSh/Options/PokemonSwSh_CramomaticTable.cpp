@@ -27,7 +27,7 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
 
 
 CramomaticRow::CramomaticRow()
-    : ball_type(BallType_Database(), CramomaticBallType::Apricorn)
+    : ball_type(BallType_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
     , is_bonus(false)
     , priority(0)
 {

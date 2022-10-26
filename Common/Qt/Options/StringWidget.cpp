@@ -45,13 +45,16 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 
     m_value.add_listener(*this);
 }
-void StringCellWidget::update(){
-    ConfigWidget::update();
+void StringCellWidget::update_value(){
     this->setText(QString::fromStdString(m_value));
+}
+void StringCellWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void StringCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -89,13 +92,16 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
 
     m_value.add_listener(*this);
 }
-void StringOptionWidget::update(){
-    ConfigWidget::update();
+void StringOptionWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
+}
+void StringOptionWidget::update_visibility(bool program_is_running){
+    ConfigWidget::update_visibility(program_is_running);
+    update_value();
 }
 void StringOptionWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

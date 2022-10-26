@@ -21,7 +21,7 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         STRING_POKEMON + " LA", "Flag Navigation Test",
         "",
         "Navigate to the flag pin.",
-        FeedbackType::REQUIRED, true, false,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -37,6 +37,7 @@ FlagNavigationTest::FlagNavigationTest()
     , FLAG_REACHED_DELAY(
         "<b>Target Reached Delay:</b><br>"
         "Once you have reached the flag, wait this many seconds to ensure everything loads and that any shinies are heard before resetting.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1.0, 0, 60
     )
     , NAVIGATION_TIMEOUT(
