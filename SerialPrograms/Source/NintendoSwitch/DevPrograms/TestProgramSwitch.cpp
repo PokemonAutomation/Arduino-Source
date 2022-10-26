@@ -149,7 +149,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     GradientArrowFinder detector(overlay, box);
     detector.make_overlays(set);
 
-    detector.process_frame(image, current_time());
+    while (true){
+        scope.wait_for(std::chrono::milliseconds(50));
+        detector.process_frame(feed.snapshot(), current_time());
+    }
 
 #if 0
     BotBaseContext context(scope, console.botbase());

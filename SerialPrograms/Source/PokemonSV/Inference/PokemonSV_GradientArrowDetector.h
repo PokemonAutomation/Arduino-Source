@@ -39,6 +39,7 @@ protected:
 
 class GradientArrowFinder : public VisualInferenceCallback{
 public:
+    ~GradientArrowFinder();
     GradientArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;

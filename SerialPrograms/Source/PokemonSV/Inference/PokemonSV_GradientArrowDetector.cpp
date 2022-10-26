@@ -65,8 +65,8 @@ bool is_gradient_arrow(
 //    cropped.save("cropped.png");
 
     double rmsd = GRADIENT_ARROW().rmsd(cropped);
-    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 110;
+//    cout << "rmsd = " << rmsd << endl;
+    return rmsd <= 80;
 }
 
 
@@ -138,6 +138,7 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
 
 
 
+GradientArrowFinder::~GradientArrowFinder() = default;
 GradientArrowFinder::GradientArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
