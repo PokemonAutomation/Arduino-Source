@@ -43,6 +43,8 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& m
 class WaterfillIterator{
 public:
     virtual ~WaterfillIterator() = default;
+
+    //  Returns false is nothing is left.
     virtual bool find_next(WaterfillObject& object, bool keep_object) = 0;
 };
 

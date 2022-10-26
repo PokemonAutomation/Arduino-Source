@@ -36,6 +36,10 @@
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 
 
 #include <QVideoFrame>
@@ -111,6 +115,8 @@ using namespace Kernels::Waterfill;
 
 
 
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -119,7 +125,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+//    using namespace PokemonLA;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -128,6 +135,35 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+//    ImageRGB32 image("SV-BattleMenu.png");
+    ImageRGB32 image("SV-Hair.png");
+    image = image.scale_to(1920, 1080);
+
+
+//    extract_box_reference(image, ImageFloatBox({0.7, 0.6, 0.2, 0.1})).save("tmp.png");
+
+//    ImageFloatBox box(0.5, 0.5, 0.4, 0.5);
+    ImageFloatBox box(0.0, 0.0, 1.0, 1.0);
+
+    VideoOverlaySet set(overlay);
+    GradientArrowFinder detector(overlay, box);
+    detector.make_overlays(set);
+
+    detector.process_frame(image, current_time());
+
+#if 0
+    BotBaseContext context(scope, console.botbase());
+    wait_until(
+        console, context, std::chrono::seconds(60),
+        {
+            {detector}
+        },
+        std::chrono::seconds(50)
+    );
+#endif
+
+
+#if 0
     ImageRGB32 image("Braviary_Fly_10.png");
 
     FlagTracker tracker(logger, overlay);
@@ -139,7 +175,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     auto end = current_time();
 
     cout << std::chrono::duration_cast<std::chrono::microseconds>((end - start) / 10).count() << endl;
-
+#endif
 
 #if 0
     StartGameUserSelectDetector detector;

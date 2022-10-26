@@ -71,6 +71,7 @@
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -129,13 +130,75 @@ using namespace Kernels;
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonSwSh;
+//    using namespace NintendoSwitch::PokemonSwSh;
+    using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
 
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    cout << "\u274c\u2705" << endl;
+    ImageRGB32 image("SV-BattleMenu.png");
+    image.scale_to(1920, 1080);
+
+    GradientArrowDetector detector({0.75, 0.63, 0.05, 0.1});
+    detector.detect(image);
+
+
+
+#if 0
+    ImageRGB32 image("Arrow-Alpha.png");
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
+            uint32_t& pixel = image.pixel(c, r);
+            if (pixel == 0xffffffff){
+                pixel = 0;
+            }
+        }
+    }
+    image.save("Arrow-Alpha2.png");
+#endif
+
+
+
+
+#if 0
+    ImageRGB32 image("SV-BattleMenu.png");
+    image.scale_to(1920, 1080);
+
+    ImageViewRGB32 box = extract_box_reference(image, ImageFloatBox({0.75, 0.63, 0.05, 0.1}));
+
+
+    PackedBinaryMatrix yellow = compress_rgb32_to_binary_range(box, 0xff808000, 0xffffff7f);
+    PackedBinaryMatrix blue = compress_rgb32_to_binary_range(box, 0xff004080, 0xff8fffff);
+
+    cout << yellow.dump() << endl;
+    cout << blue.dump() << endl;
+
+//    auto session = make_WaterfillSession(yellow);
+//    session.
+
+    auto yellows = Waterfill::find_objects_inplace(yellow, 100);
+    auto blues = Waterfill::find_objects_inplace(blue, 100);
+    cout << yellows.size() << endl;
+    cout << blues.size() << endl;
+
+    size_t c = 0;
+    for (auto& item : yellows){
+        extract_box_reference(box, item).save("yellow-" + std::to_string(c++) + ".png");
+    }
+    c = 0;
+    for (auto& item : blues){
+        extract_box_reference(box, item).save("blue-" + std::to_string(c++) + ".png");
+    }
+
+    Waterfill::WaterfillObject obj = yellows[1];
+    obj.merge_assume_no_overlap(blues[0]);
+
+    extract_box_reference(box, obj).save("Arrow.png");
+#endif
+
+
+//    cout << "\u274c\u2705" << endl;
 
 
 //    SummaryShinySymbolDetector detector;
