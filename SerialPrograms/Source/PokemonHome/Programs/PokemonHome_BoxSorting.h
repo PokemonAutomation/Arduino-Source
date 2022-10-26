@@ -20,6 +20,9 @@ namespace PokemonHome{
 class BoxSorting_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BoxSorting_Descriptor();
+
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class BoxSorting : public SingleSwitchProgramInstance{
