@@ -40,6 +40,7 @@ language
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -69,6 +70,26 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+struct BoxSorting_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : pkmn(m_stats["Pokemon"])
+        , empty(m_stats["Empty Slots"])
+        , compare(m_stats["Compares"])
+        , swaps(m_stats["Swaps"])
+    {
+        m_display_order.emplace_back(Stat("Pokemon"));
+        m_display_order.emplace_back(Stat("Empty Slots"));
+        m_display_order.emplace_back(Stat("Compares"));
+        m_display_order.emplace_back(Stat("Swaps"));
+    }
+    std::atomic<uint64_t>& pkmn;
+    std::atomic<uint64_t>& empty;
+    std::atomic<uint64_t>& compare;
+    std::atomic<uint64_t>& swaps;
+};
+std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 BoxSorting::BoxSorting()
         : BOX_NUMBER(
@@ -251,6 +272,7 @@ void move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context
 }
 
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
     ImageFloatBox dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
@@ -335,10 +357,14 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 //checking color to know if a pokemon is on the slot or not
                 if(current_box_value < 15){
                     box_render.add(COLOR_RED, slot_box);
+                    stats.empty++;
+                    env.update_stats();
                     boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
                     ss << "\u274c " ;    //  "X"
                 }else{
                     box_render.add(COLOR_GREEN, slot_box);
+                    stats.pkmn++;
+                    env.update_stats();
                     boxes_data.push_back(Pokemon{}); //default initialised pokemon to know there is a pokemon here that needs a value
                     ss << "\u2705 " ;    //  checkbox
                 }
@@ -487,6 +513,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             ss.str("");
 
             //check for a match and also check if the pokemon is not already in the slot
+            stats.compare++;
+            env.update_stats();
             if(boxes_sorted[poke_nb_s] == boxes_data[poke_nb] && poke_nb_s == poke_nb){
                 break;
             }
@@ -513,6 +541,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 std::optional<Pokemon> tmp = boxes_data[poke_nb_s];
                 boxes_data[poke_nb_s] = boxes_data[poke_nb];
                 boxes_data[poke_nb] = tmp;
+                stats.swaps++;
+                env.update_stats();
                 break;
             }
         }
