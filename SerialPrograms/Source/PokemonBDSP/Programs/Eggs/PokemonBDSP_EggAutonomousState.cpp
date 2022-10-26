@@ -142,20 +142,7 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
-    m_console.log(message, COLOR_RED);
-    std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();
-    dump_image(
-        m_console, m_env.program_info(),
-        name,
-        *screen
-    );
-    send_program_recoverable_error_notification(
-        m_env,
-        m_notification_error,
-        message,
-        *screen
-    );
-    throw OperationFailedException(m_console, message);
+    dump_image_and_throw_recoverable_exception(m_env, m_console, m_notification_error, name, message);
 }
 
 void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitchPanels_H
-#define PokemonAutomation_NintendoSwitchPanels_H
+#ifndef PokemonAutomation_NintendoSwitch_Panels_H
+#define PokemonAutomation_NintendoSwitch_Panels_H
 
 #include "CommonFramework/Panels/PanelList.h"
 

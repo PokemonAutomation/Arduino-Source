@@ -10,6 +10,7 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"

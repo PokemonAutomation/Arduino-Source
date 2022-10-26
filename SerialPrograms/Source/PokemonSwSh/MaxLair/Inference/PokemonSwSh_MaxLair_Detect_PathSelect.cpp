@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"

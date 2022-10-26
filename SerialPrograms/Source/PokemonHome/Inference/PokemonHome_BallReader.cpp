@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h"

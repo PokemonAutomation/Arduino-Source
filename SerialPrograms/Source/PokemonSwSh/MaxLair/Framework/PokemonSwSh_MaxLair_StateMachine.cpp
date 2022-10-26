@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"

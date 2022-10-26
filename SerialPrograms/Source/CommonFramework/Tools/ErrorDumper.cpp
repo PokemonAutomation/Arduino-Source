@@ -6,12 +6,18 @@
 
 #include <mutex>
 #include <QDir>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "ConsoleHandle.h"
 #include "ErrorDumper.h"
-
+#include "ProgramEnvironment.h"
 namespace PokemonAutomation{
 
 
@@ -40,6 +46,31 @@ std::string dump_image(
         name
     );
     return name;
+}
+
+void dump_image_and_throw_recoverable_exception(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    EventNotificationOption& notification_error,
+    const std::string& error_name,
+    const std::string& message
+){
+    // m_stats.m_errors++;
+    env.log(message, COLOR_RED);
+    console.overlay().add_log_text("Error: " + error_name, COLOR_RED);
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    dump_image(
+        console, env.program_info(),
+        error_name,
+        *screen
+    );
+    send_program_recoverable_error_notification(
+        env,
+        notification_error,
+        message,
+        *screen
+    );
+    throw OperationFailedException(console, message);
 }
 
 

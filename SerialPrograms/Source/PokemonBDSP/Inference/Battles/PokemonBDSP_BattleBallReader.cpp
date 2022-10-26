@@ -6,6 +6,7 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"

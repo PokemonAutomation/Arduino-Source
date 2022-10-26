@@ -70,6 +70,10 @@ private:
     // Return true if the program should stop
     bool process_hatched_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi);
 
+    // Used to wait until Y-Comm icon shows up.
+    // Throw error if it does not find it after 10 sec.
+    void wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg);
+
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
     // EggStepCountOption STEPS_TO_HATCH;

@@ -45,19 +45,6 @@ const size_t POKEMON_APP_INDEX = 1;
 const size_t TOWN_MAP_APP_INDEX = 5;
 
 
-void wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
-    context.wait_for_all_requests();
-    const bool y_comm_visible = true;
-    YCommIconDetector end_egg_hatching_detector(y_comm_visible);
-    int ret = wait_until(
-        env.console, context, std::chrono::seconds(10),
-        {{end_egg_hatching_detector}}
-    );
-    if (ret != 0){
-        throw OperationFailedException(env.console, error_msg + " No Y-Comm mark found.");
-    }
-}
-
 }
 
 
@@ -240,18 +227,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 throw e;
             }
 
-            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-            dump_image(
-                env.console, env.program_info(),
-                "EggAutonomous",
-                *screen
-            );
-            send_program_recoverable_error_notification(
-                env,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                e.message(),
-                *screen
-            );
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
@@ -383,7 +358,8 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
             context.wait_for_all_requests();
 
-            throw OperationFailedException(env.console, "Max number of loops reached. Not enough eggs in party?");
+            dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+                "MaxLoop", "Max number of loops reached. Not enough eggs in party?");
         }
         
         context.wait_for_all_requests();
@@ -471,8 +447,8 @@ void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, Bo
         {{end_egg_hatching_detector}}
     );
     if (ret > 0){
-        env.console.overlay().add_log_text("Error detecting egg hatching ends", COLOR_WHITE);
-        throw OperationFailedException(env.console, "Cannot detect egg hatching ends.");
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "NoHatchEnd", "Cannot detect egg hatching ends.");
     }
 }
 
@@ -532,13 +508,13 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             {{dialog_over_detector}}
         );
     } else {
-        env.console.overlay().add_log_text("Error detecting Nursery dialog", COLOR_WHITE);
-        throw OperationFailedException(env.console, "Cannot detect dialog selection arrow when talking to Nursery lady.");
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "NoNurseryDialog", "Cannot detect dialog selection arrow when talking to Nursery lady.");
     }
     // If dialog over is not detected:
     if (ret < 0){
-        env.console.overlay().add_log_text("Error detecting Nursery dialog end", COLOR_WHITE);
-        throw OperationFailedException(env.console, "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.");
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "NoNurseryDialoEnd", "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.");
     }
 
     return num_eggs_retrieved;
@@ -699,7 +675,8 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     {{pokemon_menu_detector}}
                 );
                 if (ret != 0){
-                    throw OperationFailedException(env.console, "Cannot detect pokemon menu in storage box.");
+                    dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+                        "NoPokemonMenuInStorage", "Cannot detect pokemon menu in storage box.");
                 }
 
                 const bool stop_on_detected = true;
@@ -728,7 +705,8 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     pbf_press_button(context, BUTTON_A, 20, 100);
                 }
                 if (dialog_count == max_dialog_count){
-                    throw OperationFailedException(env.console, "Unexpected dialogs when releasing pokemon.");
+                    dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+                        "UnexpectedReleasingDialog", "Unexpected dialogs when releasing pokemon.");
                 }
                 break;
             }
@@ -781,11 +759,26 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             {{y_comm_detector}}
         );
         if (ret > 0){
-            throw OperationFailedException(env.console, "Cannot detect menu from overworld. No Y-Comm mark found.");
+            dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+                "NoYCommFoundAfterMenu", "Cannot detect Y-Comm after leaving menu.");
         }
     }
 
     return false;
+}
+
+void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
+    context.wait_for_all_requests();
+    const bool y_comm_visible = true;
+    YCommIconDetector y_comm_detector(y_comm_visible);
+    int ret = wait_until(
+        env.console, context, std::chrono::seconds(10),
+        {{y_comm_detector}}
+    );
+    if (ret != 0){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "NoYCommFound", error_msg + " No Y-Comm mark found.");
+    }
 }
 
 
