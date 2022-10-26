@@ -8,9 +8,11 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
@@ -28,13 +30,16 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
 }
 
 bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
-    double area = (double)object.area_ratio();
-    if (area < 0.4 || area > 0.5){
+    double area_ratio = (double)object.area_ratio();
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "Object area: " << object.area << ", area ratio: " << area_ratio
+                  << " bound [0.4, 0.5]" << std::endl;
+        dump_debug_image(global_logger_command_line(), "PokemonSwSh/SelectionArrowFinder", "is_selection_arrow", extract_box_reference(image, object));
+    }
+    if (area_ratio < 0.4 || area_ratio > 0.5){
         return false;
     }
 
-//    size_t width = object.width();
-//    size_t height = object.height();
     ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
     filter_rgb32(
@@ -44,20 +49,23 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
         true
     );
 
-//    cropped.save("cropped.png");
-
     double rmsd = SELECTION_ARROW().rmsd(cropped);
-//    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 110;
+    
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "rmsd, threshold 110" << rmsd << std::endl;
+    }
+    return rmsd <= 130;
 }
-std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image){
+std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area){
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX)" << std::endl;
+    }
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
     auto session = make_WaterfillSession(matrix);
-    auto finder = session->make_iterator(200);
+    auto finder = session->make_iterator(min_area);
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
-//        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);
         }
@@ -76,7 +84,10 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
-    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
+    const float screen_scale = screen.height() / 1080.0;
+    const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(
+        extract_box_reference(screen, m_box), min_arrow_area);
 
     m_arrow_boxes.clear();
     for (const ImagePixelBox& mark : arrows){
@@ -157,10 +168,13 @@ RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
 }
 
 int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
+    const float screen_scale = screen.height() / 1080.0;
+    const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
     for (size_t i_row = 0; i_row < 2; i_row++){
         for (size_t j_col = 0; j_col < 5; j_col++){
 		    ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
-            std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, box));
+            std::vector<ImagePixelBox> arrows = find_selection_arrows(
+                extract_box_reference(screen, box), min_arrow_area);
             if (arrows.size() > 0){
                 return (int)(i_row * 5 + j_col);
             }
