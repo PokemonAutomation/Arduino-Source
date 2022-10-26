@@ -45,7 +45,6 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
 )
     : QWidget(&parent)
     , m_holder(holder)
-    , m_option(option)
     , m_session(option)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
