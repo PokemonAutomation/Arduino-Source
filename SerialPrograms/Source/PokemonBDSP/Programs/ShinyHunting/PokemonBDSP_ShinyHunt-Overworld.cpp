@@ -29,7 +29,7 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
         "Shiny hunt overworld " + STRING_POKEMON + ".",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

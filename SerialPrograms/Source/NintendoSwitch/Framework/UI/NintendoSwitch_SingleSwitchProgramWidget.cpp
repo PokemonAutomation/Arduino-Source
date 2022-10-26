@@ -39,6 +39,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 )
     : QWidget(&parent)
     , m_holder(holder)
+    , m_option(option)
     , m_session(option, 0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -116,7 +117,9 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
 void SingleSwitchProgramWidget2::state_change(ProgramState state){
     QMetaObject::invokeMethod(this, [this, state]{
         m_system->update_ui(state);
-        m_options->widget().setEnabled(state == ProgramState::STOPPED);
+        if (m_option.descriptor().lock_options_while_running()){
+            m_options->widget().setEnabled(state == ProgramState::STOPPED);
+        }
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             m_holder.on_idle();

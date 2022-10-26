@@ -25,7 +25,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-WattFarmer.md",
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour)",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

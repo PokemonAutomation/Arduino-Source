@@ -25,7 +25,7 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
         "Hunt for shiny strong spawns. Stop when a shiny is found.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

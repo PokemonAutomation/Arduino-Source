@@ -24,7 +24,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
         STRING_POKEMON + " SwSh", "God Egg Duplication",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

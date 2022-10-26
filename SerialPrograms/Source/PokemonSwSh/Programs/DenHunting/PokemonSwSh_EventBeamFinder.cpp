@@ -24,7 +24,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Event Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EventBeamFinder.md",
         "Drop wishing pieces until you find an event den.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

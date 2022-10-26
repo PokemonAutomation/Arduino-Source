@@ -30,7 +30,7 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Generate Name OCR",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the National " + STRING_POKEDEX + ".",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

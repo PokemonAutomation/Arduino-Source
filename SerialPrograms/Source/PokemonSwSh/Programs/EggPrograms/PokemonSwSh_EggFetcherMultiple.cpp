@@ -35,7 +35,7 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher Multiple",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcherMultiple.md",
         "Fetch eggs from multiple species without hatching them.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

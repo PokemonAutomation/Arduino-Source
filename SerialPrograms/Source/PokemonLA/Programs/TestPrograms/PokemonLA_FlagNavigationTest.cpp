@@ -21,7 +21,7 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         STRING_POKEMON + " LA", "Flag Navigation Test",
         "",
         "Navigate to the flag pin.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

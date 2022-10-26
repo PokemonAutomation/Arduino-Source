@@ -29,7 +29,7 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         STRING_POKEMON + " BDSP", "Double Battle Leveling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

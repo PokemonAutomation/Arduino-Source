@@ -32,7 +32,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         STRING_POKEMON + " SwSh", "Den Roller",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
         "Roll den to the N'th day, SR and repeat.",
-        FeedbackType::OPTIONAL_, false,
+        FeedbackType::OPTIONAL_, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

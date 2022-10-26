@@ -40,7 +40,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
         "Check Ramanas Island Tree until a Combee is found",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

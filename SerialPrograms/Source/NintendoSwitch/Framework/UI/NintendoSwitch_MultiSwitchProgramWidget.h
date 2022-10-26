@@ -24,6 +24,7 @@
 #include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
 namespace PokemonAutomation{
+    struct PanelHolder;
 namespace NintendoSwitch{
 
 
@@ -46,6 +47,7 @@ private:
 
 private:
     PanelHolder& m_holder;
+    MultiSwitchProgramOption& m_option;
     MultiSwitchProgramSession m_session;
     MultiSwitchSystemWidget* m_system;
     ConfigWidget* m_options;

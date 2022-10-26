@@ -30,7 +30,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         STRING_POKEMON + " LA", "Self Touch Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SelfTouchTrade.md",
         "Repeatedly trade " + STRING_POKEMON + " between two local Switches to fill up research.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 2, 2
     )

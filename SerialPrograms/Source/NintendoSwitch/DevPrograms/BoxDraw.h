@@ -28,6 +28,9 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    class Overlay;
+
+private:
     FloatingPointOption X;
     FloatingPointOption Y;
     FloatingPointOption WIDTH;

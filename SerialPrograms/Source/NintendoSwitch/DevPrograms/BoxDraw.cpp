@@ -4,6 +4,7 @@
  *
  */
 
+#include <mutex>
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "BoxDraw.h"
@@ -12,13 +13,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
 BoxDraw_Descriptor::BoxDraw_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:BoxDraw",
         "Nintendo Switch", "Box Draw",
         "",
         "Test box coordinates for development.",
-        FeedbackType::NONE, true,
+        FeedbackType::NONE, false, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -35,11 +37,32 @@ BoxDraw::BoxDraw()
     PA_ADD_OPTION(HEIGHT);
 }
 
+class BoxDraw::Overlay : public ConfigOption::Listener{
+public:
+    Overlay(BoxDraw& parent, VideoOverlay& overlay)
+        : m_parent(parent)
+        , m_overlay_set(overlay)
+    {
+        m_parent.X.add_listener(*this);
+        m_parent.Y.add_listener(*this);
+        m_parent.WIDTH.add_listener(*this);
+        m_parent.HEIGHT.add_listener(*this);
+    }
+    virtual void value_changed() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_overlay_set.clear();
+        m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
+    }
+
+private:
+    BoxDraw& m_parent;
+    VideoOverlaySet m_overlay_set;
+    std::mutex m_lock;
+};
+
 void BoxDraw::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    VideoOverlaySet set(env.console.overlay());
-
-    set.add(COLOR_RED, {X, Y, WIDTH, HEIGHT});
-
+    Overlay overlay(*this, env.console.overlay());
+    overlay.value_changed();
     context.wait_until_cancel();
 }
 

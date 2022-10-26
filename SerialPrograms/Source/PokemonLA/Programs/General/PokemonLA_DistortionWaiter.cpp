@@ -28,7 +28,7 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         STRING_POKEMON + " LA", "Distortion Waiter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/DistortionWaiter.md",
         "Wait for a distortion to appear.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -34,7 +34,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         STRING_POKEMON + " LA", "Leap Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
         "Shake trees and ores to grind tasks",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

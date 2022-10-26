@@ -33,7 +33,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Purple Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
         "Automatically reset for a purple beam.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

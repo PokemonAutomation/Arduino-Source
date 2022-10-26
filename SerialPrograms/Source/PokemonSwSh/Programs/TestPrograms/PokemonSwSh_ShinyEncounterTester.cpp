@@ -19,7 +19,7 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Encounter Tester",
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::REQUIRED, true, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

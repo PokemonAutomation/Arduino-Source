@@ -31,7 +31,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         STRING_POKEMON + " LA", "Apply Grits",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ApplyGrits.md",
         "Use Grits items on " + STRING_POKEMON,
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

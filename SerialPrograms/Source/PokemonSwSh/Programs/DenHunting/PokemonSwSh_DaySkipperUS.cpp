@@ -26,7 +26,7 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (US)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperUS.md",
         "A day skipper for US date format that.  (~7100 skips/hour)",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

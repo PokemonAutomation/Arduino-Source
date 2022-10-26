@@ -26,7 +26,7 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
         STRING_POKEMON + " SwSh", "Multi-Game Fossil Revive",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MultiGameFossil.md",
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

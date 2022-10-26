@@ -33,7 +33,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         STRING_POKEMON + " SwSh", "Auto-Host Rolling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
-        FeedbackType::OPTIONAL_, false,
+        FeedbackType::OPTIONAL_, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -18,7 +18,9 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    FeedbackType feedback, bool allow_commands_while_running,
+    FeedbackType feedback,
+    bool lock_options_while_running,
+    bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level
 )
     : ProgramDescriptor(
@@ -30,6 +32,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
+    , m_lock_options_while_running(lock_options_while_running)
     , m_allow_commands_while_running(allow_commands_while_running)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{

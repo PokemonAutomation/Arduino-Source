@@ -18,7 +18,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
         "Nintendo Switch", "Friend Delete",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendDelete.md",
         "Mass delete/block all those unwanted friends.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -24,7 +24,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
         "Farm the Stow-on-Side items dealer.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, true, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

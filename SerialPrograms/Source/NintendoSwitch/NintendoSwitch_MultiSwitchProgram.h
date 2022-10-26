@@ -63,7 +63,9 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        FeedbackType feedback, bool allow_commands_while_running,
+        FeedbackType feedback,
+        bool lock_options_while_running,
+        bool allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level,
         size_t min_switches,
         size_t max_switches,
@@ -72,6 +74,7 @@ public:
 
     FeedbackType feedback() const{ return m_feedback; }
     PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    bool lock_options_while_running() const{ return m_lock_options_while_running; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     size_t min_switches() const{ return m_min_switches; }
@@ -84,6 +87,7 @@ public:
 private:
     const FeedbackType m_feedback;
     const PABotBaseLevel m_min_pabotbase_level;
+    const bool m_lock_options_while_running;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;
