@@ -1160,8 +1160,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
+    Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp

@@ -61,6 +61,7 @@ public:
     //  if the check fails.
     //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
     virtual double rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const;
+
     //  Compute RMSD of the object on the image against the template.
     //  It will crop the original image using the bounding box of the waterfill object, then compare the cropped
     //  image against the template as-is.

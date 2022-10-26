@@ -39,6 +39,8 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 
 
@@ -146,12 +148,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ImageFloatBox box(0.0, 0.0, 1.0, 1.0);
 
     VideoOverlaySet set(overlay);
-    GradientArrowFinder detector(overlay, box);
-    detector.make_overlays(set);
+    WhiteButtonFinder white_button_detector0(WhiteButton::ButtonA, overlay, box);
+    WhiteButtonFinder white_button_detector1(WhiteButton::ButtonB, overlay, box);
+    WhiteButtonFinder white_button_detector2(WhiteButton::ButtonY, overlay, box);
+    WhiteButtonFinder white_button_detector3(WhiteButton::ButtonMinus, overlay, box);
+    DialogArrowFinder dialog_arrow_detector(overlay, box);
+    GradientArrowFinder gradient_arrow_detector(overlay, box);
+    dialog_arrow_detector.make_overlays(set);
+    gradient_arrow_detector.make_overlays(set);
 
     while (true){
         scope.wait_for(std::chrono::milliseconds(50));
-        detector.process_frame(feed.snapshot(), current_time());
+        VideoSnapshot snapshot = feed.snapshot();
+
+        white_button_detector0.process_frame(snapshot, current_time());
+        white_button_detector1.process_frame(snapshot, current_time());
+        white_button_detector2.process_frame(snapshot, current_time());
+        white_button_detector3.process_frame(snapshot, current_time());
+        dialog_arrow_detector.process_frame(snapshot, current_time());
+        gradient_arrow_detector.process_frame(snapshot, current_time());
     }
 
 #if 0

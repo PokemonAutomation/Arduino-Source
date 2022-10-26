@@ -71,6 +71,8 @@
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 
 #ifdef PA_ARCH_x86
@@ -137,12 +139,48 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("SV-Buttons2.png");
+    WhiteButtonDetector detector(WhiteButton::ButtonB, ImageFloatBox{0, 0, 1, 1});
+    detector.detect(image);
+
+
+#if 0
+    ImageRGB32 image("SV-Buttons2.png");
+
+    ImageFloatBox box(0.027, 0.922, .02, .035);
+    ImageViewRGB32 region = extract_box_reference(image, box);
+
+    region.save("tmp.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, 0xff808080, 0xffffffff);
+    auto objects = Waterfill::find_objects_inplace(matrix, 20);
+    extract_box_reference(region, objects[0]).save("cropped.png");
+#endif
+
+
+//    DialogArrowDetector detector({0.45, 0.9, .1, .05});
+//    detector.detect(image);
+
+#if 0
+    ImageFloatBox box(0.72, 0.85, 0.02, 0.035);
+
+    ImageViewRGB32 region = extract_box_reference(image, box);
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, 0xff000000, 0xff7f7fbf);
+
+    cout << matrix.dump() << endl;
+
+    auto arrow = Waterfill::find_objects_inplace(matrix, 20);
+    extract_box_reference(region, arrow[0]).save("cropped.png");
+#endif
+
+#if 0
     ImageRGB32 image("SV-BattleMenu.png");
     image.scale_to(1920, 1080);
 
     GradientArrowDetector detector({0.75, 0.63, 0.05, 0.1});
     detector.detect(image);
-
+#endif
 
 
 #if 0

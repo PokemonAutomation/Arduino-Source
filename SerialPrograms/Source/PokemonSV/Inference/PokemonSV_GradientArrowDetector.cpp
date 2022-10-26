@@ -14,9 +14,9 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_GradientArrowDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -49,20 +49,8 @@ bool is_gradient_arrow(
 //        return false;
 //    }
 
-//    size_t width = object.width();
-//    size_t height = object.height();
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
-#if 0
-    filter_rgb32(
-        object.packed_matrix(),
-        cropped,
-        COLOR_WHITE,
-        true
-    );
-#endif
-
-//    cropped.save("cropped.png");
 
     double rmsd = GRADIENT_ARROW().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;
@@ -79,8 +67,8 @@ void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
 bool GradientArrowDetector::detect(const ImageViewRGB32& screen) const{
-    std::vector<ImageFloatBox> arrows = detect_all(screen);
-    return !arrows.empty();
+    std::vector<ImageFloatBox> hits = detect_all(screen);
+    return !hits.empty();
 }
 
 std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB32& screen) const{
@@ -97,10 +85,10 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         session->set_source(yellow_matrix);
         auto iter = session->make_iterator(400);
         WaterfillObject object;
-        size_t c = 0;
+//        size_t c = 0;
         while (iter->find_next(object, false)){
 //            cout << "yellow = " << object.area << endl;
-            extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
+//            extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
             yellows.emplace_back(std::move(object));
         }
     }
@@ -109,22 +97,22 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         session->set_source(blue_matrix);
         auto iter = session->make_iterator(400);
         WaterfillObject object;
-        size_t c = 0;
+//        size_t c = 0;
         while (iter->find_next(object, false)){
 //            cout << "blue = " << object.area << endl;
-            extract_box_reference(region, object).save("blue-" + std::to_string(c++) + ".png");
+//            extract_box_reference(region, object).save("blue-" + std::to_string(c++) + ".png");
             blues.emplace_back(std::move(object));
         }
     }
 
-    std::vector<ImageFloatBox> arrows;
+    std::vector<ImageFloatBox> hits;
 
 //    size_t c = 0;
     for (WaterfillObject& yellow : yellows){
         for (WaterfillObject& blue : blues){
             WaterfillObject object;
             if (is_gradient_arrow(region, object, yellow, blue)){
-                arrows.emplace_back(translate_to_parent(screen, m_box, object));
+                hits.emplace_back(translate_to_parent(screen, m_box, object));
             }
 //            double aspect_ratio = object.aspect_ratio();
 //            cout << "aspect_ratio = " << aspect_ratio << endl;
@@ -133,7 +121,7 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         }
     }
 
-    return arrows;
+    return hits;
 }
 
 

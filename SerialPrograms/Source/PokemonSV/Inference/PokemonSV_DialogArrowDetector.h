@@ -1,11 +1,11 @@
-/*  Gradient Arrow Detector
+/*  Dialog Arrow Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_GradientArrowDetector_H
-#define PokemonAutomation_PokemonSV_GradientArrowDetector_H
+#ifndef PokemonAutomation_PokemonSV_DialogArrowDetector_H
+#define PokemonAutomation_PokemonSV_DialogArrowDetector_H
 
 #include <vector>
 #include "Common/Cpp/Color.h"
@@ -20,11 +20,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-//  This only works for horizontal arrows. If we need the vertical arrow, we can
-//  add that later.
-class GradientArrowDetector : public StaticScreenDetector{
+class DialogArrowDetector : public StaticScreenDetector{
 public:
-    GradientArrowDetector(const ImageFloatBox& box, Color color = COLOR_RED);
+    DialogArrowDetector(const ImageFloatBox& box, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -38,10 +36,10 @@ protected:
 
 
 
-class GradientArrowFinder : public VisualInferenceCallback{
+class DialogArrowFinder : public VisualInferenceCallback{
 public:
-    ~GradientArrowFinder();
-    GradientArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
+    ~DialogArrowFinder();
+    DialogArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -49,9 +47,10 @@ public:
 
 protected:
     VideoOverlay& m_overlay;
-    GradientArrowDetector m_detector;
+    DialogArrowDetector m_detector;
     FixedLimitVector<InferenceBoxScope> m_arrows;
 };
+
 
 
 
