@@ -52,7 +52,7 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     double rmsd = SELECTION_ARROW().rmsd(cropped);
     
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "rmsd, threshold 110" << rmsd << std::endl;
+        std::cout << "rmsd: " << rmsd << ", threshold 130" << std::endl;
     }
     return rmsd <= 130;
 }
@@ -85,7 +85,8 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
 }
 bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
     const float screen_scale = screen.height() / 1080.0;
-    const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
+    // Smallest arrow takes at least 600 pixels on 1920x1080 screen.
+    const size_t min_arrow_area = size_t(600.0 * screen_scale * screen_scale);
     std::vector<ImagePixelBox> arrows = find_selection_arrows(
         extract_box_reference(screen, m_box), min_arrow_area);
 
