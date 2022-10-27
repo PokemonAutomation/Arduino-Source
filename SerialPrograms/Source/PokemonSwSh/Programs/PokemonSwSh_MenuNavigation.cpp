@@ -6,26 +6,32 @@
 
 
 #include "ClientSource/Connection/BotBase.h"
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_MenuNavigation.h"
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void navigate_to_menu_app(ConsoleHandle& console, BotBaseContext& context, size_t target_app_index){
+void navigate_to_menu_app(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    size_t target_app_index,
+    EventNotificationOption& notification_option
+){
     context.wait_for_all_requests();
     RotomPhoneMenuArrowFinder menu_arrow_detector(console);
     const int cur_app_index = menu_arrow_detector.detect(console.video().snapshot());
     if (cur_app_index < 0){
-        throw OperationFailedException(console, "Cannot detect Rotom phone menu.");
+        dump_image_and_throw_recoverable_exception(
+            env, console, notification_option, "NoRotomPhoneMenu", "Cannot detect Rotom phone menu.");
     }
     console.log("Detect menu cursor at " + std::to_string(cur_app_index) + ".");
 

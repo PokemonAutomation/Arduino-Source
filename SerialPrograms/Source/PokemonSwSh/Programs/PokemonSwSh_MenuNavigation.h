@@ -10,8 +10,10 @@
 #include <stddef.h>
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
+    class ConsoleHandle;
+    class EventNotificationOption;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -19,7 +21,14 @@ namespace PokemonSwSh{
 // The target app index is from 0 to 9, in the order of top to bottom, left to right.
 // e.g. by default, Pokemon app is at index 1, while Town Map app is at index 5.
 // The function detects the current cursor location. So the function works on any initial cursor location.
-void navigate_to_menu_app(ConsoleHandle& console, BotBaseContext& context, size_t app_index);
+// Will throw OperationFailedException when failed to detect menu
+void navigate_to_menu_app(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    size_t app_index,
+    EventNotificationOption& notification_option
+    );
 
 
 }

@@ -355,7 +355,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             // Enter Rotom Phone menu
             pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
             // Select Pokemon App
-            navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+            navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
             // From menu enter Pokemon App
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
             context.wait_for_all_requests();
@@ -431,7 +431,7 @@ void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBas
         ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     }
 
-    navigate_to_menu_app(env.console, context, TOWN_MAP_APP_INDEX);
+    navigate_to_menu_app(env, env.console, context, TOWN_MAP_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
 
     fly_home(context, false);
     wait_for_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
@@ -536,7 +536,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
     // Press X to open menu
     ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
 
-    navigate_to_menu_app(env.console, context, POKEMON_APP_INDEX);
+    navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
 
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
     const uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY;
