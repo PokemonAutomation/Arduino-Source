@@ -186,9 +186,9 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     if (pokemon.has_value()){
         os << "(";
         os << "dex_number:" << pokemon->dex_number << " ";
-        os << "shiny:" << pokemon->shiny << " ";
-        os << "gmax:" << pokemon->gmax << " ";
-        os << "ball_slug: " << pokemon->ball_slug;
+        os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
+        os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
+        os << "ball_slug:" << pokemon->ball_slug;
         os << ")";
     }
     else{
