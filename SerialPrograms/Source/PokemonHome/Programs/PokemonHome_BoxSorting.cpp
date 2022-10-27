@@ -506,9 +506,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             Cursor cursor_s = get_cursor(poke_nb_s);
             Cursor cursor = get_cursor(poke_nb);
 
-            ss << "Comparing " << boxes_data[poke_nb] << " at " << cursor << " to " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
-            env.console.log(ss.str());
-            ss.str("");
+            // ss << "Comparing " << boxes_data[poke_nb] << " at " << cursor << " to " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
+            // env.console.log(ss.str());
+            // ss.str("");
 
             //check for a match and also check if the pokemon is not already in the slot
             stats.compare++;
