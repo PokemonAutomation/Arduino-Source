@@ -38,6 +38,7 @@ BeamReset::BeamReset()
     )
     , EXTRA_LINE(
         "<b>Extra Line:</b><br>(German has an extra line of text.)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

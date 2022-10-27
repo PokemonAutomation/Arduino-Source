@@ -26,6 +26,7 @@ public:
         , FILTER(rare_stars, enable_overrides)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             true
         )
         , NOTIFICATION_NONSHINY(

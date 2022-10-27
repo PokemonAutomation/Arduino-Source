@@ -53,7 +53,11 @@ SoundListener::SoundListener()
         LockWhileRunning::LOCK_WHILE_RUNNING,
         SoundType::SHINY
     )
-    , STOP_ON_DETECTED_SOUND("<b>Stop on the detected sound</b><br>Stop program when the sound is detected.", false)
+    , STOP_ON_DETECTED_SOUND(
+        "<b>Stop on the detected sound</b><br>Stop program when the sound is detected.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
+    )
 {
     PA_ADD_OPTION(SOUND_TYPE);
     PA_ADD_OPTION(STOP_ON_DETECTED_SOUND);

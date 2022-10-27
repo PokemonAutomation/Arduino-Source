@@ -213,7 +213,9 @@ OutbreakFinder::OutbreakFinder()
         STRING_POKEMON, MMO_DATABASE(), "rowlet"
     )
     , DEBUG_MODE(
-        "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.", false
+        "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(

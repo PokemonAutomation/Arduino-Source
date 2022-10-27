@@ -45,6 +45,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     : GO_HOME_WHEN_DONE(false)
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_NONSHINY(
@@ -75,6 +76,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     )
     , RUN_FROM_EVERYTHING(
         "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

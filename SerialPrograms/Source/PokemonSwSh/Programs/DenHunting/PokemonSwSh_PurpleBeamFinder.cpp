@@ -84,6 +84,7 @@ PurpleBeamFinder::PurpleBeamFinder()
     )
     , SAVE_SCREENSHOT(
         "<b>Screenshot Purple Beams:</b> (for debugging purposes)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , TIMEOUT_DELAY(

@@ -25,10 +25,12 @@ GameSettings::GameSettings()
     , m_egg_options("<font size=4><b>Egg Options:</b></font>")
     , AUTO_DEPOSIT(
         "<b>Auto-Deposit:</b><br>true = Send " + STRING_POKEMON + " to boxes is \"Automatic\".<br>false = Send " + STRING_POKEMON + " to boxes is \"Manual\".",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , EGG_FETCH_EXTRA_LINE(
         "<b>Egg Fetch Extra Line:</b><br>true = The daycare lady has an extra line of text in Japanese. Set this to true if you are running any of the egg programs in a Japanese game.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , FETCH_EGG_MASH_DELAY(
@@ -39,6 +41,7 @@ GameSettings::GameSettings()
     , m_den_options("<font size=4><b>Den Options:</b></font>")
     , DODGE_UNCATCHABLE_PROMPT_FAST(
         "<b>Dodge Uncatchable Prompt Fast:</b><br>Which method to use to bypass the uncatchable " + STRING_POKEMON + " prompt?<br>true = Use a fast (but potentially unreliable) method.<br>false = Use a slower (by about 5 seconds) method.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , m_advanced_options("<font size=5><b>Advanced Options:</b></font> You shouldn't need to touch anything below here.")

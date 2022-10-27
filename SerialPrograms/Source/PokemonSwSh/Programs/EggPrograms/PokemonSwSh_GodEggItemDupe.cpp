@@ -44,6 +44,7 @@ GodEggItemDupe::GodEggItemDupe()
     )
     , DETACH_BEFORE_RELEASE(
         "<b>Detach before Release:</b><br>Needed for items like Rusted Sword/Shield.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

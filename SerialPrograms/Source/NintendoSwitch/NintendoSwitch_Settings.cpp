@@ -38,6 +38,7 @@ ConsoleSettings::ConsoleSettings()
         "<b>Start Game Requires Internet:</b><br>"
         "Set this to true if starting the game requires checking the internet. "
         "Otherwise, programs that require soft-resetting may not work properly.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , START_GAME_INTERNET_CHECK_DELAY(
@@ -49,12 +50,14 @@ ConsoleSettings::ConsoleSettings()
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(
         "<b>Tolerate System Update Menu (fast):</b><br>"
         "Some programs can bypass the system update menu at little performance cost. Setting this to true enables this.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_SLOW(
         "<b>Tolerate System Update Menu (slow):</b><br"
         ">Some programs can bypass the system update menu, but will take a noticeable performance hit. "
         "Setting this to true enables this.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

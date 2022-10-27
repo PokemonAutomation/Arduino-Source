@@ -36,9 +36,9 @@ const EnumDatabase<MoveStyle>& MoveStyle_Database(){
 
 
 BattlePokemonActionRow::BattlePokemonActionRow()
-    : switch_pokemon(false)
+    : switch_pokemon(LockWhileRunning::LOCK_WHILE_RUNNING, false)
     , num_turns_to_switch(1)
-    , stop_after_num_moves(false)
+    , stop_after_num_moves(LockWhileRunning::LOCK_WHILE_RUNNING, false)
     , num_moves_to_stop(25, 0)
 {
     PA_ADD_OPTION(style[0]);

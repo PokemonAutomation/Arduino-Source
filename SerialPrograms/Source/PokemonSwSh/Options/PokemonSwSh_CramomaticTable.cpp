@@ -28,7 +28,7 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
 
 CramomaticRow::CramomaticRow()
     : ball_type(BallType_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
-    , is_bonus(false)
+    , is_bonus(LockWhileRunning::LOCK_WHILE_RUNNING, false)
     , priority(0)
 {
     PA_ADD_OPTION(ball_type);

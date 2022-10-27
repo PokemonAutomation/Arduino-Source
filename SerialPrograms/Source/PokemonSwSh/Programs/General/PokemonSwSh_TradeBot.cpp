@@ -45,6 +45,7 @@ TradeBot::TradeBot()
     )
     , LINK_TRADE_EXTRA_LINE(
         "<b>Link Trade Extra Line:</b><br>Set this if you are playing in German.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , SEARCH_DELAY(

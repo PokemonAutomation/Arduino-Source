@@ -36,7 +36,11 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
 
 
 RaidItemFarmerOHKO::RaidItemFarmerOHKO()
-    : BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
+    : BACKUP_SAVE(
+        "<b>Load Backup Save:</b><br>For backup save soft-locking method.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
+    )
 //    , m_advanced_options(
 //        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
 //    )

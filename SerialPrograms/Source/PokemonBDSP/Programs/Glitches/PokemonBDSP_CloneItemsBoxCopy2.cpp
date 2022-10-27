@@ -63,6 +63,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
     , RELEASE(
         "<b>Release the pokemon after cloning them:</b>"
         "Beware, if set to false, the pokemons will be stored in the subsequent boxes. Make sure you have enough empty boxes.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

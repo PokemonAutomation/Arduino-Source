@@ -74,6 +74,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     )
     , TEST_PATH(
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , SHINY_DETECTED_ENROUTE(

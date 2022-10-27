@@ -91,6 +91,7 @@ GlobalSettings::GlobalSettings()
     , SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , STATS_FILE(
@@ -101,6 +102,7 @@ GlobalSettings::GlobalSettings()
     )
     , ALL_STATS(
         "<b>All Stats:</b><br>Include all-time stats for notifications.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , WINDOW_SIZE(
@@ -121,11 +123,13 @@ GlobalSettings::GlobalSettings()
     )
     , LOG_EVERYTHING(
         "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , SAVE_DEBUG_IMAGES(
         "<b>Save Debug Images:</b><br>"
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
@@ -161,16 +165,19 @@ GlobalSettings::GlobalSettings()
     , SHOW_ALL_AUDIO_DEVICES(
         "<b>Show all Audio Devices:</b><br>"
         "Show all audio devices - including duplicates.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , SHOW_RECORD_FREQUENCIES(
         "<b>Show Record Frequencies:</b><br>"
         "Show option to record audio frequencies.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , DEVELOPER_TOKEN(

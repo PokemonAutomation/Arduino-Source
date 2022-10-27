@@ -130,8 +130,16 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
-    , DEBUG_PROCESSING_HATCHED("Debug the part of program after all eggs hatched", false)
-    , SAVE_DEBUG_VIDEO("<b>Save debug videos to Switch:</b>", false)
+    , DEBUG_PROCESSING_HATCHED(
+        "Debug the part of program after all eggs hatched",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
+    )
+    , SAVE_DEBUG_VIDEO(
+        "<b>Save debug videos to Switch:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY_KEEP(
         "Non-Shiny Keep",

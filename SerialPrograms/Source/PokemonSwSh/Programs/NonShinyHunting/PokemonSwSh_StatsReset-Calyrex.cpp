@@ -78,6 +78,7 @@ StatsResetCalyrex::StatsResetCalyrex()
     )
     , CHECK_CALYREX_STATS(
         "<b>Check Calyrex stats</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , CALYREX_HP("<b>Calyrex HP:</b>")
@@ -88,6 +89,7 @@ StatsResetCalyrex::StatsResetCalyrex()
     , CALYREX_SPEED("<b>Calyrex Speed:</b>")
     , CHECK_HORSE_STATS(
         "<b>Check Horse stats</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , HORSE_HP("<b>Horse HP:</b>")

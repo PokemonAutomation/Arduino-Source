@@ -29,6 +29,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
 ClothingBuyer::ClothingBuyer()
     : CATEGORY_ROTATION(
         "<b>Rotate Categories:</b><br>This slows down the program, but ensures it will cover all categories.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 {

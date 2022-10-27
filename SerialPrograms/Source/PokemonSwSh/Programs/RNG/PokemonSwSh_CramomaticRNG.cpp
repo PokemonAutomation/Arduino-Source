@@ -67,10 +67,12 @@ CramomaticRNG::CramomaticRNG()
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , LOG_VALUES(
         "<b>Log Animation Values:</br>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 

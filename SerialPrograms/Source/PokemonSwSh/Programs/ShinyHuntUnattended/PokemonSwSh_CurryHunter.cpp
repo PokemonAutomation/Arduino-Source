@@ -57,6 +57,7 @@ CurryHunter::CurryHunter()
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , ITERATIONS(

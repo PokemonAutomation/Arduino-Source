@@ -133,6 +133,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , TARGET_CIRCLING(
         "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
         " This increases the chance of encountering the " + STRING_POKEMON + " if it has moved or if the trajectory missed.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 {

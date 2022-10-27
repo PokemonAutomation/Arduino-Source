@@ -30,6 +30,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , use_suffix(
         "<b>Discord bot use suffix:</b><br>Use a suffix instead of a prefix for commands.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , game_status(

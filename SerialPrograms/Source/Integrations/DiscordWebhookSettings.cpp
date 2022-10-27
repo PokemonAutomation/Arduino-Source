@@ -16,9 +16,9 @@ namespace Integration{
 
 
 DiscordWebhookUrl::DiscordWebhookUrl()
-    : enabled(true)
+    : enabled(LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , label(false, "", "My test server")
-    , ping(true)
+    , ping(LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , tags_text(false, "Notifs, Showcase, LiveHost", "")
     , url(true, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {

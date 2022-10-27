@@ -37,6 +37,7 @@ MassRelease::MassRelease()
     )
     , DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

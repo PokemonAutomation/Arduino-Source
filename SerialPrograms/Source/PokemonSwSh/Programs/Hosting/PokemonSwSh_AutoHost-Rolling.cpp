@@ -46,8 +46,12 @@ std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
 AutoHostRolling::AutoHostRolling()
     : RAID_CODE(8)
     , SKIPS("<b>Day Skips:</b>", 3)
-    , BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
-    , HOST_ONLINE("<b>Host Online:</b>", true)
+    , BACKUP_SAVE(
+        "<b>Load Backup Save:</b><br>For backup save soft-locking method.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
+    )
+    , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         TICKS_PER_SECOND,
@@ -68,6 +72,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , DYNAMAX(
         "<b>1st Move Dynamax:</b><br>Dynamax on first move. (only applies if above option is non-zero)",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , TROLL_HOSTING(
@@ -76,6 +81,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , ALTERNATE_GAMES(
         "<b>Alternate Games:</b><br>Alternate hosting between 1st and 2nd games. Host from both Sword and Shield.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)

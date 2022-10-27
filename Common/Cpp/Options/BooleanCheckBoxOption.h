@@ -18,10 +18,16 @@ class BooleanCheckBoxCell : public ConfigOption{
 public:
     ~BooleanCheckBoxCell();
     BooleanCheckBoxCell(const BooleanCheckBoxCell& x);
-    BooleanCheckBoxCell(bool default_value, bool current_value);
+    BooleanCheckBoxCell(
+        LockWhileRunning lock_while_running,
+        bool default_value, bool current_value
+    );
 
 public:
-    BooleanCheckBoxCell(bool default_value);
+    BooleanCheckBoxCell(
+        LockWhileRunning lock_while_running,
+        bool default_value
+    );
 
     bool default_value() const;
     bool current_value() const;
@@ -47,8 +53,16 @@ protected:
 class BooleanCheckBoxOption : public BooleanCheckBoxCell{
 public:
     BooleanCheckBoxOption(const BooleanCheckBoxOption& x) = delete;
-    BooleanCheckBoxOption(std::string label, bool default_value);
-    BooleanCheckBoxOption(std::string label, bool default_value, bool value);
+    BooleanCheckBoxOption(
+        std::string label,
+        LockWhileRunning lock_while_running,
+        bool default_value
+    );
+    BooleanCheckBoxOption(
+        std::string label,
+        LockWhileRunning lock_while_running,
+        bool default_value, bool value
+    );
 
     const std::string& label() const{ return m_label; }
     using BooleanCheckBoxCell::operator=;

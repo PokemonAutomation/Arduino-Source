@@ -31,6 +31,7 @@ FriendDelete::FriendDelete()
     )
     , BLOCK_FRIENDS(
         "<b>Block Friends:</b><br>Block instead of delete!",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , VIEW_FRIEND_DELAY(

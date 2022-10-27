@@ -103,7 +103,9 @@ BurmyFinder::BurmyFinder()
         &NOTIFICATION_ERROR_FATAL,
     })
     , SAVE_DEBUG_VIDEO(
-        "<b>Save debug videos to Switch:</b>", false
+        "<b>Save debug videos to Switch:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        false
     )
 {
     PA_ADD_OPTION(LANGUAGE);

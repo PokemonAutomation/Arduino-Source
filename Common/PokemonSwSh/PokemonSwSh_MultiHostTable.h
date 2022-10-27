@@ -27,12 +27,12 @@ public:
         , game_slot(GameSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
         , user_slot(UserSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
         , skips(3, 0, 7)
-        , backup_save(false)
-        , always_catchable(true)
-        , use_raid_code(true)
-        , accept_FRs(true)
+        , backup_save(LockWhileRunning::LOCK_WHILE_RUNNING, false)
+        , always_catchable(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , use_raid_code(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , accept_FRs(LockWhileRunning::LOCK_WHILE_RUNNING, true)
         , move_slot(0, 0, 4)
-        , dynamax(true)
+        , dynamax(LockWhileRunning::LOCK_WHILE_RUNNING, true)
         , post_raid_delay(TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
     {
         PA_ADD_OPTION(game_slot);

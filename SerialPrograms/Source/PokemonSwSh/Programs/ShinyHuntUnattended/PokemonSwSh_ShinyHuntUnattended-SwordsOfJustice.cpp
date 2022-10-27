@@ -41,6 +41,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
     )
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , m_advanced_options(

@@ -19,7 +19,11 @@ AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool m
             ? "Auto-Hosting Lugia\nCode: Random"
             : "Den 123: Square Shiny\nIGN: Kimberly\nCode: 1234-5678\nFC: SW-1234-5678-9012"
     )
-    , SHOW_STATS("<b>Show Stats:</b> Show program stats for this session.", true)
+    , SHOW_STATS(
+        "<b>Show Stats:</b> Show program stats for this session.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        true
+    )
 //    , SCREENSHOT("<b>Notification Screenshot:</b><br>Attach screenshot of the den to notifications.")
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
 {
