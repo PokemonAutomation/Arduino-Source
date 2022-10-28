@@ -46,6 +46,7 @@ MassRelease::MassRelease()
     : GO_HOME_WHEN_DONE(false)
     , BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 0, 40
     )
     , NOTIFICATIONS({

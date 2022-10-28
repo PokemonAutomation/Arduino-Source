@@ -97,10 +97,12 @@ EggAutonomous::EggAutonomous()
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , LOOPS_PER_FETCH(
         "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 1
     )
     , NUM_EGGS_IN_COLUMN(

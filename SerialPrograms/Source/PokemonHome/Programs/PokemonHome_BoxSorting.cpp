@@ -89,27 +89,30 @@ std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
 }
 
 BoxSorting::BoxSorting()
-        : BOX_NUMBER(
-            "<b>Number of boxes to order:</b>",
-            1, 1, MAX_BOXES
-        ),
-        VIDEO_DELAY(
-            "<b>Delay of your capture card (you probably have to increase this):</b>",
-            20
-        ),
-        GAME_DELAY(
-            "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
-            10
-        ),
-        NOTIFICATIONS({
-            &NOTIFICATION_PROGRAM_FINISH
-        })
-    {
-        PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
-        PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
-        PA_ADD_OPTION(GAME_DELAY);  //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
-        PA_ADD_OPTION(NOTIFICATIONS);
-    }
+    : BOX_NUMBER(
+        "<b>Number of boxes to order:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        1, 1, MAX_BOXES
+    )
+    , VIDEO_DELAY(
+        "<b>Delay of your capture card (you probably have to increase this):</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        20
+    )
+    , GAME_DELAY(
+        "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        10
+    )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH
+    })
+{
+    PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
+    PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
+    PA_ADD_OPTION(GAME_DELAY);  //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
 
 
 

@@ -60,6 +60,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     : GO_HOME_WHEN_DONE(false)
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1, 0, 11
     )
     , MARK_OFFSET(

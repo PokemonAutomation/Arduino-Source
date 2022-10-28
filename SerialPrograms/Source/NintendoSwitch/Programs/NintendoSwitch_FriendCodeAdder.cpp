@@ -30,6 +30,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
 FriendCodeAdder::FriendCodeAdder()
     : USER_SLOT(
         "<b>User Slot:</b><br>Send friend requests for this profile.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1, 1, 8
     )
     , FRIEND_CODES(

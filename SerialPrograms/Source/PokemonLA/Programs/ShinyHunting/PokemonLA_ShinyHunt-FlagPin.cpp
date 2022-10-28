@@ -65,6 +65,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
         "<font color=\"red\">If you wish to ignore enroute shinies, scroll down to "
         "\"Enroute Shiny Action\" and set it to ignore shinies. "
         "Keep in mind that the shiny sound radius is 30 and you will need some headroom.</font>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         60
     )
     , SHINY_DETECTED_ENROUTE(
@@ -93,6 +94,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
         "<b>Stop Distance:</b><br>"
         "Reset the game when you come within this distance of the flag. "
         "Don't set this too small. The navigation is not precise enough to land directly on the flag.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         20
     )
     , FLAG_REACHED_DELAY(
@@ -103,6 +105,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
     )
     , NAVIGATION_TIMEOUT(
         "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         180, 0
     )
 {

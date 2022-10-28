@@ -55,27 +55,37 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(const SimpleIntegerCell& x)
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
+    LockWhileRunning lock_while_running,
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
-    : m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
 {}
 
 template <typename Type>
-SimpleIntegerCell<Type>::SimpleIntegerCell(Type default_value)
-    : m_data(CONSTRUCT_TOKEN, std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max(), default_value, default_value)
+SimpleIntegerCell<Type>::SimpleIntegerCell(
+    LockWhileRunning lock_while_running,
+    Type default_value
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max(), default_value, default_value)
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
+    LockWhileRunning lock_while_running,
     Type default_value, Type min_value
 )
-    : m_data(CONSTRUCT_TOKEN, min_value, std::numeric_limits<Type>::max(), default_value, default_value)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, min_value, std::numeric_limits<Type>::max(), default_value, default_value)
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
+    LockWhileRunning lock_while_running,
     Type default_value, Type min_value, Type max_value
 )
-    : m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
 {}
 
 template <typename Type>
@@ -150,25 +160,38 @@ void SimpleIntegerCell<Type>::restore_defaults(){
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     std::string label,
+    LockWhileRunning lock_while_running,
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
-    : SimpleIntegerCell<Type>(min_value, max_value, default_value, current_value)
+    : SimpleIntegerCell<Type>(lock_while_running, min_value, max_value, default_value, current_value)
     , m_label(std::move(label))
 {}
 template <typename Type>
-SimpleIntegerOption<Type>::SimpleIntegerOption(std::string label, Type default_value)
-    : SimpleIntegerCell<Type>(default_value)
+SimpleIntegerOption<Type>::SimpleIntegerOption(
+    std::string label,
+    LockWhileRunning lock_while_running,
+    Type default_value
+)
+    : SimpleIntegerCell<Type>(lock_while_running, default_value)
     , m_label(std::move(label))
 {}
 template <typename Type>
-SimpleIntegerOption<Type>::SimpleIntegerOption(std::string label, Type default_value, Type min_value)
-    : SimpleIntegerCell<Type>(default_value, min_value)
+SimpleIntegerOption<Type>::SimpleIntegerOption(
+    std::string label,
+    LockWhileRunning lock_while_running,
+    Type default_value, Type min_value
+)
+    : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value)
     , m_label(std::move(label))
 {}
 template <typename Type>
-SimpleIntegerOption<Type>::SimpleIntegerOption(std::string label, Type default_value, Type min_value, Type max_value)
-    : SimpleIntegerCell<Type>(default_value, min_value, max_value)
+SimpleIntegerOption<Type>::SimpleIntegerOption(
+    std::string label,
+    LockWhileRunning lock_while_running,
+    Type default_value, Type min_value, Type max_value
+)
+    : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value, max_value)
     , m_label(std::move(label))
 {}
 

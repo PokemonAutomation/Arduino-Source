@@ -51,10 +51,12 @@ SeedFinder::SeedFinder()
     )
     , MIN_ADVANCES(
         "<b>Min Advances:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , MAX_ADVANCES(
         "<b>Max Advances:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10000
     )
     , m_advanced_options(

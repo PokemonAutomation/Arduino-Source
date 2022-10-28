@@ -45,7 +45,7 @@ std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
 
 AutoHostRolling::AutoHostRolling()
     : RAID_CODE(8)
-    , SKIPS("<b>Day Skips:</b>", 3)
+    , SKIPS("<b>Day Skips:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, 3)
     , BACKUP_SAVE(
         "<b>Load Backup Save:</b><br>For backup save soft-locking method.",
         LockWhileRunning::LOCK_WHILE_RUNNING,
@@ -59,6 +59,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , FRIEND_ACCEPT_USER_SLOT(
         "<b>Friend Request Accept Slot:</b><br>Zero disables friend accepts.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0, 0, 8
     )
     , EXTRA_DELAY_BETWEEN_RAIDS(
@@ -68,6 +69,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , MOVE_SLOT(
         "<b>1st Move Select Slot:</b><br>Zero disables 1st move select.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0, 0, 4
     )
     , DYNAMAX(
@@ -77,6 +79,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , TROLL_HOSTING(
         "<b>Troll Hosting:</b> (requires 1st move select)<br>0 disables the troll hosting option, 1 attacks the first ally, 2 attacks the second one, 3 attacks the third one. Dynamaxing will disable this option.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0, 0, 3
     )
     , ALTERNATE_GAMES(

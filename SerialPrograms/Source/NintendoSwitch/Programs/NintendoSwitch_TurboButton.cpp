@@ -57,7 +57,11 @@ TurboButton::TurboButton()
         TICKS_PER_SECOND,
         "3", 3
     )
-    , TOTAL_PRESSES("<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.", 0)
+    , TOTAL_PRESSES(
+        "<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
+        0
+    )
 {
     PA_ADD_OPTION(BUTTON);
     PA_ADD_OPTION(PRESS_DURATION);

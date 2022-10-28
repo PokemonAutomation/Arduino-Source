@@ -145,6 +145,7 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     )
     , POKEMON_COUNT(
         "<b>Number of " + STRING_POKEMON + " to order:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         30
     )
     , DODGE_SYSTEM_UPDATE_WINDOW(

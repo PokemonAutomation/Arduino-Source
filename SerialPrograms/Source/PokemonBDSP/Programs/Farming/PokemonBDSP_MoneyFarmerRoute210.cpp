@@ -77,14 +77,14 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
         LockWhileRunning::LOCK_WHILE_RUNNING,
         HealMethod::CelesticTown
     )
-    , MON0_MOVE1_PP("<b>Lead " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON0_MOVE2_PP("<b>Lead " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON0_MOVE3_PP("<b>Lead " + STRING_POKEMON + " Move 3 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON0_MOVE4_PP("<b>Lead " + STRING_POKEMON + " Move 4 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON1_MOVE1_PP("<b>2nd " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON1_MOVE2_PP("<b>2nd " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON1_MOVE3_PP("<b>2nd " + STRING_POKEMON + " Move 3 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
-    , MON1_MOVE4_PP("<b>2nd " + STRING_POKEMON + " Move 4 PP:</b><br>Set to zero to not use this move.", 5, 0, 64)
+    , MON0_MOVE1_PP("<b>Lead " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON0_MOVE2_PP("<b>Lead " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON0_MOVE3_PP("<b>Lead " + STRING_POKEMON + " Move 3 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON0_MOVE4_PP("<b>Lead " + STRING_POKEMON + " Move 4 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON1_MOVE1_PP("<b>2nd " + STRING_POKEMON + " Move 1 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON1_MOVE2_PP("<b>2nd " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON1_MOVE3_PP("<b>2nd " + STRING_POKEMON + " Move 3 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MON1_MOVE4_PP("<b>2nd " + STRING_POKEMON + " Move 4 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCK_WHILE_RUNNING, 5, 0, 64)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,

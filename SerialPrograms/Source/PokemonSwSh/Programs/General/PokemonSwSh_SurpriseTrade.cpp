@@ -34,6 +34,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
 SurpriseTrade::SurpriseTrade()
     : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2
     )
     , INITIAL_WAIT(

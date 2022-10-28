@@ -90,12 +90,12 @@ CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
     , m_action(action)
     , text("", false)
     , mount(PathMount_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathMount::NO_MOUNT)
-    , move_forward_ticks("Ticks to Move:", 0)
+    , move_forward_ticks("Ticks to Move:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
     , move_speed(PathSpeed_Database(), LockWhileRunning::LOCK_WHILE_RUNNING,PathSpeed::NORMAL_SPEED)
     , left_x("x: [left: -1.0, right: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
     , left_y("y: [backward: -1.0, forward: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
-    , jump_wait_ticks("Ticks after jump:", 0)
-    , wait_ticks("Ticks:", 0)
+    , jump_wait_ticks("Ticks after jump:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
+    , wait_ticks("Ticks:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
 {
     PA_ADD_STATIC(text);
     PA_ADD_OPTION(mount);

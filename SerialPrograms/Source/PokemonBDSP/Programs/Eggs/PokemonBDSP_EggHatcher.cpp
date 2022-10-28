@@ -49,6 +49,7 @@ EggHatcher::EggHatcher()
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
     , BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         3
     )
     , SAVE_AND_RESET(

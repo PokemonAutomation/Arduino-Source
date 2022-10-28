@@ -48,9 +48,9 @@ uint8_t research_catch_count(const std::string& slug){
 TradeCountTableRow::TradeCountTableRow(const std::string& slug, const ImageViewRGB32& icon)
     : StaticTableRow(slug)
     , default_value(research_catch_count(slug))
-    , pokemon(Pokemon::get_pokemon_name(slug).display_name(), icon, 40)
-    , count(default_value, 0, default_value)
-    , default_label(std::to_string(default_value), ImageViewRGB32())
+    , pokemon(LockWhileRunning::LOCK_WHILE_RUNNING, Pokemon::get_pokemon_name(slug).display_name(), icon, 40)
+    , count(LockWhileRunning::LOCK_WHILE_RUNNING, default_value, 0, default_value)
+    , default_label(LockWhileRunning::LOCK_WHILE_RUNNING, std::to_string(default_value), ImageViewRGB32())
 {
     PA_ADD_STATIC(pokemon);
     add_option(count, "Count");

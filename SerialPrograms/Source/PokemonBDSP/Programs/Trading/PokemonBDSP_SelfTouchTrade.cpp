@@ -45,6 +45,7 @@ SelfTouchTrade::SelfTouchTrade()
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 0, 40
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

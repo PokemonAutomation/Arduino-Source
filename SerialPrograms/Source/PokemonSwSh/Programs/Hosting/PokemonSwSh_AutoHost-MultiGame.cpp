@@ -52,6 +52,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     , GAME_LIST(true)
     , FR_FORWARD_ACCEPT(
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1
     )
     , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)

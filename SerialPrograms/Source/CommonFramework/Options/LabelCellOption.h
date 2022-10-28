@@ -22,13 +22,22 @@ public:
     ~LabelCellOption();
 
     //  Make label with no icon.
-    LabelCellOption(std::string text);
+    LabelCellOption(
+        LockWhileRunning lock_while_running,
+        std::string text
+    );
 
     //  Make label with the icon in its original resolution.
-    LabelCellOption(std::string text, const ImageViewRGB32& icon);
+    LabelCellOption(
+        LockWhileRunning lock_while_running,
+        std::string text, const ImageViewRGB32& icon
+    );
 
     //  Make label with icon and scale it so that the largest dimension is "icon_size" pixels.
-    LabelCellOption(std::string text, const ImageViewRGB32& icon, size_t icon_size);
+    LabelCellOption(
+        LockWhileRunning lock_while_running,
+        std::string text, const ImageViewRGB32& icon, size_t icon_size
+    );
 
 //    LabelCellOption(std::string text, ImageRGB32 icon);
 

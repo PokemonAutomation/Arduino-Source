@@ -58,6 +58,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
     : GO_HOME_WHEN_DONE(false)
     , BOXES(
         "<b>Boxes to Clone:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         999, 0, 999
     )
     , RELEASE(

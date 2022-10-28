@@ -35,8 +35,8 @@ ResolutionOption::ResolutionOption(
 )
     : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
     , DESCRIPTION(std::move(description))
-    , WIDTH("<b>Width:</b>", scale_dpi_width(default_width))
-    , HEIGHT("<b>Height:</b>", scale_dpi_height(default_height))
+    , WIDTH("<b>Width:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
+    , HEIGHT("<b>Height:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(WIDTH);

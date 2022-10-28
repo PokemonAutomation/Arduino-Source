@@ -22,14 +22,24 @@ public:
     ~SimpleIntegerCell();
     SimpleIntegerCell(const SimpleIntegerCell& x);
     SimpleIntegerCell(
+        LockWhileRunning lock_while_running,
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
 
 public:
-    SimpleIntegerCell(Type default_value);
-    SimpleIntegerCell(Type default_value, Type min_value);
-    SimpleIntegerCell(Type default_value, Type min_value, Type max_value);
+    SimpleIntegerCell(
+        LockWhileRunning lock_while_running,
+        Type default_value
+    );
+    SimpleIntegerCell(
+        LockWhileRunning lock_while_running,
+        Type default_value, Type min_value
+    );
+    SimpleIntegerCell(
+        LockWhileRunning lock_while_running,
+        Type default_value, Type min_value, Type max_value
+    );
 
     Type min_value() const;
     Type max_value() const;
@@ -64,14 +74,24 @@ public:
     SimpleIntegerOption(const SimpleIntegerOption& x) = delete;
     SimpleIntegerOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
 
 public:
-    SimpleIntegerOption(std::string label, Type default_value);
-    SimpleIntegerOption(std::string label, Type default_value, Type min_value);
-    SimpleIntegerOption(std::string label, Type default_value, Type min_value, Type max_value);
+    SimpleIntegerOption(std::string label,
+        LockWhileRunning lock_while_running,
+        Type default_value
+    );
+    SimpleIntegerOption(std::string label,
+        LockWhileRunning lock_while_running,
+        Type default_value, Type min_value
+    );
+    SimpleIntegerOption(std::string label,
+        LockWhileRunning lock_while_running,
+        Type default_value, Type min_value, Type max_value
+    );
 
     const std::string& label() const{ return m_label; }
 

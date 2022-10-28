@@ -41,6 +41,7 @@ TradeBot::TradeBot()
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2
     )
     , LINK_TRADE_EXTRA_LINE(

@@ -56,14 +56,26 @@ struct LabelCellOption::Data{
 
 
 LabelCellOption::~LabelCellOption() = default;
-LabelCellOption::LabelCellOption(std::string text)
-    : m_data(CONSTRUCT_TOKEN, std::move(text))
+LabelCellOption::LabelCellOption(
+    LockWhileRunning lock_while_running,
+    std::string text
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(text))
 {}
-LabelCellOption::LabelCellOption(std::string text, const ImageViewRGB32& icon)
-    : m_data(CONSTRUCT_TOKEN, std::move(text), icon)
+LabelCellOption::LabelCellOption(
+    LockWhileRunning lock_while_running,
+    std::string text, const ImageViewRGB32& icon
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(text), icon)
 {}
-LabelCellOption::LabelCellOption(std::string text, const ImageViewRGB32& icon, size_t icon_size)
-    : m_data(CONSTRUCT_TOKEN, std::move(text), icon, icon_size)
+LabelCellOption::LabelCellOption(
+    LockWhileRunning lock_while_running,
+    std::string text, const ImageViewRGB32& icon, size_t icon_size
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(text), icon, icon_size)
 {}
 //LabelCellOption::LabelCellOption(std::string text, ImageRGB32 icon)
 //    : m_data(CONSTRUCT_TOKEN, std::move(text), std::move(icon))

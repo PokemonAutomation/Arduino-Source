@@ -20,7 +20,7 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
         {CramomaticBallType::Apricorn, "apricorn", "Apricorn (Level Ball, Lure Ball, Moon Ball, Friend Ball, Love Ball, Fast Ball, Heavy Ball)"},
         {CramomaticBallType::Safari,   "safari",   "Safari Ball"},
         {CramomaticBallType::Sport,    "sport",    "Sport Ball (uses two different Apricorn colors)"},
-        });
+    });
     return database;
 }
 
@@ -29,7 +29,7 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
 CramomaticRow::CramomaticRow()
     : ball_type(BallType_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
     , is_bonus(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , priority(0)
+    , priority(LockWhileRunning::LOCK_WHILE_RUNNING, 0)
 {
     PA_ADD_OPTION(ball_type);
     PA_ADD_OPTION(is_bonus);

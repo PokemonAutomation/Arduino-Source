@@ -36,6 +36,7 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
 ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
     : REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         24
     )
     , START_TO_ATTACK_DELAY(

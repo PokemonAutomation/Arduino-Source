@@ -68,10 +68,11 @@ void PathMakerCell::operator=(const PathMakerCell& x){
 PathMakerCell::PathMakerCell(EnumDropdownCell<PathAction>& action)
     : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , m_action(action)
-    , x_axis("X:", 128), y_axis("Y:", 128)
-    , button_hold_ticks("Ticks to Hold:", 250)
-    , button_release_ticks("Ticks to Release:", 250)
-    , wait_ticks("Ticks to Wait:", 125)
+    , x_axis("X:", LockWhileRunning::LOCK_WHILE_RUNNING, 128)
+    , y_axis("Y:", LockWhileRunning::LOCK_WHILE_RUNNING, 128)
+    , button_hold_ticks("Ticks to Hold:", LockWhileRunning::LOCK_WHILE_RUNNING, 250)
+    , button_release_ticks("Ticks to Release:", LockWhileRunning::LOCK_WHILE_RUNNING, 250)
+    , wait_ticks("Ticks to Wait:", LockWhileRunning::LOCK_WHILE_RUNNING, 125)
 {
     PA_ADD_OPTION(x_axis);
     PA_ADD_OPTION(y_axis);

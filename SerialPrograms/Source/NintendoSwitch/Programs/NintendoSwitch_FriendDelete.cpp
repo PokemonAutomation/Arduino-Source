@@ -27,6 +27,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
 FriendDelete::FriendDelete()
     : FRIENDS_TO_DELETE(
         "<b>Number of Friends to Delete:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         3, 0, 300
     )
     , BLOCK_FRIENDS(

@@ -70,6 +70,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     )
     , RUNS_PER_TIME_RESET(
         "<b>How Many Runs Before Resetting Time of Day:</b><br>To avoid too much time spent on resetting time of day, reset only every several runs.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         5, 1
     )
     , TEST_PATH(

@@ -62,6 +62,7 @@ std::unique_ptr<StatsTracker> DenRoller_Descriptor::make_stats() const{
 DenRoller::DenRoller()
     : SKIPS(
         "<b>Number of Skips:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         3, 0, 60
     )
     , FILTER(

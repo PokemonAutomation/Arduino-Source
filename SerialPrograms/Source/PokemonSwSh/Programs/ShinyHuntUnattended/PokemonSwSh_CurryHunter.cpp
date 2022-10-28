@@ -62,6 +62,7 @@ CurryHunter::CurryHunter()
     )
     , ITERATIONS(
         "<b>Iterations:</b><br># of cooking attempts.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         999
     )
 {

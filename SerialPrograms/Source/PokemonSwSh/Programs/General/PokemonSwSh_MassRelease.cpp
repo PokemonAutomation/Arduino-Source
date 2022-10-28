@@ -33,6 +33,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
 MassRelease::MassRelease()
     : BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 0, 32
     )
     , DODGE_SYSTEM_UPDATE_WINDOW(

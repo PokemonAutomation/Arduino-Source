@@ -33,6 +33,7 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
 EggCombined2::EggCombined2()
     : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         32, 0, 32
     )
     , FETCHES_PER_BATCH(

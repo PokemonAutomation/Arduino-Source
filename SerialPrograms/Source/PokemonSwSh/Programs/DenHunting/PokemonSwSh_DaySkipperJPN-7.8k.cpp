@@ -38,6 +38,7 @@ std::unique_ptr<StatsTracker> DaySkipperJPN7p8k_Descriptor::make_stats() const{
 DaySkipperJPN7p8k::DaySkipperJPN7p8k()
     : SKIPS(
         "<b>Number of Frame Skips:</b>",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , START_DATE(
@@ -56,6 +57,7 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k()
     )
     , CORRECTION_SKIPS(
         "<b>Auto-Correct Interval:</b><br>Run auto-recovery every this # of skips. Zero disables the auto-corrections.",
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1000
     )
 {
