@@ -39,19 +39,35 @@ BoxDraw::BoxDraw()
 
 class BoxDraw::Overlay : public ConfigOption::Listener{
 public:
+    ~Overlay(){
+        detach();
+    }
     Overlay(BoxDraw& parent, VideoOverlay& overlay)
         : m_parent(parent)
         , m_overlay_set(overlay)
     {
-        m_parent.X.add_listener(*this);
-        m_parent.Y.add_listener(*this);
-        m_parent.WIDTH.add_listener(*this);
-        m_parent.HEIGHT.add_listener(*this);
+        try{
+            m_parent.X.add_listener(*this);
+            m_parent.Y.add_listener(*this);
+            m_parent.WIDTH.add_listener(*this);
+            m_parent.HEIGHT.add_listener(*this);
+        }catch (...){
+            detach();
+            throw;
+        }
     }
     virtual void value_changed() override{
         std::lock_guard<std::mutex> lg(m_lock);
         m_overlay_set.clear();
         m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
+    }
+
+private:
+    void detach(){
+        m_parent.X.remove_listener(*this);
+        m_parent.Y.remove_listener(*this);
+        m_parent.WIDTH.remove_listener(*this);
+        m_parent.HEIGHT.remove_listener(*this);
     }
 
 private:
