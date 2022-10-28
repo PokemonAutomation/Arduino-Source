@@ -33,7 +33,7 @@ public:
     ScreenshotCell(ImageAttachmentMode default_mode = ImageAttachmentMode::JPG)
         : EnumDropdownCell<ImageAttachmentMode>(
             ImageAttachmentMode_Database(),
-            LockWhileRunning::UNLOCK_WHILE_RUNNING,
+            LockWhileRunning::UNLOCKED,
             default_mode
         )
     {}
@@ -44,7 +44,7 @@ public:
         : EnumDropdownOption<ImageAttachmentMode>(
             std::move(label),
             ImageAttachmentMode_Database(),
-            LockWhileRunning::UNLOCK_WHILE_RUNNING,
+            LockWhileRunning::UNLOCKED,
             ImageAttachmentMode::JPG
         )
     {}

@@ -52,7 +52,7 @@ ConfigOption::ConfigOption()
     : m_data(CONSTRUCT_TOKEN, true, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(LockWhileRunning lock_while_program_is_running)
-    : m_data(CONSTRUCT_TOKEN, lock_while_program_is_running == LockWhileRunning::LOCK_WHILE_RUNNING, ConfigOptionState::ENABLED)
+    : m_data(CONSTRUCT_TOKEN, lock_while_program_is_running == LockWhileRunning::LOCKED, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(ConfigOptionState visibility)
     : m_data(CONSTRUCT_TOKEN, true, visibility)

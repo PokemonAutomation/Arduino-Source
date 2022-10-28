@@ -66,13 +66,13 @@ void PathMakerCell::operator=(const PathMakerCell& x){
     wait_ticks.set(x.wait_ticks);
 }
 PathMakerCell::PathMakerCell(EnumDropdownCell<PathAction>& action)
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    : BatchOption(LockWhileRunning::LOCKED, true)
     , m_action(action)
-    , x_axis("X:", LockWhileRunning::LOCK_WHILE_RUNNING, 128)
-    , y_axis("Y:", LockWhileRunning::LOCK_WHILE_RUNNING, 128)
-    , button_hold_ticks("Ticks to Hold:", LockWhileRunning::LOCK_WHILE_RUNNING, 250)
-    , button_release_ticks("Ticks to Release:", LockWhileRunning::LOCK_WHILE_RUNNING, 250)
-    , wait_ticks("Ticks to Wait:", LockWhileRunning::LOCK_WHILE_RUNNING, 125)
+    , x_axis("X:", LockWhileRunning::LOCKED, 128)
+    , y_axis("Y:", LockWhileRunning::LOCKED, 128)
+    , button_hold_ticks("Ticks to Hold:", LockWhileRunning::LOCKED, 250)
+    , button_release_ticks("Ticks to Release:", LockWhileRunning::LOCKED, 250)
+    , wait_ticks("Ticks to Wait:", LockWhileRunning::LOCKED, 125)
 {
     PA_ADD_OPTION(x_axis);
     PA_ADD_OPTION(y_axis);
@@ -123,7 +123,7 @@ void PathMakerCell::value_changed(){
 
 
 PathMakerRow2::PathMakerRow2()
-    : action(PathAction_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
+    : action(PathAction_Database(), LockWhileRunning::LOCKED, PathAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);

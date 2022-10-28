@@ -91,17 +91,17 @@ std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
 BoxSorting::BoxSorting()
     : BOX_NUMBER(
         "<b>Number of boxes to order:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1, 1, MAX_BOXES
     )
     , VIDEO_DELAY(
         "<b>Delay of your capture card (you probably have to increase this):</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         20
     )
     , GAME_DELAY(
         "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         10
     )
     , NOTIFICATIONS({

@@ -41,7 +41,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     std::string default_delay_ticks,
     ShinyDetectedAction default_action
 )
-    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
+    : GroupOption(std::move(label), LockWhileRunning::LOCKED)
     , DESCRIPTION(std::move(description))
     , ACTION(
         "<b>Shiny Detected Action:</b>",
@@ -50,7 +50,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
             {ShinyDetectedAction::STOP_PROGRAM,             "stop",         "Stop program. Align camera for a screenshot. Then go Home."},
             {ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM,  "video+stop",   "Stop program. Align camera for a screenshot + video. Then go Home."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         default_action
     )
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)

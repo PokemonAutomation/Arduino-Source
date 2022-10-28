@@ -48,7 +48,7 @@ ApplyGrits::ApplyGrits()
             {5, "5", "5"},
             {6, "6", "6"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1
     )
     , NOTIFICATIONS({

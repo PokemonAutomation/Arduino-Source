@@ -91,7 +91,7 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
     })
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
 {

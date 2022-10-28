@@ -66,12 +66,12 @@ BerryFarmer2::BerryFarmer2()
     )
     , FETCH_ATTEMPTS(
         "<b>Number of Fetch Attempts:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         100000
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
     , ENCOUNTER_BOT_OPTIONS(false, true)
@@ -93,12 +93,12 @@ BerryFarmer2::BerryFarmer2()
     )
     , START_BATTLE_TIMEOUT(
         "<b>Start Battle Timeout:</b><br>After a battle is detected, wait this long to flee in seconds.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         15
     )
     , RUSTLING_INTERVAL(
         "<b>Rustling Interval:</b><br>How much time between two rustling sounds has to pass to be considered slow rustling in ms.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1350
     )
     , RUSTLING_TIMEOUT(
@@ -113,7 +113,7 @@ BerryFarmer2::BerryFarmer2()
     )
     , SOUND_THRESHOLD(
         "<b>Maximum Sound Error Coefficient",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.68, 0, 1.0
     )
 {

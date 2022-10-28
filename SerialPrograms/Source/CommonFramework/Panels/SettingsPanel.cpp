@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 SettingsPanelInstance::SettingsPanelInstance(const PanelDescriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_options(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , m_options(LockWhileRunning::LOCKED)
 {}
 
 void SettingsPanelInstance::from_json(const JsonValue& json){

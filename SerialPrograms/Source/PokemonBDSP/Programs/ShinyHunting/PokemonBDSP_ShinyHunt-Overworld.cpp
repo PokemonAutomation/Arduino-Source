@@ -56,7 +56,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
         "<b>Reset Game in Case of Error:</b><br>"
         "When the program encounters an error, whether to reset the game to fix it.<br>"
         "<b>Make sure you have set \"Throw balls. Save if caught.\" in Option Overrides if you don't stop when finding a shiny.</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , NOTIFICATIONS({

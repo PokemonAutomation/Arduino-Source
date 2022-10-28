@@ -37,7 +37,7 @@ FloatingPoint::FloatingPoint(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_option(
         SingleStatementOption::m_label,
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         obj.get_double_throw(JSON_DEFAULT),
         obj.get_double_throw(JSON_MIN_VALUE),
         obj.get_double_throw(JSON_MAX_VALUE)

@@ -53,7 +53,7 @@ EggAutonomous::EggAutonomous()
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         10, 1, 30
     )
     , TRAVEL_TIME_PER_FETCH(
@@ -71,7 +71,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
     , AUTO_SAVING(
@@ -85,7 +85,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

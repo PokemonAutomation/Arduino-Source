@@ -36,7 +36,7 @@ TrainPokemonOCR::TrainPokemonOCR()
     )
     , THREADS(
         "<b>Worker Threads:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         std::thread::hardware_concurrency()
     )
 {

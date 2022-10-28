@@ -23,7 +23,7 @@ ConsoleSettings& ConsoleSettings::instance(){
     return settings;
 }
 ConsoleSettings::ConsoleSettings()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
     , CONNECT_CONTROLLER_DELAY(
         "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
         TICKS_PER_SECOND,
@@ -38,7 +38,7 @@ ConsoleSettings::ConsoleSettings()
         "<b>Start Game Requires Internet:</b><br>"
         "Set this to true if starting the game requires checking the internet. "
         "Otherwise, programs that require soft-resetting may not work properly.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , START_GAME_INTERNET_CHECK_DELAY(
@@ -50,14 +50,14 @@ ConsoleSettings::ConsoleSettings()
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(
         "<b>Tolerate System Update Menu (fast):</b><br>"
         "Some programs can bypass the system update menu at little performance cost. Setting this to true enables this.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_SLOW(
         "<b>Tolerate System Update Menu (slow):</b><br"
         ">Some programs can bypass the system update menu, but will take a noticeable performance hit. "
         "Setting this to true enables this.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
 {

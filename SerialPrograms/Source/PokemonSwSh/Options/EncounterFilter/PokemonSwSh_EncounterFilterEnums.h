@@ -32,7 +32,7 @@ public:
     EncounterActionCell()
         : EnumDropdownCell<EncounterAction>(
             EncounterAction_Database(),
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockWhileRunning::LOCKED,
             EncounterAction::StopProgram
         )
     {}
@@ -56,7 +56,7 @@ public:
     ShinyFilterCell(bool rare_stars)
         : EnumDropdownCell<ShinyFilter>(
             rare_stars ? ShinyFilter_RareStars_Database() : ShinyFilter_Normal_Database(),
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockWhileRunning::LOCKED,
             ShinyFilter::NOT_SHINY
         )
     {}

@@ -145,12 +145,12 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     )
     , POKEMON_COUNT(
         "<b>Number of " + STRING_POKEMON + " to order:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         30
     )
     , DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
 {

@@ -33,12 +33,12 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
 EggCombined2::EggCombined2()
     : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         32, 0, 32
     )
     , FETCHES_PER_BATCH(
         "<b>Fetches per Batch:</b><br>For each batch of eggs, attempt this many egg fetches.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         6.0, 0, 7
     )
     , m_advanced_options(

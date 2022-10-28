@@ -52,7 +52,7 @@ public:
                 {MountDetectorLogging::LOG_ONLY,                "log",      "Log to output window."},
                 {MountDetectorLogging::LOG_AND_DUMP_FAILURES,   "log+dump", "Log to output window and save to file."},
             },
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockWhileRunning::LOCKED,
             MountDetectorLogging::LOG_AND_DUMP_FAILURES
         )
     {}

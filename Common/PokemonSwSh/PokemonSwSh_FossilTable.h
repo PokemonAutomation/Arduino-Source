@@ -39,10 +39,10 @@ private:
 
 public:
     FossilGame()
-        : game_slot(GameSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
-        , user_slot(UserSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
-        , fossil(Fossil_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, Fossil::Dracovish)
-        , revives(LockWhileRunning::LOCK_WHILE_RUNNING, 960, 0, 965)
+        : game_slot(GameSlot_Database(), LockWhileRunning::LOCKED, 1)
+        , user_slot(UserSlot_Database(), LockWhileRunning::LOCKED, 1)
+        , fossil(Fossil_Database(), LockWhileRunning::LOCKED, Fossil::Dracovish)
+        , revives(LockWhileRunning::LOCKED, 960, 0, 965)
     {
         PA_ADD_OPTION(game_slot);
         PA_ADD_OPTION(user_slot);

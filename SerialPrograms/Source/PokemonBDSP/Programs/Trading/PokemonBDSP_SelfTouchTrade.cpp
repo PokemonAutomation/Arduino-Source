@@ -40,12 +40,12 @@ SelfTouchTrade::SelfTouchTrade()
             {HostingSwitch::Switch0, "switch0", "Switch 0 (Left)"},
             {HostingSwitch::Switch1, "switch1", "Switch 1 (Right)"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         HostingSwitch::Switch0
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2, 0, 40
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

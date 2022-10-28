@@ -27,12 +27,12 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
 FriendDelete::FriendDelete()
     : FRIENDS_TO_DELETE(
         "<b>Number of Friends to Delete:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         3, 0, 300
     )
     , BLOCK_FRIENDS(
         "<b>Block Friends:</b><br>Block instead of delete!",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , VIEW_FRIEND_DELAY(

@@ -49,7 +49,7 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     : GO_HOME_WHEN_DONE(false)
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , ENCOUNTER_BOT_OPTIONS(true, false)

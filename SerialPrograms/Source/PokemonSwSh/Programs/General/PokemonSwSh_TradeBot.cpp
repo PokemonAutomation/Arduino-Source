@@ -41,12 +41,12 @@ TradeBot::TradeBot()
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2
     )
     , LINK_TRADE_EXTRA_LINE(
         "<b>Link Trade Extra Line:</b><br>Set this if you are playing in German.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , SEARCH_DELAY(

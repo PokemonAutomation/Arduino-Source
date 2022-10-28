@@ -95,7 +95,7 @@ LeapGrinder::LeapGrinder()
     , POKEMON("<b>Pokemon Species</b>", POKEMON_DATABASE, "cherubi")
     , LEAPS(
         "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1, 1, 100
     )
     , SHINY_DETECTED_ENROUTE(

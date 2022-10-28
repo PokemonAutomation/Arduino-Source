@@ -98,7 +98,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.75, 0, 1.0
     )
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())

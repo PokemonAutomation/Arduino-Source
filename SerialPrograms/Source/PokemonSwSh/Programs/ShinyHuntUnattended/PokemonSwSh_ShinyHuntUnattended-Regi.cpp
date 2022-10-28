@@ -46,7 +46,7 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
     )
     , CORRECTION_INTERVAL(
         "<b>Correction Interval:</b><br>Periodically leave the building to fix broken lights. Zero disables these corrections.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         20
     )
     , TRANSITION_DELAY(

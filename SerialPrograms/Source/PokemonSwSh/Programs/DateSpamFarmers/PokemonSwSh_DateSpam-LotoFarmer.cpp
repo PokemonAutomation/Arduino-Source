@@ -34,7 +34,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
 LotoFarmer::LotoFarmer()
     : SKIPS(
         "<b>Number of Loto Attempts:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         100000
     )
     , MASH_B_DURATION(

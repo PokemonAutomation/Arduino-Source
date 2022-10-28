@@ -40,7 +40,7 @@ std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const
 
 
 SingleSwitchProgramInstance::SingleSwitchProgramInstance()
-    : m_options(LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    : m_options(LockWhileRunning::UNLOCKED)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",

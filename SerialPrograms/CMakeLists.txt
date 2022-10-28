@@ -432,6 +432,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/StringSelectTableOption.h
+    Source/CommonFramework/Options/TrainOCRModeOption.h
     Source/CommonFramework/Options/UI/LabelCellWidget.cpp
     Source/CommonFramework/Options/UI/LabelCellWidget.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp

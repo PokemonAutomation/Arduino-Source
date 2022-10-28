@@ -34,17 +34,17 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
 PokeJobsFarmer::PokeJobsFarmer()
     : SKIPS(
         "<b>Number of days:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         200
     )
     , CONCURRENCY(
         "<b>Number of concurrent " + STRING_POKEJOB + "s per day:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2
     )
     , MENU_INDEX(
         "<b>Index of " + STRING_POKEJOB + "s in Rotom menu:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         3
     )
     , m_advanced_options(

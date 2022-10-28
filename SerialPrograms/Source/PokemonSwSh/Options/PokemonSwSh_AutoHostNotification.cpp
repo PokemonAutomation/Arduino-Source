@@ -12,7 +12,7 @@ namespace PokemonSwSh{
 
 
 AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool max_lair)
-    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption(std::move(label), LockWhileRunning::LOCKED, true, false)
     , DESCRIPTION(
         "<b>Description:</b>", "",
         max_lair
@@ -21,7 +21,7 @@ AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool m
     )
     , SHOW_STATS(
         "<b>Show Stats:</b> Show program stats for this session.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
 //    , SCREENSHOT("<b>Notification Screenshot:</b><br>Attach screenshot of the den to notifications.")

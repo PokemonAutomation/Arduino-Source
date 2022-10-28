@@ -213,7 +213,7 @@ AutoMultiSpawn::AutoMultiSpawn()
         {
             {MultiSpawn::MirelandsHippopotas, "mirelands-hippopotas", "Mirelands - Hippopotas"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         MultiSpawn::MirelandsHippopotas
     )
     , PATH(false, "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".", "", "")

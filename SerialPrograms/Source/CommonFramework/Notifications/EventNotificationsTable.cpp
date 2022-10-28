@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOption*> options)
-    : StaticTableOption("", LockWhileRunning::UNLOCK_WHILE_RUNNING, false)
+    : StaticTableOption("", LockWhileRunning::UNLOCKED, false)
 {
     for (EventNotificationOption* option : options){
         add_row(option);
@@ -44,7 +44,7 @@ std::vector<std::string> EventNotificationsTable::make_header() const{
 
 
 EventNotificationsOption::EventNotificationsOption(std::vector<EventNotificationOption*> options)
-    : GroupOption("Discord Notifications", LockWhileRunning::UNLOCK_WHILE_RUNNING, true)
+    : GroupOption("Discord Notifications", LockWhileRunning::UNLOCKED, true)
     , m_table(std::move(options))
 {
     PA_ADD_OPTION(m_table);

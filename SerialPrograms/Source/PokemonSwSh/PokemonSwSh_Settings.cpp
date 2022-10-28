@@ -21,16 +21,16 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
     , m_egg_options("<font size=4><b>Egg Options:</b></font>")
     , AUTO_DEPOSIT(
         "<b>Auto-Deposit:</b><br>true = Send " + STRING_POKEMON + " to boxes is \"Automatic\".<br>false = Send " + STRING_POKEMON + " to boxes is \"Manual\".",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , EGG_FETCH_EXTRA_LINE(
         "<b>Egg Fetch Extra Line:</b><br>true = The daycare lady has an extra line of text in Japanese. Set this to true if you are running any of the egg programs in a Japanese game.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , FETCH_EGG_MASH_DELAY(
@@ -41,7 +41,7 @@ GameSettings::GameSettings()
     , m_den_options("<font size=4><b>Den Options:</b></font>")
     , DODGE_UNCATCHABLE_PROMPT_FAST(
         "<b>Dodge Uncatchable Prompt Fast:</b><br>Which method to use to bypass the uncatchable " + STRING_POKEMON + " prompt?<br>true = Use a fast (but potentially unreliable) method.<br>false = Use a slower (by about 5 seconds) method.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , m_advanced_options("<font size=5><b>Advanced Options:</b></font> You shouldn't need to touch anything below here.")
@@ -195,32 +195,32 @@ GameSettings::GameSettings()
     , m_shiny_detection("<font size=4><b>Shiny Detection:</b></font>")
     , SHINY_ALPHA_THRESHOLD(
         "<b>Shiny Threshold:</b><br>Threshold to detect a shiny encounter.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2.0, 0
     )
     , BALL_SPARKLE_ALPHA(
         "<b>Ball Sparkle Alpha:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.4, 0
     )
     , STAR_SPARKLE_ALPHA(
         "<b>Star Sparkle Alpha:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.5, 0
     )
     , SQUARE_SPARKLE_ALPHA(
         "<b>Ball Sparkle Alpha:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.3, 0
     )
     , LINE_SPARKLE_ALPHA(
         "<b>Star Sparkle Alpha:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.3, 0
     )
     , SHINY_DIALOG_ALPHA(
         "<b>Shiny Dialog Alpha:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1.2, 0
     )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")

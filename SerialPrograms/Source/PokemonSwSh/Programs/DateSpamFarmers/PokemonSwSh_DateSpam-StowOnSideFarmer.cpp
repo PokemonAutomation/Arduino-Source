@@ -34,12 +34,12 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
 StowOnSideFarmer::StowOnSideFarmer()
     : SKIPS(
         "<b>Number of Purchase Attempts:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         100000
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0, 0
     )
 {

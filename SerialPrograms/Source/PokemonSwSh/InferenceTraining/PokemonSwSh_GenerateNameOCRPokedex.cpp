@@ -52,7 +52,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Pokedex::IsleOfArmor, "isle-of-armor", "Isle of Armor"},
             {Pokedex::CrownTundra, "crown-tundra", "Crown Tundra"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         Pokedex::Galar
     )
     , MODE(
@@ -61,7 +61,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Mode::SaveToJson, "save-to-json", "Read names and save to JSON."},
             {Mode::GenerateTrainingData, "generate-training-data", "Generate training data."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         Mode::GenerateTrainingData
     )
 {

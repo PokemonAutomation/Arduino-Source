@@ -68,7 +68,7 @@ StatsReset::StatsReset()
             {GiftPokemon::Cosmog,   "cosmog",       "Cosmog"},
             {GiftPokemon::Poipole,  "poipole",      "Poipole"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         GiftPokemon::TypeNull
     )
     , HP("<b>HP:</b>")

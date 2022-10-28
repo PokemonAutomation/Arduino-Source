@@ -41,17 +41,17 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
 CramomaticRNG::CramomaticRNG()
     : NUM_APRICORN_ONE(
         "<b>Primary Apricorns:</b><br>Number of Apricorns in the selected slot.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
     , NUM_APRICORN_TWO(
         "<b>Secondary Apricorns:</b><br>Number of Apricorns in the slot below the selected one.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
     , NUM_NPCS(
         "<b>NPCs:</b><br>Number of NPCs in the dojo, including " + STRING_POKEMON + ".",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         21
     )
     , BALL_TABLE(
@@ -62,22 +62,22 @@ CramomaticRNG::CramomaticRNG()
     )
     , MAX_PRIORITY_ADVANCES(
         "<b>Priority Advances:</b><br>How many advances to check when checking for higher priority selections.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         300
     )
     , MAX_UNKNOWN_ADVANCES(
         "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         300
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , LOG_VALUES(
         "<b>Log Animation Values:</br>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
 

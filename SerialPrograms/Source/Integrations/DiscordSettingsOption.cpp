@@ -18,7 +18,7 @@ namespace Integration{
 
 
 DiscordMessageSettingsOption::DiscordMessageSettingsOption()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
     , instance_name(
         false,
         "<b>Instance Name:</b><br>If you are running multiple instances of this program, give it a name to distinguish them in notifications.",
@@ -52,7 +52,7 @@ DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, 
 
 
 DiscordSettingsOption::DiscordSettingsOption()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
 {
     PA_ADD_OPTION(message);
     PA_ADD_OPTION(webhooks);

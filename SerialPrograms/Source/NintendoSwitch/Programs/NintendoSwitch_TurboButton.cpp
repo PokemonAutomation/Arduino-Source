@@ -44,7 +44,7 @@ TurboButton::TurboButton()
             {BUTTON_HOME,       "HOME", "Home"},
             {BUTTON_CAPTURE,    "CAPTURE", "Capture"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         BUTTON_A
     )
     , PRESS_DURATION(
@@ -59,7 +59,7 @@ TurboButton::TurboButton()
     )
     , TOTAL_PRESSES(
         "<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
 {

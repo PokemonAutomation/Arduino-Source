@@ -86,16 +86,16 @@ void CustomPathCell::operator=(const CustomPathCell& x){
     wait_ticks.set(x.wait_ticks);
 }
 CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    : BatchOption(LockWhileRunning::LOCKED, true)
     , m_action(action)
     , text("", false)
-    , mount(PathMount_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathMount::NO_MOUNT)
-    , move_forward_ticks("Ticks to Move:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , move_speed(PathSpeed_Database(), LockWhileRunning::LOCK_WHILE_RUNNING,PathSpeed::NORMAL_SPEED)
-    , left_x("x: [left: -1.0, right: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
-    , left_y("y: [backward: -1.0, forward: 1.0]", LockWhileRunning::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
-    , jump_wait_ticks("Ticks after jump:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , wait_ticks("Ticks:", LockWhileRunning::LOCK_WHILE_RUNNING, 0)
+    , mount(PathMount_Database(), LockWhileRunning::LOCKED, PathMount::NO_MOUNT)
+    , move_forward_ticks("Ticks to Move:", LockWhileRunning::LOCKED, 0)
+    , move_speed(PathSpeed_Database(), LockWhileRunning::LOCKED,PathSpeed::NORMAL_SPEED)
+    , left_x("x: [left: -1.0, right: 1.0]", LockWhileRunning::LOCKED, 0, -1.0, 1.0)
+    , left_y("y: [backward: -1.0, forward: 1.0]", LockWhileRunning::LOCKED, 0, -1.0, 1.0)
+    , jump_wait_ticks("Ticks after jump:", LockWhileRunning::LOCKED, 0)
+    , wait_ticks("Ticks:", LockWhileRunning::LOCKED, 0)
 {
     PA_ADD_STATIC(text);
     PA_ADD_OPTION(mount);
@@ -160,7 +160,7 @@ void CustomPathCell::value_changed(){
 
 
 CustomPathTableRow2::CustomPathTableRow2()
-    : action(PathAction_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
+    : action(PathAction_Database(), LockWhileRunning::LOCKED, PathAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);
@@ -319,7 +319,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults()
 
 
 CustomPathTable::CustomPathTable()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
 //    : PATH(
 //        "<b>Custom Path Table:</b><br>"
 //        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"

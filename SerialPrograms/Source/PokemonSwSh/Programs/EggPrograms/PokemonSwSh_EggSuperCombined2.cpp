@@ -33,22 +33,22 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
 EggSuperCombined2::EggSuperCombined2()
     : BOXES_TO_RELEASE(
         "<b>Boxes to Release:</b><br>Start by releasing this many boxes.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2, 0, 32
     )
     , BOXES_TO_SKIP(
         "<b>Boxes to Skip:</b><br>Then skip this many boxes.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1, 0, 32
     )
     , BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         31, 0, 32
     )
     , FETCHES_PER_BATCH(
         "<b>Fetches per Batch:</b><br>For each batch of eggs, attempt this many egg fetches.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         6.0, 0, 7
     )
     , m_advanced_options(

@@ -84,7 +84,7 @@ uint8_t swap_party(BotBaseContext& context, uint8_t column){
 EggHatcher::EggHatcher()
     : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         3
     )
     , m_advanced_options(

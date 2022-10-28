@@ -214,7 +214,7 @@ OutbreakFinder::OutbreakFinder()
     )
     , DEBUG_MODE(
         "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

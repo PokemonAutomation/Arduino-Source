@@ -84,7 +84,7 @@ PurpleBeamFinder::PurpleBeamFinder()
     )
     , SAVE_SCREENSHOT(
         "<b>Screenshot Purple Beams:</b> (for debugging purposes)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , TIMEOUT_DELAY(
@@ -98,22 +98,22 @@ PurpleBeamFinder::PurpleBeamFinder()
 //    )
     , MIN_BRIGHTNESS(
         "<b>Minimum Brightness:</b><br>Range: 0 - 768",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         500, 0, 768
     )
     , MIN_EUCLIDEAN(
         "<b>Minimum Euclidean Distance:</b><br>Range: 0 - 443",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         15, 0, 443
     )
     , MIN_DELTA_STDDEV_RATIO(
         "<b>Minimum Delta/Stddev Ratio:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         5.0, 0
     )
     , MIN_SIGMA_STDDEV_RATIO(
         "<b>Minimum Sigma/Stddev Ratio:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         5.0, 0
     )
 {

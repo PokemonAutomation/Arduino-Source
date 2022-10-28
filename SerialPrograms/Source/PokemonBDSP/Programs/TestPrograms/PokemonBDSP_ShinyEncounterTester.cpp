@@ -33,13 +33,13 @@ ShinyEncounterTester::ShinyEncounterTester()
             {BattleType::STARTER, "starter", "Starter Battle"},
             {BattleType::STANDARD, "standard", "Wild Encounter"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         BattleType::STANDARD
     )
     , USE_SOUND_DETECTION(
         "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
         "<b>Make sure you have correct audio input set.</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , NOTIFICATIONS({

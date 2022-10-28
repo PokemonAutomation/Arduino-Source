@@ -45,13 +45,13 @@ std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
 
 AutoHostRolling::AutoHostRolling()
     : RAID_CODE(8)
-    , SKIPS("<b>Day Skips:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, 3)
+    , SKIPS("<b>Day Skips:</b>", LockWhileRunning::LOCKED, 3)
     , BACKUP_SAVE(
         "<b>Load Backup Save:</b><br>For backup save soft-locking method.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
-    , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCKED, true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         TICKS_PER_SECOND,
@@ -59,7 +59,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , FRIEND_ACCEPT_USER_SLOT(
         "<b>Friend Request Accept Slot:</b><br>Zero disables friend accepts.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0, 0, 8
     )
     , EXTRA_DELAY_BETWEEN_RAIDS(
@@ -69,22 +69,22 @@ AutoHostRolling::AutoHostRolling()
     )
     , MOVE_SLOT(
         "<b>1st Move Select Slot:</b><br>Zero disables 1st move select.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0, 0, 4
     )
     , DYNAMAX(
         "<b>1st Move Dynamax:</b><br>Dynamax on first move. (only applies if above option is non-zero)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , TROLL_HOSTING(
         "<b>Troll Hosting:</b> (requires 1st move select)<br>0 disables the troll hosting option, 1 attacks the first ally, 2 attacks the second one, 3 attacks the third one. Dynamaxing will disable this option.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0, 0, 3
     )
     , ALTERNATE_GAMES(
         "<b>Alternate Games:</b><br>Alternate hosting between 1st and 2nd games. Host from both Sword and Shield.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)

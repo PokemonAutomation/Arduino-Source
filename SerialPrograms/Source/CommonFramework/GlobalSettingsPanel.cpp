@@ -33,10 +33,10 @@ ResolutionOption::ResolutionOption(
     std::string label, std::string description,
     int default_width, int default_height
 )
-    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
+    : GroupOption(std::move(label), LockWhileRunning::LOCKED)
     , DESCRIPTION(std::move(description))
-    , WIDTH("<b>Width:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
-    , HEIGHT("<b>Height:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
+    , WIDTH("<b>Width:</b>", LockWhileRunning::LOCKED, scale_dpi_width(default_width))
+    , HEIGHT("<b>Height:</b>", LockWhileRunning::LOCKED, scale_dpi_height(default_height))
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(WIDTH);
@@ -87,11 +87,11 @@ GlobalSettings& GlobalSettings::instance(){
     return settings;
 }
 GlobalSettings::GlobalSettings()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockWhileRunning::LOCKED)
     , SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , STATS_FILE(
@@ -102,7 +102,7 @@ GlobalSettings::GlobalSettings()
     )
     , ALL_STATS(
         "<b>All Stats:</b><br>Include all-time stats for notifications.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , WINDOW_SIZE(
@@ -123,13 +123,13 @@ GlobalSettings::GlobalSettings()
     )
     , LOG_EVERYTHING(
         "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , SAVE_DEBUG_IMAGES(
         "<b>Save Debug Images:</b><br>"
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
@@ -152,32 +152,32 @@ GlobalSettings::GlobalSettings()
     , AUDIO_FILE_VOLUME_SCALE(
         "<b>Audio File Input Volume Scale:</b><br>"
         "Multiply audio file playback by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0.31622776601683793320, //  -10dB
         -10000, 10000
     )
     , AUDIO_DEVICE_VOLUME_SCALE(
         "<b>Audio Device Input Volume Scale:</b><br>"
         "Multiply audio device input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         1.0, -10000, 10000
     )
     , SHOW_ALL_AUDIO_DEVICES(
         "<b>Show all Audio Devices:</b><br>"
         "Show all audio devices - including duplicates.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , SHOW_RECORD_FREQUENCIES(
         "<b>Show Record Frequencies:</b><br>"
         "Show option to record audio frequencies.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         true
     )
     , DEVELOPER_TOKEN(

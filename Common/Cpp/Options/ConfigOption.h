@@ -20,8 +20,8 @@ class ConfigWidget;
 
 
 enum class LockWhileRunning{
-    UNLOCK_WHILE_RUNNING,
-    LOCK_WHILE_RUNNING,
+    UNLOCKED,
+    LOCKED,
 };
 enum class ConfigOptionState{
     ENABLED,

@@ -97,12 +97,12 @@ EggAutonomous::EggAutonomous()
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         10, 1, 30
     )
     , LOOPS_PER_FETCH(
         "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         2, 1
     )
     , NUM_EGGS_IN_COLUMN(
@@ -115,7 +115,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         0
     )
     , AUTO_SAVING(
@@ -129,17 +129,17 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
     , DEBUG_PROCESSING_HATCHED(
         "Debug the part of program after all eggs hatched",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

@@ -57,12 +57,12 @@ SoundListener::SoundListener()
             {SoundType::AlphaMusic, "alpha-music",  "Alpha Music"},
             {SoundType::ItemDrop,   "item-drop",    "Item Drop Sound"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         SoundType::Shiny
     )
     , STOP_ON_DETECTED_SOUND(
         "<b>Stop on the detected sound</b><br>Stop program when the sound is detected.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
 {

@@ -72,7 +72,7 @@ IngoOpponentOption::IngoOpponentOption()
             {IngoOpponents::Ress,           "ress",         "Ress"},
             {IngoOpponents::Ingo_Alphas,    "ingo-alphas",  "Ingo - but using alphas"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         IngoOpponents::Wenton
     )
 {}

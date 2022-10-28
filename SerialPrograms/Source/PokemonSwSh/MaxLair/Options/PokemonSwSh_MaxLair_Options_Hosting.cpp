@@ -18,7 +18,7 @@ HostingSettings::~HostingSettings(){
     MODE.remove_listener(*this);
 }
 HostingSettings::HostingSettings()
-    : GroupOption("Hosting Options", LockWhileRunning::LOCK_WHILE_RUNNING)
+    : GroupOption("Hosting Options", LockWhileRunning::LOCKED)
     , MODE(
         "<b>Mode:</b>",
         {
@@ -26,7 +26,7 @@ HostingSettings::HostingSettings()
             {HostingMode::HOST_LOCALLY, "local", "Host Locally: Allow other local Switches to join."},
             {HostingMode::HOST_ONLINE, "online", "Host Online: Allow other people online to join."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         HostingMode::NOT_HOSTING
     )
     , RAID_CODE(

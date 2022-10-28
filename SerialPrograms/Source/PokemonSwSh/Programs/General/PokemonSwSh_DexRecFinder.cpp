@@ -64,7 +64,7 @@ std::unique_ptr<StatsTracker> DexRecFinder_Descriptor::make_stats() const{
 
 
 DexRecFilters::DexRecFilters()
-    : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCK_WHILE_RUNNING, true, true)
+    : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCKED, true, true)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for stop filters to work correctly.",
         PokemonNameReader::instance().languages(), true

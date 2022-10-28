@@ -26,10 +26,10 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
 {}
 
 BoxDraw::BoxDraw()
-    : X("<b>X Coordinate:</b>", LockWhileRunning::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
-    , Y("<b>Y Coordinate:</b>", LockWhileRunning::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
-    , WIDTH("<b>Width:</b>", LockWhileRunning::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
-    , HEIGHT("<b>Height:</b>", LockWhileRunning::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
+    : X("<b>X Coordinate:</b>", LockWhileRunning::UNLOCKED, 0.3, 0.0, 1.0)
+    , Y("<b>Y Coordinate:</b>", LockWhileRunning::UNLOCKED, 0.3, 0.0, 1.0)
+    , WIDTH("<b>Width:</b>", LockWhileRunning::UNLOCKED, 0.4, 0.0, 1.0)
+    , HEIGHT("<b>Height:</b>", LockWhileRunning::UNLOCKED, 0.4, 0.0, 1.0)
 {
     PA_ADD_OPTION(X);
     PA_ADD_OPTION(Y);

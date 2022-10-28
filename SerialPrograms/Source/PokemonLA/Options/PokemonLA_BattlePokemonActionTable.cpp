@@ -36,10 +36,10 @@ const EnumDatabase<MoveStyle>& MoveStyle_Database(){
 
 
 BattlePokemonActionRow::BattlePokemonActionRow()
-    : switch_pokemon(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , num_turns_to_switch(LockWhileRunning::LOCK_WHILE_RUNNING, 1)
-    , stop_after_num_moves(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , num_moves_to_stop(LockWhileRunning::LOCK_WHILE_RUNNING, 25, 0)
+    : switch_pokemon(LockWhileRunning::LOCKED, false)
+    , num_turns_to_switch(LockWhileRunning::LOCKED, 1)
+    , stop_after_num_moves(LockWhileRunning::LOCKED, false)
+    , num_moves_to_stop(LockWhileRunning::LOCKED, 25, 0)
 {
     PA_ADD_OPTION(style[0]);
     PA_ADD_OPTION(style[1]);
@@ -197,9 +197,9 @@ const IntegerEnumDatabase& MoveIndex_Database(){
 
 
 MoveGrinderActionRow::MoveGrinderActionRow()
-    : pokemon_index(PokemonIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , move_index(MoveIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , attempts(LockWhileRunning::LOCK_WHILE_RUNNING, 1, 1)
+    : pokemon_index(PokemonIndex_Database(), LockWhileRunning::LOCKED, 0)
+    , move_index(MoveIndex_Database(), LockWhileRunning::LOCKED, 0)
+    , attempts(LockWhileRunning::LOCKED, 1, 1)
 {
     PA_ADD_OPTION(pokemon_index);
     PA_ADD_OPTION(move_index);

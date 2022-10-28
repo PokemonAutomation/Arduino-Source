@@ -16,7 +16,7 @@ namespace Integration{
 
 
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : GroupOption("Discord Integration Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
 //    , m_integration_enabled(integration_enabled)
     , token(
         true,
@@ -30,7 +30,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , use_suffix(
         "<b>Discord bot use suffix:</b><br>Use a suffix instead of a prefix for commands.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockWhileRunning::LOCKED,
         false
     )
     , game_status(

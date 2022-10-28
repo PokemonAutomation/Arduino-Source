@@ -16,9 +16,9 @@ namespace Integration{
 
 
 DiscordWebhookUrl::DiscordWebhookUrl()
-    : enabled(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    : enabled(LockWhileRunning::LOCKED, true)
     , label(false, "", "My test server")
-    , ping(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    , ping(LockWhileRunning::LOCKED, true)
     , tags_text(false, "Notifs, Showcase, LiveHost", "")
     , url(true, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {
@@ -87,7 +87,7 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
 
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
-    : GroupOption("Discord Webhook Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption("Discord Webhook Settings", LockWhileRunning::LOCKED, true, false)
 {
     PA_ADD_OPTION(urls);
 }
