@@ -50,7 +50,8 @@ public:
     }
 };
 TestMessageButton::TestMessageButton(EventNotificationOption& p_option)
-    : option(p_option)
+    : ConfigOption(LockWhileRunning::UNLOCKED)
+    , option(p_option)
 {}
 ConfigWidget* TestMessageButton::make_QtWidget(QWidget& parent){
     return new TestButtonWidget(parent, *this);
@@ -107,7 +108,7 @@ struct EventNotificationOption::Data{
         , m_ping(LockWhileRunning::UNLOCKED, ping)
         , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
-        , m_tags(false, "Notifs", "")
+        , m_tags(false, LockWhileRunning::UNLOCKED, "Notifs", "")
         , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
@@ -124,7 +125,7 @@ struct EventNotificationOption::Data{
         , m_ping(LockWhileRunning::UNLOCKED, ping)
         , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
-        , m_tags(false, tags_to_str(tags), "")
+        , m_tags(false, LockWhileRunning::UNLOCKED, tags_to_str(tags), "")
         , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
@@ -142,7 +143,7 @@ struct EventNotificationOption::Data{
         , m_ping(LockWhileRunning::UNLOCKED, ping)
         , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
         , m_screenshot(screenshot)
-        , m_tags(false, tags_to_str(tags), "")
+        , m_tags(false, LockWhileRunning::UNLOCKED, tags_to_str(tags), "")
         , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)

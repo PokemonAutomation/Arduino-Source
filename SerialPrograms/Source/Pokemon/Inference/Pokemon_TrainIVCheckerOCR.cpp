@@ -30,6 +30,7 @@ TrainIVCheckerOCR_Descriptor::TrainIVCheckerOCR_Descriptor()
 TrainIVCheckerOCR::TrainIVCheckerOCR()
     : DIRECTORY(
         false,
+        LockWhileRunning::LOCKED,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
         "IVCheckerOCR/",
         "IVCheckerOCR/"

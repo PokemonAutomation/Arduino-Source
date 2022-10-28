@@ -17,11 +17,11 @@ namespace Integration{
 
 DiscordIntegrationChannel::DiscordIntegrationChannel()
     : enabled(LockWhileRunning::LOCKED, true)
-    , label(false, "", "My test server")
+    , label(false, LockWhileRunning::LOCKED, "", "My test server")
     , ping(LockWhileRunning::LOCKED, true)
-    , tags_text(false, "Notifs, Showcase, LiveHost", "")
+    , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
     , allow_commands(LockWhileRunning::LOCKED, true)
-    , channel_id(false, "", "123456789012345678")
+    , channel_id(false, LockWhileRunning::LOCKED, "", "123456789012345678")
 {
     //  Keep the old JSON tags for backwards compatibility.
     add_option(enabled, "Enabled");

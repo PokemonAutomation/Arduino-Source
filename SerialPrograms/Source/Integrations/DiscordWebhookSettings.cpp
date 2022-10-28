@@ -17,10 +17,10 @@ namespace Integration{
 
 DiscordWebhookUrl::DiscordWebhookUrl()
     : enabled(LockWhileRunning::LOCKED, true)
-    , label(false, "", "My test server")
+    , label(false, LockWhileRunning::LOCKED, "", "My test server")
     , ping(LockWhileRunning::LOCKED, true)
-    , tags_text(false, "Notifs, Showcase, LiveHost", "")
-    , url(true, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
+    , url(true, LockWhileRunning::LOCKED, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {
     //  Keep the old JSON tags for backwards compatibility.
     add_option(enabled, "Enabled");

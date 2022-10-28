@@ -36,10 +36,12 @@ struct StringCell::Data{
 StringCell::~StringCell() = default;
 StringCell::StringCell(
     bool is_password,
+    LockWhileRunning lock_while_program_is_running,
     std::string default_value,
     std::string placeholder_text
 )
-    : m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text))
+    : ConfigOption(lock_while_program_is_running)
+    , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text))
 {}
 #if 0
 std::unique_ptr<ConfigOption> StringCell::clone() const{
@@ -101,11 +103,12 @@ void StringCell::restore_defaults(){
 
 StringOption::StringOption(
     bool is_password,
+    LockWhileRunning lock_while_program_is_running,
     std::string label,
     std::string default_value,
     std::string placeholder_text
 )
-     : StringCell(is_password, default_value, placeholder_text)
+     : StringCell(is_password, lock_while_program_is_running, default_value, placeholder_text)
      , m_label(std::move(label))
 {}
 

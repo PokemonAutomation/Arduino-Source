@@ -216,7 +216,12 @@ AutoMultiSpawn::AutoMultiSpawn()
         LockWhileRunning::LOCKED,
         MultiSpawn::MirelandsHippopotas
     )
-    , PATH(false, "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".", "", "")
+    , PATH(
+        false,
+        LockWhileRunning::LOCKED,
+        "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".",
+        "", ""
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,

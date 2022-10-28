@@ -96,6 +96,7 @@ GlobalSettings::GlobalSettings()
     )
     , STATS_FILE(
         false,
+        LockWhileRunning::LOCKED,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         "PA-Stats.txt",
         "PA-Stats.txt"
@@ -182,6 +183,7 @@ GlobalSettings::GlobalSettings()
     )
     , DEVELOPER_TOKEN(
         true,
+        LockWhileRunning::LOCKED,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
         "", ""
     )
