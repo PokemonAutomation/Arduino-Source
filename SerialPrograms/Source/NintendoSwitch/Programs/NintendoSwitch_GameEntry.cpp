@@ -99,6 +99,7 @@ void start_game_from_home_with_inference(
             console.log("Detected Home screen.");
         }else{
             console.log("Failed to detect Home screen after 10 seconds.", COLOR_RED);
+            throw OperationFailedException(console, "Failed to detect Home screen after 10 seconds.");
         }
         context.wait_for(std::chrono::milliseconds(100));
     }
@@ -111,9 +112,10 @@ void start_game_from_home_with_inference(
         context.wait_for_all_requests();
     }
 
-    while (true){
+    for (size_t attempts = 0;;){
         pbf_press_button(context, BUTTON_A, 20, 105);
         context.wait_for_all_requests();
+        attempts++;
 
         StartGameUserSelectWatcher detector;
         UpdateMenuWatcher update_menu(false);
@@ -132,6 +134,9 @@ void start_game_from_home_with_inference(
         }
         if (ret == 1){
             console.log("Detected update menu.", COLOR_RED);
+        }else if (attempts >= 5){
+            console.log("Failed to detect user-select screen after 5 attempts.", COLOR_RED);
+            throw OperationFailedException(console, "Failed to detect user-select screen after 5 attempts.");
         }else{
             console.log("Failed to detect user-select screen after 3 seconds. Attempting to dodge possible update window.", COLOR_RED);
         }
