@@ -62,6 +62,11 @@ void StaticTableRow::restore_defaults(){
         item.second->restore_defaults();
     }
 }
+void StaticTableRow::report_program_state(bool program_is_running){
+    for (const auto& item : m_options){
+        item.second->report_program_state(program_is_running);
+    }
+}
 std::vector<ConfigOption*> StaticTableRow::make_cells(){
     std::vector<ConfigOption*> ret;
     ret.reserve(m_options.size());
@@ -243,6 +248,11 @@ std::string StaticTableOption::check_validity() const{
 }
 void StaticTableOption::restore_defaults(){
     m_data->restore_defaults();
+}
+void StaticTableOption::report_program_state(bool program_is_running){
+    for (StaticTableRow* row : m_data->m_table){
+        row->report_program_state(program_is_running);
+    }
 }
 
 bool StaticTableOption::saveload_enabled() const{

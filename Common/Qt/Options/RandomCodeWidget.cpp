@@ -133,10 +133,6 @@ void RandomCodeWidget::update_value(){
     m_box_code->setText(QString::fromStdString(current.code_string()));
     update_labels();
 }
-void RandomCodeWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void RandomCodeWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();

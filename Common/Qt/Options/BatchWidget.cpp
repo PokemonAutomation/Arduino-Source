@@ -54,12 +54,6 @@ void BatchWidget::update_value(){
         item->update_value();
     }
 }
-void BatchWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    for (ConfigWidget* item : m_options){
-        item->update_visibility(program_is_running);
-    }
-}
 void BatchWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();

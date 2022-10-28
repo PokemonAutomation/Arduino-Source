@@ -135,7 +135,7 @@ struct EventNotificationOption::Data{
         ImageAttachmentMode screenshot,
         std::vector<std::string> tags,
         std::chrono::seconds rate_limit
-        )
+    )
         : screenshot_supported(true)
         , m_enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, enabled)
         , m_label(std::move(label))

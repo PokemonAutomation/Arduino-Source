@@ -78,7 +78,7 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         );
     }
 
-    EditableTableWidget::update_table();
+    EditableTableWidget::update_value();
 //    EditableTableWidget2::value_changed();
 
 //    m_table->resizeColumnsToContents();
@@ -130,22 +130,7 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     value.add_listener(*this);
 }
 
-void EditableTableWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_table();
-}
-void EditableTableWidget::value_changed(){
-    QMetaObject::invokeMethod(m_table, [this]{
-        update_table();
-    }, Qt::QueuedConnection);
-}
-void EditableTableWidget::update_sizes(){
-    m_table->resizeColumnsToContents();
-    m_table->resizeRowsToContents();
-    m_table->update_height();
-}
-
-void EditableTableWidget::update_table(){
+void EditableTableWidget::update_value(){
     std::vector<std::shared_ptr<EditableTableRow>> latest = m_value.current_refs();
 //    cout << "latest.size() = " << latest.size() << endl;
 
@@ -218,6 +203,17 @@ void EditableTableWidget::update_table(){
     m_current = std::move(latest);
     EditableTableWidget::update_sizes();
 }
+void EditableTableWidget::value_changed(){
+    QMetaObject::invokeMethod(m_table, [this]{
+        update_value();
+    }, Qt::QueuedConnection);
+}
+void EditableTableWidget::update_sizes(){
+    m_table->resizeColumnsToContents();
+    m_table->resizeRowsToContents();
+    m_table->update_height();
+}
+
 
 
 QWidget* EditableTableWidget::make_clone_button(EditableTableRow& row){

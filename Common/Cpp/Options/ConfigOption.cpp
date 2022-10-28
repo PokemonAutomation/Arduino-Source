@@ -73,13 +73,6 @@ size_t ConfigOption::total_listeners() const{
     SpinLockGuard lg(data.lock);
     return data.listeners.size();
 }
-void ConfigOption::push_update(){
-    Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
-    for (Listener* listener : data.listeners){
-        listener->value_changed();
-    }
-}
 
 
 
@@ -89,31 +82,38 @@ void ConfigOption::load_json(const JsonValue& json){}
 JsonValue ConfigOption::to_json() const{
     return JsonValue();
 }
+bool ConfigOption::lock_while_program_is_running() const{
+    return m_data->lock_while_program_is_running;
+}
 std::string ConfigOption::check_validity() const{
     return std::string();
 }
 void ConfigOption::restore_defaults(){}
-bool ConfigOption::lock_while_program_is_running() const{
-    return m_data->lock_while_program_is_running;
+ConfigOptionState ConfigOption::visibility() const{
+    return m_data->visibility.load(std::memory_order_relaxed);
 }
-void ConfigOption::set_program_is_running(bool program_is_running){
+void ConfigOption::set_visibility(ConfigOptionState visibility){
+    if (m_data->set_visibility(visibility)){
+        report_value_changed();
+    }
+}
+
+
+
+void ConfigOption::report_program_state(bool program_is_running){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     for (Listener* listener : data.listeners){
         listener->program_state_changed(program_is_running);
     }
 }
-ConfigOptionState ConfigOption::visibility() const{
-    return m_data->visibility.load(std::memory_order_relaxed);
-}
-void ConfigOption::set_visibility(ConfigOptionState visibility){
-    if (m_data->set_visibility(visibility)){
-        push_update();
+void ConfigOption::report_value_changed(){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.lock);
+    for (Listener* listener : data.listeners){
+        listener->value_changed();
     }
 }
-
-
-
 
 
 

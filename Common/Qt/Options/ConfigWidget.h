@@ -24,11 +24,12 @@ public:
     QWidget& widget(){ return *m_widget; }
 
     //  Needs to be called on the UI thread.
-    virtual void update_value();
+    virtual void update_value(){}
     virtual void update_visibility(bool program_is_running);
+    void update_all(bool program_is_running);
 
 protected:
-    virtual void program_state_changed(bool program_is_running);
+    virtual void program_state_changed(bool program_is_running) override;
 
 protected:
     ConfigOption& m_value;

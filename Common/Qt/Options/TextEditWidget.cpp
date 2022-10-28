@@ -84,10 +84,6 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
 void TextEditWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
 }
-void TextEditWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void TextEditWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();

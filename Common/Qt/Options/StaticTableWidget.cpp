@@ -15,9 +15,9 @@
 #include "Common/Qt/AutoHeightTable.h"
 #include "StaticTableWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -116,7 +116,6 @@ StaticTableWidget::StaticTableWidget(QWidget& parent, StaticTableOption& value)
         buttons->addStretch(2);
     }
 }
-
 
 
 

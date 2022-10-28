@@ -21,7 +21,6 @@ public:
     StringCellWidget(QWidget& parent, StringCell& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -36,7 +35,6 @@ public:
     StringOptionWidget(QWidget& parent, StringOption& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

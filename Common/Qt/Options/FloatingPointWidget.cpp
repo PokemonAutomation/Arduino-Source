@@ -66,10 +66,6 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
 void FloatingPointCellWidget::update_value(){
     this->setText(QString::number(m_value, 'f'));
 }
-void FloatingPointCellWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void FloatingPointCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
@@ -96,14 +92,13 @@ FloatingPointOptionWidget::FloatingPointOptionWidget(QWidget& parent, FloatingPo
     layout->addWidget(m_cell, 1);
     value.add_listener(*this);
 }
-void FloatingPointOptionWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-//    m_cell->update_value();
+void FloatingPointOptionWidget::update_value(){
+    m_cell->update_value();
 }
 void FloatingPointOptionWidget::value_changed(){
-//    QMetaObject::invokeMethod(this, [this]{
-//        update_value();
-//    }, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, [this]{
+        update_value();
+    }, Qt::QueuedConnection);
 }
 
 

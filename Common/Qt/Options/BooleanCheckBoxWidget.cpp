@@ -51,10 +51,6 @@ void BooleanCheckBoxCellWidget::update_value(){
         m_box->setChecked(m_value);
     }
 }
-void BooleanCheckBoxCellWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void BooleanCheckBoxCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
@@ -94,10 +90,6 @@ void BooleanCheckBoxOptionWidget::update_value(){
     if (m_value != m_box->isChecked()){
         m_box->setChecked(m_value);
     }
-}
-void BooleanCheckBoxOptionWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
 }
 void BooleanCheckBoxOptionWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{

@@ -22,7 +22,7 @@ public:
     ~StaticTextWidget();
     StaticTextWidget(QWidget& parent, StaticTextOption& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
     virtual void value_changed() override;
 
 private:
@@ -36,7 +36,7 @@ public:
     ~SectionDividerWidget();
     SectionDividerWidget(QWidget& parent, SectionDividerOption& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
     virtual void value_changed() override;
 
 private:

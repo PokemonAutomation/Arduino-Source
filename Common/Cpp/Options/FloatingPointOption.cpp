@@ -83,7 +83,7 @@ std::string FloatingPointCell::set(double x){
     }
     if (err.empty()){
         m_data->m_current.store(x, std::memory_order_relaxed);
-        push_update();
+        report_value_changed();
     }
     return err;
 }
@@ -100,7 +100,7 @@ void FloatingPointCell::load_json(const JsonValue& json){
         value = data.m_default;
     }
     data.m_current.store(value, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 JsonValue FloatingPointCell::to_json() const{
     return (double)*this;
@@ -127,7 +127,7 @@ std::string FloatingPointCell::check_validity() const{
 void FloatingPointCell::restore_defaults(){
     Data& data = *m_data;
     data.m_current.store(data.m_default, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 
 

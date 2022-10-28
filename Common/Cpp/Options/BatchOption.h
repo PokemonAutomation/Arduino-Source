@@ -36,6 +36,8 @@ public:
     virtual void restore_defaults() override;
     virtual void reset_state() override;
 
+    virtual void report_program_state(bool program_is_running) override;
+
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool horizontal() const;

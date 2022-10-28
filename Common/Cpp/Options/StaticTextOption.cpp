@@ -46,10 +46,10 @@ void StaticTextOption::set_text(std::string label){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_text = std::move(label);
     }
-    push_update();
+    report_value_changed();
 }
 void StaticTextOption::load_json(const JsonValue&){
-    push_update();
+    report_value_changed();
 }
 JsonValue StaticTextOption::to_json() const{
     return JsonValue();
@@ -87,10 +87,10 @@ void SectionDividerOption::set_text(std::string label){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_text = std::move(label);
     }
-    push_update();
+    report_value_changed();
 }
 void SectionDividerOption::load_json(const JsonValue&){
-    push_update();
+    report_value_changed();
 }
 JsonValue SectionDividerOption::to_json() const{
     return JsonValue();

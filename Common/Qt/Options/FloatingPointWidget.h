@@ -20,7 +20,6 @@ public:
     FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -33,7 +32,7 @@ public:
     ~FloatingPointOptionWidget();
     FloatingPointOptionWidget(QWidget& parent, FloatingPointOption& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
     virtual void value_changed() override;
 
 private:

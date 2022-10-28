@@ -49,7 +49,7 @@ std::string DateOption::set(QDate x){
         SpinLockGuard lg(m_lock);
         m_current = x;
     }
-    push_update();
+    report_value_changed();
     return std::string();
 }
 
@@ -90,7 +90,7 @@ void DateOption::load_json(const JsonValue& json){
         SpinLockGuard lg(m_lock);
         m_current = date;
     }
-    push_update();
+    report_value_changed();
 }
 JsonValue DateOption::to_json() const{
     return to_json(m_current);
@@ -111,7 +111,7 @@ void DateOption::restore_defaults(){
         SpinLockGuard lg(m_lock);
         m_current = m_default;
     }
-    push_update();
+    report_value_changed();
 }
 
 

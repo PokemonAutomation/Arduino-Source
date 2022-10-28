@@ -138,10 +138,6 @@ void StringSelectCellWidget::update_value(){
         hide_options();
     }
 }
-void StringSelectCellWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void StringSelectCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
@@ -163,10 +159,6 @@ StringSelectOptionWidget::StringSelectOptionWidget(QWidget& parent, StringSelect
     text->setWordWrap(true);
     layout->addWidget(text, 1);
     layout->addWidget(m_cell, 1);
-}
-void StringSelectOptionWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    m_cell->update_value();
 }
 
 

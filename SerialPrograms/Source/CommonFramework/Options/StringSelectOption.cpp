@@ -201,19 +201,19 @@ size_t StringSelectCell::index() const{
 
 void StringSelectCell::set_by_index(size_t index){
     m_data->set_by_index(index);
-    push_update();
+    report_value_changed();
 }
 std::string StringSelectCell::set_by_slug(const std::string& slug){
     std::string error = m_data->set_by_slug(slug);
     if (error.empty()){
-        push_update();
+        report_value_changed();
     }
     return "";
 }
 std::string StringSelectCell::set_by_name(const std::string& display_name){
     std::string error = m_data->set_by_name(display_name);
     if (error.empty()){
-        push_update();
+        report_value_changed();
     }
     return "";
 }
@@ -224,7 +224,7 @@ const StringSelectDatabase& StringSelectCell::database() const{
 
 void StringSelectCell::load_json(const JsonValue& json){
     if (m_data->load_json(json)){
-        push_update();
+        report_value_changed();
     }
 }
 JsonValue StringSelectCell::to_json() const{
@@ -232,7 +232,7 @@ JsonValue StringSelectCell::to_json() const{
 }
 void StringSelectCell::restore_defaults(){
     m_data->restore_defaults();
-    push_update();
+    report_value_changed();
 }
 
 

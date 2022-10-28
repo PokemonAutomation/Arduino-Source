@@ -30,6 +30,8 @@ public:
     virtual std::string check_validity() const;
     virtual void restore_defaults();
 
+    void report_program_state(bool program_is_running);
+
 
 protected:
     void add_option(ConfigOption& option, std::string serialization_string);
@@ -80,6 +82,8 @@ public:
 
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override final;
+
+    virtual void report_program_state(bool program_is_running) override;
 
 public:
     bool saveload_enabled() const;

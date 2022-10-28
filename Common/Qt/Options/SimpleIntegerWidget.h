@@ -22,7 +22,6 @@ public:
     SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:
@@ -37,7 +36,7 @@ public:
     ~SimpleIntegerOptionWidget();
     SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
     virtual void value_changed() override;
 
 private:

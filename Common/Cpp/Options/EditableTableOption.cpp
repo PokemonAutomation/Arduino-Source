@@ -120,7 +120,7 @@ void EditableTableOption::load_json(const JsonValue& json){
         }
         m_current = std::move(table);
     }
-    push_update();
+    report_value_changed();
 }
 JsonValue EditableTableOption::to_json() const{
     SpinLockGuard lg(m_lock);
@@ -152,7 +152,7 @@ void EditableTableOption::restore_defaults(){
         }
         m_current = std::move(tmp);
     }
-    push_update();
+    report_value_changed();
 }
 
 
@@ -168,7 +168,7 @@ void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTable
             m_current[c]->m_index.store(c, std::memory_order_relaxed);
         }
     }
-    push_update();
+    report_value_changed();
 }
 void EditableTableOption::clone_row(const EditableTableRow& row){
     {
@@ -186,7 +186,7 @@ void EditableTableOption::clone_row(const EditableTableRow& row){
             m_current[c]->m_index.store(c, std::memory_order_relaxed);
         }
     }
-    push_update();
+    report_value_changed();
 }
 void EditableTableOption::remove_row(EditableTableRow& row){
     {
@@ -204,7 +204,7 @@ void EditableTableOption::remove_row(EditableTableRow& row){
             m_current[c]->m_index.store(c, std::memory_order_relaxed);
         }
     }
-    push_update();
+    report_value_changed();
 }
 
 

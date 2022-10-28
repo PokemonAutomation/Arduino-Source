@@ -21,14 +21,12 @@ public:
     ~EditableTableWidget();
     EditableTableWidget(QWidget& parent, EditableTableOption& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
     virtual void value_changed() override;
 
     void update_sizes();
 
 private:
-    void update_table();
-
     QWidget* make_clone_button(EditableTableRow& row);
     QWidget* make_insert_button(EditableTableRow& row);
     QWidget* make_delete_button(EditableTableRow& row);

@@ -140,7 +140,7 @@ void RandomCodeOption::load_json(const JsonValue& json){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_current = code;
     }
-    push_update();
+    report_value_changed();
 }
 JsonValue RandomCodeOption::to_json() const{
     SpinLockGuard lg(m_data->m_lock);
@@ -168,7 +168,7 @@ std::string RandomCodeOption::set(RaidCodeOption code){
         }
         m_data->m_current = code;
     }
-    push_update();
+    report_value_changed();
     return std::string();
 }
 bool RandomCodeOption::code_enabled() const{
@@ -188,7 +188,7 @@ void RandomCodeOption::restore_defaults(){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_current = m_data->m_default;
     }
-    push_update();
+    report_value_changed();
 }
 
 

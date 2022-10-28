@@ -57,7 +57,7 @@ void LanguageOCR::set(Language language){
         return;
     }
     m_current.store(iter->second, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 
 
@@ -78,7 +78,7 @@ void LanguageOCR::load_json(const JsonValue& json){
         return;
     }
     m_current.store(iter->second, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 JsonValue LanguageOCR::to_json() const{
     return language_data((Language)*this).code;
@@ -89,7 +89,7 @@ std::string LanguageOCR::check_validity() const{
 }
 void LanguageOCR::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 
 

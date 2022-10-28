@@ -108,7 +108,7 @@ std::string SimpleIntegerCell<Type>::set(Type x){
         return std::string();
     }
     m_data->m_current.store(x, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
     return std::string();
 }
 template <typename Type>
@@ -140,7 +140,7 @@ std::string SimpleIntegerCell<Type>::check_validity() const{
 template <typename Type>
 void SimpleIntegerCell<Type>::restore_defaults(){
     m_data->m_current.store(m_data->m_default, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 
 

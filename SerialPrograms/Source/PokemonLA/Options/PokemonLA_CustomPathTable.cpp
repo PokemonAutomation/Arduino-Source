@@ -395,12 +395,6 @@ public:
         });
     }
 
-    virtual void update_visibility(bool program_is_running) override{
-        ConfigWidget::update_visibility(program_is_running);
-//        m_travel_location->update();
-//        m_table_widget->update();
-    }
-
 private:
     ConfigWidget* m_travel_location = nullptr;
     ConfigWidget* m_table_widget = nullptr;

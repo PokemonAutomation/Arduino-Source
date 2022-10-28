@@ -21,7 +21,6 @@ public:
     EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropdownCell& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 protected:
@@ -35,7 +34,7 @@ class EnumDropdownOptionWidget : public QWidget, public ConfigWidget{
 public:
     EnumDropdownOptionWidget(QWidget& parent, IntegerEnumDropdownOption& value);
 
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_value() override;
 
 private:
     EnumDropdownCellWidget* m_cell;

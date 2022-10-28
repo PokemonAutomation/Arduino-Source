@@ -48,10 +48,6 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 void StringCellWidget::update_value(){
     this->setText(QString::fromStdString(m_value));
 }
-void StringCellWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
-}
 void StringCellWidget::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
@@ -94,10 +90,6 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
 }
 void StringOptionWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
-}
-void StringOptionWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    update_value();
 }
 void StringOptionWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{

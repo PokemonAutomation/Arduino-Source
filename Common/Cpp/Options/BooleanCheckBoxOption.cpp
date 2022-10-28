@@ -53,13 +53,13 @@ BooleanCheckBoxCell::operator bool() const{
 }
 void BooleanCheckBoxCell::operator=(bool x){
     m_data->m_current.store(x, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 void BooleanCheckBoxCell::load_json(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
         *this = value;
-        push_update();
+        report_value_changed();
     }
 }
 JsonValue BooleanCheckBoxCell::to_json() const{
@@ -67,7 +67,7 @@ JsonValue BooleanCheckBoxCell::to_json() const{
 }
 void BooleanCheckBoxCell::restore_defaults(){
     *this = m_data->m_default;
-    push_update();
+    report_value_changed();
 }
 
 

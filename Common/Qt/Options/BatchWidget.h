@@ -21,7 +21,6 @@ public:
     BatchWidget(QWidget& parent, BatchOption& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 protected:

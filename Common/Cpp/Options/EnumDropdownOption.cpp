@@ -69,7 +69,7 @@ bool IntegerEnumDropdownCell::set_value(size_t value){
         return false;
     }
     data.m_current.store(value, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
     return true;
 }
 const IntegerEnumDatabase& IntegerEnumDropdownCell::database() const{
@@ -84,14 +84,14 @@ void IntegerEnumDropdownCell::load_json(const JsonValue& json){
     const EnumEntry* entry = data.m_database.find_slug(*str);
     if (entry != nullptr && entry->enabled){
         data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        push_update();
+        report_value_changed();
     }
 
     //  Backward compatibility with display names.
     entry = data.m_database.find_display(*str);
     if (entry != nullptr && entry->enabled){
         data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        push_update();
+        report_value_changed();
     }
 }
 JsonValue IntegerEnumDropdownCell::to_json() const{
@@ -101,7 +101,7 @@ JsonValue IntegerEnumDropdownCell::to_json() const{
 void IntegerEnumDropdownCell::restore_defaults(){
     Data& data = *m_data;
     data.m_current.store(data.m_default, std::memory_order_relaxed);
-    push_update();
+    report_value_changed();
 }
 
 

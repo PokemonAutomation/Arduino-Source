@@ -22,7 +22,6 @@ public:
     FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
     virtual void value_changed() override;
 
 private:

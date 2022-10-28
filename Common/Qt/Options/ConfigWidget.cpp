@@ -29,14 +29,12 @@ ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)
     ConfigWidget::update_visibility(false);
     m_value.add_listener(*this);
 }
-void ConfigWidget::update_value(){
-
-}
 void ConfigWidget::update_visibility(bool program_is_running){
     m_program_is_running = program_is_running;
     if (m_widget == nullptr){
         return;
     }
+//    cout << "update_visibility = " << program_is_running << endl;
 //    if (!m_program_is_running){
 //        cout << "asdf" << endl;
 //    }
@@ -56,6 +54,10 @@ void ConfigWidget::update_visibility(bool program_is_running){
         m_widget->setVisible(false);
         break;
     }
+}
+void ConfigWidget::update_all(bool program_is_running){
+    update_value();
+    update_visibility(program_is_running);
 }
 
 void ConfigWidget::program_state_changed(bool program_is_running){

@@ -42,13 +42,12 @@ StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
 
     m_value.add_listener(*this);
 }
-void StaticTextWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
+void StaticTextWidget::update_value(){
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void StaticTextWidget::value_changed(){
     QMetaObject::invokeMethod(m_text, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 
@@ -76,13 +75,12 @@ SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption
 
     m_value.add_listener(*this);
 }
-void SectionDividerWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
+void SectionDividerWidget::update_value(){
     m_text->setText(QString::fromStdString(m_value.text()));
 }
 void SectionDividerWidget::value_changed(){
     QMetaObject::invokeMethod(m_text, [this]{
-        update();
+        update_value();
     }, Qt::QueuedConnection);
 }
 

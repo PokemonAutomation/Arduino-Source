@@ -79,6 +79,12 @@ void BatchOption::reset_state(){
         item.first->reset_state();
     }
 }
+void BatchOption::report_program_state(bool program_is_running){
+    ConfigOption::report_program_state(program_is_running);
+    for (const auto& item : m_data->m_options){
+        item.first->report_program_state(program_is_running);
+    }
+}
 
 bool BatchOption::horizontal() const{
     return m_data->m_horizontal;

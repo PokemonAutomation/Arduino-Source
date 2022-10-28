@@ -81,7 +81,7 @@ std::string FixedCodeOption::set(std::string x){
         }
         m_data->m_current = std::move(x);
     }
-    push_update();
+    report_value_changed();
     return std::string();
 }
 
@@ -94,7 +94,7 @@ void FixedCodeOption::load_json(const JsonValue& json){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_current = *str;
     }
-    push_update();
+    report_value_changed();
 }
 JsonValue FixedCodeOption::to_json() const{
     SpinLockGuard lg(m_data->m_lock);
@@ -121,7 +121,7 @@ void FixedCodeOption::restore_defaults(){
         SpinLockGuard lg(m_data->m_lock);
         m_data->m_current = m_data->m_default;
     }
-    push_update();
+    report_value_changed();
 }
 
 

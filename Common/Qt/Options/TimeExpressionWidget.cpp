@@ -37,11 +37,6 @@ void TimeExpressionCellWidget<Type>::update_value(){
     this->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
-void TimeExpressionCellWidget<Type>::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
-    this->update_value();
-}
-template <typename Type>
 void TimeExpressionCellWidget<Type>::value_changed(){
     QMetaObject::invokeMethod(this, [this]{
         this->update_value();
@@ -99,11 +94,6 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
 }
 template <typename Type>
 void TimeExpressionOptionWidget<Type>::update_value(){
-    m_box->setText(QString::fromStdString(m_value.current_text()));
-}
-template <typename Type>
-void TimeExpressionOptionWidget<Type>::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
     m_box->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>

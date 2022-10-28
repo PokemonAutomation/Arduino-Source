@@ -38,8 +38,8 @@ enum class ConfigOptionState{
 class ConfigOption{
 public:
     struct Listener{
-        virtual void program_state_changed(bool program_is_running){};
-        virtual void value_changed(){};
+        virtual void value_changed(){}
+        virtual void program_state_changed(bool program_is_running){}
     };
     void add_listener(Listener& listener);
     void remove_listener(Listener& listener);
@@ -64,6 +64,9 @@ public:
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
 
+public:
+    bool lock_while_program_is_running() const;
+
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual std::string check_validity() const;
 
@@ -73,18 +76,24 @@ public:
     //  transient state that the option object may have.
     virtual void reset_state(){};
 
-    bool lock_while_program_is_running() const;
-    void set_program_is_running(bool program_is_running);
-
     ConfigOptionState visibility() const;
     virtual void set_visibility(ConfigOptionState visibility);
 
 
 public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
+    //  Report that the program state has changed. This will cause UI elements
+    //  to lock/unlock depending on whether they are allowed to be changed by
+    //  the user while the program is running.
+    virtual void report_program_state(bool program_is_running);
 
 protected:
-    void push_update();
+    //  Report that the value of this config has changed. This will be pushed to
+    //  all listeners.
+    void report_value_changed();
+
+
+public:
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
 
 private:
     struct Data;
