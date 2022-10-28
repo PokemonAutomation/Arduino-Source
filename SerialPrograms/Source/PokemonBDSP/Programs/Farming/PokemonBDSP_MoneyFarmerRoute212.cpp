@@ -108,12 +108,13 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
 
 bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
-
+    context.wait_for_all_requests();
     if (man){
         env.log("Starting battle with man (left).");
     }else{
         env.log("Starting battle with woman (right).");
     }
+    env.console.overlay().add_log_text("Starting battle", COLOR_WHITE);
 
     pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
 
@@ -141,6 +142,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         switch (ret){
         case 0:{
             env.log("Battle menu detected!", COLOR_BLUE);
+            env.console.overlay().add_log_text("Choose move", COLOR_BLUE);
             battle_menu_seen = true;
 
             pbf_press_button(context, BUTTON_ZL, 10, 125);
@@ -166,6 +168,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         }
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
+            env.console.overlay().add_log_text("Battle finished", COLOR_WHITE);
             pbf_mash_button(context, BUTTON_B, 250);
             return false;
 //        case 1:
@@ -173,7 +176,8 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 //            pbf_mash_button(context, BUTTON_B, 250);
 //            return;
         case 2:
-            env.log("Detected move learn!", COLOR_BLUE);
+            env.log("Detected move to learn!", COLOR_BLUE);
+            env.console.overlay().add_log_text("Detected move to learn", COLOR_WHITE);
             if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
                 pbf_move_right_joystick(context, 128, 255, 20, 105);
                 pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -192,11 +196,14 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 
 
 void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
+    console.overlay().add_log_text("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
     pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-
+    context.wait_for_all_requests();
+    console.overlay().add_log_text("Heal complete", COLOR_WHITE);
+    console.overlay().add_log_text("To rich couple", COLOR_WHITE);
     console.log("Returning to rich couple location...");
     pbf_move_left_joystick(context, 128, 255, 8 * TICKS_PER_SECOND, 0);
     pbf_move_left_joystick(context, 255, 128, 380, 0);
@@ -221,11 +228,13 @@ void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotB
     pp[1] = MOVE2_PP;
     pp[2] = MOVE3_PP;
     pp[3] = MOVE4_PP;
+    context.wait_for_all_requests();
 }
 
 
 void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
     console.log("Flying back to Hearthome City to heal.");
+    console.overlay().add_log_text("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
@@ -289,19 +298,21 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     if (START_LOCATION == StartLocation::Hearthome){
         heal_at_center_and_return(env.console, context, pp);
         need_to_charge = false;
-    }else{
+    }else{ // start location is the row above the rich couple
         if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
+        // Reset position to right most on the row above the rich couple
         pbf_move_left_joystick(context, 255, 128, 180, 0);
     }
 
     while (true){
+        context.wait_for_all_requests();
         env.update_stats();
-
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
+            env.console.overlay().add_log_text("Charging Vs. Seeker", COLOR_WHITE);
             charge_vs_seeker(context);
         }
 
@@ -314,6 +325,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         QSize dimensions;
         std::vector<ImagePixelBox> bubbles;
         {
+            env.console.overlay().add_log_text("Using Vs. Seeker", COLOR_WHITE);
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
                 env.console, context,
@@ -349,12 +361,17 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         }
 
         if (man && woman){
+            env.console.overlay().add_log_text("Found both", COLOR_GREEN);
             stats.m_both++;
         }else if (man){
+            env.console.overlay().add_log_text("Found Gentleman", COLOR_GREEN);
             stats.m_man++;
         }else if (woman){
+            env.console.overlay().add_log_text("Found Madame", COLOR_GREEN);
             stats.m_woman++;
         }
+
+        env.update_stats();
 
         if (woman){
 //            pbf_move_left_joystick(context, 0, 128, 52, 0);

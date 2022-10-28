@@ -18,6 +18,7 @@ namespace PokemonBDSP{
 
 
 bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
+    console.overlay().add_log_text("Heal by Global Room", COLOR_WHITE);
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
     pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
@@ -48,6 +49,7 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     pbf_mash_button(context, BUTTON_B, 400);
 
     context.wait_for_all_requests();
+    console.overlay().add_log_text("Heal complete", COLOR_WHITE);
     return true;
 }
 
