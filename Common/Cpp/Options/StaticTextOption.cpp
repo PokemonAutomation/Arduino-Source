@@ -27,7 +27,8 @@ struct StaticTextOption::Data{
 
 StaticTextOption::~StaticTextOption() = default;
 StaticTextOption::StaticTextOption(std::string label, bool text_wrapping)
-    : m_data(CONSTRUCT_TOKEN, std::move(label), text_wrapping)
+    : ConfigOption(LockWhileRunning::UNLOCKED)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), text_wrapping)
 {}
 #if 0
 std::unique_ptr<ConfigOption> StaticTextOption::clone() const{
