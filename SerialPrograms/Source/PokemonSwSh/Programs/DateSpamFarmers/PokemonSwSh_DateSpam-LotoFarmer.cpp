@@ -39,6 +39,7 @@ LotoFarmer::LotoFarmer()
     )
     , MASH_B_DURATION(
         "<b>Mash B for this long to exit the dialog:</b><br>(Some languages like German need to increase this.)",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "9 * TICKS_PER_SECOND"
     )

@@ -90,6 +90,7 @@ DexRecFinder::DexRecFinder()
     : GO_HOME_WHEN_DONE(false)
     , VIEW_TIME(
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
@@ -103,11 +104,13 @@ DexRecFinder::DexRecFinder()
     )
     , ENTER_POKEDEX_TIME(
         "<b>Enter " + STRING_POKEDEX + " Time:</b><br>Wait this long for the " + STRING_POKEDEX + " to open.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , BACK_OUT_TIME(
         "<b>Back Out Time:</b><br>Mash B for this long to return to the overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

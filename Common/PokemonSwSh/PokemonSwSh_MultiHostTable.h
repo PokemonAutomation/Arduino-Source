@@ -33,7 +33,7 @@ public:
         , accept_FRs(LockWhileRunning::LOCKED, true)
         , move_slot(LockWhileRunning::LOCKED, 0, 0, 4)
         , dynamax(LockWhileRunning::LOCKED, true)
-        , post_raid_delay(TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
+        , post_raid_delay(LockWhileRunning::LOCKED, TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
     {
         PA_ADD_OPTION(game_slot);
         PA_ADD_OPTION(user_slot);

@@ -39,6 +39,7 @@ SurpriseTrade::SurpriseTrade()
     )
     , INITIAL_WAIT(
         "<b>Time to wait for a Trade Partner:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
@@ -47,11 +48,13 @@ SurpriseTrade::SurpriseTrade()
     )
     , TRADE_ANIMATION(
         "<b>Trade Animation Time:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "23 * TICKS_PER_SECOND"
     )
     , EVOLVE_DELAY(
         "<b>Evolve Delay:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )

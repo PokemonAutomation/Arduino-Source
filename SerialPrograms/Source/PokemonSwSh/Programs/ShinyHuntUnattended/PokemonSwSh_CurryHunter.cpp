@@ -52,6 +52,7 @@ std::unique_ptr<StatsTracker> CurryHunter_Descriptor::make_stats() const{
 CurryHunter::CurryHunter()
     : WALK_UP_DELAY(
         "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )

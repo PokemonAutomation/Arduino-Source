@@ -23,6 +23,7 @@ public:
     ~TimeExpressionCell();
     TimeExpressionCell(const TimeExpressionCell& x);
     TimeExpressionCell(
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         Type min_value, Type max_value,
         std::string default_value, std::string current_value
@@ -30,15 +31,18 @@ public:
 
 public:
     TimeExpressionCell(
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value
     );
     TimeExpressionCell(
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value,
         Type min_value
     );
     TimeExpressionCell(
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value,
         Type min_value,
@@ -78,6 +82,7 @@ public:
     TimeExpressionOption(const TimeExpressionOption& x) = delete;
     TimeExpressionOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         double ticks_per_second, Type min_value, Type max_value,
         std::string default_value, std::string current_value
     );
@@ -85,17 +90,20 @@ public:
 public:
     TimeExpressionOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value
     );
     TimeExpressionOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value,
         Type min_value
     );
     TimeExpressionOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         double ticks_per_second,
         std::string default_value,
         Type min_value,

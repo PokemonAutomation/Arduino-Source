@@ -68,11 +68,13 @@ EggHatcher::EggHatcher()
     )
     , SAFETY_TIME0(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "105 * TICKS_PER_SECOND"
     )

@@ -88,6 +88,7 @@ BerryFarmer2::BerryFarmer2()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
@@ -103,11 +104,13 @@ BerryFarmer2::BerryFarmer2()
     )
     , RUSTLING_TIMEOUT(
         "<b>Rustling Timeout:</b><br>Wait this many ticks to detect rustling.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "400"
     )
     , SECONDARY_ATTEMPT_MASH_TIME(
         "<b>Secondary attempt mash time:</b><br>Mash ZL this many ticks for secondary fetch attempts.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "240"
     )

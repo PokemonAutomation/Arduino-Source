@@ -46,16 +46,19 @@ EggCombined2::EggCombined2()
     )
     , SAFETY_TIME(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "12 * TICKS_PER_SECOND"
     )
     , EARLY_HATCH_SAFETY(
         "<b>Early Hatch Safety:</b><br>Eggs will not hatch early by more than this period.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "88 * TICKS_PER_SECOND"
     )

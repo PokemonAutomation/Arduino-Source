@@ -35,6 +35,7 @@ GameSettings::GameSettings()
     )
     , FETCH_EGG_MASH_DELAY(
         "<b>Fetch Egg Mash Delay:</b><br>Time needed to mash B to fetch an egg and return to overworld when auto-deposit is on.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "800"
     )
@@ -48,147 +49,175 @@ GameSettings::GameSettings()
     , m_general_options("<font size=4><b>General Timings:</b></font>")
     , AUTO_FR_DURATION(
         "<b>Auto-FR Duration:</b><br>Time to accept FRs before returning to den lobby.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , OVERWORLD_TO_MENU_DELAY(
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "120"
     )
     , MENU_TO_OVERWORLD_DELAY(
         "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "250"
     )
     , GAME_TO_HOME_DELAY_FAST(
         "<b>Game to Home Delay (fast):</b><br>"
         "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "100"
     )
     , GAME_TO_HOME_DELAY_SAFE(
         "<b>Game to Home Delay (safe):</b><br>"
         "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "125"
     )
     , HOME_TO_GAME_DELAY(
         "<b>Home to Game Delay:</b><br>Delay to enter game from home menu.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , OPEN_YCOMM_DELAY(
         "<b>Open Y-COMM Delay:</b><br>Time needed to open Y-COMM.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "200"
     )
     , ENTER_PROFILE_DELAY(
         "<b>Enter Profile Delay:</b><br>Delay to enter your Switch profile.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , START_GAME_WAIT(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "11 * TICKS_PER_SECOND"
     )
     , m_den_timings("<font size=4><b>Den Timings:</b></font>")
     , ENTER_OFFLINE_DEN_DELAY(
         "<b>Enter Offline Game Delay:</b><br>Time needed to enter a den on final button press.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "125"
     )
     , REENTER_DEN_DELAY(
         "<b>Re-enter Den Delay:</b><br>Time from exiting den after a day-skip to when you can collect watts and re-enter it.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , COLLECT_WATTS_OFFLINE_DELAY(
         "<b>Collect Watts Delay (offline):</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "80"
     )
     , COLLECT_WATTS_ONLINE_DELAY(
         "<b>Collect Watts Delay (online):</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , UNCATCHABLE_PROMPT_DELAY(
         "<b>Uncatchable Prompt Delay:</b><br>Time needed to bypass uncatchable pokemon prompt.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "110"
     )
     , OPEN_LOCAL_DEN_LOBBY_DELAY(
         "<b>Open Local Den Lobby Delay:</b><br>Time needed to open a den lobby on local connection.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , ENTER_SWITCH_POKEMON(
         "<b>Enter Switch " + STRING_POKEMON + ":</b><br>Time needed to enter Switch " + STRING_POKEMON + ".",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "4 * TICKS_PER_SECOND"
     )
     , EXIT_SWITCH_POKEMON(
         "<b>Exit Switch " + STRING_POKEMON + ":</b><br>Time needed to exit Switch " + STRING_POKEMON + " back to den lobby.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , FULL_LOBBY_TIMER(
         "<b>Full Lobby Timer:</b><br>Always 3 minutes.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "180 * TICKS_PER_SECOND"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY(
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "20"
     )
     , BOX_CHANGE_DELAY(
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "80"
     )
     , BOX_PICKUP_DROP_DELAY(
         "<b>Box Pickup/Drop Delay:</b><br>Delay to pickup/drop " + STRING_POKEMON + ".",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "90"
     )
     , MENU_TO_POKEMON_DELAY(
         "<b>Menu To " + STRING_POKEMON + " Delay:</b><br>Delay to enter " + STRING_POKEMON + " menu.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "300"
     )
     , POKEMON_TO_BOX_DELAY(
         "<b>" + STRING_POKEMON + " to Box Delay:</b><br>Delay to enter box system.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "300"
     )
     , BOX_TO_POKEMON_DELAY(
         "<b>Box to " + STRING_POKEMON + " Delay:</b><br>Delay to exit box system.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "250"
     )
     , POKEMON_TO_MENU_DELAY(
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "250"
     )

@@ -72,6 +72,7 @@ DenRoller::DenRoller()
     , VIEW_TIME(
         "<b>View Time:</b><br>Wait this long before restting. This wait is skipped if the desired " +
         STRING_POKEMON + " is set since the program will be watching it for you.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
@@ -86,6 +87,7 @@ DenRoller::DenRoller()
     , READ_DELAY(
         "<b>Read Delay:</b><br>Wait this long before attempting to " +
         STRING_POKEMON + ". This needs to be long enough for the silhouette to load.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )

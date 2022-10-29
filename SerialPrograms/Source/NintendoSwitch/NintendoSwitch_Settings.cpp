@@ -26,11 +26,13 @@ ConsoleSettings::ConsoleSettings()
     : BatchOption(LockWhileRunning::LOCKED)
     , CONNECT_CONTROLLER_DELAY(
         "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , SETTINGS_TO_HOME_DELAY(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "120"
     )
@@ -44,6 +46,7 @@ ConsoleSettings::ConsoleSettings()
     , START_GAME_INTERNET_CHECK_DELAY(
         "<b>Start Game Internet Check Delay:</b><br>"
         "If starting the game requires checking the internet, wait this long for it.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

@@ -38,6 +38,7 @@ FastCodeEntry::FastCodeEntry()
     )
     , INITIAL_DELAY(
         "<b>Initial Delay:</b><br>Wait this long before entering the code.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "0 * TICKS_PER_SECOND"
     )

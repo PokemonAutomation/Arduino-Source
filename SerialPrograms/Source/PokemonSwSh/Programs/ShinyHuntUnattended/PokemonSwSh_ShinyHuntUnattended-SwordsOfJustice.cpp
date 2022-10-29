@@ -36,6 +36,7 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
 ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
     : EXIT_CAMP_TO_RUN_DELAY(
         "<b>Exit Camp to Run Delay:</b><br>This needs to be carefully calibrated.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1890"
     )
@@ -49,6 +50,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
     )
     , ENTER_CAMP_DELAY(
         "<b>Enter Camp Delay:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

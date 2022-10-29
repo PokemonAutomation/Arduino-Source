@@ -38,6 +38,7 @@ ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
 ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
     : START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1990"
     )
@@ -51,6 +52,7 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
     )
     , TRANSITION_DELAY(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )

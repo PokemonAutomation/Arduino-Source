@@ -52,6 +52,7 @@ PokeJobsFarmer::PokeJobsFarmer()
     )
     , MASH_B_DURATION(
         "<b>Mash B for this long upon completion of " + STRING_POKEJOB + ":</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

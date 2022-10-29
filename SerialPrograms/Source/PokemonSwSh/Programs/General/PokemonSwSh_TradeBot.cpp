@@ -51,21 +51,25 @@ TradeBot::TradeBot()
     )
     , SEARCH_DELAY(
         "<b>Time to wait for a Trade Partner:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , CONFIRM_DELAY(
         "<b>Time to wait for Partner to Confirm:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , TRADE_START(
         "<b>Time for Trade to Start:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , TRADE_COMMUNICATION(
         "<b>Communication Window:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
@@ -74,11 +78,13 @@ TradeBot::TradeBot()
     )
     , TRADE_ANIMATION(
         "<b>Trade Animation Time:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "23 * TICKS_PER_SECOND"
     )
     , EVOLVE_DELAY(
         "<b>Evolve Delay:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )

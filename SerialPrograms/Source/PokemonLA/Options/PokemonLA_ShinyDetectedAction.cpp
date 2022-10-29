@@ -59,6 +59,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
         "<b>Screenshot Delay:</b><br>"
         "Align the camera, then wait this long before taking a screenshot + video of the shiny.<br>"
         "Set to zero to skip this. Don't set this too large or the shiny may run away!",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         std::move(default_delay_ticks)
     )

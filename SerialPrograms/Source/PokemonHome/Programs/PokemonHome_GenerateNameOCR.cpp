@@ -44,6 +44,7 @@ GenerateNameOCRData::GenerateNameOCRData()
     )
     , DELAY(
         "<b>Delay Between Each Iteration:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "30"
     )

@@ -71,6 +71,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     )
     , MASH_TO_TRADE_DELAY(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )

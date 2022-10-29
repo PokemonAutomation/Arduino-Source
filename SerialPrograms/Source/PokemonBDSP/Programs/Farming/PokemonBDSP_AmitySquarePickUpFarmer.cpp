@@ -49,6 +49,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
     )
     , ONE_WAY_MOVING_TIME(
         "<b>One Way walking Time:</b><br>Walk this amount of time in one direction before going back to finish one round of walking.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
@@ -59,6 +60,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
     )
     , WAIT_TIME_FOR_POKEMON(
         "<b>Wait Time for Pokemon:</b><br>Wait this time for pokemon to catch up to you before you ask for a berry.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

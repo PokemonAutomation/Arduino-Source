@@ -53,6 +53,7 @@ EggFetcher::EggFetcher()
     )
     , TRAVEL_TIME_PER_FETCH(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )

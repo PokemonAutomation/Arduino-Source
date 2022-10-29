@@ -72,6 +72,7 @@ FroslassFinder::FroslassFinder()
     : DASH_DURATION(
         "<b>Braviary dash duration:</b><br>"
         "How many ticks for Braviary to dash to reach the hole.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "986"
     )

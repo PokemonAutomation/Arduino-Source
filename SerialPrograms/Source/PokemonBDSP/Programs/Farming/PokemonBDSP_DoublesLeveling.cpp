@@ -65,6 +65,7 @@ DoublesLeveling::DoublesLeveling()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )

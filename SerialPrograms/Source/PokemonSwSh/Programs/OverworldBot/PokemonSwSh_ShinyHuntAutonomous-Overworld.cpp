@@ -101,6 +101,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , MAX_MOVE_DURATION(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
         " If you set this too high, you may wander too far from the grassy area.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "200"
     )
@@ -123,11 +124,13 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , WATCHDOG_TIMER(
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )

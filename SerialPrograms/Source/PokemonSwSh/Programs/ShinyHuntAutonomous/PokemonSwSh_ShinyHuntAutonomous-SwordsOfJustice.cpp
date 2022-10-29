@@ -64,16 +64,19 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , POST_BATTLE_MASH_TIME(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long before entering the camp.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , ENTER_CAMP_DELAY(
         "<b>Enter Camp Delay:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

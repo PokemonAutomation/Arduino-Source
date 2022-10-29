@@ -54,6 +54,7 @@ AutoHostRolling::AutoHostRolling()
     , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCKED, true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
@@ -64,6 +65,7 @@ AutoHostRolling::AutoHostRolling()
     )
     , EXTRA_DELAY_BETWEEN_RAIDS(
         "<b>Extra Delay Between Raids:</b><br>May aid in farming.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "0 * TICKS_PER_SECOND"
     )
@@ -97,26 +99,31 @@ AutoHostRolling::AutoHostRolling()
     )
     , CONNECT_TO_INTERNET_DELAY(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , ENTER_ONLINE_DEN_DELAY(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , OPEN_ONLINE_DEN_LOBBY_DELAY(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , RAID_START_TO_EXIT_DELAY(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
     , DELAY_TO_SELECT_MOVE(
         "<b>Delay to Select Move:</b><br>This + above = time from start raid to select move.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "32 * TICKS_PER_SECOND"
     )

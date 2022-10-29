@@ -36,6 +36,7 @@ WattFarmer::WattFarmer()
     : GRIP_MENU_WAIT(
         "<b>Exit Grip Menu Delay:</b> "
         "Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )

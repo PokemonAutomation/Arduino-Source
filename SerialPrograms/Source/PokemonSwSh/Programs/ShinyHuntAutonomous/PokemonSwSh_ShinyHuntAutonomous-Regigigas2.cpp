@@ -65,6 +65,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     )
     , CATCH_TO_OVERWORLD_DELAY(
         "<b>Catch to Overworld Delay:</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

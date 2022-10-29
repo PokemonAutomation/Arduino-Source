@@ -45,16 +45,19 @@ FriendCodeAdder::FriendCodeAdder()
     )
     , OPEN_CODE_PAD_DELAY(
         "<b>Open Code Pad Delay</b>",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , SEARCH_TIME(
         "<b>Search Time:</b><br>Wait this long after initiating search.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , TOGGLE_BEST_STATUS_DELAY(
         "<b>Toggle Best Delay:</b><br>Time needed to toggle the best friend status.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )

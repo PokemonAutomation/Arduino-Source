@@ -49,11 +49,13 @@ TurboButton::TurboButton()
     )
     , PRESS_DURATION(
         "<b>Press Duration:</b><br>Hold the button down for this long.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "5", 5
     )
     , RELEASE_DURATION(
         "<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         "3", 3
     )
