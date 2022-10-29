@@ -138,8 +138,9 @@ void find_symbol_candidates(
     do{
         changed = false;
         for (auto iter0 = objmap.begin(); iter0 != objmap.end(); ++iter0){
-            for (auto iter1 = objmap.begin(); iter1 != objmap.end(); ++iter1){
+            for (auto iter1 = objmap.begin(); iter1 != objmap.end();){
                 if (iter0->first >= iter1->first){
+                    ++iter1;
                     continue;
                 }
                 const WaterfillObject& obj0 = iter0->second;
@@ -152,9 +153,8 @@ void find_symbol_candidates(
                     iter0->second.merge_assume_no_overlap(iter1->second);
                     iter1 = objmap.erase(iter1);
                     changed = true;
-                    if (iter1 == objmap.end()){
-                        break;
-                    }
+                }else{
+                    ++iter1;
                 }
             }
         }
