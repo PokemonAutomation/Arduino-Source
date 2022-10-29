@@ -34,7 +34,8 @@ StandardEncounterDetection::StandardEncounterDetection(
     , m_shininess(shininess)
     , m_double_battle(false)
 {
-    InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});
+//    InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});
+    InferenceBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
     InferenceBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
     InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});

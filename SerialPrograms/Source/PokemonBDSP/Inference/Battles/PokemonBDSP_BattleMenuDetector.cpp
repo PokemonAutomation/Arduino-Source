@@ -10,9 +10,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonBDSP_BattleMenuDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,8 +25,10 @@ BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color)
     , m_left0_status    (0.140, 0.922, 0.100, 0.010)
     , m_left1_status    (0.140, 0.910, 0.100, 0.010)
     , m_right_status    (0.405, 0.925, 0.100, 0.010)
-    , m_opponent_left   (0.685, 0.065, 0.020, 0.030)
-    , m_opponent_right  (0.960, 0.065, 0.020, 0.030)
+//    , m_opponent_left   (0.685, 0.065, 0.020, 0.030)
+//    , m_opponent_right  (0.960, 0.065, 0.020, 0.030)
+    , m_opponent_left   (0.708, 0.070, 0.005, 0.028)
+    , m_opponent_right  (0.982, 0.070, 0.005, 0.028)
     , m_ball_left       (0.890, 0.475, 0.02, 0.03)
     , m_ball_right      (0.960, 0.475, 0.03, 0.03)
     , m_menu_battle     (0.817, 0.585 + 0 * 0.1075, 0.150, 0.070)
@@ -66,6 +68,7 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
         bool left = is_white(extract_box_reference(screen, m_opponent_left));
         bool right = is_white(extract_box_reference(screen, m_opponent_right));
         if (!left && !right){
+//            cout << "opp left or right" << endl;
             return false;
         }
     }
@@ -155,9 +158,11 @@ void BattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{
 bool BattleMenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
+//        cout << "no detect" << endl;
         m_trigger_count = 0;
         return false;
     }
+//    cout << "detected" << endl;
     m_trigger_count++;
     return m_trigger_count >= 5;
 }

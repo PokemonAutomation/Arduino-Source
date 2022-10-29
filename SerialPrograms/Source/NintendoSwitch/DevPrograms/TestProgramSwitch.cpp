@@ -127,9 +127,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace NintendoSwitch;
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
+    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-    using namespace PokemonSV;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -138,6 +138,35 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+
+    InferenceBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
+    InferenceBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
+    InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
+    InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
+
+
+//    ImageRGB32 image("Paralyzed.png");
+
+#if 0
+    BattleMenuDetector detector(BattleType::STANDARD);
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
+    BattleMenuWatcher watcher(BattleType::STANDARD);
+    BotBaseContext context(scope, console.botbase());
+    wait_until(
+        console, context, std::chrono::seconds(60),
+        {
+            {watcher}
+        }
+    );
+#endif
+
+
+#if 0
 //    ImageRGB32 image("SV-BattleMenu.png");
 //    ImageRGB32 image("SV-Hair.png");
 //    image = image.scale_to(1920, 1080);
@@ -172,6 +201,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         gradient_arrow_detector.process_frame(snapshot, current_time());
         battle_menu.process_frame(snapshot, current_time());
     }
+#endif
 
 #if 0
     BotBaseContext context(scope, console.botbase());
