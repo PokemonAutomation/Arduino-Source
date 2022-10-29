@@ -128,11 +128,17 @@ void MultiSwitchProgramSession::run_program_instance(const ProgramInfo& info){
 }
 void MultiSwitchProgramSession::internal_stop_program(){
     std::unique_lock<std::mutex> lg(m_lock);
-    if (m_scope == nullptr){
-        return;
+    size_t consoles = m_system.count();
+    for (size_t c = 0; c < consoles; c++){
+        m_system[c].serial_session().stop();
     }
-    m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
-    m_cv.wait(lg, [this]{ return m_scope == nullptr; });
+    if (m_scope != nullptr){
+        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        m_cv.wait(lg, [this]{ return m_scope == nullptr; });
+    }
+    for (size_t c = 0; c < consoles; c++){
+        m_system[c].serial_session().reset();
+    }
 }
 void MultiSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();

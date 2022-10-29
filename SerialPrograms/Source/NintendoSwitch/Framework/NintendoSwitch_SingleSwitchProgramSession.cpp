@@ -89,9 +89,11 @@ void SingleSwitchProgramSession::run_program_instance(const ProgramInfo& info){
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     SpinLockGuard lg(m_lock);
+    m_system.serial_session().stop();
     if (m_scope != nullptr){
         m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
     }
+    m_system.serial_session().reset();
 }
 void SingleSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();

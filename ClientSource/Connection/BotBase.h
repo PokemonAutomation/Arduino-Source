@@ -109,7 +109,7 @@ public:
     }
 
 
-    virtual bool cancel(std::exception_ptr exception) noexcept{
+    virtual bool cancel(std::exception_ptr exception) noexcept override{
         if (CancellableScope::cancel(std::move(exception))){
             return true;
         }
