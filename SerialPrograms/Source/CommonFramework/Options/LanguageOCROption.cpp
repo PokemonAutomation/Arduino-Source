@@ -9,7 +9,7 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "LanguageOCROption.h"
 
-//#include <iostream>
+#include <iostream>
 //using std::cout;
 //using std::endl;
 
@@ -69,12 +69,16 @@ void LanguageOCR::load_json(const JsonValue& json){
     Language language;
     try{
         language = language_code_to_enum(*str);
-    }catch (const InternalProgramError&){
+    }catch (const InternalProgramError& e){
+        std::cout << "Error loading json for language OCR option: " << e.message() << std::endl;
         return;
     }
 
     auto iter = m_case_map.find(language);
     if (iter == m_case_map.end()){
+        const auto& lan_data = language_data(language);
+        std::cout << "Warning: no language data for loaded language option " << lan_data.name
+                  << " (" << lan_data.code << ")." << std::endl;
         return;
     }
     m_current.store(iter->second, std::memory_order_relaxed);
