@@ -152,6 +152,9 @@ void find_symbol_candidates(
                     iter0->second.merge_assume_no_overlap(iter1->second);
                     iter1 = objmap.erase(iter1);
                     changed = true;
+                    if (iter1 == objmap.end()){
+                        break;
+                    }
                 }
             }
         }
