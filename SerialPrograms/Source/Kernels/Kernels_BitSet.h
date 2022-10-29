@@ -12,6 +12,10 @@
 #include <vector>
 #include "Common/Compiler.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -93,6 +97,7 @@ public:
         : m_width(width)
         , m_dense((width*height + WORD_BITS - 1) / WORD_BITS)
     {
+//        cout << width << " x " << height << endl;
         memset(m_dense.data(), 0, m_dense.size() * sizeof(uint32_t));
     }
 

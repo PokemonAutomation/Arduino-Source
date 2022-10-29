@@ -138,12 +138,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    ImageRGB32 image("HomeScreen.png");
 
+    HomeDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+#if 0
     InferenceBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
     InferenceBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
     InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
-
+#endif
 
 //    ImageRGB32 image("Paralyzed.png");
 

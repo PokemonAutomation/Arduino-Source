@@ -591,6 +591,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h

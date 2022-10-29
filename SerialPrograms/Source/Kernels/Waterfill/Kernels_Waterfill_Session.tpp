@@ -16,9 +16,9 @@
 #include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h"
 #include "Kernels_Waterfill_Session.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -34,8 +34,8 @@ public:
     WaterfillSession_t(PackedBinaryMatrixCore<Tile>& source)
         : m_source(&source)
         , m_object(source.width(), source.height())
-        , m_busy_tiles(source.width(), source.height())
-        , m_object_tiles(source.width(), source.height())
+        , m_busy_tiles(source.tile_width(), source.tile_height())
+        , m_object_tiles(source.tile_width(), source.tile_height())
     {}
 
     void set_source(PackedBinaryMatrixCore<Tile>& source){
