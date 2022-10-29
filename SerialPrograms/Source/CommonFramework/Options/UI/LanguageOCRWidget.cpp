@@ -73,7 +73,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     m_status->setOpenExternalLinks(true);
     vbox->addWidget(m_status);
 
-    LanguageOCRWidget::update();
+    LanguageOCRWidget::update_value();
 
     connect(
         m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
