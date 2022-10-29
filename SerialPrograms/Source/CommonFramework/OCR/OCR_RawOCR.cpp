@@ -12,6 +12,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "OCR_RawOCR.h"
 
@@ -78,6 +79,9 @@ public:
                 }
             }
 
+            global_logger_tagged().log(
+                "Initializing TesseractAPI (" + m_language_code + "): " + m_training_data_path
+            );
             std::unique_ptr<TesseractAPI> api(
                 new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
             );

@@ -35,6 +35,7 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     bool white;
+//    cout << "stats_bottom_row.average.sum() = " << stats_bottom_row.average.sum() << endl;
     if (stats_bottom_row.average.sum() < 200){
         white = false;
     }else if (stats_bottom_row.average.sum() > 500){
@@ -63,12 +64,15 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
         }
     }
 
+//    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) > 20){
         return false;
     }
+//    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) > 20){
         return false;
     }
+//    cout << euclidean_distance(stats_bottom_left.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_left.average, stats_bottom_right.average) > 20){
         return false;
     }
