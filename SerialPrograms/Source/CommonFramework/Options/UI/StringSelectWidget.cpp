@@ -11,9 +11,9 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "StringSelectWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -48,7 +48,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 
-    StringSelectCellWidget::update();
+    StringSelectCellWidget::update_value();
 
     connect(
         this, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
