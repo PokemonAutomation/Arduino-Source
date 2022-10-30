@@ -24,6 +24,10 @@ int test_pokemonSwSh_DialogTriangleDetector(const ImageViewRGB32& image, bool ta
 
 int test_pokemonSwSh_RetrieveEggArrowFinder(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSwSh_StoragePokemonMenuArrowFinder(const ImageViewRGB32& image, bool target);
+
+int test_pokemonSwSh_CheckNurseryArrowFinder(const ImageViewRGB32& image, bool target);
+
 int test_pokemonSwSh_YCommIconDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonSwSh_RotomPhoneMenuArrowFinder(const ImageViewRGB32& image, int target);

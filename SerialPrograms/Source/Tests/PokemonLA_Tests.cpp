@@ -205,7 +205,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
         }
     } else { // Region keyword found
         if (target_region_index < 0 || target_num_MMOs_on_region_map < 0){
-            cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands-5.png)." << endl; 
+            cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands_5.png)." << endl; 
         }
         const auto results = detector.detect_MMOs_on_region_map(image);
         TEST_RESULT_EQUAL((int)results.size(), target_num_MMOs_on_region_map);
