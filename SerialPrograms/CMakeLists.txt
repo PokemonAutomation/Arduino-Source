@@ -658,14 +658,14 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_x86_SSE41.cpp
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Routines.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill.hh
+    Source/Kernels/Waterfill/Kernels_Waterfill.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
