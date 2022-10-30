@@ -69,6 +69,24 @@ int test_pokemonSwSh_RetrieveEggArrowFinder(const ImageViewRGB32& image, bool ta
     return 0;
 }
 
+int test_pokemonSwSh_StoragePokemonMenuArrowFinder(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    StoragePokemonMenuArrowFinder detector(overlay);
+
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSwSh_CheckNurseryArrowFinder(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    CheckNurseryArrowFinder detector(overlay);
+
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 int test_pokemonSwSh_YCommIconDetector(const ImageViewRGB32& image, bool target){
     const bool is_on = true;
     YCommIconDetector detector(is_on);

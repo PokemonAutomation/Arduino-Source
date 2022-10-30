@@ -29,7 +29,7 @@ namespace PokemonAutomation{
 // CommandLineTests/                    <- root test folder
 // - PokemonLA/                         <- test space to organize tests
 //   - BattleMenuDetector/              <- test object, name of the class/function/file to test
-//     - IngoBattleDayTime-True.png     <- test file
+//     - IngoBattleDayTime_True.png     <- test file
 
 namespace{
 
@@ -121,7 +121,7 @@ int run_test_obj(const std::string& test_space, const QFileInfo& obj_info, size_
     cout << "Testing " << test_name << ":" << endl;
 
     // Recursively get test filenames, like:
-    // ./CommandLineTests/PokemonLA/BattleMenuDetector/IngoBattleMenuDayTime-True.png
+    // ./CommandLineTests/PokemonLA/BattleMenuDetector/IngoBattleMenuDayTime_True.png
     return run_test_obj_dir(test_func, obj_info.filePath(), num_passed, ignore_list);
 }
 
@@ -233,12 +233,12 @@ int run_command_line_tests(){
                     cur_info = QFileInfo(path);
                 }
             }
-            // If full_path is "CommandLineTest/PokemonLA/DialogueEllipseDetector/macOS_bright/WendyNight-True.png", then
+            // If full_path is "CommandLineTest/PokemonLA/DialogueEllipseDetector/macOS_bright/WendyNight_True.png", then
             // path_components contains:
             // - PokemonLA
             // - DialogueEllipseDetector
             // - macOS_bright
-            // - WendyNight-True.png
+            // - WendyNight_True.png
             if (path_components.size() == 0){
                 cerr << "Error: cannot parse " << full_path << ". Empty path in TEST_LIST?" << endl;
                 return 1;

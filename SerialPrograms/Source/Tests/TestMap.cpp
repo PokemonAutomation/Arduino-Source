@@ -214,6 +214,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonSwSh_RetrieveEggArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_RetrieveEggArrowFinder, _1)},
     {"PokemonSwSh_YCommIconDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommIconDetector, _1)},
     {"PokemonSwSh_RotomPhoneMenuArrowFinder", std::bind(image_int_detector_helper, test_pokemonSwSh_RotomPhoneMenuArrowFinder, _1)},
+    {"PokemonSwSh_StoragePokemonMenuArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_StoragePokemonMenuArrowFinder, _1)},
+    {"PokemonSwSh_CheckNurseryArrowFinder", std::bind(image_bool_detector_helper, test_pokemonSwSh_CheckNurseryArrowFinder, _1)},
     {"PokemonSwSh_BlackDialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BlackDialogBoxDetector, _1)},
     {"PokemonSwSh_BoxShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_BoxShinySymbolDetector, _1)},
     {"PokemonSwSh_BoxGenderDetector", std::bind(image_int_detector_helper, test_pokemonSwSh_BoxGenderDetector, _1)},

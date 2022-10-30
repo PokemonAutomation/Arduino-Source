@@ -526,7 +526,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     // If dialog over is not detected:
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "NoNurseryDialoEnd", "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.");
+            "NoNurseryDialogEnd", "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.");
     }
 
     return num_eggs_retrieved;
