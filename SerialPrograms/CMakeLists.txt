@@ -586,23 +586,23 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64xH_Default.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64xH_Default.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h
@@ -659,23 +659,23 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Routines.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill.hh
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
