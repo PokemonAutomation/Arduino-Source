@@ -16,15 +16,13 @@ namespace Kernels{
 
 
 BinaryMatrixType get_BinaryMatrixType(){
+
 #ifdef PA_ARCH_x86
-#if 1
-    if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
-        return BinaryMatrixType::i64x32_x64_AVX512;
-    }
-#endif
+//    if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+//        return BinaryMatrixType::i64x32_x64_AVX512;
+//    }
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return BinaryMatrixType::i64x32_x64_AVX512;
-//        return BinaryMatrixType::i64x64_x64_AVX512;
     }
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return BinaryMatrixType::i64x16_x64_AVX2;
@@ -33,27 +31,30 @@ BinaryMatrixType get_BinaryMatrixType(){
         return BinaryMatrixType::i64x8_x64_SSE42;
     }
 #endif
+
+//    return BinaryMatrixType::i64x8_Default;
     return BinaryMatrixType::i64x4_Default;
 }
 
 
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x4_Default();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x4_Default(size_t width, size_t height);
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_Default();
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_Default(size_t width, size_t height);
 
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_x64_SSE42();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_x64_SSE42(size_t width, size_t height);
-
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x16_x64_AVX2();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x16_x64_AVX2(size_t width, size_t height);
-
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x32_x64_AVX512();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x32_x64_AVX512(size_t width, size_t height);
-
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height);
 
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType type){
     switch (type){
+
+#ifdef PA_ARCH_x86
 #ifdef PA_AutoDispatch_x64_19_IceLake
     case BinaryMatrixType::i64x32_x64_AVX512:
         return make_PackedBinaryMatrix_64x32_x64_AVX512();
@@ -70,12 +71,20 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType 
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_PackedBinaryMatrix_64x8_x64_SSE42();
 #endif
-    default:
+#endif
+
+    case BinaryMatrixType::i64x8_Default:
+        return make_PackedBinaryMatrix_64x8_Default();
+    case BinaryMatrixType::i64x4_Default:
         return make_PackedBinaryMatrix_64x4_Default();
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported tile type.");
     }
 }
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType type, size_t width, size_t height){
     switch (type){
+
+#ifdef PA_ARCH_x86
 #ifdef PA_AutoDispatch_x64_19_IceLake
     case BinaryMatrixType::i64x32_x64_AVX512:
         return make_PackedBinaryMatrix_64x32_x64_AVX512(width, height);
@@ -92,29 +101,36 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType 
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_PackedBinaryMatrix_64x8_x64_SSE42(width, height);
 #endif
-    default:
+#endif
+
+    case BinaryMatrixType::i64x8_Default:
+        return make_PackedBinaryMatrix_64x8_Default(width, height);
+    case BinaryMatrixType::i64x4_Default:
         return make_PackedBinaryMatrix_64x4_Default(width, height);
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported tile type.");
     }
 }
 
 
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_Default();
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_Default(size_t width, size_t height);
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x4_Default();
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x4_Default(size_t width, size_t height);
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_Default();
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_Default(size_t width, size_t height);
 
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_x64_SSE42();
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_x64_SSE42(size_t width, size_t height);
-
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x16_x64_AVX2();
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x16_x64_AVX2(size_t width, size_t height);
-
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x32_x64_AVX512();
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x32_x64_AVX512(size_t width, size_t height);
-
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512();
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height);
 
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType type){
     switch (type){
+
+#ifdef PA_ARCH_x86
 #ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_x64_AVX512:
         return make_SparseBinaryMatrix_64x64_x64_AVX512();
@@ -127,12 +143,20 @@ std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType 
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_SparseBinaryMatrix_64x8_x64_SSE42();
 #endif
+#endif
+
+    case BinaryMatrixType::i64x8_Default:
+        return make_SparseBinaryMatrix_64x8_Default();
+    case BinaryMatrixType::i64x4_Default:
+        return make_SparseBinaryMatrix_64x4_Default();
     default:
-        return make_SparseBinaryMatrix_Default();
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported tile type.");
     }
 }
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType type, size_t width, size_t height){
     switch (type){
+
+#ifdef PA_ARCH_x86
 #ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_x64_AVX512:
         return make_SparseBinaryMatrix_64x64_x64_AVX512(width, height);
@@ -145,8 +169,14 @@ std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType 
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_SparseBinaryMatrix_64x8_x64_SSE42(width, height);
 #endif
+#endif
+
+    case BinaryMatrixType::i64x8_Default:
+        return make_SparseBinaryMatrix_64x8_Default(width, height);
+    case BinaryMatrixType::i64x4_Default:
+        return make_SparseBinaryMatrix_64x4_Default(width, height);
     default:
-        return make_SparseBinaryMatrix_Default(width, height);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported tile type.");
     }
 }
 

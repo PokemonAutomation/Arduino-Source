@@ -295,15 +295,19 @@ SOURCES += \
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x4_Default.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64xH_Default.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
@@ -339,10 +343,10 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
@@ -1084,6 +1088,10 @@ HEADERS += \
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h \
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
@@ -1095,12 +1103,13 @@ HEADERS += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h \
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h \
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp \
@@ -1130,6 +1139,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \

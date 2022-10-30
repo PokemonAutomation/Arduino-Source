@@ -28,6 +28,7 @@ namespace Kernels{
 // For example, for AVX2 feature, the optimized shape is 64x16.
 enum class BinaryMatrixType{
     i64x4_Default,
+    i64x8_Default,
     i64x8_x64_SSE42,
     i64x16_x64_AVX2,
     i64x64_x64_AVX512,

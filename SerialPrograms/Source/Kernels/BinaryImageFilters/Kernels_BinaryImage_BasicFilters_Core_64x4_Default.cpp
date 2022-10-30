@@ -4,7 +4,7 @@
  *
  */
 
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
 #include "Kernels_BinaryImage_BasicFilters_Default.h"
 
