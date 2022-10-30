@@ -26,7 +26,8 @@ Xoroshiro128PlusState find_rng_state(
 
     for (size_t i = 0; i < 128; i++) {
         context.wait_for_all_requests();
-        console.log("RNG: Attack animation " + std::to_string(i + 1) + "/128");
+        std::string text = std::to_string(i + 1) + "/128";
+        console.log("RNG: Attack animation " + text);
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         uint64_t last_bit = 0;
         switch (detection) {
@@ -34,12 +35,15 @@ Xoroshiro128PlusState find_rng_state(
             throw OperationFailedException(console, "Attack animation could not be detected.");
             break;
         case OrbeetleAttackAnimationDetector::SPECIAL:
+            text += " : Special";
             last_bit = 1;
             break;
         case OrbeetleAttackAnimationDetector::PHYSICAL:
+            text += " : Physical";
             last_bit = 0;
             break;
         }
+        console.overlay().add_log_text(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         if (i < 64) {
