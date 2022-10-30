@@ -8,11 +8,13 @@
 #define PokemonAutomation_ShinyHuntTracker_H
 
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
+#include "Pokemon/Pokemon_DataTypes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
 
 
 class ShinyHuntTracker : public StatsTracker{

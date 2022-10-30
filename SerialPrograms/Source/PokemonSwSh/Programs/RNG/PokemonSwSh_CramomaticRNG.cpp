@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -37,6 +38,33 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+
+class CramomaticRNG_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : iterations(m_stats["Iterations"])
+        , reads(m_stats["Seed Reads"])
+        , rereads(m_stats["Rereads"])
+        , errors(m_stats["Errors"])
+        , balls(m_stats["Balls"])
+    {
+        m_display_order.emplace_back("Iterations");
+        m_display_order.emplace_back("Seed Reads");
+        m_display_order.emplace_back("Rereads");
+        m_display_order.emplace_back("Errors");
+        m_display_order.emplace_back("Balls");
+    }
+
+public:
+    std::atomic<uint64_t>& iterations;
+    std::atomic<uint64_t>& reads;
+    std::atomic<uint64_t>& rereads;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& balls;
+};
+std::unique_ptr<StatsTracker> CramomaticRNG_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 CramomaticRNG::CramomaticRNG()
     : NUM_APRICORN_ONE(
@@ -101,7 +129,7 @@ void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBa
     pbf_wait(context, 2 * TICKS_PER_SECOND);
 }
 
-CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> selected_balls) {
+CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> selected_balls){
     Xoroshiro128Plus rng(state);
     size_t advances = 0;
     uint16_t priority_advances = 0;
@@ -272,6 +300,9 @@ bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseCon
 
 
 void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
+    env.update_stats();
+
     std::vector<CramomaticSelection> selections = BALL_TABLE.selected_balls();
     if (selections.empty()) {
         throw UserSetupError(env.console, "At least one type of ball needs to be selected!");
@@ -309,12 +340,17 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         if (!is_state_valid) {
             rng = Xoroshiro128Plus(find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES));
             is_state_valid = true;
+            stats.reads++;
         }
         else {
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
+            stats.rereads++;
         }
+        env.update_stats();
         Xoroshiro128PlusState rng_state = rng.get_state();
         if (rng_state.s0 == 0 && rng_state.s1 == 0) {
+            stats.errors++;
+            env.update_stats();
             throw OperationFailedException(env.console, "Invalid RNG state detected.");
         }
 
@@ -329,11 +365,17 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         choose_apricorn(env, context, sport);
 
         bool did_refuse = receive_ball(env, context);
-        if (!did_refuse) {
+        if (did_refuse){
+            stats.balls++;
+        }else{
             is_state_valid = false;
+            stats.errors++;
         }
+        env.update_stats();
 
         iteration++;
+        stats.iterations++;
+        env.update_stats();
     }
 }
 

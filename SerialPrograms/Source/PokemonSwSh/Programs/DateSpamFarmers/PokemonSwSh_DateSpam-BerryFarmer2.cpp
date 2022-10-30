@@ -35,6 +35,7 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
+
 class BerryFarmer2_Descriptor::Stats : public ShinyHuntTracker{
 public:
     Stats()
@@ -50,7 +51,6 @@ public:
     std::atomic<uint64_t>& days;
     std::atomic<uint64_t>& shakes;
 };
-
 std::unique_ptr<StatsTracker> BerryFarmer2_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }

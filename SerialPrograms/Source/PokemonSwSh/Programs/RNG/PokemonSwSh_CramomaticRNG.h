@@ -22,6 +22,9 @@ namespace PokemonSwSh {
 class CramomaticRNG_Descriptor : public SingleSwitchProgramDescriptor {
 public:
     CramomaticRNG_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 struct CramomaticTarget {

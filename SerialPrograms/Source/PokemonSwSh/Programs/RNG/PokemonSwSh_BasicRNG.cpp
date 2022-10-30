@@ -83,21 +83,26 @@ Xoroshiro128PlusState refind_rng_state(
     std::vector<bool> last_bit_sequence = rng.generate_last_bit_sequence(max_advances - min_advances);
     size_t distance = 0;
 
+    size_t i = 0;
     while (possible_indices > 1) {
         context.wait_for_all_requests();
 
+        std::string text = std::to_string(++i) + "/?";
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         switch (detection) {
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
             throw OperationFailedException(console, "Attack animation could not be detected.");
             break;
         case OrbeetleAttackAnimationDetector::SPECIAL:
+            text += " : Special";
             sequence.emplace_back(true);
             break;
         case OrbeetleAttackAnimationDetector::PHYSICAL:
+            text += " : Physical";
             sequence.emplace_back(false);
             break;
         }
+        console.overlay().add_log_text(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         std::vector<bool>::iterator last_bit_start = std::search(last_bit_sequence.begin(), last_bit_sequence.end(), sequence.begin(), sequence.end());
