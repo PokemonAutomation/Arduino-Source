@@ -9,10 +9,8 @@
 
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/StringSelectOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "PokemonSwSh_CramomaticTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

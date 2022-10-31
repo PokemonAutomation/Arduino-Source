@@ -16,6 +16,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
@@ -115,6 +117,8 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(NUM_APRICORN_TWO);
     PA_ADD_OPTION(NUM_NPCS);
     PA_ADD_OPTION(BALL_TABLE);
+
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MAX_PRIORITY_ADVANCES);
@@ -333,6 +337,15 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     size_t iteration = 0;
     while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
+
+        //  Touch the date.
+        if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
+            env.log("Touching date to prevent rollover.");
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }
+
         env.console.log("Cram-o-matic RNG iteration: " + std::to_string(iteration));
         navigate_to_party(env, context);
         context.wait_for_all_requests();
