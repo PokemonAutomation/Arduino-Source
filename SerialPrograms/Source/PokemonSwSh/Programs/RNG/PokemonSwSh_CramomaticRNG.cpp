@@ -15,6 +15,7 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -461,7 +462,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             stats.total_balls += amount;
         }else{
             is_state_valid = false;
-            stats.errors++;
+            
+            if (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
+                stats.errors++;
+            }
         }
         env.update_stats();
 
