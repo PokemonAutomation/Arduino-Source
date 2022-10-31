@@ -135,8 +135,10 @@ Xoroshiro128PlusState refind_rng_state(
 
 void do_rng_advances(ConsoleHandle& console, BotBaseContext& context, Xoroshiro128Plus& rng, size_t advances) {
     for (size_t i = 0; i < advances; i++) {
-        if ((i + 1) % 100 == 0) {
-            console.log("RNG advance: " + std::to_string(i + 1) + "/" + std::to_string(advances));
+        if ((i + 1) % 10 == 0) {
+            std::string text = std::to_string(i + 1) + "/" + std::to_string(advances);
+            console.log("RNG advance: " + text);
+            console.overlay().add_log_text("Advancing: " + text, COLOR_RED);
         }
         pbf_press_button(context, BUTTON_RCLICK, 10, 10);
         rng.next();
