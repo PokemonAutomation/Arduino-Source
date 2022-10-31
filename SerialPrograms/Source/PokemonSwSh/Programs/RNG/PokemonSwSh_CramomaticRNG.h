@@ -62,6 +62,7 @@ private:
     void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport);
     bool receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 

@@ -324,6 +324,16 @@ bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseCon
     return arrow_detected;
 }
 
+void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    // Mash the B button to exit potential menus or dialog boxes
+    pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
+
+    // take a step in case Hyde repositioned the player
+    pbf_move_left_joystick(context, 128, 0, TICKS_PER_SECOND, 10);
+
+    context.wait_for_all_requests();
+}
+
 
 void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
@@ -358,6 +368,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
 
     size_t iteration = 0;
+    uint16_t state_errors = 0;
+    uint16_t apricorn_selection_errors = 0;
     while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
 
         //  Touch the date.
@@ -382,11 +394,19 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             stats.rereads++;
         }
         env.update_stats();
+
         Xoroshiro128PlusState rng_state = rng.get_state();
         if (rng_state.s0 == 0 && rng_state.s1 == 0) {
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(env.console, "Invalid RNG state detected.");
+
+            state_errors++;
+            if (state_errors >= 3) {
+                throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
+            }
+            recover_from_wrong_state(env, context);
+            is_state_valid = false;
+            break;
         }
 
         CramomaticTarget target = calculate_target(env, rng.get_state(), BALL_TABLE.selected_balls());
@@ -397,7 +417,22 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         do_rng_advances(env.console, context, rng, target.needed_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
         leave_to_overworld_and_interact(env, context);
-        choose_apricorn(env, context, sport);
+
+        try {
+            choose_apricorn(env, context, sport);
+        }
+        catch (OperationFailedException&) {
+            stats.errors++;
+            env.update_stats();
+
+            apricorn_selection_errors++;
+            if (apricorn_selection_errors >= 3) {
+                throw OperationFailedException(env.console, "Could not detect bag three times on a row.");
+            }
+
+            is_state_valid = false;
+            break;
+        }
 
         bool did_refuse = receive_ball(env, context);
         if (did_refuse){
@@ -411,12 +446,15 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari) {
                 stats.sport_safari_balls += amount;
             }
-            stats.balls += amount;
+            stats.total_balls += amount;
         }else{
             is_state_valid = false;
             stats.errors++;
         }
         env.update_stats();
+
+        state_errors = 0;
+        apricorn_selection_errors = 0;
 
         iteration++;
         stats.iterations++;
