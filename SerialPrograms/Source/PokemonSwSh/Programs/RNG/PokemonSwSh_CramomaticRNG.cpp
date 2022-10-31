@@ -48,13 +48,19 @@ public:
         , reads(m_stats["Seed Reads"])
         , rereads(m_stats["Rereads"])
         , errors(m_stats["Errors"])
-        , balls(m_stats["Balls"])
+        , total_balls(m_stats["Balls"])
+        , apri_balls(m_stats["Apricorn Balls"])
+        , sport_safari_balls(m_stats["Safari/Sport Balls"])
+        , bonus(m_stats["Bonus"])
     {
         m_display_order.emplace_back("Iterations");
         m_display_order.emplace_back("Seed Reads");
         m_display_order.emplace_back("Rereads");
         m_display_order.emplace_back("Errors");
         m_display_order.emplace_back("Balls");
+        m_display_order.emplace_back("Apricorn Balls");
+        m_display_order.emplace_back("Safari/Sport Balls");
+        m_display_order.emplace_back("Bonus");
     }
 
 public:
@@ -62,7 +68,10 @@ public:
     std::atomic<uint64_t>& reads;
     std::atomic<uint64_t>& rereads;
     std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& balls;
+    std::atomic<uint64_t>& total_balls;
+    std::atomic<uint64_t>& apri_balls;
+    std::atomic<uint64_t>& sport_safari_balls;
+    std::atomic<uint64_t>& bonus;
 };
 std::unique_ptr<StatsTracker> CramomaticRNG_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -238,7 +247,8 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
         advances++;
     }
 
-
+    // Choose the first result which doesn't overshadow a higher priority choice.
+    // Ignores rng advances done by NPCs when the menu closes
     while (possible_targets.size() > 1) {
         auto last_target = possible_targets.end() - 1;
         auto second_to_last_target = possible_targets.end() - 2;
@@ -391,7 +401,17 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         bool did_refuse = receive_ball(env, context);
         if (did_refuse){
-            stats.balls++;
+            int amount = target.is_bonus ? 5 : 1;
+            if (target.is_bonus) {
+                stats.bonus++;
+            }
+            if (target.ball_type == CramomaticBallType::Apricorn) {
+                stats.apri_balls += amount;
+            }
+            else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari) {
+                stats.sport_safari_balls += amount;
+            }
+            stats.balls += amount;
         }else{
             is_state_valid = false;
             stats.errors++;
