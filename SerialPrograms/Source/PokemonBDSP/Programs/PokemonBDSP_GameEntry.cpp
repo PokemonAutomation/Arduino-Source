@@ -74,7 +74,11 @@ bool reset_game_from_home(
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
-    if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
+    bool video_available = console.video().snapshot();
+    if (video_available ||
+        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
+        tolerate_update_menu
+    ){
         close_game(context);
         start_game_from_home(
             console,

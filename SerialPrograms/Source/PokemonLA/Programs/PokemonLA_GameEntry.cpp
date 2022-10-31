@@ -57,7 +57,11 @@ bool switch_home_to_gamemenu(
     ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu
 ){
-    if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
+    bool video_available = console.video().snapshot();
+    if (video_available ||
+        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
+        tolerate_update_menu
+    ){
         close_game(context);
         start_game_from_home(
             console,
