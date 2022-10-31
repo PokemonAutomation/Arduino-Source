@@ -100,6 +100,16 @@ CramomaticRNG::CramomaticRNG()
         LockWhileRunning::LOCKED,
         300
     )
+    , ADVANCE_PRESS_DURATION(
+        "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
+        LockWhileRunning::LOCKED,
+        10
+    )
+    , ADVANCE_RELEASE_DURATION(
+        "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        LockWhileRunning::LOCKED,
+        10
+    )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
         LockWhileRunning::LOCKED,
@@ -123,6 +133,8 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MAX_PRIORITY_ADVANCES);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
+    PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
+    PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
     PA_ADD_OPTION(SAVE_SCREENSHOTS);
     PA_ADD_OPTION(LOG_VALUES);
 }
@@ -373,7 +385,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         num_apricorn_one -= sport ? 2 : 4;
         num_apricorn_two -= sport ? 2 : 0;
 
-        do_rng_advances(env.console, context, rng, target.needed_advances);
+        do_rng_advances(env.console, context, rng, target.needed_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
         leave_to_overworld_and_interact(env, context);
         choose_apricorn(env, context, sport);
 

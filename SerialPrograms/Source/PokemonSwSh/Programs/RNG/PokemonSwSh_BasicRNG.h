@@ -32,7 +32,7 @@ Xoroshiro128PlusState refind_rng_state(
     bool log_values
 );
 
-void do_rng_advances(ConsoleHandle& env, BotBaseContext& context, Xoroshiro128Plus& rng, size_t advances);
+void do_rng_advances(ConsoleHandle& env, BotBaseContext& context, Xoroshiro128Plus& rng, size_t advances, uint16_t press_duration = 10, uint16_t release_duration = 10);
 
 
 

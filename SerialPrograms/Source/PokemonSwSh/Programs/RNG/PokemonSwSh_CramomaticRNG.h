@@ -52,6 +52,8 @@ private:
     SectionDividerOption m_advanced_options;
     SimpleIntegerOption<uint16_t> MAX_PRIORITY_ADVANCES;
     SimpleIntegerOption<uint16_t> MAX_UNKNOWN_ADVANCES;
+    SimpleIntegerOption<uint16_t> ADVANCE_PRESS_DURATION;
+    SimpleIntegerOption<uint16_t> ADVANCE_RELEASE_DURATION;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
