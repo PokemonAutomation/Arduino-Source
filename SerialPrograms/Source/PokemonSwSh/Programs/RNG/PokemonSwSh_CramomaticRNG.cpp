@@ -96,6 +96,13 @@ CramomaticRNG::CramomaticRNG()
     , BALL_TABLE(
         "<b>Wanted Balls:</b><br>Exact kind depends on the currently selected apricorn."
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -138,6 +145,8 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(BALL_TABLE);
 
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
+
+    PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MAX_PRIORITY_ADVANCES);
@@ -371,6 +380,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint16_t state_errors = 0;
     uint16_t apricorn_selection_errors = 0;
     while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
@@ -404,9 +414,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (state_errors >= 3) {
                 throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
             }
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.");
             recover_from_wrong_state(env, context);
             is_state_valid = false;
-            break;
+            continue;
         }
 
         CramomaticTarget target = calculate_target(env, rng.get_state(), BALL_TABLE.selected_balls());
@@ -427,11 +438,12 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3) {
-                throw OperationFailedException(env.console, "Could not detect bag three times on a row.");
+                throw OperationFailedException(env.console, "Could not detect the bag three times on a row.");
             }
-
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.");
             is_state_valid = false;
-            break;
+            recover_from_wrong_state(env, context);
+            continue;
         }
 
         bool did_refuse = receive_ball(env, context);
@@ -460,6 +472,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         stats.iterations++;
         env.update_stats();
     }
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

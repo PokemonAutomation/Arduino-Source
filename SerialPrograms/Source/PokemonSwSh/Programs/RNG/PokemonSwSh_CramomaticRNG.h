@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -48,6 +49,9 @@ private:
     CramomaticTable BALL_TABLE;
 
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
+
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     SimpleIntegerOption<uint16_t> MAX_PRIORITY_ADVANCES;
