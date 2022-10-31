@@ -29,7 +29,7 @@ void resume_game_no_interact_old(BotBaseContext& context, bool tolerate_update_m
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_back_out(BotBaseContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
+void resume_game_back_out_old(BotBaseContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
     uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
@@ -42,7 +42,7 @@ void resume_game_back_out(BotBaseContext& context, bool tolerate_update_menu, ui
     }
 }
 void resume_game_front_of_den_nowatts(BotBaseContext& context, bool tolerate_update_menu){
-    resume_game_back_out(context, tolerate_update_menu, 400);
+    resume_game_back_out_old(context, tolerate_update_menu, 400);
 }
 
 void fast_reset_game(

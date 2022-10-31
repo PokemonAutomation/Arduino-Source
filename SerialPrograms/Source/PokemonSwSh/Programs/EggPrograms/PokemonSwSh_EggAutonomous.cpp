@@ -16,7 +16,6 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
@@ -187,7 +186,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
     }

@@ -6,7 +6,7 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "NintendoSwitch_TurboA.h"
 
 namespace PokemonAutomation{
@@ -32,7 +32,7 @@ TurboA::TurboA(){
 void TurboA::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        PokemonSwSh::resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        PokemonSwSh::resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
 
     while (true){

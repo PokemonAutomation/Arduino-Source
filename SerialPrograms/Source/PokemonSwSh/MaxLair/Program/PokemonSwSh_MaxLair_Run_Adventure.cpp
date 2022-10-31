@@ -5,12 +5,10 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
@@ -150,7 +148,7 @@ void loop_adventures(
                 env.log("Touching date to prevent rollover.");
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 5 * TICKS_PER_SECOND);
+                resume_game_back_out(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 5 * TICKS_PER_SECOND);
             });
         }
 

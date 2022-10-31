@@ -9,7 +9,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h"
 
@@ -115,7 +115,7 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     if (START_LOCATION.start_in_grip_menu()) {
         grip_menu_connect_go_home(context);
-        PokemonSwSh::resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
     else {
         pbf_press_dpad(context, DPAD_LEFT, 5, 5);
