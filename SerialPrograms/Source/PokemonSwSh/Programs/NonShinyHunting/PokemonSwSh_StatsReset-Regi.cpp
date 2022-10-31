@@ -17,7 +17,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_StatsReset-Regi.h"
 
 namespace PokemonAutomation{

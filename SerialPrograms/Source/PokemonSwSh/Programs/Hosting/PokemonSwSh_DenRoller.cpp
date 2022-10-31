@@ -16,7 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_DenRoller.h"
 

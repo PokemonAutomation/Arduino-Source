@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void resume_game_no_interact(BotBaseContext& context, bool tolerate_update_menu){
+void resume_game_no_interact_old(BotBaseContext& context, bool tolerate_update_menu){
     uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);

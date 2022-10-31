@@ -15,11 +15,28 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "PokemonSwSh_StartGame.h"
+#include "PokemonSwSh_GameEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+
+
+void resume_game_no_interact(
+    ConsoleHandle& console, BotBaseContext& context,
+    bool tolerate_update_menu
+){
+    bool video_available = console.video().snapshot();
+    if (video_available){
+        resume_game_from_home(console, context);
+    }else{
+        resume_game_no_interact_old(context, tolerate_update_menu);
+    }
+
+}
+
+
 
 
 void enter_loading_game(

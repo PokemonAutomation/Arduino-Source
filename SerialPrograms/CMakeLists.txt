@@ -1490,8 +1490,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h
-    Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp
-    Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.cpp
+    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp

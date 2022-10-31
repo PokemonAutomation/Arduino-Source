@@ -7,12 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 #define PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh_EggHelpers.h"
 
@@ -208,7 +207,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
     }
 
-    void eggcombined2_body(Logger& logger, BotBaseContext& context){
+    void eggcombined2_body(ConsoleHandle& console, BotBaseContext& context){
         if (BOXES_TO_HATCH == 0){
             ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
             return;
@@ -238,10 +237,10 @@ struct EggCombinedSession{
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
                 if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-                    logger.log("Touching date to prevent rollover.");
+                    console.log("Touching date to prevent rollover.");
                     pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                     touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                    resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 }
 
                 fetch_residual += fetches_per_batch;

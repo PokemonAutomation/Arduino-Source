@@ -4,10 +4,9 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_MassRelease.h"
 
@@ -50,7 +49,7 @@ MassRelease::MassRelease()
 void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        resume_game_no_interact(context, DODGE_SYSTEM_UPDATE_WINDOW);
+        resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
         pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }

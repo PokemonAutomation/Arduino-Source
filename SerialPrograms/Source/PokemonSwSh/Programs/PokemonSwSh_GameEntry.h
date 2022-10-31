@@ -15,6 +15,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+
+void resume_game_no_interact(
+    ConsoleHandle& console, BotBaseContext& context,
+    bool tolerate_update_menu
+);
+
+
+
 //  Start the game with the specified "game_slot" and "user_slot".
 //  If "game_slot" is zero, it uses whatever the cursor is on.
 //  If "user_slot" is zero, it uses whatever the cursor is on.

@@ -10,7 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "Program/PokemonSwSh_MaxLair_Run_Adventure.h"
 #include "PokemonSwSh_MaxLair_BossFinder.h"
 
@@ -180,7 +180,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);
-            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }else{
             pbf_press_button(context, BUTTON_B, 5, 5);
         }

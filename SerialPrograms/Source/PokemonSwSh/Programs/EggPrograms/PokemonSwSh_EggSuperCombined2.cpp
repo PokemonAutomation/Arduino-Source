@@ -6,6 +6,7 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggCombinedShared.h"
@@ -117,7 +118,7 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
     pbf_mash_button(context, BUTTON_B, 600);
 
-    session.eggcombined2_body(env.logger(), context);
+    session.eggcombined2_body(env.console, context);
 }
 
 

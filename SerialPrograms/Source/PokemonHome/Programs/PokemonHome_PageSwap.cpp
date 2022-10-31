@@ -4,10 +4,9 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonHome_PageSwap.h"
 
 namespace PokemonAutomation{
@@ -44,7 +43,7 @@ PageSwap::PageSwap()
 void PageSwap::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        PokemonSwSh::resume_game_no_interact(context, DODGE_SYSTEM_UPDATE_WINDOW);
+        PokemonSwSh::resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
         pbf_press_button(context, BUTTON_RCLICK, 5, 5);
     }

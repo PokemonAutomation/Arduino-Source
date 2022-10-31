@@ -12,6 +12,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_RaidItemFarmerOKHO.h"
 
@@ -122,7 +123,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
             if (console.index() == 0){
                 resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
-                resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+                resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }
         }
     );
@@ -182,8 +183,8 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                         touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
                         last_touch += TOUCH_DATE_INTERVAL;
                     }
-                    start_game_from_home(
-                        context,
+                    start_game_from_home_with_inference(
+                        console, context,
                         ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                         0, 0,
                         BACKUP_SAVE
