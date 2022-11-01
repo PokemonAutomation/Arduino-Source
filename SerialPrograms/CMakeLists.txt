@@ -1484,14 +1484,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.cpp
+    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h
     Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h
-    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.cpp
-    Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp
