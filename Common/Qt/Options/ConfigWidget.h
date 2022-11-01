@@ -29,6 +29,7 @@ public:
     void update_all(bool program_is_running);
 
 protected:
+    virtual void visibility_changed() override;
     virtual void program_state_changed(bool program_is_running) override;
 
 protected:

@@ -10,6 +10,10 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -94,12 +98,18 @@ ConfigOptionState ConfigOption::visibility() const{
 }
 void ConfigOption::set_visibility(ConfigOptionState visibility){
     if (m_data->set_visibility(visibility)){
-        report_value_changed();
+        report_visibility_changed();
     }
 }
 
 
-
+void ConfigOption::report_visibility_changed(){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.lock);
+    for (Listener* listener : data.listeners){
+        listener->visibility_changed();
+    }
+}
 void ConfigOption::report_program_state(bool program_is_running){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);

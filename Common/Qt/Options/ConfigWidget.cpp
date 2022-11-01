@@ -60,6 +60,11 @@ void ConfigWidget::update_all(bool program_is_running){
     update_visibility(program_is_running);
 }
 
+void ConfigWidget::visibility_changed(){
+    QMetaObject::invokeMethod(m_widget, [this]{
+        update_visibility(m_program_is_running);
+    }, Qt::QueuedConnection);
+}
 void ConfigWidget::program_state_changed(bool program_is_running){
     QMetaObject::invokeMethod(m_widget, [this, program_is_running]{
         update_visibility(program_is_running);

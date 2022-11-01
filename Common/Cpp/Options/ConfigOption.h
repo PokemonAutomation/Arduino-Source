@@ -39,6 +39,7 @@ class ConfigOption{
 public:
     struct Listener{
         virtual void value_changed(){}
+        virtual void visibility_changed(){}
         virtual void program_state_changed(bool program_is_running){}
     };
     void add_listener(Listener& listener);
@@ -81,6 +82,10 @@ public:
 
 
 public:
+    //  Report that the visibility has changed. Attached UI elements should
+    //  respond accordingly to show, hide, or lock this element.
+    virtual void report_visibility_changed();
+
     //  Report that the program state has changed. This will cause UI elements
     //  to lock/unlock depending on whether they are allowed to be changed by
     //  the user while the program is running.
