@@ -47,19 +47,17 @@ public:
     Stats()
         : iterations(m_stats["Iterations"])
         , reads(m_stats["Seed Reads"])
-        , rereads(m_stats["Rereads"])
         , errors(m_stats["Errors"])
         , total_balls(m_stats["Balls"])
-        , apri_balls(m_stats["Apricorn Balls"])
+        , apri_balls(m_stats["Apriballs"])
         , sport_safari_balls(m_stats["Safari/Sport Balls"])
         , bonus(m_stats["Bonus"])
     {
         m_display_order.emplace_back("Iterations");
         m_display_order.emplace_back("Seed Reads");
-        m_display_order.emplace_back("Rereads");
         m_display_order.emplace_back("Errors");
         m_display_order.emplace_back("Balls");
-        m_display_order.emplace_back("Apricorn Balls");
+        m_display_order.emplace_back("Apriballs");
         m_display_order.emplace_back("Safari/Sport Balls");
         m_display_order.emplace_back("Bonus");
     }
@@ -67,7 +65,6 @@ public:
 public:
     std::atomic<uint64_t>& iterations;
     std::atomic<uint64_t>& reads;
-    std::atomic<uint64_t>& rereads;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& total_balls;
     std::atomic<uint64_t>& apri_balls;
@@ -171,7 +168,6 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     std::vector<CramomaticTarget> possible_targets;
 
     std::sort(selected_balls.begin(), selected_balls.end(), [](CramomaticSelection sel1, CramomaticSelection sel2) { return sel1.priority > sel2.priority; });
-
     // priority_advances only starts counting up after the first good result is found
     while (priority_advances <= MAX_PRIORITY_ADVANCES) {
         // calculate the result for the current temp_rng state
@@ -402,7 +398,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         else {
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
-            stats.rereads++;
+            stats.reads++;
         }
         env.update_stats();
 
@@ -415,7 +411,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (state_errors >= 3) {
                 throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
             }
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.");
+            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", *screen);
             recover_from_wrong_state(env, context);
             is_state_valid = false;
             continue;
@@ -441,14 +438,15 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (apricorn_selection_errors >= 3) {
                 throw OperationFailedException(env.console, "Could not detect the bag three times on a row.");
             }
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.");
+            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", *screen);
             is_state_valid = false;
             recover_from_wrong_state(env, context);
             continue;
         }
 
         bool did_refuse = receive_ball(env, context);
-        if (did_refuse){
+        if (did_refuse || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
             int amount = target.is_bonus ? 5 : 1;
             if (target.is_bonus) {
                 stats.bonus++;
@@ -462,10 +460,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             stats.total_balls += amount;
         }else{
             is_state_valid = false;
-            
-            if (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
-                stats.errors++;
-            }
+            stats.errors++;
         }
         env.update_stats();
 
