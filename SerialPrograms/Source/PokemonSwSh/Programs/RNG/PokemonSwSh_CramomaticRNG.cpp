@@ -15,6 +15,7 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -46,23 +47,29 @@ public:
     Stats()
         : iterations(m_stats["Iterations"])
         , reads(m_stats["Seed Reads"])
-        , rereads(m_stats["Rereads"])
         , errors(m_stats["Errors"])
-        , balls(m_stats["Balls"])
+        , total_balls(m_stats["Balls"])
+        , apri_balls(m_stats["Apriballs"])
+        , sport_safari_balls(m_stats["Safari/Sport Balls"])
+        , bonus(m_stats["Bonus"])
     {
         m_display_order.emplace_back("Iterations");
         m_display_order.emplace_back("Seed Reads");
-        m_display_order.emplace_back("Rereads");
         m_display_order.emplace_back("Errors");
         m_display_order.emplace_back("Balls");
+        m_display_order.emplace_back("Apriballs");
+        m_display_order.emplace_back("Safari/Sport Balls");
+        m_display_order.emplace_back("Bonus");
     }
 
 public:
     std::atomic<uint64_t>& iterations;
     std::atomic<uint64_t>& reads;
-    std::atomic<uint64_t>& rereads;
     std::atomic<uint64_t>& errors;
-    std::atomic<uint64_t>& balls;
+    std::atomic<uint64_t>& total_balls;
+    std::atomic<uint64_t>& apri_balls;
+    std::atomic<uint64_t>& sport_safari_balls;
+    std::atomic<uint64_t>& bonus;
 };
 std::unique_ptr<StatsTracker> CramomaticRNG_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -87,6 +94,13 @@ CramomaticRNG::CramomaticRNG()
     , BALL_TABLE(
         "<b>Wanted Balls:</b><br>Exact kind depends on the currently selected apricorn."
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -99,6 +113,16 @@ CramomaticRNG::CramomaticRNG()
         "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
         LockWhileRunning::LOCKED,
         300
+    )
+    , ADVANCE_PRESS_DURATION(
+        "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
+        LockWhileRunning::LOCKED,
+        10
+    )
+    , ADVANCE_RELEASE_DURATION(
+        "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        LockWhileRunning::LOCKED,
+        10
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
@@ -120,9 +144,13 @@ CramomaticRNG::CramomaticRNG()
 
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
+    PA_ADD_OPTION(NOTIFICATIONS);
+
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MAX_PRIORITY_ADVANCES);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
+    PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
+    PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
     PA_ADD_OPTION(SAVE_SCREENSHOTS);
     PA_ADD_OPTION(LOG_VALUES);
 }
@@ -140,7 +168,6 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     std::vector<CramomaticTarget> possible_targets;
 
     std::sort(selected_balls.begin(), selected_balls.end(), [](CramomaticSelection sel1, CramomaticSelection sel2) { return sel1.priority > sel2.priority; });
-
     // priority_advances only starts counting up after the first good result is found
     while (priority_advances <= MAX_PRIORITY_ADVANCES) {
         // calculate the result for the current temp_rng state
@@ -226,7 +253,8 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
         advances++;
     }
 
-
+    // Choose the first result which doesn't overshadow a higher priority choice.
+    // Ignores rng advances done by NPCs when the menu closes
     while (possible_targets.size() > 1) {
         auto last_target = possible_targets.end() - 1;
         auto second_to_last_target = possible_targets.end() - 2;
@@ -302,6 +330,16 @@ bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseCon
     return arrow_detected;
 }
 
+void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    // Mash the B button to exit potential menus or dialog boxes
+    pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
+
+    // take a step in case Hyde repositioned the player
+    pbf_move_left_joystick(context, 128, 0, TICKS_PER_SECOND, 10);
+
+    context.wait_for_all_requests();
+}
+
 
 void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
@@ -336,7 +374,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
 
     size_t iteration = 0;
+    uint16_t state_errors = 0;
+    uint16_t apricorn_selection_errors = 0;
     while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
@@ -357,14 +398,24 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         else {
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
-            stats.rereads++;
+            stats.reads++;
         }
         env.update_stats();
+
         Xoroshiro128PlusState rng_state = rng.get_state();
         if (rng_state.s0 == 0 && rng_state.s1 == 0) {
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(env.console, "Invalid RNG state detected.");
+
+            state_errors++;
+            if (state_errors >= 3) {
+                throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
+            }
+            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", *screen);
+            recover_from_wrong_state(env, context);
+            is_state_valid = false;
+            continue;
         }
 
         CramomaticTarget target = calculate_target(env, rng.get_state(), BALL_TABLE.selected_balls());
@@ -373,23 +424,54 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         num_apricorn_one -= sport ? 2 : 4;
         num_apricorn_two -= sport ? 2 : 0;
 
-        do_rng_advances(env.console, context, rng, target.needed_advances);
+        do_rng_advances(env.console, context, rng, target.needed_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
         leave_to_overworld_and_interact(env, context);
-        choose_apricorn(env, context, sport);
+
+        try {
+            choose_apricorn(env, context, sport);
+        }
+        catch (OperationFailedException&) {
+            stats.errors++;
+            env.update_stats();
+
+            apricorn_selection_errors++;
+            if (apricorn_selection_errors >= 3) {
+                throw OperationFailedException(env.console, "Could not detect the bag three times on a row.");
+            }
+            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", *screen);
+            is_state_valid = false;
+            recover_from_wrong_state(env, context);
+            continue;
+        }
 
         bool did_refuse = receive_ball(env, context);
-        if (did_refuse){
-            stats.balls++;
+        if (did_refuse || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
+            int amount = target.is_bonus ? 5 : 1;
+            if (target.is_bonus) {
+                stats.bonus++;
+            }
+            if (target.ball_type == CramomaticBallType::Apricorn) {
+                stats.apri_balls += amount;
+            }
+            else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari) {
+                stats.sport_safari_balls += amount;
+            }
+            stats.total_balls += amount;
         }else{
             is_state_valid = false;
             stats.errors++;
         }
         env.update_stats();
 
+        state_errors = 0;
+        apricorn_selection_errors = 0;
+
         iteration++;
         stats.iterations++;
         env.update_stats();
     }
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

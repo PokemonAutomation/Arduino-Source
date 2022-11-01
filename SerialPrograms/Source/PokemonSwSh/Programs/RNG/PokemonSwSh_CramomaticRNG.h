@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -49,9 +50,14 @@ private:
 
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
+
     SectionDividerOption m_advanced_options;
     SimpleIntegerOption<uint16_t> MAX_PRIORITY_ADVANCES;
     SimpleIntegerOption<uint16_t> MAX_UNKNOWN_ADVANCES;
+    SimpleIntegerOption<uint16_t> ADVANCE_PRESS_DURATION;
+    SimpleIntegerOption<uint16_t> ADVANCE_RELEASE_DURATION;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
@@ -60,6 +66,7 @@ private:
     void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport);
     bool receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 
