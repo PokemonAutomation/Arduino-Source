@@ -40,7 +40,7 @@ void resume_game_from_home(
         UpdateMenuWatcher detector(false);
         int ret = wait_until(
             console, context,
-            std::chrono::milliseconds(500),
+            std::chrono::milliseconds(1000),
             { detector }
         );
         if (ret < 0){

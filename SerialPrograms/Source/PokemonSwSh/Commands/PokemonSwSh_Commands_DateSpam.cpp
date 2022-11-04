@@ -132,7 +132,7 @@ int register_message_converters_pokemon_date_spam(){
         PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "home_roll_date_enter_game_autorollback() - ";
+            ss << "touch_date_from_home() - ";
             if (body.size() != sizeof(pabb_touch_date_from_home)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_touch_date_from_home*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
