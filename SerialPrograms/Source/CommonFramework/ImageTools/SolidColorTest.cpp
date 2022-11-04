@@ -50,7 +50,7 @@ bool is_grey(
         return false;
     }
     //  If it's too dark, color ratios will be unstable.
-    if (sum < 50){
+    if (sum < 100){
         return true;
     }
     return is_solid(stats, {0.333333, 0.333333, 0.333333}, 0.1, max_stddev_sum);

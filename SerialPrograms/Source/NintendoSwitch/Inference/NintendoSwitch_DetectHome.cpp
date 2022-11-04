@@ -8,15 +8,15 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch_DetectHome.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 HomeDetector::HomeDetector()
-    : m_bottom_row(0.15, 0.92, 0.30, 0.05)
+    : m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)
     , m_bottom_right(0.83, 0.70, 0.15, 0.15)
@@ -44,6 +44,8 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
+//    cout << "white: " << white << endl;
+
     ImageStats stats_bottom_icons = image_stats(extract_box_reference(screen, m_bottom_icons));
 //    cout << stats_bottom_icons.average << stats_bottom_icons.stddev << endl;
     if (stats_bottom_icons.stddev.sum() < 50){
@@ -56,24 +58,29 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
 //    cout << stats_bottom_right.average << stats_bottom_right.stddev << endl;
     if (white){
         if (!is_white(stats_bottom_left) || !is_white(stats_bottom_right)){
+//            cout << "asdf" << endl;
             return false;
         }
     }else{
         if (!is_grey(stats_bottom_left, 0, 150) || !is_grey(stats_bottom_right, 0, 150)){
+//            cout << "qwer" << endl;
             return false;
         }
     }
 
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) > 20){
+//        cout << "qwer = " << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
         return false;
     }
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) > 20){
+//        cout << "asdf" << endl;
         return false;
     }
 //    cout << euclidean_distance(stats_bottom_left.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_left.average, stats_bottom_right.average) > 20){
+//        cout << "zxcv" << endl;
         return false;
     }
 
@@ -107,7 +114,7 @@ bool HomeWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp
 
 
 StartGameUserSelectDetector::StartGameUserSelectDetector()
-    : m_bottom_row(0.15, 0.92, 0.30, 0.05)
+    : m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_top_row(0.50, 0.47, 0.45, 0.05)
     , m_mid_row(0.10, 0.55, 0.80, 0.02)
@@ -191,8 +198,8 @@ bool StartGameUserSelectWatcher::process_frame(const ImageViewRGB32& frame, Wall
 
 
 UpdateMenuDetector::UpdateMenuDetector()
-    : m_box_top(0.25, 0.26, 0.50, 0.05)
-    , m_box_mid(0.25, 0.49, 0.50, 0.05)
+    : m_box_top(0.25, 0.26, 0.50, 0.02)
+    , m_box_mid(0.25, 0.52, 0.50, 0.02)
     , m_top(0.10, 0.15, 0.80, 0.03)
     , m_left(0.08, 0.25, 0.10, 0.38)
     , m_bottom_solid(0.10, 0.84, 0.80, 0.04)
@@ -210,7 +217,7 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
-    if (stats_box_top.average.sum() < 200){
+    if (stats_box_top.average.sum() < 300){
         white = false;
     }else if (stats_box_top.average.sum() > 500){
         white = true;
@@ -234,6 +241,7 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_left = image_stats(extract_box_reference(screen, m_left));
 //    cout << stats_left.stddev << endl;
     if (stats_left.stddev.sum() < 30){
+//        cout << "zxcv" << endl;
         return false;
     }
 
@@ -244,15 +252,18 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
 //    cout << bottom_solid.average << bottom_solid.stddev << endl;
 
     if (euclidean_distance(stats_top.average, bottom_solid.average) > 10){
+//        cout << "qwer" << endl;
         return false;
     }
 
     if (white){
         if (!is_grey(stats_top, 100, 300) || !is_grey(bottom_solid, 100, 300)){
+//            cout << "asdf" << endl;
             return false;
         }
     }else{
         if (!is_grey(stats_top, 0, 100) || !is_grey(bottom_solid, 0, 100)){
+//            cout << "zxcv" << endl;
             return false;
         }
     }
