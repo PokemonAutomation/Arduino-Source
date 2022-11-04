@@ -127,6 +127,9 @@ std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image){
 #endif
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){
+        if (object.area < 100){
+            continue;
+        }
         ImagePixelBox object_box;
         if (ExclamationMatcher::instance().matches(object_box, image, object)){
             ret.emplace_back(object_box);
