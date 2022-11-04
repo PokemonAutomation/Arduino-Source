@@ -43,6 +43,7 @@
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 
 
 #include <QVideoFrame>
@@ -126,8 +127,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
-    using namespace PokemonBDSP;
+    using namespace PokemonSwSh;
+//    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 //    using namespace PokemonSV;
 
@@ -138,10 +139,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    ImageRGB32 image("HomeScreen.png");
+    ImageRGB32 image("ExclamationFalsePositive.png");
 
-    HomeDetector detector;
-    cout << detector.detect(image) << endl;
+    find_exclamation_marks(image);
+
+//    HomeDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
 #if 0

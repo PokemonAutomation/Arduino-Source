@@ -12,6 +12,10 @@
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonSwSh_MarkFinder.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -120,18 +124,22 @@ std::vector<ImagePixelBox> find_exclamation_marks(const ImageViewRGB32& image){
     cout << "objects = " << objects.size() << endl;
     static int c = 0;
     for (const auto& object : objects){
-        image.copy(
-            object.min_x, object.min_y, object.width(), object.height()
-        ).save("test-" + std::to_string(c++) + ".png");
+        extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
     }
 #endif
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){
+        if (object.area < 100){
+            continue;
+        }
         ImagePixelBox object_box;
         if (ExclamationMatcher::instance().matches(object_box, image, object)){
             ret.emplace_back(object_box);
+//            static int c = 0;
+//            extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
         }
     }
+//    cout << ret.size() << endl;
     return ret;
 }
 std::vector<ImagePixelBox> find_question_marks(const ImageViewRGB32& image){

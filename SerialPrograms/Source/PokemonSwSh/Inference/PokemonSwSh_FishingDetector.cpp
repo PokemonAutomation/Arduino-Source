@@ -4,10 +4,8 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_FishingDetector.h"
 
@@ -60,6 +58,10 @@ bool FishingHookDetector::process_frame(const ImageViewRGB32& frame, WallClock t
         ImageFloatBox box = translate_to_parent(frame, m_hook_box, mark);
         m_marks.emplace_back(m_overlay, box, COLOR_YELLOW);
     }
+
+//    if (!exclamation_marks.empty()){
+//        frame.save("test.png");
+//    }
 
     return !exclamation_marks.empty();
 }
