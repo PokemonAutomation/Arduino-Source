@@ -139,9 +139,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    ImageRGB32 image("ExclamationFalsePositive.png");
 
-    find_exclamation_marks(image);
+    ImageRGB32 image("GermanUpdate.jpg");
+//    auto image = feed.snapshot();
+    UpdateMenuDetector detector;
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+
+
+//    ImageRGB32 image("ExclamationFalsePositive.png");
+//    find_exclamation_marks(image);
 
 //    HomeDetector detector;
 //    cout << detector.detect(image) << endl;
