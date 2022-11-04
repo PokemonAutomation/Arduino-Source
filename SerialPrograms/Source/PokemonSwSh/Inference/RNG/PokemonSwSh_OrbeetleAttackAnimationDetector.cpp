@@ -76,9 +76,9 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
         m_console.log("Orbeetle attack ratio blue: " + std::to_string(animation_ratios.b));
     }
 
-    if ((animation_ratios.r >= 1.5 * baseline_ratios.r)
-        && (animation_ratios.g <= 0.85 * baseline_ratios.g)
-        && (animation_ratios.b <= 0.85 * baseline_ratios.b)
+    if ((animation_ratios.r >= 1.4 * baseline_ratios.r)
+//        && (animation_ratios.g <= 0.85 * baseline_ratios.g)
+//        && (animation_ratios.b <= 0.85 * baseline_ratios.b)
         )
     {
         if (save_screenshot) {
