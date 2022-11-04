@@ -140,8 +140,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-    ImageRGB32 image("GermanUpdate.jpg");
+    ImageRGB32 image("GermanUpdate2.png");
 //    auto image = feed.snapshot();
+//    HomeDetector detector;
     UpdateMenuDetector detector;
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);

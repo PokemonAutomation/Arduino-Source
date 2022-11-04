@@ -8,15 +8,15 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch_DetectHome.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 HomeDetector::HomeDetector()
-    : m_bottom_row(0.15, 0.92, 0.30, 0.05)
+    : m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)
     , m_bottom_right(0.83, 0.70, 0.15, 0.15)
@@ -44,6 +44,8 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
+//    cout << "white: " << white << endl;
+
     ImageStats stats_bottom_icons = image_stats(extract_box_reference(screen, m_bottom_icons));
 //    cout << stats_bottom_icons.average << stats_bottom_icons.stddev << endl;
     if (stats_bottom_icons.stddev.sum() < 50){
@@ -56,24 +58,29 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
 //    cout << stats_bottom_right.average << stats_bottom_right.stddev << endl;
     if (white){
         if (!is_white(stats_bottom_left) || !is_white(stats_bottom_right)){
+//            cout << "asdf" << endl;
             return false;
         }
     }else{
         if (!is_grey(stats_bottom_left, 0, 150) || !is_grey(stats_bottom_right, 0, 150)){
+//            cout << "qwer" << endl;
             return false;
         }
     }
 
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) > 20){
+//        cout << "qwer = " << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
         return false;
     }
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) << endl;
     if (euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) > 20){
+//        cout << "asdf" << endl;
         return false;
     }
 //    cout << euclidean_distance(stats_bottom_left.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_left.average, stats_bottom_right.average) > 20){
+//        cout << "zxcv" << endl;
         return false;
     }
 
@@ -107,7 +114,7 @@ bool HomeWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp
 
 
 StartGameUserSelectDetector::StartGameUserSelectDetector()
-    : m_bottom_row(0.15, 0.92, 0.30, 0.05)
+    : m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_top_row(0.50, 0.47, 0.45, 0.05)
     , m_mid_row(0.10, 0.55, 0.80, 0.02)
