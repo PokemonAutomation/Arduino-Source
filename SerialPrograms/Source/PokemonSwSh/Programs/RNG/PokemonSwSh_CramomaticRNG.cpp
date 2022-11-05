@@ -321,7 +321,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 }
 
-std::string CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     // receive ball and refuse to use the cram-o-matic again
     VideoOverlaySet boxes(env.console);
 
@@ -369,13 +369,7 @@ std::string CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, Bot
         }
     }
     pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
-    if (!arrow_detected){
-        return "";
-    }
-    if (best_ball.empty()){
-        best_ball = "unknown";
-    }
-    return best_ball;
+    return {arrow_detected, best_ball};
 }
 
 void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -508,36 +502,25 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             continue;
         }
 
-        std::string ball = receive_ball(env, context);
+        std::pair<bool, std::string> result = receive_ball(env, context);
 //        cout << "Ball Slug = " << ball << endl;
-        do{
-            if (ball.empty()){
-                is_state_valid = false;
-                stats.errors++;
-                break;
-            }
+        if (result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
+            const std::string& ball = result.second;
+            stats.total_balls++;
 
             auto iter = APRIBALLS.find(ball);
             if (iter != APRIBALLS.end()){
-                stats.total_balls++;
                 stats.apri_balls++;
-                break;
             }
 
             iter = RARE_BALLS.find(ball);
             if (iter != RARE_BALLS.end()){
-                stats.total_balls++;
                 stats.sport_safari_balls++;
-                break;
             }
-
-            if (ball != "unknown"){
-                stats.total_balls++;
-                break;
-            }
-
+        }else{
+            is_state_valid = false;
             stats.errors++;
-        }while (false);
+        }
 
 #if 0
         if (!ball.empty() || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
