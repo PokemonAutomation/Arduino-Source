@@ -15,12 +15,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,6 +26,8 @@ namespace NintendoSwitch{
 //  This class will debounce that.
 class KeyboardDebouncer{
 public:
+    void clear();
+
     void add_event(bool press, VirtualControllerState state);
 
     //  Returns when the consumer thread should wakt up again.
@@ -60,12 +57,16 @@ public:
     );
     ~VirtualController();
 
+public:
+    //  These 3 must be called from UI thread.
     void clear_state();
 
     //  Returns false if key is not handled. (pass it up to next handler)
     bool on_key_press(Qt::Key key);
     bool on_key_release(Qt::Key key);
 
+public:
+    //  Call from any thread.
     ProgramState last_known_state() const;
     void on_state_changed(ProgramState state);
 

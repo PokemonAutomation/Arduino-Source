@@ -8,15 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_FishingDetector_H
 
 #include <chrono>
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
     class VideoOverlay;

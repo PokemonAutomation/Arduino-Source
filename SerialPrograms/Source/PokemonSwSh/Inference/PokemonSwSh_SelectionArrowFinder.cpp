@@ -4,8 +4,7 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -15,6 +14,7 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

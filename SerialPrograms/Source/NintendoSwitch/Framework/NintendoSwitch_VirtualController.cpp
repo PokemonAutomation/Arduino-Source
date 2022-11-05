@@ -15,14 +15,19 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch_VirtualController.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+void KeyboardDebouncer::clear(){
+    SpinLockGuard lg(m_lock);
+    m_last = VirtualControllerState();
+    m_history.clear();
+}
 
 void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
     WallClock now = current_time();
@@ -45,6 +50,7 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
     SpinLockGuard lg(m_lock);
 
     if (m_history.empty()){
+//        cout << "empty" << endl;
         state = m_last;
         return WallClock::max();
     }
@@ -104,8 +110,13 @@ VirtualController::~VirtualController(){
     m_thread.join();
 }
 void VirtualController::clear_state(){
+//    cout << "clear_state" << endl;
     m_controller_state = VirtualControllerState();
     m_pressed_buttons.clear();
+    m_history.clear();
+
+    std::lock_guard<std::mutex> lg(m_sleep_lock);
+    m_cv.notify_all();
 }
 
 bool VirtualController::on_key_press(Qt::Key key){

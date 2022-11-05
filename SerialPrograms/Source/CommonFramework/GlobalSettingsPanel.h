@@ -21,9 +21,9 @@
 #include "CommonFramework/Panels/PanelTools.h"
 #include "Integrations/DiscordSettingsOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

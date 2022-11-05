@@ -13,9 +13,9 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "WaterfillTemplateMatcher.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{

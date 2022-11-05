@@ -12,8 +12,6 @@
 #include <mutex>
 #include <QWidget>
 #include "Common/Cpp/ImageResolution.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 
 class QComboBox;

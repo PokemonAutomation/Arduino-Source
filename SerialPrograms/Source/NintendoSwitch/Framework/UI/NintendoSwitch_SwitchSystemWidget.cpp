@@ -8,19 +8,15 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QFileDialog>
-#include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/ControllerDevices/SerialPortWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -225,10 +221,12 @@ void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
     }
 }
 void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
+//    cout << "focusInEvent" << endl;
     focus_in(event);
     QWidget::focusInEvent(event);
 }
 void SwitchSystemWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "focusOutEvent" << endl;
     focus_out(event);
     QWidget::focusOutEvent(event);
 }

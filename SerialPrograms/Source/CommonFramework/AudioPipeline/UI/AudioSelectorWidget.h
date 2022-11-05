@@ -13,7 +13,6 @@
 #include <mutex>
 #include <QWidget>
 #include <QSlider>
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 

@@ -11,8 +11,6 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "ClientSource/Connection/MessageLogger.h"
-#include "SerialPortOption.h"
 #include "SerialPortSession.h"
 
 namespace PokemonAutomation{

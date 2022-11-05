@@ -21,7 +21,6 @@
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;

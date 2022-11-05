@@ -1,4 +1,6 @@
-# How to Build (Qt 6.3) - Windows
+# How to Build (Qt 6.4) - Windows
+
+***Note: Qt 6.4 is not recommended at this time due to a bug in their video pipeline that distorts colors.***
 
 ## Build Tools:
 
