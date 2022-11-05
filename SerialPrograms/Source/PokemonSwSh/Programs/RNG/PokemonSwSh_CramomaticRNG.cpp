@@ -8,7 +8,11 @@
  *
  */
 
+#include <algorithm>
+#include <set>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -17,6 +21,8 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
@@ -24,7 +30,9 @@
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h"
 
-#include <algorithm>
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -76,7 +84,12 @@ std::unique_ptr<StatsTracker> CramomaticRNG_Descriptor::make_stats() const{
 }
 
 CramomaticRNG::CramomaticRNG()
-    : NUM_APRICORN_ONE(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>Required to read the ball received.",
+        PokemonNameReader::instance().languages(),
+        true
+    )
+    , NUM_APRICORN_ONE(
         "<b>Primary Apricorns:</b><br>Number of Apricorns in the selected slot.",
         LockWhileRunning::LOCKED,
         0
@@ -137,6 +150,8 @@ CramomaticRNG::CramomaticRNG()
 
 {
     PA_ADD_OPTION(START_LOCATION);
+
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(NUM_APRICORN_ONE);
     PA_ADD_OPTION(NUM_APRICORN_TWO);
     PA_ADD_OPTION(NUM_NPCS);
@@ -306,13 +321,21 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 }
 
-bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     // receive ball and refuse to use the cram-o-matic again
     VideoOverlaySet boxes(env.console);
+
     SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     arrow_detector.make_overlays(boxes);
+
+    InferenceBoxScope dialog_text(env.console, 0.21, 0.80, 0.53, 0.17);
+    InferenceBoxScope dialog_box(env.console, 0.70, 0.90, 0.03, 0.05);
+    const double LOG10P_THRESHOLD = -1.5;
+    std::string best_ball;
+
     size_t presses = 0;
     bool arrow_detected = false;
+
     while (presses < 30 && !arrow_detected) {
         presses++;
         pbf_press_button(context, BUTTON_B, 10, 165);
@@ -322,12 +345,31 @@ bool CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseCon
         if (SAVE_SCREENSHOTS) {
             dump_debug_image(env.logger(), "cramomatic-rng", "receive", *screen);
         }
+
+        //  If we detect a dialog box, attempt to read the ball that was received.
+        ImageStats stats = image_stats(extract_box_reference(*screen, dialog_box));
+//        cout << stats.average << stats.stddev << endl;
+        if (is_grey(stats, 0, 200, 5)){
+            OCR::StringMatchResult result = PokeballNameReader::instance().read_substring(
+                env.console, LANGUAGE,
+                extract_box_reference(*screen, dialog_text),
+                {{0xff007f7f, 0xffc0ffff}}
+            );
+            result.clear_beyond_log10p(LOG10P_THRESHOLD);
+            if (best_ball.empty() && !result.results.empty()){
+                auto iter = result.results.begin();
+                if (iter->first < LOG10P_THRESHOLD){
+                    best_ball = iter->second.token;
+                }
+            }
+        }
+
         if (arrow_detector.detect(*screen)) {
             arrow_detected = true;
         }
     }
     pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
-    return arrow_detected;
+    return {arrow_detected, best_ball};
 }
 
 void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -358,6 +400,20 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     else {
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
+
+    static const std::set<std::string> APRIBALLS{
+        "fast-ball",
+        "friend-ball",
+        "lure-ball",
+        "level-ball",
+        "heavy-ball",
+        "love-ball",
+        "moon-ball",
+    };
+    static const std::set<std::string> RARE_BALLS{
+        "sport-ball",
+        "safari-ball",
+    };
 
     Xoroshiro128Plus rng(0, 0);
     bool is_state_valid = false;
@@ -393,6 +449,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         if (!is_state_valid) {
             rng = Xoroshiro128Plus(find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES));
+//            rng = Xoroshiro128Plus(100, 10000);
             is_state_valid = true;
             stats.reads++;
         }
@@ -445,8 +502,28 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             continue;
         }
 
-        bool did_refuse = receive_ball(env, context);
-        if (did_refuse || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
+        std::pair<bool, std::string> result = receive_ball(env, context);
+//        cout << "Ball Slug = " << ball << endl;
+        if (result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
+            const std::string& ball = result.second;
+            stats.total_balls++;
+
+            auto iter = APRIBALLS.find(ball);
+            if (iter != APRIBALLS.end()){
+                stats.apri_balls++;
+            }
+
+            iter = RARE_BALLS.find(ball);
+            if (iter != RARE_BALLS.end()){
+                stats.sport_safari_balls++;
+            }
+        }else{
+            is_state_valid = false;
+            stats.errors++;
+        }
+
+#if 0
+        if (!ball.empty() || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
             int amount = target.is_bonus ? 5 : 1;
             if (target.is_bonus) {
                 stats.bonus++;
@@ -462,6 +539,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             is_state_valid = false;
             stats.errors++;
         }
+#endif
         env.update_stats();
 
         state_errors = 0;
