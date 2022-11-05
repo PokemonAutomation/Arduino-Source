@@ -64,7 +64,7 @@ private:
 };
 
 
-
+// Detect the Switch system update screen when you are about to enter a game from Switch Home screen
 class UpdateMenuDetector : public StaticScreenDetector{
 public:
     UpdateMenuDetector();

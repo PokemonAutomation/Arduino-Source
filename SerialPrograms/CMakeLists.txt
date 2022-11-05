@@ -1561,6 +1561,8 @@ file(GLOB MAIN_SOURCES
     Source/Tests/CommandLineTests.h
     Source/Tests/Kernels_Tests.cpp
     Source/Tests/Kernels_Tests.h
+    Source/Tests/NintendoSwitch_Tests.cpp
+    Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
     Source/Tests/PokemonSwSh_Tests.cpp
