@@ -63,11 +63,11 @@ public:
     {
         m_display_order.emplace_back("Iterations");
         m_display_order.emplace_back("Seed Reads");
-        m_display_order.emplace_back("Errors");
+        m_display_order.emplace_back("Errors", true);
         m_display_order.emplace_back("Balls");
         m_display_order.emplace_back("Apriballs");
         m_display_order.emplace_back("Safari/Sport Balls");
-        m_display_order.emplace_back("Bonus");
+        m_display_order.emplace_back("Bonus", true);
     }
 
 public:
@@ -503,24 +503,34 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
 
         std::pair<bool, std::string> result = receive_ball(env, context);
+
+        //  Update ball stats.
+        if (!result.second.empty()){
+            stats.total_balls++;
+        }
+        auto iter = APRIBALLS.find(result.second);
+        if (iter != APRIBALLS.end()){
+            stats.apri_balls++;
+        }
+        iter = RARE_BALLS.find(result.second);
+        if (iter != RARE_BALLS.end()){
+            stats.sport_safari_balls++;
+        }
+
+        //  Out of apricorns.
+        if (!result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
+            throw ProgramFinishedException();
+        }
+
+
+#if 0
 //        cout << "Ball Slug = " << ball << endl;
         if (result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
-            const std::string& ball = result.second;
-            stats.total_balls++;
-
-            auto iter = APRIBALLS.find(ball);
-            if (iter != APRIBALLS.end()){
-                stats.apri_balls++;
-            }
-
-            iter = RARE_BALLS.find(ball);
-            if (iter != RARE_BALLS.end()){
-                stats.sport_safari_balls++;
-            }
         }else{
             is_state_valid = false;
             stats.errors++;
         }
+#endif
 
 #if 0
         if (!ball.empty() || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
