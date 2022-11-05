@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Pokemon_EncounterBotOptions_H
 #define PokemonAutomation_Pokemon_EncounterBotOptions_H
 
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

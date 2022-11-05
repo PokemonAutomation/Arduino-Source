@@ -139,7 +139,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    ImageFloatBox box(0.21, 0.80, 0.53, 0.17);
 
+    VideoSnapshot frame = feed.snapshot();
+    ImageViewRGB32 image = extract_box_reference(frame, box);
+
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff007f7f, 0xffc0ffff, false);
+    filtered.save("test.png");
+
+    PokeballNameReader::instance().read_substring(
+        logger, Language::English,
+        image,
+        {{0xff007f7f, 0xff80ffff}}, 0
+    );
+
+
+#if 0
     ImageRGB32 image("GermanUpdate2.png");
 //    auto image = feed.snapshot();
 //    HomeDetector detector;
@@ -147,7 +162,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
-
+#endif
 
 //    ImageRGB32 image("ExclamationFalsePositive.png");
 //    find_exclamation_marks(image);

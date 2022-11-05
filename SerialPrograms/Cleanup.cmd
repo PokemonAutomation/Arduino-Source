@@ -19,4 +19,4 @@ rd /s /q "release\"
 rd /s /q "SerialPrograms\"
 rd /s /q "ErrorDumps\"
 
-rd /s /q "..\build-SerialPrograms*"
+::rd /s /q "..\build-SerialPrograms*"

@@ -25,11 +25,11 @@ ShinyHuntTracker::ShinyHuntTracker(bool shiny_types)
     m_display_order.emplace_back("Encounters");
     m_display_order.emplace_back("Errors", true);
     if (shiny_types){
-        m_display_order.emplace_back("Star Shinies");
-        m_display_order.emplace_back("Square Shinies");
+        m_display_order.emplace_back("Star Shinies", true);
+        m_display_order.emplace_back("Square Shinies", true);
         m_display_order.emplace_back("Unknown Shinies", true);
     }else{
-        m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Shinies", true);
     }
     m_display_order.emplace_back("Caught", true);
 }
