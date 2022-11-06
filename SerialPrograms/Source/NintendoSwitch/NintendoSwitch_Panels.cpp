@@ -25,6 +25,10 @@
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
+#ifdef PA_OFFICIAL
+#include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
+#endif
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -56,6 +60,9 @@ std::vector<PanelEntry> make_panels(){
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
+#ifdef PA_OFFICIAL
+        add_panels(ret);
+#endif
     }
 
     return ret;

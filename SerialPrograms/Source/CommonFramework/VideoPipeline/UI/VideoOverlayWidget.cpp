@@ -102,7 +102,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         for (const auto& item: *m_texts){
             painter.setPen(QColor((uint32_t)item.color));
             QFont text_font = this->font();
-            text_font.setPointSizeF(item.font_size);
+            text_font.setPointSizeF(item.font_size * height / 100.0);
             painter.setFont(text_font);
 
             const int xmin = std::max((int)(width * item.x + 0.5), 1);

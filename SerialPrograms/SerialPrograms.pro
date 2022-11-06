@@ -17,10 +17,6 @@ CONFIG += force_debug_info
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-exists(../../Internal/SerialPrograms/TelemetryURLs.h){
-    DEFINES += PA_OFFICIAL
-}
-
 win32-g++{
     CONFIG += c++1z
 
@@ -1598,6 +1594,16 @@ HEADERS += \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
     Source/Tests/TestUtils.h
+
+
+
+exists(../../Internal/SerialPrograms/TelemetryURLs.h){
+    DEFINES += PA_OFFICIAL
+    SOURCES += ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp
+    HEADERS += ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h
+}
+
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -64,11 +64,8 @@ public:
 
 public:
     std::vector<Box> boxes() const;
-
     std::vector<OverlayText> texts() const;
-
     std::vector<OverlayText> log_texts() const;
-
     std::vector<Box> log_text_background() const;
 
     // Override `VideoOverlay::add_box()`. See the overridden function for more comments.
@@ -105,13 +102,9 @@ private:
 
 private:
     mutable SpinLock m_lock;
-
     std::map<const ImageFloatBox*, Color> m_boxes;
-
     std::set<const OverlayText*> m_texts;
-
     std::deque<OverlayText> m_log_texts;
-
     std::set<Listener*> m_listeners;
 };
 

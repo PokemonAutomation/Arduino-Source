@@ -10,15 +10,15 @@ namespace PokemonAutomation{
 
 namespace {
 
-const float log_xmin = 0.025f;
-const float log_width = 0.35f;
-const size_t log_max_lines = 20;
-const float log_font_size = 4.0f;
-const float log_line_spacing = 0.04f;
-const float log_x_border = 0.009f;
-const float log_y_border = 0.016f;
-const float log_ymax = 0.95f;
-const Color log_bg_color{200, 10, 10, 10};
+const float LOG_MIN_X = 0.025f;
+const float LOG_WIDTH = 0.35f;
+const size_t LOG_MAX_LINES = 20;
+const float LOG_FONT_SIZE = 4.0f;
+const float LOG_LINE_SPACING = 0.04f;
+const float LOG_BORDER_X = 0.009f;
+const float LOG_BORDER_Y = 0.016f;
+const float LOG_MAX_Y = 0.95f;
+const Color LOG_BACKGROUND_COLOR{200, 10, 10, 10};
 
 }
 
@@ -106,16 +106,16 @@ std::vector<OverlayText> VideoOverlaySession::texts() const{
 void VideoOverlaySession::add_log_text(std::string message, Color color){
     SpinLockGuard lg(m_lock, "VideoOverlay::add_log_text()");
     const size_t old_num_lines = m_log_texts.size();
-    m_log_texts.emplace_front(std::move(message), log_xmin + log_x_border, 0.0f, log_font_size, color);
+    m_log_texts.emplace_front(std::move(message), LOG_MIN_X + LOG_BORDER_X, 0.0f, LOG_FONT_SIZE, color);
 
-    if (m_log_texts.size() > log_max_lines){
+    if (m_log_texts.size() > LOG_MAX_LINES){
         m_log_texts.pop_back();
     }
 
-    float y = log_ymax - log_y_border;
+    float y = LOG_MAX_Y - LOG_BORDER_Y;
     for(auto& item : m_log_texts){
         item.y = y;
-        y -= log_line_spacing;
+        y -= LOG_LINE_SPACING;
     }
     
     push_log_text_update();
@@ -166,9 +166,9 @@ void VideoOverlaySession::push_text_background_update(){
 
     std::shared_ptr<std::vector<Box>> ptr = std::make_shared<std::vector<Box>>();
     if (m_log_texts.size() > 0){
-        const float log_bg_height = log_max_lines * log_line_spacing + 2*log_y_border;
-        ImageFloatBox region(log_xmin, log_ymax - log_bg_height, log_width, log_bg_height);
-        ptr->emplace_back(region, log_bg_color);
+        const float log_bg_height = LOG_MAX_LINES * LOG_LINE_SPACING + 2*LOG_BORDER_Y;
+        ImageFloatBox region(LOG_MIN_X, LOG_MAX_Y - log_bg_height, LOG_WIDTH, log_bg_height);
+        ptr->emplace_back(region, LOG_BACKGROUND_COLOR);
     }
     for (Listener* listeners : m_listeners){
         listeners->log_text_background_update(ptr);
@@ -179,9 +179,9 @@ std::vector<VideoOverlaySession::Box> VideoOverlaySession::log_text_background()
     SpinLockGuard lg(m_lock);
     std::vector<Box> ret;
     if (m_log_texts.size() > 0){
-        const float log_bg_height = log_max_lines * log_line_spacing + 2*log_y_border;
-        ImageFloatBox region(log_xmin, log_ymax - log_bg_height, log_width, log_bg_height);
-        ret.emplace_back(region, log_bg_color);
+        const float log_bg_height = LOG_MAX_LINES * LOG_LINE_SPACING + 2*LOG_BORDER_Y;
+        ImageFloatBox region(LOG_MIN_X, LOG_MAX_Y - log_bg_height, LOG_WIDTH, log_bg_height);
+        ret.emplace_back(region, LOG_BACKGROUND_COLOR);
     }
     return ret;
 }

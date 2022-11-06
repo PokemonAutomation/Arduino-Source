@@ -99,6 +99,7 @@ private:
 };
 
 
+
 // Used by video inference sessions to manage inference boxes.
 // VideoOverlaySet will be passed to the inference callbacks in a session
 // to store inference boxes. When the session ends, VideoOverlaySet::clear()
@@ -126,27 +127,29 @@ private:
     std::deque<InferenceBoxScope> m_boxes;
 };
 
+
+
 // A text as part of the video overlay.
-struct OverlayText {
+struct OverlayText{
     // Text content.
     // Note overlay cannot handle newline character "\n".
     std::string message;
     // x coordinate of the text start, range: 0.0-1.0.
-    float x;
+    double x;
     // y coordinate of the text start, range: 0.0-1.0.
-    float y;
+    double y;
     // Font point size. This value is relative to the video overlay widget height. So you can
     // set it without considering overlay widget resolution.
     // Value of 4.0 gives a large, comfortable font size while not too large to clutter the screen.
-    float font_size;
+    double font_size;
     // Text color.
     Color color;
 
 public:
     OverlayText(std::string message,
-        float x,
-        float y,
-        float font_size = 1.0f,
+        double x,
+        double y,
+        double font_size = 1.0,
         Color color = COLOR_BLUE
     )
         : message(std::move(message))
@@ -161,21 +164,22 @@ public:
 
 // A text as part of the video overlay.
 // It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
-class OverlayTextScope : public OverlayText {
+class OverlayTextScope : public OverlayText{
+    OverlayTextScope(const OverlayTextScope&) = delete;
+    void operator=(const OverlayTextScope&) = delete;
+
 public:
     ~OverlayTextScope(){
         m_overlay.remove_text(*this);
     }
-    OverlayTextScope(const OverlayTextScope&) = delete;
-    void operator=(const OverlayTextScope&) = delete;
 
 public:
     OverlayTextScope(
         VideoOverlay& overlay,
         std::string message,
-        float x,
-        float y,
-        float font_size = 1.0f,
+        double x,
+        double y,
+        double font_size = 1.0,
         Color color = COLOR_BLUE
     )
         : OverlayText(message, x, y, font_size, color)
@@ -188,23 +192,27 @@ private:
     VideoOverlay& m_overlay;
 };
 
+
+
 // Used to clear log messages on video overlay automatically.
 // Place this at the beginning of a program, so that when the program exits, it will
 // clear the log messages from the overlay automatically.
-class OverlayLogTextScope {
+class OverlayLogTextScope{
+    OverlayLogTextScope(const OverlayLogTextScope&) = delete;
+    void operator=(const OverlayLogTextScope&) = delete;
+
 public:
-    OverlayLogTextScope(
-        VideoOverlay& overlay
-    ) :m_overlay(overlay) {}
+    OverlayLogTextScope(VideoOverlay& overlay)
+        : m_overlay(overlay)
+    {}
     ~OverlayLogTextScope(){
         m_overlay.clear_log_texts();
     }
-    OverlayLogTextScope(const OverlayLogTextScope&) = delete;
-    void operator=(const OverlayLogTextScope&) = delete;
 
 private:
     VideoOverlay& m_overlay;
 };
+
 
 
 }
