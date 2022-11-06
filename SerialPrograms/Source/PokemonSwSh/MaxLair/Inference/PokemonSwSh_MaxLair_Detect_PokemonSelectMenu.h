@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

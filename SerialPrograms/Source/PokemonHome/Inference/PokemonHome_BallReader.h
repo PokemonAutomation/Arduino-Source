@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonHome_BallReader_H
 
 #include <string>
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 

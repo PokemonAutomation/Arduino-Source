@@ -6,7 +6,7 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "FrozenImageDetector.h"
 
 #include <iostream>

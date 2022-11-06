@@ -6,7 +6,7 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonBDSP_BoxShinyDetector.h"
 
 #include <iostream>

@@ -24,20 +24,16 @@ public:
     void set_enabled_boxes(bool visible) { m_enabled_boxes = visible;}
     void set_enabled_text(bool visible) { m_enabled_text = visible;}
     void set_enabled_log(bool visible) {m_enabled_log = visible;}
+    void set_enabled_stats(bool visible) {m_enabled_stats = visible;}
 
 private:
-    // Override VideoOverlaySession::Listener::box_update().
-    // This function is called asynchronously when there is change of boxes in VideoOverlaySession.
-    virtual void box_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
-    // Override VideoOverlaySession::Listener::text_update().
-    // This function is called asynchronously when there is change of texts in VideoOverlaySession.
-    virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
-    // Override VideoOverlaySession::Listener::log_text_update().
-    // This function is called asynchronously when there is change of log texts in VideoOverlaySession.
-    virtual void log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
-    // Override VideoOverlaySession::Listener::log_text_background_update().
-    // This function is called asynchronously when there is change of log text background in VideoOverlaySession.
-    virtual void log_text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
+    //  Asynchronous changes to the overlays.
+
+    virtual void update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
+    virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
+    virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
+    virtual void update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
+    virtual void update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent*) override;
@@ -50,10 +46,12 @@ private:
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
     std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
+    std::shared_ptr<const std::vector<OverlayStat>> m_stats;
 
     bool m_enabled_boxes;
     bool m_enabled_text;
     bool m_enabled_log;
+    bool m_enabled_stats;
 };
 
 

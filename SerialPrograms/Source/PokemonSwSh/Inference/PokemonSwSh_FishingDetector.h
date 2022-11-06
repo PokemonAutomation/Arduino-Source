@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_FishingDetector_H
 
 #include <chrono>
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

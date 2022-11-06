@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "BlackBorderCheck.h"

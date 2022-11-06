@@ -10,7 +10,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_OrbeetleAttackAnimationDetector_H
 #define PokemonAutomation_PokemonSwSh_OrbeetleAttackAnimationDetector_H
 
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation {

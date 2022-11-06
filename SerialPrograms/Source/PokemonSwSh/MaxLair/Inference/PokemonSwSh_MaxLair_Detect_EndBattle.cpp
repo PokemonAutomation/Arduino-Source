@@ -6,7 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_MaxLair_Detect_EndBattle.h"
 
 #include <iostream>

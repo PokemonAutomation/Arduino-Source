@@ -12,7 +12,7 @@
 
 #include <chrono>
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
     class CancellableScope;

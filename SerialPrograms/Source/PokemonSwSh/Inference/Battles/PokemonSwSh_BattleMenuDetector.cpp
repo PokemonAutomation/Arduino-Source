@@ -7,7 +7,7 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_BattleMenuDetector.h"
 
 #include <iostream>

@@ -9,7 +9,7 @@
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "BlackScreenDetector.h"
 
 //#include <iostream>

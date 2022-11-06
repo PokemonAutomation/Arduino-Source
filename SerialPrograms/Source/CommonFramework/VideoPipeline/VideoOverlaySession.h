@@ -44,16 +44,14 @@ public:
     // Video overlay UI class (e.g. VideoOverlayWidget) inherits this listener to listen
     // to the overlay session.
     struct Listener{
-        // `VideoOverlaySession` will call this function to give the newest boxes to the listener.
-        virtual void box_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        //  VideoOverlaySession will call these when they change.
 
-        // `VideoOverlaySession` will call this function to give the newest texts to the listener.
-        virtual void text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
+        virtual void update_boxes(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
+        virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
+        virtual void update_log_background(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        virtual void update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats){}
 
-        // `VideoOverlaySession` will call this function to give the newest log texts to the listener.
-        virtual void log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
-        // `VideoOverlaySession` will call this function to give the newest log text background to the listener.
-        virtual void log_text_background_update(const std::shared_ptr<const std::vector<Box>>& boxes){}
     };
 
     // Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
@@ -102,9 +100,11 @@ private:
 
 private:
     mutable SpinLock m_lock;
+
     std::map<const ImageFloatBox*, Color> m_boxes;
     std::set<const OverlayText*> m_texts;
     std::deque<OverlayText> m_log_texts;
+
     std::set<Listener*> m_listeners;
 };
 

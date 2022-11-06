@@ -14,7 +14,7 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "PokemonBDSP_BoxGenderDetector.h"
 

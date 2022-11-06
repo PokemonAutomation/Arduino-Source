@@ -9,7 +9,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 

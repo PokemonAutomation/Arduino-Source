@@ -55,7 +55,7 @@ void VideoOverlaySession::push_box_update(){
         ptr->emplace_back(*item.first, item.second);
     }
     for (Listener* listeners : m_listeners){
-        listeners->box_update(ptr);
+        listeners->update_boxes(ptr);
     }
 }
 
@@ -90,7 +90,7 @@ void VideoOverlaySession::push_text_update(){
         ptr->emplace_back(*item);
     }
     for (Listener* listeners : m_listeners){
-        listeners->text_update(ptr);
+        listeners->update_text(ptr);
     }
 }
 
@@ -146,7 +146,7 @@ void VideoOverlaySession::push_log_text_update(){
         ptr->emplace_back(item);
     }
     for (Listener* listeners : m_listeners){
-        listeners->log_text_update(ptr);
+        listeners->update_log_text(ptr);
     }
 }
 
@@ -171,7 +171,7 @@ void VideoOverlaySession::push_text_background_update(){
         ptr->emplace_back(region, LOG_BACKGROUND_COLOR);
     }
     for (Listener* listeners : m_listeners){
-        listeners->log_text_background_update(ptr);
+        listeners->update_log_background(ptr);
     }
 }
 

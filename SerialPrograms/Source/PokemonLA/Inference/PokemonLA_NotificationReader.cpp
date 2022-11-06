@@ -4,14 +4,10 @@
  *
  */
 
-#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_NotificationReader.h"
 
 #include <iostream>

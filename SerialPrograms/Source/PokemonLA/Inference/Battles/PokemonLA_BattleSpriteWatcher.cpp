@@ -6,12 +6,9 @@
 
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/ImageTools/ImageGradient.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_BattleSpriteWatcher.h"
 
 #include <vector>

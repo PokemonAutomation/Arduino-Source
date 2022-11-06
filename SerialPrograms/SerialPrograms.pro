@@ -1047,7 +1047,9 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h \
     Source/CommonFramework/VideoPipeline/VideoFeed.h \
     Source/CommonFramework/VideoPipeline/VideoOverlay.h \
+    Source/CommonFramework/VideoPipeline/VideoOverlayScopes.h \
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.h \
+    Source/CommonFramework/VideoPipeline/VideoOverlayTypes.h \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \

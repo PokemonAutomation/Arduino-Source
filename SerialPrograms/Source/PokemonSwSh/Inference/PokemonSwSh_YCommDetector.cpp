@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSwSh_YCommDetector.h"
 

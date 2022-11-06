@@ -7,7 +7,7 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_BattleMoveSelectionDetector.h"
 
 #include <iostream>

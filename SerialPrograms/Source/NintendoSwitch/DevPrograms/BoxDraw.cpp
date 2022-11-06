@@ -6,7 +6,7 @@
 
 #include <mutex>
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "BoxDraw.h"
 
 namespace PokemonAutomation{

@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch_DetectHome.h"
 
 //#include <iostream>

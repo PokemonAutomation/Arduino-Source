@@ -34,6 +34,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_enabled_boxes(true)
     , m_enabled_text(true)
     , m_enabled_log(true)
+    , m_enabled_stats(false)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -43,24 +44,25 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
 }
 
 
-void VideoOverlayWidget::box_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes){
-    SpinLockGuard lg(m_lock, "VideoOverlay::box_update()");
+void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes){
+    SpinLockGuard lg(m_lock, "VideoOverlay::update_boxes()");
     m_boxes = boxes;
 }
-
-void VideoOverlayWidget::text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){
-    SpinLockGuard lg(m_lock, "VideoOverlay::text_update()");
+void VideoOverlayWidget::update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){
+    SpinLockGuard lg(m_lock, "VideoOverlay::update_text()");
     m_texts = texts;
 }
-
-void VideoOverlayWidget::log_text_update(const std::shared_ptr<const std::vector<OverlayText>>& texts){
-    SpinLockGuard lg(m_lock, "VideoOverlay::log_text_update()");
+void VideoOverlayWidget::update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){
+    SpinLockGuard lg(m_lock, "VideoOverlay::update_log_text()");
     m_log_texts = texts;
 }
-
-void VideoOverlayWidget::log_text_background_update(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
-    SpinLockGuard lg(m_lock, "VideoOverlay::log_text_background_update()");
+void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
+    SpinLockGuard lg(m_lock, "VideoOverlay::update_log_background()");
     m_log_text_bg_boxes = bg_boxes;
+}
+void VideoOverlayWidget::update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats){
+    SpinLockGuard lg(m_lock, "VideoOverlay::update_stats()");
+    m_stats = stats;
 }
 
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
@@ -137,6 +139,10 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 
             painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
         }
+    }
+
+    if (m_enabled_stats){
+
     }
 }
 

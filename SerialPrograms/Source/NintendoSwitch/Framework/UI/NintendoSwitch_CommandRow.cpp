@@ -47,6 +47,11 @@ CommandRow::CommandRow(
     m_overlay_log->setChecked(true);
     command_row->addWidget(m_overlay_log);
 
+    m_overlay_stats = new QCheckBox("Stats", this);
+    m_overlay_stats->setChecked(false);
+    m_overlay_stats->setEnabled(false);
+    command_row->addWidget(m_overlay_stats);
+
     command_row->addSpacing(5);
 
     m_load_profile_button = new QPushButton("Load Profile", this);
@@ -75,6 +80,10 @@ CommandRow::CommandRow(
     connect(
         m_overlay_log, &QCheckBox::stateChanged,
         this, [this](int){ emit set_overlay_log(m_overlay_log->isChecked()); }
+    );
+    connect(
+        m_overlay_stats, &QCheckBox::stateChanged,
+        this, [this](int){ emit set_overlay_stats(m_overlay_stats->isChecked()); }
     );
     connect(
         m_load_profile_button, &QPushButton::clicked,

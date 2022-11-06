@@ -10,7 +10,7 @@
 #include <string>
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/Options/StringSelectOption.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{
     namespace ImageMatch{

@@ -11,7 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/OCR/OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{

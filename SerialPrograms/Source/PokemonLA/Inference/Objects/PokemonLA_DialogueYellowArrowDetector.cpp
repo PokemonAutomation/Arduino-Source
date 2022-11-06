@@ -9,7 +9,7 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonLA_DialogueYellowArrowDetector.h"
 

@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 

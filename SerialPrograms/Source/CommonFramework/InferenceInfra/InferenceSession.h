@@ -11,7 +11,7 @@
 #include <vector>
 #include <map>
 #include <atomic>
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "InferenceCallback.h"
 
 namespace PokemonAutomation{
