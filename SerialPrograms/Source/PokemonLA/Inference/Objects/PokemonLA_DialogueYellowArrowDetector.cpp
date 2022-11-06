@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <utility>
 #include <vector>
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
