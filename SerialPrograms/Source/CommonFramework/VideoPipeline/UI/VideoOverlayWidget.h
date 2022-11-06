@@ -21,10 +21,9 @@ public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
-    // Whether to hide inference visualization
-    void set_inference_hidden(bool hidden) { m_inference_hidden = hidden;}
-    // Whether to hide log text visualization
-    void set_log_text_hidden(bool hidden) {m_log_hidden = hidden;}
+    void set_enabled_boxes(bool visible) { m_enabled_boxes = visible;}
+    void set_enabled_text(bool visible) { m_enabled_text = visible;}
+    void set_enabled_log(bool visible) {m_enabled_log = visible;}
 
 private:
     // Override VideoOverlaySession::Listener::box_update().
@@ -52,8 +51,9 @@ private:
     std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
 
-    bool m_inference_hidden;
-    bool m_log_hidden;
+    bool m_enabled_boxes;
+    bool m_enabled_text;
+    bool m_enabled_log;
 };
 
 

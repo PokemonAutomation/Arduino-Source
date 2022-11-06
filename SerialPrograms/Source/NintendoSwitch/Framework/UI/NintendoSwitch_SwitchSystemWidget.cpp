@@ -100,15 +100,21 @@ SwitchSystemWidget::SwitchSystemWidget(
         }
     );
     connect(
-        m_command, &CommandRow::set_log_text_overlay,
+        m_command, &CommandRow::set_overlay_boxes,
         m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_log_overlay_enabled(enabled);
+            m_camera_widget->set_overlay_boxes_enabled(enabled);
         }
     );
     connect(
-        m_command, &CommandRow::set_inference_overlay,
+        m_command, &CommandRow::set_overlay_text,
         m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_inference_overlay_enabled(enabled);
+            m_camera_widget->set_overlay_text_enabled(enabled);
+        }
+    );
+    connect(
+        m_command, &CommandRow::set_overlay_log,
+        m_camera_widget, [this](bool enabled){
+            m_camera_widget->set_overlay_log_enabled(enabled);
         }
     );
     connect(

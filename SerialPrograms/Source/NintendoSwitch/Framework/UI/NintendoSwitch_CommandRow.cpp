@@ -33,14 +33,20 @@ CommandRow::CommandRow(
     command_row->addWidget(m_status, 12);
     command_row->addSpacing(5);
 
-    m_log_overlay_box = new QCheckBox("Log Overlay", this);
-    m_log_overlay_box->setChecked(false);
-    command_row->addWidget(m_log_overlay_box, 4);
-    command_row->addSpacing(5);
+    command_row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
-    m_inference_box = new QCheckBox("Inference Overlay", this);
-    m_inference_box->setChecked(true);
-    command_row->addWidget(m_inference_box, 4);
+    m_overlay_boxes = new QCheckBox("Boxes", this);
+    m_overlay_boxes->setChecked(true);
+    command_row->addWidget(m_overlay_boxes);
+
+    m_overlay_text = new QCheckBox("Text", this);
+    m_overlay_text->setChecked(true);
+    command_row->addWidget(m_overlay_text);
+
+    m_overlay_log = new QCheckBox("Log", this);
+    m_overlay_log->setChecked(true);
+    command_row->addWidget(m_overlay_log);
+
     command_row->addSpacing(5);
 
     m_load_profile_button = new QPushButton("Load Profile", this);
@@ -59,12 +65,16 @@ CommandRow::CommandRow(
     update_ui();
 
     connect(
-        m_log_overlay_box, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_log_text_overlay(m_log_overlay_box->isChecked()); }
+        m_overlay_boxes, &QCheckBox::stateChanged,
+        this, [this](int){ emit set_overlay_boxes(m_overlay_boxes->isChecked()); }
     );
     connect(
-        m_inference_box, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_inference_overlay(m_inference_box->isChecked()); }
+        m_overlay_text, &QCheckBox::stateChanged,
+        this, [this](int){ emit set_overlay_text(m_overlay_text->isChecked()); }
+    );
+    connect(
+        m_overlay_log, &QCheckBox::stateChanged,
+        this, [this](int){ emit set_overlay_log(m_overlay_log->isChecked()); }
     );
     connect(
         m_load_profile_button, &QPushButton::clicked,

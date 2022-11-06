@@ -42,8 +42,9 @@ public:
     );
     ~CameraSelectorWidget();
 
-    void set_inference_overlay_enabled(bool enabled);
-    void set_log_overlay_enabled(bool enabled);
+    void set_overlay_boxes_enabled(bool enabled);
+    void set_overlay_text_enabled(bool enabled);
+    void set_overlay_log_enabled(bool enabled);
 
 private:
     void update_camera_list();

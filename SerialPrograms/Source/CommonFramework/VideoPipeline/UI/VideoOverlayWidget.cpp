@@ -31,8 +31,9 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
     , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
     , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
-    , m_inference_hidden(false)
-    , m_log_hidden(true)
+    , m_enabled_boxes(true)
+    , m_enabled_text(true)
+    , m_enabled_log(true)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -71,7 +72,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
 
-    if (!m_inference_hidden){
+    if (m_enabled_boxes){
         for (const auto& item : *m_boxes){
             painter.setPen(QColor((uint32_t)item.color));
     //        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
@@ -98,7 +99,9 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
                 ymax - ymin
             );
         }
+    }
 
+    if (m_enabled_text){
         for (const auto& item: *m_texts){
             painter.setPen(QColor((uint32_t)item.color));
             QFont text_font = this->font();
@@ -112,7 +115,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         }
     }
 
-    if (!m_log_hidden){
+    if (m_enabled_log){
         for (const auto& item : *m_log_text_bg_boxes){
             QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
             painter.setPen(box_color);

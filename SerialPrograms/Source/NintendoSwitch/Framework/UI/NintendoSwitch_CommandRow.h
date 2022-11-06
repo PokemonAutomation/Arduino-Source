@@ -33,8 +33,9 @@ public:
     bool on_key_release(Qt::Key key);
 
 signals:
-    void set_inference_overlay(bool enabled);
-    void set_log_text_overlay(bool enabled);
+    void set_overlay_boxes(bool enabled);
+    void set_overlay_text(bool enabled);
+    void set_overlay_log(bool enabled);
     void load_profile();
     void save_profile();
     void screenshot_requested();
@@ -49,8 +50,9 @@ private:
     bool m_allow_commands_while_running;
     QComboBox* m_command_box;
     QLabel* m_status;
-    QCheckBox* m_log_overlay_box;
-    QCheckBox* m_inference_box;
+    QCheckBox* m_overlay_log;
+    QCheckBox* m_overlay_text;
+    QCheckBox* m_overlay_boxes;
     QPushButton* m_load_profile_button;
     QPushButton* m_save_profile_button;
     QPushButton* m_screenshot_button;
