@@ -27,7 +27,7 @@ bool read_type_array(
     ConsoleHandle& console,
     const ImageViewRGB32& screen,
     const ImageFloatBox& box,
-    std::deque<InferenceBoxScope>& hits,
+    std::deque<OverlayBoxScope>& hits,
     size_t count,
     PokemonType* type, ImagePixelBox* boxes
 );

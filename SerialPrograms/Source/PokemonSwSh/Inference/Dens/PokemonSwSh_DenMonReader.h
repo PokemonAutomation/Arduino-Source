@@ -49,10 +49,10 @@ public:
 private:
     const ImageMatch::SilhouetteDictionaryMatcher& m_matcher;
     Logger& m_logger;
-    InferenceBoxScope m_white;
-    InferenceBoxScope m_den_color;
-    InferenceBoxScope m_lair_pink;
-    InferenceBoxScope m_sprite;
+    OverlayBoxScope m_white;
+    OverlayBoxScope m_den_color;
+    OverlayBoxScope m_lair_pink;
+    OverlayBoxScope m_sprite;
 };
 
 

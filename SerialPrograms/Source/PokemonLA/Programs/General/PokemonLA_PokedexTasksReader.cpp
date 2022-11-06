@@ -28,15 +28,15 @@ public:
     PokemonTasksReader(ConsoleHandle& console)
         : m_console(console)
         , m_tasks_box{
-            InferenceBoxScope(console, 0.400, 0.190, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.244, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.298, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.353, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.406, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.460, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.514, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.568, 0.040, 0.045),
-            InferenceBoxScope(console, 0.400, 0.622, 0.040, 0.045)
+            OverlayBoxScope(console, 0.400, 0.190, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.244, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.298, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.353, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.406, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.460, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.514, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.568, 0.040, 0.045),
+            OverlayBoxScope(console, 0.400, 0.622, 0.040, 0.045)
         }
     {}
 
@@ -53,7 +53,7 @@ public:
 
 private:
     ConsoleHandle& m_console;
-    std::array<InferenceBoxScope, 9> m_tasks_box;
+    std::array<OverlayBoxScope, 9> m_tasks_box;
 };
 
 PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()

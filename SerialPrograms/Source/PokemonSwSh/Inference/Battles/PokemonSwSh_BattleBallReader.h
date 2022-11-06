@@ -39,9 +39,9 @@ private:
     const PokeballNameReader& m_name_reader;
     Language m_language;
     ConsoleHandle& m_console;
-    InferenceBoxScope m_box_sprite;
-    InferenceBoxScope m_box_name;
-    InferenceBoxScope m_box_quantity;
+    OverlayBoxScope m_box_sprite;
+    OverlayBoxScope m_box_name;
+    OverlayBoxScope m_box_quantity;
 };
 
 

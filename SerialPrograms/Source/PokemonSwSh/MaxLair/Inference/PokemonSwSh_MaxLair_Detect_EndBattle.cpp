@@ -90,10 +90,10 @@ bool PokemonCaughtMenuDetector::detect(const ImageViewRGB32& screen){
 
 
 size_t count_catches(VideoOverlay& overlay, const ImageViewRGB32& screen){
-    InferenceBoxScope box0(overlay, 0.780, 0.400 + 0*0.133, 0.030, 0.030, COLOR_BLUE);
-    InferenceBoxScope box1(overlay, 0.780, 0.400 + 1*0.133, 0.030, 0.030, COLOR_BLUE);
-    InferenceBoxScope box2(overlay, 0.780, 0.400 + 2*0.133, 0.030, 0.030, COLOR_BLUE);
-    InferenceBoxScope box3(overlay, 0.780, 0.400 + 3*0.133, 0.030, 0.030, COLOR_BLUE);
+    OverlayBoxScope box0(overlay, 0.780, 0.400 + 0*0.133, 0.030, 0.030, COLOR_BLUE);
+    OverlayBoxScope box1(overlay, 0.780, 0.400 + 1*0.133, 0.030, 0.030, COLOR_BLUE);
+    OverlayBoxScope box2(overlay, 0.780, 0.400 + 2*0.133, 0.030, 0.030, COLOR_BLUE);
+    OverlayBoxScope box3(overlay, 0.780, 0.400 + 3*0.133, 0.030, 0.030, COLOR_BLUE);
 
     size_t count = 0;
     if (is_black(image_stats(extract_box_reference(screen, box0)))){

@@ -48,7 +48,7 @@ public:
 protected:
     VideoOverlay& m_overlay;
     DialogArrowDetector m_detector;
-    FixedLimitVector<InferenceBoxScope> m_arrows;
+    FixedLimitVector<OverlayBoxScope> m_arrows;
 };
 
 

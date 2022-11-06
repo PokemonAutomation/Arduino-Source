@@ -167,7 +167,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
-    InferenceBoxScope self(
+    OverlayBoxScope self(
         console,
         OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
         OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
@@ -284,7 +284,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     ConsoleHandle& console, BotBaseContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
-    InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
+    OverlayBoxScope target_box(console, target.second.box, COLOR_YELLOW);
     console.log(
         std::string("Best Target: ") +
         (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +

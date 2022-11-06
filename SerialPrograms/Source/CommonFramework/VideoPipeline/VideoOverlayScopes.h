@@ -18,16 +18,16 @@ namespace PokemonAutomation{
 
 // A box as part of the video overlay.
 // It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
-class InferenceBoxScope : public ImageFloatBox{
+class OverlayBoxScope : public ImageFloatBox{
 public:
-    ~InferenceBoxScope(){
+    ~OverlayBoxScope(){
         m_overlay.remove_box(*this);
     }
-    InferenceBoxScope(const InferenceBoxScope&) = delete;
-    void operator=(const InferenceBoxScope&) = delete;
+    OverlayBoxScope(const OverlayBoxScope&) = delete;
+    void operator=(const OverlayBoxScope&) = delete;
 
 public:
-    InferenceBoxScope(
+    OverlayBoxScope(
         VideoOverlay& overlay,
         const ImageFloatBox& box,
         Color color = COLOR_RED
@@ -38,7 +38,7 @@ public:
     {
         overlay.add_box(*this, color);
     }
-    InferenceBoxScope(
+    OverlayBoxScope(
         VideoOverlay& overlay,
         double p_x, double p_y,
         double p_width, double p_height,
@@ -143,7 +143,7 @@ public:
 
 private:
     VideoOverlay& m_overlay;
-    std::deque<InferenceBoxScope> m_boxes;
+    std::deque<OverlayBoxScope> m_boxes;
 };
 
 

@@ -23,7 +23,7 @@ bool read_type_array(
     ConsoleHandle& console,
     const ImageViewRGB32& screen,
     const ImageFloatBox& box,
-    std::deque<InferenceBoxScope>& hits,
+    std::deque<OverlayBoxScope>& hits,
     size_t count,
     PokemonType* type, ImagePixelBox* boxes
 ){
@@ -66,7 +66,7 @@ bool read_type_array(
 std::shared_ptr<const ImageRGB32> read_type_array_retry(
     ConsoleHandle& console, CancellableScope& scope,
     const ImageFloatBox& box,
-    std::deque<InferenceBoxScope>& hits,
+    std::deque<OverlayBoxScope>& hits,
     size_t count,
     PokemonType* type, ImagePixelBox* boxes,
     size_t max_attempts = 3
@@ -90,7 +90,7 @@ bool read_path(
 ){
     context.wait_for_all_requests();
 
-    std::deque<InferenceBoxScope> hits;
+    std::deque<OverlayBoxScope> hits;
 
     std::shared_ptr<const ImageRGB32> error_image;
     error_image = read_type_array_retry(console, context, box, hits, 2, path.mon1, nullptr);

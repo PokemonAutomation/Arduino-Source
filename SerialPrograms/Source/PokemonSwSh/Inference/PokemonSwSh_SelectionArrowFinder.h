@@ -29,7 +29,7 @@ public:
 protected:
     VideoOverlay& m_overlay;
     ImageFloatBox m_box;
-    std::deque<InferenceBoxScope> m_arrow_boxes;
+    std::deque<OverlayBoxScope> m_arrow_boxes;
 };
 
 

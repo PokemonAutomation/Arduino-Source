@@ -92,7 +92,7 @@ uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from
 // like the slug of the Pokemon Mr. Mime is "mr-mime".
 std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& context, Language language){
     context.wait_for_all_requests();
-    InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
+    OverlayBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
     context.wait_for(k_wait_after_read);
 
     std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();

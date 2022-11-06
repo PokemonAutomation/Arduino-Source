@@ -328,8 +328,8 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
     SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     arrow_detector.make_overlays(boxes);
 
-    InferenceBoxScope dialog_text(env.console, 0.21, 0.80, 0.53, 0.17);
-    InferenceBoxScope dialog_box(env.console, 0.70, 0.90, 0.03, 0.05);
+    OverlayBoxScope dialog_text(env.console, 0.21, 0.80, 0.53, 0.17);
+    OverlayBoxScope dialog_box(env.console, 0.70, 0.90, 0.03, 0.05);
     const double LOG10P_THRESHOLD = -1.5;
     std::string best_ball;
 

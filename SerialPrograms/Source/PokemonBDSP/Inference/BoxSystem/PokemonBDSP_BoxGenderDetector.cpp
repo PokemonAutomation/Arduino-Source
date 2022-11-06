@@ -100,7 +100,7 @@ bool is_female(const ImageViewRGB32& image, const WaterfillObject& object){
 
 EggHatchGenderFilter read_gender_from_box(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame)
 {
-    InferenceBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
+    OverlayBoxScope gender_box(overlay, 0.733, 0.022, 0.204, 0.049, COLOR_BLUE);
     ImageViewRGB32 name_and_gender = extract_box_reference(frame, gender_box);
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(name_and_gender, 0xff7f7f7f, 0xffffffff);

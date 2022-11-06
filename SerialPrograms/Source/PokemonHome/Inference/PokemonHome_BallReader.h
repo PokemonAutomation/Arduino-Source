@@ -30,7 +30,7 @@ public:
 private:
     const ImageMatch::CroppedImageDictionaryMatcher& m_matcher;
     ConsoleHandle& m_console;
-    InferenceBoxScope m_box_sprite;
+    OverlayBoxScope m_box_sprite;
 };
 
 

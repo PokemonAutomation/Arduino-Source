@@ -44,7 +44,7 @@ public:
 private:
     Logger& m_logger;
     Language m_language;
-    InferenceBoxScope m_box;
+    OverlayBoxScope m_box;
     std::set<std::string> m_slugs;
 };
 

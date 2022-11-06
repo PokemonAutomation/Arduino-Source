@@ -24,7 +24,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
-IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const InferenceBoxScope& box){
+IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
         logger, m_language, image,

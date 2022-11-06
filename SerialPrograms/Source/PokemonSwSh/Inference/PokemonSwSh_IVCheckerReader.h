@@ -25,16 +25,16 @@ public:
     std::vector<ImageViewRGB32> dump_images(const ImageViewRGB32& frame);
 
 private:
-    IVCheckerValue read(Logger& logger, const ImageViewRGB32& frame, const InferenceBoxScope& box);
+    IVCheckerValue read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box);
 
 private:
     Language m_language;
-    InferenceBoxScope m_box0;
-    InferenceBoxScope m_box1;
-    InferenceBoxScope m_box2;
-    InferenceBoxScope m_box3;
-    InferenceBoxScope m_box4;
-    InferenceBoxScope m_box5;
+    OverlayBoxScope m_box0;
+    OverlayBoxScope m_box1;
+    OverlayBoxScope m_box2;
+    OverlayBoxScope m_box3;
+    OverlayBoxScope m_box4;
+    OverlayBoxScope m_box5;
 };
 
 

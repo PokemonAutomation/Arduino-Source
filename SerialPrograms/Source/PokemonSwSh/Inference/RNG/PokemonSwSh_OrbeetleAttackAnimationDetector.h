@@ -37,7 +37,7 @@ public:
 private:
     ConsoleHandle& m_console;
     BotBaseContext& m_context;
-    InferenceBoxScope m_box;
+    OverlayBoxScope m_box;
 };
 
 

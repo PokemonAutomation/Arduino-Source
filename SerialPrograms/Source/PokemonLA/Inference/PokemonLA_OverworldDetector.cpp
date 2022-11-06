@@ -43,7 +43,7 @@ bool is_pokemon_selection(VideoOverlay& overlay, const ImageViewRGB32& frame){
 #if 1
     using namespace Kernels::Waterfill;
 
-    InferenceBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
+    OverlayBoxScope box(overlay, 0.83, 0.95, 0.11, 0.027);
 
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
         extract_box_reference(frame, box),

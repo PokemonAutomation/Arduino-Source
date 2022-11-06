@@ -41,7 +41,7 @@ public:
 private:
     VideoOverlay& m_overlay;
     ImageFloatBox m_hook_box;
-    std::deque<InferenceBoxScope> m_marks;
+    std::deque<OverlayBoxScope> m_marks;
 };
 
 

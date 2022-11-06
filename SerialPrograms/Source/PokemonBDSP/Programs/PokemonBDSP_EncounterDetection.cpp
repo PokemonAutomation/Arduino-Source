@@ -35,10 +35,10 @@ StandardEncounterDetection::StandardEncounterDetection(
     , m_double_battle(false)
 {
 //    InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});
-    InferenceBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
-    InferenceBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
-    InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
-    InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
+    OverlayBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
+    OverlayBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
+    OverlayBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
+    OverlayBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
 
     context.wait_for_all_requests();
     context.wait_for(std::chrono::milliseconds(100));

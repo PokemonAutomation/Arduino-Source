@@ -65,7 +65,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 
 
-    InferenceBoxScope box(env.console, 0.705, 0.815, 0.219, 0.055);
+    OverlayBoxScope box(env.console, 0.705, 0.815, 0.219, 0.055);
     std::string language_code = language_data(LANGUAGE).code;
 
     for (const std::string& slug : slugs){

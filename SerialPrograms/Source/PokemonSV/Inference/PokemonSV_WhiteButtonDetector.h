@@ -76,7 +76,7 @@ public:
 protected:
     VideoOverlay& m_overlay;
     WhiteButtonDetector m_detector;
-    FixedLimitVector<InferenceBoxScope> m_arrows;
+    FixedLimitVector<OverlayBoxScope> m_arrows;
 };
 
 

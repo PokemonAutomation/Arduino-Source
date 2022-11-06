@@ -100,15 +100,15 @@ public:
 
 private:
     size_t m_player_index;
-    InferenceBoxScope m_path;
-    InferenceBoxScope m_sprite0;
-    InferenceBoxScope m_sprite1;
-    InferenceBoxScope m_sprite2;
-    InferenceBoxScope m_sprite3;
-    InferenceBoxScope m_hp0;
-    InferenceBoxScope m_hp1;
-    InferenceBoxScope m_hp2;
-    InferenceBoxScope m_hp3;
+    OverlayBoxScope m_path;
+    OverlayBoxScope m_sprite0;
+    OverlayBoxScope m_sprite1;
+    OverlayBoxScope m_sprite2;
+    OverlayBoxScope m_sprite3;
+    OverlayBoxScope m_hp0;
+    OverlayBoxScope m_hp1;
+    OverlayBoxScope m_hp2;
+    OverlayBoxScope m_hp3;
 };
 
 

@@ -117,8 +117,8 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
         //  Make sure both consoles have selected something.
         std::atomic<bool> ok(true);
-        InferenceBoxScope box0(env.consoles[0], {0.925, 0.100, 0.014, 0.030});
-        InferenceBoxScope box1(env.consoles[1], {0.925, 0.100, 0.014, 0.030});
+        OverlayBoxScope box0(env.consoles[0], {0.925, 0.100, 0.014, 0.030});
+        OverlayBoxScope box1(env.consoles[1], {0.925, 0.100, 0.014, 0.030});
         TradeNameReader name_reader0(env.consoles[0], env.consoles[0], LANGUAGE_LEFT);
         TradeNameReader name_reader1(env.consoles[1], env.consoles[1], LANGUAGE_RIGHT);
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

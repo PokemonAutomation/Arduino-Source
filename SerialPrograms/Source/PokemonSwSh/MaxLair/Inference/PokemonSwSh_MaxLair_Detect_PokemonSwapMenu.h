@@ -72,20 +72,20 @@ public:
 private:
     Logger& m_logger;
     Language m_language;
-    InferenceBoxScope m_sprite0;
-    InferenceBoxScope m_sprite1;
-    InferenceBoxScope m_name0;
-    InferenceBoxScope m_name1;
-    InferenceBoxScope m_select0;
-    InferenceBoxScope m_select1;
-    InferenceBoxScope m_pp0;
-    InferenceBoxScope m_pp1;
-    InferenceBoxScope m_pp2;
-    InferenceBoxScope m_pp3;
-    InferenceBoxScope m_hp0;
-    InferenceBoxScope m_hp1;
-    InferenceBoxScope m_hp2;
-    InferenceBoxScope m_hp3;
+    OverlayBoxScope m_sprite0;
+    OverlayBoxScope m_sprite1;
+    OverlayBoxScope m_name0;
+    OverlayBoxScope m_name1;
+    OverlayBoxScope m_select0;
+    OverlayBoxScope m_select1;
+    OverlayBoxScope m_pp0;
+    OverlayBoxScope m_pp1;
+    OverlayBoxScope m_pp2;
+    OverlayBoxScope m_pp3;
+    OverlayBoxScope m_hp0;
+    OverlayBoxScope m_hp1;
+    OverlayBoxScope m_hp2;
+    OverlayBoxScope m_hp3;
 };
 
 

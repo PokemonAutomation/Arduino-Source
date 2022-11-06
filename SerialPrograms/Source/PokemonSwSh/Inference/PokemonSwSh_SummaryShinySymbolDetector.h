@@ -40,9 +40,9 @@ public:
 
 private:
     Logger& m_logger;
-    InferenceBoxScope m_state0_box;
-    InferenceBoxScope m_state1_box;
-    InferenceBoxScope m_symbol_box;
+    OverlayBoxScope m_state0_box;
+    OverlayBoxScope m_state1_box;
+    OverlayBoxScope m_symbol_box;
 };
 
 

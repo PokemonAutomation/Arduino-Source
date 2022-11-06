@@ -180,10 +180,10 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         if (FILTERS.enabled()){
             context.wait_for_all_requests();
-            InferenceBoxScope box0(env.console, ImageFloatBox(0.75, 0.531 + 0 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
+            OverlayBoxScope box0(env.console, ImageFloatBox(0.75, 0.531 + 0 * 0.1115, 0.18, 0.059));
+            OverlayBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
+            OverlayBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
+            OverlayBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
             pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
             context.wait_for_all_requests();
 

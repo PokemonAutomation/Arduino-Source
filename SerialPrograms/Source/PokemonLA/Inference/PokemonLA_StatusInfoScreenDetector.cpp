@@ -27,10 +27,10 @@ PokemonDetails read_status_info(
     const ImageViewRGB32& frame,
     Language language
 ){
-    InferenceBoxScope shiny_box(overlay, 0.726, 0.133, 0.015, 0.023, COLOR_BLUE);
-    InferenceBoxScope alpha_box(overlay, 0.750, 0.133, 0.015, 0.023, COLOR_RED);
-    InferenceBoxScope gender_box(overlay, 0.777, 0.138, 0.001, 0.015, COLOR_PURPLE);
-    InferenceBoxScope name_box(overlay, 0.525, 0.130, 0.100, 0.038, COLOR_BLACK);
+    OverlayBoxScope shiny_box(overlay, 0.726, 0.133, 0.015, 0.023, COLOR_BLUE);
+    OverlayBoxScope alpha_box(overlay, 0.750, 0.133, 0.015, 0.023, COLOR_RED);
+    OverlayBoxScope gender_box(overlay, 0.777, 0.138, 0.001, 0.015, COLOR_PURPLE);
+    OverlayBoxScope name_box(overlay, 0.525, 0.130, 0.100, 0.038, COLOR_BLACK);
 
     PokemonDetails ret;
 

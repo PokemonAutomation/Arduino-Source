@@ -252,7 +252,7 @@ void test_find_symbols(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, max_area_ratio);
 
 
-    std::deque<InferenceBoxScope> hits;
+    std::deque<OverlayBoxScope> hits;
 //    hits.clear();
     cout << "---------------" << endl;
     for (const auto& item : candidates){

@@ -38,7 +38,7 @@ protected:
     ImageFloatBox m_box;
     QSize m_dimensions;
     std::vector<ImagePixelBox> m_bubbles;
-    std::deque<InferenceBoxScope> m_boxes;
+    std::deque<OverlayBoxScope> m_boxes;
 };
 
 

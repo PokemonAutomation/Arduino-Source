@@ -119,7 +119,7 @@ int8_t BattleMoveArrowFinder::detect(const ImageViewRGB32& screen){
         return -1;
     }
 
-    const InferenceBoxScope& arrow = m_arrow_boxes[0];
+    const OverlayBoxScope& arrow = m_arrow_boxes[0];
     double arrow_y_center = arrow.y + arrow.height * 0.5;
 
     int8_t slot = arrow_slot(arrow_y_center);

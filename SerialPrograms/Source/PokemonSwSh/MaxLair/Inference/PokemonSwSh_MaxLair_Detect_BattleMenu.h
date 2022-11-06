@@ -74,28 +74,28 @@ public:
 
 private:
     Language m_language;
-    InferenceBoxScope m_opponent_name;
-    InferenceBoxScope m_summary_opponent_name;
-    InferenceBoxScope m_summary_opponent_types;
+    OverlayBoxScope m_opponent_name;
+    OverlayBoxScope m_summary_opponent_name;
+    OverlayBoxScope m_summary_opponent_types;
 
-    InferenceBoxScope m_own_name;
-    InferenceBoxScope m_own_sprite;
+    OverlayBoxScope m_own_name;
+    OverlayBoxScope m_own_sprite;
 
-    InferenceBoxScope m_opponent_hp;
-    InferenceBoxScope m_own_hp;
+    OverlayBoxScope m_opponent_hp;
+    OverlayBoxScope m_own_hp;
 
-    InferenceBoxScope m_hp0;
-    InferenceBoxScope m_hp1;
-    InferenceBoxScope m_hp2;
-    InferenceBoxScope m_sprite0;
-    InferenceBoxScope m_sprite1;
-    InferenceBoxScope m_sprite2;
+    OverlayBoxScope m_hp0;
+    OverlayBoxScope m_hp1;
+    OverlayBoxScope m_hp2;
+    OverlayBoxScope m_sprite0;
+    OverlayBoxScope m_sprite1;
+    OverlayBoxScope m_sprite2;
 
-    InferenceBoxScope m_pp0;
-    InferenceBoxScope m_pp1;
-    InferenceBoxScope m_pp2;
-    InferenceBoxScope m_pp3;
-    InferenceBoxScope m_dmax;
+    OverlayBoxScope m_pp0;
+    OverlayBoxScope m_pp1;
+    OverlayBoxScope m_pp2;
+    OverlayBoxScope m_pp3;
+    OverlayBoxScope m_dmax;
 };
 
 

@@ -103,7 +103,7 @@ private:
     double m_max_alpha;
 
     ImageFloatBox m_search_area;
-    std::deque<InferenceBoxScope> m_detection_boxes;
+    std::deque<OverlayBoxScope> m_detection_boxes;
 
     //  Sliding window of detections.
     std::deque<Mark> m_exclamations;

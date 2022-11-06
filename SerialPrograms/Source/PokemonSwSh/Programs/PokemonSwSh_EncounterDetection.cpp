@@ -61,7 +61,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
         return &m_candidates;
     }
 
-    InferenceBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
+    OverlayBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
     m_context.wait_for(m_read_name_delay);
 
     std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();

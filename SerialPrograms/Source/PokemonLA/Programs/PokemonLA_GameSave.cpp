@@ -57,8 +57,8 @@ bool save_tab_disabled(const ImageViewRGB32 &screen){
 
 
 bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-    InferenceBoxScope tab_box_scope(console, tab_box);
-    InferenceBoxScope icon_box_scope(console, save_icon_box);
+    OverlayBoxScope tab_box_scope(console, tab_box);
+    OverlayBoxScope icon_box_scope(console, save_icon_box);
     console.log("Saving game...");
     console.overlay().add_log_text("Saving game...", COLOR_WHITE);
 

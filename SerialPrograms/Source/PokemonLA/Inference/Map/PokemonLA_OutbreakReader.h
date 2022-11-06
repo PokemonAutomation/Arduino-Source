@@ -29,9 +29,9 @@ public:
 private:
     Logger& m_logger;
     Language m_language;
-    InferenceBoxScope m_dialog_box0;
-    InferenceBoxScope m_dialog_box1;
-    InferenceBoxScope m_text_box;
+    OverlayBoxScope m_dialog_box0;
+    OverlayBoxScope m_dialog_box1;
+    OverlayBoxScope m_text_box;
 };
 
 

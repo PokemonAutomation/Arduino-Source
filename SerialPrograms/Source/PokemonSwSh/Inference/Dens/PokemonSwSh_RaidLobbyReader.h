@@ -63,14 +63,14 @@ public:
 
 private:
     Logger& m_logger;
-    InferenceBoxScope m_checkbox0;
-    InferenceBoxScope m_checkbox1;
-    InferenceBoxScope m_checkbox2;
-    InferenceBoxScope m_checkbox3;
-    InferenceBoxScope m_spritebox0;
-    InferenceBoxScope m_spritebox1;
-    InferenceBoxScope m_spritebox2;
-    InferenceBoxScope m_spritebox3;
+    OverlayBoxScope m_checkbox0;
+    OverlayBoxScope m_checkbox1;
+    OverlayBoxScope m_checkbox2;
+    OverlayBoxScope m_checkbox3;
+    OverlayBoxScope m_spritebox0;
+    OverlayBoxScope m_spritebox1;
+    OverlayBoxScope m_spritebox2;
+    OverlayBoxScope m_spritebox3;
 };
 
 

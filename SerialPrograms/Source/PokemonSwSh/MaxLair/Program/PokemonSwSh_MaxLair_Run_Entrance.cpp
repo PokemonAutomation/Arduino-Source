@@ -38,7 +38,7 @@ void run_entrance(
     }
 
 
-    InferenceBoxScope box(console, 0.782, 0.850, 0.030, 0.050);
+    OverlayBoxScope box(console, 0.782, 0.850, 0.030, 0.050);
 
     pbf_wait(context, 2 * TICKS_PER_SECOND);
     while (true){
