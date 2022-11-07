@@ -148,11 +148,12 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         QColor box_color(10, 10, 10, 200);
         painter.setPen(box_color);
 
+        int start_x = (int)(width * 0.7);
 
         painter.fillRect(
-            width / 2,
+            start_x,
             0,
-            width - width / 2,
+            width - start_x,
             (int)(height * (m_stats->size() * ROW_HEIGHT + 0.02)),
             box_color
         );
@@ -167,7 +168,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
             text_font.setPointSizeF(height * TEXT_SIZE);
             painter.setFont(text_font);
 
-            int x = width * 0.51;
+            int x = start_x + width * 0.01;
             int y = height * ((c + 1) * ROW_HEIGHT + 0.01);
 
             painter.drawText(QPoint(x, y), QString::fromStdString(snapshot.text));
