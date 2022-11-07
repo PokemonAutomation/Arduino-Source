@@ -91,7 +91,7 @@ public:
     virtual void reset() override{}
 
     virtual VideoSnapshot snapshot() override{ return VideoSnapshot(); }
-    virtual double current_fps() override{ return 0; }
+    virtual double source_fps() override{ return 0; }
 };
 
 // Implement the dummy interface of VideoOverlay so that we can test

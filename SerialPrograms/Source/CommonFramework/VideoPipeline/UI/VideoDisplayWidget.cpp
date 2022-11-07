@@ -189,9 +189,9 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
     }
 }
 OverlayStatSnapshot VideoDisplayWidget::get_current() const{
-    double fps = m_video->camera().current_fps();
+    double fps = m_video->camera().source_fps();
     return OverlayStatSnapshot{
-        "Video Backend FPS: " + tostr_fixed(fps, 2),
+        "Camera Backend FPS: " + tostr_fixed(fps, 2),
         fps < 20 ? COLOR_RED : COLOR_WHITE
     };
 

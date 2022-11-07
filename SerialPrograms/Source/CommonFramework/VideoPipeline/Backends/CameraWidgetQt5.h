@@ -65,7 +65,7 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
-    virtual double current_fps() override;
+    virtual double source_fps() override;
 
     QVideoFrame latest_frame();
 

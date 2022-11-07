@@ -51,9 +51,9 @@ public:
     //  Do not call this on the main thread or it may deadlock.
     virtual VideoSnapshot snapshot() = 0;
 
-    //  Returns the current measured frames/second.
+    //  Returns the currently measured frames/second for the video source.
     //  Use this for diagnostic purposes.
-    virtual double current_fps() = 0;
+    virtual double source_fps() = 0;
 };
 
 
