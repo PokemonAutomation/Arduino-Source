@@ -31,6 +31,7 @@ Color pick_color(FeedbackType feedback, PABotBaseLevel size){
 const std::string SwitchSystemOption::JSON_SERIAL  = "Serial";
 const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
 const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
+const std::string SwitchSystemOption::JSON_OVERLAY = "Overlay";
 
 
 SwitchSystemOption::SwitchSystemOption(
@@ -40,7 +41,7 @@ SwitchSystemOption::SwitchSystemOption(
     : m_allow_commands_while_running(allow_commands_while_running)
     , m_serial(min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
-    , m_audio()
+//    , m_audio()
 {}
 SwitchSystemOption::SwitchSystemOption(
     PABotBaseLevel min_pabotbase,
@@ -73,6 +74,10 @@ void SwitchSystemOption::load_json(const JsonValue& json){
     if (value){
         m_audio.load_json(*value);
     }
+    value = obj->get_value(JSON_OVERLAY);
+    if (value){
+        m_overlay.load_json(*value);
+    }
 }
 JsonValue SwitchSystemOption::to_json() const{
     JsonObject root;
@@ -80,6 +85,7 @@ JsonValue SwitchSystemOption::to_json() const{
     root[JSON_SERIAL] = m_serial.to_json();
     root[JSON_CAMERA] = m_camera.to_json();
     root[JSON_AUDIO] = m_audio.to_json();
+    root[JSON_OVERLAY] = m_overlay.to_json();
     return root;
 }
 

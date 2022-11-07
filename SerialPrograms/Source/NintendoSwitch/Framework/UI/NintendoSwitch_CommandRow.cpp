@@ -13,14 +13,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+CommandRow::~CommandRow(){
+    m_session.remove_listener(*this);
+}
 CommandRow::CommandRow(
     QWidget& parent,
     BotBaseHandle& botbase,
+    VideoOverlaySession& session,
     bool allow_commands_while_running
 )
     : QWidget(&parent)
     , VirtualController(botbase, allow_commands_while_running)
     , m_botbase(botbase)
+    , m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_focus(false)
 {
@@ -37,19 +42,19 @@ CommandRow::CommandRow(
     command_row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
     m_overlay_boxes = new QCheckBox("Boxes", this);
-    m_overlay_boxes->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_BOXES);
+    m_overlay_boxes->setChecked(session.enabled_boxes());
     command_row->addWidget(m_overlay_boxes);
 
     m_overlay_text = new QCheckBox("Text", this);
-    m_overlay_text->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_TEXT);
+    m_overlay_text->setChecked(session.enabled_text());
     command_row->addWidget(m_overlay_text);
 
     m_overlay_log = new QCheckBox("Log", this);
-    m_overlay_log->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_LOG);
+    m_overlay_log->setChecked(session.enabled_log());
     command_row->addWidget(m_overlay_log);
 
     m_overlay_stats = new QCheckBox("Stats", this);
-    m_overlay_stats->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_STATS);
+    m_overlay_stats->setChecked(session.enabled_stats());
     command_row->addWidget(m_overlay_stats);
 
     command_row->addSpacing(5);
@@ -70,20 +75,20 @@ CommandRow::CommandRow(
     update_ui();
 
     connect(
-        m_overlay_boxes, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_overlay_boxes(m_overlay_boxes->isChecked()); }
+        m_overlay_boxes, &QCheckBox::clicked,
+        this, [this](bool checked){ m_session.set_enabled_boxes(checked); }
     );
     connect(
         m_overlay_text, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_overlay_text(m_overlay_text->isChecked()); }
+        this, [this](bool checked){ m_session.set_enabled_text(checked); }
     );
     connect(
         m_overlay_log, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_overlay_log(m_overlay_log->isChecked()); }
+        this, [this](bool checked){ m_session.set_enabled_log(checked); }
     );
     connect(
         m_overlay_stats, &QCheckBox::stateChanged,
-        this, [this](int){ emit set_overlay_stats(m_overlay_stats->isChecked()); }
+        this, [this](bool checked){ m_session.set_enabled_stats(checked); }
     );
     connect(
         m_load_profile_button, &QPushButton::clicked,
@@ -97,6 +102,8 @@ CommandRow::CommandRow(
         m_screenshot_button, &QPushButton::clicked,
         this, [this](bool){ emit screenshot_requested(); }
     );
+
+    m_session.add_listener(*this);
 }
 
 bool CommandRow::on_key_press(Qt::Key key){
@@ -172,6 +179,29 @@ void CommandRow::on_state_changed(ProgramState state){
     VirtualController::on_state_changed(state);
     update_ui();
 }
+
+
+void CommandRow::enabled_boxes(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        this->m_overlay_boxes->setChecked(enabled);
+    }, Qt::QueuedConnection);
+}
+void CommandRow::enabled_text(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        this->m_overlay_text->setChecked(enabled);
+    }, Qt::QueuedConnection);
+}
+void CommandRow::enabled_log(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        this->m_overlay_log->setChecked(enabled);
+    }, Qt::QueuedConnection);
+}
+void CommandRow::enabled_stats(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        this->m_overlay_stats->setChecked(enabled);
+    }, Qt::QueuedConnection);
+}
+
 
 
 

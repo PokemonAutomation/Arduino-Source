@@ -42,11 +42,6 @@ public:
     );
     ~CameraSelectorWidget();
 
-    void set_overlay_boxes_enabled(bool enabled);
-    void set_overlay_text_enabled(bool enabled);
-    void set_overlay_log_enabled(bool enabled);
-    void set_overlay_stats_enabled(bool enabled);
-
 private:
     void update_camera_list();
     void update_resolution_list();

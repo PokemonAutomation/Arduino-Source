@@ -35,6 +35,7 @@ SwitchSystemSession::SwitchSystemSession(
     , m_serial(m_logger, option.m_serial)
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)
+    , m_overlay(option.m_overlay)
 {
     m_camera->set_resolution(option.m_camera.current_resolution);
     m_camera->set_source(option.m_camera.info);
@@ -45,12 +46,14 @@ void SwitchSystemSession::get(SwitchSystemOption& option){
     option.m_serial.set_port(m_serial.get());
     m_camera->get(option.m_camera);
     m_audio.get(option.m_audio);
+    m_overlay.get(option.m_overlay);
 }
 void SwitchSystemSession::set(const SwitchSystemOption& option){
     m_serial.set(option.m_serial.port());
 //    m_serial.botbase().reset(option.m_serial.port());
     m_camera->set(option.m_camera);
     m_audio.set(option.m_audio);
+    m_overlay.set(option.m_overlay);
 }
 
 void SwitchSystemSession::set_allow_user_commands(bool allow){

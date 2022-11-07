@@ -24,6 +24,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "VideoOverlay.h"
+#include "VideoOverlayOption.h"
 
 namespace PokemonAutomation{
 
@@ -47,6 +48,11 @@ public:
     struct Listener{
         //  VideoOverlaySession will call these when they change.
 
+        virtual void enabled_boxes(bool enabled){}
+        virtual void enabled_text (bool enabled){}
+        virtual void enabled_log  (bool enabled){}
+        virtual void enabled_stats(bool enabled){}
+
         virtual void update_boxes(const std::shared_ptr<const std::vector<Box>>& boxes){}
         virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
         virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
@@ -63,6 +69,20 @@ public:
 
 public:
     ~VideoOverlaySession();
+    VideoOverlaySession(VideoOverlayOption& option);
+
+    void get(VideoOverlayOption& option);
+    void set(const VideoOverlayOption& option);
+
+    bool enabled_boxes() const{ return m_option.boxes.load(std::memory_order_relaxed); }
+    bool enabled_text () const{ return m_option.text.load(std::memory_order_relaxed); }
+    bool enabled_log  () const{ return m_option.log.load(std::memory_order_relaxed); }
+    bool enabled_stats() const{ return m_option.stats.load(std::memory_order_relaxed); }
+
+    void set_enabled_boxes(bool enabled);
+    void set_enabled_text (bool enabled);
+    void set_enabled_log  (bool enabled);
+    void set_enabled_stats(bool enabled);
 
     std::vector<Box> boxes() const;
     std::vector<OverlayText> texts() const;
@@ -73,7 +93,7 @@ public:
     virtual void remove_box(const ImageFloatBox& box) override;
 
     virtual void add_text(const OverlayText& text) override;
-    virtual void remove_text(const OverlayText& texxt) override;
+    virtual void remove_text(const OverlayText& text) override;
 
     virtual void add_log_text(std::string message, Color color) override;
     virtual void clear_log_texts() override;
@@ -103,6 +123,8 @@ private:
 
 private:
     mutable SpinLock m_lock;
+
+    VideoOverlayOption& m_option;
 
     std::map<const ImageFloatBox*, Color> m_boxes;
     std::set<const OverlayText*> m_texts;

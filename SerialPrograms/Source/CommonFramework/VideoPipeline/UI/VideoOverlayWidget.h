@@ -27,13 +27,13 @@ public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
-    void set_enabled_boxes(bool visible) { m_enabled_boxes = visible; }
-    void set_enabled_text(bool visible) { m_enabled_text = visible; }
-    void set_enabled_log(bool visible) { m_enabled_log = visible; }
-    void set_enabled_stats(bool visible) { m_enabled_stats = visible; }
-
 private:
     //  Asynchronous changes to the overlays.
+
+    virtual void enabled_boxes(bool enabled) override;
+    virtual void enabled_text (bool enabled) override;
+    virtual void enabled_log  (bool enabled) override;
+    virtual void enabled_stats(bool enabled) override;
 
     virtual void update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
     virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
@@ -53,11 +53,6 @@ private:
     std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
     const std::list<OverlayStat*>* m_stats;
-
-    bool m_enabled_boxes;
-    bool m_enabled_text;
-    bool m_enabled_log;
-    bool m_enabled_stats;
 };
 
 

@@ -12,19 +12,22 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class CommandRow : public QWidget, public VirtualController{
+class CommandRow : public QWidget, public VirtualController, public VideoOverlaySession::Listener{
     Q_OBJECT
 
 public:
+    ~CommandRow();
     CommandRow(
         QWidget& parent,
         BotBaseHandle& botbase,
+        VideoOverlaySession& session,
         bool allow_commands_while_running
     );
 
@@ -33,10 +36,6 @@ public:
     bool on_key_release(Qt::Key key);
 
 signals:
-    void set_overlay_boxes(bool enabled);
-    void set_overlay_text(bool enabled);
-    void set_overlay_log(bool enabled);
-    void set_overlay_stats(bool enabled);
     void load_profile();
     void save_profile();
     void screenshot_requested();
@@ -47,7 +46,14 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
+    virtual void enabled_boxes(bool enabled) override;
+    virtual void enabled_text (bool enabled) override;
+    virtual void enabled_log  (bool enabled) override;
+    virtual void enabled_stats(bool enabled) override;
+
+private:
     BotBaseHandle& m_botbase;
+    VideoOverlaySession& m_session;
     bool m_allow_commands_while_running;
     QComboBox* m_command_box;
     QLabel* m_status;

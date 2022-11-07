@@ -85,6 +85,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command = new CommandRow(
             *widget,
             m_serial_widget->botbase(),
+            m_session.overlay_session(),
             m_session.allow_commands_while_running()
         );
         group_layout->addWidget(m_command);
@@ -97,30 +98,6 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_serial_widget, &SerialPortWidget::signal_on_ready,
         m_command, [this](bool ready){
             m_command->update_ui();
-        }
-    );
-    connect(
-        m_command, &CommandRow::set_overlay_boxes,
-        m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_overlay_boxes_enabled(enabled);
-        }
-    );
-    connect(
-        m_command, &CommandRow::set_overlay_text,
-        m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_overlay_text_enabled(enabled);
-        }
-    );
-    connect(
-        m_command, &CommandRow::set_overlay_log,
-        m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_overlay_log_enabled(enabled);
-        }
-    );
-    connect(
-        m_command, &CommandRow::set_overlay_stats,
-        m_camera_widget, [this](bool enabled){
-            m_camera_widget->set_overlay_stats_enabled(enabled);
         }
     );
     connect(

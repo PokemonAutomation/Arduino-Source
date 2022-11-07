@@ -192,18 +192,6 @@ void CameraSelectorWidget::resolution_change(Resolution resolution){
 
 
 
-void CameraSelectorWidget::set_overlay_boxes_enabled(bool enabled){
-    m_display.overlay().set_enabled_boxes(enabled);
-}
-void CameraSelectorWidget::set_overlay_text_enabled(bool enabled){
-    m_display.overlay().set_enabled_text(enabled);
-}
-void CameraSelectorWidget::set_overlay_log_enabled(bool enabled){
-    m_display.overlay().set_enabled_log(enabled);
-}
-void CameraSelectorWidget::set_overlay_stats_enabled(bool enabled){
-    m_display.overlay().set_enabled_stats(enabled);
-}
 
 
 

@@ -20,6 +20,7 @@
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,6 +33,7 @@ class SwitchSystemOption{
     static const std::string JSON_SERIAL;
     static const std::string JSON_CAMERA;
     static const std::string JSON_AUDIO;
+    static const std::string JSON_OVERLAY;
 
 public:
     SwitchSystemOption(
@@ -53,6 +55,7 @@ public:
     SerialPortOption m_serial;
     CameraOption m_camera;
     AudioOption m_audio;
+    VideoOverlayOption m_overlay;
 };
 
 

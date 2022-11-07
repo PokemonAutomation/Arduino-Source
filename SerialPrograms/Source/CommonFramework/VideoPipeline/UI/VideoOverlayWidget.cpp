@@ -8,9 +8,9 @@
 #include <QResizeEvent>
 #include "VideoOverlayWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -31,10 +31,6 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
     , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
     , m_stats(nullptr)
-    , m_enabled_boxes(DEFAULT_ENABLE_BOXES)
-    , m_enabled_text(DEFAULT_ENABLE_TEXT)
-    , m_enabled_log(DEFAULT_ENABLE_LOG)
-    , m_enabled_stats(DEFAULT_ENABLE_STATS)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -43,6 +39,18 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     m_session.add_listener(*this);
 }
 
+void VideoOverlayWidget::enabled_boxes(bool enabled){
+    QMetaObject::invokeMethod(this, [this]{ this->update(); });
+}
+void VideoOverlayWidget::enabled_text(bool enabled){
+    QMetaObject::invokeMethod(this, [this]{ this->update(); });
+}
+void VideoOverlayWidget::enabled_log(bool enabled){
+    QMetaObject::invokeMethod(this, [this]{ this->update(); });
+}
+void VideoOverlayWidget::enabled_stats(bool enabled){
+    QMetaObject::invokeMethod(this, [this]{ this->update(); });
+}
 
 void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes){
     SpinLockGuard lg(m_lock, "VideoOverlay::update_boxes()");
@@ -74,7 +82,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
 
-    if (m_enabled_boxes){
+    if (m_session.enabled_boxes()){
         for (const auto& item : *m_boxes){
             painter.setPen(QColor((uint32_t)item.color));
     //        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
@@ -103,7 +111,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         }
     }
 
-    if (m_enabled_text){
+    if (m_session.enabled_text()){
         for (const auto& item: *m_texts){
             painter.setPen(QColor((uint32_t)item.color));
             QFont text_font = this->font();
@@ -117,7 +125,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         }
     }
 
-    if (m_enabled_log){
+    if (m_session.enabled_log()){
         for (const auto& item : *m_log_text_bg_boxes){
             QColor box_color(item.color.red(), item.color.green(), item.color.blue(), item.color.alpha());
             painter.setPen(box_color);
@@ -141,7 +149,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         }
     }
 
-    if (m_enabled_stats && m_stats){
+    if (m_session.enabled_stats() && m_stats){
         const double TEXT_SIZE = 0.02;
         const double ROW_HEIGHT = 0.03;
 
