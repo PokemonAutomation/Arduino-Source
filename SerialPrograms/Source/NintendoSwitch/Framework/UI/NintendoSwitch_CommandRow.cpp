@@ -5,8 +5,8 @@
  */
 
 #include <QHBoxLayout>
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
 #include "NintendoSwitch_CommandRow.h"
 
 namespace PokemonAutomation{
@@ -37,20 +37,19 @@ CommandRow::CommandRow(
     command_row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
     m_overlay_boxes = new QCheckBox("Boxes", this);
-    m_overlay_boxes->setChecked(true);
+    m_overlay_boxes->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_BOXES);
     command_row->addWidget(m_overlay_boxes);
 
     m_overlay_text = new QCheckBox("Text", this);
-    m_overlay_text->setChecked(true);
+    m_overlay_text->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_TEXT);
     command_row->addWidget(m_overlay_text);
 
     m_overlay_log = new QCheckBox("Log", this);
-    m_overlay_log->setChecked(true);
+    m_overlay_log->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_LOG);
     command_row->addWidget(m_overlay_log);
 
     m_overlay_stats = new QCheckBox("Stats", this);
-    m_overlay_stats->setChecked(true);
-//    m_overlay_stats->setEnabled(PreloadSettings::instance().DEVELOPER_MODE);
+    m_overlay_stats->setChecked(VideoOverlayWidget::DEFAULT_ENABLE_STATS);
     command_row->addWidget(m_overlay_stats);
 
     command_row->addSpacing(5);

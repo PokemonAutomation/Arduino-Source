@@ -31,10 +31,10 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
     , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
     , m_stats(nullptr)
-    , m_enabled_boxes(true)
-    , m_enabled_text(true)
-    , m_enabled_log(true)
-    , m_enabled_stats(true)
+    , m_enabled_boxes(DEFAULT_ENABLE_BOXES)
+    , m_enabled_text(DEFAULT_ENABLE_TEXT)
+    , m_enabled_log(DEFAULT_ENABLE_LOG)
+    , m_enabled_stats(DEFAULT_ENABLE_STATS)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);

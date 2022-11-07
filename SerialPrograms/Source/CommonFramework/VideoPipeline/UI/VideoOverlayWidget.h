@@ -18,6 +18,12 @@ struct OverlayText;
 
 class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener{
 public:
+    static constexpr bool DEFAULT_ENABLE_BOXES  = true;
+    static constexpr bool DEFAULT_ENABLE_TEXT   = true;
+    static constexpr bool DEFAULT_ENABLE_LOG    = false;
+    static constexpr bool DEFAULT_ENABLE_STATS  = true;
+
+public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
