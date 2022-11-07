@@ -49,7 +49,7 @@ CommandRow::CommandRow(
     command_row->addWidget(m_overlay_log);
 
     m_overlay_stats = new QCheckBox("Stats", this);
-    m_overlay_stats->setChecked(false);
+    m_overlay_stats->setChecked(true);
 //    m_overlay_stats->setEnabled(PreloadSettings::instance().DEVELOPER_MODE);
     command_row->addWidget(m_overlay_stats);
 

@@ -124,7 +124,7 @@ OverlayStatSnapshot VisualInferencePivot::get_current() const{
         color = COLOR_YELLOW;
     }
     return OverlayStatSnapshot{
-        "Video Inference Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
+        "Video Pivot Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
         color
     };
 }

@@ -6,7 +6,6 @@
 
 #include <QPainter>
 #include <QResizeEvent>
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "VideoOverlayWidget.h"
 
 #include <iostream>
@@ -35,7 +34,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_enabled_boxes(true)
     , m_enabled_text(true)
     , m_enabled_log(true)
-    , m_enabled_stats(false)
+    , m_enabled_stats(true)
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);

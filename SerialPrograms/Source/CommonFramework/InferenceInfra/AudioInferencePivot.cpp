@@ -129,7 +129,7 @@ OverlayStatSnapshot AudioInferencePivot::get_current() const{
         color = COLOR_YELLOW;
     }
     return OverlayStatSnapshot{
-        "Audio Inference Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
+        "Audio Pivot Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
         color
     };
 }
