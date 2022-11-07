@@ -14,6 +14,8 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSwSh_YCommDetector.h"
 
+#include <utility>
+#include <vector>
 #include <iostream>
 using std::cout;
 using std::endl;
