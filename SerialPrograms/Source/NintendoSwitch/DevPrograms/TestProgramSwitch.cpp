@@ -144,6 +144,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     overlay.add_log_text("asdfasdf", COLOR_RED);
 
+    OverlayStat stat0;
+    OverlayStat stat1;
+    OverlayStat stat2;
+    overlay.add_stat(stat0);
+    overlay.add_stat(stat1);
+    overlay.add_stat(stat2);
+
+    for (size_t c = 0;; c++){
+        stat2.set_text(std::to_string(c));
+        scope.wait_for(std::chrono::milliseconds(100));
+    }
+
 
 
 #if 0

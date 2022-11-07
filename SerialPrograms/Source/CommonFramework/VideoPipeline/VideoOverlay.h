@@ -52,6 +52,10 @@ public:
     // Remove all messages added by `add_log_text()`.
     // Use `OverlayLogTextScope` to remove log messages automatically.
     virtual void clear_log_texts() = 0;
+
+    virtual void add_stat(OverlayStat& stat) = 0;
+    virtual void remove_stat(OverlayStat& stat) = 0;
+
 };
 
 

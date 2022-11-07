@@ -24,6 +24,14 @@ const Color LOG_BACKGROUND_COLOR{200, 10, 10, 10};
 
 
 
+VideoOverlaySession::~VideoOverlaySession(){
+    SpinLockGuard lg(m_lock);
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(nullptr);
+    }
+}
+
+
 void VideoOverlaySession::add_listener(Listener& listener){
     SpinLockGuard lg(m_lock);
     m_listeners.insert(&listener);
@@ -185,5 +193,104 @@ std::vector<VideoOverlaySession::Box> VideoOverlaySession::log_text_background()
     }
     return ret;
 }
+
+
+
+
+void VideoOverlaySession::add_stat(OverlayStat& stat){
+    SpinLockGuard lg(m_lock);
+    auto map_iter = m_stats.find(&stat);
+    if (map_iter != m_stats.end()){
+        return;
+    }
+
+    //  Remove all stats so they aren't being referenced.
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(nullptr);
+    }
+
+    m_stats_order.emplace_back(&stat);
+    auto list_iter = m_stats_order.end();
+    --list_iter;
+    try{
+        m_stats.emplace(&stat, list_iter);
+    }catch (...){
+        m_stats_order.pop_back();
+        throw;
+    }
+
+    //  Add all the stats back.
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(&m_stats_order);
+    }
+
+//    push_stats_update();
+}
+void VideoOverlaySession::remove_stat(OverlayStat& stat){
+    SpinLockGuard lg(m_lock);
+    auto iter = m_stats.find(&stat);
+    if (iter == m_stats.end()){
+        return;
+    }
+
+    //  Remove all stats so they aren't being referenced.
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(nullptr);
+    }
+
+    m_stats_order.erase(iter->second);
+    m_stats.erase(iter);
+
+    //  Add all the stats back.
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(&m_stats_order);
+    }
+
+//    push_stats_update();
+}
+
+#if 0
+void VideoOverlaySession::push_stats_update(){
+    if (m_listeners.empty()){
+        return;
+    }
+
+    std::shared_ptr<std::vector<OverlayStatSnapshot>> ptr = std::make_shared<std::vector<OverlayStatSnapshot>>();
+    for(const auto& item : m_stats_order){
+        std::string text;
+        Color color = item->get_text(text);
+        ptr->emplace_back(OverlayStatSnapshot{text, color});
+    }
+    for (Listener* listeners : m_listeners){
+        listeners->update_stats(&m_stats_order);
+    }
+}
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

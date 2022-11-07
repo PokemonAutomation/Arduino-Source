@@ -21,10 +21,10 @@ public:
     ~VideoOverlayWidget();
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
-    void set_enabled_boxes(bool visible) { m_enabled_boxes = visible;}
-    void set_enabled_text(bool visible) { m_enabled_text = visible;}
-    void set_enabled_log(bool visible) {m_enabled_log = visible;}
-    void set_enabled_stats(bool visible) {m_enabled_stats = visible;}
+    void set_enabled_boxes(bool visible) { m_enabled_boxes = visible; }
+    void set_enabled_text(bool visible) { m_enabled_text = visible; }
+    void set_enabled_log(bool visible) { m_enabled_log = visible; }
+    void set_enabled_stats(bool visible) { m_enabled_stats = visible; }
 
 private:
     //  Asynchronous changes to the overlays.
@@ -33,7 +33,7 @@ private:
     virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
     virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
     virtual void update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
-    virtual void update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats) override;
+    virtual void update_stats(const std::list<OverlayStat*>* stats) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent*) override;
@@ -46,7 +46,7 @@ private:
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
     std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
-    std::shared_ptr<const std::vector<OverlayStat>> m_stats;
+    const std::list<OverlayStat*>* m_stats;
 
     bool m_enabled_boxes;
     bool m_enabled_text;

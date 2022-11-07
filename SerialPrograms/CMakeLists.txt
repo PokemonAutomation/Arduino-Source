@@ -510,6 +510,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoOverlayScopes.h
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.h
+    Source/CommonFramework/VideoPipeline/VideoOverlayTypes.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h

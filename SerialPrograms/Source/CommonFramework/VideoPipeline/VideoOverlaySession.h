@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <vector>
+#include <list>
 #include <set>
 #include <map>
 #include <deque>
@@ -50,7 +51,7 @@ public:
         virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
         virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
         virtual void update_log_background(const std::shared_ptr<const std::vector<Box>>& boxes){}
-        virtual void update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats){}
+        virtual void update_stats(const std::list<OverlayStat*>* stats){}
 
     };
 
@@ -61,24 +62,24 @@ public:
     void remove_listener(Listener& listener);
 
 public:
+    ~VideoOverlaySession();
+
     std::vector<Box> boxes() const;
     std::vector<OverlayText> texts() const;
     std::vector<OverlayText> log_texts() const;
     std::vector<Box> log_text_background() const;
 
-    // Override `VideoOverlay::add_box()`. See the overridden function for more comments.
     virtual void add_box(const ImageFloatBox& box, Color color) override;
-    // Override `VideoOverlay::remove_box()`. See the overridden function for more comments.
     virtual void remove_box(const ImageFloatBox& box) override;
 
-    // Override `VideoOverlay::add_text()`. See the overridden function for more comments.
     virtual void add_text(const OverlayText& text) override;
-    // Override `VideoOverlay::remove_text()`. See the overridden function for more comments.
     virtual void remove_text(const OverlayText& texxt) override;
-    // Override `VideoOverlay::add_log_text()`. See the overridden function for more comments.
+
     virtual void add_log_text(std::string message, Color color) override;
-    // Override `VideoOverlay::clear_log_texts()`. See the overridden function for more comments.
     virtual void clear_log_texts() override;
+
+    virtual void add_stat(OverlayStat& stat) override;
+    virtual void remove_stat(OverlayStat& stat) override;
 
 private:
     // Pass the current boxes to the listeners.
@@ -98,12 +99,17 @@ private:
     // texts background.
     void push_text_background_update();
 
+//    void push_stats_update();
+
 private:
     mutable SpinLock m_lock;
 
     std::map<const ImageFloatBox*, Color> m_boxes;
     std::set<const OverlayText*> m_texts;
     std::deque<OverlayText> m_log_texts;
+
+    std::list<OverlayStat*> m_stats_order;
+    std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;
 
     std::set<Listener*> m_listeners;
 };

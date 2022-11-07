@@ -99,17 +99,17 @@ class DummyVideoOverlay: public VideoOverlay{
 public:
     DummyVideoOverlay() {}
 
-    virtual void add_box(const ImageFloatBox& box, Color color) override {}
+    virtual void add_box(const ImageFloatBox& box, Color color) override{}
+    virtual void remove_box(const ImageFloatBox& box) override{}
 
-    virtual void remove_box(const ImageFloatBox& box) override {}
+    virtual void add_text(const OverlayText& text) override{}
+    virtual void remove_text(const OverlayText& text) override{}
 
-    virtual void add_text(const OverlayText& text) override {}
+    virtual void add_log_text(std::string message, Color color) override{}
+    virtual void clear_log_texts() override{}
 
-    virtual void remove_text(const OverlayText& text) override {}
-
-    virtual void add_log_text(std::string message, Color color) override {}
-
-    virtual void clear_log_texts() override {}
+    virtual void add_stat(OverlayStat& stat) override{}
+    virtual void remove_stat(OverlayStat& stat) override{}
 };
 
 // Implement the dummy interface of AudioFeed so that we can test

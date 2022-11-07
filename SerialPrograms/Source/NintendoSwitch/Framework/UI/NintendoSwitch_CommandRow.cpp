@@ -5,6 +5,7 @@
  */
 
 #include <QHBoxLayout>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch_CommandRow.h"
 
@@ -49,7 +50,7 @@ CommandRow::CommandRow(
 
     m_overlay_stats = new QCheckBox("Stats", this);
     m_overlay_stats->setChecked(false);
-    m_overlay_stats->setEnabled(false);
+    m_overlay_stats->setEnabled(PreloadSettings::instance().DEVELOPER_MODE);
     command_row->addWidget(m_overlay_stats);
 
     command_row->addSpacing(5);

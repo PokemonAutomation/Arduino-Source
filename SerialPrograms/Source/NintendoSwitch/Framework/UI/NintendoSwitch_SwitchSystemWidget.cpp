@@ -118,6 +118,12 @@ SwitchSystemWidget::SwitchSystemWidget(
         }
     );
     connect(
+        m_command, &CommandRow::set_overlay_stats,
+        m_camera_widget, [this](bool enabled){
+            m_camera_widget->set_overlay_stats_enabled(enabled);
+        }
+    );
+    connect(
         m_command, &CommandRow::load_profile,
         m_command, [this](){
             std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();

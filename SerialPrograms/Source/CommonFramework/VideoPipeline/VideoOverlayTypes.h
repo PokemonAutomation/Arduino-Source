@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{
 
@@ -51,9 +52,26 @@ public:
 
 
 
-struct OverlayStat{
-    std::string text;
-    Color color;
+struct OverlayStatSnapshot{
+    std::string text = "---";
+    Color color = COLOR_WHITE;
+};
+
+class OverlayStat{
+public:
+    OverlayStat(const OverlayStat&) = delete;
+    void operator=(const OverlayStat&) = delete;
+
+public:
+    ~OverlayStat();
+    OverlayStat();
+
+    Color get_text(std::string& text) const;
+    void set_text(std::string text, Color color = COLOR_WHITE);
+
+private:
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

@@ -31,6 +31,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
     , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
     , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
+    , m_stats(nullptr)
     , m_enabled_boxes(true)
     , m_enabled_text(true)
     , m_enabled_log(true)
@@ -60,7 +61,7 @@ void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::
     SpinLockGuard lg(m_lock, "VideoOverlay::update_log_background()");
     m_log_text_bg_boxes = bg_boxes;
 }
-void VideoOverlayWidget::update_stats(const std::shared_ptr<const std::vector<OverlayStat>>& stats){
+void VideoOverlayWidget::update_stats(const std::list<OverlayStat*>* stats){
     SpinLockGuard lg(m_lock, "VideoOverlay::update_stats()");
     m_stats = stats;
 }
@@ -141,8 +142,40 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         }
     }
 
-    if (m_enabled_stats){
+    if (m_enabled_stats && m_stats){
+        const double TEXT_SIZE = 2 / 100.;
+        const double ROW_HEIGHT = 3 / 100.;
 
+        QColor box_color(10, 10, 10, 200);
+        painter.setPen(box_color);
+
+
+        painter.fillRect(
+            width / 2,
+            0,
+            width - width / 2,
+            (int)(height * m_stats->size() * (ROW_HEIGHT + 0.01)),
+            box_color
+        );
+
+        size_t c = 0;
+        for (const auto& stat : *m_stats){
+            std::string text;
+            Color color = stat->get_text(text);
+
+            painter.setPen(QColor((uint32_t)color));
+
+            QFont text_font = this->font();
+            text_font.setPointSizeF(height * TEXT_SIZE);
+            painter.setFont(text_font);
+
+            int x = width * 0.51;
+            int y = height * ((c + 1) * ROW_HEIGHT + 0.01);
+
+            painter.drawText(QPoint(x, y), QString::fromStdString(text));
+
+            c++;
+        }
     }
 }
 

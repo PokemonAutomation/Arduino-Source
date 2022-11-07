@@ -201,6 +201,9 @@ void CameraSelectorWidget::set_overlay_text_enabled(bool enabled){
 void CameraSelectorWidget::set_overlay_log_enabled(bool enabled){
     m_display.overlay().set_enabled_log(enabled);
 }
+void CameraSelectorWidget::set_overlay_stats_enabled(bool enabled){
+    m_display.overlay().set_enabled_stats(enabled);
+}
 
 
 
