@@ -176,11 +176,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    ImageRGB32 image("GermanUpdate2.png");
+#if 1
+    ImageRGB32 image("screenshot-20221107-210754107968.png");
 //    auto image = feed.snapshot();
-//    HomeDetector detector;
-    UpdateMenuDetector detector;
+    HomeDetector detector;
+//    UpdateMenuDetector detector;
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;

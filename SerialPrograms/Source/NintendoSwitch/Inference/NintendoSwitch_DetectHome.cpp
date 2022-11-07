@@ -62,7 +62,7 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
             return false;
         }
     }else{
-        if (!is_grey(stats_bottom_left, 0, 150) || !is_grey(stats_bottom_right, 0, 150)){
+        if (!is_grey(stats_bottom_left, 0, 200) || !is_grey(stats_bottom_right, 0, 200)){
 //            cout << "qwer" << endl;
             return false;
         }
