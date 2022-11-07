@@ -154,10 +154,15 @@ std::vector<Resolution> CameraSession::supported_resolutions() const{
     }
     return ret;
 }
-QVideoFrame CameraSession::latest_frame(){
+std::pair<QVideoFrame, uint64_t> CameraSession::latest_frame(){
     SpinLockGuard lg(m_frame_lock);
-    return m_last_frame;
+    return {m_last_frame, m_last_frame_seqnum};
 }
+void CameraSession::report_rendered_frame(WallClock timestamp){
+    SpinLockGuard lg(m_frame_lock);
+    m_fps_tracker_display.push_event(timestamp);
+}
+
 VideoSnapshot CameraSession::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_lock);
@@ -202,9 +207,13 @@ VideoSnapshot CameraSession::snapshot(){
 
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
-double CameraSession::source_fps(){
+double CameraSession::fps_source(){
     SpinLockGuard lg(m_frame_lock);
-    return m_fps_tracker.events_per_second();
+    return m_fps_tracker_source.events_per_second();
+}
+double CameraSession::fps_display(){
+    SpinLockGuard lg(m_frame_lock);
+    return m_fps_tracker_display.events_per_second();
 }
 
 
@@ -314,7 +323,7 @@ void CameraSession::startup(){
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
-                m_fps_tracker.push_event(now);
+                m_fps_tracker_source.push_event(now);
             }
             std::lock_guard<std::mutex> lg(m_lock);
             for (FrameListener* listener : m_frame_listeners){
@@ -358,15 +367,22 @@ void VideoWidget::paintEvent(QPaintEvent* event){
     //  Lock should not be needed since it's only updated on this UI thread.
 //    std::lock_guard<std::mutex> lg(m_lock);
 
-    QVideoFrame frame = m_session.latest_frame();
-    if (frame.isValid()){
-//        cout << "frame: " << m_last_frame.width() << " x " << m_last_frame.height() << endl;
-        QRect rect(0,0, this->width(), this->height());
-        QVideoFrame::PaintOptions options;
-        QPainter painter(this);
-        frame.paint(&painter, rect, options);
+    std::pair<QVideoFrame, uint64_t> frame = m_session.latest_frame();
+    if (!frame.first.isValid()){
+        return;
     }
+
+//        cout << "frame: " << m_last_frame.width() << " x " << m_last_frame.height() << endl;
+    QRect rect(0,0, this->width(), this->height());
+    QVideoFrame::PaintOptions options;
+    QPainter painter(this);
+    frame.first.paint(&painter, rect, options);
     // std::cout << "paintEvent end" << std::endl;
+
+    if (m_last_seqnum != frame.second){
+        m_last_seqnum = frame.second;
+        m_session.report_rendered_frame(current_time());
+    }
 }
 
 

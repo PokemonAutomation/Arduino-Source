@@ -177,7 +177,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
             painter.setFont(text_font);
 
             int x = start_x + width * 0.01;
-            int y = height * ((c + 1) * ROW_HEIGHT + 0.01);
+            int y = height * ((c + 1) * ROW_HEIGHT + 0.005);
 
             painter.drawText(QPoint(x, y), QString::fromStdString(snapshot.text));
 

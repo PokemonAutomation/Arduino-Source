@@ -133,6 +133,8 @@ VideoDisplayWidget::VideoDisplayWidget(
     , m_overlay_session(overlay)
     , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
+    , m_source_fps(*this)
+    , m_display_fps(*this)
 {
     this->add_widget(*m_video);
     this->add_widget(*m_overlay);
@@ -146,12 +148,14 @@ VideoDisplayWidget::VideoDisplayWidget(
     m_overlay->setHidden(false);
     m_overlay->raise();
 
-    overlay.add_stat(*this);
+    overlay.add_stat(m_source_fps);
+    overlay.add_stat(m_display_fps);
 }
 VideoDisplayWidget::~VideoDisplayWidget(){
     //  Close the window popout first since it holds references to this class.
     m_window.reset();
-    m_overlay_session.remove_stat(*this);
+    m_overlay_session.remove_stat(m_display_fps);
+    m_overlay_session.remove_stat(m_source_fps);
 }
 
 
@@ -188,13 +192,21 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
         QWidget::mouseDoubleClickEvent(event);
     }
 }
-OverlayStatSnapshot VideoDisplayWidget::get_current() const{
-    double fps = m_video->camera().source_fps();
+
+
+OverlayStatSnapshot VideoSourceFPS::get_current() const{
+    double fps = m_parent.m_video->camera().fps_source();
     return OverlayStatSnapshot{
-        "Video Backend FPS: " + tostr_fixed(fps, 2),
+        "Video Source FPS: " + tostr_fixed(fps, 2),
         fps < 20 ? COLOR_RED : COLOR_WHITE
     };
-
+}
+OverlayStatSnapshot VideoDisplayFPS::get_current() const{
+    double fps = m_parent.m_video->camera().fps_display();
+    return OverlayStatSnapshot{
+        "Video Display FPS: " + (fps < 0 ? "???" : tostr_fixed(fps, 2)),
+        fps >= 0 && fps < 20 ? COLOR_RED : COLOR_WHITE
+    };
 }
 
 

@@ -68,10 +68,39 @@ private:
 
 
 
+
+
+
+class VideoDisplayWidget;
+
+class VideoSourceFPS : public OverlayStat{
+public:
+    VideoSourceFPS(VideoDisplayWidget& parent)
+        : m_parent(parent)
+    {}
+    virtual OverlayStatSnapshot get_current() const override;
+
+private:
+    VideoDisplayWidget& m_parent;
+};
+
+class VideoDisplayFPS : public OverlayStat{
+public:
+    VideoDisplayFPS(VideoDisplayWidget& parent)
+        : m_parent(parent)
+    {}
+    virtual OverlayStatSnapshot get_current() const override;
+
+private:
+    VideoDisplayWidget& m_parent;
+};
+
+
+
 //  The widget that owns the video window.
 //  It consists of a VideoWidget that loads the video content from Switch and a VideoOverlayWidget
 //  that renders inference boxes and other visualizations on top of the video content.
-class VideoDisplayWidget : public WidgetStackFixedAspectRatio, public OverlayStat{
+class VideoDisplayWidget : public WidgetStackFixedAspectRatio{
 public:
     VideoDisplayWidget(
         QWidget& parent, QLayout& holder,
@@ -100,9 +129,9 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    virtual OverlayStatSnapshot get_current() const override;
+    friend class VideoSourceFPS;
+    friend class VideoDisplayFPS;
 
-private:
     QLayout& m_holder;
     const size_t m_id;
     CommandReceiver& m_command_receiver;
@@ -110,6 +139,9 @@ private:
     VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay = nullptr;
     std::unique_ptr<VideoDisplayWindow> m_window;
+
+    VideoSourceFPS m_source_fps;
+    VideoDisplayFPS m_display_fps;
 };
 
 

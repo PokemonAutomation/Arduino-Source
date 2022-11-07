@@ -70,9 +70,11 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
-    virtual double source_fps() override;
+    virtual double fps_source() override;
+    virtual double fps_display() override;
 
-    QVideoFrame latest_frame();
+    std::pair<QVideoFrame, uint64_t> latest_frame();
+    void report_rendered_frame(WallClock timestamp);
 
     virtual VideoWidget* make_QtWidget(QWidget* parent) override;
 
@@ -103,7 +105,8 @@ private:
 
     std::vector<Resolution> m_resolutions;
 
-    EventRateTracker m_fps_tracker;
+    EventRateTracker m_fps_tracker_source;
+    EventRateTracker m_fps_tracker_display;
 
     //  Last Frame
     QVideoFrame m_last_frame;
@@ -139,6 +142,7 @@ private:
 
 private:
     CameraSession& m_session;
+    uint64_t m_last_seqnum = 0;
 };
 
 

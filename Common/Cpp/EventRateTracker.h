@@ -63,7 +63,7 @@ public:
 
     void push_event(WallClock::duration usage_since_last, WallClock timestamp = current_time()){
         WallClock threshold = timestamp - m_window;
-        while (m_history.size() > 2){
+        while (m_history.size() > 1){
             if (m_history.front().timestamp >= threshold){
                 break;
             }
