@@ -6,13 +6,17 @@
 
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "CommonFramework/InferenceInfra/AudioInferencePivot.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "ConsoleHandle.h"
 
 namespace PokemonAutomation{
 
 
 ConsoleHandle::ConsoleHandle(ConsoleHandle&& x) = default;
-ConsoleHandle::~ConsoleHandle(){}
+ConsoleHandle::~ConsoleHandle(){
+    m_overlay.remove_stat(*m_audio_pivot);
+    m_overlay.remove_stat(*m_video_pivot);
+}
 
 
 ConsoleHandle::ConsoleHandle(
@@ -34,6 +38,8 @@ ConsoleHandle::ConsoleHandle(
 void ConsoleHandle::initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher){
     m_video_pivot = std::make_unique<VisualInferencePivot>(scope, m_video, dispatcher);
     m_audio_pivot = std::make_unique<AudioInferencePivot>(scope, m_audio, dispatcher);
+    m_overlay.add_stat(*m_video_pivot);
+    m_overlay.add_stat(*m_audio_pivot);
 }
 
 

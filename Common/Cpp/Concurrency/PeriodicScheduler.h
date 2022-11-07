@@ -14,7 +14,9 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "AsyncDispatcher.h"
 
 namespace PokemonAutomation{
@@ -66,6 +68,8 @@ class PeriodicRunner : public Cancellable{
 public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
+    double current_utilization() const;
+
 protected:
     PeriodicRunner(AsyncDispatcher& dispatcher);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
@@ -89,6 +93,9 @@ private:
     std::atomic<size_t> m_pending_waits;
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    mutable SpinLock m_stats_lock;
+    UtilizationTracker m_utilization;
 
     PeriodicScheduler m_scheduler;
 

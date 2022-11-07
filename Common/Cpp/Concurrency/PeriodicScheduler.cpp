@@ -140,6 +140,8 @@ bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
 void PeriodicRunner::thread_loop(){
     bool is_back_to_back = false;
     std::unique_lock<std::mutex> lg(m_lock);
+    WallClock last_check_timestamp = current_time();
+    WallClock::duration idle_since_last_check = WallClock::duration(0);
     while (true){
         if (cancelled()){
             return;
@@ -151,6 +153,15 @@ void PeriodicRunner::thread_loop(){
         }
 
         WallClock now = current_time();
+
+        {
+            SpinLockGuard lg1(m_stats_lock);
+            m_utilization.push_event(now - last_check_timestamp - idle_since_last_check, now);
+        }
+        last_check_timestamp = now;
+        idle_since_last_check = WallClock::duration(0);
+//        cout << m_utilization.utilization() << endl;
+
         void* event = m_scheduler.request_next_event(now);
 
         //  Event is available now. Run it.
@@ -167,16 +178,25 @@ void PeriodicRunner::thread_loop(){
         if (cancelled()){
             return;
         }
+
+        WallClock start = current_time();
         if (next < WallClock::max()){
             m_cv.wait_until(lg, next);
         }else{
             m_cv.wait(lg);
         }
+        WallClock end = current_time();
+        idle_since_last_check += end - start;
     }
 }
 void PeriodicRunner::stop_thread(){
     PeriodicRunner::cancel(nullptr);
     m_task.reset();
+}
+
+double PeriodicRunner::current_utilization() const{
+    SpinLockGuard lg(m_stats_lock);
+    return m_utilization.utilization();
 }
 
 

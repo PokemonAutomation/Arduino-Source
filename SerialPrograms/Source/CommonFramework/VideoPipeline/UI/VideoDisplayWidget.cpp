@@ -6,6 +6,7 @@
 
 #include <QResizeEvent>
 #include <QVBoxLayout>
+#include "Common/Cpp/PrettyPrint.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
@@ -129,6 +130,7 @@ VideoDisplayWidget::VideoDisplayWidget(
     , m_holder(holder)
     , m_id(id)
     , m_command_receiver(command_receiver)
+    , m_overlay_session(overlay)
     , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
 {
@@ -143,26 +145,15 @@ VideoDisplayWidget::VideoDisplayWidget(
     m_overlay->setVisible(true);
     m_overlay->setHidden(false);
     m_overlay->raise();
+
+    overlay.add_stat(*this);
 }
 VideoDisplayWidget::~VideoDisplayWidget(){
     //  Close the window popout first since it holds references to this class.
     m_window.reset();
+    m_overlay_session.remove_stat(*this);
 }
 
-
-
-void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
-//    if (!PreloadSettings::instance().DEVELOPER_MODE){
-//        return;
-//    }
-    // If this widget is not already inside a VideoDisplayWindow, move it
-    // into a VideoDisplayWindow
-    if (!m_window){
-        move_to_new_window();
-    }else{
-        QWidget::mouseDoubleClickEvent(event);
-    }
-}
 
 void VideoDisplayWidget::move_to_new_window(){
     if (m_window){
@@ -181,6 +172,29 @@ void VideoDisplayWidget::move_back_from_window(){
     this->set_size_policy(ADJUST_HEIGHT_TO_WIDTH);
     m_holder.addWidget(this);
     m_window.reset();
+}
+
+
+
+void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
+//    if (!PreloadSettings::instance().DEVELOPER_MODE){
+//        return;
+//    }
+    // If this widget is not already inside a VideoDisplayWindow, move it
+    // into a VideoDisplayWindow
+    if (!m_window){
+        move_to_new_window();
+    }else{
+        QWidget::mouseDoubleClickEvent(event);
+    }
+}
+OverlayStatSnapshot VideoDisplayWidget::get_current() const{
+    double fps = m_video->camera().current_fps();
+    return OverlayStatSnapshot{
+        "Video Backend FPS: " + tostr_fixed(fps, 2),
+        fps < 20 ? COLOR_RED : COLOR_WHITE
+    };
+
 }
 
 

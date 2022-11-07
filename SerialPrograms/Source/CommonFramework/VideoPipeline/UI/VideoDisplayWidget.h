@@ -71,7 +71,7 @@ private:
 //  The widget that owns the video window.
 //  It consists of a VideoWidget that loads the video content from Switch and a VideoOverlayWidget
 //  that renders inference boxes and other visualizations on top of the video content.
-class VideoDisplayWidget : public WidgetStackFixedAspectRatio{
+class VideoDisplayWidget : public WidgetStackFixedAspectRatio, public OverlayStat{
 public:
     VideoDisplayWidget(
         QWidget& parent, QLayout& holder,
@@ -100,9 +100,13 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
+    virtual OverlayStatSnapshot get_current() const override;
+
+private:
     QLayout& m_holder;
     const size_t m_id;
     CommandReceiver& m_command_receiver;
+    VideoOverlaySession& m_overlay_session;
     VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay = nullptr;
     std::unique_ptr<VideoDisplayWindow> m_window;

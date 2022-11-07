@@ -50,7 +50,7 @@ CommandRow::CommandRow(
 
     m_overlay_stats = new QCheckBox("Stats", this);
     m_overlay_stats->setChecked(false);
-    m_overlay_stats->setEnabled(PreloadSettings::instance().DEVELOPER_MODE);
+//    m_overlay_stats->setEnabled(PreloadSettings::instance().DEVELOPER_MODE);
     command_row->addWidget(m_overlay_stats);
 
     command_row->addSpacing(5);

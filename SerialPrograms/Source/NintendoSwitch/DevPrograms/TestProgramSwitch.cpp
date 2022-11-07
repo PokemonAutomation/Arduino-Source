@@ -140,6 +140,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 0
     OverlayTextScope text(overlay, "hello world", 0.5, 0.5, 10, COLOR_WHITE);
 
     overlay.add_log_text("asdfasdf", COLOR_RED);
@@ -155,7 +156,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         stat2.set_text(std::to_string(c));
         scope.wait_for(std::chrono::milliseconds(100));
     }
-
+#endif
 
 
 #if 0

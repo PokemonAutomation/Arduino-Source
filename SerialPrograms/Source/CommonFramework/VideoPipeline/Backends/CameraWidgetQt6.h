@@ -15,9 +15,9 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
@@ -70,6 +70,7 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
+    virtual double current_fps() override;
 
     QVideoFrame latest_frame();
 
@@ -88,7 +89,7 @@ private:
 
     //  If you need both locks, acquire "m_lock" first.
     mutable std::mutex m_lock;
-    SpinLock m_frame_lock;
+    mutable SpinLock m_frame_lock;
 
     CameraInfo m_device;
     Resolution m_resolution;
@@ -101,6 +102,8 @@ private:
     std::unique_ptr<QMediaCaptureSession> m_capture;
 
     std::vector<Resolution> m_resolutions;
+
+    EventRateTracker m_fps_tracker;
 
     //  Last Frame
     QVideoFrame m_last_frame;

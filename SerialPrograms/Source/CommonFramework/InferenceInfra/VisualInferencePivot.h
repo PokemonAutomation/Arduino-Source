@@ -10,6 +10,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"
 
@@ -19,7 +20,7 @@ class VideoFeed;
 
 
 
-class VisualInferencePivot final : public PeriodicRunner{
+class VisualInferencePivot final : public PeriodicRunner, public OverlayStat{
 public:
     VisualInferencePivot(CancellableScope& scope, VideoFeed& feed, AsyncDispatcher& dispatcher);
     virtual ~VisualInferencePivot();
@@ -40,6 +41,7 @@ public:
 
 private:
     virtual void run(void* event, bool is_back_to_back) noexcept override;
+    virtual OverlayStatSnapshot get_current() const override;
 
 private:
     struct PeriodicCallback;

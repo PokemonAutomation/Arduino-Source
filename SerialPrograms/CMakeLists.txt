@@ -93,6 +93,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId_x86.tpp
     ../Common/Cpp/EnumDatabase.cpp
     ../Common/Cpp/EnumDatabase.h
+    ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ImageResolution.cpp

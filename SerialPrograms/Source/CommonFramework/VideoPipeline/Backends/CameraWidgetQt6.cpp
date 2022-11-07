@@ -202,7 +202,10 @@ VideoSnapshot CameraSession::snapshot(){
 
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
-
+double CameraSession::current_fps(){
+    SpinLockGuard lg(m_frame_lock);
+    return m_fps_tracker.events_per_second();
+}
 
 
 void CameraSession::shutdown(){
@@ -311,6 +314,7 @@ void CameraSession::startup(){
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
+                m_fps_tracker.push_event(now);
             }
             std::lock_guard<std::mutex> lg(m_lock);
             for (FrameListener* listener : m_frame_listeners){

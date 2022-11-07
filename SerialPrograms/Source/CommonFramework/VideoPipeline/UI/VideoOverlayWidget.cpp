@@ -143,8 +143,8 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     }
 
     if (m_enabled_stats && m_stats){
-        const double TEXT_SIZE = 2 / 100.;
-        const double ROW_HEIGHT = 3 / 100.;
+        const double TEXT_SIZE = 0.02;
+        const double ROW_HEIGHT = 0.03;
 
         QColor box_color(10, 10, 10, 200);
         painter.setPen(box_color);
@@ -154,16 +154,15 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
             width / 2,
             0,
             width - width / 2,
-            (int)(height * m_stats->size() * (ROW_HEIGHT + 0.01)),
+            (int)(height * (m_stats->size() * ROW_HEIGHT + 0.02)),
             box_color
         );
 
         size_t c = 0;
         for (const auto& stat : *m_stats){
-            std::string text;
-            Color color = stat->get_text(text);
+            OverlayStatSnapshot snapshot = stat->get_current();
 
-            painter.setPen(QColor((uint32_t)color));
+            painter.setPen(QColor((uint32_t)snapshot.color));
 
             QFont text_font = this->font();
             text_font.setPointSizeF(height * TEXT_SIZE);
@@ -172,7 +171,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
             int x = width * 0.51;
             int y = height * ((c + 1) * ROW_HEIGHT + 0.01);
 
-            painter.drawText(QPoint(x, y), QString::fromStdString(text));
+            painter.drawText(QPoint(x, y), QString::fromStdString(snapshot.text));
 
             c++;
         }

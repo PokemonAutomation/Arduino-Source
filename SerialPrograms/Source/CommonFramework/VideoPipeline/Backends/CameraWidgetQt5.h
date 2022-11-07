@@ -16,6 +16,7 @@
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
 #include <QVideoProbe>
+#include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -64,6 +65,7 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
+    virtual double current_fps() override;
 
     QVideoFrame latest_frame();
 
@@ -106,6 +108,8 @@ private:
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
     std::vector<Resolution> m_resolutions;
+
+    EventRateTracker m_fps_tracker;
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;

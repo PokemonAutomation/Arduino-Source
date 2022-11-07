@@ -818,6 +818,7 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/EnumDatabase.h \
+    ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \

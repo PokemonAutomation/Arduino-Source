@@ -5,12 +5,13 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioInferencePivot.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -114,6 +115,23 @@ void AudioInferencePivot::run(void* event, bool is_back_to_back) noexcept{
     }catch (...){
         callback.scope.cancel(std::current_exception());
     }
+}
+
+
+OverlayStatSnapshot AudioInferencePivot::get_current() const{
+    double utilization = this->current_utilization();
+    Color color = COLOR_WHITE;
+    if (utilization > 0.90){
+        color = COLOR_RED;
+    }else if (utilization > 0.80){
+        color = COLOR_ORANGE;
+    }else if (utilization > 0.50){
+        color = COLOR_YELLOW;
+    }
+    return OverlayStatSnapshot{
+        "Audio Inference Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
+        color
+    };
 }
 
 

@@ -63,15 +63,10 @@ public:
     void operator=(const OverlayStat&) = delete;
 
 public:
-    ~OverlayStat();
-    OverlayStat();
+    virtual ~OverlayStat() = default;
+    OverlayStat() = default;
 
-    Color get_text(std::string& text) const;
-    void set_text(std::string text, Color color = COLOR_WHITE);
-
-private:
-    struct Data;
-    Pimpl<Data> m_data;
+    virtual OverlayStatSnapshot get_current() const = 0;
 };
 
 

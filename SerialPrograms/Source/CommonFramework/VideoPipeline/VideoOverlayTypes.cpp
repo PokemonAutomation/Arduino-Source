@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 
 
 
-
+#if 0
 struct OverlayStat::Data{
     mutable SpinLock m_lock;
     OverlayStatSnapshot m_current;
@@ -34,7 +34,7 @@ void OverlayStat::set_text(std::string text, Color color){
     m_data->m_current.text = std::move(text);
     m_data->m_current.color = color;
 }
-
+#endif
 
 
 

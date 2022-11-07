@@ -129,7 +129,6 @@ using namespace Kernels;
 
 
 
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;

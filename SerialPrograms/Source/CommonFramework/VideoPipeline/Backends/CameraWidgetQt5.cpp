@@ -269,6 +269,10 @@ VideoSnapshot CameraSession::snapshot(){
         return snapshot_image();
     }
 }
+double CameraSession::current_fps(){
+    SpinLockGuard lg(m_frame_lock);
+    return m_fps_tracker.events_per_second();
+}
 
 
 

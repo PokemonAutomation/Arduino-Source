@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "AudioInferenceCallback.h"
 
@@ -18,7 +19,7 @@ class AudioFeed;
 
 
 
-class AudioInferencePivot final : public PeriodicRunner{
+class AudioInferencePivot final : public PeriodicRunner, public OverlayStat{
 public:
     AudioInferencePivot(CancellableScope& scope, AudioFeed& feed, AsyncDispatcher& dispatcher);
     virtual ~AudioInferencePivot();
@@ -39,6 +40,7 @@ public:
 
 private:
     virtual void run(void* event, bool is_back_to_back) noexcept override;
+    virtual OverlayStatSnapshot get_current() const override;
 
 private:
     struct PeriodicCallback;
