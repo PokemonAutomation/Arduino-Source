@@ -265,6 +265,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.cpp \
+    Source/CommonFramework/VideoPipeline/VideoOverlayTypes.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/DpiScaler.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
