@@ -46,6 +46,7 @@ CommandRow::CommandRow(
     command_row->addWidget(m_overlay_boxes);
 
     m_overlay_text = new QCheckBox("Text", this);
+    m_overlay_text->setHidden(true);    //  Nothing uses text overlay yet.
     m_overlay_text->setChecked(session.enabled_text());
     command_row->addWidget(m_overlay_text);
 
