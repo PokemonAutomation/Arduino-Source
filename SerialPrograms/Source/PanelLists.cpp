@@ -5,8 +5,10 @@
  */
 
 #include <array>
+#include <QStandardItemModel>
+#include <QVBoxLayout>
 #include <QLabel>
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
@@ -18,81 +20,88 @@
 #include "PokemonSV/PokemonSV_Panels.h"
 #include "PanelLists.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
 
 
-class MyTabBar : public QTabBar{
-public:
-    using QTabBar::QTabBar;
-#if 0
-    virtual QSize tabSizeHint(int index) const{
-        QSize ret = QTabBar::tabSizeHint(index);
-        cout << ret.width() << " x " << ret.height() << endl;
-        return QSize(ret.width() * 0.8, ret.height());
-    }
-#endif
-};
 
 
 
-ProgramTabs::ProgramTabs(QWidget& parent, PanelHolder& holder)
-    : QTabWidget(&parent)
+ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
+    : QGroupBox("Program Select", &parent)
+    , m_holder(holder)
 {
-    setTabBar(new MyTabBar(this));
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setAlignment(Qt::AlignTop);
+    m_dropdown = new NoWheelComboBox(this);
+    layout->addWidget(m_dropdown);
 
-    add(new PanelList(*this, holder,
-        "Switch",  "Nintendo Switch",
-        NintendoSwitch::make_panels()
+    add(PanelListDescriptor(
+        "Nintendo Switch",
+        &NintendoSwitch::make_panels
     ));
-    add(new PanelList(*this, holder,
-        "Home", Pokemon::STRING_POKEMON + " Home",
-        NintendoSwitch::PokemonHome::make_panels()
+    add(PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Home",
+        NintendoSwitch::PokemonHome::make_panels
     ));
-    add(new PanelList(*this, holder,
-        "SwSh", Pokemon::STRING_POKEMON + " Sword and Shield",
-        NintendoSwitch::PokemonSwSh::make_panels()
+    add(PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Sword and Shield",
+        NintendoSwitch::PokemonSwSh::make_panels
     ));
-    add(new PanelList(*this, holder,
-        "BDSP", Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl",
-        NintendoSwitch::PokemonBDSP::make_panels()
+    add(PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl",
+        NintendoSwitch::PokemonBDSP::make_panels
     ));
-    add(new PanelList(*this, holder,
-        "LA", Pokemon::STRING_POKEMON + " Legends Arceus",
-        NintendoSwitch::PokemonLA::make_panels()
+    add(PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Legends Arceus",
+        NintendoSwitch::PokemonLA::make_panels
     ));
-    add(new PanelList(*this, holder,
-        "SV", Pokemon::STRING_POKEMON + " Scarlet and Violet",
-        NintendoSwitch::PokemonSV::make_panels()
+    add(PanelListDescriptor(
+        Pokemon::STRING_POKEMON + " Scarlet and Violet",
+        NintendoSwitch::PokemonSV::make_panels, false
     ));
 
-#if 0
-    QTabBar* bar = this->tabBar();
-    for (int c = 0; c < bar->count(); c++){
-//        cout << "asdf" << endl;
-        const char* name = bar->tabData(c).typeName();
-        if (name){
-            cout << name << endl;
-        }else{
-            cout << "(null)" << endl;
+    //  Load the 1st list by default.
+    m_dropdown->setCurrentIndex(0);
+    m_active_index = 0;
+    m_active_list = m_lists[0].make_QWidget(*this, m_holder);
+    layout->addWidget(m_active_list);
+
+    connect(
+        m_dropdown, &QComboBox::activated,
+        this, [this](int index){
+            change_list(index);
         }
-//        bar->tabButton(c, QTabBar::RightSide)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    }
-#endif
-
-    connect(this, &ProgramTabs::currentChanged, this, [&](int index){
-        if (index >= 0 && (size_t)index < m_lists.size()){
-            PERSISTENT_SETTINGS().panels["ProgramTab"] = m_lists[index]->label();
-        }
-    });
+    );
 }
 
-void ProgramTabs::load_persistent_panel(){
-    const std::string* str = PERSISTENT_SETTINGS().panels.get_string("ProgramTab");
+void ProgramSelect::add(PanelListDescriptor list){
+    int index = m_dropdown->count();
+    m_dropdown->addItem(QString::fromStdString(list.name()));
+    m_lists.emplace_back(std::move(list));
+    if (!m_tab_map.emplace(m_lists.back().name(), index).second){
+        m_lists.pop_back();
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Category Name: " + m_lists.back().name());
+    }
+    if (!m_lists.back().enabled()){
+        auto* model = qobject_cast<QStandardItemModel*>(m_dropdown->model());
+        if (model != nullptr){
+            QStandardItem* line_handle = model->item(index);
+            if (line_handle != nullptr){
+                line_handle->setEnabled(false);
+            }
+        }
+    }
+}
+
+
+
+void ProgramSelect::load_persistent_panel(){
+    const std::string* str = PERSISTENT_SETTINGS().panels.get_string("ProgramCategory");
     if (str == nullptr){
         return;
     }
@@ -100,34 +109,34 @@ void ProgramTabs::load_persistent_panel(){
     if (iter == m_tab_map.end()){
         return;
     }
-    setCurrentIndex(iter->second);
-    str = PERSISTENT_SETTINGS().panels.get_string(PanelList::JSON_PROGRAM_PANEL);
+    m_dropdown->setCurrentIndex(iter->second);
+    change_list(iter->second);
+    str = PERSISTENT_SETTINGS().panels.get_string(PanelListWidget::JSON_PROGRAM_PANEL);
     if (str != nullptr){
-        m_lists[currentIndex()]->set_panel(*str);
+        m_active_list->set_panel(*str);
     }
 }
 
-void ProgramTabs::add(PanelList* list){
-    int index = count();
-    addTab(list, QString::fromStdString(list->label()));
-    setTabToolTip(index, QString::fromStdString(list->description()));
-    if (list->items() == 0){
-        setTabEnabled((int)m_lists.size(), false);
+void ProgramSelect::change_list(int index){
+    if (m_active_index == index && m_active_list != nullptr){
+        return;
     }
-    m_lists.emplace_back(list);
-    if (!m_tab_map.emplace(list->label(), index).second){
-        m_lists.pop_back();
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Tab Name: " + list->label());
-    }
+    m_dropdown->setCurrentIndex(index);
+    m_active_index = index;
+    PERSISTENT_SETTINGS().panels["ProgramCategory"] = m_lists[index].name();
+    delete m_active_list;
+    m_active_list = m_lists[index].make_QWidget(*this, m_holder);
+    layout()->addWidget(m_active_list);
 }
 
-QSize ProgramTabs::sizeHint() const{
-    QSize size = QTabWidget::sizeHint();
+QSize ProgramSelect::sizeHint() const{
+    QSize size = QGroupBox::sizeHint();
 //    cout << size.width() << " x " << size.height() << endl;
 //    cout << this->size().width() << " x " << this->size().height() << endl;
     size.setWidth(scale_dpi_width(size.width() + 10));
     return size;
 }
+
 
 
 

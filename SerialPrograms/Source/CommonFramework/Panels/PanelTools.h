@@ -8,7 +8,6 @@
 #define PokemonAutomation_Panel_H
 
 #include <memory>
-#include "Common/Compiler.h"
 #include "PanelDescriptor.h"
 
 class QWidget;
@@ -25,7 +24,10 @@ struct PanelHolder{
     //  Returns true if ready for new panel.
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) = 0;
 
-    virtual void load_panel(std::unique_ptr<PanelInstance> panel) = 0;
+    virtual void load_panel(
+        std::shared_ptr<const PanelDescriptor> descriptor,
+        std::unique_ptr<PanelInstance> panel
+    ) = 0;
     virtual Logger& raw_logger() = 0;
     virtual void on_busy() = 0;
     virtual void on_idle() = 0;

@@ -12,9 +12,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
-#include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
 #include "PanelLists.h"
@@ -55,14 +53,21 @@ MainWindow::MainWindow(QWidget* parent)
     QVBoxLayout* left_layout = new QVBoxLayout();
     hbox->addLayout(left_layout, 0);
 
-
+#if 0
     QGroupBox* program_box = new QGroupBox("Program Select", centralwidget);
     left_layout->addWidget(program_box, 1);
     QVBoxLayout* program_layout = new QVBoxLayout(program_box);
     program_layout->setAlignment(Qt::AlignTop);
 
+//    NoWheelComboBox* program_dropdown = new NoWheelComboBox(this);
+//    program_layout->addWidget(program_dropdown);
+
     m_program_list = new ProgramTabs(*this, *this);
     program_layout->addWidget(m_program_list);
+#else
+    m_program_list = new ProgramSelect(*this, *this);
+    left_layout->addWidget(m_program_list, 1);
+#endif
 
 
     QGroupBox* support_box = new QGroupBox(
@@ -161,7 +166,7 @@ MainWindow::MainWindow(QWidget* parent)
         settings, &QPushButton::clicked,
         this, [this](bool){
             if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
-                load_panel(GlobalSettings_Descriptor::INSTANCE.make_panel());
+                load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
             }
         }
     );
@@ -212,6 +217,7 @@ void MainWindow::close_panel(){
 #endif
 
     m_current_panel.reset();
+    m_current_panel_descriptor.reset();
 }
 
 bool MainWindow::report_new_panel_intent(const PanelDescriptor& descriptor){
@@ -228,11 +234,15 @@ bool MainWindow::report_new_panel_intent(const PanelDescriptor& descriptor){
 
     return true;
 }
-void MainWindow::load_panel(std::unique_ptr<PanelInstance> panel){
+void MainWindow::load_panel(
+    std::shared_ptr<const PanelDescriptor> descriptor,
+    std::unique_ptr<PanelInstance> panel
+){
     close_panel();
 
     //  Make new widget.
     m_current_panel_widget = panel->make_widget(*this, *this);
+    m_current_panel_descriptor = std::move(descriptor);
     m_current_panel = std::move(panel);
     m_right_panel_layout->addWidget(m_current_panel_widget);
 }

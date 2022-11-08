@@ -6,7 +6,6 @@
 
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Json/JsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "PanelInstance.h"
 #include "PanelList.h"
@@ -17,16 +16,35 @@
 
 namespace PokemonAutomation{
 
-const std::string PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
-PanelList::PanelList(
-    QTabWidget& parent, PanelHolder& holder,
-    std::string label, std::string description,
+
+PanelListDescriptor::PanelListDescriptor(
+    std::string name,
+    MakePanelEntries factory,
+    bool enabled
+)
+    : m_name(std::move(name))
+    , m_factory(factory)
+    , m_enabled(enabled)
+{}
+PanelListWidget* PanelListDescriptor::make_QWidget(QWidget& parent, PanelHolder& holder) const{
+    return new PanelListWidget(
+        parent, holder,
+        m_factory()
+    );
+}
+
+
+
+
+
+const std::string PanelListWidget::JSON_PROGRAM_PANEL = "ProgramPanel";
+
+PanelListWidget::PanelListWidget(
+    QWidget& parent, PanelHolder& holder,
     std::vector<PanelEntry> list
 )
     : QListWidget(&parent)
-    , m_label(label)
-    , m_description(std::move(description))
     , m_panel_holder(holder)
 {
 //    QFontMetrics fm(this->font());
@@ -69,13 +87,13 @@ PanelList::PanelList(
 }
 
 
-void PanelList::handle_panel_clicked(const std::string& text){
+void PanelListWidget::handle_panel_clicked(const std::string& text){
     auto iter = m_panel_map.find(text);
     if (iter == m_panel_map.end()){
         PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = "";
         return;
     }
-    const PanelDescriptor* descriptor = iter->second.get();
+    std::shared_ptr<const PanelDescriptor>& descriptor = iter->second;
 //    cout << descriptor->display_name() << endl;
     if (!m_panel_holder.report_new_panel_intent(*descriptor)){
         return;
@@ -83,7 +101,7 @@ void PanelList::handle_panel_clicked(const std::string& text){
     try{
         std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
         panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
-        m_panel_holder.load_panel(std::move(panel));
+        m_panel_holder.load_panel(descriptor, std::move(panel));
 
         PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = iter->first;
     }catch (const Exception& error){
@@ -96,7 +114,7 @@ void PanelList::handle_panel_clicked(const std::string& text){
     }
 }
 
-void PanelList::set_panel(const std::string& panel_name){
+void PanelListWidget::set_panel(const std::string& panel_name){
     const auto panels = findItems(QString::fromStdString(panel_name), Qt::MatchExactly);
     if (panels.size() > 0){
         setCurrentItem(panels[0]);

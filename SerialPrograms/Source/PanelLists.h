@@ -7,15 +7,18 @@
 #ifndef PokemonAutomation_ProgramTabs_H
 #define PokemonAutomation_ProgramTabs_H
 
-#include <QTabWidget>
+#include <QGroupBox>
 #include "CommonFramework/Panels/PanelList.h"
+
+class QComboBox;
 
 namespace PokemonAutomation{
 
 
-class ProgramTabs : public QTabWidget{
+
+class ProgramSelect : public QGroupBox{
 public:
-    ProgramTabs(QWidget& parent, PanelHolder& holder);
+    ProgramSelect(QWidget& parent, PanelHolder& holder);
 
     // Load the panel specified in the persistent setting.
     void load_persistent_panel();
@@ -23,13 +26,20 @@ public:
     virtual QSize sizeHint() const override;
 
 private:
-    void add(PanelList* list);
+    void add(PanelListDescriptor list);
+    void change_list(int index);
 
 private:
-    std::vector<PanelList*> m_lists;
-    std::map<std::string, int> m_tab_map;
-};
+    PanelHolder& m_holder;
 
+    std::vector<PanelListDescriptor> m_lists;
+    std::map<std::string, int> m_tab_map;
+
+    QComboBox* m_dropdown;
+
+    int m_active_index = -1;
+    PanelListWidget* m_active_list = nullptr;
+};
 
 
 
