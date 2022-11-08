@@ -33,9 +33,9 @@ BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, ConsoleHandle& console, BotB
     // : m_env(env)
     : m_console(console)
     , m_context(context)
-    , m_text_box0(console, 0.400, 0.825, 0.05, 0.05, COLOR_RED)
-    , m_text_box1(console, 0.250, 0.900, 0.05, 0.05, COLOR_RED)
-    , m_box(console, 0.10, 0.005, 0.8, 0.470, COLOR_RED)
+    , m_text_box0(console, {0.400, 0.825, 0.05, 0.05}, COLOR_RED)
+    , m_text_box1(console, {0.250, 0.900, 0.05, 0.05}, COLOR_RED)
+    , m_box(console, {0.10, 0.005, 0.8, 0.470}, COLOR_RED)
 {
     for (size_t c = 0; c < 32; c++){
         m_boxes.emplace_back(0.10 + 0.025*c, 0.005, 0.025, 0.470);

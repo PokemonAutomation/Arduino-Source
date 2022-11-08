@@ -9,7 +9,6 @@
 
 #include <string>
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "VideoOverlayTypes.h"
 
 namespace PokemonAutomation{
@@ -25,12 +24,12 @@ public:
     //
     // Can use `InferenceBoxScope: public ImageFloatBox` to handle box removal automatically when it's destroyed.
     // Can also use `VideoOverlay.h:VideoOverlaySet` to manage multiple boxes.
-    virtual void add_box(const ImageFloatBox& box, Color color) = 0;
+    virtual void add_box(const OverlayBox& box) = 0;
     
     // Asychronously, remove an added inference box.
     // The box must be already added.
     // See `add_box()` for more info on managing boxes.
-    virtual void remove_box(const ImageFloatBox& box) = 0;
+    virtual void remove_box(const OverlayBox& box) = 0;
 
     // Asychronously, add a text, `OverlayText` as part of the video overlay.
     // Once added, `text` cannot be destroyed until after `VideoOverlay::remove_text()` is called to remove it.

@@ -101,8 +101,8 @@ class DummyVideoOverlay: public VideoOverlay{
 public:
     DummyVideoOverlay() {}
 
-    virtual void add_box(const ImageFloatBox& box, Color color) override{}
-    virtual void remove_box(const ImageFloatBox& box) override{}
+    virtual void add_box(const OverlayBox& box) override{}
+    virtual void remove_box(const OverlayBox& box) override{}
 
     virtual void add_text(const OverlayText& text) override{}
     virtual void remove_text(const OverlayText& text) override{}

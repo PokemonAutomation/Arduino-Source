@@ -147,7 +147,7 @@ void trade_current_pokemon(
 TradeNameReader::TradeNameReader(Logger& logger, VideoOverlay& overlay, Language language)
     : m_logger(logger)
     , m_language(language)
-    , m_box(overlay, 0.80, 0.155, 0.18, 0.05)
+    , m_box(overlay, {0.80, 0.155, 0.18, 0.05})
 {
     std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json";
     JsonValue json = load_json_file(path);

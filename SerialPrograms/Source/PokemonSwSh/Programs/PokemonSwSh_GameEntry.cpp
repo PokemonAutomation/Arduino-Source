@@ -64,7 +64,7 @@ void enter_loading_game(
     {
         std::chrono::milliseconds timeout(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND));
 
-        OverlayBoxScope box(console, 0.2, 0.2, 0.6, 0.6);
+        OverlayBoxScope box(console, {0.2, 0.2, 0.6, 0.6});
 
         bool black_found = false;
 

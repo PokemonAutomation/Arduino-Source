@@ -44,9 +44,9 @@ BattleBallReader::BattleBallReader(
     , m_name_reader(PokeballNameReader::instance())
     , m_language(language)
     , m_console(console)
-    , m_box_sprite(console, 0.649, 0.624, 0.0335, 0.060)
-    , m_box_name(console, 0.710, 0.624, 0.18, 0.060)
-    , m_box_quantity(console, 0.895, 0.624, 0.059, 0.060)
+    , m_box_sprite(console, {0.649, 0.624, 0.0335, 0.060})
+    , m_box_name(console, {0.710, 0.624, 0.18, 0.060})
+    , m_box_quantity(console, {0.895, 0.624, 0.059, 0.060})
 {}
 
 std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{

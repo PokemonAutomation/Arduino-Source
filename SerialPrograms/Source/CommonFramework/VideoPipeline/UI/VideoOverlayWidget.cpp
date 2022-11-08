@@ -8,9 +8,10 @@
 #include <QResizeEvent>
 #include "VideoOverlayWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -26,7 +27,7 @@ VideoOverlayWidget::~VideoOverlayWidget(){
 VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session)
     : QWidget(&parent)
     , m_session(session)
-    , m_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.boxes()))
+    , m_boxes(std::make_shared<std::vector<OverlayBox>>(session.boxes()))
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
     , m_log_texts(std::make_shared<std::vector<OverlayText>>(session.log_texts()))
     , m_log_text_bg_boxes(std::make_shared<std::vector<VideoOverlaySession::Box>>(session.log_text_background()))
@@ -52,7 +53,7 @@ void VideoOverlayWidget::enabled_stats(bool enabled){
     QMetaObject::invokeMethod(this, [this]{ this->update(); });
 }
 
-void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes){
+void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){
     SpinLockGuard lg(m_lock, "VideoOverlay::update_boxes()");
     m_boxes = boxes;
 }
@@ -84,7 +85,8 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 
     if (m_session.enabled_boxes()){
         for (const auto& item : *m_boxes){
-            painter.setPen(QColor((uint32_t)item.color));
+            QColor color = QColor((uint32_t)item.color);
+            painter.setPen(color);
     //        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
     //        cout << (int)(width * box->x + 0.5)
     //             << " " << (int)(height * box->y + 0.5)
@@ -108,6 +110,44 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
                 xmax - xmin,
                 ymax - ymin
             );
+
+
+            //  Draw the label.
+
+            if (item.label.empty()){
+                continue;
+            }
+
+            QString text = QString::fromStdString(item.label);
+
+            QFont text_font = this->font();
+            text_font.setPointSizeF((int)(height * 0.015));
+            painter.setFont(text_font);
+
+            QRect br = painter.boundingRect(0, 0, width, height, 0, text);
+//            cout << br.x() << " " << br.y() << " : " << br.width() << " " << br.height() << endl;
+
+            int padding_width = (int)(width * 0.005);
+            int padding_height = (int)(height * 0.004);
+
+            int box_height = 3*padding_height + (int)(height * 0.02);
+            int box_width  = 2*padding_width + br.width();
+
+            if (ymin - box_height < 0){
+                ymin += box_height;
+            }
+
+            painter.fillRect(
+                xmin,
+                std::max(ymin - box_height, 0),
+                box_width,
+                box_height,
+                color
+            );
+
+            painter.setPen(QColor(0xffffffff));
+            painter.drawText(QPoint(xmin + padding_width, ymin - 2*padding_height), text);
+
         }
     }
 

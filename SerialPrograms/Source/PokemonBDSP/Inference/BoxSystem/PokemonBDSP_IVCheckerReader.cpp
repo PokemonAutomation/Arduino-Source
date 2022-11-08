@@ -14,12 +14,12 @@ namespace PokemonBDSP{
 
 IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language language)
     : m_language(language)
-    , m_box0(overlay, 0.785, 0.196 + 0 * 0.0529, 0.2, 0.0515)
-    , m_box1(overlay, 0.785, 0.196 + 1 * 0.0529, 0.2, 0.0515)
-    , m_box2(overlay, 0.785, 0.196 + 2 * 0.0529, 0.2, 0.0515)
-    , m_box3(overlay, 0.785, 0.196 + 3 * 0.0529, 0.2, 0.0515)
-    , m_box4(overlay, 0.785, 0.196 + 4 * 0.0529, 0.2, 0.0515)
-    , m_box5(overlay, 0.785, 0.196 + 5 * 0.0529, 0.2, 0.0515)
+    , m_box0(overlay, {0.785, 0.196 + 0 * 0.0529, 0.2, 0.0515})
+    , m_box1(overlay, {0.785, 0.196 + 1 * 0.0529, 0.2, 0.0515})
+    , m_box2(overlay, {0.785, 0.196 + 2 * 0.0529, 0.2, 0.0515})
+    , m_box3(overlay, {0.785, 0.196 + 3 * 0.0529, 0.2, 0.0515})
+    , m_box4(overlay, {0.785, 0.196 + 4 * 0.0529, 0.2, 0.0515})
+    , m_box5(overlay, {0.785, 0.196 + 5 * 0.0529, 0.2, 0.0515})
 {}
 
 

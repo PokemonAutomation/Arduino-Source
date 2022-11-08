@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 // A box as part of the video overlay.
 // It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
-class OverlayBoxScope : public ImageFloatBox{
+class OverlayBoxScope : public OverlayBox{
 public:
     ~OverlayBoxScope(){
         m_overlay.remove_box(*this);
@@ -29,30 +29,28 @@ public:
 public:
     OverlayBoxScope(
         VideoOverlay& overlay,
+        Color color,
+        const ImageFloatBox& box,
+        std::string label
+    )
+        : OverlayBox(color, box, std::move(label))
+        , m_overlay(overlay)
+    {
+        overlay.add_box(*this);
+    }
+
+    OverlayBoxScope(
+        VideoOverlay& overlay,
         const ImageFloatBox& box,
         Color color = COLOR_RED
     )
-        : ImageFloatBox(box)
-        , m_color(color)
+        : OverlayBox(color, box, "")
         , m_overlay(overlay)
     {
-        overlay.add_box(*this, color);
-    }
-    OverlayBoxScope(
-        VideoOverlay& overlay,
-        double p_x, double p_y,
-        double p_width, double p_height,
-        Color color = COLOR_RED
-    )
-        : ImageFloatBox(p_x, p_y, p_width, p_height)
-        , m_color(color)
-        , m_overlay(overlay)
-    {
-        overlay.add_box(*this, color);
+        overlay.add_box(*this);
     }
 
 private:
-    Color m_color;
     VideoOverlay& m_overlay;
 };
 
@@ -137,8 +135,8 @@ public:
     void clear(){
         m_boxes.clear();
     }
-    void add(Color color, const ImageFloatBox& box){
-        m_boxes.emplace_back(m_overlay, box, color);
+    void add(Color color, const ImageFloatBox& box, std::string label = ""){
+        m_boxes.emplace_back(m_overlay, color, box, std::move(label));
     }
 
 private:

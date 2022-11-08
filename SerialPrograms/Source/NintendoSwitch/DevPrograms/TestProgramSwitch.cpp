@@ -139,6 +139,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
+    OverlayBoxScope box(overlay, COLOR_RED, {0.4, 0.4, 0.2, 0.2}, "asdf qwer sdfg");
+
+
+
 
 #if 0
     OverlayTextScope text(overlay, "hello world", 0.5, 0.5, 10, COLOR_WHITE);
@@ -176,7 +180,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     ImageRGB32 image("screenshot-20221107-210754107968.png");
 //    auto image = feed.snapshot();
     HomeDetector detector;

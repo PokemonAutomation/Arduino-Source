@@ -24,14 +24,14 @@ namespace PokemonSwSh{
 
 RaidLobbyReader::RaidLobbyReader(Logger& logger, VideoOverlay& overlay)
     : m_logger(logger)
-    , m_checkbox0(overlay, 0.593, 0.337 + 0.0775*0, 0.034, 0.06)
-    , m_checkbox1(overlay, 0.593, 0.337 + 0.0775*1, 0.034, 0.06)
-    , m_checkbox2(overlay, 0.593, 0.337 + 0.0775*2, 0.034, 0.06)
-    , m_checkbox3(overlay, 0.593, 0.337 + 0.0775*3, 0.034, 0.06)
-    , m_spritebox0(overlay, 0.820, 0.337 + 0.0775*0, 0.034, 0.06)
-    , m_spritebox1(overlay, 0.820, 0.337 + 0.0775*1, 0.034, 0.06)
-    , m_spritebox2(overlay, 0.820, 0.337 + 0.0775*2, 0.034, 0.06)
-    , m_spritebox3(overlay, 0.820, 0.337 + 0.0775*3, 0.034, 0.06)
+    , m_checkbox0(overlay, {0.593, 0.337 + 0.0775*0, 0.034, 0.06})
+    , m_checkbox1(overlay, {0.593, 0.337 + 0.0775*1, 0.034, 0.06})
+    , m_checkbox2(overlay, {0.593, 0.337 + 0.0775*2, 0.034, 0.06})
+    , m_checkbox3(overlay, {0.593, 0.337 + 0.0775*3, 0.034, 0.06})
+    , m_spritebox0(overlay, {0.820, 0.337 + 0.0775*0, 0.034, 0.06})
+    , m_spritebox1(overlay, {0.820, 0.337 + 0.0775*1, 0.034, 0.06})
+    , m_spritebox2(overlay, {0.820, 0.337 + 0.0775*2, 0.034, 0.06})
+    , m_spritebox3(overlay, {0.820, 0.337 + 0.0775*3, 0.034, 0.06})
 {}
 
 RaidLobbyState RaidLobbyReader::read(const ImageViewRGB32& screen){

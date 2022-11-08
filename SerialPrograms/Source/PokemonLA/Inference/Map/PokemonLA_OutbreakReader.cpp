@@ -19,9 +19,9 @@ namespace PokemonLA{
 OutbreakReader::OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay)
     : m_logger(logger)
     , m_language(language)
-    , m_dialog_box0(overlay, 0.030, 0.177, 0.020, 0.038)
-    , m_dialog_box1(overlay, 0.030, 0.225, 0.020, 0.038)
-    , m_text_box(overlay, 0.050, 0.177, 0.200, 0.038)
+    , m_dialog_box0(overlay, {0.030, 0.177, 0.020, 0.038})
+    , m_dialog_box1(overlay, {0.030, 0.225, 0.020, 0.038})
+    , m_text_box(overlay, {0.050, 0.177, 0.200, 0.038})
 {}
 
 OCR::StringMatchResult OutbreakReader::read(const ImageViewRGB32& screen) const{

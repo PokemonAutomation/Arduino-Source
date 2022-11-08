@@ -35,7 +35,7 @@ private:
     virtual void enabled_log  (bool enabled) override;
     virtual void enabled_stats(bool enabled) override;
 
-    virtual void update_boxes(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& boxes) override;
+    virtual void update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes) override;
     virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
     virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
     virtual void update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
@@ -48,7 +48,7 @@ private:
     VideoOverlaySession& m_session;
 
     SpinLock m_lock;
-    std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_boxes;
+    std::shared_ptr<const std::vector<OverlayBox>> m_boxes;
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
     std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
     std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;

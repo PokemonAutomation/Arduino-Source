@@ -10,8 +10,26 @@
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
+
+
+struct OverlayBox{
+    Color color;
+    ImageFloatBox box;
+    std::string label;
+
+    OverlayBox(Color p_color, const ImageFloatBox& p_box, std::string p_label)
+        : color(p_color)
+        , box(p_box)
+        , label(std::move(p_label))
+    {}
+    operator const ImageFloatBox&() const{ return box; }
+    operator ImageFloatBox&(){ return box; }
+};
+
+
 
 
 // A text as part of the video overlay.

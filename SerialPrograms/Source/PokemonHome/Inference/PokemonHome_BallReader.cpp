@@ -30,7 +30,7 @@ const PokemonBDSP::PokeballSpriteMatcher& BALL_SPRITE_MATCHER(){
 BallReader::BallReader(ConsoleHandle& console)
     : m_matcher(BALL_SPRITE_MATCHER())
     , m_console(console)
-    , m_box_sprite(console, 0.228, 0.095, 0.030, 0.049)
+    , m_box_sprite(console, {0.228, 0.095, 0.030, 0.049})
 {}
 
 

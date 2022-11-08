@@ -169,9 +169,13 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 ) const{
     OverlayBoxScope self(
         console,
-        OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
-        OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
-        0.04, 0.1, COLOR_CYAN
+        {
+            OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
+            OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
+            0.04,
+            0.1
+        },
+        COLOR_CYAN
     );
 
     OverworldTargetTracker target_tracker(

@@ -34,12 +34,15 @@ namespace PokemonAutomation{
 // class will be forwarded to any UI components that are attached to it.
 class VideoOverlaySession : public VideoOverlay{
 public:
+    //  Deprecated
     struct Box{
-        ImageFloatBox box;
         Color color;
-        Box(const ImageFloatBox& box, Color color) : box(box), color(color) {}
-        Box(const Box&) = default;
-        Box(Box&&) = default;
+        ImageFloatBox box;
+
+        Box(Color p_color, const ImageFloatBox& p_box)
+            : color(p_color)
+            , box(p_box)
+        {}
     };
 
 public:
@@ -53,7 +56,7 @@ public:
         virtual void enabled_log  (bool enabled){}
         virtual void enabled_stats(bool enabled){}
 
-        virtual void update_boxes(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        virtual void update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){}
         virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
         virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
         virtual void update_log_background(const std::shared_ptr<const std::vector<Box>>& boxes){}
@@ -84,13 +87,13 @@ public:
     void set_enabled_log  (bool enabled);
     void set_enabled_stats(bool enabled);
 
-    std::vector<Box> boxes() const;
+    std::vector<OverlayBox> boxes() const;
     std::vector<OverlayText> texts() const;
     std::vector<OverlayText> log_texts() const;
     std::vector<Box> log_text_background() const;
 
-    virtual void add_box(const ImageFloatBox& box, Color color) override;
-    virtual void remove_box(const ImageFloatBox& box) override;
+    virtual void add_box(const OverlayBox& box) override;
+    virtual void remove_box(const OverlayBox& box) override;
 
     virtual void add_text(const OverlayText& text) override;
     virtual void remove_text(const OverlayText& text) override;
@@ -126,7 +129,7 @@ private:
 
     VideoOverlayOption& m_option;
 
-    std::map<const ImageFloatBox*, Color> m_boxes;
+    std::set<const OverlayBox*> m_boxes;
     std::set<const OverlayText*> m_texts;
     std::deque<OverlayText> m_log_texts;
 

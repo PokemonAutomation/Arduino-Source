@@ -93,9 +93,9 @@ PokemonDetails read_focused_wild_pokemon_info(
 ){
     PokemonDetails ret;
 
-    const OverlayBoxScope name_box(overlay, 0.108, 0.868, 0.135, 0.037, COLOR_BLACK);
-    const OverlayBoxScope gender_box(overlay, 0.307, 0.873, 0.016, 0.030, COLOR_PURPLE);
-    const OverlayBoxScope alpha_box(overlay, 0.307, 0.920, 0.016, 0.029, COLOR_RED);
+    const OverlayBoxScope name_box(overlay, {0.108, 0.868, 0.135, 0.037}, COLOR_BLACK);
+    const OverlayBoxScope gender_box(overlay, {0.307, 0.873, 0.016, 0.030}, COLOR_PURPLE);
+    const OverlayBoxScope alpha_box(overlay, {0.307, 0.920, 0.016, 0.029}, COLOR_RED);
 
     const ImageViewRGB32 name_image = extract_box_reference(frame, name_box);
 

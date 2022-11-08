@@ -38,9 +38,9 @@ BattleBallReader::BattleBallReader(
     , m_name_reader(PokeballNameReader::instance())
     , m_language(language)
     , m_console(console)
-    , m_box_sprite(console, 0.617, 0.650, 0.0335, 0.060)
-    , m_box_name(console, 0.650, 0.650, 0.22, 0.060)
-    , m_box_quantity(console, 0.880, 0.650, 0.070, 0.060)
+    , m_box_sprite(console, {0.617, 0.650, 0.0335, 0.060})
+    , m_box_name(console, {0.650, 0.650, 0.22, 0.060})
+    , m_box_quantity(console, {0.880, 0.650, 0.070, 0.060})
 {}
 
 

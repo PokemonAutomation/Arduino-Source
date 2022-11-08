@@ -109,12 +109,12 @@ void VideoOverlaySession::set_enabled_stats(bool enabled){
 
 
 
-void VideoOverlaySession::add_box(const ImageFloatBox& box, Color color){
+void VideoOverlaySession::add_box(const OverlayBox& box){
     SpinLockGuard lg(m_lock, "VideoOverlaySession::add_box()");
-    m_boxes[&box] = color;
+    m_boxes.insert(&box);
     push_box_update();
 }
-void VideoOverlaySession::remove_box(const ImageFloatBox& box){
+void VideoOverlaySession::remove_box(const OverlayBox& box){
     SpinLockGuard lg(m_lock, "VideoOverlaySession::remove_box()");
     m_boxes.erase(&box);
     push_box_update();
@@ -126,20 +126,20 @@ void VideoOverlaySession::push_box_update(){
     }
     
     // We create a newly allocated Box vector to avoid listeners accessing `m_boxes` asynchronously.
-    std::shared_ptr<std::vector<Box>> ptr = std::make_shared<std::vector<Box>>();
+    std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     for (const auto& item : m_boxes){
-        ptr->emplace_back(*item.first, item.second);
+        ptr->emplace_back(*item);
     }
     for (Listener* listeners : m_listeners){
         listeners->update_boxes(ptr);
     }
 }
 
-std::vector<VideoOverlaySession::Box> VideoOverlaySession::boxes() const{
+std::vector<OverlayBox> VideoOverlaySession::boxes() const{
     SpinLockGuard lg(m_lock);
-    std::vector<Box> ret;
+    std::vector<OverlayBox> ret;
     for (const auto& item : m_boxes){
-        ret.emplace_back(*item.first, item.second);
+        ret.emplace_back(*item);
     }
     return ret;
 }
@@ -244,7 +244,7 @@ void VideoOverlaySession::push_text_background_update(){
     if (m_log_texts.size() > 0){
         const float log_bg_height = LOG_MAX_LINES * LOG_LINE_SPACING + 2*LOG_BORDER_Y;
         ImageFloatBox region(LOG_MIN_X, LOG_MAX_Y - log_bg_height, LOG_WIDTH, log_bg_height);
-        ptr->emplace_back(region, LOG_BACKGROUND_COLOR);
+        ptr->emplace_back(LOG_BACKGROUND_COLOR, region);
     }
     for (Listener* listeners : m_listeners){
         listeners->update_log_background(ptr);
@@ -257,7 +257,7 @@ std::vector<VideoOverlaySession::Box> VideoOverlaySession::log_text_background()
     if (m_log_texts.size() > 0){
         const float log_bg_height = LOG_MAX_LINES * LOG_LINE_SPACING + 2*LOG_BORDER_Y;
         ImageFloatBox region(LOG_MIN_X, LOG_MAX_Y - log_bg_height, LOG_WIDTH, log_bg_height);
-        ret.emplace_back(region, LOG_BACKGROUND_COLOR);
+        ret.emplace_back(LOG_BACKGROUND_COLOR, region);
     }
     return ret;
 }

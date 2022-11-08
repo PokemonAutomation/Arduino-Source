@@ -38,10 +38,10 @@ const ImageMatch::SilhouetteDictionaryMatcher& DEN_SPRITE_MATCHER(){
 DenMonReader::DenMonReader(Logger& logger, VideoOverlay& overlay)
     : m_matcher(DEN_SPRITE_MATCHER())
     , m_logger(logger)
-    , m_white(overlay, 0.800, 0.200, 0.150, 0.100)
-    , m_den_color(overlay, 0.400, 0.050, 0.200, 0.100)
-    , m_lair_pink(overlay, 0.575, 0.035, 0.050, 0.100)
-    , m_sprite(overlay, 0.098, 0.23, 0.285, 0.41)
+    , m_white(overlay, {0.800, 0.200, 0.150, 0.100})
+    , m_den_color(overlay, {0.400, 0.050, 0.200, 0.100})
+    , m_lair_pink(overlay, {0.575, 0.035, 0.050, 0.100})
+    , m_sprite(overlay, {0.098, 0.23, 0.285, 0.41})
 {}
 
 
