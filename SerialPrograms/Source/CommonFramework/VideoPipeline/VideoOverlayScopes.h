@@ -71,13 +71,11 @@ public:
 public:
     OverlayTextScope(
         VideoOverlay& overlay,
+        Color color,
         std::string message,
-        double x,
-        double y,
-        double font_size = 1.0,
-        Color color = COLOR_BLUE
+        double x, double y, double font_size
     )
-        : OverlayText(message, x, y, font_size, color)
+        : OverlayText(color, message, x, y, font_size)
         , m_overlay(overlay)
     {
         overlay.add_text(*this);
@@ -101,7 +99,7 @@ public:
         : m_overlay(overlay)
     {}
     ~OverlayLogTextScope(){
-        m_overlay.clear_log_texts();
+        m_overlay.clear_log();
     }
 
 private:

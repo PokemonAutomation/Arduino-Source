@@ -215,7 +215,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         try{
             if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                 env.log("Touching date to prevent rollover.");
-                env.console.overlay().add_log_text("Touching date", COLOR_WHITE);
+                env.console.overlay().add_log("Touching date", COLOR_WHITE);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
                 resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -248,7 +248,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 throw OperationFailedException(env.console, "Failed 3 batches in the row.");
             }
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            env.console.overlay().add_log_text("Reset game", COLOR_WHITE);
+            env.console.overlay().add_log("Reset game", COLOR_WHITE);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -296,10 +296,10 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             context.wait_for_all_requests();
             // +1 here because video overlay is for general users. Genearl users start counts at 1, while us programmers start count at 0.
             if (restart_bike_loop){
-                env.console.overlay().add_log_text("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
+                env.console.overlay().add_log("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
                 restart_bike_loop = false;
             } else {
-                env.console.overlay().add_log_text("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
+                env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
             }
             int ret = run_until(
                 env.console, context,
@@ -357,7 +357,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         if (bike_loop_count >= MAX_BIKE_LOOP_COUNT){
             env.log("Reached max number of bike loops " + std::to_string(MAX_BIKE_LOOP_COUNT));
-            env.console.overlay().add_log_text("Error: max loops " + std::to_string(MAX_BIKE_LOOP_COUNT), COLOR_WHITE);
+            env.console.overlay().add_log("Error: max loops " + std::to_string(MAX_BIKE_LOOP_COUNT), COLOR_WHITE);
             env.log("Take a screenshot of party to debug.");
             // Now take a photo at the player's party for dumping debug info:
             // Enter Rotom Phone menu
@@ -423,7 +423,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
 void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     context.wait_for_all_requests();
     env.log("Save game.");
-    env.console.overlay().add_log_text("Save game", COLOR_WHITE);
+    env.console.overlay().add_log("Save game", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
@@ -433,7 +433,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
 void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool fly_from_overworld){
     context.wait_for_all_requests();
     env.log("Fly to reset position");
-    env.console.overlay().add_log_text("Call Flying Taxi", COLOR_WHITE);
+    env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
     if (fly_from_overworld){
         // Open menu
         ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
@@ -446,7 +446,7 @@ void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
-    env.console.overlay().add_log_text("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
+    env.console.overlay().add_log("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
     const bool y_comm_visible_at_end_of_egg_hatching = true;
     YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
     const int ret = run_until(
@@ -494,7 +494,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     if (ret == 0){
         ++num_eggs_retrieved;
         env.log("Found egg");
-        env.console.overlay().add_log_text("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
+        env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
         stats.m_fetch_success++;
         env.update_stats();
         // Press A to get the egg
@@ -509,7 +509,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         );
     } else if (ret == 1){
         env.log("No egg");
-        env.console.overlay().add_log_text("No egg", COLOR_WHITE);
+        env.console.overlay().add_log("No egg", COLOR_WHITE);
         ret = run_until(
             env.console, context,
             [](BotBaseContext& context){
@@ -539,7 +539,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
 // Return true if the program should stop
 bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi){
     env.log("Checking hatched pokemon.");
-    env.console.overlay().add_log_text("Checking hatched pokemon", COLOR_WHITE);
+    env.console.overlay().add_log("Checking hatched pokemon", COLOR_WHITE);
 
     // Press X to open menu
     ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
@@ -574,7 +574,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             bool shiny = BoxShinySymbolDetector::detect(screen);
             if (shiny){
                 env.log("Pokemon " + std::to_string(i_hatched) + " is shiny!", COLOR_BLUE);
-                env.console.overlay().add_log_text("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
+                env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
                 stats.m_shinies++;
                 env.update_stats();
                 send_encounter_notification(
@@ -586,7 +586,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 );
             }else{
                 env.log("Pokemon " + std::to_string(i_hatched) + " is not shiny.", COLOR_PURPLE);
-                env.console.overlay().add_log_text("Pokemon " + std::to_string(i_hatched+1) + "/5 not shiny", COLOR_WHITE);
+                env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 not shiny", COLOR_WHITE);
             }
             // Note: we assume the pokemon storage UI is in the state of judging pokemon stats.
             //   In this way we can detect pokemon stats.
@@ -601,7 +601,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             switch (action){
             case EggHatchAction::StopProgram:
                 env.log("Program stop requested...");
-                env.console.overlay().add_log_text("Request program stop", COLOR_WHITE);
+                env.console.overlay().add_log("Request program stop", COLOR_WHITE);
                 if (!shiny){
                     send_encounter_notification(
                         env,
@@ -615,7 +615,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             case EggHatchAction::Keep:
                 env.log("Moving Pokemon to keep box...", COLOR_BLUE);
                 m_num_pokemon_kept++;
-                env.console.overlay().add_log_text("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
+                env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
                 if (!shiny){
                     send_encounter_notification(
                         env,
@@ -661,13 +661,13 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 
                 if (m_num_pokemon_kept >= MAX_KEEPERS){
                     env.log("Max keepers reached. Stopping program...");
-                    env.console.overlay().add_log_text("Max Keepers reached.", COLOR_WHITE);
+                    env.console.overlay().add_log("Max Keepers reached.", COLOR_WHITE);
                     return true;
                 }
                 break;
             case EggHatchAction::Release:
                 env.log("Releasing Pokemon...", COLOR_PURPLE);
-                env.console.overlay().add_log_text("Release Pokemon", COLOR_WHITE);
+                env.console.overlay().add_log("Release Pokemon", COLOR_WHITE);
 
                 // ssf_press_button2(context, BUTTON_A, 60, 10);
                 // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);

@@ -28,22 +28,13 @@
 
 namespace PokemonAutomation{
 
-// This class holds the real-time state of the video overlays. You can
-// asychronously add/remove objects to it.
-// This class is not responsible for any UI. However, any changes made to this
-// class will be forwarded to any UI components that are attached to it.
+//  This class holds the real-time state of the video overlays. You can
+//  asychronously add/remove objects to it.
+//  This class is not responsible for any UI. However, any changes made to this
+//  class will be forwarded to any UI components that are attached to it.
 class VideoOverlaySession : public VideoOverlay{
 public:
-    //  Deprecated
-    struct Box{
-        Color color;
-        ImageFloatBox box;
-
-        Box(Color p_color, const ImageFloatBox& p_box)
-            : color(p_color)
-            , box(p_box)
-        {}
-    };
+    static constexpr size_t LOG_MAX_LINES = 20;
 
 public:
     // Video overlay UI class (e.g. VideoOverlayWidget) inherits this listener to listen
@@ -57,9 +48,14 @@ public:
         virtual void enabled_stats(bool enabled){}
 
         virtual void update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){}
-        virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){}
-        virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& boxes){}
-        virtual void update_log_background(const std::shared_ptr<const std::vector<Box>>& boxes){}
+        virtual void update_text (const std::shared_ptr<const std::vector<OverlayText>>& texts){}
+        virtual void update_log  (const std::shared_ptr<const std::vector<OverlayLogLine>>& boxes){}
+
+        //  This one is different from the others. The listeners will store this
+        //  pointer and access it directly and asynchronously. If you need to
+        //  change the structure of the list itself, you must first call this
+        //  with null to remove it from all the listeners. Then add the updated
+        //  one back when you're done.
         virtual void update_stats(const std::list<OverlayStat*>* stats){}
 
     };
@@ -89,8 +85,7 @@ public:
 
     std::vector<OverlayBox> boxes() const;
     std::vector<OverlayText> texts() const;
-    std::vector<OverlayText> log_texts() const;
-    std::vector<Box> log_text_background() const;
+    std::vector<OverlayLogLine> log_texts() const;
 
     virtual void add_box(const OverlayBox& box) override;
     virtual void remove_box(const OverlayBox& box) override;
@@ -98,31 +93,17 @@ public:
     virtual void add_text(const OverlayText& text) override;
     virtual void remove_text(const OverlayText& text) override;
 
-    virtual void add_log_text(std::string message, Color color) override;
-    virtual void clear_log_texts() override;
+    virtual void add_log(std::string message, Color color) override;
+    virtual void clear_log() override;
 
     virtual void add_stat(OverlayStat& stat) override;
     virtual void remove_stat(OverlayStat& stat) override;
 
 private:
-    // Pass the current boxes to the listeners.
-    // Called by `add_box()` and `remove_box()` so that when boxes change, the listeners know the
-    // change.
+    //  Push updates to the various listeners.
     void push_box_update();
-    // Pass the current texts to the listeners.
-    // Called by `add_text()`, `remove_text()` so that when texts change, the listeners know the
-    // change.
     void push_text_update();
-    // Pass the log texts to the listeners.
-    // Called by `add_log_text()` and `clear_log_texts()` to notify listeners of updating the log
-    // texts.
     void push_log_text_update();
-    // Pass the log text background box to the listeners.
-    // Called by `add_log_text()` and `clear_log_texts()` to notify listeners of updating the log
-    // texts background.
-    void push_text_background_update();
-
-//    void push_stats_update();
 
 private:
     mutable SpinLock m_lock;
@@ -131,7 +112,7 @@ private:
 
     std::set<const OverlayBox*> m_boxes;
     std::set<const OverlayText*> m_texts;
-    std::deque<OverlayText> m_log_texts;
+    std::deque<OverlayLogLine> m_log_texts;
 
     std::list<OverlayStat*> m_stats_order;
     std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;

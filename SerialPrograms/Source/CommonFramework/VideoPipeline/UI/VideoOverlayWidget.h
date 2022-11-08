@@ -36,13 +36,18 @@ private:
     virtual void enabled_stats(bool enabled) override;
 
     virtual void update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes) override;
-    virtual void update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
-    virtual void update_log_text(const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
-    virtual void update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes) override;
+    virtual void update_text (const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
+    virtual void update_log  (const std::shared_ptr<const std::vector<OverlayLogLine>>& texts) override;
     virtual void update_stats(const std::list<OverlayStat*>* stats) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent*) override;
+
+private:
+    void update_boxes(QPainter& painter);
+    void update_text (QPainter& painter);
+    void update_log  (QPainter& painter);
+    void update_stats(QPainter& painter);
 
 private:
     VideoOverlaySession& m_session;
@@ -50,8 +55,7 @@ private:
     SpinLock m_lock;
     std::shared_ptr<const std::vector<OverlayBox>> m_boxes;
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
-    std::shared_ptr<const std::vector<OverlayText>> m_log_texts;
-    std::shared_ptr<const std::vector<VideoOverlaySession::Box>> m_log_text_bg_boxes;
+    std::shared_ptr<const std::vector<OverlayLogLine>> m_log;
     const std::list<OverlayStat*>* m_stats;
 };
 

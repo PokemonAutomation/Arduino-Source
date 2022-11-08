@@ -139,9 +139,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
 
 
-    OverlayBoxScope box(overlay, COLOR_RED, {0.4, 0.4, 0.2, 0.2}, "asdf qwer sdfg");
+//    OverlayBoxScope box(overlay, COLOR_RED, {0.4, 0.4, 0.2, 0.2}, "asdf qwer sdfg");
 
 
+    overlay.add_log("asdfasdf", COLOR_RED);
+
+    for (int c = 0; c < 20; c++){
+        overlay.add_log("qwerqwer", COLOR_GREEN);
+        scope.wait_for(std::chrono::milliseconds(1000));
+    }
+
+    scope.wait_for(std::chrono::milliseconds(5000));
+    cout << "clear" << endl;
+    overlay.clear_log();
 
 
 #if 0

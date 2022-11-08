@@ -107,8 +107,8 @@ public:
     virtual void add_text(const OverlayText& text) override{}
     virtual void remove_text(const OverlayText& text) override{}
 
-    virtual void add_log_text(std::string message, Color color) override{}
-    virtual void clear_log_texts() override{}
+    virtual void add_log(std::string message, Color color) override{}
+    virtual void clear_log() override{}
 
     virtual void add_stat(OverlayStat& stat) override{}
     virtual void remove_stat(OverlayStat& stat) override{}

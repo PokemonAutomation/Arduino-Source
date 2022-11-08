@@ -124,7 +124,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             }
-            env.console.overlay().add_log_text("Battle started", COLOR_GREEN);
+            env.console.overlay().add_log("Battle started", COLOR_GREEN);
 
             //  Detect shiny.
             DoublesShinyDetection result_wild;

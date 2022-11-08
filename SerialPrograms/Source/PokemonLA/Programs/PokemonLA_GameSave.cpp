@@ -60,7 +60,7 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     OverlayBoxScope tab_box_scope(console, tab_box);
     OverlayBoxScope icon_box_scope(console, save_icon_box);
     console.log("Saving game...");
-    console.overlay().add_log_text("Saving game...", COLOR_WHITE);
+    console.overlay().add_log("Saving game...", COLOR_WHITE);
 
     // Press DPAD_UP to open menu
     pbf_press_dpad(context, DPAD_UP, 20, 120);

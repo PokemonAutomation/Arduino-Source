@@ -43,7 +43,7 @@ Xoroshiro128PlusState find_rng_state(
             last_bit = 0;
             break;
         }
-        console.overlay().add_log_text(text, COLOR_BLUE);
+        console.overlay().add_log(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         if (i < 64) {
@@ -102,7 +102,7 @@ Xoroshiro128PlusState refind_rng_state(
             sequence.emplace_back(false);
             break;
         }
-        console.overlay().add_log_text(text, COLOR_BLUE);
+        console.overlay().add_log(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         std::vector<bool>::iterator last_bit_start = std::search(last_bit_sequence.begin(), last_bit_sequence.end(), sequence.begin(), sequence.end());
@@ -138,7 +138,7 @@ void do_rng_advances(ConsoleHandle& console, BotBaseContext& context, Xoroshiro1
         if ((i + 1) % 10 == 0) {
             std::string text = std::to_string(i + 1) + "/" + std::to_string(advances);
             console.log("RNG advance: " + text);
-            console.overlay().add_log_text("Advancing: " + text, COLOR_GREEN);
+            console.overlay().add_log("Advancing: " + text, COLOR_GREEN);
         }
         pbf_press_button(context, BUTTON_RCLICK, press_duration, release_duration);
         rng.next();

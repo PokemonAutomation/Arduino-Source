@@ -23,7 +23,7 @@ namespace PokemonLA{
 
 
 void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context, TimeOfDay target_time, Camp camp){
-    console.overlay().add_log_text("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
+    console.overlay().add_log("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
     // Move to the tent
     switch (camp)
     {

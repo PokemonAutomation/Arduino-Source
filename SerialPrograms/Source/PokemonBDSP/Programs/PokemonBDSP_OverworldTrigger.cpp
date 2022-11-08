@@ -119,7 +119,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
             }
         );
     }else{
-        console.overlay().add_log_text("Using Sweet Scent", COLOR_CYAN);
+        console.overlay().add_log("Using Sweet Scent", COLOR_CYAN);
         //  Use Sweet Scent to trigger encounter.
         overworld_to_menu(console, context);
 

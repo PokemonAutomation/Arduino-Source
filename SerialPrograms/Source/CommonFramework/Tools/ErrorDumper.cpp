@@ -57,7 +57,7 @@ void dump_image_and_throw_recoverable_exception(
 ){
     // m_stats.m_errors++;
     env.log(message, COLOR_RED);
-    console.overlay().add_log_text("Error: " + error_name, COLOR_RED);
+    console.overlay().add_log("Error: " + error_name, COLOR_RED);
     std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
     dump_image(
         console, env.program_info(),
