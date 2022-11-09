@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PanelList_H
 #define PokemonAutomation_PanelList_H
 
-#include <memory>
-#include <QListWidget>
-#include "CommonFramework/Panels/PanelDescriptor.h"
+#include <vector>
 #include "CommonFramework/Panels/PanelTools.h"
+
+class QWidget;
 
 namespace PokemonAutomation{
 
@@ -18,50 +18,24 @@ class PanelListWidget;
 
 
 class PanelListDescriptor{
-    using MakePanelEntries = std::vector<PanelEntry> (*)();
+    using MakePanelEntries = std::vector<PanelEntry>(*)();
 
 public:
-    PanelListDescriptor(
-        std::string name,
-        MakePanelEntries factory,
-        bool enabled = true
-    );
+    virtual ~PanelListDescriptor() = default;
+    PanelListDescriptor(std::string name, bool enabled = true);
 
     const std::string& name() const{ return m_name; }
     bool enabled() const{ return m_enabled; }
 
+    virtual std::vector<PanelEntry> make_panels() const = 0;
+
+public:
     PanelListWidget* make_QWidget(QWidget& parent, PanelHolder& holder) const;
 
 protected:
     std::string m_name;
-    MakePanelEntries m_factory;
     bool m_enabled;
 };
-
-
-
-class PanelListWidget : public QListWidget{
-public:
-    static const std::string JSON_PROGRAM_PANEL;
-
-public:
-    PanelListWidget(
-        QWidget& parent, PanelHolder& holder,
-        std::vector<PanelEntry> list
-    );
-
-    size_t items() const{ return m_panel_map.size(); }
-
-    void set_panel(const std::string& panel_name);
-
-private:
-    void handle_panel_clicked(const std::string& text);
-
-private:
-    PanelHolder& m_panel_holder;
-    std::map<std::string, std::shared_ptr<const PanelDescriptor>> m_panel_map;
-};
-
 
 
 

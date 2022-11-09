@@ -18,7 +18,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 
-#include "CommonFramework/Panels/PanelElements.h"
+#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"

@@ -10,8 +10,6 @@
 #include <memory>
 #include "PanelDescriptor.h"
 
-class QWidget;
-
 namespace PokemonAutomation{
 
 class Logger;

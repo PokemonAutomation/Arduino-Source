@@ -8,14 +8,18 @@
 #include <QGroupBox>
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "PanelDescriptor.h"
-#include "PanelInstance.h"
+#include "CommonFramework/Panels/PanelDescriptor.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "PanelElements.h"
 #include "PanelWidget.h"
 
 namespace PokemonAutomation{
+
+
+
+QWidget* PanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return new PanelWidget(parent, *this, holder);
+}
 
 
 PanelWidget::PanelWidget(

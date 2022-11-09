@@ -11,8 +11,8 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/DpiScaler.h"
+#include "CommonFramework/Panels/UI/PanelListWidget.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
@@ -29,8 +29,6 @@ namespace PokemonAutomation{
 
 
 
-
-
 ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     : QGroupBox("Program Select", &parent)
     , m_holder(holder)
@@ -40,35 +38,21 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     m_dropdown = new NoWheelComboBox(this);
     layout->addWidget(m_dropdown);
 
-    add(PanelListDescriptor(
-        "Nintendo Switch",
-        &NintendoSwitch::make_panels
-    ));
-    add(PanelListDescriptor(
-        Pokemon::STRING_POKEMON + " Home",
-        NintendoSwitch::PokemonHome::make_panels
-    ));
-    add(PanelListDescriptor(
-        Pokemon::STRING_POKEMON + " Sword and Shield",
-        NintendoSwitch::PokemonSwSh::make_panels
-    ));
-    add(PanelListDescriptor(
-        Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl",
-        NintendoSwitch::PokemonBDSP::make_panels
-    ));
-    add(PanelListDescriptor(
-        Pokemon::STRING_POKEMON + " Legends Arceus",
-        NintendoSwitch::PokemonLA::make_panels
-    ));
-    add(PanelListDescriptor(
-        Pokemon::STRING_POKEMON + " Scarlet and Violet",
-        NintendoSwitch::PokemonSV::make_panels, false
-    ));
+
+
+    add(std::make_unique<NintendoSwitch::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::PokemonHome::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::PokemonSwSh::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
+
+
 
     //  Load the 1st list by default.
     m_dropdown->setCurrentIndex(0);
     m_active_index = 0;
-    m_active_list = m_lists[0].make_QWidget(*this, m_holder);
+    m_active_list = m_lists[0]->make_QWidget(*this, m_holder);
     layout->addWidget(m_active_list);
 
     connect(
@@ -79,15 +63,16 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     );
 }
 
-void ProgramSelect::add(PanelListDescriptor list){
+void ProgramSelect::add(std::unique_ptr<PanelListDescriptor> list){
     int index = m_dropdown->count();
-    m_dropdown->addItem(QString::fromStdString(list.name()));
+    m_dropdown->addItem(QString::fromStdString(list->name()));
     m_lists.emplace_back(std::move(list));
-    if (!m_tab_map.emplace(m_lists.back().name(), index).second){
+    const PanelListDescriptor& back = *m_lists.back();
+    if (!m_tab_map.emplace(back.name(), index).second){
         m_lists.pop_back();
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Category Name: " + m_lists.back().name());
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Category Name: " + back.name());
     }
-    if (!m_lists.back().enabled()){
+    if (!back.enabled()){
         auto* model = qobject_cast<QStandardItemModel*>(m_dropdown->model());
         if (model != nullptr){
             QStandardItem* line_handle = model->item(index);
@@ -123,9 +108,9 @@ void ProgramSelect::change_list(int index){
     }
     m_dropdown->setCurrentIndex(index);
     m_active_index = index;
-    PERSISTENT_SETTINGS().panels["ProgramCategory"] = m_lists[index].name();
+    PERSISTENT_SETTINGS().panels["ProgramCategory"] = m_lists[index]->name();
     delete m_active_list;
-    m_active_list = m_lists[index].make_QWidget(*this, m_holder);
+    m_active_list = m_lists[index]->make_QWidget(*this, m_holder);
     layout()->addWidget(m_active_list);
 }
 

@@ -8,7 +8,7 @@
 #define PokemonAutomation_SettingsPanelWidget_H
 
 #include "PanelWidget.h"
-#include "SettingsPanel.h"
+#include "CommonFramework/Panels/SettingsPanel.h"
 
 class QPushButton;
 

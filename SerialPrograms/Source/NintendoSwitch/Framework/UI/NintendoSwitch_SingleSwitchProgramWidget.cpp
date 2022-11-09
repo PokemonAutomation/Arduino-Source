@@ -11,7 +11,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/PanelElements.h"
+#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"

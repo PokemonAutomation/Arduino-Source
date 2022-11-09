@@ -93,7 +93,12 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-std::vector<PanelEntry> make_panels(){
+
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Sword and Shield")
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");

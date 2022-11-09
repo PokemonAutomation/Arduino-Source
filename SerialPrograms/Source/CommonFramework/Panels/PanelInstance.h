@@ -29,6 +29,8 @@ public:
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 
     void save_settings() const;
+
+public:
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder);
 
 public:

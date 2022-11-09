@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchViewer_H
 
 #include "CommonFramework/Panels/PanelInstance.h"
-#include "CommonFramework/Panels/PanelWidget.h"
+#include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemSession.h"
 

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_Panels.h"
 
 #include "PokemonLA_Settings.h"
@@ -50,7 +51,11 @@ namespace PokemonLA{
 
 
 
-std::vector<PanelEntry> make_panels(){
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends Arceus")
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");

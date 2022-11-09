@@ -33,7 +33,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-std::vector<PanelEntry> make_panels(){
+
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor("Nintendo Switch")
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");
@@ -67,6 +72,8 @@ std::vector<PanelEntry> make_panels(){
 
     return ret;
 }
+
+
 
 
 

@@ -8,7 +8,6 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PanelInstance.h"
-#include "PanelWidget.h"
 
 namespace PokemonAutomation{
 
@@ -34,9 +33,6 @@ void PanelInstance::save_settings() const{
     }
     global_logger_tagged().log("Saving panel settings...");
     PERSISTENT_SETTINGS().write();
-}
-QWidget* PanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
-    return new PanelWidget(parent, *this, holder);
 }
 
 

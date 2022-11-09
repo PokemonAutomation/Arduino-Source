@@ -16,6 +16,11 @@
 namespace PokemonAutomation{
 
 
+QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return SettingsPanelWidget::make(parent, *this, holder);
+}
+
+
 SettingsPanelWidget* SettingsPanelWidget::make(
     QWidget& parent,
     SettingsPanelInstance& instance,

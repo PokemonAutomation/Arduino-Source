@@ -13,7 +13,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-std::vector<PanelEntry> make_panels();
+
+class PanelListFactory : public PanelListDescriptor{
+public:
+    PanelListFactory();
+    virtual std::vector<PanelEntry> make_panels() const;
+};
 
 
 

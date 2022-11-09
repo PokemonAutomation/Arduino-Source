@@ -45,7 +45,12 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-std::vector<PanelEntry> make_panels(){
+
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Brilliant Diamond and Shining Pearl")
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");

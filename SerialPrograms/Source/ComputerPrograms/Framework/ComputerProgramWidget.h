@@ -18,7 +18,7 @@
 #ifndef PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 #define PokemonAutomation_ComputerPrograms_ComputerProgramWidget_H
 
-#include "CommonFramework/Panels/PanelElements.h"
+#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "ComputerPrograms/ComputerProgram.h"
 #include "ComputerPrograms/Framework/ComputerProgramSession.h"
 #include "ComputerProgramSession.h"

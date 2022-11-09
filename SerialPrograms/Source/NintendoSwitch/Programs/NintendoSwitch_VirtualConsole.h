@@ -8,8 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_VirtualConsole_H
 
 #include "CommonFramework/Panels/PanelInstance.h"
-#include "CommonFramework/Panels/PanelWidget.h"
-#include "CommonFramework/Windows/MainWindow.h"
+#include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 

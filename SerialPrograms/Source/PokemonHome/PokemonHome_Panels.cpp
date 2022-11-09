@@ -5,9 +5,8 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome_Panels.h"
-
-#include "PokemonHome_Settings.h"
 
 #include "Programs/PokemonHome_PageSwap.h"
 #include "Programs/PokemonHome_BoxSorting.h"
@@ -20,7 +19,11 @@ namespace PokemonHome{
 
 
 
-std::vector<PanelEntry> make_panels(){
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Home")
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
 //    ret.emplace_back("---- Settings ----");

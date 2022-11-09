@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_Panels.h"
 
 #include "PokemonSV_Settings.h"
@@ -15,7 +16,11 @@ namespace PokemonSV{
 
 
 
-std::vector<PanelEntry> make_panels(){
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Scarlet and Violet", false)
+{}
+
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
 
     ret.emplace_back("---- Settings ----");

@@ -12,7 +12,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/PanelElements.h"
+#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"

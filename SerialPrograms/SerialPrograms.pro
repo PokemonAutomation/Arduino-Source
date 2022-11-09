@@ -234,13 +234,14 @@ SOURCES += \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
-    Source/CommonFramework/Panels/PanelElements.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
-    Source/CommonFramework/Panels/PanelWidget.cpp \
     Source/CommonFramework/Panels/ProgramDescriptor.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
-    Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
+    Source/CommonFramework/Panels/UI/PanelElements.cpp \
+    Source/CommonFramework/Panels/UI/PanelListWidget.cpp \
+    Source/CommonFramework/Panels/UI/PanelWidget.cpp \
+    Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/ProgramSession.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
@@ -1014,14 +1015,15 @@ HEADERS += \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
     Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
-    Source/CommonFramework/Panels/PanelElements.h \
     Source/CommonFramework/Panels/PanelInstance.h \
     Source/CommonFramework/Panels/PanelList.h \
     Source/CommonFramework/Panels/PanelTools.h \
-    Source/CommonFramework/Panels/PanelWidget.h \
     Source/CommonFramework/Panels/ProgramDescriptor.h \
     Source/CommonFramework/Panels/SettingsPanel.h \
-    Source/CommonFramework/Panels/SettingsPanelWidget.h \
+    Source/CommonFramework/Panels/UI/PanelElements.h \
+    Source/CommonFramework/Panels/UI/PanelListWidget.h \
+    Source/CommonFramework/Panels/UI/PanelWidget.h \
+    Source/CommonFramework/Panels/UI/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/ProgramSession.h \
     Source/CommonFramework/Resources/SpriteDatabase.h \
