@@ -179,10 +179,14 @@ MainWindow::MainWindow(QWidget* parent)
     // Load the program panel specified in the persistent setting.
     m_program_list->load_persistent_panel();
 
+    GlobalSettings::instance().WINDOW_SIZE.WIDTH.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.add_listener(*this);
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
     close_panel();
+    GlobalSettings::instance().WINDOW_SIZE.WIDTH.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.remove_listener(*this);
 }
 
 
@@ -191,8 +195,10 @@ void MainWindow::closeEvent(QCloseEvent* event){
     QMainWindow::closeEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
+    m_pending_resize = true;
     GlobalSettings::instance().WINDOW_SIZE.WIDTH.set(width());
     GlobalSettings::instance().WINDOW_SIZE.HEIGHT.set(height());
+    m_pending_resize = false;
 }
 
 void MainWindow::close_panel(){
@@ -260,7 +266,13 @@ void MainWindow::on_idle(){
 }
 
 
-
+void MainWindow::value_changed(){
+    QMetaObject::invokeMethod(this, [this]{
+        if (!m_pending_resize){
+            resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
+        }
+    });
+}
 
 
 

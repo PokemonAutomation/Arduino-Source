@@ -8,6 +8,7 @@
 #define PokemonAutomation_MainWindow_H
 
 #include <QMainWindow>
+#include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "PanelLists.h"
@@ -19,7 +20,7 @@ namespace PokemonAutomation{
 class FileWindowLoggerWindow;
 
 
-class MainWindow : public QMainWindow, public PanelHolder{
+class MainWindow : public QMainWindow, public PanelHolder, public ConfigOption::Listener{
 public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
@@ -36,9 +37,11 @@ private:
         std::unique_ptr<PanelInstance> panel
     ) override;
     virtual Logger& raw_logger() override{ return global_logger_raw(); }
+
 private:
     virtual void on_busy() override;
     virtual void on_idle() override;
+    virtual void value_changed() override;
 
 private:
     QWidget* centralwidget;
@@ -58,6 +61,8 @@ private:
     QWidget* m_current_panel_widget;
 
     std::unique_ptr<FileWindowLoggerWindow> m_output_window;
+
+    bool m_pending_resize = false;
 };
 
 

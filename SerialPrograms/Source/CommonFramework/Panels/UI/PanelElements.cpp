@@ -157,21 +157,9 @@ void StatsBar::set_stats(std::string current_stats, std::string historical_stats
 RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState initial_state)
     : QGroupBox("Actions", &parent)
 {
-#if 0
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* action_layout = new QHBoxLayout();
     layout->addLayout(action_layout);
-
-    {
-        QPushButton* button = new QPushButton("Still can't find any shinies? Click here to DM Elvis for FREE SHINIES!!!");
-        QFont font = button->font();
-        font.setPointSize(32);
-        button->setFont(font);
-        layout->addWidget(button);
-    }
-#else
-    QHBoxLayout* action_layout = new QHBoxLayout(this);
-#endif
 //    action_layout->setContentsMargins(0, 0, 0, 0);
 
     {

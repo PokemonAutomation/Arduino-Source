@@ -108,7 +108,7 @@ GlobalSettings::GlobalSettings()
     )
     , WINDOW_SIZE(
         "Window Size:",
-        "Set the size of the window. Restart application to take effect.<br>"
+        "Set the size of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
         1280, 720
     )
