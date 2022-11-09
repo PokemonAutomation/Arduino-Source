@@ -72,7 +72,7 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     layout->addWidget(m_active_list);
 
     connect(
-        m_dropdown, &QComboBox::activated,
+        m_dropdown, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
             change_list(index);
         }
