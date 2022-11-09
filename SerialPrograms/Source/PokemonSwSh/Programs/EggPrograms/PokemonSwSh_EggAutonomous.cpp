@@ -704,6 +704,17 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 pbf_press_dpad(context, DPAD_UP, 20, 30);
                 // Press A to confirm release, wait for a while to let the next dialog box pop up.
                 pbf_press_button(context, BUTTON_A, 20, 200);
+
+                context.wait_for_all_requests();
+                ret = wait_until(
+                    env.console, context, std::chrono::seconds(10),
+                    {{dialog_detector}}
+                );
+                if (ret != 0){
+                    dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+                        "MissingSecondReleasingDialog", "Miss second dialog when releasing pokemon.");
+                }
+                pbf_press_button(context, BUTTON_A, 20, 100);
                 
                 size_t dialog_count = 0;
                 const size_t max_dialog_count = 6;
