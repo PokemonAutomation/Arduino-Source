@@ -158,6 +158,9 @@ RunnablePanelActionBar::RunnablePanelActionBar(QWidget& parent, ProgramState ini
     : QGroupBox("Actions", &parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+
+//    layout->addWidget(new QPushButton("Start Raid Now!", this));
+
     QHBoxLayout* action_layout = new QHBoxLayout();
     layout->addLayout(action_layout);
 //    action_layout->setContentsMargins(0, 0, 0, 0);
