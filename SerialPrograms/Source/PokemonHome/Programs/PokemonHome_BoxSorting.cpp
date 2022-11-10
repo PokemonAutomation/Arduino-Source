@@ -258,7 +258,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
     env.console.log(ss.str());
 
-    // TODO: shortest path movement though pages, boxes, rows, cols
+    // TODO: shortest path movement though pages, boxes
     for (size_t i = cur_cursor.box; i < dest_cursor.box; ++i){
         pbf_press_button(context, BUTTON_R, 10, GAME_DELAY+30);
     }
@@ -266,18 +266,46 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
         pbf_press_button(context, BUTTON_L, 10, GAME_DELAY+30);
     }
 
-    for (size_t i = cur_cursor.row; i < dest_cursor.row; ++i){
-        pbf_press_dpad(context, DPAD_DOWN, 1, GAME_DELAY);
-    }
-    for (size_t i = dest_cursor.row; i < cur_cursor.row; ++i){
-        pbf_press_dpad(context, DPAD_UP, 1, GAME_DELAY);
+
+    // direct nav up or down through rows
+    if (!(cur_cursor.row == 0 && dest_cursor.row == 4) && !(dest_cursor.row == 0 && cur_cursor.row == 4)) {
+        for (size_t i = cur_cursor.row; i < dest_cursor.row; ++i){
+            pbf_press_dpad(context, DPAD_DOWN, 1, GAME_DELAY);
+        }
+        for (size_t i = dest_cursor.row; i < cur_cursor.row; ++i){
+            pbf_press_dpad(context, DPAD_UP, 1, GAME_DELAY);
+        }
+    } else { // wrap around is faster to move between first or last row
+        if (cur_cursor.row == 0 && dest_cursor.row == 4) {
+            for (size_t i = 0; i <= 2; ++i){
+                pbf_press_dpad(context, DPAD_UP, 1, GAME_DELAY);
+            }
+        } else {
+            for (size_t i = 0; i <= 2; ++i){
+                pbf_press_dpad(context, DPAD_DOWN, 1, GAME_DELAY);
+            }
+        }
     }
 
-    for (size_t i = cur_cursor.column; i < dest_cursor.column; ++i){
-        pbf_press_dpad(context, DPAD_RIGHT, 1, GAME_DELAY);
-    }
-    for (size_t i = dest_cursor.column; i < cur_cursor.column; ++i){
-        pbf_press_dpad(context, DPAD_LEFT, 1, GAME_DELAY);
+    // direct nav forward or backward through columns
+    if ((dest_cursor.column > cur_cursor.column && dest_cursor.column - cur_cursor.column <= 3) || (cur_cursor.column > dest_cursor.column && cur_cursor.column - dest_cursor.column <= 3)) {
+        for (size_t i = cur_cursor.column; i < dest_cursor.column; ++i){
+            pbf_press_dpad(context, DPAD_RIGHT, 1, GAME_DELAY);
+        }
+        for (size_t i = dest_cursor.column; i < cur_cursor.column; ++i){
+            pbf_press_dpad(context, DPAD_LEFT, 1, GAME_DELAY);
+        }
+    } else { // wrap around is faster if direct movement is more than 3 away
+        if (dest_cursor.column > cur_cursor.column) {
+            for (size_t i = 0; i < MAX_COLUMNS - (dest_cursor.column - cur_cursor.column); ++i){
+                pbf_press_dpad(context, DPAD_LEFT, 1, GAME_DELAY);
+            }
+        }
+        if (cur_cursor.column > dest_cursor.column) {
+            for (size_t i = 0; i < MAX_COLUMNS - (cur_cursor.column - dest_cursor.column); ++i){
+                pbf_press_dpad(context, DPAD_RIGHT, 1, GAME_DELAY);
+            }
+        }
     }
 
     context.wait_for_all_requests();
