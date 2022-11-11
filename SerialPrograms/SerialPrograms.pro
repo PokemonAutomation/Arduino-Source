@@ -477,6 +477,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp \
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp \
+    Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp \
     Source/PokemonHome/Options/PokemonHome_BoxSortingTable.cpp \
     Source/PokemonHome/PokemonHome_Panels.cpp \
     Source/PokemonHome/PokemonHome_Settings.cpp \
@@ -1292,6 +1293,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h \
     Source/PokemonHome/Inference/PokemonHome_BallReader.h \
+    Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h \
     Source/PokemonHome/Options/PokemonHome_BoxSortingTable.h \
     Source/PokemonHome/PokemonHome_Panels.h \
     Source/PokemonHome/PokemonHome_Settings.h \

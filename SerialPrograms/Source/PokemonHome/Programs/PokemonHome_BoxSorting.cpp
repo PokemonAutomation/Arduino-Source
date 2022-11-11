@@ -46,6 +46,7 @@ language
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
@@ -171,18 +172,21 @@ size_t get_index(size_t box, size_t row, size_t column){
 struct Pokemon{
     std::vector<BoxSortingSelection>* preferences;
 
-    // When adding any new member here, do not forget to modify the three operators below
+    // When adding any new member here, do not forget to modify the operators below (ctrl-f "new struct members")
     uint16_t national_dex_number = 0;
     bool shiny = false;
     bool gmax = false;
     std::string ball_slug = "";
+    EggHatchGenderFilter gender = EggHatchGenderFilter::Genderless;
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
+    // NOTE edit when adding new struct members
     return lhs.national_dex_number == rhs.national_dex_number &&
         lhs.shiny == rhs.shiny &&
         lhs.gmax == rhs.gmax &&
-        lhs.ball_slug == rhs.ball_slug;
+        lhs.ball_slug == rhs.ball_slug &&
+        lhs.gender == rhs.gender;
 }
 
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
@@ -195,6 +199,7 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
 
     for (const BoxSortingSelection preference : *lhs->preferences){
         switch(preference.sort_type) {
+            // NOTE edit when adding new struct members
             // TODO TESTING and account for preference.reverse
             case BoxSortingSortType::NationalDexNo:
                 return lhs->national_dex_number < rhs->national_dex_number;
@@ -217,6 +222,14 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
                     return false;
                 }
                 break;
+            case BoxSortingSortType::Gender:
+                if (lhs->gender < rhs->gender){
+                    return true;
+                }
+                if (lhs->gender > rhs->gender){
+                    return false;
+                }
+                break;
         }
     }
 
@@ -226,11 +239,13 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
 std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon)
 {
     if (pokemon.has_value()){
+        // NOTE edit when adding new struct members
         os << "(";
         os << "national_dex_number:" << pokemon->national_dex_number << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
-        os << "ball_slug:" << pokemon->ball_slug;
+        os << "ball_slug:" << pokemon->ball_slug << " ";
+        os << "gender:" << gender_to_string(pokemon->gender);
         os << ")";
     }
     else{
@@ -367,10 +382,12 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
         pokemon["row"] =  cursor.row;
         pokemon["column"] =  cursor.column;
         if (boxes_data[poke_nb] != std::nullopt){
+            // NOTE edit when adding new struct members
             pokemon["national_dex_number"] =  boxes_data[poke_nb]->national_dex_number;
             pokemon["shiny"] =  boxes_data[poke_nb]->shiny;
             pokemon["gmax"] =  boxes_data[poke_nb]->gmax;
             pokemon["ball_slug"] =  boxes_data[poke_nb]->ball_slug;
+            pokemon["gender"] = gender_to_string(boxes_data[poke_nb]->gender);
         }
         pokemon_data.push_back(std::move(pokemon));
     }
@@ -393,9 +410,10 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    ImageFloatBox national_dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
+    ImageFloatBox national_dex_number_box(0.447, 0.250, 0.037, 0.034); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
+    ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.048); // origin symbol pos
 
     // vector that will store data for each slot
     std::vector<std::optional<Pokemon>> boxes_data;
@@ -526,6 +544,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         box_render.add(COLOR_RED, national_dex_number_box);
         box_render.add(COLOR_BLUE, shiny_symbol_box);
         box_render.add(COLOR_GREEN, gmax_symbol_box);
+        box_render.add(COLOR_YELLOW, origin_symbol_box);
 
         //cycle through each summary of the current box and fill pokemon information
         for (size_t row = 0; row < MAX_ROWS; row++){
@@ -556,6 +575,13 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
                     BallReader ball_reader(env.console);
                     boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(*screen);
+
+                    BoxGenderDetector::make_overlays(box_render);
+                    EggHatchGenderFilter gender = BoxGenderDetector::detect(*screen);
+                    env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+                    boxes_data[get_index(box_nb, row, column)]->gender = gender;
+
+                    // NOTE edit when adding new struct members (detetions go here likely)
 
                     pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
                     context.wait_for_all_requests();

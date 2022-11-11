@@ -22,6 +22,7 @@ enum class BoxSortingSortType
     Shiny,
     Gigantamax,
     Ball_Slug,
+    Gender,
 };
 
 struct BoxSortingSelection

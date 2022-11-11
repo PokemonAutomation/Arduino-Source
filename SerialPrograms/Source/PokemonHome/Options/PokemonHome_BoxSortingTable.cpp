@@ -17,6 +17,7 @@ const EnumDatabase<BoxSortingSortType>& BallType_Database() {
         {BoxSortingSortType::Shiny,    "shiny",    "Shiny"},
         {BoxSortingSortType::Gigantamax,    "gigantamax",    "Gigantamax"},
         {BoxSortingSortType::Ball_Slug,    "ball_slug",    "Ball Type"},
+        {BoxSortingSortType::Gender,    "gender",    "Gender (Male, Female, Genderless)"},
     });
     return database;
 }
@@ -64,7 +65,7 @@ std::vector<BoxSortingSelection> BoxSortingTable::preferences() const{
 
 std::vector<std::string> BoxSortingTable::make_header() const{
     return std::vector<std::string>{
-        "Criteria", "Only Bonus", "Priority",
+        "Criteria", "Reverse",
     };
 }
 
