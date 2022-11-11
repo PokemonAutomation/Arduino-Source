@@ -30,6 +30,10 @@ language
 #include <map>
 #include <optional>
 #include <sstream>
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -104,6 +108,21 @@ BoxSorting::BoxSorting()
         LockWhileRunning::LOCKED,
         10
     )
+    , SORT_TABLE(
+        "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
+    )
+    , OUTPUT_FILE(
+          false,
+          LockWhileRunning::LOCKED,
+          "<b>Output File:</b><br>JSON file for output of storage boxes.",
+          "box_order.json",
+          "box_order.json"
+      )
+    , DRY_RUN(
+          "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
+          LockWhileRunning::LOCKED,
+          false
+      )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH
     })
@@ -111,6 +130,9 @@ BoxSorting::BoxSorting()
     PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
     PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
     PA_ADD_OPTION(GAME_DELAY);  //delay for non video feedback, this way I can go as fast as pokemon home can handle movement when needed
+    PA_ADD_OPTION(SORT_TABLE);
+    PA_ADD_OPTION(OUTPUT_FILE);
+    PA_ADD_OPTION(DRY_RUN);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -147,15 +169,17 @@ size_t get_index(size_t box, size_t row, size_t column){
 
 
 struct Pokemon{
+    std::vector<BoxSortingSelection>* preferences;
+
     // When adding any new member here, do not forget to modify the three operators below
-    uint16_t dex_number = 0;
+    uint16_t national_dex_number = 0;
     bool shiny = false;
     bool gmax = false;
     std::string ball_slug = "";
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
-    return lhs.dex_number == rhs.dex_number &&
+    return lhs.national_dex_number == rhs.national_dex_number &&
         lhs.shiny == rhs.shiny &&
         lhs.gmax == rhs.gmax &&
         lhs.ball_slug == rhs.ball_slug;
@@ -168,27 +192,42 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     if (!rhs.has_value()){
         return true;
     }
-    // For example, we could imagine that people want to sort first by ball type, then by dex number.
-    // if (lhs->ball_slug < rhs->ball_slug){
-    //     return true;
-    // }
-    // if (lhs->ball_slug > rhs->ball_slug){
-    //     return false;
-    // }
-    // if (lhs->shiny != rhs->shiny){
-    //     return lhs->shiny;
-    // }
-    // if (lhs->gmax != rhs->gmax){
-    //     return lhs->gmax;
-    // }
-    return lhs->dex_number < rhs->dex_number;
+
+    for (const BoxSortingSelection preference : *lhs->preferences){
+        switch(preference.sort_type) {
+            // TODO TESTING and account for preference.reverse
+            case BoxSortingSortType::NationalDexNo:
+                return lhs->national_dex_number < rhs->national_dex_number;
+                break;
+            case BoxSortingSortType::Shiny:
+                if (lhs->shiny != rhs->shiny){
+                     return lhs->shiny;
+                 }
+                break;
+            case BoxSortingSortType::Gigantamax:
+                if (lhs->gmax != rhs->gmax){
+                    return lhs->gmax;
+                }
+                break;
+            case BoxSortingSortType::Ball_Slug:
+                if (lhs->ball_slug < rhs->ball_slug){
+                    return true;
+                }
+                if (lhs->ball_slug > rhs->ball_slug){
+                    return false;
+                }
+                break;
+        }
+    }
+
+    return lhs->national_dex_number < rhs->national_dex_number;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon)
 {
     if (pokemon.has_value()){
         os << "(";
-        os << "dex_number:" << pokemon->dex_number << " ";
+        os << "national_dex_number:" << pokemon->national_dex_number << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
         os << "ball_slug:" << pokemon->ball_slug;
@@ -199,8 +238,6 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     }
     return os;
 }
-
-
 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t VIDEO_DELAY){
 
@@ -320,11 +357,43 @@ void print_boxes_data(const std::vector<std::optional<Pokemon>>& boxes_data, Sin
     env.console.log(ss.str());
 }
 
+void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_data, const std::string& json_path, bool sorted){
+    JsonArray pokemon_data;
+    for (size_t poke_nb = 0; poke_nb < boxes_data.size(); poke_nb++){
+        Cursor cursor = get_cursor(poke_nb);
+        JsonObject pokemon;
+        pokemon["index"] = poke_nb;
+        pokemon["box"] = cursor.box;
+        pokemon["row"] =  cursor.row;
+        pokemon["column"] =  cursor.column;
+        if (boxes_data[poke_nb] != std::nullopt){
+            pokemon["national_dex_number"] =  boxes_data[poke_nb]->national_dex_number;
+            pokemon["shiny"] =  boxes_data[poke_nb]->shiny;
+            pokemon["gmax"] =  boxes_data[poke_nb]->gmax;
+            pokemon["ball_slug"] =  boxes_data[poke_nb]->ball_slug;
+        }
+        pokemon_data.push_back(std::move(pokemon));
+    }
+    if (sorted) {
+        const std::string sorted_path = ".sorted";
+        pokemon_data.dump(json_path + sorted_path);
+    } else {
+        pokemon_data.dump(json_path);
+    }
+
+}
+
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
+    if (sort_preferences.empty()) {
+        throw UserSetupError(env.console, "At least sorting selection needs to be made!");
+    }
+
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    ImageFloatBox dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
+    ImageFloatBox national_dex_number_box(0.44, 0.245, 0.04, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
 
@@ -414,7 +483,11 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     box_render.add(COLOR_GREEN, slot_box);
                     stats.pkmn++;
                     env.update_stats();
-                    boxes_data.push_back(Pokemon{}); //default initialised pokemon to know there is a pokemon here that needs a value
+                    boxes_data.push_back(
+                        Pokemon{
+                            .preferences = &sort_preferences
+                        }
+                    ); //default initialised pokemon to know there is a pokemon here that needs a value
                     ss << "\u2705 " ;    //  checkbox
                 }
             }
@@ -450,7 +523,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_press_button(context, BUTTON_A, 10, VIDEO_DELAY+150);
         context.wait_for_all_requests();
 
-        box_render.add(COLOR_RED, dex_number_box);
+        box_render.add(COLOR_RED, national_dex_number_box);
         box_render.add(COLOR_BLUE, shiny_symbol_box);
         box_render.add(COLOR_GREEN, gmax_symbol_box);
 
@@ -461,15 +534,15 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 if(boxes_data[get_index(box_nb, row, column)].has_value()){
                     screen = env.console.video().snapshot();
                     ImageRGB32 image = to_blackwhite_rgb32_range(
-                        extract_box_reference(*screen, dex_number_box),
+                        extract_box_reference(*screen, national_dex_number_box),
                         0xff808080, 0xffffffff, true
                     );
 
-                    int dex_number = OCR::read_number(env.console, image);
-                    if (dex_number == -1){
+                    int national_dex_number = OCR::read_number(env.console, image);
+                    if (national_dex_number == -1){
                         dump_image(env.console, ProgramInfo(), "ReadSummary", *screen);
                     }
-                    boxes_data[get_index(box_nb, row, column)]->dex_number = dex_number;
+                    boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
 
                     int shiny_stddev_value = image_stddev(extract_box_reference(*screen, shiny_symbol_box)).sum();
                     bool is_shiny = shiny_stddev_value > 30;
@@ -522,51 +595,55 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     env.console.log("Current boxes data :");
     print_boxes_data(boxes_data, env);
+    output_boxes_data_json(boxes_data, OUTPUT_FILE, false);
 
     env.console.log("Sorted boxes data :");
     print_boxes_data(boxes_sorted, env);
+    output_boxes_data_json(boxes_sorted, OUTPUT_FILE, true);
 
-    // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
+    if (!DRY_RUN) {
+        // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
 
-    // going thru the sorted list one by one and for each one go through the current pokemon layout to find the closest possible match to fill the slot
-    for (size_t poke_nb_s = 0; poke_nb_s < boxes_sorted.size(); poke_nb_s++){
-        if (boxes_sorted[poke_nb_s] == std::nullopt){ // we've hit the end of the sorted list.
-            break;
-        }
-        for (size_t poke_nb = poke_nb_s; poke_nb < boxes_data.size(); poke_nb++){
-            Cursor cursor_s = get_cursor(poke_nb_s);
-            Cursor cursor = get_cursor(poke_nb);
-
-            // ss << "Comparing " << boxes_data[poke_nb] << " at " << cursor << " to " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
-            // env.console.log(ss.str());
-            // ss.str("");
-
-            //check for a match and also check if the pokemon is not already in the slot
-            stats.compare++;
-            env.update_stats();
-            if(boxes_sorted[poke_nb_s] == boxes_data[poke_nb] && poke_nb_s == poke_nb){ // Same spot no need to move.
+        // going thru the sorted list one by one and for each one go through the current pokemon layout to find the closest possible match to fill the slot
+        for (size_t poke_nb_s = 0; poke_nb_s < boxes_sorted.size(); poke_nb_s++){
+            if (boxes_sorted[poke_nb_s] == std::nullopt){ // we've hit the end of the sorted list.
                 break;
             }
-            if(boxes_sorted[poke_nb_s] == boxes_data[poke_nb]){
-                ss << "Swapping " << boxes_data[poke_nb] << " at " << cursor << " and " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
-                env.console.log(ss.str());
-                ss.str("");
+            for (size_t poke_nb = poke_nb_s; poke_nb < boxes_data.size(); poke_nb++){
+                Cursor cursor_s = get_cursor(poke_nb_s);
+                Cursor cursor = get_cursor(poke_nb);
 
-                //moving cursor to the pokemon to pick it up
-                cur_cursor = move_cursor_to(env, context, cur_cursor, cursor, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
+                // ss << "Comparing " << boxes_data[poke_nb] << " at " << cursor << " to " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
+                // env.console.log(ss.str());
+                // ss.str("");
 
-                //moving to destination to place it or swap it
-                cur_cursor = move_cursor_to(env, context, cur_cursor, cursor_s, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
-
-                context.wait_for_all_requests();
-
-                std::swap(boxes_data[poke_nb_s], boxes_data[poke_nb]);
-                stats.swaps++;
+                //check for a match and also check if the pokemon is not already in the slot
+                stats.compare++;
                 env.update_stats();
+                if(boxes_sorted[poke_nb_s] == boxes_data[poke_nb] && poke_nb_s == poke_nb){ // Same spot no need to move.
+                    break;
+                }
+                if(boxes_sorted[poke_nb_s] == boxes_data[poke_nb]){
+                    ss << "Swapping " << boxes_data[poke_nb] << " at " << cursor << " and " << boxes_sorted[poke_nb_s] << " at " << cursor_s;
+                    env.console.log(ss.str());
+                    ss.str("");
 
-                break;
+                    //moving cursor to the pokemon to pick it up
+                    cur_cursor = move_cursor_to(env, context, cur_cursor, cursor, GAME_DELAY);
+                    pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
+
+                    //moving to destination to place it or swap it
+                    cur_cursor = move_cursor_to(env, context, cur_cursor, cursor_s, GAME_DELAY);
+                    pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
+
+                    context.wait_for_all_requests();
+
+                    std::swap(boxes_data[poke_nb_s], boxes_data[poke_nb]);
+                    stats.swaps++;
+                    env.update_stats();
+
+                    break;
+                }
             }
         }
     }
