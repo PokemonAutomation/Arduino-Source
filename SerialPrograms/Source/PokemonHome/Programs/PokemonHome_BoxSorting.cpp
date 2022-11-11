@@ -413,7 +413,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     ImageFloatBox national_dex_number_box(0.447, 0.250, 0.037, 0.034); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
-    ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.048); // origin symbol pos
+    ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
+    ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // origin symbol pos
+
 
     // vector that will store data for each slot
     std::vector<std::optional<Pokemon>> boxes_data;
@@ -544,7 +546,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         box_render.add(COLOR_RED, national_dex_number_box);
         box_render.add(COLOR_BLUE, shiny_symbol_box);
         box_render.add(COLOR_GREEN, gmax_symbol_box);
-        box_render.add(COLOR_YELLOW, origin_symbol_box);
+        box_render.add(COLOR_DARKGREEN, origin_symbol_box);
+        box_render.add(COLOR_DARK_BLUE, pokemon_box);
 
         //cycle through each summary of the current box and fill pokemon information
         for (size_t row = 0; row < MAX_ROWS; row++){
