@@ -9,10 +9,8 @@ break into smaller functions
 read pokemon name and store the slug (easier to detect missread than reading a number)
 Optimise the swapping algo
 Add enum for ball ? Also, BDSP is reading from swsh data. Worth refactoring ?
-Find a way to let the user customize the sorting algo based on their preference
 
 ideas for more checks :
-gender
 ability
 nature
 type
@@ -170,7 +168,7 @@ size_t get_index(size_t box, size_t row, size_t column){
 
 
 struct Pokemon{
-    std::vector<BoxSortingSelection>* preferences;
+    const std::vector<BoxSortingSelection>* preferences;
 
     // When adding any new member here, do not forget to modify the operators below (ctrl-f "new struct members")
     uint16_t national_dex_number = 0;
@@ -202,7 +200,9 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
             // NOTE edit when adding new struct members
             // TODO TESTING and account for preference.reverse
             case BoxSortingSortType::NationalDexNo:
-                return lhs->national_dex_number < rhs->national_dex_number;
+                if (lhs->national_dex_number != rhs->national_dex_number){
+                    return lhs->national_dex_number < rhs->national_dex_number;
+                }
                 break;
             case BoxSortingSortType::Shiny:
                 if (lhs->shiny != rhs->shiny){
@@ -372,7 +372,7 @@ void print_boxes_data(const std::vector<std::optional<Pokemon>>& boxes_data, Sin
     env.console.log(ss.str());
 }
 
-void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_data, const std::string& json_path, bool sorted){
+void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_data, const std::string& json_path){
     JsonArray pokemon_data;
     for (size_t poke_nb = 0; poke_nb < boxes_data.size(); poke_nb++){
         Cursor cursor = get_cursor(poke_nb);
@@ -391,20 +391,14 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
         }
         pokemon_data.push_back(std::move(pokemon));
     }
-    if (sorted) {
-        const std::string sorted_path = ".sorted";
-        pokemon_data.dump(json_path + sorted_path);
-    } else {
-        pokemon_data.dump(json_path);
-    }
-
+    pokemon_data.dump(json_path);
 }
 
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()) {
-        throw UserSetupError(env.console, "At least sorting selection needs to be made!");
+        throw UserSetupError(env.console, "At least one sorting method selection needs to be made!");
     }
 
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
@@ -584,7 +578,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                     boxes_data[get_index(box_nb, row, column)]->gender = gender;
 
-                    // NOTE edit when adding new struct members (detetions go here likely)
+                    // NOTE edit when adding new struct members (detections go here likely)
 
                     pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
                     context.wait_for_all_requests();
@@ -624,11 +618,13 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     env.console.log("Current boxes data :");
     print_boxes_data(boxes_data, env);
-    output_boxes_data_json(boxes_data, OUTPUT_FILE, false);
+    const std::string json_path = OUTPUT_FILE;
+    output_boxes_data_json(boxes_data, json_path);
 
     env.console.log("Sorted boxes data :");
     print_boxes_data(boxes_sorted, env);
-    output_boxes_data_json(boxes_sorted, OUTPUT_FILE, true);
+    const std::string sorted_path = json_path + ".sorted";
+    output_boxes_data_json(boxes_sorted, sorted_path);
 
     if (!DRY_RUN) {
         // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
