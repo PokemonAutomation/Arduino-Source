@@ -176,6 +176,7 @@ struct Pokemon{
     bool gmax = false;
     std::string ball_slug = "";
     EggHatchGenderFilter gender = EggHatchGenderFilter::Genderless;
+    uint16_t ot_id = 0;
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
@@ -245,7 +246,8 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
         os << "ball_slug:" << pokemon->ball_slug << " ";
-        os << "gender:" << gender_to_string(pokemon->gender);
+        os << "gender:" << gender_to_string(pokemon->gender) << " ";
+        os << "ot_id:" << pokemon->ot_id << " ";
         os << ")";
     }
     else{
@@ -388,6 +390,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
             pokemon["gmax"] =  boxes_data[poke_nb]->gmax;
             pokemon["ball_slug"] =  boxes_data[poke_nb]->ball_slug;
             pokemon["gender"] = gender_to_string(boxes_data[poke_nb]->gender);
+            pokemon["ot_id"] = boxes_data[poke_nb]->ot_id;
         }
         pokemon_data.push_back(std::move(pokemon));
     }
@@ -588,7 +591,23 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                     boxes_data[get_index(box_nb, row, column)]->gender = gender;
 
+                    image = to_blackwhite_rgb32_range(
+                        extract_box_reference(*screen, ot_id_box),
+                        0xff808080, 0xffffffff, true
+                    );
+
+                    int ot_id = OCR::read_number(env.console, image);
+                    if (ot_id == -1){
+                        dump_image(env.console, ProgramInfo(), "ReadSummary", *screen);
+                    }
+                    boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
+
                     // NOTE edit when adding new struct members (detections go here likely)
+
+                    // level_box
+                    // ot_box
+                    // nature_box
+                    // ability_box
 
                     pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
                     context.wait_for_all_requests();
