@@ -16,7 +16,6 @@ nature
 type
 original game
 OT
-ID OT
 moves
 stats
 level
