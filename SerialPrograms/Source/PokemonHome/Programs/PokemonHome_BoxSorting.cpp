@@ -113,8 +113,8 @@ BoxSorting::BoxSorting()
           false,
           LockWhileRunning::LOCKED,
           "<b>Output File:</b><br>JSON file for output of storage boxes.",
-          "box_order.json",
-          "box_order.json"
+          "box_order",
+          "box_order"
       )
     , DRY_RUN(
           "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
@@ -393,7 +393,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
         }
         pokemon_data.push_back(std::move(pokemon));
     }
-    pokemon_data.dump(json_path);
+    pokemon_data.dump(json_path + ".json");
 }
 
 void do_sort(
@@ -707,7 +707,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     env.console.log("Sorted boxes data :");
     print_boxes_data(boxes_sorted, env);
-    const std::string sorted_path = json_path + ".sorted";
+    const std::string sorted_path = json_path + "-sorted";
     output_boxes_data_json(boxes_sorted, sorted_path);
 
     if (!DRY_RUN) {
