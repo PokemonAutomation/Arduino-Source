@@ -101,7 +101,7 @@ EggAutonomous::EggAutonomous()
     , LOOPS_PER_FETCH(
         "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
         LockWhileRunning::LOCKED,
-        2, 1
+        1, 1
     )
     , NUM_EGGS_IN_COLUMN(
         "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
