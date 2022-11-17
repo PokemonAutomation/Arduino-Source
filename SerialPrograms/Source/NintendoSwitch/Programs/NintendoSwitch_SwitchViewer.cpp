@@ -5,6 +5,7 @@
  */
 
 #include <QVBoxLayout>
+#include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h"
@@ -70,8 +71,17 @@ void SwitchViewer_Widget::construct(){
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
+    QScrollArea* scroll_outer = new QScrollArea(this);
+    layout->addWidget(scroll_outer);
+    scroll_outer->setWidgetResizable(true);
+
+    QWidget* scroll_inner = new QWidget(scroll_outer);
+    scroll_outer->setWidget(scroll_inner);
+    QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
+    scroll_layout->setAlignment(Qt::AlignTop);
+
     m_switches = new MultiSwitchSystemWidget(*this, m_session, 0);
-    layout->addWidget(m_switches);
+    scroll_layout->addWidget(m_switches);
 }
 
 

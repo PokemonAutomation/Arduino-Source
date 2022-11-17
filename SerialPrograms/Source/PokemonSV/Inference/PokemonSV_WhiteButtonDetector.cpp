@@ -70,19 +70,19 @@ WhiteButtonMatcher::WhiteButtonMatcher(WhiteButton type, size_t min_width, size_
     , m_max_rmsd(max_rmsd)
 {}
 const WhiteButtonMatcher& WhiteButtonMatcher::A(){
-    static WhiteButtonMatcher matcher(WhiteButton::ButtonA, 15, 15, 80);
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonA, 15, 15, 90);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::B(){
-    static WhiteButtonMatcher matcher(WhiteButton::ButtonB, 15, 15, 80);
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonB, 15, 15, 90);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::Y(){
-    static WhiteButtonMatcher matcher(WhiteButton::ButtonY, 15, 15, 80);
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonY, 15, 15, 90);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::Minus(){
-    static WhiteButtonMatcher matcher(WhiteButton::ButtonMinus, 15, 15, 80);
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonMinus, 15, 15, 90);
     return matcher;
 }
 
@@ -137,10 +137,13 @@ void WhiteButtonFinder::make_overlays(VideoOverlaySet& items) const{
 }
 bool WhiteButtonFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     std::vector<ImageFloatBox> hits = m_detector.detect_all(frame);
-//    cout << "arrors = " << arrows.size() << endl;
+//    cout << "arrows = " << arrows.size() << endl;
     m_arrows.reset(hits.size());
     for (const ImageFloatBox& hit : hits){
         m_arrows.emplace_back(m_overlay, hit, COLOR_MAGENTA);
+    }
+    if (!hits.empty()){
+        frame.save("test.png");
     }
     return !hits.empty();
 }

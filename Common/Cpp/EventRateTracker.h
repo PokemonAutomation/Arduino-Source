@@ -73,6 +73,10 @@ public:
         m_history.emplace_back(Entry{timestamp, usage_since_last});
         m_running_usage += usage_since_last;
     }
+    void push_idle(){
+        m_history.clear();
+        m_running_usage = WallClock::duration(0);
+    }
 
     size_t events_in_window() const{
         return m_history.size();
@@ -84,10 +88,14 @@ public:
         if (m_history.size() < 2){
             return 0;
         }
-        auto delta_time = m_history.back().timestamp - m_history.front().timestamp;
+        auto iter = m_history.begin();
+        auto delta_time = m_history.back().timestamp - iter->timestamp;
         delta_time = std::max(delta_time, m_min_window);
-        auto usage = m_running_usage - m_history.front().usage;
+        auto usage = m_running_usage - iter->usage;
         std::chrono::microseconds time_usec = std::chrono::duration_cast<std::chrono::microseconds>(delta_time);
+        if (time_usec.count() == 0){
+            return 0;
+        }
         std::chrono::microseconds usage_usec = std::chrono::duration_cast<std::chrono::microseconds>(usage);
         return (double)usage_usec.count() / time_usec.count();
     }

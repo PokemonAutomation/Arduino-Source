@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Common/Cpp/Rectangle.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;
@@ -33,37 +34,13 @@ using pxint_t = size_t;
 // min_y: topmost pixel coordinate of the box
 // max_x: 1 + rightmost pixel coordinate of the box
 // max_y: 1 + bottommost pixel coordinate of the box
-struct ImagePixelBox{
-    size_t min_x;
-    size_t min_y;
-    size_t max_x;  //  One past the end.
-    size_t max_y;  //  One past the end.
-
+struct ImagePixelBox : public Rectangle<size_t>{
     ImagePixelBox() = default;
     ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y);
     ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object);
 
-    size_t width() const{ return max_x - min_x; }
-    size_t height() const{ return max_y - min_y; }
-    size_t area() const{ return (size_t)width() * (size_t)height(); }
-
     size_t center_x() const{ return (min_x + max_x)/2; }
     size_t center_y() const{ return (min_y + max_y)/2; }
-
-    //  Create a box covering both `this` box and the parameter `box` passed in.
-    //  If the parameter `box` has 0 area, do no change.
-    //  If `this` box has 0 area, `this` becomes the parameter `box`.
-    void merge_with(const ImagePixelBox& box);
-
-    //  Return whether two boxes overlap. Boxes touching each other does not count as overlap.
-    bool overlap(const ImagePixelBox& box) const;
-
-    //  Return the overlapping area of `this` box and the parameter `box` passed in.
-    size_t overlap_with(const ImagePixelBox& box) const;
-
-    //  Whether a point (x, y) is inside the box. Points on the border of the box does not
-    //  count as inside.
-    bool inside(size_t x, size_t y) const;
 
     //  Clip this box to be within the image size.
     void clip(size_t image_width, size_t image_height);

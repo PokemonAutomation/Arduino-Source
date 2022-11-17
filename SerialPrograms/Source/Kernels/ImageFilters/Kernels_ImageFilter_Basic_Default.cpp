@@ -79,24 +79,94 @@ private:
     const uint32_t m_maxA;
     size_t m_count;
 };
-
-
-
 size_t filter_rgb32_range_Default(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t mins, uint32_t maxs,
+    uint32_t replacement, bool invert
 ){
-    ImageFilter_RgbRange_Default filter0(mins0, maxs0, replacement0, invert0);
-    filter_rbg32(image, bytes_per_row, width, height, filter0, out0, bytes_per_row0);
-    return filter0.count();
+    ImageFilter_RgbRange_Default filter(mins, maxs, replacement, invert);
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
 }
 void filter_rgb32_range_Default(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    filter_rbg32<ImageFilter_RgbRange_Default>(
+    filter_per_pixel<ImageFilter_RgbRange_Default>(
         image, bytes_per_row, width, height, filter, filter_count
     );
+}
+
+
+
+
+
+class ImageFilter_RgbEuclidean_Default{
+public:
+    static const size_t VECTOR_SIZE = 1;
+
+public:
+    ImageFilter_RgbEuclidean_Default(uint32_t expected, double max_euclidean_distance, uint32_t replacement, bool invert)
+        : m_replacement(replacement)
+        , m_invert(invert ? 1 : 0)
+        , m_expected_r((expected & 0x00ff0000) >> 16)
+        , m_expected_g((expected & 0x0000ff00) >> 8)
+        , m_expected_b(expected & 0x000000ff)
+        , m_distance_squared((uint32_t)(max_euclidean_distance * max_euclidean_distance))
+        , m_count(0)
+    {}
+
+    PA_FORCE_INLINE size_t count() const{
+        return m_count;
+    }
+
+    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
+        uint32_t pixel = in[0];
+        uint32_t ret = 1;
+        uint32_t sum_sqr = 0;
+        {
+            uint32_t p = (pixel & 0x00ff0000) >> 16;
+            p -= m_expected_r;
+            sum_sqr += p * p;
+        }
+        {
+            uint32_t p = (pixel & 0x0000ff00) >> 8;
+            p -= m_expected_g;
+            sum_sqr += p * p;
+        }
+        {
+            uint32_t p = pixel & 0x000000ff;
+            p -= m_expected_b;
+            sum_sqr += p * p;
+        }
+        ret = sum_sqr <= m_distance_squared;
+        m_count += ret;
+        ret ^= m_invert;
+        out[0] = ret ? pixel : m_replacement;
+    }
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
+        process_full(out, in);
+    }
+
+private:
+    const uint32_t m_replacement;
+    const uint32_t m_invert;
+    uint32_t m_expected_r;
+    uint32_t m_expected_g;
+    uint32_t m_expected_b;
+    uint32_t m_distance_squared;
+    size_t m_count;
+};
+size_t filter_rgb32_euclidean_Default(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t expected, double max_euclidean_distance,
+    uint32_t replacement, bool invert
+){
+    ImageFilter_RgbEuclidean_Default filter(expected, max_euclidean_distance, replacement, invert);
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
 }
 
 
@@ -175,12 +245,13 @@ private:
 
 
 size_t to_blackwhite_rgb32_range_Default(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, bool in_range_black0
+    const uint32_t* image, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t mins, uint32_t maxs, bool in_range_black
 ){
-    ToBlackWhite_RgbRange_Default filter0(mins0, maxs0, in_range_black0);
-    filter_rbg32(image, bytes_per_row, width, height, filter0, out0, bytes_per_row0);
-    return filter0.count();
+    ToBlackWhite_RgbRange_Default filter(mins, maxs, in_range_black);
+    filter_per_pixel(image, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
 }
 void to_blackwhite_rgb32_range_Default(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,

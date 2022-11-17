@@ -13,7 +13,9 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-
+size_t PeriodicScheduler::events() const{
+    return m_events.size();
+}
 bool PeriodicScheduler::add_event(void* event, std::chrono::milliseconds period, WallClock start){
     auto ret = m_events.emplace(event, PeriodicEvent{m_callback_id, period});
     if (!ret.second){
@@ -128,6 +130,11 @@ void PeriodicRunner::remove_event(void* event){
     m_pending_waits--;
     m_scheduler.remove_event(event);
     m_cv.notify_all();
+
+    if (m_scheduler.events() == 0){
+        SpinLockGuard lg1(m_stats_lock);
+        m_utilization.push_idle();
+    }
 }
 bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){

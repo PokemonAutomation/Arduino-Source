@@ -18,6 +18,18 @@
 namespace PokemonAutomation{
 
 
+
+void filter_by_mask(
+    const PackedBinaryMatrix& matrix,
+    ImageRGB32& image,
+    Color replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+);
+
+
+
+
+
 PackedBinaryMatrix compress_rgb32_to_binary_min(
     const ImageViewRGB32& image,
     uint8_t min_red,
@@ -69,16 +81,12 @@ PackedBinaryMatrix compress_rgb32_to_binary_multirange(
 
 
 
-void filter_rgb32(
-    const PackedBinaryMatrix& matrix,
-    ImageRGB32& image,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+
+
+PackedBinaryMatrix compress_rgb32_to_binary_euclidean(
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance
 );
-
-
-
-
 
 
 

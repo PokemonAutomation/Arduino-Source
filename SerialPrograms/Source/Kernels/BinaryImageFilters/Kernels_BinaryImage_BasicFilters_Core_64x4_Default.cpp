@@ -13,14 +13,25 @@ namespace Kernels{
 
 
 
+void filter_by_mask_64x4_Default(
+    const PackedBinaryMatrix_IB& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    uint32_t replace_with, bool replace_if_zero
+){
+    FilterByMask_Default filter(replace_with, replace_if_zero);
+    filter_by_mask(static_cast<const PackedBinaryMatrix_64x4_Default&>(matrix).get(), image, bytes_per_row, filter);
+}
+
+
+
 void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
+    PackedBinaryMatrix_IB& matrix, uint32_t mins, uint32_t maxs
 ){
-    Compressor_RgbRange_Default compressor0(mins0, maxs0);
+    Compressor_RgbRange_Default compressor(mins, maxs);
     compress_rgb32_to_binary(
         image, bytes_per_row,
-        static_cast<PackedBinaryMatrix_64x4_Default&>(matrix0).get(), compressor0
+        static_cast<PackedBinaryMatrix_64x4_Default&>(matrix).get(), compressor
     );
 }
 void compress_rgb32_to_binary_range_64x4_Default(
@@ -34,15 +45,17 @@ void compress_rgb32_to_binary_range_64x4_Default(
 
 
 
-void filter_rgb32_64x4_Default(
-    const PackedBinaryMatrix_IB& matrix,
-    uint32_t* image, size_t bytes_per_row,
-    uint32_t replace_with, bool replace_if_zero
+void compress_rgb32_to_binary_euclidean_64x4_Default(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix,
+    uint32_t expected, double max_euclidean_distance
 ){
-    BinaryFilter_RgbRange_Default filter(replace_with, replace_if_zero);
-    filter_rgb32(static_cast<const PackedBinaryMatrix_64x4_Default&>(matrix).get(), image, bytes_per_row, filter);
+    Compressor_RgbEuclidean_Default compressor(expected, max_euclidean_distance);
+    compress_rgb32_to_binary(
+        image, bytes_per_row,
+        static_cast<PackedBinaryMatrix_64x4_Default&>(matrix).get(), compressor
+    );
 }
-
 
 
 

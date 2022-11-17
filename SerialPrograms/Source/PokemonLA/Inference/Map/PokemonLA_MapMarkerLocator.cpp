@@ -55,8 +55,8 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
     const size_t lava_min_y = (size_t)(screen.height() * 0.124);
     const size_t lava_max_y = (size_t)(screen.height() * 0.243 + 0.5);
     while (finder->find_next(red_marker_obj, true)){
-        const size_t center_x = red_marker_obj.center_x();
-        const size_t center_y = red_marker_obj.center_y();
+        const size_t center_x = (size_t)red_marker_obj.center_of_gravity_x();
+        const size_t center_y = (size_t)red_marker_obj.center_of_gravity_y();
         if (center_x >= lava_min_x && center_x <= lava_max_x && center_y >= lava_min_y && center_y <= lava_max_y){
             // Skip lava area
             continue;
@@ -79,8 +79,8 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
 
     // Get those end point regions from matrix2 into marker_ends.
     // The object in marker_ends are in the local coordinate system of the red marker
-    const size_t local_marker_center_x = red_marker_obj.center_x() - red_marker_obj.min_x;
-    const size_t local_marker_center_y = red_marker_obj.center_y() - red_marker_obj.min_y;
+    const size_t local_marker_center_x = (size_t)red_marker_obj.center_of_gravity_x() - red_marker_obj.min_x;
+    const size_t local_marker_center_y = (size_t)red_marker_obj.center_of_gravity_y() - red_marker_obj.min_y;
     session->set_source(matrix2);
     finder = session->make_iterator(1);
     std::vector<Kernels::Waterfill::WaterfillObject> marker_ends;
@@ -96,8 +96,8 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
     // The angle of each marker end relative to the marker center
     double end_angles[3] = {0.0, 0.0, 0.0};
     for(int i = 0; i < 3; i++){
-        ptrdiff_t x = (ptrdiff_t)marker_ends[i].center_x() - (ptrdiff_t)local_marker_center_x;
-        ptrdiff_t y = (ptrdiff_t)marker_ends[i].center_y() - (ptrdiff_t)local_marker_center_y;
+        ptrdiff_t x = (ptrdiff_t)marker_ends[i].center_of_gravity_x() - (ptrdiff_t)local_marker_center_x;
+        ptrdiff_t y = (ptrdiff_t)marker_ends[i].center_of_gravity_y() - (ptrdiff_t)local_marker_center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;
@@ -126,7 +126,7 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
     double red_marker_direction = end_angles[(min_angle_distance_index+2)%3];
     cout << "Found red marker direction " << red_marker_direction << endl;
 
-    output.pixel(red_marker_obj.center_x(), red_marker_obj.center_y()) = (uint32_t)Color(255, 0, 0);
+    output.pixel((size_t)red_marker_obj.center_of_gravity_x(), (size_t)red_marker_obj.center_of_gravity_y()) = (uint32_t)Color(255, 0, 0);
     output.save("./test_map_location.png");
 
     return red_marker_direction;

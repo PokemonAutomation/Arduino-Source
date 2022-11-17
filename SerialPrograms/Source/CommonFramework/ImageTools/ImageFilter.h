@@ -22,12 +22,14 @@ class ImageRGB32;
 //  Returns the # of pixels inside the range [mins, maxs].
 ImageRGB32 filter_rgb32_range(
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, Color replace_with, bool replace_color_within_range
+    uint32_t mins, uint32_t maxs,
+    Color replace_with, bool replace_color_within_range
 );
 ImageRGB32 filter_rgb32_range(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, Color replace_with, bool replace_color_within_range
+    uint32_t mins, uint32_t maxs,
+    Color replace_with, bool replace_color_within_range
 );
 
 
@@ -43,6 +45,22 @@ struct FilterRgb32Range{
 std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
     const ImageViewRGB32& image,
     const std::vector<FilterRgb32Range>& filters
+);
+
+
+//  If `replace_color_within_range` is true, replace the color range [mins, maxs] with the color `replace_with`.
+//  If `replace_color_within_range` is false, replace the color outside of the distance with the color `replace_with`.
+//  Returns the # of pixels inside the distance.
+ImageRGB32 filter_rgb32_euclidean(
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance,
+    Color replace_with, bool replace_color_within_range
+);
+ImageRGB32 filter_rgb32_euclidean(
+    size_t& pixels_in_range,
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance,
+    Color replace_with, bool replace_color_within_range
 );
 
 

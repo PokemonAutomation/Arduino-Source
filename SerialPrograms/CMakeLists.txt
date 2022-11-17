@@ -80,6 +80,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Containers/AlignedMalloc.h
     ../Common/Cpp/Containers/AlignedVector.h
     ../Common/Cpp/Containers/AlignedVector.tpp
+    ../Common/Cpp/Containers/BoxSet.h
     ../Common/Cpp/Containers/DllSafeString.h
     ../Common/Cpp/Containers/FixedLimitVector.h
     ../Common/Cpp/Containers/FixedLimitVector.tpp
@@ -145,6 +146,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
     ../Common/Cpp/PrintDebuggers.h
+    ../Common/Cpp/Rectangle.h
+    ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
@@ -578,10 +581,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp
@@ -1175,10 +1174,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h
+    Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_DialogDetector.h
+    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
+    Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp
+    Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
+    Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
+    Source/PokemonSV/Programs/PokemonSV_GameEntry.h
+    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp
+    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
@@ -1690,7 +1699,7 @@ if (ARCH_FLAGS_09_Nehalem)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
@@ -1705,7 +1714,7 @@ endif()
 if (ARCH_FLAGS_13_Haswell)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
@@ -1719,7 +1728,7 @@ SET_SOURCE_FILES_PROPERTIES(
 endif()
 if (ARCH_FLAGS_17_Skylake)
 SET_SOURCE_FILES_PROPERTIES(
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp

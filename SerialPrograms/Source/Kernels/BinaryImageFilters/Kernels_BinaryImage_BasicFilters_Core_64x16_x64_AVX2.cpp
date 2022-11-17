@@ -15,6 +15,17 @@ namespace Kernels{
 
 
 
+void filter_by_mask_64x16_x64_AVX2(
+    const PackedBinaryMatrix_IB& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    uint32_t replace_with, bool replace_if_zero
+){
+    FilterByMask_x64_AVX2 filter(replace_with, replace_if_zero);
+    filter_by_mask(static_cast<const PackedBinaryMatrix_64x16_x64_AVX2&>(matrix).get(), image, bytes_per_row, filter);
+}
+
+
+
 void compress_rgb32_to_binary_range_64x16_x64_AVX2(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
@@ -36,13 +47,16 @@ void compress_rgb32_to_binary_range_64x16_x64_AVX2(
 
 
 
-void filter_rgb32_64x16_x64_AVX2(
-    const PackedBinaryMatrix_IB& matrix,
-    uint32_t* image, size_t bytes_per_row,
-    uint32_t replace_with, bool replace_if_zero
+void compress_rgb32_to_binary_euclidean_64x16_x64_AVX2(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix,
+    uint32_t expected, double max_euclidean_distance
 ){
-    Filter_RgbRange_x64_AVX2 filter(replace_with, replace_if_zero);
-    filter_rgb32(static_cast<const PackedBinaryMatrix_64x16_x64_AVX2&>(matrix).get(), image, bytes_per_row, filter);
+    Compressor_RgbEuclidean_x64_AVX2 compressor(expected, max_euclidean_distance);
+    compress_rgb32_to_binary(
+        image, bytes_per_row,
+        static_cast<PackedBinaryMatrix_64x16_x64_AVX2&>(matrix).get(), compressor
+    );
 }
 
 

@@ -582,10 +582,15 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
+    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -809,6 +814,7 @@ HEADERS += \
     ../Common/Cpp/Containers/AlignedMalloc.h \
     ../Common/Cpp/Containers/AlignedVector.h \
     ../Common/Cpp/Containers/AlignedVector.tpp \
+    ../Common/Cpp/Containers/BoxSet.h \
     ../Common/Cpp/Containers/DllSafeString.h \
     ../Common/Cpp/Containers/FixedLimitVector.h \
     ../Common/Cpp/Containers/FixedLimitVector.tpp \
@@ -847,6 +853,7 @@ HEADERS += \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/PrintDebuggers.h \
+    ../Common/Cpp/Rectangle.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/StreamConverters.h \
     ../Common/Cpp/StringTools.h \
@@ -1093,11 +1100,6 @@ HEADERS += \
     Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h \
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
@@ -1396,10 +1398,15 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
+    Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
+    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

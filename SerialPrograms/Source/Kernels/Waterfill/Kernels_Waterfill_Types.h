@@ -50,8 +50,8 @@ public:
     size_t width() const{ return max_x - min_x; }
     size_t height() const{ return max_y - min_y; }
 
-    size_t center_x() const{ return sum_x / area; }
-    size_t center_y() const{ return sum_y / area; }
+    double center_of_gravity_x() const{ return (double)sum_x / area; }
+    double center_of_gravity_y() const{ return (double)sum_y / area; }
 
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }

@@ -27,12 +27,16 @@ using namespace Kernels::Waterfill;
 
 
 
-const ImageMatch::ExactImageMatcher& DIALOG_ARROW(){
-    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/DialogArrow.png");
+const ImageMatch::ExactImageMatcher& DIALOG_ARROW_BLACK(){
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/DialogArrow-Black.png");
+    return matcher;
+}
+const ImageMatch::ExactImageMatcher& DIALOG_ARROW_WHITE(){
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/DialogArrow-White.png");
     return matcher;
 }
 
-bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
+bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object, bool black_arrow){
     double aspect_ratio = object.aspect_ratio();
 //    cout << "aspect_ratio = " << aspect_ratio << endl;
     if (aspect_ratio < 1.0 || aspect_ratio > 1.3){
@@ -45,7 +49,9 @@ bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object)
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
-    double rmsd = DIALOG_ARROW().rmsd(cropped);
+    double rmsd = black_arrow
+        ? DIALOG_ARROW_BLACK().rmsd(cropped)
+        : DIALOG_ARROW_WHITE().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;
 }
@@ -68,16 +74,29 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, 0xff000000, 0xff7f7fbf);
 
     std::vector<ImageFloatBox> hits;
 
-    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-    auto iter = session->make_iterator(20);
-    WaterfillObject object;
-    while (iter->find_next(object, false)){
-        if (is_dialog_arrow(region, object)){
-            hits.emplace_back(translate_to_parent(screen, m_box, object));
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, 0xff000000, 0xff7f7fbf);
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(20);
+        WaterfillObject object;
+        while (iter->find_next(object, false)){
+            if (is_dialog_arrow(region, object, true)){
+                hits.emplace_back(translate_to_parent(screen, m_box, object));
+            }
+        }
+    }
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, 0xff808080, 0xffffffff);
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(20);
+        WaterfillObject object;
+        while (iter->find_next(object, false)){
+            if (is_dialog_arrow(region, object, false)){
+                hits.emplace_back(translate_to_parent(screen, m_box, object));
+            }
         }
     }
 

@@ -41,11 +41,21 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
+#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 
 
+#include <QPixmap>
 #include <QVideoFrame>
 
 //#include <Windows.h>
@@ -121,27 +131,193 @@ using namespace Kernels::Waterfill;
 
 
 
+void merge_enclosed(){
+
+}
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-//    using namespace PokemonSV;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
+    BotBaseContext context(scope, console.botbase());
 
+
+
+#if 0
+    RaidShinyStarDetector detector(overlay);
+    wait_until(
+        console, context,
+        WallClock::max(),
+        {detector}
+    );
+#endif
+
+
+
+#if 0
+    ImageRGB32 image("ShinyRaid.png");
+
+    ImageViewRGB32 cropped = extract_box_reference(image, ImageFloatBox{0.5, 0.1, 0.4, 0.7});
+    cropped.save("test-cropped.png");
+
+
+    ImageRGB32 filtered = filter_rgb32_range(cropped, 0xff804040, 0xffffffff, Color(0xffffff00), true);
+    filtered.save("test-filtered.png");
+#endif
+
+#if 0
+    uint8_t year = MAX_YEAR;
+    while (true){
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        home_roll_date_enter_game_autorollback(console, context, year);
+        pbf_mash_button(context, BUTTON_A, 250);
+    }
+#endif
+
+#if 0
+    ImageRGB32 image("GradiantArrowHorizontal-Template.png");
+
+    ImageRGB32 rotated(image.height(), image.width());
+
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
+            rotated.pixel(r, c) = image.pixel(c, r);
+        }
+    }
+    rotated.save("GradiantArrowVertical-Template.png");
+#endif
+
+
+#if 0
+    auto image = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(image, ImageFloatBox{0.500, 0.555, 0.310, 0.070});
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_euclidean(cropped, 0xff757f9c, 100);
+//    cout << matrix.dump() << endl;
+
+    matrix.invert();
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(100);
+    WaterfillObject object;
+    while (iter->find_next(object, false)){
+//        extract_box_reference(image, object).save("Arrow-Template.png");
+        cout << object.area << endl;
+    }
+#endif
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    ImageViewRGB32 cropped = extract_box_reference(image, ImageFloatBox{0.500, 0.555, 0.310, 0.070});
+//    ImageRGB32 filtered = filter_rgb32_range(cropped, 0xffc00000, 0xffffffff, Color(0x00000000), true);
+    size_t pixels;
+    ImageRGB32 filtered = filter_rgb32_euclidean(pixels, cropped, 0xff757f9c, 100, Color(0x00000000), true);
+    cout << "pixels = " << pixels << endl;
+    filtered.save("test.png");
+#endif
+
+
+#if 0
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808000, 0xffffff80);
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(100);
+    WaterfillObject object;
+    while (iter->find_next(object, false)){
+        extract_box_reference(image, object).save("Arrow-Template.png");
+    }
+#endif
+
+#if 0
+    ImageRGB32 image("WhiteButtonA.png");
+    ImageRGB32 filtered = filter_rgb32_range(image, 0xff000000, 0xff7f7f7f, Color(0x00000000), true);
+
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
+            if (8 < c && c < 30 && 8 < r && r < 30){
+                filtered.pixel(c, r) = image.pixel(c, r);
+            }
+        }
+    }
+    filtered.save("WhiteButtonA-processed.png");
+#endif
+
+#if 0
+    WhiteButtonFinder next_button(WhiteButton::ButtonA, console.overlay(), {0.9, 0.9, 0.1, 0.1});
+    wait_until(
+        console, context,
+        std::chrono::seconds(60),
+        {next_button}
+    );
+#endif
+
+
+#if 0
+    TeraCardReader reader;
+//    auto image = ImageRGB32("ErrorDumps/20221115-234552197119-ReadStarsFailed.png");
+    auto image = feed.snapshot();
+    cout << reader.detect(image) << endl;
+    cout << "stars = " << reader.stars(image) << endl;
+
+//    BattleMenuDetector battle_menu;
+//    cout << battle_menu.detect(image) << endl;
+#endif
 
 //    OverlayBoxScope box(overlay, COLOR_RED, {0.4, 0.4, 0.2, 0.2}, "asdf qwer sdfg");
 
 
+//    reset_game_to_gamemenu(console, context);
+
+
+#if 0
+    ImageRGB32 image("Arrow.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(20);
+    WaterfillObject object;
+    while (iter->find_next(object, false)){
+        extract_box_reference(image, object).save("Arrow-Template.png");
+    }
+#endif
+
+
+//    YCommMenuDetector detector(true);
+//    HomeDetector detector;
+//    cout << detector.detect(image) << endl;
+//    cout << detector.detect(feed.snapshot()) << endl;
+
+
+
+#if 0
+    while (true){
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        reset_game_from_home(env, console, context);
+    }
+#endif
+
+
+
+#if 0
     overlay.add_log("asdfasdf", COLOR_RED);
 
     for (int c = 0; c < 20; c++){
@@ -152,7 +328,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     scope.wait_for(std::chrono::milliseconds(5000));
     cout << "clear" << endl;
     overlay.clear_log();
-
+#endif
 
 #if 0
     OverlayTextScope text(overlay, "hello world", 0.5, 0.5, 10, COLOR_WHITE);
@@ -246,6 +422,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    ImageFloatBox box(0.5, 0.5, 0.4, 0.5);
     ImageFloatBox box(0.0, 0.0, 1.0, 1.0);
 
+
     VideoOverlaySet set(overlay);
     WhiteButtonFinder white_button_detector0(WhiteButton::ButtonA, overlay, box);
     WhiteButtonFinder white_button_detector1(WhiteButton::ButtonB, overlay, box);
@@ -253,8 +430,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     WhiteButtonFinder white_button_detector3(WhiteButton::ButtonMinus, overlay, box);
     DialogArrowFinder dialog_arrow_detector(overlay, box);
     GradientArrowFinder gradient_arrow_detector(overlay, box);
- //   dialog_arrow_detector.make_overlays(set);
- //   gradient_arrow_detector.make_overlays(set);
+    dialog_arrow_detector.make_overlays(set);
+    gradient_arrow_detector.make_overlays(set);
     BattleMenuFinder battle_menu;
     battle_menu.make_overlays(set);
 
@@ -293,6 +470,144 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 }
 
+
+
+
+#if 0
+struct RaidShinyStar{
+    double alpha;
+    WaterfillObject object;
+};
+
+
+class RaidShinyStarDetector : public VisualInferenceCallback{
+    static constexpr double ALPHA_THRESHOLD = 1.0;
+
+public:
+    RaidShinyStarDetector(VideoOverlay& overlay)
+        : VisualInferenceCallback("RaidShinyStarDetector")
+        , m_overlay(overlay)
+        , m_box(overlay, {0.5, 0.1, 0.4, 0.7})
+    {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+    std::vector<RaidShinyStar> process_frame(const ImageViewRGB32& frame);
+
+private:
+    double test_object(const ImageViewRGB32& image, const WaterfillObject& object);
+
+
+private:
+    VideoOverlay& m_overlay;
+    OverlayBoxScope m_box;
+    std::deque<OverlayBoxScope> m_stars;
+};
+
+
+void RaidShinyStarDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_box);
+}
+bool RaidShinyStarDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    process_frame(frame);
+    return false;
+}
+
+double RaidShinyStarDetector::test_object(const ImageViewRGB32& image, const WaterfillObject& object){
+    double aspect_ratio = object.aspect_ratio();
+    if (aspect_ratio < 0.9 || aspect_ratio > 1.1){
+        return 0;
+    }
+
+    double area_ratio = object.area_ratio();
+    if (area_ratio < 0.5 || area_ratio > 0.8){
+        return 0;
+    }
+
+    //  Check that center of gravity is centered.
+    double center_of_gravity_x = object.center_of_gravity_x();
+    double center_of_gravity_y = object.center_of_gravity_y();
+    double center_x = object.min_x + object.width() * 0.5;
+    double center_y = object.min_y + object.height() * 0.5;
+
+    double center_shift_x = center_x - center_of_gravity_x;
+    double center_shift_y = center_y - center_of_gravity_y;
+    center_shift_x *= center_shift_x;
+    center_shift_y *= center_shift_y;
+
+    double max_x_sqr = object.width() * 0.1;
+    double max_y_sqr = object.height() * 0.1;
+    max_x_sqr *= max_x_sqr;
+    max_y_sqr *= max_y_sqr;
+
+    if (center_shift_x > max_x_sqr){
+        return 0;
+    }
+    if (center_shift_y > max_y_sqr){
+        return 0;
+    }
+
+    return 1.0;
+}
+
+
+std::vector<RaidShinyStar> RaidShinyStarDetector::process_frame(const ImageViewRGB32& frame){
+
+    ImageViewRGB32 cropped = extract_box_reference(frame, m_box);
+
+    std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(cropped, {
+        {0xff808080, 0xffffffff},
+        {0xff909090, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xffb0b0b0, 0xffffffff},
+        {0xffc0c0c0, 0xffffffff},
+        {0xffd0d0d0, 0xffffffff},
+        {0xffe0e0e0, 0xffffffff},
+
+        {0xff804040, 0xffffffff},
+        {0xff905050, 0xffffffff},
+        {0xffa06060, 0xffffffff},
+
+        {0xff408040, 0xffffffff},
+        {0xff509050, 0xffffffff},
+        {0xff60a060, 0xffffffff},
+
+        {0xff404080, 0xffffffff},
+        {0xff505090, 0xffffffff},
+        {0xff6060a0, 0xffffffff},
+    });
+
+//    std::vector<RaidShinyStar>
+    std::vector<RaidShinyStar> stars;
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+    WaterfillObject object;
+    for (PackedBinaryMatrix& matrix : matrices){
+        session->set_source(matrix);
+        auto iter = session->make_iterator(10);
+        while (iter->find_next(object, false)){
+            double alpha = test_object(cropped, object);
+            if (alpha >= ALPHA_THRESHOLD){
+                stars.emplace_back(RaidShinyStar{alpha, object});
+            }
+        }
+    }
+
+
+
+
+
+
+    //  Redraw the boxes.
+    m_stars.clear();
+    for (const RaidShinyStar& star : stars){
+        m_stars.emplace_back(m_overlay, translate_to_parent(frame, m_box, star.object), COLOR_BLUE);
+    }
+    return stars;
+}
+
+#endif
 
 
 

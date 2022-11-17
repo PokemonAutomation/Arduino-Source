@@ -37,6 +37,24 @@ private:
     double m_max_rgb_sum;
     double m_max_stddev_sum;
 };
+class WhiteScreenDetector : public StaticScreenDetector{
+public:
+    WhiteScreenDetector(
+        Color color = COLOR_RED,
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        double min_rgb_sum = 500,
+        double max_stddev_sum = 10
+    );
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_box;
+    double m_min_rgb_sum;
+    double m_max_stddev_sum;
+};
 
 
 class BlackScreenWatcher : public BlackScreenDetector, public VisualInferenceCallback{
@@ -52,7 +70,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 };
 
-// Detect when a perido of black screen is over
+// Detect when a period of black screen is over
 class BlackScreenOverWatcher : public VisualInferenceCallback{
 public:
     BlackScreenOverWatcher(
@@ -71,6 +89,29 @@ public:
 private:
     BlackScreenDetector m_detector;
     bool m_has_been_black = false;
+};
+
+
+
+
+class WhiteScreenOverWatcher : public VisualInferenceCallback{
+public:
+    WhiteScreenOverWatcher(
+        Color color = COLOR_RED,
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        double min_rgb_sum = 500,
+        double max_stddev_sum = 10
+    );
+
+    bool white_is_over(const ImageViewRGB32& frame);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    WhiteScreenDetector m_detector;
+    bool m_has_been_white = false;
 };
 
 

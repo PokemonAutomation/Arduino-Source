@@ -30,9 +30,6 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-
-
-
 class BattleMenuFinder : public VisualInferenceCallback{
 public:
     BattleMenuFinder();
@@ -42,6 +39,55 @@ public:
 
 private:
     BattleMenuDetector m_detector;
+    size_t m_trigger_count = 0;
+};
+
+
+
+class MoveSelectDetector : public StaticScreenDetector{
+public:
+    MoveSelectDetector();
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    WhiteButtonDetector m_status_button;
+    GradientArrowDetector m_arrow;
+};
+class MoveSelectFinder : public VisualInferenceCallback{
+public:
+    MoveSelectFinder();
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    MoveSelectDetector m_detector;
+    size_t m_trigger_count = 0;
+};
+
+
+
+class TeraCatchDetector : public StaticScreenDetector{
+public:
+    TeraCatchDetector();
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    GradientArrowDetector m_arrow;
+};
+class TeraCatchFinder : public VisualInferenceCallback{
+public:
+    TeraCatchFinder();
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    TeraCatchDetector m_detector;
     size_t m_trigger_count = 0;
 };
 

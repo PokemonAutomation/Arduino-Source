@@ -28,6 +28,8 @@ namespace PokemonAutomation{
 //
 class PeriodicScheduler{
 public:
+    size_t events() const;
+
     //  Returns true if event was successfully added.
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);

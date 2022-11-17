@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -17,9 +17,9 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-// #include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+//#include "CommonFramework/ImageTools/ImageFilter.h"
+//#include "CommonFramework/ImageTools/SolidColorTest.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
@@ -58,7 +58,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
                 // break;
             }
 
-            if (boxes[i].overlap(boxes[j])){
+            if (boxes[i].overlaps_with(boxes[j])){
                 disjoint_set.merge(i, j);
             }
         }
@@ -244,11 +244,11 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
         }
 
         // Skip the item area (lower left of the screen)
-        if (object.center_x() >= item_area_x && object.center_y() >= item_area_y){
+        if (object.center_of_gravity_x() >= item_area_x && object.center_of_gravity_y() >= item_area_y){
             continue;
         }
         // Skip if it overlaps with the main character.
-        if (character_area.inside(object.center_x(), object.center_y())){
+        if (character_area.is_inside((size_t)object.center_of_gravity_x(), (size_t)object.center_of_gravity_y())){
             continue;
         }
         
@@ -259,10 +259,10 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
         pxint_t radius = (pxint_t)size;
 
         ImagePixelBox box;
-        box.min_x = (pxint_t)object.center_x() - radius;
-        box.max_x = (pxint_t)object.center_x() + radius;
-        box.min_y = (pxint_t)object.center_y() - radius;
-        box.max_y = (pxint_t)object.center_y() + radius;
+        box.min_x = (pxint_t)object.center_of_gravity_x() - radius;
+        box.max_x = (pxint_t)object.center_of_gravity_x() + radius;
+        box.min_y = (pxint_t)object.center_of_gravity_y() - radius;
+        box.max_y = (pxint_t)object.center_of_gravity_y() + radius;
         box.clip(debug_image.width(), debug_image.height());
 
         // std::cout << "core berry color " << to_str(box) << std::endl;
@@ -310,10 +310,10 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
         }
 
         ImagePixelBox box;
-        box.min_x = candidate_box.min_x + (pxint_t)(object.center_x() - object.width()/2);
-        box.max_x = candidate_box.min_x + (pxint_t)(object.center_x() + object.width()/2);
-        box.min_y = candidate_box.min_y + (pxint_t)(object.center_y() - object.height()/2);
-        box.max_y = candidate_box.min_y + (pxint_t)(object.center_y() + object.height()/2);
+        box.min_x = candidate_box.min_x + (pxint_t)(object.center_of_gravity_x() - object.width()/2);
+        box.max_x = candidate_box.min_x + (pxint_t)(object.center_of_gravity_x() + object.width()/2);
+        box.min_y = candidate_box.min_y + (pxint_t)(object.center_of_gravity_y() - object.height()/2);
+        box.max_y = candidate_box.min_y + (pxint_t)(object.center_of_gravity_y() + object.height()/2);
 
         std::cout << "full-color region #pixels: " << object.area << " at " << box.center_x() << " " << box.center_y() << std::endl;
 

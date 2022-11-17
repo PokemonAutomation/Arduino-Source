@@ -285,7 +285,7 @@ bool is_arrow(const ImageViewRGB32& image, const WaterfillObject& object){
     ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
     PackedBinaryMatrix matrix = object.packed_matrix();
-    filter_rgb32(matrix, cropped, Color(0), true);
+    filter_by_mask(matrix, cropped, Color(0), true);
 
 
     ImageStats stats = image_stats(cropped);

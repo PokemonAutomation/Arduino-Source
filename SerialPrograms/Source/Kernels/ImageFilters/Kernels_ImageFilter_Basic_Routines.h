@@ -18,9 +18,9 @@ namespace Kernels{
 
 
 template <typename Runner>
-PA_FORCE_INLINE void filter_rbg32(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    Runner& filter0, uint32_t* out0, size_t bytes_per_row0
+PA_FORCE_INLINE void filter_per_pixel(
+    const uint32_t* image, size_t in_bytes_per_row, size_t width, size_t height,
+    Runner& filter, uint32_t* out, size_t out_bytes_per_row
 ){
     if (width == 0 || height == 0){
         return;
@@ -28,25 +28,25 @@ PA_FORCE_INLINE void filter_rbg32(
     const size_t VECTOR_SIZE = Runner::VECTOR_SIZE;
     do{
         const uint32_t* in = image;
-        uint32_t* o0 = out0;
+        uint32_t* o0 = out;
         size_t lc = width / VECTOR_SIZE;
         while (lc--){
-            filter0.process_full(o0, in);
+            filter.process_full(o0, in);
             in += VECTOR_SIZE;
             o0 += VECTOR_SIZE;
         }
         size_t left = width % VECTOR_SIZE;
         if (left != 0){
-            filter0.process_partial(o0, in, left);
+            filter.process_partial(o0, in, left);
         }
-        image = (const uint32_t*)((const char*)image + bytes_per_row);
-        out0 = (uint32_t*)((const char*)out0 + bytes_per_row0);
+        image = (const uint32_t*)((const char*)image + in_bytes_per_row);
+        out = (uint32_t*)((const char*)out + out_bytes_per_row);
     }while (--height);
 }
 
 
 template <typename Runner>
-PA_FORCE_INLINE void filter_rbg32(
+PA_FORCE_INLINE void filter_per_pixel(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){

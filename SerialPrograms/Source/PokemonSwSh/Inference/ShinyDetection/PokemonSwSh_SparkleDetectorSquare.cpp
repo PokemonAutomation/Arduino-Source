@@ -433,8 +433,8 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
     size_t box_area = width * height;
     const PackedBinaryMatrix matrix = object.packed_matrix();
 
-    size_t center_x = object.center_x() - object.min_x;
-    size_t center_y = object.center_y() - object.min_y;
+    size_t center_x = (size_t)object.center_of_gravity_x() - object.min_x;
+    size_t center_y = (size_t)object.center_of_gravity_y() - object.min_y;
 
 
     //  Check the hole.

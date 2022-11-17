@@ -74,6 +74,7 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
+#include "Common/Cpp/Containers/BoxSet.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -124,8 +125,29 @@ using namespace Kernels;
 
 
 
+#if 0
+using Box = Rectangle<size_t>;
+
+struct MergableBox{
+    Rectangle<size_t> box;
+    size_t active_pixels;
+
+    bool merge(const MergableBox& x){
+//        if (box.min_x){
+//
+//        }
+    }
+};
 
 
+class LinearBoxSet{
+public:
+
+
+private:
+    std::vector<Box> m_boxes;
+};
+#endif
 
 
 
@@ -134,13 +156,26 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh;
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
-
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    ImageRGB32 image("SV-Buttons2.png");
-    WhiteButtonDetector detector(WhiteButton::ButtonB, ImageFloatBox{0, 0, 1, 1});
-    detector.detect(image);
+    BoxSet<size_t> set;
+    cout << set.dump() << endl;
+
+    set.insert({10, 20, 15, 25});
+    set.insert({11, 19, 13, 27});
+    set.insert({12, 18, 13, 27});
+    cout << set.dump() << endl;
+
+    auto iter = set.lower_bound_min_y(11);
+    for (; iter != set.end_min_y(); ++iter){
+        cout << iter->first << endl;
+    }
+
+
+//    ImageRGB32 image("SV-Buttons2.png");
+//    WhiteButtonDetector detector(WhiteButton::ButtonB, ImageFloatBox{0, 0, 1, 1});
+//    detector.detect(image);
 
 
 #if 0

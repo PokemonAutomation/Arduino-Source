@@ -17,8 +17,10 @@ namespace Kernels{
 
 
 size_t filter_rgb32_range(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t mins, uint32_t maxs,
+    uint32_t replacement, bool invert
 );
 
 
@@ -51,6 +53,19 @@ void filter_rgb32_range(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 );
+
+
+
+size_t filter_rgb32_euclidean(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t expected, double max_euclidean_distance,
+    uint32_t replacement, bool invert
+);
+
+
+
+
 
 
 

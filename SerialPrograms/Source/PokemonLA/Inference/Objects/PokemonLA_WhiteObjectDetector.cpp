@@ -94,7 +94,7 @@ void WhiteObjectDetector::merge_heavily_overlapping(double tolerance){
                 ++candidate;
                 continue;
             }
-            size_t overlap = current->second.overlap_with(candidate->second);
+            size_t overlap = current->second.overlapping_area(candidate->second);
             if ((double)overlap * ratio > current->first){
                 current->second.merge_with(candidate->second);
                 candidate = boxes.erase(candidate);

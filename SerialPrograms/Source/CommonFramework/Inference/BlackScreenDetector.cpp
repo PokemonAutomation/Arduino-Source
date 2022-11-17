@@ -29,12 +29,30 @@ BlackScreenDetector::BlackScreenDetector(
     , m_max_rgb_sum(max_rgb_sum)
     , m_max_stddev_sum(max_stddev_sum)
 {}
-
 void BlackScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool BlackScreenDetector::detect(const ImageViewRGB32& screen) const{
     return is_black(extract_box_reference(screen, m_box), m_max_rgb_sum, m_max_stddev_sum);
+}
+
+
+
+WhiteScreenDetector::WhiteScreenDetector(
+    Color color, const ImageFloatBox& box,
+    double min_rgb_sum,
+    double max_stddev_sum
+)
+    : m_color(color)
+    , m_box(box)
+    , m_min_rgb_sum(min_rgb_sum)
+    , m_max_stddev_sum(max_stddev_sum)
+{}
+void WhiteScreenDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+bool WhiteScreenDetector::detect(const ImageViewRGB32& screen) const{
+    return is_white(extract_box_reference(screen, m_box), m_min_rgb_sum, m_max_stddev_sum);
 }
 
 
@@ -68,7 +86,6 @@ BlackScreenOverWatcher::BlackScreenOverWatcher(
 void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
-
 bool BlackScreenOverWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return black_is_over(frame);
 }
@@ -79,6 +96,35 @@ bool BlackScreenOverWatcher::black_is_over(const ImageViewRGB32& frame){
     }
     return m_has_been_black;
 }
+
+
+
+
+WhiteScreenOverWatcher::WhiteScreenOverWatcher(
+    Color color, const ImageFloatBox& box,
+    double min_rgb_sum,
+    double max_stddev_sum
+)
+    : VisualInferenceCallback("BlackScreenOverWatcher")
+    , m_detector(color, box, min_rgb_sum, max_stddev_sum)
+{}
+void WhiteScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
+    m_detector.make_overlays(items);
+}
+
+bool WhiteScreenOverWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    return white_is_over(frame);
+}
+bool WhiteScreenOverWatcher::white_is_over(const ImageViewRGB32& frame){
+    if (m_detector.detect(frame)){
+        m_has_been_white = true;
+        return false;
+    }
+    return m_has_been_white;
+}
+
+
+
 
 
 

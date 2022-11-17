@@ -42,7 +42,7 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
 
     ImageRGB32 cropped = extract_box_reference(image, object).copy();
 
-    filter_rgb32(
+    filter_by_mask(
         object.packed_matrix(),
         cropped,
         COLOR_WHITE,

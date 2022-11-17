@@ -69,14 +69,14 @@ bool RadialSparkleDetector::is_ball() const{
     }
 
     //  Compute angles for the 4 largest regions.
-    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_x() - m_object.min_x);
-    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_y() - m_object.min_y);
+    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_of_gravity_x() - m_object.min_x);
+    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_of_gravity_y() - m_object.min_y);
     std::set<double> angles;
     {
         size_t c = 0;
         for (const auto& region : m_regions){
-            ptrdiff_t x = (ptrdiff_t)region.second.center_x() - center_x;
-            ptrdiff_t y = (ptrdiff_t)region.second.center_y() - center_y;
+            ptrdiff_t x = (ptrdiff_t)region.second.center_of_gravity_x() - center_x;
+            ptrdiff_t y = (ptrdiff_t)region.second.center_of_gravity_y() - center_y;
             double angle = std::atan2(y, x) * 57.29577951308232;
             if (angle < 0){
                 angle += 360;
@@ -132,13 +132,13 @@ bool RadialSparkleDetector::is_star() const{
     }
 
     //  Compute angles for the 5 largest regions.
-    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_x() - m_object.min_x);
-    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_y() - m_object.min_y);
+    ptrdiff_t center_x = (ptrdiff_t)(m_object.center_of_gravity_x() - m_object.min_x);
+    ptrdiff_t center_y = (ptrdiff_t)(m_object.center_of_gravity_y() - m_object.min_y);
     std::set<double> angles;
     size_t c = 0;
     for (const auto& region : m_regions){
-        ptrdiff_t x = (ptrdiff_t)region.second.center_x() - center_x;
-        ptrdiff_t y = (ptrdiff_t)region.second.center_y() - center_y;
+        ptrdiff_t x = (ptrdiff_t)region.second.center_of_gravity_x() - center_x;
+        ptrdiff_t y = (ptrdiff_t)region.second.center_of_gravity_y() - center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;

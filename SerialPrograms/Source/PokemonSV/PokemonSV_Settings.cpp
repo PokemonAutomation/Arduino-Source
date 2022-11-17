@@ -22,6 +22,13 @@ GameSettings& GameSettings::instance(){
 }
 GameSettings::GameSettings()
     : BatchOption(LockWhileRunning::LOCKED)
+    , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
+    , GAME_TO_HOME_DELAY(
+        "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
+        LockWhileRunning::LOCKED,
+        TICKS_PER_SECOND,
+        "125"
+    )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",

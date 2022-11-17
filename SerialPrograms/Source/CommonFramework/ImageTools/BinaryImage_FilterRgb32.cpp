@@ -18,6 +18,29 @@ namespace PokemonAutomation{
 
 
 
+void filter_by_mask(
+    const PackedBinaryMatrix& matrix,
+    ImageRGB32& image,
+    Color replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+){
+    if (matrix.width() > image.width()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
+    }
+    if (matrix.height() > image.height()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
+    }
+    Kernels::filter_by_mask(
+        matrix,
+        image.data(), image.bytes_per_row(),
+        (uint32_t)replace_with, replace_if_zero
+    );
+}
+
+
+
+
+
 PackedBinaryMatrix compress_rgb32_to_binary_min(
     const ImageViewRGB32& image,
     uint8_t min_red,
@@ -125,29 +148,19 @@ PackedBinaryMatrix compress_rgb32_to_binary_multirange(
 
 
 
-void filter_rgb32(
-    const PackedBinaryMatrix& matrix,
-    ImageRGB32& image,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+
+
+PackedBinaryMatrix compress_rgb32_to_binary_euclidean(
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance
 ){
-    if (matrix.width() > image.width()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
-    }
-    if (matrix.height() > image.height()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
-    }
-    Kernels::filter_rgb32(
-        matrix,
+    PackedBinaryMatrix ret(image.width(), image.height());
+    Kernels::compress_rgb32_to_binary_euclidean(
         image.data(), image.bytes_per_row(),
-        (uint32_t)replace_with, replace_if_zero
+        ret, expected, max_euclidean_distance
     );
+    return ret;
 }
-
-
-
-
-
 
 
 

@@ -28,12 +28,25 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
+
+//  Selectively replace each pixel in an image with the specified pixel
+//  according to the respective bit in the binary matrix.
+void filter_by_mask(
+    const PackedBinaryMatrix_IB& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    uint32_t replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+);
+
+
+
 //  Compress (image, bytes_per_row) into a binary_image.
 //  Use the specified RGB ranges to determine whether each pixel
 //  becomes a 0 or a 1.
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
+    PackedBinaryMatrix_IB& matrix,
+    uint32_t mins, uint32_t maxs
 );
 
 
@@ -59,13 +72,12 @@ void compress_rgb32_to_binary_range(
 
 
 
-//  Selectively replace each pixel in an rgb32 image with the specified pixel
-//  according to the respective bit in the binary matrix.
-void filter_rgb32(
-    const PackedBinaryMatrix_IB& matrix,
-    uint32_t* image, size_t bytes_per_row,
-    uint32_t replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+//  Compress (image, bytes_per_row) into a binary_image.
+//  For each pixel, set to 1 if distance is within the expected value.
+void compress_rgb32_to_binary_euclidean(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix,
+    uint32_t expected, double max_euclidean_distance
 );
 
 

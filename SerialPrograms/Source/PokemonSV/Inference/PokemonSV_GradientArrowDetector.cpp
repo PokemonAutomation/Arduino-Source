@@ -27,8 +27,12 @@ using namespace Kernels::Waterfill;
 
 
 
-const ImageMatch::ExactImageMatcher& GRADIENT_ARROW(){
-    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradiantArrow-Template.png");
+const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_HORIZONTAL(){
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradiantArrowHorizontal-Template.png");
+    return matcher;
+}
+const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_VERTICAL(){
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradiantArrowVertical-Template.png");
     return matcher;
 }
 
@@ -40,21 +44,21 @@ bool is_gradient_arrow(
     object = yellow;
     object.merge_assume_no_overlap(blue);
 
-    double aspect_ratio = object.aspect_ratio();
-    if (aspect_ratio < 0.7 || aspect_ratio > 1.0){
-        return false;
-    }
-//    double area = (double)object.area_ratio();
-//    if (area < 0.4 || area > 0.5){
-//        return false;
-//    }
-
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
+    const double THRESHOLD = 80;
 
-    double rmsd = GRADIENT_ARROW().rmsd(cropped);
-//    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 80;
+    double aspect_ratio = object.aspect_ratio();
+    if (0.7 < aspect_ratio && aspect_ratio < 1.0){
+        double rmsd = GRADIENT_ARROW_HORIZONTAL().rmsd(cropped);
+        return rmsd <= THRESHOLD;
+    }
+    if (1.0  < aspect_ratio && aspect_ratio < 1.43){
+        double rmsd = GRADIENT_ARROW_VERTICAL().rmsd(cropped);
+        return rmsd <= THRESHOLD;
+    }
+
+    return false;
 }
 
 

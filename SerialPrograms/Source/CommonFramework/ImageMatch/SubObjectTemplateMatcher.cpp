@@ -78,7 +78,7 @@ double SubObjectTemplateMatcher::rmsd_with_background_replace(
 //         << ": " << object_box.min_x << "-" << object_box.width()
 //         << " " << object_box.min_y << "-" << object_box.height() << endl;
 
-    filter_rgb32(
+    filter_by_mask(
         binary_image.submatrix(
             object_box.min_x, object_box.min_y,
             object_box.width(), object_box.height()

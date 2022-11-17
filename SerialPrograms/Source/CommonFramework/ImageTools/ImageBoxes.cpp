@@ -5,9 +5,9 @@
  */
 
 #include <algorithm>
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Rectangle.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewHSV32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -21,9 +21,11 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+template struct Rectangle<size_t>;
+
 
 ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, size_t p_max_y)
-    : min_x(p_min_x) , min_y(p_min_y) , max_x(p_max_x) , max_y(p_max_y)
+    : Rectangle(p_min_x, p_min_y, p_max_x, p_max_y)
 {
     const size_t MAX_VALUE = 0xffffffff;
 
@@ -48,18 +50,6 @@ ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, siz
             nullptr, PA_CURRENT_FUNCTION, "Pixel Overflow: max_y = " + std::to_string(max_y)
         );
     }
-    if (min_x > max_x){
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Invalid Box: min_x = " + std::to_string(min_x) + ", max_x = " + std::to_string(max_x)
-        );
-    }
-    if (min_y > max_y){
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Invalid Box: min_y = " + std::to_string(min_y) + ", max_y = " + std::to_string(max_y)
-        );
-    }
 }
 
 
@@ -67,41 +57,6 @@ ImagePixelBox::ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object)
     : ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
 {}
 
-
-void ImagePixelBox::merge_with(const ImagePixelBox& box){
-    if (box.area() == 0){
-        return;
-    }
-    if (this->area() == 0){
-        *this = box;
-    }
-    min_x = std::min(min_x, box.min_x);
-    min_y = std::min(min_y, box.min_y);
-    max_x = std::max(max_x, box.max_x);
-    max_y = std::max(max_y, box.max_y);
-}
-
-bool ImagePixelBox::overlap(const ImagePixelBox& box) const{
-    return !(box.min_x >= max_x || box.max_x <= min_x || box.min_y >= max_y || box.max_y <= min_y);
-}
-
-size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
-    size_t min_x = std::max(this->min_x, box.min_x);
-    size_t max_x = std::min(this->max_x, box.max_x);
-    if (min_x >= max_x){
-        return 0;
-    }
-    size_t min_y = std::max(this->min_y, box.min_y);
-    size_t max_y = std::min(this->max_y, box.max_y);
-    if (min_y >= max_y){
-        return 0;
-    }
-    return (max_x - min_x) * (max_y - min_y);
-}
-
-bool ImagePixelBox::inside(size_t x, size_t y) const{
-    return x > min_x && x < max_x && y > min_y && y < max_y;
-}
 
 void ImagePixelBox::clip(size_t image_width, size_t image_height){
     min_x = std::max((size_t)0, min_x);
@@ -209,8 +164,8 @@ ImageFloatBox translate_to_parent(
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 ){
-    double width = original_image.width();
-    double height = original_image.height();
+    double width = (double)original_image.width();
+    double height = (double)original_image.height();
     ptrdiff_t box_x = (ptrdiff_t)(width * inference_box.x + 0.5);
     ptrdiff_t box_y = (ptrdiff_t)(height * inference_box.y + 0.5);
     return ImageFloatBox(
