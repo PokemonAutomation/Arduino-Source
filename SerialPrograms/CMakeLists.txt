@@ -1699,7 +1699,7 @@ if (ARCH_FLAGS_09_Nehalem)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
-    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
@@ -1714,7 +1714,7 @@ endif()
 if (ARCH_FLAGS_13_Haswell)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
-    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
@@ -1728,7 +1728,7 @@ SET_SOURCE_FILES_PROPERTIES(
 endif()
 if (ARCH_FLAGS_17_Skylake)
 SET_SOURCE_FILES_PROPERTIES(
-    Source/Kernels/ImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
