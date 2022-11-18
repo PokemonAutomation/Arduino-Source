@@ -85,15 +85,29 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
     std::vector<WaterfillObject> blues;
     std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
     {
-        PackedBinaryMatrix yellow_matrix = compress_rgb32_to_binary_range(region, 0xffc0c000, 0xffffff7f);
-        session->set_source(yellow_matrix);
-        auto iter = session->make_iterator(400);
-        WaterfillObject object;
-//        size_t c = 0;
-        while (iter->find_next(object, false)){
-//            cout << "yellow = " << object.area << endl;
-//            extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
-            yellows.emplace_back(std::move(object));
+        std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
+            region,
+            {
+                {0xffc0c000, 0xffffff7f},
+                {0xffc0c000, 0xffffff3f},
+                {0xffd0d000, 0xffffff7f},
+                {0xffd0d000, 0xffffff3f},
+                {0xffe0e000, 0xffffff7f},
+                {0xffe0e000, 0xffffff3f},
+            }
+        );
+
+//        PackedBinaryMatrix yellow_matrix = compress_rgb32_to_binary_range(region, 0xffc0c000, 0xffffff7f);
+        for (PackedBinaryMatrix& matrix : matrices){
+            session->set_source(matrix);
+            auto iter = session->make_iterator(400);
+            WaterfillObject object;
+    //        size_t c = 0;
+            while (iter->find_next(object, false)){
+    //            cout << "yellow = " << object.area << endl;
+    //            extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
+                yellows.emplace_back(std::move(object));
+            }
         }
     }
     {

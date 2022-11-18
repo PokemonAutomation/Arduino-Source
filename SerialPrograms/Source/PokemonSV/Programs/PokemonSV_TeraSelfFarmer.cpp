@@ -12,7 +12,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -92,7 +92,7 @@ const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
         {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
         {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
     };
-    return PreloadSettings::instance().DEVELOPER_MODE ? database0 : database1;
+    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
 }
 
 
@@ -110,7 +110,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         50, 1, 999
     )
     , FIX_TIME_ON_CATCH(
-        "<b>Fix Clock on Catch:</b><br>Fix the time when catching so that the date will be correct.",
+        "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
         LockWhileRunning::UNLOCKED, true
     )
     , MAX_STARS(
@@ -252,6 +252,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     //  State machine to return to overworld.
     bool summary_read = false;
+    bool black_screen_detected = false;
+    bool white_screen_detected = false;
     std::chrono::seconds timeout = std::chrono::seconds(60);
     while (true){
         context.wait_for_all_requests();
@@ -259,6 +261,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
         WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1}, COLOR_RED);
+        BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
+        WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         DialogFinder dialog(COLOR_YELLOW);
         GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
         int ret = wait_until(
@@ -267,6 +271,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             {
                 catch_menu,
                 next_button,
+                black_screen,
+                white_screen,
                 dialog,
                 gradient
             }
@@ -279,11 +285,28 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             timeout = std::chrono::seconds(60);
             break;
         case 2:
+            env.log("Detected black screen is over.");
+            black_screen_detected = true;
+            timeout = std::chrono::seconds(60);
+            context.wait_for(std::chrono::seconds(1));
+            break;
+        case 3:
+            env.log("Detected white screen is over.");
+            //  If both white and black screens are over, we are out of the raid.
+            if (white_screen_detected && black_screen_detected){
+                timeout = std::chrono::seconds(4);
+            }else{
+                timeout = std::chrono::seconds(60);
+            }
+            white_screen_detected = true;
+            context.wait_for(std::chrono::seconds(1));
+            break;
+        case 4:
             env.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             timeout = std::chrono::seconds(5);
             break;
-        case 3:
+        case 5:
             env.log("Detected post catch.");
             if (!summary_read){
                 m_caught++;
