@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -81,15 +82,24 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 }
 
 
+const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
+    static EnumDatabase<TeraSelfFarmer::Mode> database0{
+        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
+        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
+    };
+    static EnumDatabase<TeraSelfFarmer::Mode> database1{
+        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
+        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
+        {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
+    };
+    return PreloadSettings::instance().DEVELOPER_MODE ? database0 : database1;
+}
+
 
 TeraSelfFarmer::TeraSelfFarmer()
     : MODE(
         "<b>Mode:</b>",
-        {
-            {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-            {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
-            {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
-        },
+        database(),
         LockWhileRunning::LOCKED,
         Mode::FARM_ITEMS_ONLY
     )
@@ -239,59 +249,6 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 
     process_catch_prompt(env, context);
-#if 0
-    {
-        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1});
-        pbf_mash_button(context, BUTTON_A, 250);
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(60),
-            {next_button}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(
-                env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "BattleMenuNotFound",
-                "Unable to detect prize screen after 60 seconds."
-            );
-        }
-        env.log("Detected (A) Next button.");
-    }
-    pbf_mash_button(context, BUTTON_A, 125);
-
-    {
-        env.log("Waiting for black screen.");
-        BlackScreenOverWatcher black_screen;
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(60),
-            {black_screen}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(
-                env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "BattleMenuNotFound",
-                "Unable to detect end of battle after 60 seconds."
-            );
-        }
-
-        env.log("Waiting for white screen.");
-        WhiteScreenOverWatcher white_screen;
-        ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(60),
-            {white_screen}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(
-                env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "BattleMenuNotFound",
-                "Unable to detect end of battle after 60 seconds."
-            );
-        }
-    }
-#endif
 
     //  State machine to return to overworld.
     bool summary_read = false;
@@ -301,9 +258,9 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.log("Looking for post raid dialogs...");
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1});
-        DialogFinder dialog;
-        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10});
+        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1}, COLOR_RED);
+        DialogFinder dialog(COLOR_YELLOW);
+        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
         int ret = wait_until(
             env.console, context,
             timeout,

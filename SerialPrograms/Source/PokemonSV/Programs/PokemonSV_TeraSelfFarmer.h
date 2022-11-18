@@ -54,6 +54,7 @@ private:
         CATCH_ALL,
         SHINY_HUNT,
     };
+    static const EnumDatabase<TeraSelfFarmer::Mode>& database();
     EnumDropdownOption<Mode> MODE;
 
     SimpleIntegerOption<uint16_t> MAX_CATCHES;
