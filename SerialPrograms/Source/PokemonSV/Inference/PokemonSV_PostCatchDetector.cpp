@@ -54,31 +54,10 @@ bool AddToPartyDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    return m_dialog.detect_with_type(screen) == DialogDetector::PROMPT_DIALOG;
+    return m_dialog.detect(screen);
 }
 
 
-AddToPartyFinder::AddToPartyFinder(Color color)
-    : VisualInferenceCallback("TeraCardFinder")
-    , m_detector(color)
-{}
-
-void AddToPartyFinder::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-bool AddToPartyFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!m_detector.detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    bool detected = m_trigger_count >= 5;
-    if (detected){
-//        cout << "Detected Battle Menu" << endl;
-    }
-    return detected;
-}
 
 
 

@@ -18,39 +18,50 @@ namespace PokemonSV{
 
 
 
-class DialogDetector : public StaticScreenDetector{
+//  Detect dialog that has the small arrow at bottom to show the next dialog.
+class AdvanceDialogDetector : public StaticScreenDetector{
 public:
-    enum DialogType{
-        NO_DIALOG,
-        ADVANCE_DIALOG,
-        PROMPT_DIALOG,
-    };
-
-public:
-    DialogDetector(Color color = COLOR_RED);
+    AdvanceDialogDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
-    DialogType detect_with_type(const ImageViewRGB32& screen) const;
 
 protected:
     Color m_color;
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_bot;
     ImageFloatBox m_arrow;
-    ImageFloatBox m_gradient;
 };
-class DialogFinder : public VisualInferenceCallback{
+class AdvanceDialogFinder : public DetectorToFinder_ConsecutiveDebounce<AdvanceDialogDetector>{
 public:
-    DialogFinder(Color color = COLOR_RED);
+    AdvanceDialogFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("AdvanceDialogFinder", 5, color)
+    {}
+};
+
+
+
+//  Detect dialog that prompts the player to make a choice.
+class PromptDialogDetector : public StaticScreenDetector{
+public:
+    PromptDialogDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
 
-private:
-    DialogDetector m_detector;
-    size_t m_trigger_count = 0;
+protected:
+    Color m_color;
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_bot;
+    ImageFloatBox m_gradient;
 };
+class PromptDialogFinder : public DetectorToFinder_ConsecutiveDebounce<PromptDialogDetector>{
+public:
+    PromptDialogFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, color)
+    {}
+};
+
 
 
 

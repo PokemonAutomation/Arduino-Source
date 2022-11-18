@@ -81,25 +81,27 @@ size_t EggFetcher::fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContex
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
 
     VideoOverlaySet overlays(env.console.overlay());
-    DialogDetector detector;
-    detector.make_overlays(overlays);
+    AdvanceDialogDetector detect_advance;
+    PromptDialogDetector detect_prompt;
+    detect_advance.make_overlays(overlays);
+    detect_prompt.make_overlays(overlays);
 
-    {
+    do{
         pbf_press_button(context, BUTTON_A, 20, 180);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();
-        DialogDetector::DialogType detection = detector.detect_with_type(screen);
-        if (detection == DialogDetector::NO_DIALOG){
-            stats.m_errors++;
-            return 0;
+        if (detect_advance.detect(screen)){
+            break;
         }
-        if (detection == DialogDetector::PROMPT_DIALOG){
+        if (detect_prompt.detect(screen)){
             stats.m_errors++;
             pbf_press_button(context, BUTTON_B, 20, 230);
             return 0;
         }
-    }
+        stats.m_errors++;
+        return 0;
+    }while(false);
 
     size_t fetched = 0;
     while (true){
@@ -107,18 +109,16 @@ size_t EggFetcher::fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContex
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();
-        DialogDetector::DialogType detection = detector.detect_with_type(screen);
-        switch (detection){
-        case DialogDetector::NO_DIALOG:
-            stats.m_attempts++;
-            return fetched;
-        case DialogDetector::ADVANCE_DIALOG:
+        if (detect_advance.detect(screen)){
             continue;
-        case DialogDetector::PROMPT_DIALOG:
+        }
+        if (detect_prompt.detect(screen)){
             stats.m_eggs++;
             fetched++;
             continue;
         }
+        stats.m_attempts++;
+        return fetched;
     }
 }
 

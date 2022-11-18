@@ -35,27 +35,6 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-BattleMenuFinder::BattleMenuFinder(Color color)
-    : VisualInferenceCallback("BattleMenuFinder")
-    , m_detector(color)
-{}
-void BattleMenuFinder::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-bool BattleMenuFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!m_detector.detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    bool detected = m_trigger_count >= 5;
-    if (detected){
-//        cout << "Detected Battle Menu" << endl;
-    }
-    return detected;
-}
-
 
 
 MoveSelectDetector::MoveSelectDetector(Color color)
@@ -77,27 +56,6 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-MoveSelectFinder::MoveSelectFinder(Color color)
-    : VisualInferenceCallback("BattleMenuFinder")
-    , m_detector(color)
-{}
-void MoveSelectFinder::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-bool MoveSelectFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!m_detector.detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    bool detected = m_trigger_count >= 5;
-    if (detected){
-//        cout << "Detected Battle Menu" << endl;
-    }
-    return detected;
-}
-
 
 
 
@@ -115,26 +73,6 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-TeraCatchFinder::TeraCatchFinder(Color color)
-    : VisualInferenceCallback("TeraCatchFinder")
-    , m_detector(color)
-{}
-void TeraCatchFinder::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-bool TeraCatchFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!m_detector.detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    bool detected = m_trigger_count >= 5;
-    if (detected){
-//        cout << "Detected Battle Menu" << endl;
-    }
-    return detected;
-}
 
 
 

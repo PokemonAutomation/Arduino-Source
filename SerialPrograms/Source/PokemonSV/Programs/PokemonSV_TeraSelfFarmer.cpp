@@ -267,7 +267,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1}, COLOR_RED);
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
-        DialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogFinder dialog(COLOR_YELLOW);
 //        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
         AddToPartyFinder post_catch(COLOR_CYAN);
         int ret = wait_until(

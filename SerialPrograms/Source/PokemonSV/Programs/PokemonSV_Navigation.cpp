@@ -35,7 +35,7 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
     pbf_press_button(context, BUTTON_A, 20, 2 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
     {
-        DialogFinder detector;
+        AdvanceDialogFinder detector;
         int ret = wait_until(
             console, context,
             std::chrono::seconds(5),

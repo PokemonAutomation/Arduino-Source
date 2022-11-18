@@ -32,22 +32,16 @@ protected:
     ImageFloatBox m_top_right;
     ImageFloatBox m_bottom_left;
     ImageFloatBox m_bottom_right;
-    DialogDetector m_dialog;
+    PromptDialogDetector m_dialog;
 };
-
-
-
-class AddToPartyFinder : public VisualInferenceCallback{
+class AddToPartyFinder : public DetectorToFinder_ConsecutiveDebounce<AddToPartyDetector>{
 public:
-    AddToPartyFinder(Color color = COLOR_RED);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    AddToPartyDetector m_detector;
-    size_t m_trigger_count = 0;
+    AddToPartyFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("AddToPartyFinder", 5, color)
+    {}
 };
+
+
 
 
 
