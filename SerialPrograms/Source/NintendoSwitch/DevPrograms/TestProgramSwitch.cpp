@@ -50,8 +50,10 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 
 
@@ -160,6 +162,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
+//    home_to_date_time(context, false, false);
+
+    save_game_from_overworld(console, context);
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+    cout << detector.is_shiny(image) << endl;
+#endif
 
 #if 0
     RaidShinyStarDetector detector(overlay);

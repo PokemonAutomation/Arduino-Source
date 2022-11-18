@@ -32,12 +32,12 @@ TeraCardReader::TeraCardReader(Color color)
     , m_stars(0.500, 0.555, 0.310, 0.070)
 {}
 void TeraCardReader::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_top);
-    items.add(COLOR_RED, m_bottom_left);
-    items.add(COLOR_RED, m_bottom_right);
-    items.add(COLOR_RED, m_label);
-    items.add(COLOR_RED, m_cursor);
-    items.add(COLOR_RED, m_stars);
+    items.add(m_color, m_top);
+    items.add(m_color, m_bottom_left);
+    items.add(m_color, m_bottom_right);
+    items.add(m_color, m_label);
+    items.add(m_color, m_cursor);
+    items.add(m_color, m_stars);
 }
 bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
     ImageStats top = image_stats(extract_box_reference(screen, m_top));

@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
@@ -38,6 +39,17 @@ protected:
     ImageFloatBox m_box_bot;
     ImageFloatBox m_arrow;
     ImageFloatBox m_gradient;
+};
+class DialogFinder : public VisualInferenceCallback{
+public:
+    DialogFinder(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    DialogDetector m_detector;
+    size_t m_trigger_count = 0;
 };
 
 

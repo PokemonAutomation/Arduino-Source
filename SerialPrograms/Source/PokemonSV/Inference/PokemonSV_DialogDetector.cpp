@@ -70,6 +70,30 @@ DialogDetector::DialogType DialogDetector::detect_with_type(const ImageViewRGB32
 }
 
 
+DialogFinder::DialogFinder(Color color)
+    : VisualInferenceCallback("DialogFinder")
+    , m_detector(color)
+{}
+void DialogFinder::make_overlays(VideoOverlaySet& items) const{
+    m_detector.make_overlays(items);
+}
+bool DialogFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    //  Need 5 consecutive successful detections.
+    if (!m_detector.detect(frame)){
+        m_trigger_count = 0;
+        return false;
+    }
+    m_trigger_count++;
+    bool detected = m_trigger_count >= 5;
+    if (detected){
+//        cout << "Detected Battle Menu" << endl;
+    }
+    return detected;
+}
+
+
+
+
 
 
 

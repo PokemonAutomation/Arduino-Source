@@ -68,7 +68,7 @@ GradientArrowDetector::GradientArrowDetector(const ImageFloatBox& box, Color col
     , m_box(box)
 {}
 void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box);
+    items.add(m_color, m_box);
 }
 bool GradientArrowDetector::detect(const ImageViewRGB32& screen) const{
     std::vector<ImageFloatBox> hits = detect_all(screen);

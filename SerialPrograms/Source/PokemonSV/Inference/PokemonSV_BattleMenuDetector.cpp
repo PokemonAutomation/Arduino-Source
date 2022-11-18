@@ -16,9 +16,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BattleMenuDetector::BattleMenuDetector()
-    : m_status_button(WhiteButton::ButtonY, ImageFloatBox(0.35, 0.90, 0.30, 0.08))
-    , m_arrow(ImageFloatBox(0.75, 0.62, 0.05, 0.18))
+BattleMenuDetector::BattleMenuDetector(Color color)
+    : m_status_button(WhiteButton::ButtonY, ImageFloatBox(0.35, 0.90, 0.30, 0.08), color)
+    , m_arrow(ImageFloatBox(0.75, 0.62, 0.05, 0.18), color)
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_status_button.make_overlays(items);
@@ -35,8 +35,9 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-BattleMenuFinder::BattleMenuFinder()
+BattleMenuFinder::BattleMenuFinder(Color color)
     : VisualInferenceCallback("BattleMenuFinder")
+    , m_detector(color)
 {}
 void BattleMenuFinder::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
@@ -57,9 +58,9 @@ bool BattleMenuFinder::process_frame(const ImageViewRGB32& frame, WallClock time
 
 
 
-MoveSelectDetector::MoveSelectDetector()
-    : m_status_button(WhiteButton::ButtonY, ImageFloatBox(0.35, 0.90, 0.30, 0.08))
-    , m_arrow(ImageFloatBox(0.705, 0.550, 0.050, 0.410))
+MoveSelectDetector::MoveSelectDetector(Color color)
+    : m_status_button(WhiteButton::ButtonY, ImageFloatBox(0.35, 0.90, 0.30, 0.08), color)
+    , m_arrow(ImageFloatBox(0.705, 0.550, 0.050, 0.410), color)
 {}
 void MoveSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_status_button.make_overlays(items);
@@ -76,8 +77,9 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-MoveSelectFinder::MoveSelectFinder()
+MoveSelectFinder::MoveSelectFinder(Color color)
     : VisualInferenceCallback("BattleMenuFinder")
+    , m_detector(color)
 {}
 void MoveSelectFinder::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
@@ -99,8 +101,8 @@ bool MoveSelectFinder::process_frame(const ImageViewRGB32& frame, WallClock time
 
 
 
-TeraCatchDetector::TeraCatchDetector()
-    : m_arrow(ImageFloatBox(0.75, 0.80, 0.08, 0.09))
+TeraCatchDetector::TeraCatchDetector(Color color)
+    : m_arrow(ImageFloatBox(0.75, 0.80, 0.08, 0.09), color)
 {}
 void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
@@ -113,8 +115,9 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
 }
 
 
-TeraCatchFinder::TeraCatchFinder()
+TeraCatchFinder::TeraCatchFinder(Color color)
     : VisualInferenceCallback("TeraCatchFinder")
+    , m_detector(color)
 {}
 void TeraCatchFinder::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);

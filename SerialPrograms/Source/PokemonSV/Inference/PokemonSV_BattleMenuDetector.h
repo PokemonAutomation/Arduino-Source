@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 class BattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector();
+    BattleMenuDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -32,7 +32,7 @@ private:
 };
 class BattleMenuFinder : public VisualInferenceCallback{
 public:
-    BattleMenuFinder();
+    BattleMenuFinder(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -46,7 +46,7 @@ private:
 
 class MoveSelectDetector : public StaticScreenDetector{
 public:
-    MoveSelectDetector();
+    MoveSelectDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -57,7 +57,7 @@ private:
 };
 class MoveSelectFinder : public VisualInferenceCallback{
 public:
-    MoveSelectFinder();
+    MoveSelectFinder(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -71,7 +71,7 @@ private:
 
 class TeraCatchDetector : public StaticScreenDetector{
 public:
-    TeraCatchDetector();
+    TeraCatchDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -81,7 +81,7 @@ private:
 };
 class TeraCatchFinder : public VisualInferenceCallback{
 public:
-    TeraCatchFinder();
+    TeraCatchFinder(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

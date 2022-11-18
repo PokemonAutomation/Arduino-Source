@@ -584,12 +584,15 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
+    Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
+    Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
@@ -1400,12 +1403,15 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
+    Source/PokemonSV/Programs/PokemonSV_Navigation.h \
+    Source/PokemonSV/Programs/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \

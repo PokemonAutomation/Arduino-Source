@@ -37,8 +37,6 @@ bool reset_game_from_home(
 
 
 
-
-
 }
 }
 }

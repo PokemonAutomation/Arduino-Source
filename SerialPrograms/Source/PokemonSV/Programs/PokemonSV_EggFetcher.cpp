@@ -23,7 +23,7 @@ using namespace Pokemon;
 EggFetcher_Descriptor::EggFetcher_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:EggFetcher",
-        STRING_POKEMON + " BDSP", "Egg Fetcher",
+        STRING_POKEMON + " SV", "Egg Fetcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggFetcher.md",
         "Automatically fetch eggs from a picnic",
         FeedbackType::REQUIRED, false,
