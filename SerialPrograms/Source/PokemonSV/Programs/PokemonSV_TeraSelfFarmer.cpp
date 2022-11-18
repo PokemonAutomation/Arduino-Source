@@ -4,13 +4,14 @@
  *
  */
 
+#include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+//#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -24,7 +25,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+//#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
 #include "PokemonSV_TeraSelfFarmer.h"
@@ -145,6 +146,21 @@ TeraSelfFarmer::TeraSelfFarmer()
 }
 
 
+void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    if (MODE == Mode::FARM_ITEMS_ONLY){
+        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+    }else{
+        if (FIX_TIME_ON_CATCH){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            home_to_date_time(context, false, false);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_from_home(env.console, context);
+        }
+    }
+    pbf_mash_button(context, BUTTON_A, 250);
+}
 void TeraSelfFarmer::read_summary(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
@@ -222,21 +238,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         return;
     }
 
-    if (MODE == Mode::FARM_ITEMS_ONLY){
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-    }else{
-        m_caught++;
-        stats.m_caught++;
-        if (FIX_TIME_ON_CATCH){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            home_to_date_time(context, false, false);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_from_home(env.console, context);
-        }
-    }
-
+    process_catch_prompt(env, context);
+#if 0
     {
         WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1});
         pbf_mash_button(context, BUTTON_A, 250);
@@ -288,27 +291,46 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             );
         }
     }
+#endif
 
     //  State machine to return to overworld.
     bool summary_read = false;
+    std::chrono::seconds timeout = std::chrono::seconds(60);
     while (true){
-        env.log("Looking for post raid dialogs...");
         context.wait_for_all_requests();
+        env.log("Looking for post raid dialogs...");
+
+        TeraCatchFinder catch_menu(COLOR_BLUE);
+        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1});
         DialogFinder dialog;
         GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10});
         int ret = wait_until(
             env.console, context,
-            std::chrono::seconds(5),
-            {dialog, gradient}
+            timeout,
+            {
+                catch_menu,
+                next_button,
+                dialog,
+                gradient
+            }
         );
         switch (ret){
         case 0:
+        case 1:
+            env.log("Detected (A) Next button.");
+            pbf_mash_button(context, BUTTON_A, 125);
+            timeout = std::chrono::seconds(60);
+            break;
+        case 2:
             env.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
-            continue;
-        case 1:
+            timeout = std::chrono::seconds(5);
+            break;
+        case 3:
             env.log("Detected post catch.");
             if (!summary_read){
+                m_caught++;
+                stats.m_caught++;
                 pbf_press_dpad(context, DPAD_DOWN, 20, 20);
                 pbf_press_button(context, BUTTON_A, 20, 230);
                 context.wait_for_all_requests();
@@ -316,6 +338,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 summary_read = true;
             }
             pbf_press_button(context, BUTTON_B, 20, 230);
+            timeout = std::chrono::seconds(5);
             break;
         default:
             env.log("No detection, assume returned to overworld.");

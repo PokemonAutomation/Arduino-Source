@@ -40,6 +40,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    void process_catch_prompt(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void read_summary(
         SingleSwitchProgramEnvironment& env,
         BotBaseContext& context,
