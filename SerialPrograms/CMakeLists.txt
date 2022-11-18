@@ -960,6 +960,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
+    Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
+    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.cpp
+    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
