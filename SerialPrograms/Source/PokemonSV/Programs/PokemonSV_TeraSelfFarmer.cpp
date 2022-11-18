@@ -194,7 +194,9 @@ void TeraSelfFarmer::read_summary(
             NOTIFICATION_NONSHINY,
             NOTIFICATION_SHINY,
             false, true,
-            {}, std::nan(""), battle_snapshot
+            {{{}, ShinyType::UNKNOWN_SHINY}},
+            std::nan(""),
+            battle_snapshot
         );
         if (MODE == Mode::SHINY_HUNT){
             throw ProgramFinishedException();
@@ -205,7 +207,8 @@ void TeraSelfFarmer::read_summary(
             NOTIFICATION_NONSHINY,
             NOTIFICATION_SHINY,
             false, false,
-            {}, std::nan("")
+            {{{}, ShinyType::NOT_SHINY}},
+            std::nan("")
         );
     }
 
