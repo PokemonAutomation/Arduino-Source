@@ -26,6 +26,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
@@ -267,7 +268,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         DialogFinder dialog(COLOR_YELLOW);
-        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
+//        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
+        AddToPartyFinder post_catch(COLOR_CYAN);
         int ret = wait_until(
             env.console, context,
             timeout,
@@ -277,7 +279,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 black_screen,
                 white_screen,
                 dialog,
-                gradient
+                post_catch,
             }
         );
         switch (ret){

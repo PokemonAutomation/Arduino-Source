@@ -55,6 +55,7 @@
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 
 
 #include <QPixmap>
@@ -162,9 +163,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
+    AddToPartyDetector detector;
+    cout << detector.detect(feed.snapshot()) << endl;
+
+
+
+
 //    home_to_date_time(context, false, false);
 
-    save_game_from_overworld(console, context);
+//    save_game_from_overworld(console, context);
 
 
 #if 0
