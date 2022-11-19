@@ -50,9 +50,12 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 
 
 #include <QPixmap>
@@ -160,6 +163,51 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
+//    auto image = feed.snapshot();
+//    PokemonSummaryDetector detector;
+//    cout << detector.detect(image) << endl;
+
+
+#if 0
+    ImageRGB32 image("cursor_basic_00q.png");
+    GradientArrowDetector detector({0, 0, 1, 1});
+
+    auto hits = detector.detect_all(image);
+    cout << "hits = " << hits.size() << endl;
+    for (auto& item : hits){
+        extract_box_reference(image, item).save("test.png");
+    }
+#endif
+
+
+
+#if 1
+    ImageRGB32 image("screenshot-20221118-210501270724.png");
+
+    MoveSelectDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
+    AddToPartyDetector detector;
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
+
+
+
+//    home_to_date_time(context, false, false);
+
+//    save_game_from_overworld(console, context);
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+    cout << detector.is_shiny(image) << endl;
+#endif
 
 #if 0
     RaidShinyStarDetector detector(overlay);
@@ -193,7 +241,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 #if 0
-    ImageRGB32 image("GradiantArrowHorizontal-Template.png");
+    ImageRGB32 image("GradientArrowHorizontal-Template.png");
 
     ImageRGB32 rotated(image.height(), image.width());
 
@@ -202,7 +250,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             rotated.pixel(r, c) = image.pixel(c, r);
         }
     }
-    rotated.save("GradiantArrowVertical-Template.png");
+    rotated.save("GradientArrowVertical-Template.png");
 #endif
 
 

@@ -9,9 +9,12 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "PokemonHome/Options/PokemonHome_BoxSortingTable.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,6 +38,9 @@ private:
     SimpleIntegerOption<uint16_t> BOX_NUMBER;
     SimpleIntegerOption<uint16_t> VIDEO_DELAY;
     SimpleIntegerOption<uint16_t> GAME_DELAY;
+    BoxSortingTable SORT_TABLE;
+    StringOption OUTPUT_FILE;
+    BooleanCheckBoxOption DRY_RUN;
     EventNotificationsOption NOTIFICATIONS;
 
 };

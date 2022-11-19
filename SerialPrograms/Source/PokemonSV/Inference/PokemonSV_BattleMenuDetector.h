@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 class BattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector();
+    BattleMenuDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -30,23 +30,18 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class BattleMenuFinder : public VisualInferenceCallback{
+class BattleMenuFinder : public DetectorToFinder_ConsecutiveDebounce<BattleMenuDetector>{
 public:
-    BattleMenuFinder();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    BattleMenuDetector m_detector;
-    size_t m_trigger_count = 0;
+    BattleMenuFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("BattleMenuFinder", 5, color)
+    {}
 };
 
 
 
 class MoveSelectDetector : public StaticScreenDetector{
 public:
-    MoveSelectDetector();
+    MoveSelectDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -55,23 +50,18 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class MoveSelectFinder : public VisualInferenceCallback{
+class MoveSelectFinder : public DetectorToFinder_ConsecutiveDebounce<MoveSelectDetector>{
 public:
-    MoveSelectFinder();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    MoveSelectDetector m_detector;
-    size_t m_trigger_count = 0;
+    MoveSelectFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("MoveSelectFinder", 5, color)
+    {}
 };
 
 
 
 class TeraCatchDetector : public StaticScreenDetector{
 public:
-    TeraCatchDetector();
+    TeraCatchDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -79,16 +69,11 @@ public:
 private:
     GradientArrowDetector m_arrow;
 };
-class TeraCatchFinder : public VisualInferenceCallback{
+class TeraCatchFinder : public DetectorToFinder_ConsecutiveDebounce<TeraCatchDetector>{
 public:
-    TeraCatchFinder();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    TeraCatchDetector m_detector;
-    size_t m_trigger_count = 0;
+    TeraCatchFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("TeraCatchFinder", 5, color)
+    {}
 };
 
 

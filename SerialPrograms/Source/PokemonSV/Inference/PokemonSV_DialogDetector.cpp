@@ -18,23 +18,18 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-DialogDetector::DialogDetector(Color color)
+AdvanceDialogDetector::AdvanceDialogDetector(Color color)
     : m_color(color)
     , m_box_top(0.50, 0.74, 0.20, 0.01)
     , m_box_bot(0.30, 0.88, 0.40, 0.01)
     , m_arrow(0.710, 0.850, 0.030, 0.042)
-    , m_gradient(0.50, 0.40, 0.40, 0.50)
 {}
-void DialogDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box_top);
-    items.add(COLOR_RED, m_box_bot);
-    items.add(COLOR_RED, m_arrow);
+void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box_top);
+    items.add(m_color, m_box_bot);
+    items.add(m_color, m_arrow);
 }
-bool DialogDetector::detect(const ImageViewRGB32& screen) const{
-    DialogType result = detect_with_type(screen);
-    return result != NO_DIALOG;
-}
-DialogDetector::DialogType DialogDetector::detect_with_type(const ImageViewRGB32& screen) const{
+bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
     bool white;
     if (is_white(stats_top)){
@@ -42,32 +37,67 @@ DialogDetector::DialogType DialogDetector::detect_with_type(const ImageViewRGB32
     }else if (is_black(stats_top)){
         white = false;
     }else{
-        return NO_DIALOG;
+        return false;
     }
 
     ImageStats stats_bot = image_stats(extract_box_reference(screen, m_box_bot));
     if (white){
         if (!is_white(stats_bot)){
-            return NO_DIALOG;
+            return false;
         }
     }else{
         if (!is_black(stats_bot)){
-            return NO_DIALOG;
+            return false;
         }
     }
 
     DialogArrowDetector arrow_detector(m_arrow);
-    if (arrow_detector.detect(screen)){
-        return ADVANCE_DIALOG;
+    return arrow_detector.detect(screen);
+}
+
+
+
+
+PromptDialogDetector::PromptDialogDetector(Color color)
+    : m_color(color)
+    , m_box_top(0.50, 0.74, 0.20, 0.01)
+    , m_box_bot(0.30, 0.88, 0.40, 0.01)
+    , m_gradient(0.50, 0.40, 0.40, 0.50)
+{}
+void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box_top);
+    items.add(m_color, m_box_bot);
+    items.add(m_color, m_gradient);
+}
+bool PromptDialogDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
+    bool white;
+    if (is_white(stats_top)){
+        white = true;
+    }else if (is_black(stats_top)){
+        white = false;
+    }else{
+        return false;
+    }
+
+    ImageStats stats_bot = image_stats(extract_box_reference(screen, m_box_bot));
+    if (white){
+        if (!is_white(stats_bot)){
+            return false;
+        }
+    }else{
+        if (!is_black(stats_bot)){
+            return false;
+        }
     }
 
     GradientArrowDetector gradiant_detector(m_gradient);
-    if (gradiant_detector.detect(screen)){
-        return PROMPT_DIALOG;
-    }
-
-    return NO_DIALOG;
+    return gradiant_detector.detect(screen);
 }
+
+
+
+
 
 
 

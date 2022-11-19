@@ -34,7 +34,7 @@ raw_image = image.copy()
 
 # ==================================================================
 # LA map weather symbol
-add_infer_box_to_image(raw_image, 0.028, 0.069, 0.025, 0.044, image)
+# add_infer_box_to_image(raw_image, 0.028, 0.069, 0.025, 0.044, image)
 
 # ==================================================================
 # LA mult-pokemon battle sprite arrow
@@ -221,6 +221,26 @@ add_infer_box_to_image(raw_image, 0.028, 0.069, 0.025, 0.044, image)
 # add_infer_box_to_image(raw_image, 0.500, 0.760, 0.200, 0.020, image)
 # add_infer_box_to_image(raw_image, 0.400, 0.900, 0.200, 0.020, image)
 # add_infer_box_to_image(raw_image, 0.720, 0.855, 0.030, 0.060, image)
+
+# ==================================================================
+# Pokemon Home Box Sorting
+
+# , m_box_sprite(console, {0.228, 0.095, 0.030, 0.049}) // ball
+# ImageFloatBox GENDER_BOX{0.417, 0.097, 0.031, 0.046}; // gender
+
+# add_infer_box_to_image(raw_image, 0.495, 0.0045, 0.01, 0.005, image) # square color to check which mode is active
+# add_infer_box_to_image(raw_image, 0.447, 0.250, 0.037, 0.034, image) # pokemon national dex number pos
+# add_infer_box_to_image(raw_image, 0.702, 0.09, 0.04, 0.06, image) # shiny symbol pos
+# add_infer_box_to_image(raw_image, 0.463, 0.09, 0.04, 0.06, image) # gmax symbol pos
+# add_infer_box_to_image(raw_image, 0.623, 0.095, 0.033, 0.05, image) # origin symbol pos
+# add_infer_box_to_image(raw_image, 0.69, 0.18, 0.28, 0.46, image) # pokemon render pos
+# add_infer_box_to_image(raw_image, 0.228, 0.095, 0.030, 0.049, image) # ball type pos
+# add_infer_box_to_image(raw_image, 0.417, 0.097, 0.031, 0.046, image) # gender pos
+# add_infer_box_to_image(raw_image, 0.546, 0.099, 0.044, 0.041, image) # Level box
+# add_infer_box_to_image(raw_image, 0.782, 0.719, 0.193, 0.046, image) # OT ID box
+# add_infer_box_to_image(raw_image, 0.492, 0.719, 0.165, 0.049, image) # OT box
+# add_infer_box_to_image(raw_image, 0.157, 0.783, 0.212, 0.042, image) # Nature box
+# add_infer_box_to_image(raw_image, 0.158, 0.838, 0.213, 0.042, image) # Ability box
 
 viewer = ImageViewer(image)
 viewer.run()
