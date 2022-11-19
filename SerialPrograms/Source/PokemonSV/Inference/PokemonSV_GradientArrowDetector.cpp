@@ -28,11 +28,11 @@ using namespace Kernels::Waterfill;
 
 
 const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_HORIZONTAL(){
-    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradiantArrowHorizontal-Template.png");
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradientArrowHorizontal-Template.png");
     return matcher;
 }
 const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_VERTICAL(){
-    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradiantArrowVertical-Template.png");
+    static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/GradientArrowVertical-Template.png");
     return matcher;
 }
 
@@ -88,10 +88,12 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
             {
+                {0xff808000, 0xffffff7f},
+                {0xff808000, 0xffffff3f},
+                {0xffa0a000, 0xffffff7f},
+                {0xffa0a000, 0xffffff3f},
                 {0xffc0c000, 0xffffff7f},
                 {0xffc0c000, 0xffffff3f},
-                {0xffd0d000, 0xffffff7f},
-                {0xffd0d000, 0xffffff3f},
                 {0xffe0e000, 0xffffff7f},
                 {0xffe0e000, 0xffffff3f},
             }

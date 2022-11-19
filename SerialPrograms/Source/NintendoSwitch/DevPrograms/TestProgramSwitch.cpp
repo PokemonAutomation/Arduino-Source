@@ -182,7 +182,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
-    ImageRGB32 image("screenshot-20221118-162821826570.png");
+    ImageRGB32 image("screenshot-20221118-210501270724.png");
 
     MoveSelectDetector detector;
     cout << detector.detect(image) << endl;
@@ -241,7 +241,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 #if 0
-    ImageRGB32 image("GradiantArrowHorizontal-Template.png");
+    ImageRGB32 image("GradientArrowHorizontal-Template.png");
 
     ImageRGB32 rotated(image.height(), image.width());
 
@@ -250,7 +250,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             rotated.pixel(r, c) = image.pixel(c, r);
         }
     }
-    rotated.save("GradiantArrowVertical-Template.png");
+    rotated.save("GradientArrowVertical-Template.png");
 #endif
 
 
