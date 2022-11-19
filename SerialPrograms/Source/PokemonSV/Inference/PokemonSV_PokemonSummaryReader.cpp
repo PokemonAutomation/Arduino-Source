@@ -22,13 +22,13 @@ PokemonSummaryDetector::PokemonSummaryDetector(Color color)
     : m_color(color)
     , m_top_blue_left(0.30, 0.09, 0.10, 0.05)
     , m_top_blue_right(0.60, 0.09, 0.35, 0.05)
-    , m_bottom_orange(0.03, 0.94, 0.80, 0.04)
+    , m_bottom(0.03, 0.94, 0.40, 0.04)
     , m_shiny_symbol(0.575, 0.865, 0.017, 0.030)
 {}
 void PokemonSummaryDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_top_blue_left);
     items.add(m_color, m_top_blue_right);
-    items.add(m_color, m_bottom_orange);
+    items.add(m_color, m_bottom);
     items.add(m_color, m_shiny_symbol);
 }
 bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
@@ -44,9 +44,11 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    ImageStats bottom_orange = image_stats(extract_box_reference(screen, m_bottom_orange));
-//    cout << bottom_orange.average << bottom_orange.stddev << endl;
-    if (!is_solid(bottom_orange, {0.648549, 0.286158, 0.0652928}, 0.15, 20)){
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
+//    cout << bottom.average << bottom.stddev << endl;
+    if (!is_solid(bottom, {0.648549, 0.286158, 0.0652928}, 0.15, 20) && //  Scarlet
+        !is_solid(bottom, {0.367816, 0.0746615, 0.557523}, 0.15, 20)    //  Violet
+    ){
         return false;
     }
 

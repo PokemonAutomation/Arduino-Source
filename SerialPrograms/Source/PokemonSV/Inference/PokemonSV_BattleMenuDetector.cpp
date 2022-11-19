@@ -47,9 +47,11 @@ void MoveSelectDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_status_button.detect(screen)){
+//        cout << "status" << endl;
         return false;
     }
     if (!m_arrow.detect(screen)){
+//        cout << "arrow" << endl;
         return false;
     }
     return true;

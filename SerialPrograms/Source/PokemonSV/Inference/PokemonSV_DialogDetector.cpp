@@ -25,9 +25,9 @@ AdvanceDialogDetector::AdvanceDialogDetector(Color color)
     , m_arrow(0.710, 0.850, 0.030, 0.042)
 {}
 void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box_top);
-    items.add(COLOR_RED, m_box_bot);
-    items.add(COLOR_RED, m_arrow);
+    items.add(m_color, m_box_top);
+    items.add(m_color, m_box_bot);
+    items.add(m_color, m_arrow);
 }
 bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
@@ -65,9 +65,9 @@ PromptDialogDetector::PromptDialogDetector(Color color)
     , m_gradient(0.50, 0.40, 0.40, 0.50)
 {}
 void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box_top);
-    items.add(COLOR_RED, m_box_bot);
-    items.add(COLOR_RED, m_gradient);
+    items.add(m_color, m_box_top);
+    items.add(m_color, m_box_bot);
+    items.add(m_color, m_gradient);
 }
 bool PromptDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));

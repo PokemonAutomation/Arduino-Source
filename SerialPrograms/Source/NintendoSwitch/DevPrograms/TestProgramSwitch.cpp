@@ -163,9 +163,36 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
+//    auto image = feed.snapshot();
+//    PokemonSummaryDetector detector;
+//    cout << detector.detect(image) << endl;
+
+
+#if 0
+    ImageRGB32 image("cursor_basic_00q.png");
+    GradientArrowDetector detector({0, 0, 1, 1});
+
+    auto hits = detector.detect_all(image);
+    cout << "hits = " << hits.size() << endl;
+    for (auto& item : hits){
+        extract_box_reference(image, item).save("test.png");
+    }
+#endif
+
+
+
+#if 1
+    ImageRGB32 image("screenshot-20221118-162821826570.png");
+
+    MoveSelectDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
     AddToPartyDetector detector;
     cout << detector.detect(feed.snapshot()) << endl;
-
+#endif
 
 
 

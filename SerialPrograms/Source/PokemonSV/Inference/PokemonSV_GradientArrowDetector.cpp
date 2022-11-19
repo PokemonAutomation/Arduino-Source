@@ -14,9 +14,9 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_GradientArrowDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -97,29 +97,46 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
             }
         );
 
+//        size_t c = 0;
 //        PackedBinaryMatrix yellow_matrix = compress_rgb32_to_binary_range(region, 0xffc0c000, 0xffffff7f);
         for (PackedBinaryMatrix& matrix : matrices){
             session->set_source(matrix);
-            auto iter = session->make_iterator(400);
+            auto iter = session->make_iterator(100);
             WaterfillObject object;
-    //        size_t c = 0;
             while (iter->find_next(object, false)){
-    //            cout << "yellow = " << object.area << endl;
-    //            extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
+//                cout << "yellow = " << object.area << endl;
+//                extract_box_reference(region, object).save("yellow-" + std::to_string(c++) + ".png");
                 yellows.emplace_back(std::move(object));
             }
         }
     }
     {
-        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff004080, 0xff8fffff);
-        session->set_source(blue_matrix);
-        auto iter = session->make_iterator(400);
-        WaterfillObject object;
+        std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
+            region,
+            {
+                {0xff004080, 0xff7fffff},
+                {0xff004080, 0xff5fffff},
+                {0xff004080, 0xff3fffff},
+                {0xff0080c0, 0xff7fffff},
+                {0xff0080c0, 0xff5fffff},
+                {0xff0080c0, 0xff3fffff},
+                {0xff00c0c0, 0xff7fffff},
+                {0xff00c0c0, 0xff5fffff},
+                {0xff00c0c0, 0xff3fffff},
+            }
+        );
+        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff3fffff);
+//        cout << blue_matrix.dump() << endl;
 //        size_t c = 0;
-        while (iter->find_next(object, false)){
-//            cout << "blue = " << object.area << endl;
-//            extract_box_reference(region, object).save("blue-" + std::to_string(c++) + ".png");
-            blues.emplace_back(std::move(object));
+        for (PackedBinaryMatrix& matrix : matrices){
+            session->set_source(matrix);
+            auto iter = session->make_iterator(100);
+            WaterfillObject object;
+            while (iter->find_next(object, false)){
+//                cout << "blue = " << object.area << endl;
+//                extract_box_reference(region, object).save("blue-" + std::to_string(c++) + ".png");
+                blues.emplace_back(std::move(object));
+            }
         }
     }
 

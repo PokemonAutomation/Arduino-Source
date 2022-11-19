@@ -31,9 +31,15 @@ protected:
     Color m_color;
     ImageFloatBox m_top_blue_left;
     ImageFloatBox m_top_blue_right;
-    ImageFloatBox m_bottom_orange;
+    ImageFloatBox m_bottom;
 
     ImageFloatBox m_shiny_symbol;
+};
+class PokemonSummaryFinder : public DetectorToFinder_ConsecutiveDebounce<PokemonSummaryDetector>{
+public:
+    PokemonSummaryFinder(Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("PokemonSummaryFinder", 5, color)
+    {}
 };
 
 

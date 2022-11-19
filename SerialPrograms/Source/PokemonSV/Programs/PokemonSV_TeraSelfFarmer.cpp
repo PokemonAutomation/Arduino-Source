@@ -268,8 +268,9 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
-//        GradientArrowFinder gradient(env.console.overlay(), {0.40, 0.40, 0.30, 0.10}, COLOR_CYAN);
-        AddToPartyFinder post_catch(COLOR_CYAN);
+        PromptDialogFinder prompt(COLOR_PURPLE);
+//        AddToPartyFinder post_catch(COLOR_CYAN);
+        PokemonSummaryFinder summary(COLOR_CYAN);
         int ret = wait_until(
             env.console, context,
             timeout,
@@ -279,7 +280,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 black_screen,
                 white_screen,
                 dialog,
-                post_catch,
+                prompt,
+                summary,
             }
         );
         switch (ret){
@@ -312,13 +314,19 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             timeout = std::chrono::seconds(5);
             break;
         case 5:
-            env.log("Detected post catch.");
+            env.log("Detected prompt.");
+            if (!summary_read){
+                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+            }else{
+                pbf_press_button(context, BUTTON_B, 20, 105);
+            }
+            break;
+        case 6:
+            env.log("Detected summary.");
             if (!summary_read){
                 m_caught++;
                 stats.m_caught++;
-                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-                pbf_press_button(context, BUTTON_A, 20, 230);
-                context.wait_for_all_requests();
                 read_summary(env, context, battle_snapshot);
                 summary_read = true;
             }
