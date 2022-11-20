@@ -310,6 +310,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 summary,
             }
         );
+        context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
         case 1:
@@ -399,6 +400,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 //            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
+        context.wait_for(std::chrono::milliseconds(100));
 
         VideoSnapshot screen = env.console.video().snapshot();
         TeraCardReader reader;

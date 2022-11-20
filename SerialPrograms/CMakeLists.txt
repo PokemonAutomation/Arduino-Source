@@ -790,8 +790,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.h
     Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp
     Source/Pokemon/Options/Pokemon_EggHatchFilter.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h

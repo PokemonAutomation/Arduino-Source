@@ -395,7 +395,6 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
     Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
@@ -594,6 +593,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
@@ -1216,7 +1216,6 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
     Source/Pokemon/Options/Pokemon_EggHatchFilter.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
@@ -1419,6 +1418,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
