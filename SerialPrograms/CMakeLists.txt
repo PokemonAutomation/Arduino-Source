@@ -1174,6 +1174,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.h
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp

@@ -582,6 +582,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
@@ -1406,6 +1407,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.h \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.h \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
