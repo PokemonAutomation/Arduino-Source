@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_BattleBallInventoryReader_H
 
 #include <string>
-#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
@@ -25,10 +24,7 @@ class BattleBallReader{
     static const double ALPHA_SPREAD;
 
 public:
-    BattleBallReader(
-        ConsoleHandle& console,
-        Language language
-    );
+    BattleBallReader(ConsoleHandle& console, Language language);
 
 public:
     std::string read_ball(const ImageViewRGB32& screen) const;

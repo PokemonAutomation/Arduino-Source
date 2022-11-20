@@ -38,7 +38,7 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
         AdvanceDialogFinder detector;
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(5),
+            std::chrono::seconds(30),
             {detector}
         );
         if (ret < 0){

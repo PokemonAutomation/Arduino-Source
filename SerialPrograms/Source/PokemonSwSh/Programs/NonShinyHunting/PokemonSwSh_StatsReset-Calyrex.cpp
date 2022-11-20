@@ -67,10 +67,15 @@ std::unique_ptr<StatsTracker> StatsResetCalyrex_Descriptor::make_stats() const{
 
 StatsResetCalyrex::StatsResetCalyrex()
     : GO_HOME_WHEN_DONE(false)
-    , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
+    , BALL_SELECT(
+        "<b>Ball Select:</b>",
+        LockWhileRunning::LOCKED,
+        "master-ball"
+    )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages(),
+        LockWhileRunning::LOCKED,
         true
     )
     , CHECK_CALYREX_STATS(

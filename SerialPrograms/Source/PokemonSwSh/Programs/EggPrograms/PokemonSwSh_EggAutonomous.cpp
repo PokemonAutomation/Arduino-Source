@@ -89,6 +89,7 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IVCheckerReader::instance().languages(),
+        LockWhileRunning::LOCKED,
         false
     )
     , MAX_KEEPERS(

@@ -74,6 +74,7 @@ PokemonNameSelectCell::PokemonNameSelectCell(
     : PokemonNameSelectData(slugs)
     , StringSelectCell(
         PokemonNameSelectData::m_database,
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}
@@ -84,6 +85,7 @@ PokemonNameSelectCell::PokemonNameSelectCell(
     : PokemonNameSelectData(json_file_slugs)
     , StringSelectCell(
         PokemonNameSelectData::m_database,
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}
@@ -100,6 +102,7 @@ PokemonNameSelectOption::PokemonNameSelectOption(
     , StringSelectOption(
         std::move(label),
         PokemonNameSelectData::m_database,
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}
@@ -112,6 +115,7 @@ PokemonNameSelectOption::PokemonNameSelectOption(
     , StringSelectOption(
         std::move(label),
         PokemonNameSelectData::m_database,
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}

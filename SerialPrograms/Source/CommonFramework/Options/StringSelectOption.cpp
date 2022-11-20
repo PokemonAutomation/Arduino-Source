@@ -12,8 +12,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/NoWheelComboBox.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "StringSelectOption.h"
 
 //#include <iostream>
@@ -180,11 +178,21 @@ struct StringSelectCell::Data{
 StringSelectCell::~StringSelectCell() = default;
 
 
-StringSelectCell::StringSelectCell(const StringSelectDatabase& database, size_t default_index)
-    : m_data(CONSTRUCT_TOKEN, database, default_index)
+StringSelectCell::StringSelectCell(
+    const StringSelectDatabase& database,
+    LockWhileRunning lock_while_running,
+    size_t default_index
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, database, default_index)
 {}
-StringSelectCell::StringSelectCell(const StringSelectDatabase& database, const std::string& default_slug)
-    : m_data(CONSTRUCT_TOKEN, database, default_slug)
+StringSelectCell::StringSelectCell(
+    const StringSelectDatabase& database,
+    LockWhileRunning lock_while_running,
+    const std::string& default_slug
+)
+    : ConfigOption(lock_while_running)
+    , m_data(CONSTRUCT_TOKEN, database, default_slug)
 {}
 
 

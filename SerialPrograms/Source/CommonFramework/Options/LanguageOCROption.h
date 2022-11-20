@@ -18,7 +18,12 @@ namespace OCR{
 
 class LanguageOCR : public ConfigOption{
 public:
-    LanguageOCR(std::string label, const LanguageSet& languages, bool required = true);
+    LanguageOCR(
+        std::string label,
+        const LanguageSet& languages,
+        LockWhileRunning lock_while_running,
+        bool required = true
+    );
 
 //    explicit operator bool() const{ return m_case_list[m_current].first != Language::None && m_case_list[m_current].second; }
 

@@ -57,7 +57,12 @@ std::unique_ptr<StatsTracker> DistortionWaiter_Descriptor::make_stats() const{
 
 
 DistortionWaiter::DistortionWaiter()
-    : LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
+    )
     , NOTIFICATION_DISTORTION(
         "Distortion Appeared",
         true, true, ImageAttachmentMode::JPG,

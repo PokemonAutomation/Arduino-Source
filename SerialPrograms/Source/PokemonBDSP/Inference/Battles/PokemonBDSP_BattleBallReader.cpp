@@ -8,9 +8,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h"
 #include "PokemonBDSP_BattleBallReader.h"
 
@@ -30,10 +28,7 @@ const PokeballSpriteMatcher& BALL_SPRITE_MATCHER(){
 
 
 
-BattleBallReader::BattleBallReader(
-    ConsoleHandle& console,
-    Language language
-)
+BattleBallReader::BattleBallReader(ConsoleHandle& console, Language language)
     : m_matcher(BALL_SPRITE_MATCHER())
     , m_name_reader(PokeballNameReader::instance())
     , m_language(language)

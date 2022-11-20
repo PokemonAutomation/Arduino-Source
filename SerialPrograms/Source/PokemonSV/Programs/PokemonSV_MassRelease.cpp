@@ -62,7 +62,7 @@ MassRelease::MassRelease()
     , BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
         LockWhileRunning::UNLOCKED,
-        2, 0, 32
+        2, 0, 40
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,

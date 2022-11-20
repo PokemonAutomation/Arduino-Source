@@ -40,6 +40,8 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
+//    cout << "white = " << white << endl;
+
     ImageStats stats_bot = image_stats(extract_box_reference(screen, m_box_bot));
     if (white){
         if (!is_white(stats_bot)){
@@ -50,6 +52,7 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
             return false;
         }
     }
+//    cout << "asdf" << endl;
 
     DialogArrowDetector arrow_detector(m_arrow);
     return arrow_detector.detect(screen);

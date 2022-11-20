@@ -48,13 +48,9 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
         this, [this](){
             bool ok;
             Type current = (Type)this->text().toLong(&ok);
-            QPalette palette;
-            if (ok && m_value.check_validity(current).empty()){
-                palette.setColor(QPalette::Text, Qt::black);
-            }else{
-                palette.setColor(QPalette::Text, Qt::red);
-            }
-            this->setPalette(palette);
+            current = std::max(current, m_value.min_value());
+            current = std::min(current, m_value.max_value());
+            this->setText(QString::number(current));
             m_value.set(current);
         }
     );

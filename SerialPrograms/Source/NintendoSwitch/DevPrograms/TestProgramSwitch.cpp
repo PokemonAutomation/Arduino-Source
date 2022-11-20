@@ -51,11 +51,13 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
 
 
 #include <QPixmap>
@@ -106,10 +108,12 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 TestProgram::TestProgram()
     : LANGUAGE(
         "<b>OCR Language:</b>",
-        { Language::English }, false
+        { Language::English },
+        LockWhileRunning::LOCKED,
+        false
     )
     , STATIC_TEXT("Test text...")
-    , SELECT("String Select", test_database(), 0)
+    , SELECT("String Select", test_database(), LockWhileRunning::LOCKED, 0)
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -162,16 +166,39 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
 
+    BattleBallReader reader(console, LANGUAGE);
+
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    context.wait_for_all_requests();
+
+    int quantity = move_to_ball(reader, console, context, "poke-ball");
+    cout << "quantity = " << quantity << endl;
+
+
+#if 0
+    BattleBallReader reader(console, Language::English);
+    auto image = feed.snapshot();
+    cout << reader.read_quantity(image) << endl;
+    cout << reader.read_ball(image) << endl;
+#endif
+
+#if 0
+//    ImageRGB32 image("screenshot-20221120-001408323077.png");
+    ImageRGB32 image("screenshot-20221118-160757832016.png");
+    PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
 
 //    auto image = feed.snapshot();
 //    PokemonSummaryDetector detector;
 //    cout << detector.detect(image) << endl;
 
 
+#if 0
     auto image = feed.snapshot();
     ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.86, 0.01, 0.02, 0.05}));
     cout << stats.average << stats.stddev << endl;
-
+#endif
 
 #if 0
     ImageRGB32 image("cursor_basic_00q.png");

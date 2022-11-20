@@ -68,8 +68,16 @@ public:
     void operator=(const StringSelectCell&) = delete;
 
 public:
-    StringSelectCell(const StringSelectDatabase& database, size_t default_index);
-    StringSelectCell(const StringSelectDatabase& database, const std::string& default_slug);
+    StringSelectCell(
+        const StringSelectDatabase& database,
+        LockWhileRunning lock_while_running,
+        size_t default_index
+    );
+    StringSelectCell(
+        const StringSelectDatabase& database,
+        LockWhileRunning lock_while_running,
+        const std::string& default_slug
+    );
 
     size_t default_index() const;
     const std::string& default_slug() const;
@@ -110,17 +118,19 @@ public:
     StringSelectOption(
         std::string label,
         const StringSelectDatabase& database,
+        LockWhileRunning lock_while_running,
         size_t default_index
     )
-        : StringSelectCell(database, default_index)
+        : StringSelectCell(database, lock_while_running, default_index)
         , m_label(std::move(label))
     {}
     StringSelectOption(
         std::string label,
         const StringSelectDatabase& database,
+        LockWhileRunning lock_while_running,
         const std::string& default_slug
     )
-        : StringSelectCell(database, default_slug)
+        : StringSelectCell(database, lock_while_running, default_slug)
         , m_label(std::move(label))
     {}
 

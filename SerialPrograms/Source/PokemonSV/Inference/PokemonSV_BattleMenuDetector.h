@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSV_BattleMenuDetector_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"

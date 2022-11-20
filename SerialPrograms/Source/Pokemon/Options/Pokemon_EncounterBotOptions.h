@@ -20,7 +20,9 @@ public:
     EncounterBotLanguage(bool required = false)
         : LanguageOCR(
             "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
-            PokemonNameReader::instance().languages(), required
+            PokemonNameReader::instance().languages(),
+            LockWhileRunning::LOCKED,
+            required
         )
     {}
 };

@@ -56,7 +56,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
 EncounterFilterOverride::EncounterFilterOverride()
-    : pokemon(ALL_POKEMON_NAMES(), "starly")
+    : pokemon(ALL_POKEMON_NAMES(), LockWhileRunning::LOCKED, "starly")
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);

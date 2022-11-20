@@ -57,6 +57,7 @@ StarterReset::StarterReset()
     , STARTER(
         "<b>Starter:</b>",
         STARTER_DATABASE,
+        LockWhileRunning::LOCKED,
         "turtwig"
     )
     , USE_SOUND_DETECTION(

@@ -56,7 +56,8 @@ StatsReset::StatsReset()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        IVCheckerReader::instance().languages()
+        IVCheckerReader::instance().languages(),
+        LockWhileRunning::LOCKED
     )
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",

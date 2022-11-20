@@ -140,7 +140,9 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
 BoxReorderNationalDex::BoxReorderNationalDex()
     : LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for " + STRING_POKEMON + " to be identified correctly.",
-        PokemonNameReader::instance().languages(), true
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
     )
     , POKEMON_COUNT(
         "<b>Number of " + STRING_POKEMON + " to order:</b>",

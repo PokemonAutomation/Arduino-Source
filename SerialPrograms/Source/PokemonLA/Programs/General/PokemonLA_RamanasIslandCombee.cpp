@@ -76,7 +76,12 @@ std::unique_ptr<StatsTracker> RamanasCombeeFinder_Descriptor::make_stats() const
 
 
 RamanasCombeeFinder:: RamanasCombeeFinder()
-    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    : LANGUAGE(
+        "<b>Game Language</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
+    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",

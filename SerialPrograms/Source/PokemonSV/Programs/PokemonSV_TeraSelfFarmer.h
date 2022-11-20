@@ -13,7 +13,9 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 //#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
     struct VideoSnapshot;
@@ -57,6 +59,8 @@ private:
     static const EnumDatabase<TeraSelfFarmer::Mode>& database();
     EnumDropdownOption<Mode> MODE;
 
+    OCR::LanguageOCR LANGUAGE;
+    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     SimpleIntegerOption<uint16_t> MAX_CATCHES;
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 

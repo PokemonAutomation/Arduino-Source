@@ -28,7 +28,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     : m_rare_stars(rare_stars)
-    , pokemon(COMBINED_DEX_NAMES(), "rookidee")
+    , pokemon(COMBINED_DEX_NAMES(), LockWhileRunning::LOCKED, "rookidee")
     , shininess(rare_stars)
 {
     PA_ADD_OPTION(action);

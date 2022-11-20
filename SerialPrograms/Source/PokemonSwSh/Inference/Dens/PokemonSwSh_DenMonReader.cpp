@@ -116,7 +116,12 @@ DenMonSelectData::DenMonSelectData(){
     }
 }
 DenMonSelectOption::DenMonSelectOption(std::string label)
-    : StringSelectOption(std::move(label), DenMonSelectData::m_database, "")
+    : StringSelectOption(
+        std::move(label),
+        DenMonSelectData::m_database,
+        LockWhileRunning::LOCKED,
+        ""
+    )
 {}
 
 

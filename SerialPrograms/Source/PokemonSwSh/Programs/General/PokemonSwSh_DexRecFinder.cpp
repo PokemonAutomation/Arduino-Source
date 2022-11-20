@@ -62,11 +62,15 @@ DexRecFilters::DexRecFilters()
     : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCKED, true, true)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for stop filters to work correctly.",
-        PokemonNameReader::instance().languages(), true
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
     )
     , DESIRED(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when it finds this " + STRING_POKEMON + ". Requires the language be set.",
-        COMBINED_DEX_NAMES(), "ralts"
+        COMBINED_DEX_NAMES(),
+        LockWhileRunning::LOCKED,
+        "ralts"
     )
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "

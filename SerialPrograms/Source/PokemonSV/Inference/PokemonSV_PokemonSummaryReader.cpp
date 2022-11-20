@@ -34,13 +34,13 @@ void PokemonSummaryDetector::make_overlays(VideoOverlaySet& items) const{
 bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats top_blue_left = image_stats(extract_box_reference(screen, m_top_blue_left));
 //    cout << top_blue_left.average << top_blue_left.stddev << endl;
-    if (!is_solid(top_blue_left, {0.0745162, 0.311321, 0.614163}, 0.20, 10)){
+    if (!is_solid(top_blue_left, {0.0745162, 0.311321, 0.614163}, 0.30, 10)){
         return false;
     }
 
     ImageStats top_blue_right = image_stats(extract_box_reference(screen, m_top_blue_right));
 //    cout << top_blue_right.average << top_blue_right.stddev << endl;
-    if (!is_solid(top_blue_right, {0.0745162, 0.311321, 0.614163}, 0.20, 10)){
+    if (!is_solid(top_blue_right, {0.0745162, 0.311321, 0.614163}, 0.30, 10)){
         return false;
     }
 

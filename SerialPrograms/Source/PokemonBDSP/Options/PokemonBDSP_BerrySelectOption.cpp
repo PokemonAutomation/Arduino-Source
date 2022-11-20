@@ -43,6 +43,7 @@ BerrySelectCell::BerrySelectCell(
 )
     : StringSelectCell(
         ALL_BERRYS_SELECT_DATABASE(),
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}

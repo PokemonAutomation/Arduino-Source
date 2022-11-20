@@ -43,7 +43,8 @@ GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
 GenerateIVCheckerOCR::GenerateIVCheckerOCR()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        IVCheckerReader::instance().languages()
+        IVCheckerReader::instance().languages(),
+        LockWhileRunning::LOCKED
     )
     , HP("<b>HP:</b>", IVCheckerValue::Best)
     , ATTACK("<b>Attack:</b>", IVCheckerValue::Best)
