@@ -1176,6 +1176,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp
+    Source/PokemonSV/Inference/PokemonSV_BoxDetection.h
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp
@@ -1194,6 +1196,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h
+    Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp
+    Source/PokemonSV/Programs/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp

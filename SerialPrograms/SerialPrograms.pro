@@ -583,6 +583,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
@@ -594,6 +595,7 @@ SOURCES += \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
+    Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
@@ -1405,6 +1407,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_BoxDetection.h \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
@@ -1416,6 +1419,7 @@ HEADERS += \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
+    Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \

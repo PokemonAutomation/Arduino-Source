@@ -168,6 +168,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    cout << detector.detect(image) << endl;
 
 
+    auto image = feed.snapshot();
+    ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.86, 0.01, 0.02, 0.05}));
+    cout << stats.average << stats.stddev << endl;
+
+
 #if 0
     ImageRGB32 image("cursor_basic_00q.png");
     GradientArrowDetector detector({0, 0, 1, 1});
@@ -180,8 +185,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 0
+    ImageRGB32 image("screenshot-20221119-215550079437.png");
 
-#if 1
+    WhiteButtonDetector next_button(WhiteButton::ButtonA, {0.8, 0.9, 0.2, 0.1}, COLOR_RED);
+    cout << next_button.detect(image) << endl;
+#endif
+
+#if 0
+    ImageRGB32 image("screenshot-20221118-211428612196.png");
+
+    TeraCardReader detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
     ImageRGB32 image("screenshot-20221118-210501270724.png");
 
     MoveSelectDetector detector;
