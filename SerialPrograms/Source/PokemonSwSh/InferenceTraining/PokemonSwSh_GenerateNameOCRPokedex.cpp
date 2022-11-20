@@ -43,7 +43,8 @@ GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
 GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        PokemonNameReader::instance().languages()
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED
     )
     , POKEDEX(
         "<b>" + STRING_POKEDEX + ":</b>",

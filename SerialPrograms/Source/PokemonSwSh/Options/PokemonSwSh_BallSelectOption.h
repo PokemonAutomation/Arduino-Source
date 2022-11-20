@@ -23,7 +23,11 @@ public:
 
 class PokemonBallSelectOption : public StringSelectOption{
 public:
-    PokemonBallSelectOption(std::string label, const std::string& default_slug = "");
+    PokemonBallSelectOption(
+        std::string label,
+        LockWhileRunning lock_while_running,
+        const std::string& default_slug = ""
+    );
 };
 
 

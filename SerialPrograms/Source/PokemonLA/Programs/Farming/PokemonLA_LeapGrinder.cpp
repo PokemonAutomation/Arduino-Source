@@ -74,7 +74,12 @@ std::unique_ptr<StatsTracker> LeapGrinder_Descriptor::make_stats() const{
 
 
 LeapGrinder::LeapGrinder()
-    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    : LANGUAGE(
+        "<b>Game Language</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
+    )
     , POKEMON_DATABASE(make_name_database({
         "aipom",
         "burmy",
@@ -92,7 +97,12 @@ LeapGrinder::LeapGrinder()
         "nosepass",
         "bergmite",
     }))
-    , POKEMON("<b>Pokemon Species</b>", POKEMON_DATABASE, "cherubi")
+    , POKEMON(
+        "<b>Pokemon Species</b>",
+        POKEMON_DATABASE,
+        LockWhileRunning::LOCKED,
+        "cherubi"
+    )
     , LEAPS(
         "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
         LockWhileRunning::LOCKED,

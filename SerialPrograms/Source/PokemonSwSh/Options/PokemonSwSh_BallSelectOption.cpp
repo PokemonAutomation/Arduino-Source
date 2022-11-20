@@ -9,6 +9,10 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BallSelectOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -19,6 +23,7 @@ using namespace Pokemon;
 StringSelectDatabase make_all_balls_database(){
     StringSelectDatabase ret;
     for (const auto& slug : POKEBALL_SLUGS()){
+//        cout << "slug = " << slug << endl;
         const PokeballNames& data = get_pokeball_name(slug);
         const SpriteDatabase::Sprite* sprite = ALL_POKEBALL_SPRITES().get_nothrow(slug);
         if (sprite == nullptr){
@@ -43,6 +48,7 @@ PokemonBallSelectCell::PokemonBallSelectCell(
 )
     : StringSelectCell(
         ALL_BALLS_SELECT_DATABASE(),
+        LockWhileRunning::LOCKED,
         default_slug
     )
 {}
@@ -50,11 +56,14 @@ PokemonBallSelectCell::PokemonBallSelectCell(
 
 
 PokemonBallSelectOption::PokemonBallSelectOption(
-    std::string label, const std::string& default_slug
+    std::string label,
+    LockWhileRunning lock_while_running,
+    const std::string& default_slug
 )
     : StringSelectOption(
         std::move(label),
         ALL_BALLS_SELECT_DATABASE(),
+        lock_while_running,
         default_slug
     )
 {}

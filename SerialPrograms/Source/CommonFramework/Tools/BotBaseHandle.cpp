@@ -205,6 +205,8 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
         error = e.message();
     }catch (const SerialProtocolException& e){
         error = e.message();
+    }catch (const ProgramCancelledException& e){
+        error = e.message();
     }
     if (error.empty()){
         m_state.store(State::CONNECTING, std::memory_order_release);

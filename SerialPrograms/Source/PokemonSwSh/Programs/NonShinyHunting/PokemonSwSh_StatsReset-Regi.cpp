@@ -67,10 +67,15 @@ std::unique_ptr<StatsTracker> StatsResetRegi_Descriptor::make_stats() const{
 
 StatsResetRegi::StatsResetRegi()
     : GO_HOME_WHEN_DONE(false)
-    , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
+    , BALL_SELECT(
+        "<b>Ball Select:</b>",
+        LockWhileRunning::LOCKED,
+        "master-ball"
+    )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages(),
+        LockWhileRunning::LOCKED,
         true
     )
     , HP("<b>HP:</b>")

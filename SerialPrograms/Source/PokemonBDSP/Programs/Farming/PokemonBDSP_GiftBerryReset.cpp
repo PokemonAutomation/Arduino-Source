@@ -77,7 +77,9 @@ GiftBerryReset::GiftBerryReset()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b><br>This is needed to read the berry name.",
-            Pokemon::BerryNameReader::instance().languages(), true
+        Pokemon::BerryNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
     )
     , TARGET_BERRIES(
         "<b>Berries:</b><br>Multiple berries can be selected. The program will stop if one of the selected berries is received."

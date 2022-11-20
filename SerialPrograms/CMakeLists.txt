@@ -790,8 +790,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp
-    Source/Pokemon/Options/Pokemon_BallSelectWidget.h
     Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp
     Source/Pokemon/Options/Pokemon_EggHatchFilter.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
@@ -1174,6 +1172,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.h
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp
@@ -1192,6 +1192,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
+    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
+    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp

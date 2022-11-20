@@ -89,7 +89,7 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
 ConsoleSpecificOptions::ConsoleSpecificOptions(std::string label, const LanguageSet& languages, bool host)
     : GroupOption(std::move(label), LockWhileRunning::LOCKED)
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
-    , language("<b>Game Language:</b>", languages, true)
+    , language("<b>Game Language:</b>", languages, LockWhileRunning::LOCKED, true)
 {
     ConsoleSpecificOptions::set_host(host);
     PA_ADD_STATIC(is_host_label);

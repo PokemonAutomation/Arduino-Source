@@ -38,7 +38,8 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
 GenerateNameOCRData::GenerateNameOCRData()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        PokemonNameReader::instance().languages()
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED
     )
     , DELAY(
         "<b>Delay Between Each Iteration:</b>",

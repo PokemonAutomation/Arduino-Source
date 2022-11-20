@@ -29,6 +29,7 @@
 //#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
 #include "PokemonSV_TeraSelfFarmer.h"
 
@@ -104,9 +105,18 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::LOCKED,
         Mode::FARM_ITEMS_ONLY
     )
+    , LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::UNLOCKED
+    )
+    , BALL_SELECT(
+        "<b>Ball Select:</b>",
+        LockWhileRunning::UNLOCKED,
+        "poke-ball"
+    )
     , MAX_CATCHES(
-        "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ". "
-        "Use this to avoid running out of your default ball and using the wrong ball.",
+        "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
         LockWhileRunning::UNLOCKED,
         50, 1, 999
     )
@@ -150,6 +160,8 @@ TeraSelfFarmer::TeraSelfFarmer()
     )
 {
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(MAX_CATCHES);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
     PA_ADD_OPTION(MAX_STARS);
@@ -171,7 +183,20 @@ void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, B
         }
         m_caught++;
     }
-    pbf_mash_button(context, BUTTON_A, 250);
+
+    BattleBallReader reader(env.console, LANGUAGE);
+//    pbf_mash_button(context, BUTTON_A, 250);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    context.wait_for_all_requests();
+
+    int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
+    if (quantity == 0){
+        throw OperationFailedException(env.logger(), "Unable to find appropriate ball. Did you run out?");
+    }
+    if (quantity < 0){
+        env.log("Unable to read ball quantity.", COLOR_RED);
+    }
+    pbf_mash_button(context, BUTTON_A, 125);
 }
 void TeraSelfFarmer::read_summary(
     SingleSwitchProgramEnvironment& env,
@@ -285,6 +310,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 summary,
             }
         );
+        context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
         case 1:
@@ -374,6 +400,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 //            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
+        context.wait_for(std::chrono::milliseconds(100));
 
         VideoSnapshot screen = env.console.video().snapshot();
         TeraCardReader reader;

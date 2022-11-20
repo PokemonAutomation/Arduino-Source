@@ -53,7 +53,7 @@ bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object,
         ? DIALOG_ARROW_BLACK().rmsd(cropped)
         : DIALOG_ARROW_WHITE().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 80;
+    return rmsd <= 100;
 }
 
 

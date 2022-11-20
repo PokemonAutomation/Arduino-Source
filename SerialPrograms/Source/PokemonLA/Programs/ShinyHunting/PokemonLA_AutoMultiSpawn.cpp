@@ -207,7 +207,12 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
 
 
 AutoMultiSpawn::AutoMultiSpawn()
-    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    : LANGUAGE(
+        "<b>Game Language</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
+    )
     , SPAWN(
         "<b>Spawn Point</b>:",
         {

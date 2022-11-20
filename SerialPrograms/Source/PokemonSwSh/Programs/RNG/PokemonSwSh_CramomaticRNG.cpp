@@ -87,6 +87,7 @@ CramomaticRNG::CramomaticRNG()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read the ball received.",
         PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
         true
     )
     , NUM_APRICORN_ONE(

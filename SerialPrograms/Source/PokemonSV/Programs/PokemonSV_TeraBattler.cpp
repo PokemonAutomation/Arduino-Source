@@ -23,7 +23,7 @@ bool run_tera_battle(
     BotBaseContext& context,
     EventNotificationOption& error_notification
 ){
-
+    size_t consecutive_move_select = 0;
     while (true){
         context.wait_for_all_requests();
 
@@ -50,10 +50,18 @@ bool run_tera_battle(
             break;
         case 1:
             env.log("Detected move select.");
+            consecutive_move_select++;
+            //  If we end up here consecutively too many time, the move is
+            //  probably disabled. Selet a different move.
+            if (consecutive_move_select > 3){
+                env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+            }
             pbf_press_button(context, BUTTON_A, 20, 10);
             break;
         case 2:
             env.log("Detected target select.");
+            consecutive_move_select = 0;
             pbf_press_button(context, BUTTON_A, 20, 10);
             break;
         case 3:

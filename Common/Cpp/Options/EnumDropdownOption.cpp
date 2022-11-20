@@ -32,7 +32,8 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& 
     : ConfigOption(x)
     , m_data(CONSTRUCT_TOKEN, x.database(), x.default_value(), x.current_value())
 {}
-IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDatabase& database,
+IntegerEnumDropdownCell::IntegerEnumDropdownCell(
+    const IntegerEnumDatabase& database,
     LockWhileRunning lock_while_running,
     size_t default_value, size_t current_value
 )
@@ -46,7 +47,8 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDatabase& data
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Current value is not in the database: " + std::to_string(current_value));
     }
 }
-IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDatabase& database,
+IntegerEnumDropdownCell::IntegerEnumDropdownCell(
+    const IntegerEnumDatabase& database,
     LockWhileRunning lock_while_running,
     size_t default_value
 )

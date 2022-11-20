@@ -19,8 +19,14 @@ namespace OCR{
 
 
 
-LanguageOCR::LanguageOCR(std::string label, const LanguageSet& languages, bool required)
-    : m_label(std::move(label))
+LanguageOCR::LanguageOCR(
+    std::string label,
+    const LanguageSet& languages,
+    LockWhileRunning lock_while_running,
+    bool required
+)
+    : ConfigOption(lock_while_running)
+    , m_label(std::move(label))
     , m_default(0)
     , m_current(0)
 {

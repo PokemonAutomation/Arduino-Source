@@ -84,7 +84,12 @@ std::unique_ptr<StatsTracker> BurmyFinder_Descriptor::make_stats() const{
 
 
 BurmyFinder::BurmyFinder()
-    : LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
+    : LANGUAGE(
+        "<b>Game Language</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockWhileRunning::LOCKED,
+        true
+    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
