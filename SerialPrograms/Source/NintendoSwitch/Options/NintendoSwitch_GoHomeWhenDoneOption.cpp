@@ -15,7 +15,7 @@ GoHomeWhenDoneOption::GoHomeWhenDoneOption(bool default_value)
     : BooleanCheckBoxOption(
         "<b>Go Home when Done:</b><br>"
         "When the program finishes, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         default_value
     )
 {}

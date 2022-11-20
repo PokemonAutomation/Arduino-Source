@@ -26,7 +26,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
+//#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
@@ -169,6 +169,7 @@ void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, B
             pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_from_home(env.console, context);
         }
+        m_caught++;
     }
     pbf_mash_button(context, BUTTON_A, 250);
 }
@@ -264,7 +265,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.log("Looking for post raid dialogs...");
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.9, 0.9, 0.1, 0.1}, COLOR_RED);
+        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.8, 0.9, 0.2, 0.1}, COLOR_RED);
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
@@ -324,8 +325,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             break;
         case 6:
             env.log("Detected summary.");
+            context.wait_for(std::chrono::milliseconds(500));
             if (!summary_read){
-                m_caught++;
                 stats.m_caught++;
                 read_summary(env, context, battle_snapshot);
                 summary_read = true;

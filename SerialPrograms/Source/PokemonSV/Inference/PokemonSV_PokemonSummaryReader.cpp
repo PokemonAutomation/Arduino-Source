@@ -46,11 +46,16 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
 
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
+    if (bottom.stddev.sum() > 20){
+        return false;
+    }
+#if 0
     if (!is_solid(bottom, {0.648549, 0.286158, 0.0652928}, 0.15, 20) && //  Scarlet
         !is_solid(bottom, {0.367816, 0.0746615, 0.557523}, 0.15, 20)    //  Violet
     ){
         return false;
     }
+#endif
 
 //    ImageStats shiny_symbol = image_stats(extract_box_reference(screen, m_shiny_symbol));
 //    cout << shiny_symbol.average << shiny_symbol.stddev << endl;
