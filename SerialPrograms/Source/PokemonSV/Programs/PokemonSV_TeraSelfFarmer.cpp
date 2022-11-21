@@ -172,17 +172,19 @@ TeraSelfFarmer::TeraSelfFarmer()
 void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (MODE == Mode::FARM_ITEMS_ONLY){
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-    }else{
-        if (FIX_TIME_ON_CATCH){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            home_to_date_time(context, false, false);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_from_home(env.console, context);
-        }
-        m_caught++;
+        pbf_mash_button(context, BUTTON_A, 125);
+        return;
     }
+
+    if (FIX_TIME_ON_CATCH){
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        home_to_date_time(context, false, false);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        resume_game_from_home(env.console, context);
+    }
+    m_caught++;
 
     BattleBallReader reader(env.console, LANGUAGE);
 //    pbf_mash_button(context, BUTTON_A, 250);
@@ -290,7 +292,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.log("Looking for post raid dialogs...");
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.8, 0.9, 0.2, 0.1}, COLOR_RED);
+        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.8, 0.93, 0.2, 0.07}, COLOR_RED);
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
