@@ -10,9 +10,9 @@
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -153,7 +153,7 @@ VideoDisplayWidget::VideoDisplayWidget(
 }
 VideoDisplayWidget::~VideoDisplayWidget(){
     //  Close the window popout first since it holds references to this class.
-    m_window.reset();
+    move_back_from_window();
     m_overlay_session.remove_stat(m_display_fps);
     m_overlay_session.remove_stat(m_source_fps);
 }

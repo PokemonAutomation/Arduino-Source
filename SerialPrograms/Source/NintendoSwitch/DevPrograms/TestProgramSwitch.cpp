@@ -168,6 +168,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    ImageRGB32 image("ArrowFail.png");
+//    auto image = feed.snapshot();
+
+    AdvanceDialogDetector detector;
+    cout << detector.detect(image) << endl;
+//    image.frame->save("test.png");
 
 
 
@@ -201,7 +207,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    cout << detector.detect(image) << endl;
 
 
-#if 1
+#if 0
     auto image = feed.snapshot();
     ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}));
     cout << stats.average << stats.stddev << endl;

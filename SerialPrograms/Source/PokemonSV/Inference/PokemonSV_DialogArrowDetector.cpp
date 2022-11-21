@@ -48,12 +48,13 @@ bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object,
 //    }
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
+//    cropped.save("test.png");
 
     double rmsd = black_arrow
         ? DIALOG_ARROW_BLACK().rmsd(cropped)
         : DIALOG_ARROW_WHITE().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 100;
+    return rmsd <= 120;
 }
 
 
