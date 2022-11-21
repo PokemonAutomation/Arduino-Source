@@ -166,6 +166,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
 
+
+
+
+
+
+#if 0
     BattleBallReader reader(console, LANGUAGE);
 
     pbf_press_button(context, BUTTON_A, 20, 105);
@@ -173,6 +179,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     int quantity = move_to_ball(reader, console, context, "poke-ball");
     cout << "quantity = " << quantity << endl;
+#endif
 
 
 #if 0
@@ -194,9 +201,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    cout << detector.detect(image) << endl;
 
 
-#if 0
+#if 1
     auto image = feed.snapshot();
-    ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.86, 0.01, 0.02, 0.05}));
+    ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}));
     cout << stats.average << stats.stddev << endl;
 #endif
 

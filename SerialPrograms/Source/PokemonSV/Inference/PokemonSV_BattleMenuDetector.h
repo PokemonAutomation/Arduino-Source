@@ -66,6 +66,8 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
+    Color m_color;
+    ImageFloatBox m_box;
     GradientArrowDetector m_arrow;
 };
 class TeraCatchFinder : public DetectorToFinder_ConsecutiveDebounce<TeraCatchDetector>{

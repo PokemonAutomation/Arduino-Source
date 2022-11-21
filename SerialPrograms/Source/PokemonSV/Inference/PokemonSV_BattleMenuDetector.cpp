@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
@@ -62,12 +63,19 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
 
 
 TeraCatchDetector::TeraCatchDetector(Color color)
-    : m_arrow(ImageFloatBox(0.75, 0.80, 0.08, 0.09), color)
+    : m_color(color)
+    , m_box(0.95, 0.81, 0.02, 0.06)
+    , m_arrow({0.75, 0.80, 0.08, 0.09}, color)
 {}
 void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
     m_arrow.make_overlays(items);
 }
 bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats box = image_stats(extract_box_reference(screen, m_box));
+    if (!is_solid(box, {0.554348, 0.445652, 0.})){
+        return false;
+    }
     if (!m_arrow.detect(screen)){
         return false;
     }

@@ -315,9 +315,15 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-        case 1:
-            env.log("Detected (A) Next button.");
+            env.log("Unexpected catch prompt. Skipping...", COLOR_RED);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
             pbf_mash_button(context, BUTTON_A, 125);
+            timeout = std::chrono::seconds(60);
+            break;
+        case 1:
+            env.log("Detected possible (A) Next button.");
+            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_press_button(context, BUTTON_B, 20, 105);
             timeout = std::chrono::seconds(60);
             break;
         case 2:
