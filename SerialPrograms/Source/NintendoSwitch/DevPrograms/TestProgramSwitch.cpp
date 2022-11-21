@@ -167,14 +167,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
+//    ImageRGB32 image("screenshot-20221121-074407897208.png");
+    auto image = feed.snapshot();
+    TeraCatchDetector detector;
+    cout << detector.detect(image) << endl;
 
+
+
+#if 0
     ImageRGB32 image("ArrowFail.png");
 //    auto image = feed.snapshot();
 
     AdvanceDialogDetector detector;
     cout << detector.detect(image) << endl;
 //    image.frame->save("test.png");
-
+#endif
 
 
 #if 0
@@ -226,7 +233,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    ImageRGB32 image("screenshot-20221119-215550079437.png");
+    ImageRGB32 image("screenshot-20221121-070043212515.png");
 
     WhiteButtonDetector next_button(WhiteButton::ButtonA, {0.8, 0.9, 0.2, 0.1}, COLOR_RED);
     cout << next_button.detect(image) << endl;

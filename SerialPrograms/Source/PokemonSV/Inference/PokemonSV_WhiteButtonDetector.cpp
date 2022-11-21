@@ -70,7 +70,7 @@ WhiteButtonMatcher::WhiteButtonMatcher(WhiteButton type, size_t min_width, size_
     , m_max_rmsd(max_rmsd)
 {}
 const WhiteButtonMatcher& WhiteButtonMatcher::A(){
-    static WhiteButtonMatcher matcher(WhiteButton::ButtonA, 15, 15, 90);
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonA, 15, 15, 100);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::B(){
@@ -126,10 +126,16 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 
 WhiteButtonFinder::~WhiteButtonFinder() = default;
-WhiteButtonFinder::WhiteButtonFinder(WhiteButton button, VideoOverlay& overlay, const ImageFloatBox& box, Color color)
+WhiteButtonFinder::WhiteButtonFinder(
+    WhiteButton button, size_t consecutive_detections,
+    VideoOverlay& overlay,
+    const ImageFloatBox& box,
+    Color color
+)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
     , m_detector(button, box, color)
+    , m_consecutive_detections(consecutive_detections)
 {}
 
 void WhiteButtonFinder::make_overlays(VideoOverlaySet& items) const{
@@ -142,10 +148,17 @@ bool WhiteButtonFinder::process_frame(const ImageViewRGB32& frame, WallClock tim
     for (const ImageFloatBox& hit : hits){
         m_arrows.emplace_back(m_overlay, hit, COLOR_MAGENTA);
     }
-    if (!hits.empty()){
-        frame.save("test.png");
+//    if (!hits.empty()){
+//        frame.save("test.png");
+//    }
+
+    if (hits.empty()){
+        m_trigger_count = 0;
+        return false;
     }
-    return !hits.empty();
+
+    m_trigger_count++;
+    return m_trigger_count >= m_consecutive_detections;
 }
 
 

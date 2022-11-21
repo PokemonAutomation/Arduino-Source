@@ -8,9 +8,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -73,7 +73,8 @@ void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats box = image_stats(extract_box_reference(screen, m_box));
-    if (!is_solid(box, {0.554348, 0.445652, 0.})){
+//    cout << box.average << box.stddev << endl;
+    if (!is_solid(box, {0.554348, 0.445652, 0.}, 0.15, 20)){
         return false;
     }
     if (!m_arrow.detect(screen)){

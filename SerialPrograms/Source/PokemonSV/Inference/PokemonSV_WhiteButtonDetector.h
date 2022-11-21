@@ -2,6 +2,10 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  Warning: This detector is currently very prone to false positives.
+ *  It is much worse than the PLA buttons because these one have transparent
+ *  text which must be stored as zero alpha.
+ *
  */
 
 #ifndef PokemonAutomation_PokemonSV_WhiteButtonDetector_H
@@ -67,7 +71,12 @@ protected:
 class WhiteButtonFinder : public VisualInferenceCallback{
 public:
     ~WhiteButtonFinder();
-    WhiteButtonFinder(WhiteButton button, VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
+    WhiteButtonFinder(
+        WhiteButton button, size_t consecutive_detections,
+        VideoOverlay& overlay,
+        const ImageFloatBox& box,
+        Color color = COLOR_RED
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -77,6 +86,8 @@ protected:
     VideoOverlay& m_overlay;
     WhiteButtonDetector m_detector;
     FixedLimitVector<OverlayBoxScope> m_arrows;
+    size_t m_consecutive_detections;
+    size_t m_trigger_count = 0;
 };
 
 

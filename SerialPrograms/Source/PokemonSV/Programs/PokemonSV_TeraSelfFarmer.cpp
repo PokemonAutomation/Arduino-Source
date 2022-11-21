@@ -292,7 +292,12 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.log("Looking for post raid dialogs...");
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(WhiteButton::ButtonA, env.console.overlay(), {0.8, 0.93, 0.2, 0.07}, COLOR_RED);
+        WhiteButtonFinder next_button(
+            WhiteButton::ButtonA, 20,
+            env.console.overlay(),
+            {0.8, 0.93, 0.2, 0.07},
+            COLOR_RED
+        );
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
@@ -318,12 +323,6 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             env.log("Unexpected catch prompt. Skipping...", COLOR_RED);
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
             pbf_mash_button(context, BUTTON_A, 125);
-            timeout = std::chrono::seconds(60);
-            break;
-        case 1:
-            env.log("Detected possible (A) Next button.");
-            pbf_mash_button(context, BUTTON_A, 125);
-            pbf_press_button(context, BUTTON_B, 20, 105);
             timeout = std::chrono::seconds(60);
             break;
         case 2:
@@ -357,6 +356,17 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 pbf_press_button(context, BUTTON_B, 20, 105);
             }
             break;
+        case 1:
+            //  Next button detector is unreliable. Check if the summary is
+            //  open. If so, fall-through to that.
+            if (!summary.detect(env.console.video().snapshot())){
+                env.log("Detected possible (A) Next button.");
+                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_press_button(context, BUTTON_B, 20, 105);
+                timeout = std::chrono::seconds(60);
+                break;
+            }
+            env.log("Detected false positive (A) Next button.", COLOR_RED);
         case 6:
             env.log("Detected summary.");
             context.wait_for(std::chrono::milliseconds(500));
