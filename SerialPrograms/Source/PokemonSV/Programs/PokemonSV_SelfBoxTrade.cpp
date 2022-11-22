@@ -38,7 +38,7 @@ SelfBoxTrade::SelfBoxTrade()
     : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
         LockWhileRunning::LOCKED,
-        2, 0, 40
+        2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
