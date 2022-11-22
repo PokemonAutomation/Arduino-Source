@@ -280,8 +280,6 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         return;
     }
 
-    process_catch_prompt(env, context);
-
     //  State machine to return to overworld.
     bool summary_read = false;
     bool black_screen_detected = false;
@@ -320,10 +318,13 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            env.log("Unexpected catch prompt. Skipping...", COLOR_RED);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-            pbf_mash_button(context, BUTTON_A, 125);
-            timeout = std::chrono::seconds(60);
+            env.log("Detected catch prompt. Skipping...");
+            try{
+                process_catch_prompt(env, context);
+                pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                pbf_mash_button(context, BUTTON_A, 125);
+                timeout = std::chrono::seconds(60);
+            }catch (OperationFailedException&){}
             break;
         case 2:
             env.log("Detected black screen is over.");
@@ -370,13 +371,16 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         case 6:
             env.log("Detected summary.");
             context.wait_for(std::chrono::milliseconds(500));
-            if (!summary_read){
-                stats.m_caught++;
-                read_summary(env, context, battle_snapshot);
-                summary_read = true;
+            try {
+                if (!summary_read){
+                    read_summary(env, context, battle_snapshot);
+                    stats.m_caught++;
+                    summary_read = true;
+                }
+                pbf_press_button(context, BUTTON_B, 20, 230);
+                timeout = std::chrono::seconds(5);
+            }catch (OperationFailedException&){
             }
-            pbf_press_button(context, BUTTON_B, 20, 230);
-            timeout = std::chrono::seconds(5);
             break;
         default:
             env.log("No detection, assume returned to overworld.");
