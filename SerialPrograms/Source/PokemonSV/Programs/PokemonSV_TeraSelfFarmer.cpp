@@ -368,7 +368,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             //  open. If so, fall-through to that.
             if (!summary.detect(env.console.video().snapshot())){
                 env.log("Detected possible (A) Next button.");
-                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 timeout = std::chrono::seconds(60);
                 break;

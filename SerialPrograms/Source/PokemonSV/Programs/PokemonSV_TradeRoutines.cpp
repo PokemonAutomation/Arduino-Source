@@ -198,7 +198,7 @@ void trade_current_pokemon(
         case 1:
             console.log("Detected box. Trade completed.");
             tracker.check_unrecoverable_error(console);
-            context.wait_for(std::chrono::milliseconds(100));
+            context.wait_for(std::chrono::milliseconds(500));
             return;
         default:
             stats.m_errors++;
