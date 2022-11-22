@@ -19,7 +19,7 @@ namespace PokemonSV{
 
 void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
     {
-        GradientArrowFinder detector(console.overlay(), {0.72, 0.55, 0.05, 0.08});
+        GradientArrowFinder detector(console.overlay(), GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){

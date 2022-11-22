@@ -598,8 +598,10 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
+    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
+    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1423,8 +1425,10 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
+    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \
+    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

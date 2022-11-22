@@ -38,7 +38,7 @@ BoxSelectDetector::BoxSelectDetector(Color color)
     : m_color(color)
     , m_exists(true, color)
     , m_dialog(color)
-    , m_gradient({0.20, 0.17, 0.50, 0.10}, color)
+    , m_gradient(GradientArrowType::RIGHT, {0.20, 0.17, 0.50, 0.10}, color)
 {}
 void BoxSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_exists.make_overlays(items);

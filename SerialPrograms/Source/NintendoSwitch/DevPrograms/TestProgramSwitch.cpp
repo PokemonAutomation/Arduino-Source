@@ -58,6 +58,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
+#include "PokemonSV/Programs/PokemonSV_TradeRoutines.h"
 
 
 #include <QPixmap>
@@ -167,11 +168,29 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
-//    ImageRGB32 image("screenshot-20221121-074407897208.png");
-    auto image = feed.snapshot();
-    TeraCatchDetector detector;
-    cout << detector.detect(image) << endl;
+    TradeStats stats;
+    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
+
+#if 0
+    MultiConsoleErrorState state;
+    TradeStats stats;
+    env.run_in_parallel(
+        scope,
+        [&](ConsoleHandle& console, BotBaseContext& context){
+            trade_current_pokemon(console, context, state, stats);
+        }
+    );
+#endif
+
+
+
+#if 0
+    ImageRGB32 image("NoCardDetection.png");
+//    auto image = feed.snapshot();
+    TeraCardReader detector;
+    cout << detector.detect(image) << endl;
+#endif
 
 
 #if 0
@@ -216,7 +235,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 0
     auto image = feed.snapshot();
-    ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}));
+    ImageStats stats = image_stats(extract_box_reference(image, ImageFloatBox{0.30, 0.33, 0.40, 0.02}));
     cout << stats.average << stats.stddev << endl;
 #endif
 

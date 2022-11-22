@@ -5,23 +5,24 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "MultiConsoleErrors.h"
 
 namespace PokemonAutomation{
 
 
 
-void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, const std::string& msg){
+void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, std::string msg){
     logger.log(msg, COLOR_RED);
-    m_unrecoverable_error.store(true, std::memory_order_release);
-    throw OperationFailedException(logger, msg);
+    bool expected = false;
+    if (m_unrecoverable_error.compare_exchange_strong(expected, true)){
+        m_message = msg;
+    }
+    throw OperationFailedException(logger, std::move(msg));
 }
 void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){
         logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
-        throw ProgramCancelledException();
+        throw OperationFailedException(logger, m_message);
     }
 }
 

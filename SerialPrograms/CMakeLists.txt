@@ -1202,10 +1202,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
+    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp
+    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp
     Source/PokemonSV/Programs/PokemonSV_TeraBattler.h
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp
     Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h
+    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp
+    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp

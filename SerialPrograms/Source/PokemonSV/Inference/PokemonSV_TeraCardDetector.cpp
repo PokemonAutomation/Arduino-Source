@@ -73,7 +73,7 @@ bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    GradientArrowDetector arrow_detector(m_cursor);
+    GradientArrowDetector arrow_detector(GradientArrowType::RIGHT, m_cursor);
     if (!arrow_detector.detect(screen)){
         return false;
     }

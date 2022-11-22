@@ -38,6 +38,12 @@ public:
          : DetectorToFinder_ConsecutiveDebounce("AdvanceDialogFinder", 5, color)
     {}
 };
+class AdvanceDialogHold : public DetectorToFinder_HoldDebounce<AdvanceDialogDetector>{
+public:
+    AdvanceDialogHold(std::chrono::milliseconds duration, Color color = COLOR_RED)
+         : DetectorToFinder_HoldDebounce("AdvanceDialogHold", duration, color)
+    {}
+};
 
 
 
@@ -46,6 +52,9 @@ class PromptDialogDetector : public StaticScreenDetector{
 public:
     //  Will catch any prompt.
     PromptDialogDetector(Color color = COLOR_RED);
+
+    //  Will only look for prompts with the cursor in this box.
+    PromptDialogDetector(const ImageFloatBox& arrow_box, Color color = COLOR_RED);
 
     //  Will only catch prompts with the cursor at a specific line.
     //  (line_index = 0) is the lowest line.
@@ -65,6 +74,9 @@ class PromptDialogFinder : public DetectorToFinder_ConsecutiveDebounce<PromptDia
 public:
     PromptDialogFinder(Color color = COLOR_RED)
          : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, color)
+    {}
+    PromptDialogFinder(const ImageFloatBox& arrow_box, Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, arrow_box, color)
     {}
     PromptDialogFinder(size_t line_index, Color color = COLOR_RED)
          : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, line_index, color)

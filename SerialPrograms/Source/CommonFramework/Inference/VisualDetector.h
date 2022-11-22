@@ -61,6 +61,46 @@ private:
 
 
 
+//  Wrap a detector into a finder.
+//  This one requires the detector to return true consecutively for X time
+//  before returning true.
+template <typename Detector>
+class DetectorToFinder_HoldDebounce : public Detector, public VisualInferenceCallback{
+public:
+    template <class... Args>
+    DetectorToFinder_HoldDebounce(
+        std::string label,
+        std::chrono::milliseconds duration,
+        Args&&... args
+    )
+        : Detector(std::forward<Args>(args)...)
+        , VisualInferenceCallback(std::move(label))
+        , m_duration(duration)
+    {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        Detector::make_overlays(items);
+    }
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        //  Need 5 consecutive successful detections.
+
+        if (!this->detect(frame)){
+            m_start_of_detection = WallClock::min();
+            return false;
+        }
+        if (m_start_of_detection == WallClock::min()){
+            m_start_of_detection = timestamp;
+        }
+
+        return timestamp - m_start_of_detection >= m_duration;
+    }
+
+private:
+    std::chrono::milliseconds m_duration;
+    WallClock m_start_of_detection = WallClock::min();
+};
+
+
 
 
 }

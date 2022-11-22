@@ -300,8 +300,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
-        PromptDialogFinder add_to_party(3, COLOR_PURPLE);
-        PromptDialogFinder nickname(1, COLOR_PURPLE);
+        PromptDialogFinder add_to_party({0.500, 0.395, 0.400, 0.100}, COLOR_PURPLE);
+        PromptDialogFinder nickname({0.500, 0.545, 0.400, 0.100}, COLOR_GREEN);
         PokemonSummaryFinder summary(COLOR_CYAN);
         int ret = wait_until(
             env.console, context,

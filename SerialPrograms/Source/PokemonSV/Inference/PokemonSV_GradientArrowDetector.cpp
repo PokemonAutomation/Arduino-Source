@@ -37,6 +37,7 @@ const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_VERTICAL(){
 }
 
 bool is_gradient_arrow(
+    GradientArrowType type,
     const ImageViewRGB32& image,
     WaterfillObject& object,
     const WaterfillObject& yellow, const WaterfillObject& blue
@@ -49,13 +50,17 @@ bool is_gradient_arrow(
     const double THRESHOLD = 80;
 
     double aspect_ratio = object.aspect_ratio();
-    if (0.7 < aspect_ratio && aspect_ratio < 1.0){
-        double rmsd = GRADIENT_ARROW_HORIZONTAL().rmsd(cropped);
-        return rmsd <= THRESHOLD;
-    }
-    if (1.0  < aspect_ratio && aspect_ratio < 1.43){
-        double rmsd = GRADIENT_ARROW_VERTICAL().rmsd(cropped);
-        return rmsd <= THRESHOLD;
+    switch (type){
+    case GradientArrowType::RIGHT:
+        if (!(0.7 < aspect_ratio && aspect_ratio < 1.0)){
+            return false;
+        }
+        return GRADIENT_ARROW_HORIZONTAL().rmsd(cropped) <= THRESHOLD;
+    case GradientArrowType::DOWN:
+        if (!(1.0 < aspect_ratio && aspect_ratio < 1.43)){
+            return false;
+        }
+        return GRADIENT_ARROW_VERTICAL().rmsd(cropped) <= THRESHOLD;
     }
 
     return false;
@@ -63,8 +68,13 @@ bool is_gradient_arrow(
 
 
 
-GradientArrowDetector::GradientArrowDetector(const ImageFloatBox& box, Color color)
-    : m_color(color)
+GradientArrowDetector::GradientArrowDetector(
+    GradientArrowType type,
+    const ImageFloatBox& box,
+    Color color
+)
+    : m_type(type)
+    , m_color(color)
     , m_box(box)
 {}
 void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
@@ -127,7 +137,7 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
                 {0xff00c0c0, 0xff3fffff},
             }
         );
-        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff3fffff);
+//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff3fffff);
 //        cout << blue_matrix.dump() << endl;
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
@@ -148,7 +158,7 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
     for (WaterfillObject& yellow : yellows){
         for (WaterfillObject& blue : blues){
             WaterfillObject object;
-            if (is_gradient_arrow(region, object, yellow, blue)){
+            if (is_gradient_arrow(m_type, region, object, yellow, blue)){
                 hits.emplace_back(translate_to_parent(screen, m_box, object));
             }
 //            double aspect_ratio = object.aspect_ratio();
@@ -164,10 +174,15 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
 
 
 GradientArrowFinder::~GradientArrowFinder() = default;
-GradientArrowFinder::GradientArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color)
+GradientArrowFinder::GradientArrowFinder(
+    VideoOverlay& overlay,
+    GradientArrowType type,
+    const ImageFloatBox& box,
+    Color color
+)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
-    , m_detector(box, color)
+    , m_detector(type, box, color)
 {}
 
 void GradientArrowFinder::make_overlays(VideoOverlaySet& items) const{

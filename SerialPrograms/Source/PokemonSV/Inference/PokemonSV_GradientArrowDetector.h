@@ -19,12 +19,21 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+enum class GradientArrowType{
+    RIGHT,
+    DOWN,
+};
+
 
 //  This only works for horizontal arrows. If we need the vertical arrow, we can
 //  add that later.
 class GradientArrowDetector : public StaticScreenDetector{
 public:
-    GradientArrowDetector(const ImageFloatBox& box, Color color = COLOR_RED);
+    GradientArrowDetector(
+        GradientArrowType type,
+        const ImageFloatBox& box,
+        Color color = COLOR_RED
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -32,6 +41,7 @@ public:
     std::vector<ImageFloatBox> detect_all(const ImageViewRGB32& screen) const;
 
 protected:
+    GradientArrowType m_type;
     Color m_color;
     ImageFloatBox m_box;
 };
@@ -41,7 +51,12 @@ protected:
 class GradientArrowFinder : public VisualInferenceCallback{
 public:
     ~GradientArrowFinder();
-    GradientArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
+    GradientArrowFinder(
+        VideoOverlay& overlay,
+        GradientArrowType type,
+        const ImageFloatBox& box,
+        Color color = COLOR_RED
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
