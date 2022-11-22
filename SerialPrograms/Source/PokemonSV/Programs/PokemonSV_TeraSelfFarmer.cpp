@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
