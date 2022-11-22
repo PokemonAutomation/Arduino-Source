@@ -67,6 +67,12 @@ PromptDialogDetector::PromptDialogDetector(Color color)
     , m_box_bot(0.30, 0.88, 0.40, 0.01)
     , m_gradient(0.50, 0.40, 0.40, 0.50)
 {}
+PromptDialogDetector::PromptDialogDetector(size_t line_index, Color color)
+    : m_color(color)
+    , m_box_top(0.50, 0.74, 0.20, 0.01)
+    , m_box_bot(0.30, 0.88, 0.40, 0.01)
+    , m_gradient(0.50, 0.62 - 0.075 * line_index, 0.40, 0.10)
+{}
 void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
     items.add(m_color, m_box_bot);

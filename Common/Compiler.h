@@ -56,6 +56,7 @@ template <typename type> using r_rref = type &&__restrict__;
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 
 #define PA_CURRENT_FUNCTION __PRETTY_FUNCTION__
 

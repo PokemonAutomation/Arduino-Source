@@ -300,8 +300,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
-        PromptDialogFinder prompt(COLOR_PURPLE);
-//        AddToPartyFinder post_catch(COLOR_CYAN);
+        PromptDialogFinder add_to_party(3, COLOR_PURPLE);
+        PromptDialogFinder nickname(1, COLOR_PURPLE);
         PokemonSummaryFinder summary(COLOR_CYAN);
         int ret = wait_until(
             env.console, context,
@@ -312,14 +312,15 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 black_screen,
                 white_screen,
                 dialog,
-                prompt,
+                add_to_party,
+                nickname,
                 summary,
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            env.log("Detected catch prompt. Skipping...");
+            env.log("Detected catch prompt.");
             try{
                 process_catch_prompt(env, context);
                 pbf_press_dpad(context, DPAD_DOWN, 10, 10);
@@ -350,13 +351,17 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             timeout = std::chrono::seconds(5);
             break;
         case 5:
-            env.log("Detected prompt.");
+            env.log("Detected add-to-party prompt.");
             if (!summary_read){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }else{
                 pbf_press_button(context, BUTTON_B, 20, 105);
             }
+            break;
+        case 6:
+            env.log("Detected nickname prompt.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
             break;
         case 1:
             //  Next button detector is unreliable. Check if the summary is
@@ -369,7 +374,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 break;
             }
             env.log("Detected false positive (A) Next button.", COLOR_RED);
-        case 6:
+        case 7:
             env.log("Detected summary.");
             context.wait_for(std::chrono::milliseconds(500));
             try {

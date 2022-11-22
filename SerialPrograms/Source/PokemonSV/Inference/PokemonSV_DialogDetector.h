@@ -44,7 +44,13 @@ public:
 //  Detect dialog that prompts the player to make a choice.
 class PromptDialogDetector : public StaticScreenDetector{
 public:
+    //  Will catch any prompt.
     PromptDialogDetector(Color color = COLOR_RED);
+
+    //  Will only catch prompts with the cursor at a specific line.
+    //  (line_index = 0) is the lowest line.
+    //  (line_index = 1) is the next lowest line.
+    PromptDialogDetector(size_t line_index, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -59,6 +65,9 @@ class PromptDialogFinder : public DetectorToFinder_ConsecutiveDebounce<PromptDia
 public:
     PromptDialogFinder(Color color = COLOR_RED)
          : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, color)
+    {}
+    PromptDialogFinder(size_t line_index, Color color = COLOR_RED)
+         : DetectorToFinder_ConsecutiveDebounce("PromptDialogFinder", 5, line_index, color)
     {}
 };
 
