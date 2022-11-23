@@ -129,15 +129,18 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
                 {0xff004080, 0xff7fffff},
                 {0xff004080, 0xff5fffff},
                 {0xff004080, 0xff3fffff},
+                {0xff004080, 0xff0fffff},
                 {0xff0080c0, 0xff7fffff},
                 {0xff0080c0, 0xff5fffff},
                 {0xff0080c0, 0xff3fffff},
+                {0xff0080c0, 0xff0fffff},
                 {0xff00c0c0, 0xff7fffff},
                 {0xff00c0c0, 0xff5fffff},
                 {0xff00c0c0, 0xff3fffff},
+                {0xff00c0c0, 0xff0fffff},
             }
         );
-//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff3fffff);
+//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff0fffff);
 //        cout << blue_matrix.dump() << endl;
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){

@@ -185,10 +185,11 @@ void trade_current_pokemon(
 
     while (true){
         AdvanceDialogHold dialog(std::chrono::seconds(2));
+        PromptDialogFinder learn_move;
 
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
-            {dialog, trade_done}
+            {dialog, trade_done, learn_move}
         );
         switch (ret){
         case 0:
@@ -199,6 +200,10 @@ void trade_current_pokemon(
             console.log("Detected box. Trade completed.");
             tracker.check_unrecoverable_error(console);
             context.wait_for(std::chrono::milliseconds(500));
+            return;
+        case 2:
+            console.log("Detected move learn.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
             return;
         default:
             stats.m_errors++;

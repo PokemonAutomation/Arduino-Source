@@ -168,8 +168,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
 
 
-    TradeStats stats;
-    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
+//    TradeStats stats;
+//    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
 
 #if 0
@@ -265,8 +265,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << detector.detect(image) << endl;
 #endif
 
-#if 0
-    ImageRGB32 image("screenshot-20221118-210501270724.png");
+#if 1
+    ImageRGB32 image("screenshot-20221122-022035906115.png");
 
     MoveSelectDetector detector;
     cout << detector.detect(image) << endl;

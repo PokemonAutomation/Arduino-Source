@@ -23,6 +23,7 @@ bool run_tera_battle(
     BotBaseContext& context,
     EventNotificationOption& error_notification
 ){
+    size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
     while (true){
         context.wait_for_all_requests();
@@ -39,7 +40,7 @@ bool run_tera_battle(
         BlackScreenOverWatcher black_screen(COLOR_GREEN);
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(120),
+            std::chrono::seconds(60),
             {
                 battle_menu,
                 move_select_menu,
@@ -71,16 +72,22 @@ bool run_tera_battle(
             break;
         case 3:
             env.log("Detected a win!", COLOR_BLUE);
+            pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 4:
             env.log("Detected a loss!", COLOR_ORANGE);
             return false;
         default:
-            dump_image_and_throw_recoverable_exception(
-                env, console, error_notification,
-                "NoStateFound",
-                "No state detected after 2 minutes."
-            );
+            consecutive_timeouts++;
+            if (consecutive_timeouts == 3){
+                dump_image_and_throw_recoverable_exception(
+                    env, console, error_notification,
+                    "NoStateFound",
+                    "No state detected after 3 minutes."
+                );
+            }
+            env.log("Unable to detect any state for 1 minute. Mashing B...", COLOR_RED);
+            pbf_mash_button(context, BUTTON_B, 250);
         }
     }
 

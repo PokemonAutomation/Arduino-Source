@@ -19,7 +19,7 @@ namespace PokemonSV{
 SomethingInBoxSlotDetector::SomethingInBoxSlotDetector(bool true_if_exists, Color color)
     : m_true_if_exists(true_if_exists)
     , m_color(color)
-    , m_exists(0.86, 0.01, 0.02, 0.05)
+    , m_exists(0.985, 0.010, 0.010, 0.050)
 {}
 void SomethingInBoxSlotDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_exists);
