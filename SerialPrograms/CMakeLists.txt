@@ -1604,6 +1604,8 @@ file(GLOB MAIN_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
+    Source/Tests/PokemonSV_Tests.cpp
+    Source/Tests/PokemonSV_Tests.h
     Source/Tests/PokemonSwSh_Tests.cpp
     Source/Tests/PokemonSwSh_Tests.h
     Source/Tests/TestMap.cpp
