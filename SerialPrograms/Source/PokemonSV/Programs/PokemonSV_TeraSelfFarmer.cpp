@@ -88,11 +88,11 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
     static EnumDatabase<TeraSelfFarmer::Mode> database0{
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
+        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
     };
     static EnumDatabase<TeraSelfFarmer::Mode> database1{
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using default ball."},
+        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
         {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
     };
     return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
