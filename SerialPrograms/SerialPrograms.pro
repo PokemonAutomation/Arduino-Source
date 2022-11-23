@@ -791,6 +791,7 @@ SOURCES += \
     Source/Tests/Kernels_Tests.cpp \
     Source/Tests/NintendoSwitch_Tests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/PokemonSV_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
     Source/Tests/TestUtils.cpp
@@ -1628,6 +1629,7 @@ HEADERS += \
     Source/Tests/Kernels_Tests.h \
     Source/Tests/NintendoSwitch_Tests.h \
     Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
     Source/Tests/TestUtils.h
