@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -246,7 +247,7 @@ void TeraSelfFarmer::read_summary(
     pbf_press_button(context, BUTTON_B, 20, 20);
 }
 
-void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
     //  Wait for first battle menu.
@@ -279,7 +280,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     }else{
         stats.m_losses++;
         context.wait_for(std::chrono::seconds(3));
-        return;
+        return false;
     }
 
     //  State machine to return to overworld.
@@ -396,9 +397,10 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             break;
         default:
             env.log("No detection, assume returned to overworld.");
-            return;
+            return true;
         }
     }
+    return true;
 }
 
 
@@ -466,7 +468,20 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
         pbf_mash_button(context, BUTTON_A, 250);
-        run_raid(env, context);
+        bool raid_won = run_raid(env, context);
+        {
+            std::stringstream ss;
+            ss << "You ";
+            if (raid_won){
+                ss << "won";
+            }
+            else{
+                ss << "lost";
+            }
+            ss << " a " << stars << " stars raid";
+            env.log(ss.str());
+
+        }
     }
 
     env.update_stats();
