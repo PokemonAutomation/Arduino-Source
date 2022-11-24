@@ -189,7 +189,7 @@ void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, B
 
     BattleBallReader reader(env.console, LANGUAGE);
 //    pbf_mash_button(context, BUTTON_A, 250);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
 
     int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
@@ -254,14 +254,14 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         BattleMenuFinder battle_menu(COLOR_RED);
         int ret = wait_until(
             env.console, context,
-            std::chrono::seconds(60),
+            std::chrono::seconds(120),
             {battle_menu}
         );
         if (ret < 0){
             dump_image_and_throw_recoverable_exception(
                 env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
                 "BattleMenuNotFound",
-                "Unable to detect Tera raid battle menu after 60 seconds."
+                "Unable to detect Tera raid battle menu after 120 seconds."
             );
         }
         battle_snapshot = env.console.video().snapshot();

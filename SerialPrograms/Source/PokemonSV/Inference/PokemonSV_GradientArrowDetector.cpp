@@ -81,11 +81,11 @@ void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool GradientArrowDetector::detect(const ImageViewRGB32& screen) const{
-    std::vector<ImageFloatBox> hits = detect_all(screen);
-    return !hits.empty();
+    ImageFloatBox box;
+    return detect(box, screen);
 }
 
-std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB32& screen) const{
+bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& screen) const{
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
@@ -155,14 +155,16 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         }
     }
 
-    std::vector<ImageFloatBox> hits;
+//    std::vector<ImageFloatBox> hits;
 
 //    size_t c = 0;
     for (WaterfillObject& yellow : yellows){
         for (WaterfillObject& blue : blues){
             WaterfillObject object;
             if (is_gradient_arrow(m_type, region, object, yellow, blue)){
-                hits.emplace_back(translate_to_parent(screen, m_box, object));
+//                hits.emplace_back(translate_to_parent(screen, m_box, object));
+                box = translate_to_parent(screen, m_box, object);
+                return true;
             }
 //            double aspect_ratio = object.aspect_ratio();
 //            cout << "aspect_ratio = " << aspect_ratio << endl;
@@ -171,7 +173,7 @@ std::vector<ImageFloatBox> GradientArrowDetector::detect_all(const ImageViewRGB3
         }
     }
 
-    return hits;
+    return false;
 }
 
 
@@ -192,13 +194,13 @@ void GradientArrowFinder::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
 bool GradientArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    std::vector<ImageFloatBox> arrows = m_detector.detect_all(frame);
-//    cout << "arrors = " << arrows.size() << endl;
-    m_arrows.reset(arrows.size());
-    for (const ImageFloatBox& arrow : arrows){
+    ImageFloatBox arrow;
+    bool found = m_detector.detect(frame);
+    m_arrows.reset(1);
+    if (found){
         m_arrows.emplace_back(m_overlay, arrow, COLOR_MAGENTA);
     }
-    return !arrows.empty();
+    return found;
 }
 
 

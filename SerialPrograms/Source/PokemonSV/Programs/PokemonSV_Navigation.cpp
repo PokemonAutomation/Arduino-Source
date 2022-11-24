@@ -10,6 +10,7 @@
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
@@ -45,11 +46,37 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
             throw OperationFailedException(console.logger(), "Unable to find save finished dialog.");
         }
         console.log("Detected save finished dialog.");
-        pbf_press_button(context, BUTTON_B, 20, 105);
+    }
+    {
+        MainMenuFinder detector;
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_B, 20, 10 * TICKS_PER_SECOND);
+            },
+            {detector}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console.logger(), "Unable to detect main menu after 10 seconds.");
+        }
+        console.log("Returned to main menu.");
     }
 }
 void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_X, 20, 230);
+    {
+        MainMenuFinder detector;
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_X, 20, 10 * TICKS_PER_SECOND);
+            },
+            {detector}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console.logger(), "Unable to detect main menu after 10 seconds.");
+        }
+        console.log("Detected to main menu.");
+    }
     context.wait_for_all_requests();
     save_game_from_menu(console, context);
     pbf_press_button(context, BUTTON_B, 20, 230);

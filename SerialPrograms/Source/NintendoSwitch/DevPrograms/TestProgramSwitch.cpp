@@ -58,6 +58,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_TradeRoutines.h"
 
 
@@ -171,6 +172,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    TradeStats stats;
 //    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
+    MainMenuDetector detector;
+    detector.move_cursor(console, context, MenuSide::RIGHT, 4);
+
+#if 0
+    auto image = feed.snapshot();
+    MenuDetector detector;
+    auto ret = detector.side(image);
+    cout << ret.second << endl;
+#endif
 
 #if 0
     MultiConsoleErrorState state;
@@ -265,7 +275,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << detector.detect(image) << endl;
 #endif
 
-#if 1
+#if 0
     ImageRGB32 image("screenshot-20221122-022035906115.png");
 
     MoveSelectDetector detector;

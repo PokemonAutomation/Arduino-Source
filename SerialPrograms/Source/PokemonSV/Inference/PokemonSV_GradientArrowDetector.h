@@ -38,7 +38,9 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-    std::vector<ImageFloatBox> detect_all(const ImageViewRGB32& screen) const;
+    //  If arrow is found, returns true and "box" contains the box for the arrow.
+    //  Otherwise, returns false and "box" is undefined.
+    bool detect(ImageFloatBox& box, const ImageViewRGB32& screen) const;
 
 protected:
     GradientArrowType m_type;

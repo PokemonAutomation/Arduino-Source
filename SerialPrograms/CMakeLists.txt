@@ -1184,6 +1184,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp
@@ -1194,6 +1196,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
+    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp
+    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp

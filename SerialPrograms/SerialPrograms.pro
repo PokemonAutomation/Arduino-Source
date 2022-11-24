@@ -587,6 +587,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
@@ -594,6 +595,7 @@ SOURCES += \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
@@ -1415,6 +1417,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
@@ -1422,6 +1425,7 @@ HEADERS += \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
+    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
