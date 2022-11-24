@@ -10,9 +10,9 @@
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -82,8 +82,11 @@ void WidgetStackFixedAspectRatio::resize_to_width(int width){
     //  Safeguard against a resizing loop where the UI bounces between larger
     //  height with scroll bar and lower height with no scroll bar.
     auto iter = m_recent_widths.find(width);
-    if (iter != m_recent_widths.end() && std::abs(width - m_stack_holder->width()) < 50){
-//        cout << "Supressing potential infinite resizing loop." << endl;
+    if (iter != m_recent_widths.end() &&
+        width > m_stack_holder->width() &&
+        width - m_stack_holder->width() < 50
+    ){
+        cout << "Supressing potential infinite resizing loop." << endl;
         return;
     }
 
@@ -175,6 +178,11 @@ void VideoDisplayWidget::move_back_from_window(){
     }
     this->set_size_policy(ADJUST_HEIGHT_TO_WIDTH);
     m_holder.addWidget(this);
+//    this->resize(this->size());
+//    cout << "VideoWidget Before: " << m_video->width() << " x " << m_video->height() << endl;
+    m_video->resize(this->size());
+//    cout << "VideoWidget After: " << m_video->width() << " x " << m_video->height() << endl;
+    m_holder.update();
     m_window.reset();
 }
 
@@ -191,6 +199,11 @@ void VideoDisplayWidget::mouseDoubleClickEvent(QMouseEvent* event){
     }else{
         QWidget::mouseDoubleClickEvent(event);
     }
+}
+void VideoDisplayWidget::paintEvent(QPaintEvent* event){
+    WidgetStackFixedAspectRatio::paintEvent(event);
+//    cout << "VideoDisplayWidget: " << this->width() << " x " << this->height() << endl;
+//    cout << "VideoWidget: " << m_video->width() << " x " << m_video->height() << endl;
 }
 
 

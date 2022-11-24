@@ -127,6 +127,7 @@ protected:
     // Override QWidget::mouseDoubleClickEvent().
     // When double click, call move_to_new_window() to move to a new window to be ready for full screen.
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+    virtual void paintEvent(QPaintEvent*) override;
 
 private:
     friend class VideoSourceFPS;

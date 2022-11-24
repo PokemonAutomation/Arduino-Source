@@ -137,7 +137,7 @@ public:
 
 private:
     virtual void new_frame_available() override;
-    virtual void paintEvent(QPaintEvent*) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
 
 private:

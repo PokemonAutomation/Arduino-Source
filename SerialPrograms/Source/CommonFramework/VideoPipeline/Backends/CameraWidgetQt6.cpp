@@ -7,18 +7,18 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 6
 
+#include <chrono>
+#include <iostream>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>
 #include <QVideoSink>
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CameraWidgetQt6.h"
 
-#include <chrono>
-#include <iostream>
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace CameraQt6QVideoSink{
@@ -372,8 +372,9 @@ void VideoWidget::paintEvent(QPaintEvent* event){
         return;
     }
 
-//        cout << "frame: " << m_last_frame.width() << " x " << m_last_frame.height() << endl;
-    QRect rect(0,0, this->width(), this->height());
+//    cout << "frame: " << this->width() << " x " << this->height() << endl;
+
+    QRect rect(0, 0, this->width(), this->height());
     QVideoFrame::PaintOptions options;
     QPainter painter(this);
     frame.first.paint(&painter, rect, options);
