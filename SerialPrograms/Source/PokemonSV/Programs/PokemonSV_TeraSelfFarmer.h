@@ -48,7 +48,7 @@ private:
         BotBaseContext& context,
         const VideoSnapshot& battle_snapshot
     );
-    void run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     enum class Mode{
