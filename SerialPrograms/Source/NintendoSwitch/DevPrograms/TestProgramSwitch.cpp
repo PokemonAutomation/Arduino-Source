@@ -174,10 +174,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
 
+    BoxDetector detector;
+    detector.move_cursor(console, context, BoxCursorLocation::SLOTS, 3, 3);
+
 //    MainMenuDetector detector;
 //    detector.move_cursor(console, context, MenuSide::RIGHT, 4);
 
-#if 1
+#if 0
     auto image = feed.snapshot();
     BoxDetector detector;
     auto ret = detector.detect_location(image);

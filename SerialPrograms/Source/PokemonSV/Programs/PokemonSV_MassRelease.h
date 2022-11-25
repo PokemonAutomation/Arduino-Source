@@ -16,6 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class BoxDetector;
 
 
 class MassRelease_Descriptor : public SingleSwitchProgramDescriptor{
@@ -36,8 +37,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void release_one(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void release_box(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

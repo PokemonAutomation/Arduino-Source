@@ -4,7 +4,11 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV_BoxDetection.h"
 
 #include <iostream>
@@ -132,7 +136,138 @@ std::pair<BoxCursorLocation, BoxCursorCoordinates> BoxDetector::detect_location(
 }
 
 
+bool BoxDetector::to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t row, uint8_t col) const{
+    switch (side){
+    case BoxCursorLocation::NONE:
+        return false;
+    case BoxCursorLocation::PARTY:
+        x = -1;
+        y = row;
+        break;
+    case BoxCursorLocation::BOX_CHANGE:
+        x = 2;
+        y = -1;
+        break;
+    case BoxCursorLocation::ALL_BOXES:
+        x = 1;
+        y = 5;
+        break;
+    case BoxCursorLocation::SEARCH:
+        x = 4;
+        y = 5;
+        break;
+    case BoxCursorLocation::SLOTS:
+        x = col;
+        y = row;
+        break;
+    }
+    return true;
+}
+void BoxDetector::move_vertical(BotBaseContext& context, int current, int desired) const{
+    int diff = (current - desired + 7) % 7;
+//    cout << "diff = " << diff << endl;
+    if (diff <= 3){
+        for (int c = 0; c < diff; c++){
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+        }
+    }else{
+        for (int c = diff; c < 7; c++){
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+        }
+    }
+}
+void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desired) const{
+    int diff = (current - desired + 7) % 7;
+    if (diff <= 3){
+        for (int c = 0; c < diff; c++){
+            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+        }
+    }else{
+        for (int c = diff; c < 7; c++){
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+        }
+    }
+}
 
+
+void BoxDetector::move_cursor(
+    ConsoleHandle& console, BotBaseContext& context,
+    BoxCursorLocation side, uint8_t row, uint8_t col
+) const{
+    int desired_x, desired_y;
+    if (!to_coordinates(desired_x, desired_y, side, row, col)){
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "BoxDetector::move_cursor() called with BoxCursorLocation::NONE."
+        );
+    }
+//    cout << "desired_x = " << desired_x << ", desired_y = " << desired_y << endl;
+
+    size_t consecutive_fails = 0;
+    while (true){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        std::pair<BoxCursorLocation, BoxCursorCoordinates> current = this->detect_location(screen);
+
+        int current_x, current_y;
+        if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
+            consecutive_fails++;
+            if (consecutive_fails > 10){
+                throw OperationFailedException(console.logger(), "Unable to detect box system.");
+            }
+            context.wait_for(std::chrono::milliseconds(100));
+            continue;
+        }
+//        cout << "current_x = " << current_x << ", current_y = " << current_y << endl;
+
+        if (current_x == desired_x && current_y == desired_y){
+//            cout << "done!" << endl;
+            return;
+        }
+
+        //  If we're on the party, always move horizontally off it first.
+        if (current_x == -1){
+            if (desired_x == -1){
+                if (row < current.second.row){
+                    for (uint8_t r = current.second.row; r != row; r--){
+                        pbf_press_dpad(context, DPAD_UP, 20, 30);
+                    }
+                }else{
+                    for (uint8_t r = current.second.row; r != row; r--){
+                        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                    }
+                }
+                continue;
+            }
+            if (desired_x < 3){
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            }else{
+                pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            }
+            continue;
+        }
+
+        //  Otherwise, always move vertically first.
+        if (current_y != desired_y){
+            move_vertical(context, current_y, desired_y);
+            continue;
+        }
+
+        //  Special case for bottom row.
+        if (current_y == 5){
+            int diff = (current_x - desired_x + 7) % 7;
+            if (diff <= 3){
+                pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            }else{
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            }
+            continue;
+        }
+
+        //  Now handle horizontals.
+        move_horizontal(context, current_x, desired_x);
+    }
+}
 
 
 

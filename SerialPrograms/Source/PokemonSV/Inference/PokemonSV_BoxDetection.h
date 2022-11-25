@@ -11,6 +11,8 @@
 #include "PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -83,6 +85,17 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
     std::pair<BoxCursorLocation, BoxCursorCoordinates> detect_location(const ImageViewRGB32& screen) const;
+
+    //  While sitting on the menu, move the cursor to the desired slot.
+    void move_cursor(
+        ConsoleHandle& console, BotBaseContext& context,
+        BoxCursorLocation side, uint8_t row, uint8_t col
+    ) const;
+
+private:
+    bool to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t row, uint8_t col) const;
+    void move_vertical(BotBaseContext& context, int current, int desired) const;
+    void move_horizontal(BotBaseContext& context, int current, int desired) const;
 
 private:
     Color m_color;

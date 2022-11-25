@@ -70,10 +70,13 @@ void MainMenuDetector::move_cursor(
     MenuSide side, int row
 ) const{
     if (side == MenuSide::NONE){
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "menu_move_cursor() called with MenuSide::NONE.");
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "MainMenuDetector::move_cursor() called with MenuSide::NONE."
+        );
     }
-    size_t consecutive_fails = 0;
 
+    size_t consecutive_fails = 0;
     while (true){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();

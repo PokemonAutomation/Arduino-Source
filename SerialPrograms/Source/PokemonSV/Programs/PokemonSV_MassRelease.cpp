@@ -81,7 +81,7 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::release_one(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
     context.wait_for_all_requests();
@@ -165,16 +165,12 @@ void MassRelease::release_one(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
     stats.m_released++;
 }
-void MassRelease::release_box(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t col = 0; col < 6; col++){
-            release_one(env, context);
+            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, row, col);
+            release_one(box_detector, env, context);
             env.update_stats();
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-        }
-        if (row < 4){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         }
     }
 }
@@ -187,16 +183,16 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
+    BoxDetector box_detector;
+    VideoOverlaySet overlays(env.console.overlay());
+    box_detector.make_overlays(overlays);
+
     for (uint8_t box = 0; box < BOXES_TO_RELEASE; box++){
         env.update_stats();
 
-        release_box(env, context);
+        release_box(box_detector, env, context);
 
         pbf_press_button(context, BUTTON_R, 20, 105);
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         stats.m_boxes++;
     }
 
