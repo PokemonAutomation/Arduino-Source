@@ -18,6 +18,7 @@ public:
     ~TextEditOption();
     TextEditOption(
         std::string label,
+        LockWhileRunning lock_while_program_is_running,
         std::string default_value,
         std::string placeholder_text
     );

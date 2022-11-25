@@ -22,7 +22,8 @@ bool run_tera_battle(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     BotBaseContext& context,
-    EventNotificationOption& error_notification
+    EventNotificationOption& error_notification,
+    bool from_start
 );
 
 

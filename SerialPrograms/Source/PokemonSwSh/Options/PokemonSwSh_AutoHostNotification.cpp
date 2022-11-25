@@ -14,7 +14,9 @@ namespace PokemonSwSh{
 AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool max_lair)
     : GroupOption(std::move(label), LockWhileRunning::LOCKED, true, false)
     , DESCRIPTION(
-        "<b>Description:</b>", "",
+        "<b>Description:</b>",
+        LockWhileRunning::LOCKED,
+        "",
         max_lair
             ? "Auto-Hosting Lugia\nCode: Random"
             : "Den 123: Square Shiny\nIGN: Kimberly\nCode: 1234-5678\nFC: SW-1234-5678-9012"

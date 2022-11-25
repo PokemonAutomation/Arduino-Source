@@ -1,0 +1,339 @@
+/*  Auto Host
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
+#include "PokemonSV_AutoHost.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+using namespace Pokemon;
+
+
+AutoHost_Descriptor::AutoHost_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonSV:AutoHost",
+        STRING_POKEMON + " SV", "Auto Host",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoHost.md",
+        "Auto-host a Tera raid.",
+        FeedbackType::REQUIRED, false,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+struct AutoHost_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : m_raids(m_stats["Raids"])
+        , m_empty(m_stats["Empty Raids"])
+        , m_full(m_stats["Full Raids"])
+        , m_raiders(m_stats["Total Raiders"])
+        , m_wins(m_stats["Wins"])
+        , m_losses(m_stats["Losses"])
+        , m_errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Raids");
+        m_display_order.emplace_back("Empty Raids");
+        m_display_order.emplace_back("Full Raids");
+        m_display_order.emplace_back("Total Raiders");
+        m_display_order.emplace_back("Wins");
+        m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Errors", true);
+    }
+    std::atomic<uint64_t>& m_raids;
+    std::atomic<uint64_t>& m_empty;
+    std::atomic<uint64_t>& m_full;
+    std::atomic<uint64_t>& m_raiders;
+    std::atomic<uint64_t>& m_wins;
+    std::atomic<uint64_t>& m_losses;
+    std::atomic<uint64_t>& m_errors;
+};
+std::unique_ptr<StatsTracker> AutoHost_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
+
+AutoHost::AutoHost()
+    : MODE(
+        "<b>Hosting Mode:</b>",
+        {
+            {Mode::LOCAL,           "local",            "Host Locally"},
+            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
+            {Mode::ONLINE_CODED,    "online-coded",     "Host Online (link code)"},
+        },
+        LockWhileRunning::UNLOCKED,
+        Mode::ONLINE_CODED
+    )
+    , LOBBY_WAIT_DELAY(
+        "<b>Lobby Wait Delay (in seconds):</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
+        LockWhileRunning::UNLOCKED,
+        60, 15, 180
+    )
+    , START_RAID_PLAYERS(
+        "<b>Start Game:</b><br>Start the raid when there are this many players.",
+        {
+            {2, "2", "2 Players (1 Joiner)"},
+            {3, "3", "3 Players (2 Joiners)"},
+            {4, "4", "4 Players (3 Joiners)"},
+        },
+        LockWhileRunning::UNLOCKED,
+        4
+    )
+    , DESCRIPTION(
+        "<b>Description:</b>",
+        LockWhileRunning::UNLOCKED,
+        "",
+        "Auto-Hosting Shiny Eevee"
+    )
+    , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
+    , NOTIFICATIONS({
+        &NOTIFICATION,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+{
+    PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(START_RAID_PLAYERS);
+    PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+
+bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
+
+    VideoOverlaySet overlays(env.console.overlay());
+
+    WallClock start_time;
+    {
+        TeraLobbyFinder lobby(COLOR_RED);
+        lobby.make_overlays(overlays);
+
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(60),
+            {lobby}
+        );
+        if (ret < 0){
+            dump_image_and_throw_recoverable_exception(
+                env, env.console,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                "NoLobby", "Unable to detect Tera lobby after 60 seconds."
+            );
+        }
+        start_time = current_time();
+        context.wait_for(std::chrono::seconds(1));
+
+        //  Send notification.
+        std::vector<std::pair<std::string, std::string>> messages;
+        std::string description = DESCRIPTION;
+        if (!description.empty()){
+            messages.emplace_back("Description", std::move(description));
+        }
+
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        std::string code = lobby.raid_code(env.logger(), env.program_info(), snapshot);
+        if (!code.empty()){
+            messages.emplace_back("Raid Code", std::move(code));
+        }
+
+        messages.emplace_back("Session Stats", env.current_stats()->to_str());
+        if (GlobalSettings::instance().ALL_STATS && env.historical_stats()){
+            messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
+        }
+
+        send_program_notification(
+            env.logger(),
+            NOTIFICATION,
+            Color(0), env.program_info(),
+            "Tera Raid Notification",
+            messages,
+            env.console.video().snapshot()
+        );
+
+    }
+
+    uint8_t last_known_player_count = 1;
+    while (true){
+        context.wait_for_all_requests();
+
+        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        WhiteScreenOverWatcher start_raid(COLOR_BLUE);
+        TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
+
+        WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
+        int ret = wait_until(
+            env.console, context,
+            end_time,
+            {dialog, start_raid, ready}
+        );
+        switch (ret){
+        case 0:
+            env.log("Raid timed out!", COLOR_ORANGE);
+//            pbf_press_button(context, BUTTON_B, 20, 230);
+            stats.m_empty++;
+            return false;
+        case 1:
+            env.log("Raid started!", COLOR_BLUE);
+            if (last_known_player_count == 4){
+                stats.m_full++;
+            }
+            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            return true;
+        case 2:
+            env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
+            last_known_player_count = ready.total_players(env.console.video().snapshot());
+            pbf_mash_button(context, BUTTON_A, 250);
+            continue;
+        default:
+            if (current_time() - start_time > std::chrono::minutes(4)){
+                dump_image_and_throw_recoverable_exception(
+                    env, env.console,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    "StuckLobby", "Stuck in lobby for 4 minutes."
+                );
+            }
+            env.log("Timeout reached. Starting raid now...", COLOR_PURPLE);
+//            pbf_mash_button(context, BUTTON_A, 250);
+        }
+        break;
+    }
+
+    while (true){
+        context.wait_for_all_requests();
+
+        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        WhiteScreenOverWatcher start_raid(COLOR_BLUE);
+        BattleMenuFinder battle_menu(COLOR_CYAN);
+        int ret = wait_until(
+            env.console, context,
+            start_time + std::chrono::minutes(4),
+            {dialog, start_raid, battle_menu}
+        );
+        switch (ret){
+        case 0:
+            env.log("Raid timed out!", COLOR_ORANGE);
+            stats.m_empty++;
+            return false;
+        case 1:
+            env.log("Raid started! (white screen)", COLOR_BLUE);
+            if (last_known_player_count == 4){
+                stats.m_full++;
+            }
+            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            return true;
+        case 2:
+            env.log("Raid started! (battle menu)", COLOR_BLUE);
+            if (last_known_player_count == 4){
+                stats.m_full++;
+            }
+            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            return true;
+        default:
+            dump_image_and_throw_recoverable_exception(
+                env, env.console,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                "StuckLobby", "Stuck in lobby for 4 minutes."
+            );
+        }
+    }
+}
+
+void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
+
+
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+
+    bool skip_reset = true;
+    bool completed_one = false;
+    size_t consecutive_failures = 0;
+    while (true){
+        env.update_stats();
+        if (consecutive_failures > 0 && !completed_one){
+            throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
+        }
+        if (consecutive_failures >= 2){
+            throw OperationFailedException(env.logger(), "Failed 2 raids in the row. Stopping to prevent possible ban.");
+        }
+
+        if (!skip_reset){
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context);
+        }
+        skip_reset = false;
+
+        //  Store the mode locally in case the user changes in the middle of
+        //  this iteration.
+        Mode mode = MODE;
+
+        if (mode != Mode::LOCAL){
+            //  Connect to internet.
+            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Online mode has not been implemented yet.");
+        }
+
+        if (!open_raid(env.console, context)){
+            env.log("No Tera raid found.", COLOR_RED);
+            consecutive_failures++;
+            continue;
+        }
+        env.log("Tera raid found!", COLOR_BLUE);
+
+        stats.m_raids++;
+        context.wait_for(std::chrono::milliseconds(100));
+
+        pbf_press_button(context, BUTTON_A, 20, 230);
+        if (mode != Mode::LOCAL){
+            if (mode == Mode::ONLINE_EVERYONE){
+                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            }
+            pbf_press_button(context, BUTTON_A, 20, 230);
+        }
+
+        context.wait_for_all_requests();
+        try{
+            if (!run_lobby(env, context)){
+                continue;
+            }
+
+            if (run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true)){
+                stats.m_wins++;
+            }else{
+                stats.m_losses++;
+            }
+            completed_one = true;
+        }catch (OperationFailedException&){
+            consecutive_failures++;
+            stats.m_errors++;
+        }
+    }
+}
+
+
+
+}
+}
+}

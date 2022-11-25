@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -21,8 +22,29 @@ bool run_tera_battle(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     BotBaseContext& context,
-    EventNotificationOption& error_notification
+    EventNotificationOption& error_notification,
+    bool from_start
 ){
+    if (from_start){
+        //  Wait for first battle menu.
+        {
+            BattleMenuFinder battle_menu(COLOR_RED);
+            int ret = wait_until(
+                console, context,
+                std::chrono::seconds(120),
+                {battle_menu}
+            );
+            if (ret < 0){
+                dump_image_and_throw_recoverable_exception(
+                    env, console, error_notification,
+                    "BattleMenuNotFound",
+                    "Unable to detect Tera raid battle menu after 120 seconds."
+                );
+            }
+            env.log("First battle menu found.");
+        }
+    }
+
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
     while (true){
@@ -49,6 +71,7 @@ bool run_tera_battle(
                 black_screen,
             }
         );
+        context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
             env.log("Detected battle menu.");

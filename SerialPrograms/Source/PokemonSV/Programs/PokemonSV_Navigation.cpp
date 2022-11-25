@@ -33,6 +33,7 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
         }
         console.log("Detected save confirmation prompt.");
     }
+    context.wait_for(std::chrono::milliseconds(100));
     pbf_press_button(context, BUTTON_A, 20, 2 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
     {
@@ -47,6 +48,7 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
         }
         console.log("Detected save finished dialog.");
     }
+    context.wait_for(std::chrono::milliseconds(100));
     {
         MainMenuFinder detector;
         int ret = run_until(
@@ -61,6 +63,7 @@ void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
         }
         console.log("Returned to main menu.");
     }
+    context.wait_for(std::chrono::milliseconds(100));
 }
 void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     {
@@ -77,7 +80,8 @@ void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
         }
         console.log("Detected to main menu.");
     }
-    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(100));
+//    context.wait_for_all_requests();
     save_game_from_menu(console, context);
     pbf_press_button(context, BUTTON_B, 20, 230);
 }

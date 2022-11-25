@@ -44,8 +44,6 @@ public:
         Detector::make_overlays(items);
     }
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
-        //  Need 5 consecutive successful detections.
-
         if (!this->detect(frame)){
             m_start_of_detection = WallClock::min();
             return false;

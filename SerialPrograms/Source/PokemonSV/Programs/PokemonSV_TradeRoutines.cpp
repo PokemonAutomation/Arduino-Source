@@ -35,13 +35,14 @@ TradeStats::TradeStats()
 
 class TradeWarningDetector : public StaticScreenDetector{
 public:
-    TradeWarningDetector()
-        : m_box_top(0.30, 0.33, 0.40, 0.02)
+    TradeWarningDetector(Color color)
+        : m_color(color)
+        , m_box_top(0.30, 0.33, 0.40, 0.02)
         , m_box_bot(0.30, 0.65, 0.40, 0.02)
     {}
     virtual void make_overlays(VideoOverlaySet& items) const override{
-        items.add(COLOR_RED, m_box_top);
-        items.add(COLOR_RED, m_box_bot);
+        items.add(m_color, m_box_top);
+        items.add(m_color, m_box_bot);
     }
     virtual bool detect(const ImageViewRGB32& screen) const override{
         ImageStats box_top = image_stats(extract_box_reference(screen, m_box_top));
@@ -56,13 +57,14 @@ public:
     }
 
 protected:
+    Color m_color;
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_bot;
 };
 class TradeWarningFinder : public DetectorToFinder<TradeWarningDetector>{
 public:
-    TradeWarningFinder()
-         : DetectorToFinder("TradeWarningFinder", std::chrono::milliseconds(250))
+    TradeWarningFinder(Color color)
+         : DetectorToFinder("TradeWarningFinder", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -105,7 +107,7 @@ void trade_current_pokemon(
 
     //  Make sure there is something to trade.
     {
-        SomethingInBoxSlotDetector detector(COLOR_RED, true);
+        SomethingInBoxSlotDetector detector(COLOR_CYAN, true);
         if (!detector.detect(console.video().snapshot())){
             stats.m_errors++;
             tracker.report_unrecoverable_error(console, "Box slot is empty.");
@@ -115,7 +117,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        GradientArrowFinder detector(COLOR_RED, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
+        GradientArrowFinder detector(COLOR_CYAN, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
             {{detector}}
@@ -131,7 +133,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        PromptDialogFinder detector(COLOR_RED, {0.500, 0.455, 0.400, 0.100});
+        PromptDialogFinder detector(COLOR_CYAN, {0.500, 0.455, 0.400, 0.100});
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {{detector}}
@@ -147,7 +149,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        TradeWarningFinder detector;
+        TradeWarningFinder detector(COLOR_CYAN);
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {{detector}}
@@ -166,7 +168,7 @@ void trade_current_pokemon(
 
     //  Wait for black screen.
     {
-        BlackScreenOverWatcher black_screen;
+        BlackScreenOverWatcher black_screen(COLOR_CYAN);
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
             {{black_screen}}
@@ -184,8 +186,8 @@ void trade_current_pokemon(
     TradeDoneHold trade_done(console);
 
     while (true){
-        AdvanceDialogFinder dialog(COLOR_RED, std::chrono::seconds(2));
-        PromptDialogFinder learn_move(COLOR_RED);
+        AdvanceDialogFinder dialog(COLOR_YELLOW, std::chrono::seconds(2));
+        PromptDialogFinder learn_move(COLOR_BLUE);
 
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
@@ -218,34 +220,20 @@ void trade_current_box(
     EventNotificationOption& notifications,
     TradeStats& stats
 ){
-    for (size_t row = 0; row < 5; row++){
-        for (size_t col = 0; col < 6; col++){
+    for (uint8_t row = 0; row < 5; row++){
+        for (uint8_t col = 0; col < 6; col++){
             env.update_stats();
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
             env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+                BoxDetector box_detector;
+                VideoOverlaySet overlays(console.overlay());
+                box_detector.make_overlays(overlays);
+
+                box_detector.move_cursor(console, context, BoxCursorLocation::SLOTS, row, col);
+
                 trade_current_pokemon(console, context, error_state, stats);
-
-                //  Move to next mon
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-
-                //  Move to next row, but only if not the last row.
-                if (col == 5 && row < 4){
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                }
-
-#if 0
-                //  Move to next box.
-                if (row == 5){
-                    pbf_press_button(context, BUTTON_R, 20, 105);
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                }
-#endif
             });
             stats.m_trades++;
         }

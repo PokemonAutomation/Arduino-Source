@@ -61,10 +61,10 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
         if (box != 0){
             env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
                 pbf_press_button(context, BUTTON_R, 20, 105);
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+//                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
             });
         }
         trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);

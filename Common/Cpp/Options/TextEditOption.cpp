@@ -36,10 +36,12 @@ struct TextEditOption::Data{
 TextEditOption::~TextEditOption() = default;
 TextEditOption::TextEditOption(
     std::string label,
+    LockWhileRunning lock_while_program_is_running,
     std::string default_value,
     std::string placeholder_text
 )
-    : m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text))
+    : ConfigOption(lock_while_program_is_running)
+    , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text))
 {}
 #if 0
 std::unique_ptr<ConfigOption> TextEditOption::clone() const{

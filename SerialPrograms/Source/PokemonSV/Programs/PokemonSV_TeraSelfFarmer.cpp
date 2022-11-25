@@ -249,29 +249,10 @@ void TeraSelfFarmer::read_summary(
 void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
-    //  Wait for first battle menu.
-    VideoSnapshot battle_snapshot;
-    {
-        BattleMenuFinder battle_menu(COLOR_RED);
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(120),
-            {battle_menu}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(
-                env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "BattleMenuNotFound",
-                "Unable to detect Tera raid battle menu after 120 seconds."
-            );
-        }
-        battle_snapshot = env.console.video().snapshot();
-        env.log("First battle menu found.");
-    }
-
     bool win = run_tera_battle(
         env, env.console, context,
-        NOTIFICATION_ERROR_RECOVERABLE
+        NOTIFICATION_ERROR_RECOVERABLE,
+        true
     );
 
     if (win){
@@ -281,6 +262,8 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         context.wait_for(std::chrono::seconds(3));
         return;
     }
+
+    VideoSnapshot battle_snapshot = env.console.video().snapshot();
 
     //  State machine to return to overworld.
     bool summary_read = false;
@@ -408,7 +391,9 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     m_caught = 0;
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+
+    bool first = true;
 
 //    uint8_t year = MAX_YEAR;
     while (true){
@@ -419,11 +404,14 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-//        home_roll_date_enter_game_autorollback(env.console, context, year);
-        home_roll_date_enter_game(env.console, context, false);
-        pbf_wait(context, RAID_SPAWN_DELAY);
-        context.wait_for_all_requests();
+        if (!first){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+//            home_roll_date_enter_game_autorollback(env.console, context, year);
+            home_roll_date_enter_game(env.console, context, false);
+            pbf_wait(context, RAID_SPAWN_DELAY);
+            context.wait_for_all_requests();
+        }
+        first = false;
 
         stats.m_skips++;
 

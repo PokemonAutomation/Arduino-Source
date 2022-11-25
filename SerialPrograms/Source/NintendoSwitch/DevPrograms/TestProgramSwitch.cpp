@@ -168,14 +168,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
+    VideoOverlaySet overlays(overlay);
 
 
 //    TradeStats stats;
 //    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
 
-    BoxDetector detector;
-    detector.move_cursor(console, context, BoxCursorLocation::SLOTS, 3, 3);
+//    BoxDetector detector;
+//    detector.move_cursor(console, context, BoxCursorLocation::SLOTS, 3, 3);
 
 //    MainMenuDetector detector;
 //    detector.move_cursor(console, context, MenuSide::RIGHT, 4);
@@ -199,12 +200,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+    auto image = feed.snapshot();
+    TeraLobbyReader detector(COLOR_RED);
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+    cout << detector.total_players(image) << endl;
+
+
 
 #if 0
-    ImageRGB32 image("NoCardDetection.png");
-//    auto image = feed.snapshot();
-    TeraCardReader detector;
+//    ImageRGB32 image("NoCardDetection.png");
+    auto image = feed.snapshot();
+    TeraCardReader detector(COLOR_RED);
+    detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
+    cout << detector.stars(image) << endl;
 #endif
 
 
