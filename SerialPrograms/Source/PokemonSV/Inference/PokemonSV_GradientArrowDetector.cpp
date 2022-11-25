@@ -73,8 +73,8 @@ GradientArrowDetector::GradientArrowDetector(
     GradientArrowType type,
     const ImageFloatBox& box
 )
-    : m_type(type)
-    , m_color(color)
+    : m_color(color)
+    , m_type(type)
     , m_box(box)
 {}
 void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
