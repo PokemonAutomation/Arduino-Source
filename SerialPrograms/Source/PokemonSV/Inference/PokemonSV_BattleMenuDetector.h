@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 class BattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector(Color color = COLOR_RED);
+    BattleMenuDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -29,10 +29,10 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class BattleMenuFinder : public DetectorToFinder_ConsecutiveDebounce<BattleMenuDetector>{
+class BattleMenuFinder : public DetectorToFinder<BattleMenuDetector>{
 public:
-    BattleMenuFinder(Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("BattleMenuFinder", 5, color)
+    BattleMenuFinder(Color color)
+         : DetectorToFinder("BattleMenuFinder", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -40,7 +40,7 @@ public:
 
 class MoveSelectDetector : public StaticScreenDetector{
 public:
-    MoveSelectDetector(Color color = COLOR_RED);
+    MoveSelectDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -49,10 +49,10 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class MoveSelectFinder : public DetectorToFinder_ConsecutiveDebounce<MoveSelectDetector>{
+class MoveSelectFinder : public DetectorToFinder<MoveSelectDetector>{
 public:
-    MoveSelectFinder(Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("MoveSelectFinder", 5, color)
+    MoveSelectFinder(Color color)
+         : DetectorToFinder("MoveSelectFinder", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -60,7 +60,7 @@ public:
 
 class TeraCatchDetector : public StaticScreenDetector{
 public:
-    TeraCatchDetector(Color color = COLOR_RED);
+    TeraCatchDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -70,10 +70,10 @@ private:
     ImageFloatBox m_box;
     GradientArrowDetector m_arrow;
 };
-class TeraCatchFinder : public DetectorToFinder_ConsecutiveDebounce<TeraCatchDetector>{
+class TeraCatchFinder : public DetectorToFinder<TeraCatchDetector>{
 public:
-    TeraCatchFinder(Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("TeraCatchFinder", 5, color)
+    TeraCatchFinder(Color color)
+         : DetectorToFinder("TeraCatchFinder", std::chrono::milliseconds(250), color)
     {}
 };
 

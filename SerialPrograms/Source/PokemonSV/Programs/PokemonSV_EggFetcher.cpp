@@ -82,7 +82,7 @@ size_t EggFetcher::fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     VideoOverlaySet overlays(env.console.overlay());
     AdvanceDialogDetector detect_advance;
-    PromptDialogDetector detect_prompt;
+    PromptDialogDetector detect_prompt(COLOR_RED);
     detect_advance.make_overlays(overlays);
     detect_prompt.make_overlays(overlays);
 

@@ -144,7 +144,7 @@ void MassRelease::release_one(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     env.log("Waiting for release to finish...");
     {
-        SomethingInBoxSlotFinder done_releasing(false);
+        SomethingInBoxSlotFinder done_releasing(COLOR_RED, false);
         int ret = run_until(
             env.console, context,
             [](BotBaseContext& context){

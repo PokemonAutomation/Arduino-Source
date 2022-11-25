@@ -31,10 +31,10 @@ bool run_tera_battle(
         BattleMenuFinder battle_menu(COLOR_RED);
         MoveSelectFinder move_select_menu(COLOR_YELLOW);
         GradientArrowFinder target_select_menu(
+            COLOR_CYAN,
             console.overlay(),
             GradientArrowType::DOWN,
-            {0.45, 0.07, 0.10, 0.10},
-            COLOR_CYAN
+            {0.45, 0.07, 0.10, 0.10}
         );
         TeraCatchFinder catch_menu(COLOR_BLUE);
         BlackScreenOverWatcher black_screen(COLOR_GREEN);

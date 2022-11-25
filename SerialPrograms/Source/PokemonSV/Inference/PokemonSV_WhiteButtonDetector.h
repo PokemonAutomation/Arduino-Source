@@ -53,7 +53,7 @@ public:
 
 class WhiteButtonDetector : public StaticScreenDetector{
 public:
-    WhiteButtonDetector(WhiteButton button, const ImageFloatBox& box, Color color = COLOR_RED);
+    WhiteButtonDetector(Color color, WhiteButton button, const ImageFloatBox& box);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -72,10 +72,10 @@ class WhiteButtonFinder : public VisualInferenceCallback{
 public:
     ~WhiteButtonFinder();
     WhiteButtonFinder(
+        Color color,
         WhiteButton button, size_t consecutive_detections,
         VideoOverlay& overlay,
-        const ImageFloatBox& box,
-        Color color = COLOR_RED
+        const ImageFloatBox& box
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;

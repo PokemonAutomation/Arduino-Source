@@ -23,8 +23,8 @@ namespace PokemonSV{
 
 MainMenuDetector::MainMenuDetector(Color color)
     : m_color(color)
-    , m_arrow_left(GradientArrowType::RIGHT, {0.02, 0.10, 0.05, 0.90}, color)
-    , m_arrow_right(GradientArrowType::RIGHT, {0.67, 0.20, 0.05, 0.50}, color)
+    , m_arrow_left(color, GradientArrowType::RIGHT, {0.02, 0.10, 0.05, 0.90})
+    , m_arrow_right(color, GradientArrowType::RIGHT, {0.67, 0.20, 0.05, 0.50})
 {}
 void MainMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow_left.make_overlays(items);
@@ -40,7 +40,7 @@ bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
     return false;
 }
 
-std::pair<MenuSide, int> MainMenuDetector::side(const ImageViewRGB32& screen) const{
+std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32& screen) const{
     ImageFloatBox box;
     if (m_arrow_left.detect(box, screen)){
         if (box.y > 0.85){
@@ -77,7 +77,7 @@ void MainMenuDetector::move_cursor(
     while (true){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
-        std::pair<MenuSide, int> current = this->side(screen);
+        std::pair<MenuSide, int> current = this->detect_location(screen);
 
         //  Failed to detect menu.
         if (current.first == MenuSide::NONE){

@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 class DialogArrowDetector : public StaticScreenDetector{
 public:
-    DialogArrowDetector(const ImageFloatBox& box, Color color = COLOR_RED);
+    DialogArrowDetector(Color color, const ImageFloatBox& box);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -39,7 +39,7 @@ protected:
 class DialogArrowFinder : public VisualInferenceCallback{
 public:
     ~DialogArrowFinder();
-    DialogArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color = COLOR_RED);
+    DialogArrowFinder(Color color, VideoOverlay& overlay, const ImageFloatBox& box);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

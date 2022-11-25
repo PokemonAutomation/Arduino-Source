@@ -73,7 +73,7 @@ bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    GradientArrowDetector arrow_detector(GradientArrowType::RIGHT, m_cursor);
+    GradientArrowDetector arrow_detector(COLOR_RED, GradientArrowType::RIGHT, m_cursor);
     if (!arrow_detector.detect(screen)){
         return false;
     }
@@ -123,26 +123,6 @@ size_t TeraCardReader::stars(const ImageViewRGB32& screen) const{
 }
 
 
-TeraCardFinder::TeraCardFinder()
-    : VisualInferenceCallback("TeraCardFinder")
-{}
-
-void TeraCardFinder::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-bool TeraCardFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!m_detector.detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    bool detected = m_trigger_count >= 5;
-    if (detected){
-//        cout << "Detected Battle Menu" << endl;
-    }
-    return detected;
-}
 
 
 

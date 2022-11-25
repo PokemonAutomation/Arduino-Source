@@ -27,6 +27,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 //#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -292,17 +293,18 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         TeraCatchFinder catch_menu(COLOR_BLUE);
         WhiteButtonFinder next_button(
+            COLOR_RED,
             WhiteButton::ButtonA, 20,
             env.console.overlay(),
-            {0.8, 0.93, 0.2, 0.07},
-            COLOR_RED
+            {0.8, 0.93, 0.2, 0.07}
         );
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
         AdvanceDialogFinder dialog(COLOR_YELLOW);
-        PromptDialogFinder add_to_party({0.500, 0.395, 0.400, 0.100}, COLOR_PURPLE);
-        PromptDialogFinder nickname({0.500, 0.545, 0.400, 0.100}, COLOR_GREEN);
+        PromptDialogFinder add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+        PromptDialogFinder nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryFinder summary(COLOR_CYAN);
+        MainMenuFinder main_menu(COLOR_DARKGREEN);
         int ret = wait_until(
             env.console, context,
             timeout,
@@ -315,6 +317,7 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 add_to_party,
                 nickname,
                 summary,
+                main_menu,
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -385,8 +388,11 @@ void TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
                 }
                 pbf_press_button(context, BUTTON_B, 20, 230);
                 timeout = std::chrono::seconds(5);
-            }catch (OperationFailedException&){
-            }
+            }catch (OperationFailedException&){}
+            break;
+        case 8:
+            env.log("Detected unexpected main menu.", COLOR_RED);
+            pbf_press_button(context, BUTTON_B, 20, 230);
             break;
         default:
             env.log("No detection, assume returned to overworld.");
@@ -431,7 +437,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         context.wait_for(std::chrono::milliseconds(100));
 
         VideoSnapshot screen = env.console.video().snapshot();
-        TeraCardReader reader;
+        TeraCardReader reader(COLOR_RED);
         size_t stars = reader.stars(screen);
         if (stars == 0){
             dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);

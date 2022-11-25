@@ -18,8 +18,8 @@ namespace PokemonSV{
 
 
 BattleMenuDetector::BattleMenuDetector(Color color)
-    : m_status_button(WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08}, color)
-    , m_arrow(GradientArrowType::RIGHT, {0.75, 0.62, 0.05, 0.18}, color)
+    : m_status_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
+    , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.62, 0.05, 0.18})
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_status_button.make_overlays(items);
@@ -39,8 +39,8 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 
 MoveSelectDetector::MoveSelectDetector(Color color)
-    : m_status_button(WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08}, color)
-    , m_arrow(GradientArrowType::RIGHT, {0.705, 0.550, 0.050, 0.410}, color)
+    : m_status_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
+    , m_arrow(color, GradientArrowType::RIGHT, {0.705, 0.550, 0.050, 0.410})
 {}
 void MoveSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_status_button.make_overlays(items);
@@ -65,7 +65,7 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
 TeraCatchDetector::TeraCatchDetector(Color color)
     : m_color(color)
     , m_box(0.95, 0.81, 0.02, 0.06)
-    , m_arrow(GradientArrowType::RIGHT, {0.75, 0.80, 0.08, 0.09}, color)
+    , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.80, 0.08, 0.09})
 {}
 void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

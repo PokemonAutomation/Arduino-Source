@@ -9,9 +9,9 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
+//#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
@@ -59,10 +59,10 @@ protected:
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_bot;
 };
-class TradeWarningFinder : public DetectorToFinder_ConsecutiveDebounce<TradeWarningDetector>{
+class TradeWarningFinder : public DetectorToFinder<TradeWarningDetector>{
 public:
     TradeWarningFinder()
-         : DetectorToFinder_ConsecutiveDebounce("TradeWarningFinder", 5)
+         : DetectorToFinder("TradeWarningFinder", std::chrono::milliseconds(250))
     {}
 };
 
@@ -71,8 +71,8 @@ public:
 class TradeDoneDetector : public StaticScreenDetector{
 public:
     TradeDoneDetector(VideoOverlay& overlay)
-        : m_cursor(GradientArrowType::DOWN, {0.24, 0.17, 0.38, 0.55})
-        , m_slot(true)
+        : m_cursor(COLOR_RED, GradientArrowType::DOWN, {0.24, 0.17, 0.38, 0.55})
+        , m_slot(COLOR_RED, true)
     {}
     virtual void make_overlays(VideoOverlaySet& items) const override{
         m_cursor.make_overlays(items);
@@ -86,10 +86,10 @@ private:
     GradientArrowDetector m_cursor;
     SomethingInBoxSlotDetector m_slot;
 };
-class TradeDoneHold : public DetectorToFinder_HoldDebounce<TradeDoneDetector>{
+class TradeDoneHold : public DetectorToFinder<TradeDoneDetector>{
 public:
     TradeDoneHold(VideoOverlay& overlay)
-         : DetectorToFinder_HoldDebounce("AdvanceDialogHold", std::chrono::milliseconds(500), overlay)
+         : DetectorToFinder("AdvanceDialogHold", std::chrono::milliseconds(500), overlay)
     {}
 };
 
@@ -105,7 +105,7 @@ void trade_current_pokemon(
 
     //  Make sure there is something to trade.
     {
-        SomethingInBoxSlotDetector detector(true);
+        SomethingInBoxSlotDetector detector(COLOR_RED, true);
         if (!detector.detect(console.video().snapshot())){
             stats.m_errors++;
             tracker.report_unrecoverable_error(console, "Box slot is empty.");
@@ -115,7 +115,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        GradientArrowFinder detector(console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
+        GradientArrowFinder detector(COLOR_RED, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
             {{detector}}
@@ -131,7 +131,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        PromptDialogFinder detector({0.500, 0.455, 0.400, 0.100}, COLOR_RED);
+        PromptDialogFinder detector(COLOR_RED, {0.500, 0.455, 0.400, 0.100});
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {{detector}}
@@ -184,8 +184,8 @@ void trade_current_pokemon(
     TradeDoneHold trade_done(console);
 
     while (true){
-        AdvanceDialogHold dialog(std::chrono::seconds(2));
-        PromptDialogFinder learn_move;
+        AdvanceDialogFinder dialog(COLOR_RED, std::chrono::seconds(2));
+        PromptDialogFinder learn_move(COLOR_RED);
 
         int ret = wait_until(
             console, context, std::chrono::minutes(2),

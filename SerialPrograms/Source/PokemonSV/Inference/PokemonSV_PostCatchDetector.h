@@ -34,10 +34,10 @@ protected:
     ImageFloatBox m_bottom_right;
     PromptDialogDetector m_dialog;
 };
-class AddToPartyFinder : public DetectorToFinder_ConsecutiveDebounce<AddToPartyDetector>{
+class AddToPartyFinder : public DetectorToFinder<AddToPartyDetector>{
 public:
     AddToPartyFinder(Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("AddToPartyFinder", 5, color)
+         : DetectorToFinder("AddToPartyFinder", std::chrono::milliseconds(250), color)
     {}
 };
 

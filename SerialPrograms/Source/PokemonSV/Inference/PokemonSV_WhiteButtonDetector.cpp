@@ -91,7 +91,7 @@ const WhiteButtonMatcher& WhiteButtonMatcher::Minus(){
 
 
 
-WhiteButtonDetector::WhiteButtonDetector(WhiteButton button, const ImageFloatBox& box, Color color)
+WhiteButtonDetector::WhiteButtonDetector(Color color, WhiteButton button, const ImageFloatBox& box)
     : m_matcher(get_button_matcher(button))
     , m_color(color)
     , m_box(box)
@@ -127,14 +127,14 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 WhiteButtonFinder::~WhiteButtonFinder() = default;
 WhiteButtonFinder::WhiteButtonFinder(
+    Color color,
     WhiteButton button, size_t consecutive_detections,
     VideoOverlay& overlay,
-    const ImageFloatBox& box,
-    Color color
+    const ImageFloatBox& box
 )
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
-    , m_detector(button, box, color)
+    , m_detector(color, button, box)
     , m_consecutive_detections(consecutive_detections)
 {}
 

@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 class TeraCardReader : public StaticScreenDetector{
 public:
-    TeraCardReader(Color color = COLOR_RED);
+    TeraCardReader(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -36,23 +36,11 @@ protected:
     ImageFloatBox m_cursor;
     ImageFloatBox m_stars;
 };
-
-
-
-class TeraCardFinder : public VisualInferenceCallback{
+class TeraCardFinder : public DetectorToFinder<TeraCardReader>{
 public:
-    TeraCardFinder();
-
-    const TeraCardReader* operator->() const{
-        return &m_detector;
-    }
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    TeraCardReader m_detector;
-    size_t m_trigger_count = 0;
+    TeraCardFinder(Color color, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+         : DetectorToFinder("TeraCardFinder", duration, color)
+    {}
 };
 
 

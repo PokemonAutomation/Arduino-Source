@@ -18,20 +18,20 @@ namespace PokemonSV{
 //  Detect whether the cursor if over a Pokemon in the box.
 class SomethingInBoxSlotDetector : public StaticScreenDetector{
 public:
-    SomethingInBoxSlotDetector(bool true_if_exists, Color color = COLOR_RED);
+    SomethingInBoxSlotDetector(Color color, bool true_if_exists);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-protected:
+private:
     bool m_true_if_exists;
     Color m_color;
     ImageFloatBox m_exists;
 };
-class SomethingInBoxSlotFinder : public DetectorToFinder_ConsecutiveDebounce<SomethingInBoxSlotDetector>{
+class SomethingInBoxSlotFinder : public DetectorToFinder<SomethingInBoxSlotDetector>{
 public:
-    SomethingInBoxSlotFinder(bool stop_on_exists, Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("SomethingInBoxSlot", 5, stop_on_exists, color)
+    SomethingInBoxSlotFinder(Color color, bool stop_on_exists)
+         : DetectorToFinder("SomethingInBoxSlot", std::chrono::milliseconds(250), color, stop_on_exists)
     {}
 };
 
@@ -40,27 +40,64 @@ public:
 //  Detect whether you have a Pokemon selected in the box system.
 class BoxSelectDetector : public StaticScreenDetector{
 public:
-    BoxSelectDetector(Color color = COLOR_RED);
+    BoxSelectDetector(Color color);
 
     bool exists(const ImageViewRGB32& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-protected:
+private:
     Color m_color;
     SomethingInBoxSlotDetector m_exists;
     AdvanceDialogDetector m_dialog;
     GradientArrowDetector m_gradient;
 };
-class BoxSelectFinder : public DetectorToFinder_ConsecutiveDebounce<BoxSelectDetector>{
+class BoxSelectFinder : public DetectorToFinder<BoxSelectDetector>{
 public:
-    BoxSelectFinder(Color color = COLOR_RED)
-         : DetectorToFinder_ConsecutiveDebounce("BoxSelectFinder", 5, color)
+    BoxSelectFinder(Color color)
+         : DetectorToFinder("BoxSelectFinder", std::chrono::milliseconds(250), color)
     {}
 };
 
 
+
+
+enum class BoxCursorLocation{
+    NONE,
+    PARTY,
+    BOX_CHANGE,
+    ALL_BOXES,
+    SEARCH,
+    SLOTS,
+};
+struct BoxCursorCoordinates{
+    uint8_t row;
+    uint8_t col;
+};
+
+class BoxDetector : public StaticScreenDetector{
+public:
+    BoxDetector(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+    std::pair<BoxCursorLocation, BoxCursorCoordinates> detect_location(const ImageViewRGB32& screen) const;
+
+private:
+    Color m_color;
+    GradientArrowDetector m_party;
+    GradientArrowDetector m_box_change;
+    GradientArrowDetector m_all_boxes;
+    GradientArrowDetector m_search;
+    GradientArrowDetector m_slots;
+};
+class BoxFinder : public DetectorToFinder<BoxDetector>{
+public:
+    BoxFinder(Color color)
+         : DetectorToFinder("BoxFinder", std::chrono::milliseconds(250), color)
+    {}
+};
 
 
 

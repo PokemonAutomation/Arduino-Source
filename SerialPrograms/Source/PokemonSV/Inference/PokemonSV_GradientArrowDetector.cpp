@@ -69,9 +69,9 @@ bool is_gradient_arrow(
 
 
 GradientArrowDetector::GradientArrowDetector(
+    Color color,
     GradientArrowType type,
-    const ImageFloatBox& box,
-    Color color
+    const ImageFloatBox& box
 )
     : m_type(type)
     , m_color(color)
@@ -180,14 +180,14 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
 
 GradientArrowFinder::~GradientArrowFinder() = default;
 GradientArrowFinder::GradientArrowFinder(
+    Color color,
     VideoOverlay& overlay,
     GradientArrowType type,
-    const ImageFloatBox& box,
-    Color color
+    const ImageFloatBox& box
 )
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
-    , m_detector(type, box, color)
+    , m_detector(color, type, box)
 {}
 
 void GradientArrowFinder::make_overlays(VideoOverlaySet& items) const{

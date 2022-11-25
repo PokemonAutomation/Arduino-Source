@@ -59,7 +59,7 @@ bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object,
 
 
 
-DialogArrowDetector::DialogArrowDetector(const ImageFloatBox& box, Color color)
+DialogArrowDetector::DialogArrowDetector(Color color, const ImageFloatBox& box)
     : m_color(color)
     , m_box(box)
 {}
@@ -107,10 +107,10 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
 
 
 DialogArrowFinder::~DialogArrowFinder() = default;
-DialogArrowFinder::DialogArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box, Color color)
+DialogArrowFinder::DialogArrowFinder(Color color, VideoOverlay& overlay, const ImageFloatBox& box)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
-    , m_detector(box, color)
+    , m_detector(color, box)
 {}
 
 void DialogArrowFinder::make_overlays(VideoOverlaySet& items) const{

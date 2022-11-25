@@ -59,6 +59,7 @@
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/PokemonSV_TradeRoutines.h"
 
 
@@ -172,14 +173,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    TradeStats stats;
 //    trade_current_box(env, scope, NOTIFICATION_TEST, stats);
 
-    MainMenuDetector detector;
-    detector.move_cursor(console, context, MenuSide::RIGHT, 4);
 
-#if 0
+//    MainMenuDetector detector;
+//    detector.move_cursor(console, context, MenuSide::RIGHT, 4);
+
+#if 1
     auto image = feed.snapshot();
-    MenuDetector detector;
-    auto ret = detector.side(image);
-    cout << ret.second << endl;
+    BoxDetector detector;
+    auto ret = detector.detect_location(image);
+    cout << (int)ret.first << " | " << (int)ret.second.row << ", " << (int)ret.second.col << endl;
 #endif
 
 #if 0

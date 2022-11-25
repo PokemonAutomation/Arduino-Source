@@ -54,7 +54,7 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
     }
 //    cout << "asdf" << endl;
 
-    DialogArrowDetector arrow_detector(m_arrow);
+    DialogArrowDetector arrow_detector(COLOR_RED, m_arrow);
     return arrow_detector.detect(screen);
 }
 
@@ -62,16 +62,13 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
 
 
 PromptDialogDetector::PromptDialogDetector(Color color)
-    : PromptDialogDetector({0.50, 0.40, 0.40, 0.50}, color)
+    : PromptDialogDetector(color, {0.50, 0.40, 0.40, 0.50})
 {}
-PromptDialogDetector::PromptDialogDetector(const ImageFloatBox& arrow_box, Color color)
+PromptDialogDetector::PromptDialogDetector(Color color, const ImageFloatBox& arrow_box)
     : m_color(color)
     , m_box_top(0.50, 0.74, 0.20, 0.01)
     , m_box_bot(0.30, 0.88, 0.40, 0.01)
     , m_gradient(arrow_box)
-{}
-PromptDialogDetector::PromptDialogDetector(size_t line_index, Color color)
-    : PromptDialogDetector({0.50, 00.62 - 0.075 * line_index, 0.40, 0.50}, color)
 {}
 void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
@@ -100,7 +97,7 @@ bool PromptDialogDetector::detect(const ImageViewRGB32& screen) const{
         }
     }
 
-    GradientArrowDetector gradiant_detector(GradientArrowType::RIGHT, m_gradient);
+    GradientArrowDetector gradiant_detector(COLOR_RED, GradientArrowType::RIGHT, m_gradient);
     return gradiant_detector.detect(screen);
 }
 

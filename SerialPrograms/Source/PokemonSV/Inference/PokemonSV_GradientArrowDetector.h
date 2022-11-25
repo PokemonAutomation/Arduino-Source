@@ -30,9 +30,9 @@ enum class GradientArrowType{
 class GradientArrowDetector : public StaticScreenDetector{
 public:
     GradientArrowDetector(
+        Color color,
         GradientArrowType type,
-        const ImageFloatBox& box,
-        Color color = COLOR_RED
+        const ImageFloatBox& box
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -43,8 +43,8 @@ public:
     bool detect(ImageFloatBox& box, const ImageViewRGB32& screen) const;
 
 protected:
-    GradientArrowType m_type;
     Color m_color;
+    GradientArrowType m_type;
     ImageFloatBox m_box;
 };
 
@@ -54,10 +54,10 @@ class GradientArrowFinder : public VisualInferenceCallback{
 public:
     ~GradientArrowFinder();
     GradientArrowFinder(
+        Color color,
         VideoOverlay& overlay,
         GradientArrowType type,
-        const ImageFloatBox& box,
-        Color color = COLOR_RED
+        const ImageFloatBox& box
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
