@@ -128,6 +128,10 @@ TeraSelfFarmer::TeraSelfFarmer()
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
         LockWhileRunning::UNLOCKED, true
     )
+    , TRY_TO_TERASTILIZE(
+        "<b>Try to terastilize:</b><br>Blindly try to terastilize. Add 4s per move but allow to have a bigger win rate in 5* raids.",
+        LockWhileRunning::UNLOCKED, false
+    )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
         LockWhileRunning::UNLOCKED,
@@ -168,6 +172,7 @@ TeraSelfFarmer::TeraSelfFarmer()
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(MAX_CATCHES);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
+    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
     PA_ADD_OPTION(MAX_STARS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -254,7 +259,8 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     bool win = run_tera_battle(
         env, env.console, context,
         NOTIFICATION_ERROR_RECOVERABLE,
-        true
+        true,
+        TRY_TO_TERASTILIZE
     );
 
     if (win){

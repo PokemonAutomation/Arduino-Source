@@ -63,6 +63,7 @@ private:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     SimpleIntegerOption<uint16_t> MAX_CATCHES;
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
+    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
     SimpleIntegerOption<uint8_t> MAX_STARS;
 

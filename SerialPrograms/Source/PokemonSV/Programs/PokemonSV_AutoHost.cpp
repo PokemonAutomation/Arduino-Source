@@ -364,7 +364,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             }
             env.update_stats();
 
-            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true);
+            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true, false);
             env.update_stats();
             if (win){
                 stats.m_wins++;
