@@ -8,7 +8,12 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
@@ -157,6 +162,20 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
             throw OperationFailedException(console.logger(), "Unable to connect to internet after 60 seconds.");
         }
     }
+}
+
+void set_time_to_1am_from_game(ConsoleHandle& console, BotBaseContext& context){
+    DateReader reader;
+    VideoOverlaySet overlays(console.overlay());
+    reader.make_overlays(overlays);
+
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+    home_to_date_time(context, true, false);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    reader.set_hours(console, context, 1);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    resume_game_from_home(console, context);
 }
 
 

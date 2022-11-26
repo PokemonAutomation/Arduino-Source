@@ -103,6 +103,11 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         4
     )
+    , ROLLOVER_PREVENTION(
+        "<b>Rollover Prevention:</b><br>Periodically set the date back to 1AM to prevent the date from rolling over and losing the raid.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
     , DESCRIPTION(
         "<b>Description:</b>",
         LockWhileRunning::UNLOCKED,
@@ -120,6 +125,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
+    PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -241,9 +247,17 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         BattleMenuFinder battle_menu(COLOR_CYAN);
 
-        int ret = wait_until(
+        int ret = run_until(
             env.console, context,
-            start_time + std::chrono::minutes(4),
+            [start_time](BotBaseContext& context){
+                while (true){
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    context.wait_for_all_requests();
+                    if (current_time() > start_time + std::chrono::minutes(4)){
+                        return;
+                    }
+                }
+            },
             {dialog, start_raid, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -282,15 +296,24 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
-
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
 
     bool skip_reset = true;
     bool completed_one = false;
     size_t consecutive_failures = 0;
+    WallClock last_time_fix = WallClock::min();
     while (true){
         env.update_stats();
+
+        if (ROLLOVER_PREVENTION){
+            WallClock now = current_time();
+            if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
+                set_time_to_1am_from_game(env.console, context);
+                last_time_fix = now;
+            }
+        }
+
         if (consecutive_failures > 0 && !completed_one){
             throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }

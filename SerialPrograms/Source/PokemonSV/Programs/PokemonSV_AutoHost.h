@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutoHost_H
 #define PokemonAutomation_PokemonSV_AutoHost_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 //#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
@@ -53,8 +54,8 @@ private:
     EnumDropdownOption<Mode> MODE;
 
     SimpleIntegerOption<uint16_t> LOBBY_WAIT_DELAY;
-//    SimpleIntegerOption<uint8_t> START_RAID_PLAYERS;
     IntegerEnumDropdownOption START_RAID_PLAYERS;
+    BooleanCheckBoxOption ROLLOVER_PREVENTION;
 
     TextEditOption DESCRIPTION;
 

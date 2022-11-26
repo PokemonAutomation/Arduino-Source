@@ -443,8 +443,8 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
 
         if (MODE == Mode::SHINY_HUNT){
-            pbf_mash_button(context, BUTTON_B, 40);
-            pbf_press_button(context, BUTTON_B, 5, 205);
+            pbf_mash_button(context, BUTTON_B, 20);
+            pbf_press_button(context, BUTTON_B, 5, 225);
             save_game_from_overworld(env.console, context);
             context.wait_for_all_requests();
             if (open_raid(env.console, context)){

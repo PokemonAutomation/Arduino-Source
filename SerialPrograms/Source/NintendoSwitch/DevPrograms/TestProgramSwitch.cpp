@@ -13,6 +13,7 @@
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
@@ -47,6 +48,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -141,13 +143,6 @@ using namespace Kernels::Waterfill;
 
 
 
-void merge_enclosed(){
-
-}
-
-
-
-
 
 
 
@@ -169,6 +164,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+    auto image = feed.snapshot();
+
+    DateReader reader;
+    reader.make_overlays(overlays);
+    cout << reader.detect(image) << endl;
+    cout << (int)reader.read_hours(logger, image) << endl;
+    reader.set_hours(console, context, 1);
+
+
+
+//    auto image = feed.snapshot();
+//    DateReader reader;
+//    reader.detect(image);
+
 
 
 //    TradeStats stats;
@@ -200,12 +211,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 0
     auto image = feed.snapshot();
     TeraLobbyReader detector(COLOR_RED);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
     cout << detector.total_players(image) << endl;
-
+#endif
 
 
 #if 0
