@@ -42,8 +42,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
 
-    ret.emplace_back("---- Multiplayer ----");
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Multiplayer ----");
         ret.emplace_back(make_single_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
         ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
     }
