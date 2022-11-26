@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_TeraCardDetector_H
 #define PokemonAutomation_PokemonSV_TeraCardDetector_H
 
+#include <atomic>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
