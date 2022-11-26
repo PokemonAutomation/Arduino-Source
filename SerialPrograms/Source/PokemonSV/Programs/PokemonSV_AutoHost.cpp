@@ -306,14 +306,6 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     while (true){
         env.update_stats();
 
-        if (ROLLOVER_PREVENTION){
-            WallClock now = current_time();
-            if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
-                set_time_to_1am_from_game(env.console, context);
-                last_time_fix = now;
-            }
-        }
-
         if (consecutive_failures > 0 && !completed_one){
             throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }
@@ -323,6 +315,13 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         if (!skip_reset){
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (ROLLOVER_PREVENTION){
+                WallClock now = current_time();
+                if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
+                    set_time_to_1am_from_home(env.console, context);
+                    last_time_fix = now;
+                }
+            }
             reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
         }
         skip_reset = false;

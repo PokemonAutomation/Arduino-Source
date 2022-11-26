@@ -47,8 +47,8 @@ class StringOption : public StringCell{
 public:
     StringOption(
         bool is_password,
-        LockWhileRunning lock_while_program_is_running,
         std::string label,
+        LockWhileRunning lock_while_program_is_running,
         std::string default_value,
         std::string placeholder_text
     );

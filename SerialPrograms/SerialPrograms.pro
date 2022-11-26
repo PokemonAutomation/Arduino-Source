@@ -351,6 +351,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/PathMaker.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
@@ -381,6 +382,7 @@ SOURCES += \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
@@ -599,6 +601,7 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
@@ -881,6 +884,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
@@ -1173,10 +1177,12 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/PathMaker.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
@@ -1209,6 +1215,7 @@ HEADERS += \
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/TestPathMakerTable.h \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
@@ -1431,6 +1438,7 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \

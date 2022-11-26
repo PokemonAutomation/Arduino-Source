@@ -14,6 +14,7 @@
 #include "Programs/PokemonSV_SelfBoxTrade.h"
 #include "Programs/PokemonSV_EggFetcher.h"
 #include "Programs/PokemonSV_TeraSelfFarmer.h"
+#include "Programs/PokemonSV_FastCodeEntry.h"
 #include "Programs/PokemonSV_AutoHost.h"
 
 namespace PokemonAutomation{
@@ -43,6 +44,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Multiplayer ----");
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
         ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
     }
 

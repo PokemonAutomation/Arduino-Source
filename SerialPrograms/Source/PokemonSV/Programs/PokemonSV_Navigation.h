@@ -26,7 +26,7 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context);
 
 void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 
-void set_time_to_1am_from_game(ConsoleHandle& console, BotBaseContext& context);
+void set_time_to_1am_from_home(ConsoleHandle& console, BotBaseContext& context);
 
 void exit_tera_win_without_catching(
     ProgramEnvironment& env,

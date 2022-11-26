@@ -21,22 +21,22 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
     : BatchOption(LockWhileRunning::LOCKED)
     , instance_name(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Instance Name:</b><br>If you are running multiple instances of this program, give it a name to distinguish them in notifications.",
+        LockWhileRunning::LOCKED,
         "",
         "(e.g. Living Room Switch)"
     )
     , user_id(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord User ID:</b><br>Set this to your discord user ID to receive pings. Your ID is a number.",
+        LockWhileRunning::LOCKED,
         "",
         "123456789012345678"
     )
     , message(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord Message:</b><br>Message to put on every discord notification.",
+        LockWhileRunning::LOCKED,
         "",
         "(e.g. Kim's Shiny Hunt)"
     )

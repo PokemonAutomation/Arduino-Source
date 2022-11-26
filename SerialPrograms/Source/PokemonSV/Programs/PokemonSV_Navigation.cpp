@@ -164,18 +164,18 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
     }
 }
 
-void set_time_to_1am_from_game(ConsoleHandle& console, BotBaseContext& context){
+void set_time_to_1am_from_home(ConsoleHandle& console, BotBaseContext& context){
     DateReader reader;
     VideoOverlaySet overlays(console.overlay());
     reader.make_overlays(overlays);
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+//    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(context, true, false);
     pbf_press_button(context, BUTTON_A, 20, 105);
     reader.set_hours(console, context, 1);
     pbf_press_button(context, BUTTON_A, 20, 105);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-    resume_game_from_home(console, context);
+//    resume_game_from_home(console, context);
 }
 
 

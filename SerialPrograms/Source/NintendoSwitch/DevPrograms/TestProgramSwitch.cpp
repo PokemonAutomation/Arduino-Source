@@ -49,6 +49,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -142,10 +143,6 @@ using namespace Kernels::Waterfill;
 
 
 
-
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -165,7 +162,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+    enter_alphanumeric_code(logger, context, "2VL4EP");
 
+//    run_path(context, get_path({0, 0}, {2, 6}));
+//    run_path(context, get_path({2, 6}, {0, 9}));
+//    run_path(context, get_path({0, 9}, {3, 8}));
+
+
+
+#if 0
     auto image = feed.snapshot();
 
     DateReader reader;
@@ -173,7 +178,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << reader.detect(image) << endl;
     cout << (int)reader.read_hours(logger, image) << endl;
     reader.set_hours(console, context, 1);
-
+#endif
 
 
 //    auto image = feed.snapshot();

@@ -34,15 +34,15 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
 SeedFinder::SeedFinder()
     : STATE_0(
         false,
-        LockWhileRunning::LOCKED,
         "<b>state[0]:</b>",
+        LockWhileRunning::LOCKED,
         "",
         ""
     )
     , STATE_1(
         false,
-        LockWhileRunning::LOCKED,
         "<b>state[1]:</b>",
+        LockWhileRunning::LOCKED,
         "",
         ""
     )
