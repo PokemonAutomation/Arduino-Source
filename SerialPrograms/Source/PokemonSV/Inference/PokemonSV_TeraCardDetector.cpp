@@ -128,7 +128,7 @@ TeraLobbyReader::TeraLobbyReader(Color color)
     , m_cursor(0.135, 0.25, 0.05, 0.25)
 //    , m_stars(0.500, 0.555, 0.310, 0.070)
     , m_timer(0.175, 0.180, 0.100, 0.080)
-    , m_code(0.310, 0.180, 0.100, 0.080)
+    , m_code(0.310, 0.180, 0.150, 0.080)
     , m_player1_spinner(0.157, 0.645, 0.037, 0.060)
     , m_player2_spinner(0.157, 0.715, 0.037, 0.060)
     , m_player3_spinner(0.157, 0.790, 0.037, 0.060)
@@ -187,7 +187,7 @@ uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
     if (player1.stddev.sum() > 20) total++;
     if (player2.stddev.sum() > 20) total++;
     if (player3.stddev.sum() > 20) total++;
-    return total;
+    return std::max(total, (uint8_t)1);
 }
 std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen){
     ImageRGB32 filtered = to_blackwhite_rgb32_range(extract_box_reference(screen, m_code), 0xff000000, 0xff7f7f7f, true);
@@ -242,13 +242,19 @@ TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(Color color, uint8_t desired_players)
     : TeraLobbyReader(color)
     , VisualInferenceCallback("TeraLobbyReadyWaiter")
     , m_desired_players(desired_players)
+    , m_last_known_player_count(-1)
 {}
 
 void TeraLobbyReadyWaiter::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);
 }
 bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return total_players(frame) >= m_desired_players;
+    if (!detect(frame)){
+        return false;
+    }
+    uint8_t players = total_players(frame);
+    m_last_known_player_count.store(players);
+    return players >= m_desired_players;
 }
 
 

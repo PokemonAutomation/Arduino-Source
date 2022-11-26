@@ -24,6 +24,10 @@
 #include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
 #include "PokemonSV_AutoHost.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -108,7 +112,7 @@ AutoHost::AutoHost()
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS({
         &NOTIFICATION,
-        &NOTIFICATION_PROGRAM_FINISH,
+//        &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
@@ -189,6 +193,12 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             end_time,
             {dialog, start_raid, ready}
         );
+        context.wait_for(std::chrono::milliseconds(100));
+        int8_t current_players = ready.last_known_player_count();
+        if (current_players > 0){
+            last_known_player_count = current_players;
+        }
+        env.log("Starting raid with " + std::to_string(last_known_player_count) + " player(s).");
         switch (ret){
         case 0:
             env.log("Raid timed out!", COLOR_ORANGE);
@@ -200,12 +210,15 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             if (last_known_player_count == 4){
                 stats.m_full++;
             }
-            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            if (last_known_player_count == 1){
+                stats.m_empty++;
+            }
+            stats.m_raiders += last_known_player_count - 1;
             return true;
         case 2:
             env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
-            last_known_player_count = ready.total_players(env.console.video().snapshot());
-            pbf_mash_button(context, BUTTON_A, 250);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 230);
             continue;
         default:
             if (current_time() - start_time > std::chrono::minutes(4)){
@@ -216,7 +229,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 );
             }
             env.log("Timeout reached. Starting raid now...", COLOR_PURPLE);
-//            pbf_mash_button(context, BUTTON_A, 250);
+            pbf_mash_button(context, BUTTON_A, 250);
         }
         break;
     }
@@ -227,31 +240,36 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         AdvanceDialogFinder dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         BattleMenuFinder battle_menu(COLOR_CYAN);
+
         int ret = wait_until(
             env.console, context,
             start_time + std::chrono::minutes(4),
             {dialog, start_raid, battle_menu}
         );
+        context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
             env.log("Raid timed out!", COLOR_ORANGE);
             stats.m_empty++;
             return false;
-        case 1:
+        case 1:{
             env.log("Raid started! (white screen)", COLOR_BLUE);
             if (last_known_player_count == 4){
                 stats.m_full++;
             }
-            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            if (last_known_player_count == 1){
+                stats.m_empty++;
+            }
+            stats.m_raiders += last_known_player_count - 1;
             return true;
-        case 2:
+        }case 2:{
             env.log("Raid started! (battle menu)", COLOR_BLUE);
             if (last_known_player_count == 4){
                 stats.m_full++;
             }
-            stats.m_raiders += std::min((int)last_known_player_count - 1, 0);
+            stats.m_raiders += last_known_player_count - 1;
             return true;
-        default:
+        }default:
             dump_image_and_throw_recoverable_exception(
                 env, env.console,
                 NOTIFICATION_ERROR_RECOVERABLE,
@@ -282,7 +300,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         if (!skip_reset){
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, context);
+            reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
         }
         skip_reset = false;
 
@@ -292,7 +310,14 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         if (mode != Mode::LOCAL){
             //  Connect to internet.
-            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Online mode has not been implemented yet.");
+//            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Online mode has not been implemented yet.");
+            try{
+                connect_to_internet_from_overworld(env.console, context);
+            }catch (OperationFailedException&){
+                consecutive_failures++;
+                stats.m_errors++;
+                continue;
+            }
         }
 
         if (!open_raid(env.console, context)){
@@ -318,9 +343,13 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             if (!run_lobby(env, context)){
                 continue;
             }
+            env.update_stats();
 
-            if (run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true)){
+            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true);
+            env.update_stats();
+            if (win){
                 stats.m_wins++;
+                exit_tera_win_without_catching(env, env.console, context);
             }else{
                 stats.m_losses++;
             }
@@ -328,6 +357,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         }catch (OperationFailedException&){
             consecutive_failures++;
             stats.m_errors++;
+            continue;
         }
     }
 }

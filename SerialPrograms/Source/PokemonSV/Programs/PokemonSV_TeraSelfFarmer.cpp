@@ -196,7 +196,7 @@ void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, B
 
     int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
     if (quantity == 0){
-        throw OperationFailedException(env.logger(), "Unable to find appropriate ball. Did you run out?");
+        throw FatalProgramException(env.logger(), "Unable to find appropriate ball. Did you run out?");
     }
     if (quantity < 0){
         env.log("Unable to read ball quantity.", COLOR_RED);
@@ -424,7 +424,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 //            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
-        context.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(500));
 
         VideoSnapshot screen = env.console.video().snapshot();
         TeraCardReader reader(COLOR_RED);
@@ -443,7 +443,8 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
 
         if (MODE == Mode::SHINY_HUNT){
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_mash_button(context, BUTTON_B, 40);
+            pbf_press_button(context, BUTTON_B, 5, 205);
             save_game_from_overworld(env.console, context);
             context.wait_for_all_requests();
             if (open_raid(env.console, context)){

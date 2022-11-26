@@ -132,7 +132,7 @@ void send_raid_notification(
         console, settings.NOTIFICATION,
         Color(),
         env.program_info(),
-        "Raid Notification",
+        "Max Raid Notification",
         embeds,
         screenshot, false
     );

@@ -89,11 +89,16 @@ class TeraLobbyReadyWaiter : public TeraLobbyReader, public VisualInferenceCallb
 public:
     TeraLobbyReadyWaiter(Color color, uint8_t desired_players);
 
+    int8_t last_known_player_count() const{
+        return m_last_known_player_count.load(std::memory_order_relaxed);
+    }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
     uint8_t m_desired_players;
+    std::atomic<int8_t> m_last_known_player_count;
 };
 
 

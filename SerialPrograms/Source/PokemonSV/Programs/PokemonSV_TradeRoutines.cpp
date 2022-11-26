@@ -37,19 +37,23 @@ class TradeWarningDetector : public StaticScreenDetector{
 public:
     TradeWarningDetector(Color color)
         : m_color(color)
-        , m_box_top(0.30, 0.33, 0.40, 0.02)
-        , m_box_bot(0.30, 0.65, 0.40, 0.02)
+//        , m_box_top(0.30, 0.33, 0.40, 0.02)
+//        , m_box_bot(0.30, 0.65, 0.40, 0.02)
+        , m_box_left(0.25, 0.33, 0.02, 0.34)
+        , m_box_right(0.73, 0.33, 0.02, 0.34)
     {}
     virtual void make_overlays(VideoOverlaySet& items) const override{
-        items.add(m_color, m_box_top);
-        items.add(m_color, m_box_bot);
+//        items.add(m_color, m_box_top);
+//        items.add(m_color, m_box_bot);
+        items.add(m_color, m_box_left);
+        items.add(m_color, m_box_right);
     }
     virtual bool detect(const ImageViewRGB32& screen) const override{
-        ImageStats box_top = image_stats(extract_box_reference(screen, m_box_top));
+        ImageStats box_top = image_stats(extract_box_reference(screen, m_box_left));
         if (!is_solid(box_top, {0.11424, 0.310539, 0.575221}, 0.30)){
             return false;
         }
-        ImageStats box_bot = image_stats(extract_box_reference(screen, m_box_bot));
+        ImageStats box_bot = image_stats(extract_box_reference(screen, m_box_right));
         if (!is_solid(box_bot, {0.11424, 0.310539, 0.575221}, 0.30)){
             return false;
         }
@@ -58,8 +62,10 @@ public:
 
 protected:
     Color m_color;
-    ImageFloatBox m_box_top;
-    ImageFloatBox m_box_bot;
+//    ImageFloatBox m_box_top;
+//    ImageFloatBox m_box_bot;
+    ImageFloatBox m_box_left;
+    ImageFloatBox m_box_right;
 };
 class TradeWarningFinder : public DetectorToFinder<TradeWarningDetector>{
 public:
