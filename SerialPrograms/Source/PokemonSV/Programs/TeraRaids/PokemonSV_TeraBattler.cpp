@@ -24,7 +24,8 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool from_start
+    bool from_start,
+    bool blindly_terastilize
 ){
     if (from_start){
         //  Wait for first battle menu.
@@ -85,6 +86,10 @@ bool run_tera_battle(
             if (consecutive_move_select > 3){
                 env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
                 pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+            }
+            if (blindly_terastilize){
+                // It might do nothing but display an error message for around 4 seconds
+                pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
             }
             pbf_press_button(context, BUTTON_A, 20, 10);
             break;
