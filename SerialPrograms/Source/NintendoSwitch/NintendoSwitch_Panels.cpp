@@ -17,6 +17,7 @@
 #include "Programs/NintendoSwitch_PreventSleep.h"
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
 #include "Programs/NintendoSwitch_FriendDelete.h"
+#include "Programs/NintendoSwitch_PushJoySticks.h"
 
 #include "DevPrograms/BoxDraw.h"
 #include "DevPrograms/PathMaker.h"
@@ -54,6 +55,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
     ret.emplace_back(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
     ret.emplace_back(make_single_switch_program<FriendDelete_Descriptor, FriendDelete>());
+    ret.emplace_back(make_single_switch_program<PushJoySticks_Descriptor, PushJoySticks>());
 
 //    ret.emplace_back("---- " + STRING_POKEMON + " Home ----");
 

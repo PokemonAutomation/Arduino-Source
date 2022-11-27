@@ -387,6 +387,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
@@ -1222,6 +1223,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \

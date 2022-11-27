@@ -776,6 +776,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp
@@ -1192,10 +1194,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
-    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp
@@ -1204,6 +1206,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
+    Source/PokemonSV/PokemonSV_Panels.cpp
+    Source/PokemonSV/PokemonSV_Panels.h
+    Source/PokemonSV/PokemonSV_Settings.cpp
+    Source/PokemonSV/PokemonSV_Settings.h
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
@@ -1230,10 +1236,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
-    Source/PokemonSV/PokemonSV_Panels.cpp
-    Source/PokemonSV/PokemonSV_Panels.h
-    Source/PokemonSV/PokemonSV_Settings.cpp
-    Source/PokemonSV/PokemonSV_Settings.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
