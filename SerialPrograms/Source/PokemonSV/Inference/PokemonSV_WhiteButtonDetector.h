@@ -68,10 +68,10 @@ protected:
 
 
 
-class WhiteButtonFinder : public VisualInferenceCallback{
+class WhiteButtonWatcher : public VisualInferenceCallback{
 public:
-    ~WhiteButtonFinder();
-    WhiteButtonFinder(
+    ~WhiteButtonWatcher();
+    WhiteButtonWatcher(
         Color color,
         WhiteButton button, size_t consecutive_detections,
         VideoOverlay& overlay,

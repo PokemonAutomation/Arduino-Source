@@ -28,7 +28,7 @@ bool run_tera_battle(
     if (from_start){
         //  Wait for first battle menu.
         {
-            BattleMenuFinder battle_menu(COLOR_RED);
+            BattleMenuWatcher battle_menu(COLOR_RED);
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(120),
@@ -50,15 +50,15 @@ bool run_tera_battle(
     while (true){
         context.wait_for_all_requests();
 
-        BattleMenuFinder battle_menu(COLOR_RED);
-        MoveSelectFinder move_select_menu(COLOR_YELLOW);
-        GradientArrowFinder target_select_menu(
+        BattleMenuWatcher battle_menu(COLOR_RED);
+        MoveSelectWatcher move_select_menu(COLOR_YELLOW);
+        GradientArrowWatcher target_select_menu(
             COLOR_CYAN,
             console.overlay(),
             GradientArrowType::DOWN,
             {0.45, 0.07, 0.10, 0.10}
         );
-        TeraCatchFinder catch_menu(COLOR_BLUE);
+        TeraCatchWatcher catch_menu(COLOR_BLUE);
         BlackScreenOverWatcher black_screen(COLOR_GREEN);
         int ret = wait_until(
             console, context,

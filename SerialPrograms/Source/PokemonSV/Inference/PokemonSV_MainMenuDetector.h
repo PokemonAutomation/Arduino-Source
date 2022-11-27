@@ -53,9 +53,9 @@ protected:
     GradientArrowDetector m_arrow_left;
     GradientArrowDetector m_arrow_right;
 };
-class MainMenuFinder : public DetectorToFinder<MainMenuDetector>{
+class MainMenuWatcher : public DetectorToFinder<MainMenuDetector>{
 public:
-    MainMenuFinder(Color color = COLOR_RED)
+    MainMenuWatcher(Color color = COLOR_RED)
          : DetectorToFinder("MenuDetector", std::chrono::milliseconds(250), color)
     {}
 };

@@ -88,7 +88,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     env.log("Selecting " + STRING_POKEMON + "...");
     {
-        BoxSelectFinder selected(COLOR_RED);
+        BoxSelectWatcher selected(COLOR_RED);
         if (!selected.exists(env.console.video().snapshot())){
             stats.m_empty++;
             env.log("Slot is empty.");
@@ -119,7 +119,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     env.log("Releasing...");
     {
-        PromptDialogFinder confirm(COLOR_CYAN);
+        PromptDialogWatcher confirm(COLOR_CYAN);
         int ret = run_until(
             env.console, context,
             [](BotBaseContext& context){
@@ -144,7 +144,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     env.log("Waiting for release to finish...");
     {
-        SomethingInBoxSlotFinder done_releasing(COLOR_RED, false);
+        SomethingInBoxSlotWatcher done_releasing(COLOR_RED, false);
         int ret = run_until(
             env.console, context,
             [](BotBaseContext& context){

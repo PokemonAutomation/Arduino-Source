@@ -39,9 +39,9 @@ private:
     ImageFloatBox m_cursor;
     ImageFloatBox m_stars;
 };
-class TeraCardFinder : public DetectorToFinder<TeraCardReader>{
+class TeraCardWatcher : public DetectorToFinder<TeraCardReader>{
 public:
-    TeraCardFinder(Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+    TeraCardWatcher(Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
          : DetectorToFinder("TeraCardFinder", duration, color)
     {}
 };
@@ -80,9 +80,9 @@ private:
     ImageFloatBox m_player2_mon;
     ImageFloatBox m_player3_mon;
 };
-class TeraLobbyFinder : public DetectorToFinder<TeraLobbyReader>{
+class TeraLobbyWatcher : public DetectorToFinder<TeraLobbyReader>{
 public:
-    TeraLobbyFinder(Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+    TeraLobbyWatcher(Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
          : DetectorToFinder("TeraLobbyFinder", duration, color)
     {}
 };

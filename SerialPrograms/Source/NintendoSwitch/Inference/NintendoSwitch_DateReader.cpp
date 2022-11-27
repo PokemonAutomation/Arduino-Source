@@ -186,7 +186,7 @@ void DateReader::set_hours(
                     pbf_press_dpad(context, DPAD_DOWN, 5, 3);
                 }
             }
-            if (hour < 12 != current_hour < 12){
+            if ((hour < 12) != (current_hour < 12)){
                 pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
                 pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
                 pbf_press_dpad(context, DPAD_DOWN, 5, 3);

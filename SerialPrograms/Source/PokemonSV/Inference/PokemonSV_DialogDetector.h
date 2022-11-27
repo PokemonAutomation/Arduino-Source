@@ -32,9 +32,9 @@ protected:
     ImageFloatBox m_box_bot;
     ImageFloatBox m_arrow;
 };
-class AdvanceDialogFinder : public DetectorToFinder<AdvanceDialogDetector>{
+class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
 public:
-    AdvanceDialogFinder(Color color, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+    AdvanceDialogWatcher(Color color, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
          : DetectorToFinder("AdvanceDialogFinder", duration, color)
     {}
 };
@@ -59,12 +59,12 @@ protected:
     ImageFloatBox m_box_bot;
     ImageFloatBox m_gradient;
 };
-class PromptDialogFinder : public DetectorToFinder<PromptDialogDetector>{
+class PromptDialogWatcher : public DetectorToFinder<PromptDialogDetector>{
 public:
-    PromptDialogFinder(Color color)
+    PromptDialogWatcher(Color color)
          : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color)
     {}
-    PromptDialogFinder(Color color, const ImageFloatBox& arrow_box)
+    PromptDialogWatcher(Color color, const ImageFloatBox& arrow_box)
          : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color, arrow_box)
     {}
 };

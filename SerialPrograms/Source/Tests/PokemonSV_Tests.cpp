@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 using namespace NintendoSwitch::PokemonSV;
 
 int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target){
-    TeraCardFinder detector(COLOR_RED);
+    TeraCardWatcher detector(COLOR_RED);
 
     for (int i = 0; i < 4; ++i){
         bool result = detector.process_frame(image, current_time());

@@ -168,7 +168,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-
+    save_game_from_menu(console, context);
 
 //    enter_alphanumeric_code(logger, context, "2VL4EP");
 

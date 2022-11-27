@@ -138,7 +138,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     WallClock start_time;
     {
-        TeraLobbyFinder lobby(COLOR_RED);
+        TeraLobbyWatcher lobby(COLOR_RED);
         lobby.make_overlays(overlays);
 
         int ret = wait_until(
@@ -189,7 +189,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     while (true){
         context.wait_for_all_requests();
 
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
 
@@ -243,9 +243,9 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     while (true){
         context.wait_for_all_requests();
 
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
-        BattleMenuFinder battle_menu(COLOR_CYAN);
+        BattleMenuWatcher battle_menu(COLOR_CYAN);
 
         int ret = run_until(
             env.console, context,

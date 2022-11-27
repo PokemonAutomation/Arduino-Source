@@ -106,17 +106,17 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
 
 
 
-DialogArrowFinder::~DialogArrowFinder() = default;
-DialogArrowFinder::DialogArrowFinder(Color color, VideoOverlay& overlay, const ImageFloatBox& box)
+DialogArrowWatcher::~DialogArrowWatcher() = default;
+DialogArrowWatcher::DialogArrowWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
     , m_detector(color, box)
 {}
 
-void DialogArrowFinder::make_overlays(VideoOverlaySet& items) const{
+void DialogArrowWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
-bool DialogArrowFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool DialogArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     std::vector<ImageFloatBox> arrows = m_detector.detect_all(frame);
 //    cout << "arrors = " << arrows.size() << endl;
     m_arrows.reset(arrows.size());

@@ -123,7 +123,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        GradientArrowFinder detector(COLOR_CYAN, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
+        GradientArrowWatcher detector(COLOR_CYAN, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
             {{detector}}
@@ -139,7 +139,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
-        PromptDialogFinder detector(COLOR_CYAN, {0.500, 0.455, 0.400, 0.100});
+        PromptDialogWatcher detector(COLOR_CYAN, {0.500, 0.455, 0.400, 0.100});
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {{detector}}
@@ -192,8 +192,8 @@ void trade_current_pokemon(
     TradeDoneHold trade_done(console);
 
     while (true){
-        AdvanceDialogFinder dialog(COLOR_YELLOW, std::chrono::seconds(2));
-        PromptDialogFinder learn_move(COLOR_BLUE);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW, std::chrono::seconds(2));
+        PromptDialogWatcher learn_move(COLOR_BLUE);
 
         int ret = wait_until(
             console, context, std::chrono::minutes(2),

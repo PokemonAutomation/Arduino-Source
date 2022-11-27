@@ -275,8 +275,8 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         context.wait_for_all_requests();
         env.log("Looking for post raid dialogs...");
 
-        TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(
+        TeraCatchWatcher catch_menu(COLOR_BLUE);
+        WhiteButtonWatcher next_button(
             COLOR_RED,
             WhiteButton::ButtonA, 20,
             env.console.overlay(),
@@ -284,11 +284,11 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         );
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
-        PromptDialogFinder add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
-        PromptDialogFinder nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
-        PokemonSummaryFinder summary(COLOR_CYAN);
-        MainMenuFinder main_menu(COLOR_DARKGREEN);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+        PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
+        PokemonSummaryWatcher summary(COLOR_CYAN);
+        MainMenuWatcher main_menu(COLOR_DARKGREEN);
         int ret = wait_until(
             env.console, context,
             timeout,

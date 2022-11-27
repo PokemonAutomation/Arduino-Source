@@ -27,55 +27,47 @@ namespace PokemonSV{
 
 
 void save_game_from_menu(ConsoleHandle& console, BotBaseContext& context){
-    {
-        GradientArrowFinder detector(COLOR_RED, console.overlay(), GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
-            },
-            {detector}
-        );
-        if (ret < 0){
-            throw OperationFailedException(console.logger(), "Unable to find save confirmation prompt.");
-        }
-        console.log("Detected save confirmation prompt.");
-    }
-    context.wait_for(std::chrono::milliseconds(100));
-    pbf_press_button(context, BUTTON_A, 20, 2 * TICKS_PER_SECOND);
-    context.wait_for_all_requests();
-    {
-        AdvanceDialogFinder detector(COLOR_RED);
+    bool saved = false;
+    while (true){
+        context.wait_for_all_requests();
+
+        MainMenuWatcher menu(COLOR_RED);
+        GradientArrowWatcher confirmation(COLOR_YELLOW, console.overlay(), GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
+        AdvanceDialogWatcher finished(COLOR_GREEN);
+
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(30),
-            {detector}
+            std::chrono::seconds(60),
+            {menu, confirmation, finished}
         );
-        if (ret < 0){
-            throw OperationFailedException(console.logger(), "Unable to find save finished dialog.");
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            if (saved){
+                console.log("Detected main menu. Finished!");
+                return;
+            }else{
+                console.log("Detected main menu. Saving game...");
+                pbf_press_button(context, BUTTON_R, 20, 105);
+                continue;
+            }
+        case 1:
+            console.log("Detected save confirmation prompt.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 2:
+            console.log("Detected save finished dialog.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            saved = true;
+            continue;
+        default:
+            throw OperationFailedException(console.logger(), "save_game_from_menu(): No recognized state after 60 seconds.");
         }
-        console.log("Detected save finished dialog.");
     }
-    context.wait_for(std::chrono::milliseconds(100));
-    {
-        MainMenuFinder detector;
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_B, 20, 10 * TICKS_PER_SECOND);
-            },
-            {detector}
-        );
-        if (ret < 0){
-            throw OperationFailedException(console.logger(), "Unable to detect main menu after 10 seconds.");
-        }
-        console.log("Returned to main menu.");
-    }
-    context.wait_for(std::chrono::milliseconds(100));
 }
 void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     {
-        MainMenuFinder detector;
+        MainMenuWatcher detector;
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
@@ -97,7 +89,7 @@ void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
 
 
 bool open_raid(ConsoleHandle& console, BotBaseContext& context){
-    TeraCardFinder card_detector(COLOR_RED);
+    TeraCardWatcher card_detector(COLOR_RED);
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
@@ -116,7 +108,7 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
 
 void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     {
-        MainMenuFinder detector;
+        MainMenuWatcher detector;
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
@@ -135,9 +127,9 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
     pbf_press_button(context, BUTTON_L, 20, 230);
     context.wait_for_all_requests();
     while (true){
-        MainMenuFinder main_menu(COLOR_RED);
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
-        PromptDialogFinder prompt(COLOR_CYAN);
+        MainMenuWatcher main_menu(COLOR_RED);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        PromptDialogWatcher prompt(COLOR_CYAN);
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
@@ -192,8 +184,8 @@ void exit_tera_win_without_catching(
         context.wait_for_all_requests();
         env.log("Looking for post raid dialogs...");
 
-        TeraCatchFinder catch_menu(COLOR_BLUE);
-        WhiteButtonFinder next_button(
+        TeraCatchWatcher catch_menu(COLOR_BLUE);
+        WhiteButtonWatcher next_button(
             COLOR_RED,
             WhiteButton::ButtonA, 20,
             console.overlay(),
@@ -201,7 +193,7 @@ void exit_tera_win_without_catching(
         );
         BlackScreenOverWatcher black_screen(COLOR_MAGENTA);
         WhiteScreenOverWatcher white_screen(COLOR_MAGENTA);
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
         int ret = wait_until(
             console, context,
             timeout,

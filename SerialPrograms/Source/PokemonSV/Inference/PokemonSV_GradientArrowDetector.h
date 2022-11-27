@@ -50,10 +50,10 @@ protected:
 
 
 
-class GradientArrowFinder : public VisualInferenceCallback{
+class GradientArrowWatcher : public VisualInferenceCallback{
 public:
-    ~GradientArrowFinder();
-    GradientArrowFinder(
+    ~GradientArrowWatcher();
+    GradientArrowWatcher(
         Color color,
         VideoOverlay& overlay,
         GradientArrowType type,
