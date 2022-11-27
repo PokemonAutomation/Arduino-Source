@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonBDSP_AutonomousStatsReset_H
-#define PokemonAutomation_PokemonBDSP_AutonomousStatsReset_H
+#ifndef PokemonAutomation_PokemonBDSP_AutonomousBallThrower_H
+#define PokemonAutomation_PokemonBDSP_AutonomousBallThrower_H
 
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
