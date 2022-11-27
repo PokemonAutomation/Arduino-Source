@@ -8,13 +8,15 @@
 //#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
-//#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-//#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+//#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
@@ -169,14 +171,33 @@ void set_time_to_12am_from_home(ConsoleHandle& console, BotBaseContext& context)
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(context, true, false);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 30);
     reader.set_hours(console, context, 0);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 30);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 //    resume_game_from_home(console, context);
 }
 
+void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+    home_to_date_time(context, true, true);
+    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_issue_scroll(context, DPAD_RIGHT, 0);
+    ssf_press_button(context, BUTTON_A, 2);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+    ssf_press_button(context, BUTTON_A, 20, 10);
+    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    resume_game_from_home(console, context);
 
+
+
+
+}
 
 
 

@@ -27,7 +27,8 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
 
 void set_time_to_12am_from_home(ConsoleHandle& console, BotBaseContext& context);
 
-
+//  Perform a No-op day skip that rolls over all the outbreaks and raids.
+void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 
 
 

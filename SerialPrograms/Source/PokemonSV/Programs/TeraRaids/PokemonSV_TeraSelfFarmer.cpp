@@ -18,6 +18,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -178,80 +179,6 @@ TeraSelfFarmer::TeraSelfFarmer()
 }
 
 
-void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (MODE == Mode::FARM_ITEMS_ONLY){
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-        pbf_mash_button(context, BUTTON_A, 125);
-        return;
-    }
-
-    if (FIX_TIME_ON_CATCH){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-        home_to_date_time(context, false, false);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        resume_game_from_home(env.console, context);
-    }
-    m_number_caught++;
-
-    BattleBallReader reader(env.console, LANGUAGE);
-//    pbf_mash_button(context, BUTTON_A, 250);
-    pbf_press_button(context, BUTTON_A, 20, 150);
-    context.wait_for_all_requests();
-
-    int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
-    if (quantity == 0){
-        throw FatalProgramException(env.logger(), "Unable to find appropriate ball. Did you run out?");
-    }
-    if (quantity < 0){
-        env.log("Unable to read ball quantity.", COLOR_RED);
-    }
-    pbf_mash_button(context, BUTTON_A, 125);
-}
-void TeraSelfFarmer::read_summary(
-    SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
-    const VideoSnapshot& battle_snapshot
-){
-    PokemonSummaryDetector reader;
-    VideoSnapshot screen = env.console.video().snapshot();
-    if (!reader.detect(screen)){
-        dump_image_and_throw_recoverable_exception(
-            env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "SummaryNotFound",
-            "Unable to detect summary screen."
-        );
-    }
-
-    if (reader.is_shiny(screen)){
-        TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
-        stats.m_shinies++;
-        send_encounter_notification(
-            env,
-            NOTIFICATION_NONSHINY,
-            NOTIFICATION_SHINY,
-            false, true,
-            {{{}, ShinyType::UNKNOWN_SHINY}},
-            std::nan(""),
-            battle_snapshot
-        );
-        if (MODE == Mode::SHINY_HUNT){
-            throw ProgramFinishedException();
-        }
-    }else{
-        send_encounter_notification(
-            env,
-            NOTIFICATION_NONSHINY,
-            NOTIFICATION_SHINY,
-            false, false,
-            {{{}, ShinyType::NOT_SHINY}},
-            std::nan("")
-        );
-    }
-
-    pbf_press_button(context, BUTTON_B, 20, 20);
-}
 
 bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
@@ -277,6 +204,16 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 
     VideoSnapshot battle_snapshot = env.console.video().snapshot();
+
+
+    if (FIX_TIME_ON_CATCH){
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        home_to_date_time(context, false, false);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        resume_game_from_home(env.console, context);
+    }
 
     TeraResult result = exit_tera_win_by_catching(
         env.console, context,
@@ -337,7 +274,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     bool first = true;
 
-//    uint8_t year = MAX_YEAR;
     while (true){
         if (m_number_caught >= MAX_CATCHES){
             break;
@@ -354,9 +290,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
         if (!first){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-//            home_roll_date_enter_game_autorollback(env.console, context, year);
-            home_roll_date_enter_game(env.console, context, false);
+            day_skip_from_overworld(env.console, context);
             pbf_wait(context, RAID_SPAWN_DELAY);
             context.wait_for_all_requests();
             stats.m_skips++;

@@ -42,12 +42,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void process_catch_prompt(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void read_summary(
-        SingleSwitchProgramEnvironment& env,
-        BotBaseContext& context,
-        const VideoSnapshot& battle_snapshot
-    );
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:

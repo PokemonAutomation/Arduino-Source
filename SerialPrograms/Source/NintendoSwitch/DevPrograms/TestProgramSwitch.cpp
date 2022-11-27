@@ -169,7 +169,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    connect_to_internet_from_overworld(console, context);
+//    connect_to_internet_from_overworld(console, context);
+    day_skip_from_overworld(console, context);
 
 
 
