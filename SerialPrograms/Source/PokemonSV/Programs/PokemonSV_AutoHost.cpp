@@ -188,12 +188,10 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     uint8_t last_known_player_count = 1;
     while (true){
-        context.wait_for_all_requests();
-
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-
+        context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(
             env.console, context,
@@ -242,12 +240,10 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
     while (true){
-        context.wait_for_all_requests();
-
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         BattleMenuWatcher battle_menu(COLOR_CYAN);
-
+        context.wait_for_all_requests();
         int ret = run_until(
             env.console, context,
             [start_time](BotBaseContext& context){

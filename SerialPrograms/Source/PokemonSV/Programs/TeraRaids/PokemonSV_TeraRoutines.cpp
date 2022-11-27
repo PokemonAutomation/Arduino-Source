@@ -139,7 +139,6 @@ TeraResult exit_tera_win_by_catching(
     TeraResult result = TeraResult::NO_DETECTION;
     VideoSnapshot screenshot;
     while (true){
-        context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
         }
@@ -156,6 +155,7 @@ TeraResult exit_tera_win_by_catching(
         PromptDialogWatcher nickname(COLOR_PURPLE);
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         OverworldWatcher overworld(COLOR_RED);
+        context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),

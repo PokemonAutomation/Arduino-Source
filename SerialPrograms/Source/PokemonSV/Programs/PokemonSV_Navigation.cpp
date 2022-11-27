@@ -69,7 +69,6 @@ void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     WallClock start = current_time();
     bool saved = false;
     while (true){
-        context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             throw OperationFailedException(console, "Failed to save game after 5 minutes.");
         }
@@ -78,6 +77,7 @@ void save_game_from_overworld(ConsoleHandle& console, BotBaseContext& context){
         {
             OverworldWatcher overworld(COLOR_CYAN);
             MainMenuWatcher main_menu(COLOR_RED);
+            context.wait_for_all_requests();
             ret = wait_until(
                 console, context,
                 std::chrono::seconds(60),
@@ -114,7 +114,6 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
     WallClock start = current_time();
     bool connected = false;
     while (true){
-        context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             throw OperationFailedException(console, "Failed to connect to internet after 5 minutes.");
         }
@@ -123,6 +122,7 @@ void connect_to_internet_from_overworld(ConsoleHandle& console, BotBaseContext& 
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
+        context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),

@@ -10,6 +10,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_TeraBattler.h"
 
 namespace PokemonAutomation{
@@ -48,8 +49,6 @@ bool run_tera_battle(
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
     while (true){
-        context.wait_for_all_requests();
-
         BattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         GradientArrowWatcher target_select_menu(
@@ -59,16 +58,17 @@ bool run_tera_battle(
             {0.45, 0.07, 0.10, 0.10}
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
-        BlackScreenOverWatcher black_screen(COLOR_GREEN);
+        OverworldWatcher overworld(COLOR_GREEN);
+        context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(60),
+            std::chrono::seconds(120),
             {
                 battle_menu,
                 move_select_menu,
                 target_select_menu,
                 catch_menu,
-                black_screen,
+                overworld,
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -80,8 +80,8 @@ bool run_tera_battle(
         case 1:
             env.log("Detected move select.");
             consecutive_move_select++;
-            //  If we end up here consecutively too many time, the move is
-            //  probably disabled. Selet a different move.
+            //  If we end up here consecutively too many times, the move is
+            //  probably disabled. Select a different move.
             if (consecutive_move_select > 3){
                 env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
                 pbf_press_dpad(context, DPAD_DOWN, 20, 40);
@@ -106,10 +106,10 @@ bool run_tera_battle(
                 dump_image_and_throw_recoverable_exception(
                     env, console, error_notification,
                     "NoStateFound",
-                    "No state detected after 3 minutes."
+                    "No state detected after 6 minutes."
                 );
             }
-            env.log("Unable to detect any state for 1 minute. Mashing B...", COLOR_RED);
+            env.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 250);
         }
     }
