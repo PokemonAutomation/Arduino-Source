@@ -56,7 +56,7 @@ protected:
 class MainMenuWatcher : public DetectorToFinder<MainMenuDetector>{
 public:
     MainMenuWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("MenuDetector", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("MainMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 

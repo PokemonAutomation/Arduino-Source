@@ -21,7 +21,8 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV_AutoHost.h"
 
 #include <iostream>
@@ -104,7 +105,7 @@ AutoHost::AutoHost()
         4
     )
     , ROLLOVER_PREVENTION(
-        "<b>Rollover Prevention:</b><br>Periodically set the date back to 1AM to prevent the date from rolling over and losing the raid.",
+        "<b>Rollover Prevention:</b><br>Periodically set the date back to 12AM to prevent the date from rolling over and losing the raid.",
         LockWhileRunning::UNLOCKED,
         true
     )
@@ -318,7 +319,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             if (ROLLOVER_PREVENTION){
                 WallClock now = current_time();
                 if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
-                    set_time_to_1am_from_home(env.console, context);
+                    set_time_to_12am_from_home(env.console, context);
                     last_time_fix = now;
                 }
             }
@@ -371,7 +372,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             env.update_stats();
             if (win){
                 stats.m_wins++;
-                exit_tera_win_without_catching(env, env.console, context);
+                exit_tera_win_without_catching(env.console, context);
             }else{
                 stats.m_losses++;
             }

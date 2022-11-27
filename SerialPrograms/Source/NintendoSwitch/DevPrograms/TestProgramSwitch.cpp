@@ -62,8 +62,9 @@
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Programs/PokemonSV_TradeRoutines.h"
+#include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
 
 
 #include <QPixmap>
@@ -143,6 +144,11 @@ using namespace Kernels::Waterfill;
 
 
 
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -163,12 +169,33 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    ImageFloatBox ball(0.890, 0.790, 0.030, 0.070);
-    ImageFloatBox radar(0.815, 0.680, 0.180, 0.310);
+    connect_to_internet_from_overworld(console, context);
 
 
 
-    save_game_from_menu(console, context);
+//    save_game_from_overworld(console, context);
+
+
+#if 0
+    OverworldDetector overworld;
+    overworld.make_overlays(overlays);
+
+    auto image = feed.snapshot();
+//    overworld.detect(image);
+    overworld.detect_ball(image);
+#endif
+
+//    ImageRGB32 image("ball-1-new.png");
+
+//    filter_rgb32_range(image, 0xffc0c000, 0xffffff3f, Color(0), false).save("ball-template.png");
+
+
+//    ImageFloatBox ball(0.890, 0.790, 0.030, 0.070);
+//    ImageFloatBox radar(0.815, 0.680, 0.180, 0.310);
+
+
+
+//    save_game_from_menu(console, context);
 
 //    enter_alphanumeric_code(logger, context, "2VL4EP");
 

@@ -11,9 +11,9 @@
 #include "PokemonSV_Settings.h"
 
 #include "Programs/PokemonSV_MassRelease.h"
-#include "Programs/PokemonSV_SelfBoxTrade.h"
+#include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 #include "Programs/PokemonSV_EggFetcher.h"
-#include "Programs/PokemonSV_TeraSelfFarmer.h"
+#include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 #include "Programs/PokemonSV_FastCodeEntry.h"
 #include "Programs/PokemonSV_AutoHost.h"
 

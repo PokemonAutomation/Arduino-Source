@@ -33,7 +33,8 @@
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
-#include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV_TeraSelfFarmer.h"
 
 namespace PokemonAutomation{
@@ -264,8 +265,60 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         return false;
     }
 
+    if (MODE == Mode::FARM_ITEMS_ONLY){
+        exit_tera_win_without_catching(env.console, context);
+        return true;
+    }
+
     VideoSnapshot battle_snapshot = env.console.video().snapshot();
 
+    TeraResult result = exit_tera_win_by_catching(
+        env.console, context,
+        LANGUAGE,
+        BALL_SELECT.slug(),
+        MODE == Mode::SHINY_HUNT
+    );
+
+    stats.m_caught++;
+
+    switch (result){
+    case TeraResult::NO_DETECTION:
+        send_encounter_notification(
+            env,
+            NOTIFICATION_NONSHINY,
+            NOTIFICATION_SHINY,
+            false, false,
+            {{{}, ShinyType::UNKNOWN}},
+            std::nan("")
+        );
+        break;
+    case TeraResult::NOT_SHINY:
+        send_encounter_notification(
+            env,
+            NOTIFICATION_NONSHINY,
+            NOTIFICATION_SHINY,
+            false, false,
+            {{{}, ShinyType::NOT_SHINY}},
+            std::nan("")
+        );
+        break;
+    case TeraResult::SHINY:
+        stats.m_shinies++;
+        send_encounter_notification(
+            env,
+            NOTIFICATION_NONSHINY,
+            NOTIFICATION_SHINY,
+            false, true,
+            {{{}, ShinyType::UNKNOWN_SHINY}},
+            std::nan(""),
+            battle_snapshot
+        );
+        if (MODE == Mode::SHINY_HUNT){
+            throw ProgramFinishedException();
+        }
+    }
+
+#if 0
     //  State machine to return to overworld.
     bool summary_read = false;
     bool black_screen_detected = false;
@@ -383,6 +436,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
             return true;
         }
     }
+#endif
     return true;
 }
 
@@ -423,26 +477,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
         first = false;
 
-
-#if 0
-        //  State machine.
-        while (true){
-            BattleMenuFinder battle_menu(COLOR_RED);
-            TeraCatchFinder catch_menu(COLOR_YELLOW);
-            PokemonSummaryFinder summary(COLOR_GREEN);
-            WhiteButtonFinder next_button(
-                COLOR_CYAN,
-                WhiteButton::ButtonA, 20,
-                env.console.overlay(),
-                {0.8, 0.93, 0.2, 0.07}
-            );
-
-
-
-        }
-#endif
-
-
         if (open_raid(env.console, context)){
 //            env.log("Tera raid found!", COLOR_BLUE);
             stats.m_raids++;
@@ -464,13 +498,12 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         if (stars > MAX_STARS){
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            close_raid(env.console, context);
             continue;
         }
 
         if (MODE == Mode::SHINY_HUNT){
-            pbf_mash_button(context, BUTTON_B, 20);
-            pbf_press_button(context, BUTTON_B, 5, 225);
+            close_raid(env.console, context);
             save_game_from_overworld(env.console, context);
             context.wait_for_all_requests();
             if (open_raid(env.console, context)){

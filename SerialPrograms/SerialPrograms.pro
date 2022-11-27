@@ -591,6 +591,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
@@ -605,10 +606,11 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1428,6 +1430,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
@@ -1442,10 +1445,11 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h \
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.h \
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

@@ -168,7 +168,7 @@ void run_codeboard_path(
 ){
     for (const DigitPath& digit : path){
         if (digit.length > 0){
-            for (size_t c = 0; c < digit.length - 1; c++){
+            for (size_t c = 0; c < (size_t)digit.length - 1; c++){
                 ssf_issue_scroll(context, digit.path[c], 3);
             }
             ssf_issue_scroll(context, digit.path[digit.length - 1], 0);

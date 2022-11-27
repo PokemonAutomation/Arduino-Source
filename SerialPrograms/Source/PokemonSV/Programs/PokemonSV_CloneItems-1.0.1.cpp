@@ -15,7 +15,7 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
-#include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV_CloneItems-1.0.1.h"
 
 namespace PokemonAutomation{

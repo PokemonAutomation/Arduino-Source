@@ -1192,6 +1192,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
@@ -1218,14 +1220,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.h
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
