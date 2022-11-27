@@ -4,6 +4,7 @@
  *
  */
 
+#include <vector>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

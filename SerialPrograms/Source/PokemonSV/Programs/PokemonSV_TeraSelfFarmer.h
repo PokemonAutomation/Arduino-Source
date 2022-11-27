@@ -74,7 +74,12 @@ private:
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
 
-    uint16_t m_caught;
+    uint16_t m_number_caught;
+
+    //  Per iteration flags.
+//    bool m_battle_finished;
+//    bool m_caught;
+//    bool m_summary_read;
 };
 
 

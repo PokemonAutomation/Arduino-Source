@@ -187,7 +187,7 @@ void TeraSelfFarmer::process_catch_prompt(SingleSwitchProgramEnvironment& env, B
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
         resume_game_from_home(env.console, context);
     }
-    m_caught++;
+    m_number_caught++;
 
     BattleBallReader reader(env.console, LANGUAGE);
 //    pbf_mash_button(context, BUTTON_A, 250);
@@ -390,7 +390,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
-    m_caught = 0;
+    m_number_caught = 0;
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
@@ -399,12 +399,19 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 //    uint8_t year = MAX_YEAR;
     while (true){
-        if (m_caught >= MAX_CATCHES){
+        if (m_number_caught >= MAX_CATCHES){
             break;
         }
 
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+
+        //  Clear per-iteration flags.
+//        m_battle_finished = false;
+//        m_caught = false;
+//        m_summary_read = false;
+
 
         if (!first){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -412,10 +419,29 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             home_roll_date_enter_game(env.console, context, false);
             pbf_wait(context, RAID_SPAWN_DELAY);
             context.wait_for_all_requests();
+            stats.m_skips++;
         }
         first = false;
 
-        stats.m_skips++;
+
+#if 0
+        //  State machine.
+        while (true){
+            BattleMenuFinder battle_menu(COLOR_RED);
+            TeraCatchFinder catch_menu(COLOR_YELLOW);
+            PokemonSummaryFinder summary(COLOR_GREEN);
+            WhiteButtonFinder next_button(
+                COLOR_CYAN,
+                WhiteButton::ButtonA, 20,
+                env.console.overlay(),
+                {0.8, 0.93, 0.2, 0.07}
+            );
+
+
+
+        }
+#endif
+
 
         if (open_raid(env.console, context)){
 //            env.log("Tera raid found!", COLOR_BLUE);

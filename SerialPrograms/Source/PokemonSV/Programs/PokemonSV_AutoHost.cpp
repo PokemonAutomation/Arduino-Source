@@ -38,7 +38,7 @@ using namespace Pokemon;
 AutoHost_Descriptor::AutoHost_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:AutoHost",
-        STRING_POKEMON + " SV", "Auto Host",
+        STRING_POKEMON + " SV", "Auto-Host",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoHost.md",
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED, false,
@@ -376,6 +376,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                 stats.m_losses++;
             }
             completed_one = true;
+            consecutive_failures = 0;
         }catch (OperationFailedException&){
             consecutive_failures++;
             stats.m_errors++;

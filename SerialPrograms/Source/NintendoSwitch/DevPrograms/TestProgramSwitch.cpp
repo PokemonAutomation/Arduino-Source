@@ -162,7 +162,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-    enter_alphanumeric_code(logger, context, "2VL4EP");
+
+    ImageFloatBox ball(0.890, 0.790, 0.030, 0.070);
+    ImageFloatBox radar(0.815, 0.680, 0.180, 0.310);
+
+
+
+
+
+//    enter_alphanumeric_code(logger, context, "2VL4EP");
 
 //    run_path(context, get_path({0, 0}, {2, 6}));
 //    run_path(context, get_path({2, 6}, {0, 9}));
