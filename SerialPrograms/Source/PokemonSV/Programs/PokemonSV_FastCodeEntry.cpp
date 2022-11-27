@@ -8,7 +8,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_FastCodeEntry.h"
 
@@ -35,10 +34,12 @@ FastCodeEntry::FastCodeEntry()
         false,
         "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric.",
         LockWhileRunning::LOCKED,
-        "0123","0123"
-    )
+        "0123", "0123"
+    ),
+    KEYBOARD_LAYOUT(KeyboardLayoutDatabase(), LockWhileRunning::LOCKED, KeyboardLayout::QWERTY)
 {
     PA_ADD_OPTION(CODE);
+    PA_ADD_OPTION(KEYBOARD_LAYOUT);
 }
 
 void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -105,7 +106,7 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         enter_digits_str(context, 4, code.c_str());
     }else if (code.size() == 6){
-        enter_alphanumeric_code(env.logger(), context, code);
+        enter_alphanumeric_code(env.logger(), context, code, KEYBOARD_LAYOUT);
     }else{
         throw UserSetupError(env.logger(), "Invalid code length. Must be 4 or 6 characters long.");
     }

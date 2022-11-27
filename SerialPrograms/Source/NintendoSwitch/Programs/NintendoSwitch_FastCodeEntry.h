@@ -15,12 +15,16 @@ namespace PokemonAutomation{
     class BotBaseContext;
 namespace NintendoSwitch{
 
-
+enum class KeyboardLayout{
+    QWERTY,
+    AZERTY
+};
 
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    const std::string& code
+    const std::string& code,
+    KeyboardLayout keyboard_layout
 );
 
 
