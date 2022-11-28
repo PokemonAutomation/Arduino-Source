@@ -179,6 +179,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageGradient.cpp \
+    Source/CommonFramework/ImageTools/ImageManip.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
@@ -983,6 +984,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
     Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageGradient.h \
+    Source/CommonFramework/ImageTools/ImageManip.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/ImageTools/WaterfillUtilities.h \

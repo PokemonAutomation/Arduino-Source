@@ -6,16 +6,18 @@
 
 #include <map>
 #include <QString>
-#include "Common/Qt/StringToolsQt.h"
+//#include "Common/Qt/StringToolsQt.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+//#include "CommonFramework/OCR/OCR_StringNormalization.h"
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
@@ -189,8 +191,82 @@ uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
     if (player3.stddev.sum() > 20) total++;
     return std::max(total, (uint8_t)1);
 }
+
 std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen){
+    using namespace Kernels::Waterfill;
+
+    //  Direct OCR is unreliable. Instead, we will waterfill each character
+    //  to isolate them, then OCR them individually.
+
+#if 1
+    ImageViewRGB32 image = extract_box_reference(screen, m_code);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, 0xff7f7f7f, true);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, 0xff7f7f7f);
+
+    std::map<size_t, std::string> map;
+    {
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(50);
+        WaterfillObject object;
+        while (iter->find_next(object, true)){
+//                cout << object.packed_matrix()->dump() << endl;
+            ImageViewRGB32 character = extract_box_reference(filtered, object);
+            ImageRGB32 padded = pad_image(character, character.width(), 0xffffffff);
+
+            std::string raw = OCR::ocr_read(Language::English, padded);
+            map.emplace(object.min_x, std::move(raw));
+        }
+    }
+
+    static const std::map<char, char> SUBSTITUTIONS{
+        {'I', '1'},
+        {'l', '1'},
+        {'O', '0'},
+        {'Z', 'S'},
+    };
+
+    std::string raw;
+    std::string normalized;
+    for (const auto& item : map){
+        if (item.second.empty()){
+            continue;
+        }
+        if (item.second.back() < 32){
+            raw += item.second.substr(0, item.second.size() - 1);
+        }else{
+            raw += item.second;
+        }
+
+        char ch = item.second[0];
+
+        //  Upper case.
+        if ('a' <= ch && ch <= 'z'){
+            ch -= 'a' - 'A';
+        }
+
+        //  Character substitution.
+        auto iter = SUBSTITUTIONS.find(ch);
+        if (iter != SUBSTITUTIONS.end()){
+            ch = iter->second;
+        }
+
+        normalized += ch;
+    }
+
+    std::string log = "Code OCR: \"" + raw + "\" -> \"" + normalized + "\"";
+    if (normalized.size() != 4 && normalized.size() != 6){
+        logger.log(log, COLOR_RED);
+        return "";
+    }
+
+    logger.log(log, COLOR_BLUE);
+    return normalized;
+
+#else
+
     ImageRGB32 filtered = to_blackwhite_rgb32_range(extract_box_reference(screen, m_code), 0xff000000, 0xff7f7f7f, true);
+//    filtered.save("test.png");
+
     std::string raw = OCR::ocr_read(Language::English, filtered);
     if (!raw.empty() && raw.back() == '\n'){
         raw.pop_back();
@@ -234,6 +310,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
 
     logger.log(log, COLOR_BLUE);
     return normalized;
+#endif
 }
 
 

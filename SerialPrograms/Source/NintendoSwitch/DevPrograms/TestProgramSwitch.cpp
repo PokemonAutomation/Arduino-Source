@@ -169,8 +169,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    ImageRGB32 image("BadCode-0.jpg");
+
+    TeraLobbyReader reader;
+    reader.raid_code(logger, env.program_info(), image);
+
+
+
+
 //    connect_to_internet_from_overworld(console, context);
-    day_skip_from_overworld(console, context);
+//    day_skip_from_overworld(console, context);
 
 
 

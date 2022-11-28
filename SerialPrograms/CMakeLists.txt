@@ -326,6 +326,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/ImageFilter.h
     Source/CommonFramework/ImageTools/ImageGradient.cpp
     Source/CommonFramework/ImageTools/ImageGradient.h
+    Source/CommonFramework/ImageTools/ImageManip.cpp
+    Source/CommonFramework/ImageTools/ImageManip.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/SolidColorTest.cpp
