@@ -13,27 +13,16 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-//#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
-#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-//#include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
-//#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV_TeraSelfFarmer.h"
@@ -90,53 +79,54 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 
 
 const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
-    static EnumDatabase<TeraSelfFarmer::Mode> database0{
-        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
-    };
+//    static EnumDatabase<TeraSelfFarmer::Mode> database0{
+//        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
+//        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
+//    };
     static EnumDatabase<TeraSelfFarmer::Mode> database1{
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
         {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
         {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
     };
-    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
+//    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
+    return database1;
 }
 
 
 TeraSelfFarmer::TeraSelfFarmer()
-    : MODE(
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::UNLOCKED
+    )
+    , MODE(
         "<b>Mode:</b>",
         database(),
         LockWhileRunning::LOCKED,
         Mode::FARM_ITEMS_ONLY
     )
-    , LANGUAGE(
-        "<b>Game Language:</b>",
-        PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
-    )
-    , BALL_SELECT(
-        "<b>Ball Select:</b>",
+    , MAX_STARS(
+        "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
         LockWhileRunning::UNLOCKED,
-        "poke-ball"
+        4, 1, 7
+    )
+    , TRY_TO_TERASTILIZE(
+        "<b>Try to terastilize:</b><br>Blindly try to terastilize. Add 4s per move but allow to have a bigger win rate in 5* raids.",
+        LockWhileRunning::UNLOCKED, false
     )
     , MAX_CATCHES(
         "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
         LockWhileRunning::UNLOCKED,
         50, 1, 999
     )
+    , BALL_SELECT(
+        "<b>Ball Select:</b>",
+        LockWhileRunning::UNLOCKED,
+        "poke-ball"
+    )
     , FIX_TIME_ON_CATCH(
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCKED, true
-    )
-    , TRY_TO_TERASTILIZE(
-        "<b>Try to terastilize:</b><br>Blindly try to terastilize. Add 4s per move but allow to have a bigger win rate in 5* raids.",
         LockWhileRunning::UNLOCKED, false
-    )
-    , MAX_STARS(
-        "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
-        LockWhileRunning::UNLOCKED,
-        4, 1, 7
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
@@ -158,29 +148,22 @@ TeraSelfFarmer::TeraSelfFarmer()
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
-    )
-    , RAID_SPAWN_DELAY(
-        "<b>Raid Spawn Delay</b>",
-        LockWhileRunning::UNLOCKED,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
-    )
 {
-    PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(BALL_SELECT);
-    PA_ADD_OPTION(MAX_CATCHES);
-    PA_ADD_OPTION(FIX_TIME_ON_CATCH);
-    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
+    PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(MAX_STARS);
+    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
+    PA_ADD_OPTION(MAX_CATCHES);
+    PA_ADD_OPTION(BALL_SELECT);
+    PA_ADD_OPTION(FIX_TIME_ON_CATCH);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
 
 bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Running raid...");
+
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
     bool win = run_tera_battle(
@@ -214,51 +197,17 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         resume_game_from_home(env.console, context);
     }
 
-    TeraResult result = exit_tera_win_by_catching(
-        env.console, context,
-        LANGUAGE,
-        BALL_SELECT.slug(),
-        MODE == Mode::SHINY_HUNT
-    );
-
     stats.m_caught++;
 
-    switch (result){
-    case TeraResult::NO_DETECTION:
-        send_encounter_notification(
-            env,
-            NOTIFICATION_NONSHINY,
-            NOTIFICATION_SHINY,
-            false, false,
-            {{{}, ShinyType::UNKNOWN}},
-            std::nan("")
-        );
-        break;
-    case TeraResult::NOT_SHINY:
-        send_encounter_notification(
-            env,
-            NOTIFICATION_NONSHINY,
-            NOTIFICATION_SHINY,
-            false, false,
-            {{{}, ShinyType::NOT_SHINY}},
-            std::nan("")
-        );
-        break;
-    case TeraResult::SHINY:
-        stats.m_shinies++;
-        send_encounter_notification(
-            env,
-            NOTIFICATION_NONSHINY,
-            NOTIFICATION_SHINY,
-            false, true,
-            {{{}, ShinyType::UNKNOWN_SHINY}},
-            std::nan(""),
-            battle_snapshot
-        );
-        if (MODE == Mode::SHINY_HUNT){
-            throw ProgramFinishedException();
-        }
-    }
+    exit_tera_win_by_catching(
+        env, env.console, context,
+        LANGUAGE,
+        BALL_SELECT.slug(),
+        NOTIFICATION_NONSHINY,
+        NOTIFICATION_SHINY,
+        MODE == Mode::SHINY_HUNT,
+        &stats.m_shinies
+    );
     return true;
 }
 
@@ -290,7 +239,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         if (!first){
             day_skip_from_overworld(env.console, context);
-            pbf_wait(context, RAID_SPAWN_DELAY);
+            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
             context.wait_for_all_requests();
             stats.m_skips++;
         }
@@ -347,7 +296,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             }
             ss << " a " << stars << " stars raid";
             env.log(ss.str());
-
         }
     }
 

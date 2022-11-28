@@ -54,12 +54,23 @@ GameSettings::GameSettings()
         TICKS_PER_SECOND,
         "40 * TICKS_PER_SECOND"
     )
+    , m_tera_raids(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , RAID_SPAWN_DELAY(
+        "<b>Raid Spawn Delay</b>",
+        LockWhileRunning::UNLOCKED,
+        TICKS_PER_SECOND,
+        "3 * TICKS_PER_SECOND"
+    )
 {
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
     PA_ADD_OPTION(START_GAME_WAIT);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(m_tera_raids);
+    PA_ADD_OPTION(RAID_SPAWN_DELAY);
 }
 
 

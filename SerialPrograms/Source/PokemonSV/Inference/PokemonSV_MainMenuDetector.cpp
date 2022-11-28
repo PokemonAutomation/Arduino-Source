@@ -65,7 +65,7 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 }
 
 
-void MainMenuDetector::move_cursor(
+bool MainMenuDetector::move_cursor(
     ConsoleHandle& console, BotBaseContext& context,
     MenuSide side, int row
 ) const{
@@ -76,7 +76,8 @@ void MainMenuDetector::move_cursor(
         );
     }
 
-    size_t consecutive_fails = 0;
+    size_t consecutive_detection_fails = 0;
+    size_t moves = 0;
     while (true){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
@@ -84,14 +85,21 @@ void MainMenuDetector::move_cursor(
 
         //  Failed to detect menu.
         if (current.first == MenuSide::NONE){
-            consecutive_fails++;
-            if (consecutive_fails > 10){
+            consecutive_detection_fails++;
+            if (consecutive_detection_fails > 10){
                 throw OperationFailedException(console.logger(), "Unable to detect menu.");
             }
             context.wait_for(std::chrono::milliseconds(100));
             continue;
         }
-        consecutive_fails = 0;
+        consecutive_detection_fails = 0;
+
+        if (moves >= 10){
+            console.log("Unable to move to target after 10 moves.", COLOR_RED);
+            return false;
+        }
+
+        moves++;
 
         //  Wrong side.
         if (current.first != side){
@@ -105,17 +113,17 @@ void MainMenuDetector::move_cursor(
 
         //  We're done!
         if (current.second == row){
-            return;
+            return true;
         }
 
         if (current.second > row){
-            for (int c = current.second; c != row; c--){
-                pbf_press_dpad(context, DPAD_UP, 20, 30);
-            }
+//            for (int c = current.second; c != row; c--){
+                pbf_press_dpad(context, DPAD_UP, 20, 20);
+//            }
         }else{
-            for (int c = current.second; c != row; c++){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            }
+//            for (int c = current.second; c != row; c++){
+                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+//            }
         }
     }
 }

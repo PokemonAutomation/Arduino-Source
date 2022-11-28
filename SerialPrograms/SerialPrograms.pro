@@ -602,12 +602,12 @@ SOURCES += \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
+    Source/PokemonSV/Programs/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
@@ -882,6 +882,7 @@ HEADERS += \
     ../Common/Cpp/StringTools.h \
     ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
+    ../Common/Cpp/ValueDebouncer.h \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
@@ -1443,12 +1444,12 @@ HEADERS += \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
+    Source/PokemonSV/Programs/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \

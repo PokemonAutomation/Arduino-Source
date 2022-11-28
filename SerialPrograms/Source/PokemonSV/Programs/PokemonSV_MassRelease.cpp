@@ -159,7 +159,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
                 "ReleaseFailed",
                 env.console.video().snapshot()
             );
-            throw OperationFailedException(env.logger(), "Unabled to release " + STRING_POKEMON + ".");
+            throw OperationFailedException(env.logger(), "Unable to release " + STRING_POKEMON + ".");
         }
         context.wait_for(std::chrono::milliseconds(100));
     }

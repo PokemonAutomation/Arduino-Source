@@ -42,7 +42,8 @@ public:
     std::pair<MenuSide, int> detect_location(const ImageViewRGB32& screen) const;
 
     //  While sitting on the menu, move the cursor to the desired slot.
-    void move_cursor(
+    //  Returns true if success.
+    bool move_cursor(
         ConsoleHandle& console, BotBaseContext& context,
         MenuSide side, int row
     ) const;

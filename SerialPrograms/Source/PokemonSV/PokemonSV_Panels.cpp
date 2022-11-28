@@ -12,10 +12,14 @@
 
 #include "Programs/PokemonSV_MassRelease.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
-#include "Programs/PokemonSV_EggFetcher.h"
+
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
+
 #include "Programs/PokemonSV_FastCodeEntry.h"
 #include "Programs/PokemonSV_AutoHost.h"
+
+#include "Programs/PokemonSV_EggFetcher.h"
+#include "Programs/PokemonSV_RideCloner-1.0.1.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,6 +45,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Multiplayer ----");

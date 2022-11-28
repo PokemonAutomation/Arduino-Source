@@ -6,10 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+//#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "Pokemon/Pokemon_Notification.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 //#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
@@ -29,6 +29,8 @@ using namespace Pokemon;
 
 
 bool open_raid(ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening raid...");
+
     TeraCardWatcher card_detector(COLOR_RED);
     int ret = run_until(
         console, context,
@@ -46,6 +48,8 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
     return true;
 }
 void close_raid(ConsoleHandle& console, BotBaseContext& context){
+    console.log("Closing raid...");
+
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
@@ -80,6 +84,8 @@ void exit_tera_win_without_catching(
     ConsoleHandle& console,
     BotBaseContext& context
 ){
+    console.log("Exiting raid without catching...");
+
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
@@ -129,16 +135,23 @@ void exit_tera_win_without_catching(
 
 
 TeraResult exit_tera_win_by_catching(
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
-    bool stop_on_shiny
+    EventNotificationOption& notification_nonshiny,
+    EventNotificationOption& notification_shiny,
+    bool stop_on_shiny,
+    std::atomic<uint64_t>* stat_shinies
 ){
-    WallClock start = current_time();
+    console.log("Exiting raid with catching...");
+
     TeraResult result = TeraResult::NO_DETECTION;
     VideoSnapshot screenshot;
+    WallClock start = current_time();
     while (true){
+        context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
         }
@@ -151,8 +164,8 @@ TeraResult exit_tera_win_by_catching(
             {0.8, 0.93, 0.2, 0.07}
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);
-        PromptDialogWatcher add_to_party(COLOR_GREEN);
-        PromptDialogWatcher nickname(COLOR_PURPLE);
+        PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+        PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_RED);
@@ -199,7 +212,7 @@ TeraResult exit_tera_win_by_catching(
         case 3:
             console.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+                pbf_press_dpad(context, DPAD_DOWN, 20, 60);
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }else{
                 pbf_press_button(context, BUTTON_B, 20, 105);
@@ -223,14 +236,13 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){
                 context.wait_for(std::chrono::milliseconds(500));
-                PokemonSummaryDetector reader;
-                VideoSnapshot screen = console.video().snapshot();
-                result = reader.is_shiny(screen)
-                    ? TeraResult::SHINY
-                    : TeraResult::NOT_SHINY;
-                if (result == TeraResult::SHINY && stop_on_shiny){
-                    return result;
-                }
+                result = run_tera_summary(
+                    env, console, context,
+                    notification_nonshiny,
+                    notification_shiny,
+                    stop_on_shiny, screenshot,
+                    stat_shinies
+                );
             }
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
@@ -246,6 +258,63 @@ TeraResult exit_tera_win_by_catching(
         }
     }
 }
+
+
+
+
+TeraResult run_tera_summary(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    EventNotificationOption& notification_nonshiny,
+    EventNotificationOption& notification_shiny,
+    bool stop_on_shiny, const ImageViewRGB32& battle_screenshot,
+    std::atomic<uint64_t>* stat_shinies
+){
+    console.log("Reading summary...");
+
+    VideoSnapshot screen = console.video().snapshot();
+    PokemonSummaryDetector reader;
+    if (reader.is_shiny(screen)){
+        if (stat_shinies != nullptr){
+            (*stat_shinies)++;
+        }
+        send_encounter_notification(
+            env,
+            notification_nonshiny,
+            notification_shiny,
+            false, true,
+            {{{}, ShinyType::UNKNOWN_SHINY}},
+            std::nan(""),
+            battle_screenshot
+        );
+        if (stop_on_shiny){
+            throw ProgramFinishedException();
+        }
+        return TeraResult::SHINY;
+    }else{
+        send_encounter_notification(
+            env,
+            notification_nonshiny,
+            notification_shiny,
+            false, false,
+            {{{}, ShinyType::NOT_SHINY}},
+            std::nan("")
+        );
+        return TeraResult::NOT_SHINY;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

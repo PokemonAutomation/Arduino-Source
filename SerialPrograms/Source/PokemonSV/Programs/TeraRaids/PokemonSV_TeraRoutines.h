@@ -10,14 +10,18 @@
 //#include <stdint.h>
 #include <string>
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{
     class ConsoleHandle;
     class BotBaseContext;
     class ProgramEnvironment;
-//    class EventNotificationOption;
+    class EventNotificationOption;
+    class ImageViewRGB32;
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
 
 
 //  While in the overworld, attempt to enter a raid in front of you.
@@ -51,12 +55,30 @@ enum class TeraResult{
 //  Upon returning, you will be in the overworld except if it is shiny and
 //  "stop_on_shiny == true', then you will be in the summary of the shiny.
 TeraResult exit_tera_win_by_catching(
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
-    bool stop_on_shiny
+    EventNotificationOption& notification_nonshiny,
+    EventNotificationOption& notification_shiny,
+    bool stop_on_shiny,
+    std::atomic<uint64_t>* stat_shinies
 );
+
+
+
+TeraResult run_tera_summary(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    EventNotificationOption& notification_nonshiny,
+    EventNotificationOption& notification_shiny,
+    bool stop_on_shiny, const ImageViewRGB32& battle_screenshot,
+    std::atomic<uint64_t>* stat_shinies
+);
+
+
 
 
 

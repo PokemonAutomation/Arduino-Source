@@ -29,6 +29,7 @@ WidgetStackFixedAspectRatio::WidgetStackFixedAspectRatio(QWidget& parent, SizePo
     layout->setAlignment(Qt::AlignCenter);
     m_stack_holder = new QWidget(m_detached_internal);
     layout->addWidget(m_stack_holder);
+//    this->setFixedHeight(495);
 }
 
 void WidgetStackFixedAspectRatio::add_widget(QWidget& widget){
@@ -38,13 +39,13 @@ void WidgetStackFixedAspectRatio::add_widget(QWidget& widget){
 void WidgetStackFixedAspectRatio::set_size_policy(SizePolicy size_policy){
     m_size_policy = size_policy;
     clear_fixed_dimensions();
-    m_recent_widths.clear();
+    m_debouncer.clear();
     update_size(this->size());
 }
 void WidgetStackFixedAspectRatio::set_aspect_ratio(double aspect_ratio){
 //    cout << "WidgetStackFixedAspectRatio::set_aspect_ratio(): " << aspect_ratio << endl;
     m_aspect_ratio = aspect_ratio;
-    m_recent_widths.clear();
+    m_debouncer.clear();
     update_size(this->size());
 }
 
@@ -73,31 +74,25 @@ void WidgetStackFixedAspectRatio::resize_to_box(QSize enclosing_box){
     }
 }
 void WidgetStackFixedAspectRatio::resize_to_width(int width){
-//    cout << "WidgetStackFixedAspectRatio::resize_to_width(): " << width << endl;
+    int previous_width = m_stack_holder->width();
+//    cout << "WidgetStackFixedAspectRatio::resize_to_width(): " << width << " <- " << previous_width << endl;
 
-    int height = (int)(width / m_aspect_ratio);
-
-    QSize size(width, height);
-
-    //  Safeguard against a resizing loop where the UI bounces between larger
-    //  height with scroll bar and lower height with no scroll bar.
-    auto iter = m_recent_widths.find(width);
-    if (iter != m_recent_widths.end() &&
-        width > m_stack_holder->width() &&
-        width - m_stack_holder->width() < 50
-    ){
-        cout << "Supressing potential infinite resizing loop." << endl;
+    if (width == previous_width){
         return;
     }
 
-    m_width_history.push_back(width);
-    m_recent_widths.insert(width);
-    if (m_width_history.size() > 10){
-        m_recent_widths.erase(m_width_history[0]);
-        m_width_history.pop_front();
+    if (width > previous_width && width < previous_width + 50 && !m_debouncer.check(width)){
+//        cout << "Supressing potential infinite resizing loop." << endl;
+        return;
     }
 
+
+    int height = (int)(width / m_aspect_ratio);
+//    cout << "Resizing: " << width << " x " << height << " from: " << previous_width << " x " << m_stack_holder->height() << endl;
+
+    QSize size(width, height);
     this->setFixedHeight(height);
+
     m_detached_internal->setFixedSize(size);
     m_stack_holder->setFixedSize(size);
     for (QWidget* widget : m_widgets){

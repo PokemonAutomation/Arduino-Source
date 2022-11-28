@@ -1,4 +1,4 @@
-/*  Clone Items
+/*  Ride Cloner
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -21,9 +21,9 @@ namespace PokemonSV{
 
 
 
-class CloneItems101_Descriptor : public SingleSwitchProgramDescriptor{
+class RideCloner101_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    CloneItems101_Descriptor();
+    RideCloner101_Descriptor();
 
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
@@ -33,29 +33,42 @@ public:
 
 
 
-class CloneItems101 : public SingleSwitchProgramInstance{
+class RideCloner101 : public SingleSwitchProgramInstance{
 public:
-    CloneItems101();
+    RideCloner101();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    size_t fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void setup(ConsoleHandle& console, BotBaseContext& context);
+    bool run_post_win(
+        ProgramEnvironment& env,
+        ConsoleHandle& console,
+        BotBaseContext& context
+    );
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCR LANGUAGE;
 
-    SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
+    enum class Mode{
+        CLONE_ONLY,
+        SHINY_HUNT,
+    };
+    EnumDropdownOption<Mode> MODE;
+
+    SimpleIntegerOption<uint16_t> RIDES_TO_CLONE;
 
     SimpleIntegerOption<uint8_t> MAX_STARS;
 
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
-    TimeExpressionOption<uint32_t> A_TO_B_DELAY;
+    TimeExpressionOption<uint16_t> A_TO_B_DELAY;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationOption NOTIFICATION_NONSHINY;
+    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
 };
 

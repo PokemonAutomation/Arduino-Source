@@ -47,6 +47,7 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
@@ -76,7 +77,6 @@ using std::cout;
 using std::endl;
 
 
-//#include "../Internal/SerialPrograms/NintendoSwitch_Commands_ScalarButtons.h"
 using namespace PokemonAutomation::Kernels;
 using namespace PokemonAutomation::Kernels::Waterfill;
 
@@ -170,11 +170,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    ImageRGB32 image("screenshot-20221128-084818449677.png");
+    PromptDialogDetector detector(COLOR_RED);
+    cout << detector.detect(image) << endl;
+
+
+//    ssf_press_button(context, BUTTON_A, 8, 20);
+//    pbf_press_button(context, BUTTON_B, 20, 105);
+
+
+
+#if 0
     ImageRGB32 image("BadCode-0.jpg");
 
     TeraLobbyReader reader;
     reader.raid_code(logger, env.program_info(), image);
-
+#endif
 
 
 

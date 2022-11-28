@@ -7,10 +7,8 @@
 #ifndef PokemonAutomation_PokemonSV_TeraSelfFarmer_H
 #define PokemonAutomation_PokemonSV_TeraSelfFarmer_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 //#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
@@ -45,29 +43,27 @@ private:
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
+    OCR::LanguageOCR LANGUAGE;
+
     enum class Mode{
         FARM_ITEMS_ONLY,
         CATCH_ALL,
         SHINY_HUNT,
     };
-    static const EnumDatabase<TeraSelfFarmer::Mode>& database();
+    static const EnumDatabase<Mode>& database();
     EnumDropdownOption<Mode> MODE;
 
-    OCR::LanguageOCR LANGUAGE;
-    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    SimpleIntegerOption<uint16_t> MAX_CATCHES;
-    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
+    SimpleIntegerOption<uint8_t> MAX_STARS;
     BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
-    SimpleIntegerOption<uint8_t> MAX_STARS;
+    SimpleIntegerOption<uint16_t> MAX_CATCHES;
+    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
+    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
-
-    SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
 
     uint16_t m_number_caught;
 
