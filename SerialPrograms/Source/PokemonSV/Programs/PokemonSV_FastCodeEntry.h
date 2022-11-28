@@ -33,15 +33,7 @@ public:
 
 private:
     StringOption CODE;
-    EnumDropdownCell<KeyboardLayout> KEYBOARD_LAYOUT;
-
-    static const EnumDatabase<KeyboardLayout>& KeyboardLayoutDatabase(){
-        static const EnumDatabase<KeyboardLayout> database({
-            {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
-            {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
-        });
-        return database;
-    }
+    EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
 };
 
 

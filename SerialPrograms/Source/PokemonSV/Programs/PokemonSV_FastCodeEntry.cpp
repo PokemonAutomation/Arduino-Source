@@ -32,11 +32,19 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
 FastCodeEntry::FastCodeEntry()
     : CODE(
         false,
-        "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric.",
+        "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)",
         LockWhileRunning::LOCKED,
         "0123", "0123"
     ),
-    KEYBOARD_LAYOUT(KeyboardLayoutDatabase(), LockWhileRunning::LOCKED, KeyboardLayout::QWERTY)
+    KEYBOARD_LAYOUT(
+        "<b>Keyboard Layout:</b>",
+        {
+            {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
+            {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
+        },
+        LockWhileRunning::LOCKED,
+        KeyboardLayout::QWERTY
+    )
 {
     PA_ADD_OPTION(CODE);
     PA_ADD_OPTION(KEYBOARD_LAYOUT);

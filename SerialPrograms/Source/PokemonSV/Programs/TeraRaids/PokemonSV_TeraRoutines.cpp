@@ -15,7 +15,7 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
-//#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
@@ -154,6 +154,7 @@ TeraResult exit_tera_win_by_catching(
         PromptDialogWatcher add_to_party(COLOR_GREEN);
         PromptDialogWatcher nickname(COLOR_PURPLE);
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
+        MainMenuWatcher main_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -166,7 +167,8 @@ TeraResult exit_tera_win_by_catching(
                 add_to_party,
                 nickname,
                 summary,
-                overworld
+                main_menu,
+                overworld,
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -233,6 +235,10 @@ TeraResult exit_tera_win_by_catching(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 6:
+            console.log("Detected unexpected main menu.", COLOR_RED);
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        case 7:
             console.log("Detected overworld.");
             return result;
         default:
