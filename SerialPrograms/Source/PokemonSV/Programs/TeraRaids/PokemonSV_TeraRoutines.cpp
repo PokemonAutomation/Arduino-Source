@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/Tools/ProgramEnvironment.h"

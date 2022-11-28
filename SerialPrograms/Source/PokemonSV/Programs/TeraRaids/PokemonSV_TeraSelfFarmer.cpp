@@ -4,7 +4,6 @@
  *
  */
 
-#include <cmath>
 #include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
