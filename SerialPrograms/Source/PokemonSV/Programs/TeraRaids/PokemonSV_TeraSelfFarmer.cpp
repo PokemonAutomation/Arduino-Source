@@ -186,7 +186,6 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     bool win = run_tera_battle(
         env, env.console, context,
         NOTIFICATION_ERROR_RECOVERABLE,
-        true,
         TRY_TO_TERASTILIZE
     );
 

@@ -23,7 +23,6 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool from_start,
     bool blindly_terastilize
 );
 

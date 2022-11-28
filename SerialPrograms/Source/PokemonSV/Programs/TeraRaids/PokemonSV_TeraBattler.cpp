@@ -24,9 +24,9 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool from_start,
     bool blindly_terastilize
 ){
+#if 0
     if (from_start){
         //  Wait for first battle menu.
         {
@@ -46,6 +46,7 @@ bool run_tera_battle(
             env.log("First battle menu found.");
         }
     }
+#endif
 
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;

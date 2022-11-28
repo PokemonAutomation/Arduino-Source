@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_FastCodeEntry_H
 #define PokemonAutomation_PokemonSV_FastCodeEntry_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 
 namespace PokemonAutomation{
@@ -18,7 +18,7 @@ namespace PokemonSV{
 
 
 
-class FastCodeEntry_Descriptor : public SingleSwitchProgramDescriptor{
+class FastCodeEntry_Descriptor : public MultiSwitchProgramDescriptor{
 public:
     FastCodeEntry_Descriptor();
 };
@@ -26,14 +26,15 @@ public:
 
 
 
-class FastCodeEntry : public SingleSwitchProgramInstance{
+class FastCodeEntry : public MultiSwitchProgramInstance{
 public:
     FastCodeEntry();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StringOption CODE;
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
+    BooleanCheckBoxOption FAST_MODE;
 };
 
 

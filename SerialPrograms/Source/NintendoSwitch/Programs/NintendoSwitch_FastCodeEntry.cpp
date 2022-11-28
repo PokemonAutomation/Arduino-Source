@@ -7,8 +7,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_FastCodeEntry.h"
 
@@ -158,7 +157,8 @@ size_t get_codeboard_path_cost(const std::vector<DigitPath>& path){
 std::vector<DigitPath> get_codeboard_path(
     const std::vector<CodeboardPosition>& positions, size_t s, size_t e,
     CodeboardPosition start,
-    KeyboardLayout keyboard_layout
+    KeyboardLayout keyboard_layout,
+    bool fast
 ){
     if (e - s == 1){
         return {get_codeboard_digit_path(start, positions[s])};
@@ -168,7 +168,7 @@ std::vector<DigitPath> get_codeboard_path(
     {
         CodeboardPosition position = positions[s];
         forward.emplace_back(get_codeboard_digit_path(start, position));
-        std::vector<DigitPath> remaining = get_codeboard_path(positions, s + 1, e, position, keyboard_layout);
+        std::vector<DigitPath> remaining = get_codeboard_path(positions, s + 1, e, position, keyboard_layout, fast);
         forward.insert(forward.end(), remaining.begin(), remaining.end());
     }
 
@@ -177,11 +177,11 @@ std::vector<DigitPath> get_codeboard_path(
         CodeboardPosition position = positions[e - 1];
         reverse.emplace_back(get_codeboard_digit_path(start, position));
         reverse.back().left_cursor = true;
-        std::vector<DigitPath> remaining = get_codeboard_path(positions, s, e - 1, position, keyboard_layout);
+        std::vector<DigitPath> remaining = get_codeboard_path(positions, s, e - 1, position, keyboard_layout, fast);
         reverse.insert(reverse.end(), remaining.begin(), remaining.end());
     }
 
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
+    if (!fast){
         return forward;
     }
 
@@ -195,6 +195,7 @@ std::vector<DigitPath> get_codeboard_path(
     Logger& logger,
     const std::string& code,
     KeyboardLayout keyboard_layout,
+    bool fast,
     CodeboardPosition start = {0, 0}
 ){
     auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
@@ -216,18 +217,17 @@ std::vector<DigitPath> get_codeboard_path(
         }
         positions.emplace_back(iter->second);
     }
-    return get_codeboard_path(positions, 0, positions.size(), start, keyboard_layout);
+    return get_codeboard_path(positions, 0, positions.size(), start, keyboard_layout, fast);
 }
 
 
 
 void run_codeboard_path(
     BotBaseContext& context,
-    const std::vector<DigitPath>& path
+    const std::vector<DigitPath>& path,
+    bool fast
 ){
-    uint16_t delay = PreloadSettings::instance().DEVELOPER_MODE
-        ? 3
-        : 50;
+    uint16_t delay = fast ? 3 : 10;
     for (const DigitPath& digit : path){
         if (digit.length > 0){
             for (size_t c = 0; c < (size_t)digit.length - 1; c++){
@@ -247,10 +247,11 @@ void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
     const std::string& code,
-    KeyboardLayout keyboard_layout
+    KeyboardLayout keyboard_layout,
+    bool fast
 ){
-    run_codeboard_path(context, get_codeboard_path(logger, code, keyboard_layout));
-    pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    run_codeboard_path(context, get_codeboard_path(logger, code, keyboard_layout, fast), fast);
+//    pbf_press_button(context, BUTTON_PLUS, 5, 3);
 }
 
 

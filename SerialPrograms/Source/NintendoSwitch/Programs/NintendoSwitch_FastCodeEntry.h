@@ -24,7 +24,8 @@ void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
     const std::string& code,
-    KeyboardLayout keyboard_layout
+    KeyboardLayout keyboard_layout,
+    bool fast
 );
 
 
