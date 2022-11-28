@@ -11,6 +11,7 @@
 #include "PokemonSV_Settings.h"
 
 #include "Programs/PokemonSV_MassRelease.h"
+#include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
@@ -41,6 +42,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
