@@ -4,6 +4,7 @@
  *
  */
 
+#include <string.h>
 #include "ImageManip.h"
 
 namespace PokemonAutomation{
