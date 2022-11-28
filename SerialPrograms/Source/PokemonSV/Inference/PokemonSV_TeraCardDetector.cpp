@@ -130,7 +130,7 @@ TeraLobbyReader::TeraLobbyReader(Color color)
     , m_cursor(0.135, 0.25, 0.05, 0.25)
 //    , m_stars(0.500, 0.555, 0.310, 0.070)
     , m_timer(0.175, 0.180, 0.100, 0.080)
-    , m_code(0.310, 0.180, 0.150, 0.080)
+    , m_code(0.310, 0.180, 0.200, 0.080)
     , m_player1_spinner(0.157, 0.645, 0.037, 0.060)
     , m_player2_spinner(0.157, 0.715, 0.037, 0.060)
     , m_player3_spinner(0.157, 0.790, 0.037, 0.060)
@@ -231,7 +231,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
         if (item.second.empty()){
             continue;
         }
-        if (item.second.back() < 32){
+        if ((uint8_t)item.second.back() < (uint8_t)32){
             raw += item.second.substr(0, item.second.size() - 1);
         }else{
             raw += item.second;

@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_FastCodeEntry.h"
@@ -180,6 +181,10 @@ std::vector<DigitPath> get_codeboard_path(
         reverse.insert(reverse.end(), remaining.begin(), remaining.end());
     }
 
+    if (!PreloadSettings::instance().DEVELOPER_MODE){
+        return forward;
+    }
+
     if (get_codeboard_path_cost(forward) <= get_codeboard_path_cost(reverse)){
         return forward;
     }else{
@@ -220,14 +225,17 @@ void run_codeboard_path(
     BotBaseContext& context,
     const std::vector<DigitPath>& path
 ){
+    uint16_t delay = PreloadSettings::instance().DEVELOPER_MODE
+        ? 3
+        : 50;
     for (const DigitPath& digit : path){
         if (digit.length > 0){
             for (size_t c = 0; c < (size_t)digit.length - 1; c++){
-                ssf_issue_scroll(context, digit.path[c], 3);
+                ssf_issue_scroll(context, digit.path[c], delay);
             }
             ssf_issue_scroll(context, digit.path[digit.length - 1], 0);
         }
-        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, delay);
         if (digit.left_cursor){
             ssf_press_button(context, BUTTON_L, 1);
         }
