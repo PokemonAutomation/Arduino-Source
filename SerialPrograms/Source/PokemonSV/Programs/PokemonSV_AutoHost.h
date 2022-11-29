@@ -59,6 +59,10 @@ private:
 
     TextEditOption DESCRIPTION;
 
+    SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
+    SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
+
+
     EventNotificationOption NOTIFICATION;
     EventNotificationsOption NOTIFICATIONS;
 };

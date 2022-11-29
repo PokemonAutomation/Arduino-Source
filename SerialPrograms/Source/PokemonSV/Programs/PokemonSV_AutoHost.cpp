@@ -115,6 +115,18 @@ AutoHost::AutoHost()
         "",
         "Auto-Hosting Shiny Eevee"
     )
+    , CONSECUTIVE_FAILURE_PAUSE(
+        "<b>Consecutive Failure Stop/Pause:</b><br>Pause or stop the program if this many consecutive raids fail.<br>"
+        "It is not recommended to set this higher than 3 since soft bans start after 3 disconnects.",
+        LockWhileRunning::UNLOCKED,
+        3, 1
+    )
+    , FAILURE_PAUSE_MINUTES(
+        "<b>Failure Pause Time (in minutes):</b><br>If you trigger the above by failing too many times, "
+        "pause for this many minutes before resuming the program. (Zero stops the program.)",
+        LockWhileRunning::UNLOCKED,
+        0, 0
+    )
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS({
         &NOTIFICATION,
@@ -128,6 +140,8 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(START_RAID_PLAYERS);
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
+    PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -306,8 +320,24 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         if (consecutive_failures > 0 && !completed_one){
             throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }
-        if (consecutive_failures >= 3){
-            throw OperationFailedException(env.logger(), "Failed 3 raids in the row. Stopping to prevent possible ban.");
+        size_t fail_threshold = CONSECUTIVE_FAILURE_PAUSE;
+        if (consecutive_failures >= fail_threshold){
+            uint16_t minutes = FAILURE_PAUSE_MINUTES;
+            if (minutes == 0){
+                throw OperationFailedException(
+                    env.logger(),
+                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
+                    "Stopping to prevent possible ban."
+                );
+            }else{
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
+                    "Pausing program for " + std::to_string(minutes) + " minute(s)."
+                );
+                context.wait_for(std::chrono::minutes(minutes));
+                consecutive_failures = 0;
+            }
         }
 
         if (!skip_reset){
@@ -359,6 +389,11 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         context.wait_for_all_requests();
         try{
+            //  REMOVE
+            if (completed_one){
+                throw OperationFailedException(env.console, "test");
+            }
+
             if (!run_lobby(env, context)){
                 continue;
             }
