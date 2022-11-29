@@ -600,6 +600,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp \
@@ -1443,6 +1444,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h \

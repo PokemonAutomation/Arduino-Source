@@ -1213,6 +1213,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
