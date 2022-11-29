@@ -33,8 +33,8 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
 
 FastCodeEntry::FastCodeEntry()
     : CODE(
-        false,
-        "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)",
+        "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)<br>"
+        "(Box is big so it's easy to land your mouse on.)",
         LockWhileRunning::LOCKED,
         "0123", "0123"
     )

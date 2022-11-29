@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_FastCodeEntry_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 
@@ -32,7 +32,7 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    StringOption CODE;
+    TextEditOption CODE;
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
     BooleanCheckBoxOption FAST_MODE;
 };

@@ -185,10 +185,10 @@ uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
 //    cout << player3.average << player3.stddev << endl;
 
     uint8_t total = 0;
-    if (player0.stddev.sum() > 20) total++;
-    if (player1.stddev.sum() > 20) total++;
-    if (player2.stddev.sum() > 20) total++;
-    if (player3.stddev.sum() > 20) total++;
+    if (player0.stddev.sum() > 80) total++;
+    if (player1.stddev.sum() > 80) total++;
+    if (player2.stddev.sum() > 80) total++;
+    if (player3.stddev.sum() > 80) total++;
     return std::max(total, (uint8_t)1);
 }
 

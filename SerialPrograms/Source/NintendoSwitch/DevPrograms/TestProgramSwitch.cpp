@@ -169,8 +169,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    pbf_move_left_joystick(context, 128, 255, 80, 0);
-    pbf_move_left_joystick(context, 128, 0, 90, 0);
+//    pbf_move_left_joystick(context, 128, 255, 80, 0);
+//    pbf_move_left_joystick(context, 128, 0, 90, 0);
 
 
 //    ImageRGB32 image("screenshot-20221128-084818449677.png");
@@ -183,11 +183,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
-    ImageRGB32 image("BadCode-0.jpg");
+#if 1
+    ImageRGB32 image("screenshot-20221128-214005707443.png");
 
     TeraLobbyReader reader;
     reader.raid_code(logger, env.program_info(), image);
+    cout << (int)reader.total_players(image) << endl;
 #endif
 
 
