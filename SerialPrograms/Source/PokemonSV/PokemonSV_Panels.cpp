@@ -56,9 +56,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Glitches ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
-    }
+    ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

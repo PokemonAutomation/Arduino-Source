@@ -389,11 +389,6 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         context.wait_for_all_requests();
         try{
-            //  REMOVE
-            if (completed_one){
-                throw OperationFailedException(env.console, "test");
-            }
-
             if (!run_lobby(env, context)){
                 continue;
             }

@@ -150,7 +150,7 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
                 box_slot_one,
             }
         );
-        context.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(50));
 
         switch (ret){
         case 0:
@@ -161,10 +161,10 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
             console.log("Detected main menu.");
             if (item_held){
                 main_menu.move_cursor(console, context, MenuSide::RIGHT, 1);
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 20);
             }else{
                 main_menu.move_cursor(console, context, MenuSide::LEFT, 5);
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 20);
             }
             continue;
         case 2:
@@ -173,7 +173,7 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
             pbf_press_dpad(context, DPAD_UP, 20, 30);
             continue;
         case 3:
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 20);
             continue;
         case 4:
             console.log("Detected 6th slot select back. (unexpected)", COLOR_RED);
@@ -183,20 +183,17 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
             console.log("Detected dialog.");
 
             //  Resolve ambiguities.
-
             VideoSnapshot snapshot = console.video().snapshot();
 
             //  Confirmation prompt for returning your ride back to ride form.
             if (return_to_ride_prompt.detect(snapshot)){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 20);
                 item_held = true;
                 continue;
             }
 
-
-
             //  No other recognized ambiguities.
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 20, 20);
             continue;
         }
         case 6:{
@@ -212,8 +209,8 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
 
             //  Not on the battle teams.
             if (!battle_team.detect(snapshot)){
-                pbf_press_button(context, BUTTON_X, 20, 105);
-                pbf_press_button(context, BUTTON_X, 20, 105);
+                pbf_press_button(context, BUTTON_X, 20, 50);
+                pbf_press_button(context, BUTTON_X, 20, 50);
                 continue;
             }
 

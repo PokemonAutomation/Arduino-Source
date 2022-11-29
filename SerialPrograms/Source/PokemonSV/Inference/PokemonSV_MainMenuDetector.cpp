@@ -104,19 +104,21 @@ bool MainMenuDetector::move_cursor(
         //  Wrong side.
         if (current.first != side){
             if (current.first == MenuSide::LEFT){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
             }else{
-                pbf_press_dpad(context, DPAD_LEFT, 20, 105);
+                pbf_press_dpad(context, DPAD_LEFT, 20, 20);
             }
             continue;
         }
 
         //  We're done!
+
         if (current.second == row){
             return true;
         }
 
-        if (current.second > row){
+        int diff = (7 + current.second - row) % 7;
+        if (diff < 4){
 //            for (int c = current.second; c != row; c--){
                 pbf_press_dpad(context, DPAD_UP, 20, 20);
 //            }
