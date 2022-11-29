@@ -33,7 +33,7 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:CloneItems1.0.1",
         STRING_POKEMON + " SV", "Clone Items (1.0.1)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/CloneItems101.md",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/CloneItems-101.md",
         "Clone items using the add-to-party glitch.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
