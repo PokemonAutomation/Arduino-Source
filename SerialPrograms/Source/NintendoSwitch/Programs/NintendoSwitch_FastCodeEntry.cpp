@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_FastCodeEntry.h"
 
@@ -251,7 +251,7 @@ void enter_alphanumeric_code(
     bool fast
 ){
     run_codeboard_path(context, get_codeboard_path(logger, code, keyboard_layout, fast), fast);
-//    pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    pbf_press_button(context, BUTTON_PLUS, 5, 3);
 }
 
 
