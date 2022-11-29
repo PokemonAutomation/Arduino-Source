@@ -18,8 +18,10 @@
 #include "Programs/PokemonSV_FastCodeEntry.h"
 #include "Programs/PokemonSV_AutoHost.h"
 
+#include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
+#include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
+
 #include "Programs/PokemonSV_EggFetcher.h"
-#include "Programs/PokemonSV_RideCloner-1.0.1.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -52,6 +54,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Glitches ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

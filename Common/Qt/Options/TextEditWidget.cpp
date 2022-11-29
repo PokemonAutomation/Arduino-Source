@@ -10,6 +10,10 @@
 #include <QTextEdit>
 #include "TextEditWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -51,6 +55,8 @@ public:
 
     virtual void focusOutEvent(QFocusEvent* event) override{
         QTextEdit::focusOutEvent(event);
+//        static size_t c = 0;
+//        cout << "focusOutEvent: " << c++ << endl;
         m_parent.m_value.set(this->toPlainText().toStdString());
     }
 

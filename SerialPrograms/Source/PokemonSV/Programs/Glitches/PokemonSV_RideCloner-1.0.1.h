@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_CloneItems_H
-#define PokemonAutomation_PokemonSV_CloneItems_H
+#ifndef PokemonAutomation_PokemonSV_RideCloner_H
+#define PokemonAutomation_PokemonSV_RideCloner_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"

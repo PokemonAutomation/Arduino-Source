@@ -306,8 +306,8 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         if (consecutive_failures > 0 && !completed_one){
             throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }
-        if (consecutive_failures >= 2){
-            throw OperationFailedException(env.logger(), "Failed 2 raids in the row. Stopping to prevent possible ban.");
+        if (consecutive_failures >= 3){
+            throw OperationFailedException(env.logger(), "Failed 3 raids in the row. Stopping to prevent possible ban.");
         }
 
         if (!skip_reset){
