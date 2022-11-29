@@ -43,7 +43,7 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         "PokemonSV:RideCloner1.0.1",
         STRING_POKEMON + " SV", "Ride Cloner (1.0.1)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/RideCloner101.md",
-        "Clone your ride legendary (and its item) using add-to-party glitch.",
+        "Clone your ride legendary (and its item) using the add-to-party glitch.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -97,7 +97,7 @@ RideCloner101::RideCloner101()
         "<b>Mode:</b>",
         {
             {Mode::CLONE_ONLY,  "clone-only",   "Clone only. Don't stop on a shiny raid."},
-            {Mode::SHINY_HUNT,  "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
+            {Mode::SHINY_HUNT,  "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
         },
         LockWhileRunning::LOCKED,
         Mode::SHINY_HUNT
@@ -363,10 +363,14 @@ bool RideCloner101::run_post_win(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 6:
-            console.log("Detected party swap.", COLOR_RED);
-            main_menu.move_cursor(console, context, MenuSide::LEFT, 5);
-            ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            console.log("Detected party swap.");
+//            context.wait_for(std::chrono::milliseconds(150));
+            try{
+                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 5)){
+                    ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
+                    pbf_press_button(context, BUTTON_B, 20, 230);
+                }
+            }catch (OperationFailedException&){}
             continue;
         case 7:
             console.log("Detected overworld.");
@@ -400,7 +404,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
 
     bool first = true;
-
+    size_t move_counter = 0;
     for (uint16_t items = 0; items < RIDES_TO_CLONE;){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -409,6 +413,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         //  Find raid.
         while (true){
+            env.update_stats();
             if (!first){
                 day_skip_from_overworld(env.console, context);
                 pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
@@ -438,9 +443,23 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 continue;
             }
 
-            if (MODE == Mode::SHINY_HUNT){
+            //  Reopen the raid if we need to do stuff.
+            bool fix_position = move_counter % 10 == 1;
+            Mode mode = MODE;
+            if (fix_position || mode == Mode::SHINY_HUNT){
                 close_raid(env.console, context);
-                save_game_from_overworld(env.console, context);
+
+                //  Save game because we're shiny-hunting.
+                if (mode == Mode::SHINY_HUNT){
+                    save_game_from_overworld(env.console, context);
+                }
+
+                //  Fix our position.
+                if (fix_position){
+                    pbf_move_left_joystick(context, 128, 255, 100, 0);
+                    pbf_move_left_joystick(context, 128, 0, 120, 0);
+                }
+
                 context.wait_for_all_requests();
                 if (open_raid(env.console, context)){
                     env.log("Tera raid found!", COLOR_BLUE);
@@ -477,6 +496,8 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }else{
             stats.m_failed++;
         }
+
+        move_counter++;
     }
 
 

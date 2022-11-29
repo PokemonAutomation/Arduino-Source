@@ -45,15 +45,13 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
-    }
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back("---- Multiplayer ----");
-        ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
-        ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
-    }
+    ret.emplace_back("---- Multiplayer ----");
+    ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
+    ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
+
+    ret.emplace_back("---- Glitches ----");
+    ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

@@ -47,8 +47,8 @@ private:
 
     enum class Mode{
         LOCAL,
-        ONLINE_EVERYONE,
         ONLINE_CODED,
+        ONLINE_EVERYONE,
     };
 
     EnumDropdownOption<Mode> MODE;

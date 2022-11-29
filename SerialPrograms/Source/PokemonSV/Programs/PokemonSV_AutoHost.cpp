@@ -83,8 +83,8 @@ AutoHost::AutoHost()
         "<b>Hosting Mode:</b>",
         {
             {Mode::LOCAL,           "local",            "Host Locally"},
-            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
             {Mode::ONLINE_CODED,    "online-coded",     "Host Online (link code)"},
+            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
         },
         LockWhileRunning::UNLOCKED,
         Mode::ONLINE_CODED
@@ -95,7 +95,7 @@ AutoHost::AutoHost()
         60, 15, 180
     )
     , START_RAID_PLAYERS(
-        "<b>Start Game:</b><br>Start the raid when there are this many players.",
+        "<b>Start Players:</b><br>Start the raid when there are this many players.",
         {
             {2, "2", "2 Players (1 Joiner)"},
             {3, "3", "3 Players (2 Joiners)"},
@@ -105,7 +105,7 @@ AutoHost::AutoHost()
         4
     )
     , ROLLOVER_PREVENTION(
-        "<b>Rollover Prevention:</b><br>Periodically set the date back to 12AM to prevent the date from rolling over and losing the raid.",
+        "<b>Rollover Prevention:</b><br>Periodically set the time back to 12AM to prevent the date from rolling over and losing the raid.",
         LockWhileRunning::UNLOCKED,
         true
     )

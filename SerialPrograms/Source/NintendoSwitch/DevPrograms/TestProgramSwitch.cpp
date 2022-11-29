@@ -169,10 +169,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    pbf_move_left_joystick(context, 128, 255, 80, 0);
+    pbf_move_left_joystick(context, 128, 0, 90, 0);
 
-    ImageRGB32 image("screenshot-20221128-084818449677.png");
-    PromptDialogDetector detector(COLOR_RED);
-    cout << detector.detect(image) << endl;
+
+//    ImageRGB32 image("screenshot-20221128-084818449677.png");
+//    PromptDialogDetector detector(COLOR_RED);
+//    cout << detector.detect(image) << endl;
 
 
 //    ssf_press_button(context, BUTTON_A, 8, 20);

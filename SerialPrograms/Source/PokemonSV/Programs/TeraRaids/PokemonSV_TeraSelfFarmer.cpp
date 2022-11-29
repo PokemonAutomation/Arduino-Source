@@ -85,7 +85,7 @@ const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
     static EnumDatabase<TeraSelfFarmer::Mode> database1{
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
         {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
-        {Mode::SHINY_HUNT,      "shiny-hunt",   "Save before each raid and catch. Stop program if shiny is found."},
+        {Mode::SHINY_HUNT,      "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
     };
 //    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
     return database1;
