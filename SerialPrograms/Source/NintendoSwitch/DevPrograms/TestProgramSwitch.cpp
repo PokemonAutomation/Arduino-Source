@@ -184,8 +184,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
-    ImageRGB32 image("screenshot-20221128-214005707443.png");
+#if 1
+    ImageRGB32 image("20221129-190351106440.jpg");
 
     TeraLobbyReader reader;
     reader.raid_code(logger, env.program_info(), image);

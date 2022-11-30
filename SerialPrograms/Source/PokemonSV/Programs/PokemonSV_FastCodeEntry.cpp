@@ -116,7 +116,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Connect the controller.
-        pbf_press_button(context, BUTTON_PLUS, 3, 0);
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
 
         if (code.size() == 4){
             if (!digits_only){

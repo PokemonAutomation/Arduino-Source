@@ -199,9 +199,12 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
     //  to isolate them, then OCR them individually.
 
 #if 1
+
+    uint32_t THRESHOLD = 0xff5f5f5f;
+
     ImageViewRGB32 image = extract_box_reference(screen, m_code);
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, 0xff7f7f7f, true);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, 0xff7f7f7f);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, THRESHOLD, true);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, THRESHOLD);
 
     std::map<size_t, std::string> map;
     {
@@ -217,6 +220,8 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
             map.emplace(object.min_x, std::move(raw));
         }
     }
+
+//    cout << map.size() << endl;
 
     static const std::map<char, char> SUBSTITUTIONS{
         {'I', '1'},
