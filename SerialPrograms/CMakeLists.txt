@@ -155,9 +155,9 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/StringTools.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
-    ../Common/Cpp/ValueDebouncer.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
+    ../Common/Cpp/ValueDebouncer.h
     ../Common/Microcontroller/DeviceRoutines.cpp
     ../Common/Microcontroller/DeviceRoutines.h
     ../Common/Microcontroller/MessageProtocol.h
