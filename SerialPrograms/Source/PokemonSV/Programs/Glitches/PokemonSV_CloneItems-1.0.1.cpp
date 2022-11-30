@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -107,6 +108,7 @@ CloneItems101::CloneItems101()
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -117,7 +119,9 @@ CloneItems101::CloneItems101()
 
 
 
-void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
+void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
+
     bool item_held = false;
     WallClock start = current_time();
     while (true){
@@ -139,7 +143,7 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(60),
+            std::chrono::seconds(10),
             {
                 overworld,
                 main_menu,
@@ -155,6 +159,7 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
         switch (ret){
         case 0:
             console.log("Detected overworld. (unexpected)", COLOR_RED);
+            stats.m_errors++;
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
@@ -177,6 +182,7 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
             continue;
         case 4:
             console.log("Detected 6th slot select back. (unexpected)", COLOR_RED);
+            stats.m_errors++;
             pbf_press_dpad(context, DPAD_UP, 20, 30);
             continue;
         case 5:{
@@ -225,7 +231,12 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
             continue;
         }
         default:
-            throw OperationFailedException(console.logger(), "No recognized state after 60 seconds.");
+            stats.m_errors++;
+            dump_image_and_throw_recoverable_exception(
+                env, console, NOTIFICATION_ERROR_RECOVERABLE,
+                "NoState", "No recognized state after 10 seconds."
+            );
+            throw OperationFailedException(console.logger(), "No recognized state after 10 seconds.");
         }
 
     }
@@ -234,12 +245,35 @@ void CloneItems101::clone_item(ConsoleHandle& console, BotBaseContext& context){
 void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
 
-    for (uint16_t cloned = 0; cloned < ITEMS_TO_CLONE; cloned++){
+    for (uint16_t cloned = 0; cloned < ITEMS_TO_CLONE;){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        clone_item(env.console, context);
-        stats.m_cloned++;
+        try{
+            clone_item(env, env.console, context);
+            cloned++;
+            stats.m_cloned++;
+            continue;
+        }catch (OperationFailedException&){}
+
+        env.console.log("Attempting to recover by backing out to a known state.", COLOR_RED);
+
+        OverworldWatcher overworld(COLOR_RED);
+        MainMenuWatcher main_menu(COLOR_YELLOW);
+        context.wait_for_all_requests();
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_B, 20, 230);
+                }
+            },
+            {overworld, main_menu}
+        );
+        context.wait_for(std::chrono::milliseconds(50));
+        if (ret < 0){
+            throw OperationFailedException(env. console.logger(), "Unable to recover from error state.");
+        }
     }
 
     env.update_stats();

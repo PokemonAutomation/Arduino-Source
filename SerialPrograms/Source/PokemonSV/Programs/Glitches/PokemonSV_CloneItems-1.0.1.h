@@ -37,7 +37,7 @@ public:
 
 
 private:
-    void clone_item(ConsoleHandle& console, BotBaseContext& context);
+    void clone_item(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
