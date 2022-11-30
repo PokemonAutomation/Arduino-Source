@@ -66,6 +66,7 @@
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 
 #include <QPixmap>
@@ -169,7 +170,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-//    pbf_move_left_joystick(context, 128, 255, 80, 0);
+
+    send_program_notification(
+        env.logger(), NOTIFICATION_TEST,
+        COLOR_GREEN, env.program_info(),
+        "Test Title",
+        {
+            {
+                "",
+                "[TestTest](https://discordtips.com/how-to-hyperlink-in-discord/)"
+            },
+        }
+    );
+
+
+
+//    pbf_move_left_joystick(context, 129, 128, 10000, 0);
 //    pbf_move_left_joystick(context, 128, 0, 90, 0);
 
 
@@ -184,7 +200,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
     ImageRGB32 image("20221129-190351106440.jpg");
 
     TeraLobbyReader reader;
