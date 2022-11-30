@@ -127,6 +127,10 @@ RideCloner101::RideCloner101()
         TICKS_PER_SECOND,
         "8"
     )
+    , TRY_TO_TERASTILLIZE(
+        "<b>Try to terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
+        LockWhileRunning::UNLOCKED, true
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
         "Non-Shiny Encounter",
@@ -155,6 +159,7 @@ RideCloner101::RideCloner101()
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
     PA_ADD_OPTION(A_TO_B_DELAY);
+    PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -475,7 +480,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             bool win = run_tera_battle(
                 env, env.console, context,
                 NOTIFICATION_ERROR_RECOVERABLE,
-                false
+                TRY_TO_TERASTILLIZE
             );
 
             if (win){

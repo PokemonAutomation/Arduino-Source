@@ -61,6 +61,7 @@ private:
 
     SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
+    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
 
     EventNotificationOption NOTIFICATION;

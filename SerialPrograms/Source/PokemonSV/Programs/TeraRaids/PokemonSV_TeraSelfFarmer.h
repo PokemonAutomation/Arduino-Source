@@ -54,7 +54,7 @@ private:
     EnumDropdownOption<Mode> MODE;
 
     SimpleIntegerOption<uint8_t> MAX_STARS;
-    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
+    BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
 
     SimpleIntegerOption<uint16_t> MAX_CATCHES;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

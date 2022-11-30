@@ -110,9 +110,9 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::UNLOCKED,
         4, 1, 7
     )
-    , TRY_TO_TERASTILIZE(
-        "<b>Try to terastilize:</b><br>Blindly try to terastilize. Add 4s per move but allow to have a bigger win rate in 5* raids.",
-        LockWhileRunning::UNLOCKED, false
+    , TRY_TO_TERASTILLIZE(
+        "<b>Try to terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
+        LockWhileRunning::UNLOCKED, true
     )
     , MAX_CATCHES(
         "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
@@ -152,7 +152,7 @@ TeraSelfFarmer::TeraSelfFarmer()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(MAX_STARS);
-    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
+    PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(MAX_CATCHES);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
@@ -169,7 +169,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     bool win = run_tera_battle(
         env, env.console, context,
         NOTIFICATION_ERROR_RECOVERABLE,
-        TRY_TO_TERASTILIZE
+        TRY_TO_TERASTILLIZE
     );
 
     if (win){
