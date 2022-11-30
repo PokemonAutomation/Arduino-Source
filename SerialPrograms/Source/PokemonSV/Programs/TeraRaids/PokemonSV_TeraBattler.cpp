@@ -95,6 +95,7 @@ bool run_tera_battle(
                 pbf_press_dpad(context, DPAD_DOWN, 20, 40);
             }
             if (terastilize_if_available && terastallizing.detect(console.video().snapshot())){
+                env.log("Detected available terastallization.");
                 pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
             }
             pbf_press_button(context, BUTTON_A, 20, 10);

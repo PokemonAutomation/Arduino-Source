@@ -127,6 +127,10 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         0, 0
     )
+    , TRY_TO_TERASTILIZE(
+        "<b>Try to terastilize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
+        LockWhileRunning::UNLOCKED, true
+    )
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS({
         &NOTIFICATION,
@@ -142,6 +146,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
+    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -394,7 +399,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             }
             env.update_stats();
 
-            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, false);
+            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, TRY_TO_TERASTILIZE);
             env.update_stats();
             if (win){
                 stats.m_wins++;

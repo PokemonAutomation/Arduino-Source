@@ -111,8 +111,8 @@ TeraSelfFarmer::TeraSelfFarmer()
         4, 1, 7
     )
     , TRY_TO_TERASTILIZE(
-        "<b>Try to terastilize:</b><br>Blindly try to terastilize. Add 4s per move but allow to have a bigger win rate in 5* raids.",
-        LockWhileRunning::UNLOCKED, false
+        "<b>Try to terastilize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
+        LockWhileRunning::UNLOCKED, true
     )
     , MAX_CATCHES(
         "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
