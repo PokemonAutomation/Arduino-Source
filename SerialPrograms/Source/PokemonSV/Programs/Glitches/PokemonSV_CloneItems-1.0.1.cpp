@@ -236,7 +236,6 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
                 env, console, NOTIFICATION_ERROR_RECOVERABLE,
                 "NoState", "No recognized state after 10 seconds."
             );
-            throw OperationFailedException(console.logger(), "No recognized state after 10 seconds.");
         }
 
     }

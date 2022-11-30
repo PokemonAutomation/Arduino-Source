@@ -197,6 +197,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         resume_game_from_home(env.console, context);
     }
 
+    m_number_caught++;
     stats.m_caught++;
 
     exit_tera_win_by_catching(
