@@ -23,7 +23,7 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool terastilize_if_available
+    bool terastillize_if_available
 );
 
 

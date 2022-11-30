@@ -24,7 +24,7 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool terastilize_if_available
+    bool terastillize_if_available
 ){
 #if 0
     if (from_start){
@@ -94,7 +94,7 @@ bool run_tera_battle(
                 env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
                 pbf_press_dpad(context, DPAD_DOWN, 20, 40);
             }
-            if (terastilize_if_available && terastallizing.detect(console.video().snapshot())){
+            if (terastillize_if_available && terastallizing.detect(console.video().snapshot())){
                 env.log("Detected available terastallization.");
                 pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
             }

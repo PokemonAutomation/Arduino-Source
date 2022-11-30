@@ -65,7 +65,7 @@ private:
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
     TimeExpressionOption<uint16_t> A_TO_B_DELAY;
-    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
+    BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;
