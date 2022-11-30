@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
-//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -24,7 +24,7 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool blindly_terastilize
+    bool terastilize_if_available
 ){
 #if 0
     if (from_start){
@@ -51,6 +51,12 @@ bool run_tera_battle(
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
     while (true){
+        // warning, this terastallizing detector isn't used in the wait_until below
+        TerastallizingDetector terastallizing(COLOR_ORANGE);
+        VideoOverlaySet overlay_set(console);
+        terastallizing.make_overlays(overlay_set);
+
+
         BattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         GradientArrowWatcher target_select_menu(
@@ -88,8 +94,7 @@ bool run_tera_battle(
                 env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
                 pbf_press_dpad(context, DPAD_DOWN, 20, 40);
             }
-            if (blindly_terastilize){
-                // It might do nothing but display an error message for around 4 seconds
+            if (terastilize_if_available && terastallizing.detect(console.video().snapshot())){
                 pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
             }
             pbf_press_button(context, BUTTON_A, 20, 10);

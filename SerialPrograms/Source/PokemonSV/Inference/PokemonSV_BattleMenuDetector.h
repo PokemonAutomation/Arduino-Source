@@ -58,6 +58,20 @@ public:
 
 
 
+class TerastallizingDetector : public StaticScreenDetector{
+public:
+    TerastallizingDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_box;
+};
+
+
+
 class TeraCatchDetector : public StaticScreenDetector{
 public:
     TeraCatchDetector(Color color);
