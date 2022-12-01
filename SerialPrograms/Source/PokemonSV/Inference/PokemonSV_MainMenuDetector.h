@@ -45,7 +45,7 @@ public:
     //  Returns true if success.
     bool move_cursor(
         ConsoleHandle& console, BotBaseContext& context,
-        MenuSide side, int row
+        MenuSide side, int row, bool fast
     ) const;
 
 

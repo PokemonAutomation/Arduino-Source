@@ -210,12 +210,12 @@ void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
             if (advance.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 5);
+                main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
                 //  Otherwise we try to move the ride legendary to the party.
-                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 6)){
+                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 6, false)){
                     //  Success, continue.
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }else{
@@ -230,7 +230,7 @@ void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
             if (main_menu.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 5);
+                main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
@@ -371,7 +371,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected party swap.");
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
-                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 5)){
+                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false)){
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }

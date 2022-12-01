@@ -165,19 +165,25 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         case 1:
             console.log("Detected main menu.");
             if (item_held){
-                main_menu.move_cursor(console, context, MenuSide::RIGHT, 1);
+                main_menu.move_cursor(console, context, MenuSide::RIGHT, 1, true);
                 pbf_press_button(context, BUTTON_A, 20, 20);
             }else{
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 5);
+                main_menu.move_cursor(console, context, MenuSide::LEFT, 1, true);
+                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_press_dpad(context, DPAD_UP, 10, 10);
+                pbf_press_dpad(context, DPAD_UP, 20, 10);
                 pbf_press_button(context, BUTTON_A, 20, 20);
             }
             continue;
         case 2:
-            console.log("Detected 6th slot select top.");
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            console.log("Detected 6th slot select top. (unexpected)", COLOR_RED);
+            stats.m_errors++;
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
             continue;
         case 3:
+            console.log("Detected 6th slot select return. (unexpected)", COLOR_RED);
+            stats.m_errors++;
             pbf_press_button(context, BUTTON_A, 20, 20);
             continue;
         case 4:
@@ -215,17 +221,17 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
 
             //  Not on the battle teams.
             if (!battle_team.detect(snapshot)){
-                pbf_press_button(context, BUTTON_X, 20, 50);
-                pbf_press_button(context, BUTTON_X, 20, 50);
+                pbf_press_button(context, BUTTON_X, 20, 10);
+                pbf_press_button(context, BUTTON_X, 20, 10);
                 continue;
             }
 
-            pbf_press_button(context, BUTTON_L, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_L, 20, 40);
+            pbf_press_button(context, BUTTON_A, 20, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_button(context, BUTTON_A, 20, 50);
             item_held = false;
 
             continue;

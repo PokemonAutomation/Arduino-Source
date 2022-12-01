@@ -67,7 +67,7 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 
 bool MainMenuDetector::move_cursor(
     ConsoleHandle& console, BotBaseContext& context,
-    MenuSide side, int row
+    MenuSide side, int row, bool fast
 ) const{
     if (side == MenuSide::NONE){
         throw InternalProgramError(
@@ -89,7 +89,7 @@ bool MainMenuDetector::move_cursor(
             if (consecutive_detection_fails > 10){
                 throw OperationFailedException(console.logger(), "Unable to detect menu.");
             }
-            context.wait_for(std::chrono::milliseconds(100));
+            context.wait_for(std::chrono::milliseconds(50));
             continue;
         }
         consecutive_detection_fails = 0;
@@ -99,33 +99,45 @@ bool MainMenuDetector::move_cursor(
             return false;
         }
 
+        //  We're done!
+        if (current.first == side && current.second == row){
+            return true;
+        }
+
         moves++;
 
         //  Wrong side.
         if (current.first != side){
             if (current.first == MenuSide::LEFT){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
             }else{
-                pbf_press_dpad(context, DPAD_LEFT, 20, 20);
+                pbf_press_dpad(context, DPAD_LEFT, 20, 10);
             }
             continue;
         }
 
-        //  We're done!
+        int rows = side == MenuSide::LEFT ? 7 : 6;
 
-        if (current.second == row){
-            return true;
-        }
+//        cout << "current = " << current.second << endl;
+//        cout << "target  = " << row << endl;
 
-        int diff = (7 + current.second - row) % 7;
+        int diff = (rows + current.second - row) % rows;
+//        cout << "diff = " << diff << endl;
         if (diff < 4){
-//            for (int c = current.second; c != row; c--){
-                pbf_press_dpad(context, DPAD_UP, 20, 20);
-//            }
+            if (fast){
+                for (int c = 0; c < diff - 1; c++){
+                    pbf_press_dpad(context, DPAD_UP, 10, 10);
+                }
+            }
+            pbf_press_dpad(context, DPAD_UP, 20, 10);
         }else{
-//            for (int c = current.second; c != row; c++){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-//            }
+            if (fast){
+                diff = rows - diff;
+                for (int c = 0; c < diff - 1; c++){
+                    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                }
+            }
+            pbf_press_dpad(context, DPAD_DOWN, 20, 10);
         }
     }
 }

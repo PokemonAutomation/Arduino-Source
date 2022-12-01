@@ -171,6 +171,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
+    while (true){
+        VideoSnapshot snapshot = feed.snapshot();
+        bool detected = party_select_top.detect(snapshot);
+        cout << detected << endl;
+        if (!detected){
+            snapshot.frame->save("test.png");
+        }
+        scope.wait_for(std::chrono::milliseconds(100));
+    }
+
+
 #if 0
     send_program_notification(
         env.logger(), NOTIFICATION_TEST,
@@ -201,7 +213,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
     ImageRGB32 image("20221130-233102169312.jpg");
 
     TeraLobbyReader reader;
