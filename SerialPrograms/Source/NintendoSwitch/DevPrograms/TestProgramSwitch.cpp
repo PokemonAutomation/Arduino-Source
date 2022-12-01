@@ -171,6 +171,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 0
     send_program_notification(
         env.logger(), NOTIFICATION_TEST,
         COLOR_GREEN, env.program_info(),
@@ -182,7 +183,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             },
         }
     );
-
+#endif
 
 
 //    pbf_move_left_joystick(context, 129, 128, 10000, 0);
@@ -200,8 +201,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
-    ImageRGB32 image("20221129-190351106440.jpg");
+#if 1
+    ImageRGB32 image("20221130-233102169312.jpg");
 
     TeraLobbyReader reader;
     reader.raid_code(logger, env.program_info(), image);

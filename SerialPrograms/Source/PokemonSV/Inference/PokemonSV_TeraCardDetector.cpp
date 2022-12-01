@@ -228,6 +228,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
         {'l', '1'},
         {'O', '0'},
         {'Z', 'S'},
+        {'\\', 'V'},
     };
 
     std::string raw;
