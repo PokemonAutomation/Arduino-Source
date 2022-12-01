@@ -111,7 +111,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         4, 1, 7
     )
     , TRY_TO_TERASTILLIZE(
-        "<b>Try to terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
+        "<b>Try to Terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
     , MAX_CATCHES(

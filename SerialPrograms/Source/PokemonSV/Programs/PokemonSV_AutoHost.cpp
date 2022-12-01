@@ -128,7 +128,7 @@ AutoHost::AutoHost()
         0, 0
     )
     , TRY_TO_TERASTILIZE(
-        "<b>Try to terastilize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
+        "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})

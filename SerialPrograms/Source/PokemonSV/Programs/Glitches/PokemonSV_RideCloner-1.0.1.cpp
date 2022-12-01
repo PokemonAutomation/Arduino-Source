@@ -128,7 +128,7 @@ RideCloner101::RideCloner101()
         "8"
     )
     , TRY_TO_TERASTILLIZE(
-        "<b>Try to terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
+        "<b>Try to Terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
