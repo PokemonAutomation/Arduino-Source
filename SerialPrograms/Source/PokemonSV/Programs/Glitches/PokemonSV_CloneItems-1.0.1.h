@@ -8,12 +8,9 @@
 #define PokemonAutomation_PokemonSV_CloneItems_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,22 +35,14 @@ public:
     CloneItems101();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
+
 private:
-    size_t fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void clone_item(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
-
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
-
-    SimpleIntegerOption<uint8_t> MAX_STARS;
-
-    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
-
-    TimeExpressionOption<uint32_t> A_TO_B_DELAY;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

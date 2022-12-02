@@ -223,8 +223,8 @@ AutoMultiSpawn::AutoMultiSpawn()
     )
     , PATH(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".",
+        LockWhileRunning::LOCKED,
         "", ""
     )
     , NOTIFICATIONS({

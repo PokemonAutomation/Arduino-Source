@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutoHost_H
 #define PokemonAutomation_PokemonSV_AutoHost_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 //#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
@@ -46,17 +47,22 @@ private:
 
     enum class Mode{
         LOCAL,
-        ONLINE_EVERYONE,
         ONLINE_CODED,
+        ONLINE_EVERYONE,
     };
 
     EnumDropdownOption<Mode> MODE;
 
     SimpleIntegerOption<uint16_t> LOBBY_WAIT_DELAY;
-//    SimpleIntegerOption<uint8_t> START_RAID_PLAYERS;
     IntegerEnumDropdownOption START_RAID_PLAYERS;
+    BooleanCheckBoxOption ROLLOVER_PREVENTION;
 
     TextEditOption DESCRIPTION;
+
+    SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
+    SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
+    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
+
 
     EventNotificationOption NOTIFICATION;
     EventNotificationsOption NOTIFICATIONS;

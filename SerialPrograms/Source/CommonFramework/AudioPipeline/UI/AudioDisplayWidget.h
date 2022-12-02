@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 #define PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 
-#include <deque>
-#include <set>
 #include <QWidget>
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/ValueDebouncer.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 
@@ -47,8 +46,8 @@ private:
     AudioSession& m_session;
     AudioOption::AudioDisplayType m_display_type;
 
-    std::deque<int> m_width_history;
-    std::set<int> m_recent_widths;
+    int m_previous_height = 0;
+    ValueDebouncer<int> m_debouncer;
 
     LifetimeSanitizer m_sanitizer;
 };

@@ -60,7 +60,17 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-
+TerastallizingDetector::TerastallizingDetector(Color color)
+    : m_color(color)
+    , m_box(0.6, 0.7, 0.06, 0.14)
+{}
+void TerastallizingDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats box = image_stats(extract_box_reference(screen, m_box));
+    return box.stddev.sum() > 240;
+}
 
 TeraCatchDetector::TeraCatchDetector(Color color)
     : m_color(color)

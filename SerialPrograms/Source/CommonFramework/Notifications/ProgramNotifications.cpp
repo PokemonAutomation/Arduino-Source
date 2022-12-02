@@ -43,15 +43,7 @@ void send_program_notification(
     JsonArray embeds;
     {
         JsonObject embed;
-        {
-            std::string str = title;
-            const std::string& instance_name = GlobalSettings::instance().DISCORD.message.instance_name;
-            if (!instance_name.empty()){
-                str += ": ";
-                str += instance_name;
-            }
-            embed["title"] = str;
-        }
+        embed["title"] = title;
 
         if (color){
             embed["color"] = (int)((uint32_t)color & 0xffffff);
@@ -60,17 +52,26 @@ void send_program_notification(
         JsonArray fields;
         {
             JsonObject field;
-            field["name"] = PreloadSettings::instance().DEVELOPER_MODE
-                ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
-                : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")";
-            std::string text = info.program_name;
+//            field["name"] = PreloadSettings::instance().DEVELOPER_MODE
+//                ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
+//                : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")";
+            field["name"] = info.program_name;
+            std::string text;
+
+            const std::string& instance_name = GlobalSettings::instance().DISCORD.message.instance_name;
+            if (!instance_name.empty()){
+                text += "Instance Name: " + instance_name;
+            }
+
+            text += "\nUp Time: ";
             if (info.start_time != WallClock::min()){
-                text += "\nUp Time: ";
                 text += duration_to_string(
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                         current_time() - info.start_time
                     )
                 );
+            }else{
+                text += "(test message)";
             }
             field["value"] = std::move(text);
             fields.push_back(std::move(field));
@@ -83,6 +84,20 @@ void send_program_notification(
             if (!item.first.empty() && !item.second.empty()){
                 fields.push_back(std::move(field));
             }
+        }
+        {
+            JsonObject field;
+            field["name"] = "Powered By:";
+            std::string text = PreloadSettings::instance().DEVELOPER_MODE
+                ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
+                : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
+            if (GlobalSettings::instance().HIDE_NOTIF_DISCORD_LINK){
+                text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/))";
+            }else{
+                text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/)/[Discord](" + DISCORD_LINK_URL + "))";
+            }
+            field["value"] = std::move(text);
+            fields.push_back(std::move(field));
         }
         embed["fields"] = std::move(fields);
 

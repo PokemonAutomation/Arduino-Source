@@ -30,9 +30,9 @@ private:
     Color m_color;
     ImageFloatBox m_exists;
 };
-class SomethingInBoxSlotFinder : public DetectorToFinder<SomethingInBoxSlotDetector>{
+class SomethingInBoxSlotWatcher : public DetectorToFinder<SomethingInBoxSlotDetector>{
 public:
-    SomethingInBoxSlotFinder(Color color, bool stop_on_exists)
+    SomethingInBoxSlotWatcher(Color color, bool stop_on_exists)
          : DetectorToFinder("SomethingInBoxSlot", std::chrono::milliseconds(250), color, stop_on_exists)
     {}
 };
@@ -55,9 +55,9 @@ private:
     AdvanceDialogDetector m_dialog;
     GradientArrowDetector m_gradient;
 };
-class BoxSelectFinder : public DetectorToFinder<BoxSelectDetector>{
+class BoxSelectWatcher : public DetectorToFinder<BoxSelectDetector>{
 public:
-    BoxSelectFinder(Color color)
+    BoxSelectWatcher(Color color)
          : DetectorToFinder("BoxSelectFinder", std::chrono::milliseconds(250), color)
     {}
 };
@@ -105,9 +105,9 @@ private:
     GradientArrowDetector m_search;
     GradientArrowDetector m_slots;
 };
-class BoxFinder : public DetectorToFinder<BoxDetector>{
+class BoxWatcher : public DetectorToFinder<BoxDetector>{
 public:
-    BoxFinder(Color color)
+    BoxWatcher(Color color)
          : DetectorToFinder("BoxFinder", std::chrono::milliseconds(250), color)
     {}
 };

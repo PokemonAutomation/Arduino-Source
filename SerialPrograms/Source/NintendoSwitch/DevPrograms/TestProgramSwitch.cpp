@@ -13,6 +13,7 @@
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
@@ -46,7 +47,10 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -59,8 +63,10 @@
 #include "PokemonSV/Inference/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Programs/PokemonSV_TradeRoutines.h"
+#include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 
 #include <QPixmap>
@@ -72,7 +78,6 @@ using std::cout;
 using std::endl;
 
 
-//#include "../Internal/SerialPrograms/NintendoSwitch_Commands_ScalarButtons.h"
 using namespace PokemonAutomation::Kernels;
 using namespace PokemonAutomation::Kernels::Waterfill;
 
@@ -141,12 +146,6 @@ using namespace Kernels::Waterfill;
 
 
 
-void merge_enclosed(){
-
-}
-
-
-
 
 
 
@@ -169,6 +168,116 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+
+#if 0
+    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
+    while (true){
+        VideoSnapshot snapshot = feed.snapshot();
+        bool detected = party_select_top.detect(snapshot);
+        cout << detected << endl;
+        if (!detected){
+            snapshot.frame->save("test.png");
+        }
+        scope.wait_for(std::chrono::milliseconds(100));
+    }
+#endif
+
+#if 0
+    send_program_notification(
+        env.logger(), NOTIFICATION_TEST,
+        COLOR_GREEN, env.program_info(),
+        "Test Title",
+        {
+            {
+                "",
+                "[TestTest](https://discordtips.com/how-to-hyperlink-in-discord/)"
+            },
+        }
+    );
+#endif
+
+
+//    pbf_move_left_joystick(context, 129, 128, 10000, 0);
+//    pbf_move_left_joystick(context, 128, 0, 90, 0);
+
+
+//    ImageRGB32 image("screenshot-20221128-084818449677.png");
+//    PromptDialogDetector detector(COLOR_RED);
+//    cout << detector.detect(image) << endl;
+
+
+//    ssf_press_button(context, BUTTON_A, 8, 20);
+//    pbf_press_button(context, BUTTON_B, 20, 105);
+
+
+
+
+#if 0
+    ImageRGB32 image("20221130-233102169312.jpg");
+
+    TeraLobbyReader reader;
+    reader.raid_code(logger, env.program_info(), image);
+    cout << (int)reader.total_players(image) << endl;
+#endif
+
+
+
+//    connect_to_internet_from_overworld(console, context);
+//    day_skip_from_overworld(console, context);
+
+
+
+//    save_game_from_overworld(console, context);
+
+
+#if 1
+    OverworldDetector overworld;
+    overworld.make_overlays(overlays);
+
+    auto image = feed.snapshot();
+//    overworld.detect(image);
+    cout << overworld.detect_ball(image) << endl;
+#endif
+
+//    wait_until();
+
+//    ImageRGB32 image("ball-1-new.png");
+
+//    filter_rgb32_range(image, 0xffc0c000, 0xffffff3f, Color(0), false).save("ball-template.png");
+
+
+//    ImageFloatBox ball(0.890, 0.790, 0.030, 0.070);
+//    ImageFloatBox radar(0.815, 0.680, 0.180, 0.310);
+
+
+
+//    save_game_from_menu(console, context);
+
+//    enter_alphanumeric_code(logger, context, "2VL4EP");
+
+//    run_path(context, get_path({0, 0}, {2, 6}));
+//    run_path(context, get_path({2, 6}, {0, 9}));
+//    run_path(context, get_path({0, 9}, {3, 8}));
+
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    DateReader reader;
+    reader.make_overlays(overlays);
+    cout << reader.detect(image) << endl;
+    cout << (int)reader.read_hours(logger, image) << endl;
+    reader.set_hours(console, context, 1);
+#endif
+
+
+//    auto image = feed.snapshot();
+//    DateReader reader;
+//    reader.detect(image);
+
 
 
 //    TradeStats stats;
@@ -200,12 +309,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 0
     auto image = feed.snapshot();
     TeraLobbyReader detector(COLOR_RED);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
     cout << detector.total_players(image) << endl;
-
+#endif
 
 
 #if 0

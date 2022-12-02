@@ -30,8 +30,8 @@ TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
 TrainPokemonOCR::TrainPokemonOCR()
     : DIRECTORY(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
+        LockWhileRunning::LOCKED,
         "PokemonNameOCR/",
         "PokemonNameOCR/"
     )

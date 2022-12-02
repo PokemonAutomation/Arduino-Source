@@ -140,30 +140,23 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 
 void AudioDisplayWidget::update_size(){
     int height = m_display_type == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
-//    cout << "height = " << height << endl;
-    this->setFixedHeight(height);
-}
+//    cout << "AudioDisplayWidget::update_size(): " << height << " <- " << m_previous_height << endl;
 
-void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
-    QWidget::resizeEvent(event);
-    // std::cout << "Audio widget size: " << this->width() << " x " << this->height() << std::endl;
+    if (height == m_previous_height){
+        return;
+    }
 
-    int width = this->width();
-
-    //  Safeguard against a resizing loop where the UI bounces between larger
-    //  height with scroll bar and lower height with no scroll bar.
-    auto iter = m_recent_widths.find(width);
-    if (iter != m_recent_widths.end() && std::abs(width - event->oldSize().width()) < 50){
+    if (height > m_previous_height && height < m_previous_height + 10 && !m_debouncer.check(height)){
 //        cout << "Supressing potential infinite resizing loop." << endl;
         return;
     }
 
-    m_width_history.push_back(width);
-    m_recent_widths.insert(width);
-    if (m_width_history.size() > 10){
-        m_recent_widths.erase(m_width_history[0]);
-        m_width_history.pop_front();
-    }
+    this->setFixedHeight(height);
+    m_previous_height = height;
+}
+
+void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
+    QWidget::resizeEvent(event);
 
     update_size();
 }

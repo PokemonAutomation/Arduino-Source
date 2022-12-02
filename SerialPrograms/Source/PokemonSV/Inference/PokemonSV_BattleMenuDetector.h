@@ -29,9 +29,9 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class BattleMenuFinder : public DetectorToFinder<BattleMenuDetector>{
+class BattleMenuWatcher : public DetectorToFinder<BattleMenuDetector>{
 public:
-    BattleMenuFinder(Color color)
+    BattleMenuWatcher(Color color)
          : DetectorToFinder("BattleMenuFinder", std::chrono::milliseconds(250), color)
     {}
 };
@@ -49,11 +49,25 @@ private:
     WhiteButtonDetector m_status_button;
     GradientArrowDetector m_arrow;
 };
-class MoveSelectFinder : public DetectorToFinder<MoveSelectDetector>{
+class MoveSelectWatcher : public DetectorToFinder<MoveSelectDetector>{
 public:
-    MoveSelectFinder(Color color)
+    MoveSelectWatcher(Color color)
          : DetectorToFinder("MoveSelectFinder", std::chrono::milliseconds(250), color)
     {}
+};
+
+
+
+class TerastallizingDetector : public StaticScreenDetector{
+public:
+    TerastallizingDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_box;
 };
 
 
@@ -70,9 +84,9 @@ private:
     ImageFloatBox m_box;
     GradientArrowDetector m_arrow;
 };
-class TeraCatchFinder : public DetectorToFinder<TeraCatchDetector>{
+class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
 public:
-    TeraCatchFinder(Color color)
+    TeraCatchWatcher(Color color)
          : DetectorToFinder("TeraCatchFinder", std::chrono::milliseconds(250), color)
     {}
 };

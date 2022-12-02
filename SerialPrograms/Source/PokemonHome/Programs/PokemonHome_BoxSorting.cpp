@@ -111,8 +111,8 @@ BoxSorting::BoxSorting()
     )
     , OUTPUT_FILE(
           false,
-          LockWhileRunning::LOCKED,
           "<b>Output File:</b><br>JSON file for output of storage boxes.",
+          LockWhileRunning::LOCKED,
           "box_order",
           "box_order"
       )

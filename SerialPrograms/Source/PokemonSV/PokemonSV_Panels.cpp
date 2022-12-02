@@ -11,10 +11,18 @@
 #include "PokemonSV_Settings.h"
 
 #include "Programs/PokemonSV_MassRelease.h"
-#include "Programs/PokemonSV_SelfBoxTrade.h"
-#include "Programs/PokemonSV_EggFetcher.h"
-#include "Programs/PokemonSV_TeraSelfFarmer.h"
+#include "Programs/General/PokemonSV_AutonomousBallThrower.h"
+#include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
+
+#include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
+
+#include "Programs/PokemonSV_FastCodeEntry.h"
 #include "Programs/PokemonSV_AutoHost.h"
+
+#include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
+#include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
+
+#include "Programs/PokemonSV_EggFetcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,6 +42,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
+    }
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
@@ -42,9 +53,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
 
     ret.emplace_back("---- Multiplayer ----");
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
-    }
+    ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
+    ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
+
+    ret.emplace_back("---- Glitches ----");
+    ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
+    ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

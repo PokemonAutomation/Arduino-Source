@@ -93,6 +93,8 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
 
+    BooleanCheckBoxOption HIDE_NOTIF_DISCORD_LINK;
+
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
     ThreadPriorityOption INFERENCE_PRIORITY0;

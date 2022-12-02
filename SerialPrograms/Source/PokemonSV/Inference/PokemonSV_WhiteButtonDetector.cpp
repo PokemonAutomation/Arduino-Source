@@ -125,8 +125,8 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 
 
-WhiteButtonFinder::~WhiteButtonFinder() = default;
-WhiteButtonFinder::WhiteButtonFinder(
+WhiteButtonWatcher::~WhiteButtonWatcher() = default;
+WhiteButtonWatcher::WhiteButtonWatcher(
     Color color,
     WhiteButton button, size_t consecutive_detections,
     VideoOverlay& overlay,
@@ -138,10 +138,10 @@ WhiteButtonFinder::WhiteButtonFinder(
     , m_consecutive_detections(consecutive_detections)
 {}
 
-void WhiteButtonFinder::make_overlays(VideoOverlaySet& items) const{
+void WhiteButtonWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
-bool WhiteButtonFinder::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool WhiteButtonWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     std::vector<ImageFloatBox> hits = m_detector.detect_all(frame);
 //    cout << "arrows = " << arrows.size() << endl;
     m_arrows.reset(hits.size());

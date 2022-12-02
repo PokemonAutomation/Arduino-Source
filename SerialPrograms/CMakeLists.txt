@@ -157,6 +157,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Time.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
+    ../Common/Cpp/ValueDebouncer.h
     ../Common/Microcontroller/DeviceRoutines.cpp
     ../Common/Microcontroller/DeviceRoutines.h
     ../Common/Microcontroller/MessageProtocol.h
@@ -164,6 +165,7 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
@@ -325,6 +327,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/ImageFilter.h
     Source/CommonFramework/ImageTools/ImageGradient.cpp
     Source/CommonFramework/ImageTools/ImageGradient.h
+    Source/CommonFramework/ImageTools/ImageManip.cpp
+    Source/CommonFramework/ImageTools/ImageManip.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/SolidColorTest.cpp
@@ -696,10 +700,13 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/PathMaker.cpp
@@ -741,6 +748,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
@@ -760,6 +769,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/TestPathMakerTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp
@@ -768,6 +779,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp
@@ -1186,6 +1199,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp
@@ -1194,32 +1209,40 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
+    Source/PokemonSV/PokemonSV_Panels.cpp
+    Source/PokemonSV/PokemonSV_Panels.h
+    Source/PokemonSV/PokemonSV_Settings.cpp
+    Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
+    Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
+    Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
+    Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
+    Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.h
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h
-    Source/PokemonSV/PokemonSV_Panels.cpp
-    Source/PokemonSV/PokemonSV_Panels.h
-    Source/PokemonSV/PokemonSV_Settings.cpp
-    Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
@@ -1631,7 +1654,6 @@ target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_Commands_ScalarButtons.cpp)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
 endif()

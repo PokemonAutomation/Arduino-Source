@@ -35,7 +35,8 @@ void trade_current_pokemon(
 void trade_current_box(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     EventNotificationOption& notifications,
-    TradeStats& stats
+    TradeStats& stats,
+    uint8_t start_row, uint8_t start_col
 );
 
 

@@ -20,14 +20,14 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
 //    , m_integration_enabled(integration_enabled)
     , token(
         true,
-        LockWhileRunning::LOCKED,
         "<b>Discord token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
+        LockWhileRunning::LOCKED,
         "", "0123456789abcdefghijklmnopqrstuvwxyzABCDEGFHIJKLMNOPQRSTUVWXYZ"
     )
     , command_prefix(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord command prefix:</b><br>Enter a command prefix for your bot.",
+        LockWhileRunning::LOCKED,
         "^", "^"
     )
     , use_suffix(
@@ -37,26 +37,26 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , game_status(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord game status:</b><br>Enter a status message your bot would display.",
+        LockWhileRunning::LOCKED,
         "", "Controlling your Switch. :)"
     )
     , hello_message(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord hello message:</b><br>Enter a message you'd like the bot to respond with to the \"$hi\" command.",
+        LockWhileRunning::LOCKED,
         "", "Automation at your service!"
     )
     , sudo(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord sudo:</b><br>Enter user ID(s) to grant sudo access to.",
+        LockWhileRunning::LOCKED,
         "", "123456789012345678"
     )
     , owner(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Discord owner:</b><br>Enter the bot owner's ID (your own ID).",
+        LockWhileRunning::LOCKED,
         "", "123456789012345678"
     )
 {

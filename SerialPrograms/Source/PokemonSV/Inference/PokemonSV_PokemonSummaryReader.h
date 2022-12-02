@@ -35,9 +35,9 @@ protected:
 
     ImageFloatBox m_shiny_symbol;
 };
-class PokemonSummaryFinder : public DetectorToFinder<PokemonSummaryDetector>{
+class PokemonSummaryWatcher : public DetectorToFinder<PokemonSummaryDetector>{
 public:
-    PokemonSummaryFinder(Color color = COLOR_RED)
+    PokemonSummaryWatcher(Color color = COLOR_RED)
          : DetectorToFinder("PokemonSummaryFinder", std::chrono::milliseconds(250), color)
     {}
 };

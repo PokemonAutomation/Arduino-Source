@@ -42,9 +42,10 @@ public:
     std::pair<MenuSide, int> detect_location(const ImageViewRGB32& screen) const;
 
     //  While sitting on the menu, move the cursor to the desired slot.
-    void move_cursor(
+    //  Returns true if success.
+    bool move_cursor(
         ConsoleHandle& console, BotBaseContext& context,
-        MenuSide side, int row
+        MenuSide side, int row, bool fast
     ) const;
 
 
@@ -53,10 +54,10 @@ protected:
     GradientArrowDetector m_arrow_left;
     GradientArrowDetector m_arrow_right;
 };
-class MainMenuFinder : public DetectorToFinder<MainMenuDetector>{
+class MainMenuWatcher : public DetectorToFinder<MainMenuDetector>{
 public:
-    MainMenuFinder(Color color = COLOR_RED)
-         : DetectorToFinder("MenuDetector", std::chrono::milliseconds(250), color)
+    MainMenuWatcher(Color color = COLOR_RED)
+         : DetectorToFinder("MainMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 

@@ -39,7 +39,7 @@ public:
                 send_program_notification(
                     global_logger_tagged(), value.option,
                     COLOR_GREEN,
-                    ProgramInfo("Notification Test"),
+                    ProgramInfo("Test Message"),
                     "Notification Test",
                     {
                         {"Event Type", value.option.label()},

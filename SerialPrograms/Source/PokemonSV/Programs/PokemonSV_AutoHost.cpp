@@ -21,7 +21,8 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV_AutoHost.h"
 
 #include <iostream>
@@ -38,7 +39,7 @@ using namespace Pokemon;
 AutoHost_Descriptor::AutoHost_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:AutoHost",
-        STRING_POKEMON + " SV", "Auto Host",
+        STRING_POKEMON + " SV", "Auto-Host",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoHost.md",
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED, false,
@@ -82,8 +83,8 @@ AutoHost::AutoHost()
         "<b>Hosting Mode:</b>",
         {
             {Mode::LOCAL,           "local",            "Host Locally"},
-            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
             {Mode::ONLINE_CODED,    "online-coded",     "Host Online (link code)"},
+            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
         },
         LockWhileRunning::UNLOCKED,
         Mode::ONLINE_CODED
@@ -94,7 +95,7 @@ AutoHost::AutoHost()
         60, 15, 180
     )
     , START_RAID_PLAYERS(
-        "<b>Start Game:</b><br>Start the raid when there are this many players.",
+        "<b>Start Players:</b><br>Start the raid when there are this many players.",
         {
             {2, "2", "2 Players (1 Joiner)"},
             {3, "3", "3 Players (2 Joiners)"},
@@ -103,11 +104,32 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         4
     )
+    , ROLLOVER_PREVENTION(
+        "<b>Rollover Prevention:</b><br>Periodically set the time back to 12AM to prevent the date from rolling over and losing the raid.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
     , DESCRIPTION(
         "<b>Description:</b>",
         LockWhileRunning::UNLOCKED,
         "",
         "Auto-Hosting Shiny Eevee"
+    )
+    , CONSECUTIVE_FAILURE_PAUSE(
+        "<b>Consecutive Failure Stop/Pause:</b><br>Pause or stop the program if this many consecutive raids fail.<br>"
+        "It is not recommended to set this higher than 3 since soft bans start after 3 disconnects.",
+        LockWhileRunning::UNLOCKED,
+        3, 1
+    )
+    , FAILURE_PAUSE_MINUTES(
+        "<b>Failure Pause Time (in minutes):</b><br>If you trigger the above by failing too many times, "
+        "pause for this many minutes before resuming the program. (Zero stops the program.)",
+        LockWhileRunning::UNLOCKED,
+        0, 0
+    )
+    , TRY_TO_TERASTILIZE(
+        "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
+        LockWhileRunning::UNLOCKED, true
     )
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS({
@@ -120,7 +142,11 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
+    PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
+    PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
+    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -132,7 +158,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     WallClock start_time;
     {
-        TeraLobbyFinder lobby(COLOR_RED);
+        TeraLobbyWatcher lobby(COLOR_RED);
         lobby.make_overlays(overlays);
 
         int ret = wait_until(
@@ -181,12 +207,10 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     uint8_t last_known_player_count = 1;
     while (true){
-        context.wait_for_all_requests();
-
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-
+        context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(
             env.console, context,
@@ -235,15 +259,21 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
     while (true){
-        context.wait_for_all_requests();
-
-        AdvanceDialogFinder dialog(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
-        BattleMenuFinder battle_menu(COLOR_CYAN);
-
-        int ret = wait_until(
+        BattleMenuWatcher battle_menu(COLOR_CYAN);
+        context.wait_for_all_requests();
+        int ret = run_until(
             env.console, context,
-            start_time + std::chrono::minutes(4),
+            [start_time](BotBaseContext& context){
+                while (true){
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    context.wait_for_all_requests();
+                    if (current_time() > start_time + std::chrono::minutes(4)){
+                        return;
+                    }
+                }
+            },
             {dialog, start_raid, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -282,24 +312,48 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
-
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
 
     bool skip_reset = true;
     bool completed_one = false;
     size_t consecutive_failures = 0;
+    WallClock last_time_fix = WallClock::min();
     while (true){
         env.update_stats();
+
         if (consecutive_failures > 0 && !completed_one){
             throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }
-        if (consecutive_failures >= 2){
-            throw OperationFailedException(env.logger(), "Failed 2 raids in the row. Stopping to prevent possible ban.");
+        size_t fail_threshold = CONSECUTIVE_FAILURE_PAUSE;
+        if (consecutive_failures >= fail_threshold){
+            uint16_t minutes = FAILURE_PAUSE_MINUTES;
+            if (minutes == 0){
+                throw OperationFailedException(
+                    env.logger(),
+                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
+                    "Stopping to prevent possible ban."
+                );
+            }else{
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
+                    "Pausing program for " + std::to_string(minutes) + " minute(s)."
+                );
+                context.wait_for(std::chrono::minutes(minutes));
+                consecutive_failures = 0;
+            }
         }
 
         if (!skip_reset){
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (ROLLOVER_PREVENTION){
+                WallClock now = current_time();
+                if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
+                    set_time_to_12am_from_home(env.console, context);
+                    last_time_fix = now;
+                }
+            }
             reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
         }
         skip_reset = false;
@@ -345,15 +399,16 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             }
             env.update_stats();
 
-            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, true);
+            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, TRY_TO_TERASTILIZE);
             env.update_stats();
             if (win){
                 stats.m_wins++;
-                exit_tera_win_without_catching(env, env.console, context);
+                exit_tera_win_without_catching(env.console, context);
             }else{
                 stats.m_losses++;
             }
             completed_one = true;
+            consecutive_failures = 0;
         }catch (OperationFailedException&){
             consecutive_failures++;
             stats.m_errors++;

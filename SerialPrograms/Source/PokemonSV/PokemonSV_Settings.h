@@ -31,6 +31,9 @@ public:
     TimeExpressionOption<uint16_t> START_GAME_WAIT;
     TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+
+    SectionDividerOption m_tera_raids;
+    TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
 };
 
 

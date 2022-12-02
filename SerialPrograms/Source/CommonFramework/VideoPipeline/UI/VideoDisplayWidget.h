@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 #define PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 
-#include <deque>
-#include <set>
+#include "Common/Cpp/ValueDebouncer.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
@@ -28,6 +27,7 @@ struct CommandReceiver{
     virtual void focus_in(QFocusEvent* event) = 0;
     virtual void focus_out(QFocusEvent* event) = 0;
 };
+
 
 
 
@@ -62,8 +62,7 @@ private:
     QWidget* m_detached_internal;
     QWidget* m_stack_holder;
 
-    std::deque<int> m_width_history;
-    std::set<int> m_recent_widths;
+    ValueDebouncer<int> m_debouncer;
 };
 
 

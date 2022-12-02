@@ -31,6 +31,10 @@ public:
 
 private:
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
+
+    SimpleIntegerOption<uint8_t> START_ROW;
+    SimpleIntegerOption<uint8_t> START_COL;
+
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };

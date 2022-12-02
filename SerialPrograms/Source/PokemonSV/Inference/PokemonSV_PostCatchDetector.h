@@ -34,9 +34,9 @@ protected:
     ImageFloatBox m_bottom_right;
     PromptDialogDetector m_dialog;
 };
-class AddToPartyFinder : public DetectorToFinder<AddToPartyDetector>{
+class AddToPartyWatcher : public DetectorToFinder<AddToPartyDetector>{
 public:
-    AddToPartyFinder(Color color = COLOR_RED)
+    AddToPartyWatcher(Color color = COLOR_RED)
          : DetectorToFinder("AddToPartyFinder", std::chrono::milliseconds(250), color)
     {}
 };

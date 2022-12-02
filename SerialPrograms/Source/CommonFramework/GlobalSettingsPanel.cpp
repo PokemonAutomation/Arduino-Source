@@ -97,8 +97,8 @@ GlobalSettings::GlobalSettings()
     )
     , STATS_FILE(
         false,
-        LockWhileRunning::LOCKED,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
+        LockWhileRunning::LOCKED,
         "PA-Stats.txt",
         "PA-Stats.txt"
     )
@@ -135,6 +135,13 @@ GlobalSettings::GlobalSettings()
         true
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
+    , HIDE_NOTIF_DISCORD_LINK(
+        "<b>Hide Discord Link in Notifications:</b><br>"
+        "Many Discord servers have rules forbidding links to other Discord servers. "
+        "Checking this box will hide the support link that appears in the footer of every Discord notification.",
+        LockWhileRunning::LOCKED,
+        false
+    )
     , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
@@ -184,8 +191,8 @@ GlobalSettings::GlobalSettings()
     )
     , DEVELOPER_TOKEN(
         true,
-        LockWhileRunning::LOCKED,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
+        LockWhileRunning::LOCKED,
         "", ""
     )
 {
@@ -202,6 +209,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
+    PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
 
     PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
     PA_ADD_OPTION(INFERENCE_PRIORITY0);

@@ -65,9 +65,9 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 }
 
 
-void MainMenuDetector::move_cursor(
+bool MainMenuDetector::move_cursor(
     ConsoleHandle& console, BotBaseContext& context,
-    MenuSide side, int row
+    MenuSide side, int row, bool fast
 ) const{
     if (side == MenuSide::NONE){
         throw InternalProgramError(
@@ -76,7 +76,8 @@ void MainMenuDetector::move_cursor(
         );
     }
 
-    size_t consecutive_fails = 0;
+    size_t consecutive_detection_fails = 0;
+    size_t moves = 0;
     while (true){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
@@ -84,38 +85,59 @@ void MainMenuDetector::move_cursor(
 
         //  Failed to detect menu.
         if (current.first == MenuSide::NONE){
-            consecutive_fails++;
-            if (consecutive_fails > 10){
+            consecutive_detection_fails++;
+            if (consecutive_detection_fails > 10){
                 throw OperationFailedException(console.logger(), "Unable to detect menu.");
             }
-            context.wait_for(std::chrono::milliseconds(100));
+            context.wait_for(std::chrono::milliseconds(50));
             continue;
         }
-        consecutive_fails = 0;
+        consecutive_detection_fails = 0;
+
+        if (moves >= 10){
+            console.log("Unable to move to target after 10 moves.", COLOR_RED);
+            return false;
+        }
+
+        //  We're done!
+        if (current.first == side && current.second == row){
+            return true;
+        }
+
+        moves++;
 
         //  Wrong side.
         if (current.first != side){
             if (current.first == MenuSide::LEFT){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
             }else{
-                pbf_press_dpad(context, DPAD_LEFT, 20, 105);
+                pbf_press_dpad(context, DPAD_LEFT, 20, 10);
             }
             continue;
         }
 
-        //  We're done!
-        if (current.second == row){
-            return;
-        }
+        int rows = side == MenuSide::LEFT ? 7 : 6;
 
-        if (current.second > row){
-            for (int c = current.second; c != row; c--){
-                pbf_press_dpad(context, DPAD_UP, 20, 30);
+//        cout << "current = " << current.second << endl;
+//        cout << "target  = " << row << endl;
+
+        int diff = (rows + current.second - row) % rows;
+//        cout << "diff = " << diff << endl;
+        if (diff < 4){
+            if (fast){
+                for (int c = 0; c < diff - 1; c++){
+                    pbf_press_dpad(context, DPAD_UP, 10, 10);
+                }
             }
+            pbf_press_dpad(context, DPAD_UP, 20, 10);
         }else{
-            for (int c = current.second; c != row; c++){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            if (fast){
+                diff = rows - diff;
+                for (int c = 0; c < diff - 1; c++){
+                    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                }
             }
+            pbf_press_dpad(context, DPAD_DOWN, 20, 10);
         }
     }
 }

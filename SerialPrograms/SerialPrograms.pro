@@ -179,6 +179,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageGradient.cpp \
+    Source/CommonFramework/ImageTools/ImageManip.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
@@ -351,6 +352,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/PathMaker.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
@@ -371,6 +373,7 @@ SOURCES += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp \
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
@@ -380,10 +383,12 @@ SOURCES += \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
@@ -588,23 +593,28 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.cpp \
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -874,12 +884,14 @@ HEADERS += \
     ../Common/Cpp/StringTools.h \
     ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
+    ../Common/Cpp/ValueDebouncer.h \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
@@ -975,6 +987,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
     Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageGradient.h \
+    Source/CommonFramework/ImageTools/ImageManip.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/ImageTools/WaterfillUtilities.h \
@@ -1172,10 +1185,12 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/PathMaker.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
@@ -1197,6 +1212,7 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
@@ -1207,10 +1223,12 @@ HEADERS += \
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/TestPathMakerTable.h \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
@@ -1419,23 +1437,28 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
-    Source/PokemonSV/Programs/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
+    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
-    Source/PokemonSV/Programs/PokemonSV_SelfBoxTrade.h \
-    Source/PokemonSV/Programs/PokemonSV_TeraBattler.h \
-    Source/PokemonSV/Programs/PokemonSV_TeraSelfFarmer.h \
-    Source/PokemonSV/Programs/PokemonSV_TradeRoutines.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
+    Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
+    Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \
