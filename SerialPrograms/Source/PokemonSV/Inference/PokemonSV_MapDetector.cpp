@@ -77,7 +77,7 @@ public:
 };
 
 
-}
+} // end anonymous namespace
 
 
 MapExitDetector::MapExitDetector(Color color)

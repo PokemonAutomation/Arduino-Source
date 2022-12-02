@@ -595,6 +595,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
@@ -602,7 +603,9 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
@@ -1441,6 +1444,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
@@ -1448,7 +1452,9 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \

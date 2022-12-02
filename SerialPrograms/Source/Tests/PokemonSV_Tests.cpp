@@ -12,6 +12,7 @@
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -76,6 +77,15 @@ int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<st
         TEST_RESULT_EQUAL(result_fixed, target_is_fixed_view);
         TEST_RESULT_EQUAL(result_rotated, !target_is_fixed_view);
     }
+
+    return 0;
+}
+
+int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target){
+    PicnicDetector detector;
+
+    const bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
 
     return 0;
 }

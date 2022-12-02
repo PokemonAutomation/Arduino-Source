@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_MapExitDetector_H
-#define PokemonAutomation_PokemonSV_MapExitDetector_H
+#ifndef PokemonAutomation_PokemonSV_MapDetector_H
+#define PokemonAutomation_PokemonSV_MapDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
