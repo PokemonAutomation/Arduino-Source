@@ -449,7 +449,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             }
 
             //  Reopen the raid if we need to do stuff.
-            bool fix_position = move_counter % 10 == 1;
+            bool fix_position = move_counter % 5 == 1;
             Mode mode = MODE;
             if (fix_position || mode == Mode::SHINY_HUNT){
                 close_raid(env.console, context);
@@ -461,8 +461,8 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
                 //  Fix our position.
                 if (fix_position){
-                    pbf_move_left_joystick(context, 128, 255, 100, 0);
-                    pbf_move_left_joystick(context, 128, 0, 120, 0);
+                    pbf_move_left_joystick(context, 128, 255, 150, 0);
+                    pbf_move_left_joystick(context, 128, 0, 200, 0);
                 }
 
                 context.wait_for_all_requests();

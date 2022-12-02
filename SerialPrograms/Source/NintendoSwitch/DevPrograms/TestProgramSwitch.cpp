@@ -171,6 +171,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 0
     GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
     while (true){
         VideoSnapshot snapshot = feed.snapshot();
@@ -181,7 +182,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         }
         scope.wait_for(std::chrono::milliseconds(100));
     }
-
+#endif
 
 #if 0
     send_program_notification(
@@ -231,14 +232,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    save_game_from_overworld(console, context);
 
 
-#if 0
+#if 1
     OverworldDetector overworld;
     overworld.make_overlays(overlays);
 
     auto image = feed.snapshot();
 //    overworld.detect(image);
-    overworld.detect_ball(image);
+    cout << overworld.detect_ball(image) << endl;
 #endif
+
+//    wait_until();
 
 //    ImageRGB32 image("ball-1-new.png");
 

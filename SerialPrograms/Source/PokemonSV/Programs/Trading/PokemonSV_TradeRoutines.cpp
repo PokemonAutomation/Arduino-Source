@@ -120,6 +120,34 @@ void trade_current_pokemon(
         }
     }
 
+#if 0
+    while (true){
+        tracker.check_unrecoverable_error(console);
+
+        GradientArrowWatcher selected(COLOR_RED, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
+        PromptDialogWatcher confirm(COLOR_YELLOW, {0.500, 0.455, 0.400, 0.100});
+        TradeWarningFinder warning(COLOR_CYAN);
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context, std::chrono::seconds(10),
+            {selected, confirm, warning}
+        );
+        switch (ret){
+        case 0:
+            console.log("Detected trade prompt.");
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            continue;
+        case 1:
+            console.log("Detected trade confirm prompt.");
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            continue;
+        case 2:
+        }
+    }
+#endif
+
+#if 0
     {
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
@@ -177,6 +205,26 @@ void trade_current_pokemon(
         BlackScreenOverWatcher black_screen(COLOR_CYAN);
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stats.m_errors++;
+            tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
+        }
+        console.log("Detected start of trade.");
+        context.wait_for(std::chrono::milliseconds(100));
+        tracker.check_unrecoverable_error(console);
+    }
+#endif
+
+    //  Wait for black screen.
+    {
+        BlackScreenOverWatcher black_screen(COLOR_CYAN);
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
+            },
             {{black_screen}}
         );
         if (ret < 0){
