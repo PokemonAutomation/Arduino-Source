@@ -53,6 +53,7 @@ private:
     static const EnumDatabase<Mode>& database();
     EnumDropdownOption<Mode> MODE;
 
+    SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
 
