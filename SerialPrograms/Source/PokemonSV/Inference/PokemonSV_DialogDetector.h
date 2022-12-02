@@ -19,6 +19,7 @@ namespace PokemonSV{
 
 
 //  Detect dialog that has the small arrow at bottom to show the next dialog.
+//  It should be able to detect both the white background dialog and black background dialog.
 class AdvanceDialogDetector : public StaticScreenDetector{
 public:
     AdvanceDialogDetector(Color color = COLOR_RED);

@@ -16,7 +16,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
+// Detect the player character is on overworld.
+// It detects the center circle of the minimap.
 class OverworldDetector : public StaticScreenDetector{
 public:
     OverworldDetector(Color color = COLOR_RED);

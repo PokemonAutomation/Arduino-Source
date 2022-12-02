@@ -51,6 +51,13 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
 
     m_matcher.reset(new ExactImageMatcher(extract_box_reference(reference, *best).copy()));
     m_area_ratio = best->area_ratio();
+
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        const auto exact_image = extract_box_reference(reference, *best);
+        cout << "Build waterfil template matcher from " << full_path << ", W x H: " << exact_image.width()
+             << " x " << exact_image.height() <<  ", area ratio: " << m_area_ratio << endl;
+        dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "matcher_exact_image", exact_image);
+    }
 }
 
 double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& image) const{

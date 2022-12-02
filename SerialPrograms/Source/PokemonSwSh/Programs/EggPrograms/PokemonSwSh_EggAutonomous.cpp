@@ -94,7 +94,7 @@ EggAutonomous::EggAutonomous()
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
-        "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
+        "This number plus the number of " + STRING_POKEMON + " in the box left to your current box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
         LockWhileRunning::LOCKED,
         10, 1, 30
@@ -233,15 +233,16 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             stats.m_errors++;
             env.update_stats();
-            // If there is no auto save, then we shouldn't reset to game to lose previous progress.
-            if (AUTO_SAVING == AutoSave::NoAutoSave){
-                throw e;
-            }
-
+            
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 context.wait_for_all_requests();
+            }
+
+            // If there is no auto save, then we shouldn't reset to game to lose previous progress.
+            if (AUTO_SAVING == AutoSave::NoAutoSave){
+                throw e;
             }
 
             consecutive_failures++;

@@ -1199,6 +1199,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
+    Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_MapDetector.h
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
