@@ -40,6 +40,16 @@ SelfBoxTrade::SelfBoxTrade()
         LockWhileRunning::LOCKED,
         2, 0, 32
     )
+    , START_ROW(
+        "<b>Starting Row of 1st Box:</b>",
+        LockWhileRunning::LOCKED,
+        1, 1, 5
+    )
+    , START_COL(
+        "<b>Starting Column of 1st Box:</b>",
+        LockWhileRunning::LOCKED,
+        1, 1, 6
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -48,6 +58,8 @@ SelfBoxTrade::SelfBoxTrade()
     })
 {
     PA_ADD_OPTION(BOXES_TO_TRADE);
+    PA_ADD_OPTION(START_ROW);
+    PA_ADD_OPTION(START_COL);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -56,6 +68,9 @@ SelfBoxTrade::SelfBoxTrade()
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
+
+    uint8_t start_row = START_ROW - 1;
+    uint8_t start_col = START_COL - 1;
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
@@ -67,7 +82,9 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 //                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
             });
         }
-        trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
+        trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats, start_row, start_col);
+        start_row = 0;
+        start_col = 0;
     }
 
     env.update_stats();

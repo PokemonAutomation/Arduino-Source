@@ -120,102 +120,6 @@ void trade_current_pokemon(
         }
     }
 
-#if 0
-    while (true){
-        tracker.check_unrecoverable_error(console);
-
-        GradientArrowWatcher selected(COLOR_RED, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
-        PromptDialogWatcher confirm(COLOR_YELLOW, {0.500, 0.455, 0.400, 0.100});
-        TradeWarningFinder warning(COLOR_CYAN);
-
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context, std::chrono::seconds(10),
-            {selected, confirm, warning}
-        );
-        switch (ret){
-        case 0:
-            console.log("Detected trade prompt.");
-            pbf_press_button(context, BUTTON_A, 20, 30);
-            continue;
-        case 1:
-            console.log("Detected trade confirm prompt.");
-            pbf_press_button(context, BUTTON_A, 20, 30);
-            continue;
-        case 2:
-        }
-    }
-#endif
-
-#if 0
-    {
-        pbf_press_button(context, BUTTON_A, 20, 0);
-        context.wait_for_all_requests();
-        GradientArrowWatcher detector(COLOR_CYAN, console, GradientArrowType::RIGHT, {0.30, 0.18, 0.38, 0.08});
-        int ret = wait_until(
-            console, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade select prompt after 10 seconds.");
-        }
-        console.log("Detected trade prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
-    {
-        pbf_press_button(context, BUTTON_A, 20, 0);
-        context.wait_for_all_requests();
-        PromptDialogWatcher detector(COLOR_CYAN, {0.500, 0.455, 0.400, 0.100});
-        int ret = wait_until(
-            console, context, std::chrono::seconds(30),
-            {{detector}}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade confirm prompt after 30 seconds.");
-        }
-        console.log("Detected trade confirm prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
-    {
-        pbf_press_button(context, BUTTON_A, 20, 0);
-        context.wait_for_all_requests();
-        TradeWarningFinder detector(COLOR_CYAN);
-        int ret = wait_until(
-            console, context, std::chrono::seconds(30),
-            {{detector}}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade warning after 30 seconds.");
-        }
-        console.log("Detected trade warning window.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
-
-    //  Start trade.
-    pbf_press_button(context, BUTTON_A, 20, 0);
-
-    //  Wait for black screen.
-    {
-        BlackScreenOverWatcher black_screen(COLOR_CYAN);
-        int ret = wait_until(
-            console, context, std::chrono::minutes(2),
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
-        }
-        console.log("Detected start of trade.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
-#endif
 
     //  Wait for black screen.
     {
@@ -260,7 +164,7 @@ void trade_current_pokemon(
         case 2:
             console.log("Detected move learn.");
             pbf_press_button(context, BUTTON_B, 20, 105);
-            return;
+            break;
         default:
             stats.m_errors++;
             tracker.report_unrecoverable_error(console, "Failed to return to box after 2 minutes after a trade.");
@@ -272,10 +176,11 @@ void trade_current_pokemon(
 void trade_current_box(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     EventNotificationOption& notifications,
-    TradeStats& stats
+    TradeStats& stats,
+    uint8_t start_row, uint8_t start_col
 ){
-    for (uint8_t row = 0; row < 5; row++){
-        for (uint8_t col = 0; col < 6; col++){
+    for (uint8_t row = start_row; row < 5; row++){
+        for (uint8_t col = start_col; col < 6; col++){
             env.update_stats();
             send_program_status_notification(env, notifications);
 
@@ -291,6 +196,7 @@ void trade_current_box(
             });
             stats.m_trades++;
         }
+        start_col = 0;
     }
 }
 
