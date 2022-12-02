@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include "Common/Compiler.h"
-//#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -105,6 +105,11 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::LOCKED,
         Mode::FARM_ITEMS_ONLY
     )
+    , MIN_STARS(
+        "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
+        LockWhileRunning::UNLOCKED,
+        1, 1, 7
+    )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
         LockWhileRunning::UNLOCKED,
@@ -151,6 +156,7 @@ TeraSelfFarmer::TeraSelfFarmer()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(MAX_CATCHES);
@@ -216,6 +222,10 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
+    if (MIN_STARS > MAX_STARS){
+        throw OperationFailedException(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
+    }
+
     m_number_caught = 0;
 
     //  Connect the controller.
@@ -264,7 +274,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.log("Detected " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
         }
 
-        if (stars > MAX_STARS){
+        if (stars < MIN_STARS || stars > MAX_STARS){
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
             close_raid(env.console, context);
