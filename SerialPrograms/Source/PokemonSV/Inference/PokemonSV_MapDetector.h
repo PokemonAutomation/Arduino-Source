@@ -81,6 +81,8 @@ public:
     {}
 };
 
+// Detect whether map is opened and ready to be closed.
+// Can also detect whether the map is in the fixed view or rotated view mode.
 class MapWatcher : public VisualInferenceCallback{
 public:
     MapWatcher(Color color = COLOR_RED);
@@ -89,7 +91,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
     // Whether the map is in the fixed view instead of rotated view.
-    bool map_in_fixed_view() const;
+    bool map_in_fixed_view() const { return m_in_fixed_view; }
 
 private:
     MapExitWatcher m_exit_watcher;
