@@ -52,7 +52,7 @@ private:
     Color m_color;
     ImageFloatBox m_arrow_box;
 };
-class MapFixedViewWatcher : public DetectorToFinder<MapExitDetector>{
+class MapFixedViewWatcher : public DetectorToFinder<MapFixedViewDetector>{
 public:
     MapFixedViewWatcher(Color color = COLOR_RED)
          : DetectorToFinder("MapFixedViewWatcher", std::chrono::milliseconds(1000), color)
@@ -74,7 +74,7 @@ private:
     Color m_color;
     ImageFloatBox m_arrow_box;
 };
-class MapRotatedViewWatcher : public DetectorToFinder<MapExitDetector>{
+class MapRotatedViewWatcher : public DetectorToFinder<MapRotatedViewDetector>{
 public:
     MapRotatedViewWatcher(Color color = COLOR_RED)
          : DetectorToFinder("MapRotatedViewWatcher", std::chrono::milliseconds(1000), color)
