@@ -1215,6 +1215,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
@@ -1225,8 +1227,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
-    Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp
-    Source/PokemonSV/Programs/PokemonSV_EggFetcher.h
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp

@@ -22,7 +22,7 @@
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
 
-#include "Programs/PokemonSV_EggFetcher.h"
+#include "Programs/Eggs/PokemonSV_EggFetcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

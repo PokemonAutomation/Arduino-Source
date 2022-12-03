@@ -601,12 +601,12 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
-    Source/PokemonSV/Programs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
@@ -1446,12 +1446,12 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
-    Source/PokemonSV/Programs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
