@@ -381,7 +381,6 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         }
         env.log("Tera raid found!", COLOR_BLUE);
 
-        stats.m_raids++;
         context.wait_for(std::chrono::milliseconds(100));
 
         pbf_press_button(context, BUTTON_A, 20, 230);
@@ -399,6 +398,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             }
             env.update_stats();
 
+            stats.m_raids++;
             bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, TRY_TO_TERASTILIZE);
             env.update_stats();
             if (win){

@@ -40,7 +40,7 @@ class DexRecFilters : public GroupOption{
 public:
     DexRecFilters();
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     StringSelectOption DESIRED;
     StringSelectTableOption EXCLUSIONS;
 };

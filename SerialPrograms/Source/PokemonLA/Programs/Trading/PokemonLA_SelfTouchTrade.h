@@ -40,7 +40,7 @@ private:
     bool move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col);
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     enum class HostingSwitch{
         Switch0,

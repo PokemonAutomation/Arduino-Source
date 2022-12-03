@@ -45,7 +45,7 @@ public:
 
 private:
     StartInGripOrGameOption START_LOCATION;
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint32_t> NUM_APRICORN_ONE;
     SimpleIntegerOption<uint32_t> NUM_APRICORN_TWO;
     SimpleIntegerOption<uint32_t> NUM_NPCS;

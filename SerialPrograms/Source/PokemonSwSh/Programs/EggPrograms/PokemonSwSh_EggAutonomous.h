@@ -80,7 +80,7 @@ private:
     
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     SimpleIntegerOption<uint8_t> LOOPS_PER_FETCH;

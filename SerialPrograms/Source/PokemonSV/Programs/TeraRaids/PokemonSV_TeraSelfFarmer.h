@@ -43,7 +43,7 @@ private:
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     enum class Mode{
         FARM_ITEMS_ONLY,

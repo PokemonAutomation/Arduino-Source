@@ -33,7 +33,7 @@ public:
 
 private:
     StartInGripOrGameOption START_LOCATION;
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> POKEMON_COUNT;
     BooleanCheckBoxOption DODGE_SYSTEM_UPDATE_WINDOW;
 };

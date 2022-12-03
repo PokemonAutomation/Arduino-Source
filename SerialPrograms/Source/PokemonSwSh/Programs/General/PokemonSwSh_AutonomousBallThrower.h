@@ -38,7 +38,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     PokemonBallSelectOption BALL_SELECT;
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
     EventNotificationOption NOTIFICATION_CATCH_FAILED;

@@ -18,19 +18,33 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-class LanguageOCRWidget : public QWidget, public ConfigWidget{
+class LanguageOCRCellWidget : public QWidget, public ConfigWidget{
 public:
-    LanguageOCRWidget(QWidget& parent, LanguageOCR& value);
+    LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& value);
 
     virtual void update_value() override;
     virtual void value_changed() override;
 
 private:
-    LanguageOCR& m_value;
+    LanguageOCRCell& m_value;
     QComboBox* m_box;
     QLabel* m_status;
     std::vector<Language> m_index_to_enum;
 //    std::map<Language, int> m_enum_to_index;
+};
+
+
+
+class LanguageOCROptionWidget : public QWidget, public ConfigWidget{
+public:
+    ~LanguageOCROptionWidget();
+    LanguageOCROptionWidget(QWidget& parent, LanguageOCROption& value);
+
+    virtual void update_value() override;
+    virtual void value_changed() override;
+
+private:
+    LanguageOCRCellWidget* m_cell;
 };
 
 

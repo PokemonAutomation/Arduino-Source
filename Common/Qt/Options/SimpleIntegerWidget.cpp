@@ -97,7 +97,7 @@ void SimpleIntegerOptionWidget<Type>::update_value(){
 }
 template <typename Type>
 void SimpleIntegerOptionWidget<Type>::value_changed(){
-    m_cell->update_value();
+    m_cell->value_changed();
 //    QMetaObject::invokeMethod(this, [this]{
 //        update_value();
 //    }, Qt::QueuedConnection);

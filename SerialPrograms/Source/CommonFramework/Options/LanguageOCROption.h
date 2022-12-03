@@ -16,10 +16,9 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-class LanguageOCR : public ConfigOption{
+class LanguageOCRCell : public ConfigOption{
 public:
-    LanguageOCR(
-        std::string label,
+    LanguageOCRCell(
         const LanguageSet& languages,
         LockWhileRunning lock_while_running,
         bool required = true
@@ -40,14 +39,35 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
-    friend class LanguageOCRWidget;
+    friend class LanguageOCRCellWidget;
 
-    const std::string m_label;
     std::vector<std::pair<Language, bool>> m_case_list;
     std::map<Language, size_t> m_case_map;
     const size_t m_default;
 
     std::atomic<size_t> m_current;
+};
+
+
+
+
+class LanguageOCROption : public LanguageOCRCell{
+public:
+    LanguageOCROption(
+        std::string label,
+        const LanguageSet& languages,
+        LockWhileRunning lock_while_running,
+        bool required = true
+    );
+
+    const std::string& label() const{ return m_label; }
+
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+private:
+    friend class LanguageOCROptionWidget;
+
+    const std::string m_label;
 };
 
 

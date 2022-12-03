@@ -35,7 +35,7 @@ public:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     
     BerryTable TARGET_BERRIES;
 

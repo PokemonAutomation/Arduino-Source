@@ -22,25 +22,23 @@ namespace OCR{
 
 
 
-ConfigWidget* LanguageOCR::make_QtWidget(QWidget& parent){
-    return new LanguageOCRWidget(parent, *this);
+ConfigWidget* LanguageOCRCell::make_QtWidget(QWidget& parent){
+    return new LanguageOCRCellWidget(parent, *this);
+}
+ConfigWidget* LanguageOCROption::make_QtWidget(QWidget& parent){
+    return new LanguageOCROptionWidget(parent, *this);
 }
 
 
 
-LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
+
+LanguageOCRCellWidget::LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QLabel* text = new QLabel(QString::fromStdString(m_value.m_label), this);
-    text->setWordWrap(true);
-    layout->addWidget(text, 1);
-
-    QVBoxLayout* vbox = new QVBoxLayout();
-    layout->addLayout(vbox, 1);
+    QVBoxLayout* vbox = new QVBoxLayout(this);
+    vbox->setContentsMargins(0, 0, 0, 0);
     m_box = new NoWheelComboBox(&parent);
 
     for (const auto& item : m_value.m_case_list){
@@ -73,7 +71,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     m_status->setOpenExternalLinks(true);
     vbox->addWidget(m_status);
 
-    LanguageOCRWidget::update_value();
+    LanguageOCRCellWidget::update_value();
 
     connect(
         m_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
@@ -88,7 +86,7 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
 }
 
 
-void LanguageOCRWidget::update_value(){
+void LanguageOCRCellWidget::update_value(){
     size_t index = m_value;
     m_box->setCurrentIndex((int)index);
 
@@ -106,10 +104,40 @@ void LanguageOCRWidget::update_value(){
         m_status->setVisible(true);
     }
 }
-void LanguageOCRWidget::value_changed(){
+void LanguageOCRCellWidget::value_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);
+}
+
+
+
+
+
+
+LanguageOCROptionWidget::~LanguageOCROptionWidget(){
+    m_value.remove_listener(*this);
+}
+LanguageOCROptionWidget::LanguageOCROptionWidget(QWidget& parent, LanguageOCROption& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+    , m_cell(new LanguageOCRCellWidget(*this, value))
+{
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
+    text->setWordWrap(true);
+    layout->addWidget(text, 1);
+    layout->addWidget(m_cell, 1);
+    value.add_listener(*this);
+}
+
+
+void LanguageOCROptionWidget::update_value(){
+    m_cell->update_value();
+}
+void LanguageOCROptionWidget::value_changed(){
+    m_cell->value_changed();
 }
 
 

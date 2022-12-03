@@ -19,14 +19,12 @@ namespace OCR{
 
 
 
-LanguageOCR::LanguageOCR(
-    std::string label,
+LanguageOCRCell::LanguageOCRCell(
     const LanguageSet& languages,
     LockWhileRunning lock_while_running,
     bool required
 )
     : ConfigOption(lock_while_running)
-    , m_label(std::move(label))
     , m_default(0)
     , m_current(0)
 {
@@ -58,7 +56,7 @@ LanguageOCR::LanguageOCR(
 }
 
 
-void LanguageOCR::set(Language language){
+void LanguageOCRCell::set(Language language){
     auto iter = m_case_map.find(language);
     if (iter == m_case_map.end()){
         return;
@@ -68,7 +66,7 @@ void LanguageOCR::set(Language language){
 }
 
 
-void LanguageOCR::load_json(const JsonValue& json){
+void LanguageOCRCell::load_json(const JsonValue& json){
     const std::string* str = json.get_string();
     if (str == nullptr){
         return;
@@ -93,17 +91,37 @@ void LanguageOCR::load_json(const JsonValue& json){
     m_current.store(iter->second, std::memory_order_relaxed);
     report_value_changed();
 }
-JsonValue LanguageOCR::to_json() const{
+JsonValue LanguageOCRCell::to_json() const{
     return language_data((Language)*this).code;
 }
 
-std::string LanguageOCR::check_validity() const{
+std::string LanguageOCRCell::check_validity() const{
     return m_case_list[m_current.load(std::memory_order_relaxed)].second ? std::string() : "Language data is not available.";
 }
-void LanguageOCR::restore_defaults(){
+void LanguageOCRCell::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
     report_value_changed();
 }
+
+
+
+
+
+
+
+
+
+
+
+LanguageOCROption::LanguageOCROption(
+    std::string label,
+    const LanguageSet& languages,
+    LockWhileRunning lock_while_running,
+    bool required
+)
+    : LanguageOCRCell(languages, lock_while_running, required)
+    , m_label(std::move(label))
+{}
 
 
 

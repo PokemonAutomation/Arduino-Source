@@ -42,7 +42,7 @@ private:
 private:
     class RunRoute;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     StringSelectDatabase POKEMON_DATABASE;
     StringSelectOption POKEMON;

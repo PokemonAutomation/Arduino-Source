@@ -46,7 +46,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     ShortcutDirectionOption SHORTCUT;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;

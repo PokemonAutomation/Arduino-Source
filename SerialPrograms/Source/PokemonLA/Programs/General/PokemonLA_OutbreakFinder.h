@@ -85,7 +85,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     StringSelectTableOption DESIRED_MO_SLUGS;
     StringSelectTableOption DESIRED_MMO_SLUGS;

@@ -49,7 +49,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     enum class Mode{
         CLONE_ONLY,

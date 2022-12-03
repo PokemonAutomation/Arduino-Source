@@ -54,7 +54,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     IVCheckerOptionOCR HP;
     IVCheckerOptionOCR ATTACK;
     IVCheckerOptionOCR DEFENSE;

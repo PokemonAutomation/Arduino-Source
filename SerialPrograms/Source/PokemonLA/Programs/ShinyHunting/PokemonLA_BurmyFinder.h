@@ -89,7 +89,7 @@ private:
     // detection when throwing pokemon to shake a tree.
     std::atomic<bool> m_enable_shiny_sound{true};
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     StopOnOption STOP_ON;
     ExitBattleMethodOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;

@@ -43,7 +43,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     PokemonBallSelectOption BALL_SELECT;
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     IVCheckerFilterOption HP;
     IVCheckerFilterOption ATTACK;
     IVCheckerFilterOption DEFENSE;

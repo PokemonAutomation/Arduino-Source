@@ -47,7 +47,7 @@ private:
     ) const;
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     enum class Pokedex{
         Galar,

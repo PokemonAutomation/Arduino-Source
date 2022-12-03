@@ -83,6 +83,23 @@ bool MainMenuDetector::move_cursor(
         VideoSnapshot screen = console.video().snapshot();
         std::pair<MenuSide, int> current = this->detect_location(screen);
 
+        {
+            std::string text = "Current Location: ";
+            switch (current.first){
+            case MenuSide::NONE:
+                text += "?";
+                break;
+            case MenuSide::LEFT:
+                text += "Left";
+                break;
+            case MenuSide::RIGHT:
+                text += "Right";
+                break;
+            }
+            text += std::to_string(current.second);
+            console.log(text);
+        }
+
         //  Failed to detect menu.
         if (current.first == MenuSide::NONE){
             consecutive_detection_fails++;

@@ -59,7 +59,7 @@ private:
     // The function will use a loop to do multiple focusing to try to get a target pokemon focused
     PokemonDetails go_to_spawn_point_and_try_focusing_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t nun_pokemon_left);
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     EnumDropdownOption<MultiSpawn> SPAWN;
 

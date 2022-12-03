@@ -37,7 +37,7 @@ public:
 private:
     void throw_ball(ConsoleHandle& console, BotBaseContext& context);
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

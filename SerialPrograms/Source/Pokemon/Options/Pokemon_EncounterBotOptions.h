@@ -15,10 +15,10 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-class EncounterBotLanguage : public OCR::LanguageOCR{
+class EncounterBotLanguage : public OCR::LanguageOCROption{
 public:
     EncounterBotLanguage(bool required = false)
-        : LanguageOCR(
+        : LanguageOCROption(
             "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
             PokemonNameReader::instance().languages(),
             LockWhileRunning::LOCKED,

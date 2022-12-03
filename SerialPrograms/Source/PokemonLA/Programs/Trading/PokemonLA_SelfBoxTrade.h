@@ -38,8 +38,8 @@ private:
     );
 
 private:
-    OCR::LanguageOCR LANGUAGE_LEFT;
-    OCR::LanguageOCR LANGUAGE_RIGHT;
+    OCR::LanguageOCROption LANGUAGE_LEFT;
+    OCR::LanguageOCROption LANGUAGE_RIGHT;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
 

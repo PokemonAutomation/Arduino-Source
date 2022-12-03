@@ -58,7 +58,7 @@ public:
 
     bool is_host;
     StaticTextOption is_host_label;
-    OCR::LanguageOCR language;
+    OCR::LanguageOCROption language;
 };
 class ConsoleSpecificOptionsFactory{
 public:

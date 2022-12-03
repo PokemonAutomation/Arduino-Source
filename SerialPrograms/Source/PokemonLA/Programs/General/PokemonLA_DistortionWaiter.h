@@ -33,7 +33,7 @@ public:
 
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     EventNotificationOption NOTIFICATION_DISTORTION;
     EventNotificationsOption NOTIFICATIONS;

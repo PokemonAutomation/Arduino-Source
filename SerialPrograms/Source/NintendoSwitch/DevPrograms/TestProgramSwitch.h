@@ -54,7 +54,7 @@ private:
     };
 
 private:
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     StaticTextOption STATIC_TEXT;
 

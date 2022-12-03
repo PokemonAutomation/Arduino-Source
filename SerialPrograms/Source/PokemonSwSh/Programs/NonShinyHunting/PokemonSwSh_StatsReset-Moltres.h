@@ -40,7 +40,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
     IVCheckerFilterOption HP;
     IVCheckerFilterOption ATTACK;
     IVCheckerFilterOption DEFENSE;
