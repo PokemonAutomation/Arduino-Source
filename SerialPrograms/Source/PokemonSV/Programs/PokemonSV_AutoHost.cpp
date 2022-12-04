@@ -219,7 +219,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-        TeraLobbyBanWatcher ban_watcher(COLOR_RED, BAN_LIST, true);
+        TeraLobbyBanWatcher ban_watcher(env.logger(), COLOR_RED, BAN_LIST, true);
         context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(

@@ -76,6 +76,7 @@ public:
 
     //  Returns true if someone is on the ban list.
     std::vector<TeraLobbyNameMatchResult> check_ban_list(
+        Logger& logger,
         const std::vector<PlayerListRowSnapshot>& ban_list,
         const ImageViewRGB32& screen,
         bool include_host
@@ -87,6 +88,7 @@ private:
         std::u32string normalized;
     };
     bool check_ban_for_image(
+        Logger& logger,
         std::vector<TeraLobbyNameMatchResult>& matches,
         std::map<Language, CacheEntry>& cache, const ImageViewRGB32& image,
         const PlayerListRowSnapshot& entry
@@ -130,7 +132,7 @@ private:
 };
 class TeraLobbyBanWatcher : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyBanWatcher(Color color, PlayerListTable& table, bool include_host);
+    TeraLobbyBanWatcher(Logger& logger, Color color, PlayerListTable& table, bool include_host);
 
     std::vector<TeraLobbyNameMatchResult> detected_banned_players() const;
 
@@ -138,6 +140,7 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
+    Logger& m_logger;
     PlayerListTable& m_table;
     bool m_include_host;
     mutable std::mutex m_lock;

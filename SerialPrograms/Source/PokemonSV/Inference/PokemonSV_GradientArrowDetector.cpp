@@ -45,6 +45,10 @@ bool is_gradient_arrow(
     object = yellow;
     object.merge_assume_no_overlap(blue);
 
+    if (object.width() < 50){
+        return false;
+    }
+
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
     const double THRESHOLD = 80;
