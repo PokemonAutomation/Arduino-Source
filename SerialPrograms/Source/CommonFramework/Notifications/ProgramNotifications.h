@@ -21,6 +21,9 @@ class StatsTracker;
 class ProgramEnvironment;
 
 
+#if 1
+//  This is the generic notification function. You shouldn't need to call this
+//  one directly.
 void send_program_notification(
     Logger& logger, EventNotificationOption& settings,
     Color color,
@@ -29,39 +32,26 @@ void send_program_notification(
     const std::vector<std::pair<std::string, std::string>>& messages,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
+#endif
 
-void send_program_telemetry(
-    Logger& logger, bool is_error, Color color,
-    const ProgramInfo& info,
+
+void send_program_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    Color color,
     const std::string& title,
-    const std::vector<std::pair<std::string, std::string>>& messages,
-    const std::string& file
-);
-
-#if 0
-void send_program_status_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    const StatsTracker* current_stats = nullptr,
-    const StatsTracker* historical_stats = nullptr,
+    std::vector<std::pair<std::string, std::string>> messages,
+    const std::string& current_stats_addendum,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
-#endif
+
+
+
 void send_program_status_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message = "",
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
 
-void send_program_finished_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
-    const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
-);
 void send_program_finished_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message = "",
@@ -74,6 +64,17 @@ void send_program_recoverable_error_notification(
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
 
+
+
+//  Notifications without the environment.
+void send_program_finished_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const ProgramInfo& info,
+    const std::string& message,
+    std::string current_stats,
+    std::string historical_stats,
+    const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
+);
 void send_program_fatal_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
@@ -81,6 +82,19 @@ void send_program_fatal_error_notification(
     std::string current_stats,
     std::string historical_stats,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
+);
+
+
+
+
+
+
+void send_program_telemetry(
+    Logger& logger, bool is_error, Color color,
+    const ProgramInfo& info,
+    const std::string& title,
+    const std::vector<std::pair<std::string, std::string>>& messages,
+    const std::string& file
 );
 
 

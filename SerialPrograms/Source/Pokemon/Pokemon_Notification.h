@@ -45,10 +45,9 @@ void send_encounter_notification(
 );
 
 void send_catch_notification(
-    Logger& logger,
+    ProgramEnvironment& env,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
-    const ProgramInfo& info,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
     bool success

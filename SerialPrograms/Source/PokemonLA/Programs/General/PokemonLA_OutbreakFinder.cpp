@@ -736,7 +736,7 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
 }
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
+//    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);
     // return;
@@ -804,11 +804,10 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     env.update_stats();
 
     send_program_notification(
-        env.console, NOTIFICATION_MATCHED,
+        env, NOTIFICATION_MATCHED,
         COLOR_GREEN,
-        env.program_info(),
         "Found Outbreak",
-        {{"Session Stats", stats.to_str()}},
+        {}, "",
         env.console.video().snapshot()
     );
 

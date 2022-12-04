@@ -282,10 +282,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             );
         }
         send_catch_notification(
-            m_console,
+            m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
-            m_env.program_info(),
             &encounter_results[0].slug_candidates,
             action.pokeball_slug,
             catch_result.balls_used,

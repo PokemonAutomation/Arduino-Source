@@ -251,10 +251,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             );
         }
         send_catch_notification(
-            m_console,
+            m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
-            m_env.program_info(),
             encounter.candidates(),
             action.second,
             results.balls_used,
@@ -296,10 +295,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             );
         }
         send_catch_notification(
-            m_console,
+            m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
-            m_env.program_info(),
             encounter.candidates(),
             action.second,
             results.balls_used,

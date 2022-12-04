@@ -50,7 +50,7 @@ bool connect_to_internet(
 }
 
 void send_raid_notification(
-    const ProgramEnvironment& env,
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -117,23 +117,11 @@ void send_raid_notification(
         embeds.emplace_back("Raid Code", code_str);
     }
 
-//    if (!screenshot.isNull()){
-        embeds.emplace_back("Session Stats", stats_tracker.to_str());
-//    }
-
-    if (GlobalSettings::instance().ALL_STATS){
-        const StatsTracker* historical_stats = env.historical_stats();
-        if (historical_stats){
-            embeds.emplace_back("Historical Stats", historical_stats->to_str());
-        }
-    }
-
     send_program_notification(
-        console, settings.NOTIFICATION,
+        env, settings.NOTIFICATION,
         Color(),
-        env.program_info(),
         "Max Raid Notification",
-        embeds,
+        embeds, "",
         screenshot, false
     );
 

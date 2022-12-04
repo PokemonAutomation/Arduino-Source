@@ -83,7 +83,7 @@ bool ShinyDetectedActionOption::stop_on_shiny() const{
 
 
 bool on_shiny_callback(
-    const ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
@@ -108,25 +108,17 @@ bool on_shiny_callback(
     ss << "Error Coefficient: " << error_coefficient << "\n(Shiny may not be visible on the screen.)";
     embeds.emplace_back("Detection Results", ss.str());
 
-    const StatsTracker* current_stats = env.current_stats();
-    if (current_stats){
-        embeds.emplace_back("Session Stats", current_stats->to_str());
-    }
-    const StatsTracker* historical_stats = env.historical_stats();
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        embeds.emplace_back("Historical Stats", historical_stats->to_str());
-    }
     send_program_notification(
-        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
-        env.program_info(),
+        env, options.NOTIFICATIONS,
+        Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
-        embeds,
+        embeds, "",
         console.video().snapshot(), true
     );
     return false;
 }
 void on_shiny_sound(
-    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
@@ -138,24 +130,15 @@ void on_shiny_sound(
     ss << "\n(Shiny may not be visible on the screen.)";
     embeds.emplace_back("Detection Results", ss.str());
 
-    const StatsTracker* current_stats = env.current_stats();
-    if (current_stats){
-        embeds.emplace_back("Session Stats", current_stats->to_str());
-    }
-    const StatsTracker* historical_stats = env.historical_stats();
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        embeds.emplace_back("Historical Stats", historical_stats->to_str());
-    }
-
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
     context.wait_for_all_requests();
 
     send_program_notification(
-        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
-        env.program_info(),
+        env, options.NOTIFICATIONS,
+        Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
-        embeds,
+        embeds, "",
         console.video().snapshot(), true
     );
 
@@ -170,27 +153,19 @@ void on_shiny_sound(
 }
 
 void on_match_found(
-    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
-    const StatsTracker* current_stats = env.current_stats();
-    if (current_stats){
-        embeds.emplace_back("Session Stats", current_stats->to_str());
-    }
-    const StatsTracker* historical_stats = env.historical_stats();
-    if (historical_stats){
-        embeds.emplace_back("Historical Stats", historical_stats->to_str());
-    }
 
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
     context.wait_for_all_requests();
 
     send_program_notification(
-        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
-        env.program_info(),
+        env, options.NOTIFICATIONS,
+        Pokemon::COLOR_STAR_SHINY,
         "Match Found",
-        embeds,
+        embeds, "",
         console.video().snapshot(), true
     );
 

@@ -204,17 +204,11 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             messages.emplace_back("Raid Code", std::move(code));
         }
 
-        messages.emplace_back("Session Stats", env.current_stats()->to_str());
-        if (GlobalSettings::instance().ALL_STATS && env.historical_stats()){
-            messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
-        }
-
         send_program_notification(
-            env.logger(),
-            NOTIFICATION,
-            Color(0), env.program_info(),
+            env, NOTIFICATION,
+            Color(0),
             "Tera Raid Notification",
-            messages,
+            messages, "",
             env.console.video().snapshot()
         );
 
@@ -287,11 +281,10 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
             stats.m_banned += detected_banned_players.size();
             send_program_notification(
-                env.logger(), NOTIFICATION,
+                env, NOTIFICATION,
                 COLOR_RED,
-                env.program_info(),
                 "Raid Canceled Due to Banned User",
-                {{"Banned User(s):", std::move(message)}},
+                {{"Banned User(s):", std::move(message)}}, "",
                 snapshot
             );
 

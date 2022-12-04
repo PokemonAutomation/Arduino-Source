@@ -21,9 +21,9 @@
 #include "../Internal/SerialPrograms/TelemetryURLs.h"
 #endif
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -142,6 +142,146 @@ void send_program_notification(
         ImageAttachment(image, settings.screenshot(), keep_file)
     );
 }
+void send_program_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    Color color,
+    const std::string& title,
+    std::vector<std::pair<std::string, std::string>> messages,
+    const std::string& current_stats_addendum,
+    const ImageViewRGB32& image, bool keep_file
+){
+    if (!settings.ok_to_send_now(env.logger())){
+        return;
+    }
+    const StatsTracker* current_stats = env.current_stats();
+    const StatsTracker* historical_stats = env.historical_stats();
+    if (current_stats){
+        std::string str = env.current_stats()->to_str();
+        if (!current_stats_addendum.empty()){
+            str += "\n";
+            str += current_stats_addendum;
+        }
+        messages.emplace_back("Session Stats", std::move(str));
+    }
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
+    }
+    send_program_notification(
+        env.logger(),
+        color,
+        settings.ping(), settings.tags(),
+        env.program_info(),
+        title,
+        messages,
+        ImageAttachment(image, settings.screenshot(), keep_file)
+    );
+}
+
+
+
+
+
+void send_program_status_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const std::string& message,
+    const ImageViewRGB32& image, bool keep_file
+){
+    send_program_notification(
+        env, settings,
+        Color(),
+        "Program Status",
+        {{"Message", message}}, "",
+        image, keep_file
+    );
+}
+void send_program_finished_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const std::string& message,
+    const ImageViewRGB32& image, bool keep_file
+){
+    send_program_notification(
+        env, settings,
+        COLOR_GREEN,
+        "Program Finished",
+        {{"Message", message}}, "",
+        image, keep_file
+    );
+}
+void send_program_recoverable_error_notification(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    const std::string& message,
+    const ImageViewRGB32& image, bool keep_file
+){
+    send_program_notification(
+        env, settings,
+        COLOR_RED,
+        "Program Error (Recoverable)",
+        {{"Message", message}}, "",
+        image, keep_file
+    );
+}
+
+
+
+
+
+
+void send_program_finished_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const ProgramInfo& info,
+    const std::string& message,
+    std::string current_stats,
+    std::string historical_stats,
+    const ImageViewRGB32& image, bool keep_file
+){
+    std::vector<std::pair<std::string, std::string>> messages{
+        {"Message", message},
+    };
+    if (!current_stats.empty()){
+        messages.emplace_back("Session Stats", std::move(current_stats));
+    }
+    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
+        messages.emplace_back("Historical Stats", std::move(historical_stats));
+    }
+    send_program_notification(
+        logger, settings,
+        COLOR_GREEN, info,
+        "Program Finished",
+        messages,
+        image, keep_file
+    );
+}
+void send_program_fatal_error_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const ProgramInfo& info,
+    const std::string& message,
+    std::string current_stats,
+    std::string historical_stats,
+    const ImageViewRGB32& image, bool keep_file
+){
+    std::vector<std::pair<std::string, std::string>> messages{
+        {"Message", message},
+    };
+    if (!current_stats.empty()){
+        messages.emplace_back("Session Stats", std::move(current_stats));
+    }
+    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
+        messages.emplace_back("Historical Stats", std::move(historical_stats));
+    }
+    send_program_notification(
+        logger, settings,
+        COLOR_RED, info,
+        "Program Stopped (Fatal Error)",
+        messages,
+        image, keep_file
+    );
+}
+
+
+
+
+
+
 
 void send_program_telemetry(
     Logger& logger, bool is_error, Color color,
@@ -213,160 +353,6 @@ void send_program_telemetry(
     }
 #endif
 }
-
-
-
-
-#if 0
-void send_program_status_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    const StatsTracker* current_stats,
-    const StatsTracker* historical_stats,
-    const ImageViewRGB32& image, bool keep_file
-){
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (current_stats){
-        messages.emplace_back("Session Stats", current_stats->to_str());
-    }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", historical_stats->to_str());
-    }
-    send_program_notification(
-        logger, settings,
-        Color(), info,
-        "Program Status",
-        messages,
-        image, keep_file
-    );
-}
-#endif
-void send_program_status_notification(
-    ProgramEnvironment& env, EventNotificationOption& settings,
-    const std::string& message,
-    const ImageViewRGB32& image, bool keep_file
-){
-    const StatsTracker* current_stats = env.current_stats();
-    const StatsTracker* historical_stats = env.historical_stats();
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (current_stats){
-        messages.emplace_back("Session Stats", env.current_stats()->to_str());
-    }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
-    }
-    send_program_notification(
-        env.logger(), settings,
-        Color(), env.program_info(),
-        "Program Status",
-        messages,
-        image, keep_file
-    );
-}
-void send_program_finished_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
-    const ImageViewRGB32& image, bool keep_file
-){
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (!current_stats.empty()){
-        messages.emplace_back("Session Stats", std::move(current_stats));
-    }
-    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats", std::move(historical_stats));
-    }
-    send_program_notification(
-        logger, settings,
-        COLOR_GREEN, info,
-        "Program Finished",
-        messages,
-        image, keep_file
-    );
-}
-void send_program_finished_notification(
-    ProgramEnvironment& env, EventNotificationOption& settings,
-    const std::string& message,
-    const ImageViewRGB32& image, bool keep_file
-){
-    const StatsTracker* current_stats = env.current_stats();
-    const StatsTracker* historical_stats = env.historical_stats();
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (current_stats){
-        messages.emplace_back("Session Stats", env.current_stats()->to_str());
-    }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
-    }
-    send_program_notification(
-        env.logger(), settings,
-        COLOR_GREEN, env.program_info(),
-        "Program Finished",
-        messages,
-        image, keep_file
-    );
-}
-void send_program_recoverable_error_notification(
-    ProgramEnvironment& env, EventNotificationOption& settings,
-    const std::string& message,
-    const ImageViewRGB32& image, bool keep_file
-){
-    const StatsTracker* current_stats = env.current_stats();
-    const StatsTracker* historical_stats = env.historical_stats();
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (current_stats){
-        messages.emplace_back("Session Stats", env.current_stats()->to_str());
-    }
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
-    }
-    send_program_notification(
-        env.logger(), settings,
-        COLOR_RED, env.program_info(),
-        "Program Error (Recoverable)",
-        messages,
-        image, keep_file
-    );
-}
-void send_program_fatal_error_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
-    const ImageViewRGB32& image, bool keep_file
-){
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
-    };
-    if (!current_stats.empty()){
-        messages.emplace_back("Session Stats", std::move(current_stats));
-    }
-    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats", std::move(historical_stats));
-    }
-    send_program_notification(
-        logger, settings,
-        COLOR_RED, info,
-        "Program Stopped (Fatal Error)",
-        messages,
-        image, keep_file
-    );
-}
-
 
 
 

@@ -153,39 +153,25 @@ void send_encounter_notification(
         }
         embeds.emplace_back("Shininess", std::move(shinies));
     }
-    {
-        std::string session_stats_str;
-        if (env.current_stats()){
-            session_stats_str += env.current_stats()->to_str();
-        }
-        if (frequencies && !frequencies->empty()){
-            if (!session_stats_str.empty()){
-                session_stats_str += "\n";
-            }
-            session_stats_str += frequencies->dump_sorted_map("");
-        }
-        if (!session_stats_str.empty()){
-            embeds.emplace_back("Session Stats", std::move(session_stats_str));
-        }
-    }
-    if (env.historical_stats()){
-        embeds.emplace_back("Historical Stats", env.historical_stats()->to_str());
+    std::string stats_addendum;
+    if (frequencies && !frequencies->empty()){
+        stats_addendum = frequencies->dump_sorted_map("");
     }
 
     if (has_shiny){
         send_program_notification(
-            env.logger(), settings_shiny,
-            color, env.program_info(),
+            env, settings_shiny,
+            color,
             "Encounter Notification",
-            embeds,
+            embeds, std::move(stats_addendum),
             screenshot, true
         );
     }else{
         send_program_notification(
-            env.logger(), settings_nonshiny,
-            color, env.program_info(),
+            env, settings_nonshiny,
+            color,
             "Encounter Notification",
-            embeds,
+            embeds, std::move(stats_addendum),
             screenshot, false
         );
     }
@@ -194,10 +180,9 @@ void send_encounter_notification(
 
 
 void send_catch_notification(
-    Logger& logger,
+    ProgramEnvironment& env,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
-    const ProgramInfo& info,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
     bool success
@@ -243,17 +228,17 @@ void send_catch_notification(
 
     if (success){
         send_program_notification(
-            logger, settings_catch_success,
-            color, info,
+            env, settings_catch_success,
+            color,
             STRING_POKEMON + " Caught",
-            embeds
+            embeds, ""
         );
     }else{
         send_program_notification(
-            logger, settings_catch_failed,
-            color, info,
+            env, settings_catch_failed,
+            color,
             "Catch Failed",
-            embeds
+            embeds, ""
         );
     }
 }

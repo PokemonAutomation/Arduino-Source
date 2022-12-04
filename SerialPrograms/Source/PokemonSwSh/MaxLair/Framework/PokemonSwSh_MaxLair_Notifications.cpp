@@ -44,11 +44,6 @@ void send_status_notification(
         status_str += "Current Path: " + str + "\n";
         embeds.emplace_back("Current Path", std::move(str));
     }
-    {
-        std::string str = runtime.session_stats.to_str();
-        status_str += "Session Stats: " + str + "\n";
-        embeds.emplace_back("Session Stats", std::move(str));
-    }
     for (size_t c = 0; c < env.consoles.size(); c++){
         const ConsoleRuntime& stats = runtime.consoles[c];
         std::string label = "Console " + std::to_string(c);
@@ -59,17 +54,12 @@ void send_status_notification(
         status_str += label + " - " + str + "\n";
         embeds.emplace_back(std::move(label), str);
     }
-    if (GlobalSettings::instance().ALL_STATS){
-        std::string str = env.historical_stats_str();
-        status_str += "Historical Stats: " + str + "\n";
-        embeds.emplace_back("Historical Stats", std::move(str));
-    }
     env.log(status_str);
     send_program_notification(
-        env.logger(), runtime.notification_status,
-        Color(), env.program_info(),
+        env, runtime.notification_status,
+        Color(),
         "Max Lair Status Update",
-        embeds
+        embeds, ""
     );
 }
 
@@ -122,18 +112,12 @@ void send_raid_notification(
     if (path_stats.runs() > 0){
         embeds.emplace_back("Current Path", path_stats.to_str());
     }
-    embeds.emplace_back("Session Stats", session_stats.to_str());
-    if (GlobalSettings::instance().ALL_STATS){
-        std::string str = env.historical_stats_str();
-        embeds.emplace_back("Historical Stats", std::move(str));
-    }
 
     send_program_notification(
-        console, settings.NOTIFICATION,
+        env, settings.NOTIFICATION,
         Color(),
-        env.program_info(),
         "Max Lair Notification",
-        embeds,
+        embeds, "",
         *screen, false
     );
 
@@ -190,17 +174,12 @@ void send_shiny_notification(
     if (path_stats.runs() > 0){
         embeds.emplace_back("Current Path", path_stats.to_str());
     }
-    embeds.emplace_back("Session Stats", session_stats.to_str());
-    if (GlobalSettings::instance().ALL_STATS){
-        std::string str = env.historical_stats_str();
-        embeds.emplace_back("Historical Stats", std::move(str));
-    }
 
     send_program_notification(
-        logger, settings,
-        Pokemon::COLOR_STAR_SHINY, env.program_info(),
+        env, settings,
+        Pokemon::COLOR_STAR_SHINY,
         "Max Lair Shiny Notification",
-        embeds,
+        embeds, "",
         image, true
     );
 }

@@ -74,21 +74,21 @@ public:
 //  Call this inside the ShinySoundDetector callback.
 //  Returns true if session should stop.
 bool on_shiny_callback(
-    const ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 //  Call this after the session ends. Only if the session stopped on the shiny.
 void on_shiny_sound(
-    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 // Alternative for matches (shiny/alphas) not found by sound.
 void on_match_found(
-    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options, bool is_match
 );
 
