@@ -18,10 +18,20 @@ namespace PokemonSV{
 
 
 
+
+struct PlayerListRowSnapshot{
+    Language language;
+    std::string name;
+    double log10p;
+};
+
+
 class PlayerListRow : public EditableTableRow{
 public:
     PlayerListRow();
     virtual std::unique_ptr<EditableTableRow> clone() const;
+
+    PlayerListRowSnapshot snapshot() const;
 
 public:
     OCR::LanguageOCRCell language;
@@ -37,6 +47,10 @@ public:
 
     virtual std::vector<std::string> make_header() const;
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+    std::vector<PlayerListRowSnapshot> snapshot() const{
+        return EditableTableOption_t<PlayerListRow>::snapshot<PlayerListRowSnapshot>();
+    }
 };
 
 

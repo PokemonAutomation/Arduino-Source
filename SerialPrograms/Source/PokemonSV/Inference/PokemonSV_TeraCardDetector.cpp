@@ -5,8 +5,8 @@
  */
 
 #include <map>
-#include <QString>
-//#include "Common/Qt/StringToolsQt.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/StringToolsQt.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -17,16 +17,17 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-//#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_TextMatcher.h"
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraCardDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -123,6 +124,23 @@ size_t TeraCardReader::stars(const ImageViewRGB32& screen) const{
 
 
 
+
+
+
+std::string TeraLobbyNameMatchResult::to_str() const{
+    std::string ret;
+    ret += "\"" + raw_ocr;
+    if (ret.back() == '\n'){
+        ret.pop_back();
+    }
+//    ret += "\" -> \"" + normalized_ocr + "\" == \"";
+    ret += "\" -> \"";
+    ret += entry.name + "\" (log10p = " + tostr_default(log10p) + ")";
+    return ret;
+}
+
+
+
 TeraLobbyReader::TeraLobbyReader(Color color)
     : m_color(color)
     , m_bottom_right(0.73, 0.85, 0.12, 0.02)
@@ -131,27 +149,24 @@ TeraLobbyReader::TeraLobbyReader(Color color)
 //    , m_stars(0.500, 0.555, 0.310, 0.070)
     , m_timer(0.175, 0.180, 0.100, 0.080)
     , m_code(0.310, 0.180, 0.200, 0.080)
-    , m_player1_spinner(0.157, 0.645, 0.037, 0.060)
-    , m_player2_spinner(0.157, 0.715, 0.037, 0.060)
-    , m_player3_spinner(0.157, 0.790, 0.037, 0.060)
-    , m_player0_mon(0.425, 0.575, 0.037, 0.060)
-    , m_player1_mon(0.425, 0.645, 0.037, 0.060)
-    , m_player2_mon(0.425, 0.715, 0.037, 0.060)
-    , m_player3_mon(0.425, 0.790, 0.037, 0.060)
-{}
+{
+    for (size_t c = 0; c < 4; c++){
+        m_player_spinner[c] = ImageFloatBox{0.157, 0.575 + 0.070*c, 0.037, 0.060};
+        m_player_name[c] = ImageFloatBox{0.200, 0.575 + 0.070*c, 0.200, 0.060};
+        m_player_mon[c] = ImageFloatBox{0.425, 0.575 + 0.070*c, 0.037, 0.060};
+    }
+}
 void TeraLobbyReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_right);
     items.add(m_color, m_label);
     items.add(m_color, m_cursor);
     items.add(m_color, m_timer);
     items.add(m_color, m_code);
-//    items.add(m_color, m_player1_spinner);
-//    items.add(m_color, m_player2_spinner);
-//    items.add(m_color, m_player3_spinner);
-    items.add(m_color, m_player0_mon);
-    items.add(m_color, m_player1_mon);
-    items.add(m_color, m_player2_mon);
-    items.add(m_color, m_player3_mon);
+    for (size_t c = 0; c < 4; c++){
+        items.add(m_color, m_player_spinner[c]);
+        items.add(m_color, m_player_name[c]);
+        items.add(m_color, m_player_mon[c]);
+    }
 }
 bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
     ImageStats bottom_right = image_stats(extract_box_reference(screen, m_bottom_right));
@@ -175,20 +190,13 @@ bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
 }
 
 uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
-    ImageStats player0 = image_stats(extract_box_reference(screen, m_player0_mon));
-    ImageStats player1 = image_stats(extract_box_reference(screen, m_player1_mon));
-    ImageStats player2 = image_stats(extract_box_reference(screen, m_player2_mon));
-    ImageStats player3 = image_stats(extract_box_reference(screen, m_player3_mon));
-//    cout << player0.average << player0.stddev << endl;
-//    cout << player1.average << player1.stddev << endl;
-//    cout << player2.average << player2.stddev << endl;
-//    cout << player3.average << player3.stddev << endl;
-
     uint8_t total = 0;
-    if (player0.stddev.sum() > 80) total++;
-    if (player1.stddev.sum() > 80) total++;
-    if (player2.stddev.sum() > 80) total++;
-    if (player3.stddev.sum() > 80) total++;
+    for (size_t c = 0; c < 4; c++){
+        ImageStats player = image_stats(extract_box_reference(screen, m_player_mon[0]));
+        if (player.stddev.sum() > 80){
+            total++;
+        }
+    }
     return std::max(total, (uint8_t)1);
 }
 
@@ -197,8 +205,6 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
 
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
-
-#if 1
 
     uint32_t THRESHOLD = 0xff5f5f5f;
 
@@ -229,6 +235,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
         {'O', '0'},
         {'Z', 'S'},
         {'\\', 'V'},
+        {']', 'V'},
     };
 
     std::string raw;
@@ -267,57 +274,101 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
 
     logger.log(log, COLOR_BLUE);
     return normalized;
+}
 
-#else
-
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(extract_box_reference(screen, m_code), 0xff000000, 0xff7f7f7f, true);
-//    filtered.save("test.png");
-
-    std::string raw = OCR::ocr_read(Language::English, filtered);
-    if (!raw.empty() && raw.back() == '\n'){
-        raw.pop_back();
+bool TeraLobbyReader::check_ban_for_image(
+    std::vector<TeraLobbyNameMatchResult>& matches,
+    std::map<Language, CacheEntry>& cache, const ImageViewRGB32& image,
+    const PlayerListRowSnapshot& ban_entry
+) const{
+    auto iter = cache.find(ban_entry.language);
+    if (iter == cache.end()){
+        CacheEntry entry;
+        entry.raw_ocr = OCR::ocr_read(ban_entry.language, image);
+        entry.normalized = OCR::normalize_utf32(entry.raw_ocr);
+        iter = cache.emplace(ban_entry.language, std::move(entry)).first;
     }
 
-    //  KD normalization.
-    QString qstr = QString::fromStdString(raw);
-    qstr = qstr.normalized(QString::NormalizationForm_KD);
+    if (iter->second.normalized.empty()){
+        return false;
+    }
 
-    static const std::map<char32_t, char32_t> SUBSTITUTIONS{
-        {'I', '1'},
-        {'l', '1'},
-        {'O', '0'},
-        {'Z', 'S'},
+    std::u32string normalized_ban_entry = OCR::normalize_utf32(ban_entry.name);
+
+    size_t distance = OCR::levenshtein_distance(
+        iter->second.normalized,
+        normalized_ban_entry
+    );
+
+    if (distance >= normalized_ban_entry.size()){
+        return false;
+    }
+
+    double probability = OCR::random_match_probability(
+        normalized_ban_entry.size(),
+        normalized_ban_entry.size() - distance,
+        language_data(ban_entry.language).random_match_chance
+    );
+    double log10p = std::log10(probability);
+
+//    cout << ban_entry.name << " -> " << to_utf8(normalized_ban_entry)
+//         << " : " << to_utf8(iter->second.normalized) << ", log10p = " << log10p << endl;
+
+#if 0
+    TeraLobbyNameMatchResult result{
+        ban_entry,
+        iter->second.raw_ocr,
+        to_utf8(iter->second.normalized),
+        log10p
     };
+    cout << result.to_str() << endl;
+#endif
 
-    std::u32string str32;
-    for (char32_t ch : qstr.toStdU32String()){
-        if (!QChar::isLetterOrNumber(ch)){
+    if (log10p <= ban_entry.log10p){
+        matches.emplace_back(TeraLobbyNameMatchResult{
+            ban_entry,
+            iter->second.raw_ocr,
+            to_utf8(iter->second.normalized),
+            log10p
+        });
+        return true;
+    }
+
+    return false;
+}
+std::vector<TeraLobbyNameMatchResult> TeraLobbyReader::check_ban_list(
+    const std::vector<PlayerListRowSnapshot>& ban_list,
+    const ImageViewRGB32& screen,
+    bool include_host
+) const{
+    if (ban_list.empty()){
+        return {};
+    }
+
+    const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
+
+    std::vector<TeraLobbyNameMatchResult> ret;
+
+    for (size_t c = (include_host ? 0 : 1); c < 4; c++){
+//        cout << "asdf" << endl;
+        ImageStats sprite = image_stats(extract_box_reference(screen, m_player_mon[c]));
+        if (sprite.stddev.sum() <= 80){
             continue;
         }
+        ImageViewRGB32 box = extract_box_reference(screen, m_player_name[c]);
+        size_t pixels;
+        ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
 
-        ch = QChar::toUpper(ch);
-        auto iter = SUBSTITUTIONS.find(ch);
-        if (iter != SUBSTITUTIONS.end()){
-            ch = iter->second;
+        std::map<Language, CacheEntry> cache;
+        for (const PlayerListRowSnapshot& entry : ban_list){
+            check_ban_for_image(ret, cache, filtered, entry);
         }
-        str32 += ch;
     }
 
-    //  Strip non-alphanumeric.
-    std::string normalized = to_utf8(str32);
-
-    std::string log = "Code OCR: \"" + raw + "\" -> \"" + normalized + "\"";
-
-
-    if (normalized.size() != 4 && normalized.size() != 6){
-        logger.log(log, COLOR_RED);
-        return "";
-    }
-
-    logger.log(log, COLOR_BLUE);
-    return normalized;
-#endif
+    return ret;
 }
+
+
 
 
 
@@ -343,6 +394,29 @@ bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock 
 
 
 
+TeraLobbyBanWatcher::TeraLobbyBanWatcher(Color color, PlayerListTable& table, bool include_host)
+    : TeraLobbyReader(color)
+    , VisualInferenceCallback("TeraLobbyBanWatcher")
+    , m_table(table)
+{}
+std::vector<TeraLobbyNameMatchResult> TeraLobbyBanWatcher::detected_banned_players() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_last_known_bans;
+}
+void TeraLobbyBanWatcher::make_overlays(VideoOverlaySet& items) const{
+    TeraLobbyReader::make_overlays(items);
+}
+bool TeraLobbyBanWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    std::vector<TeraLobbyNameMatchResult> banned = check_ban_list(
+        m_table.snapshot(), frame, m_include_host
+    );
+    if (banned.empty()){
+        return false;
+    }
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_last_known_bans = std::move(banned);
+    return true;
+}
 
 
 

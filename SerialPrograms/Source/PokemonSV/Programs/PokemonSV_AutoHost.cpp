@@ -158,7 +158,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(TRY_TO_TERASTILIZE);
-//    PA_ADD_OPTION(BAN_LIST);
+    PA_ADD_OPTION(BAN_LIST);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -222,12 +222,16 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
+        TeraLobbyBanWatcher ban_watcher(COLOR_RED, BAN_LIST, true);
         context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(
             env.console, context,
             end_time,
-            {dialog, start_raid, ready}
+            {
+                dialog, start_raid, ready,
+                {ban_watcher, std::chrono::seconds(1)}
+            }
         );
         context.wait_for(std::chrono::milliseconds(100));
         int8_t current_players = ready.last_known_player_count();
@@ -235,6 +239,8 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             last_known_player_count = current_players;
         }
         env.log("Starting raid with " + std::to_string(last_known_player_count) + " player(s).");
+        VideoSnapshot snapshot;
+        std::vector<TeraLobbyNameMatchResult> detected_banned_players;
         switch (ret){
         case 0:
             env.log("Raid timed out!", COLOR_ORANGE);
@@ -253,9 +259,42 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             return true;
         case 2:
             env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            snapshot = env.console.video().snapshot();
+            ban_watcher.process_frame(snapshot, snapshot.timestamp);
+            detected_banned_players = ban_watcher.detected_banned_players();
+            if (detected_banned_players.empty()){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 230);
+                continue;
+            }
+            //  Intentional fall-through.
+        case 3:{
+            env.log("Detected banned user!", COLOR_RED);
+            if (!snapshot){
+                snapshot = env.console.video().snapshot();
+            }
+            if (detected_banned_players.empty()){
+                detected_banned_players = ban_watcher.detected_banned_players();
+            }
+            std::string message;
+            for (const TeraLobbyNameMatchResult& user : detected_banned_players){
+                env.log("Banned User: " + user.to_str(), COLOR_RED);
+                message += user.to_str();
+                message += "\n";
+            }
+            send_program_notification(
+                env.logger(), NOTIFICATION_ERROR_RECOVERABLE,
+                COLOR_RED,
+                env.program_info(),
+                "Raid Canceled Due to Banned User",
+                {{"Banned User(s):", std::move(message)}},
+                snapshot
+            );
+
+            pbf_press_button(context, BUTTON_B, 20, 230);
             pbf_press_button(context, BUTTON_A, 20, 230);
-            continue;
+            return false;
+        }
         default:
             if (current_time() - start_time > std::chrono::minutes(4)){
                 dump_image_and_throw_recoverable_exception(

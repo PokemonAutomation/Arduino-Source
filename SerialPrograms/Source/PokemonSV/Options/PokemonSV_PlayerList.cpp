@@ -31,6 +31,13 @@ std::unique_ptr<EditableTableRow> PlayerListRow::clone() const{
     ret->log10p.set(log10p);
     return ret;
 }
+PlayerListRowSnapshot PlayerListRow::snapshot() const{
+    PlayerListRowSnapshot entry;
+    entry.language = language;
+    entry.name = name;
+    entry.log10p = log10p;
+    return entry;
+}
 
 
 

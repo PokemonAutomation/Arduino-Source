@@ -216,12 +216,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
-    ImageRGB32 image("20221130-233102169312.jpg");
+#if 1
+    ImageRGB32 image("screenshot-20221128-214005707443.png");
+//    auto image = feed.snapshot();
 
     TeraLobbyReader reader;
-    reader.raid_code(logger, env.program_info(), image);
-    cout << (int)reader.total_players(image) << endl;
+    reader.make_overlays(overlays);
+    reader.check_ban_list(
+        {
+            {Language::English, "Halazea"},
+        },
+        image,
+        true
+    );
+//    reader.raid_code(logger, env.program_info(), image);
+//    cout << (int)reader.total_players(image) << endl;
 #endif
 
 

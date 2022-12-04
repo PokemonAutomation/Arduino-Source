@@ -99,6 +99,17 @@ public:
         }
         return ret;
     }
+    template <typename RowType, typename RowSnapshotType>
+    std::vector<RowSnapshotType> snapshot() const{
+        std::vector<RowSnapshotType> ret;
+        SpinLockGuard lg(m_lock);
+        ret.reserve(m_current.size());
+        for (auto& item : m_current){
+            RowType& row = static_cast<RowType&>(*item);
+            ret.emplace_back(row.snapshot());
+        }
+        return ret;
+    }
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -138,6 +149,11 @@ public:
 
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
         return EditableTableOption::copy_snapshot<RowType>();
+    }
+
+    template <typename RowSnapshotType>
+    std::vector<RowSnapshotType> snapshot() const{
+        return EditableTableOption::snapshot<RowType, RowSnapshotType>();
     }
 
     virtual std::unique_ptr<EditableTableRow> make_row() const override{
