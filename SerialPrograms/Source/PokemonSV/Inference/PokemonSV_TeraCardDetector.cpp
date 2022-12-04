@@ -192,7 +192,7 @@ bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
 uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
     uint8_t total = 0;
     for (size_t c = 0; c < 4; c++){
-        ImageStats player = image_stats(extract_box_reference(screen, m_player_mon[0]));
+        ImageStats player = image_stats(extract_box_reference(screen, m_player_mon[c]));
         if (player.stddev.sum() > 80){
             total++;
         }
