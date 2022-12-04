@@ -54,6 +54,7 @@ struct AutoHost_Descriptor::Stats : public StatsTracker{
         , m_raiders(m_stats["Total Raiders"])
         , m_wins(m_stats["Wins"])
         , m_losses(m_stats["Losses"])
+        , m_banned(m_stats["Banned"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Raids");
@@ -62,6 +63,7 @@ struct AutoHost_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Total Raiders");
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Banned", true);
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_raids;
@@ -70,6 +72,7 @@ struct AutoHost_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& m_raiders;
     std::atomic<uint64_t>& m_wins;
     std::atomic<uint64_t>& m_losses;
+    std::atomic<uint64_t>& m_banned;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> AutoHost_Descriptor::make_stats() const{
@@ -282,8 +285,9 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 message += user.to_str();
                 message += "\n";
             }
+            stats.m_banned += detected_banned_players.size();
             send_program_notification(
-                env.logger(), NOTIFICATION_ERROR_RECOVERABLE,
+                env.logger(), NOTIFICATION,
                 COLOR_RED,
                 env.program_info(),
                 "Raid Canceled Due to Banned User",
