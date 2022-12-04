@@ -269,6 +269,7 @@ CustomPathTable2::CustomPathTable2()
         "<b>Custom Path Table:</b><br>"
         "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
         "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
+        LockWhileRunning::LOCKED,
         false,  //  Disable the save/load buttons since we have our own.
         make_defaults()
     )

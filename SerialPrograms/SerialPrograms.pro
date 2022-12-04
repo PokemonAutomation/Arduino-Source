@@ -599,6 +599,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
+    Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
@@ -1444,6 +1445,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
+    Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \

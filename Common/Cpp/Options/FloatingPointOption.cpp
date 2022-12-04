@@ -12,6 +12,10 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "FloatingPointOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 

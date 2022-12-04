@@ -76,19 +76,24 @@ std::vector<ConfigOption*> EditableTableRow::make_cells(){
 
 EditableTableOption::EditableTableOption(
     std::string label,
+    LockWhileRunning lock_while_running,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : m_label(std::move(label))
+    : ConfigOption(lock_while_running)
+    , m_label(std::move(label))
     , m_enable_saveload(true)
     , m_default(std::move(default_value))
 {
     restore_defaults();
 }
 EditableTableOption::EditableTableOption(
-    std::string label, bool enable_saveload,
+    std::string label,
+    LockWhileRunning lock_while_running,
+    bool enable_saveload,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : m_label(std::move(label))
+    : ConfigOption(lock_while_running)
+    , m_label(std::move(label))
     , m_enable_saveload(enable_saveload)
     , m_default(std::move(default_value))
 {

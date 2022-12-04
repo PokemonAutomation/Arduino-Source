@@ -86,7 +86,7 @@ public:
 class MultiHostTable : public EditableTableOption{
 public:
     MultiHostTable(bool raid_code_option)
-        : EditableTableOption("<b>Game List:</b>")
+        : EditableTableOption("<b>Game List:</b>", LockWhileRunning::LOCKED)
         , m_raid_code_option(raid_code_option)
     {}
     std::vector<std::unique_ptr<MultiHostSlot>> copy_snapshot() const{

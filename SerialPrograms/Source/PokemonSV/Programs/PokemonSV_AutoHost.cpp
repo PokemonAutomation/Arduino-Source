@@ -131,6 +131,17 @@ AutoHost::AutoHost()
         "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
+    , BAN_LIST(
+        "<b>Ban List:</b><br>Ban these people from this raid. "
+        "If anyone's name matches anything in this table, the raid will be reset.<br>"
+        "The last column is a tuning parameter that specifies how well the name needs to match. "
+        "Optical Character Recognition (OCR) is imperfect. So exact matches are rare and unreliable. "
+        "The value is the estimated log10 probability of matching by chance against random characters. "
+        "It is always negative. Lower value means the match needs to be more perfect to be a match.<br><br>"
+        "If you are getting false positive hits, decrease this value. (make it more negative)<br>"
+        "If it is failing to match, increase this value. (make it less negative)",
+        LockWhileRunning::UNLOCKED
+    )
     , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS({
         &NOTIFICATION,
@@ -147,6 +158,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(TRY_TO_TERASTILIZE);
+//    PA_ADD_OPTION(BAN_LIST);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 

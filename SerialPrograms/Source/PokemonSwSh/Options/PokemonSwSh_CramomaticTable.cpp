@@ -47,6 +47,7 @@ std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
 CramomaticTable::CramomaticTable(std::string label)
     : EditableTableOption_t<CramomaticRow>(
         std::move(label),
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}

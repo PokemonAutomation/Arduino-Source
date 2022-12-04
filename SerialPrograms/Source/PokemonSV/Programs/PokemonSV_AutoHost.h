@@ -9,12 +9,11 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-//#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-//#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Options/PokemonSV_PlayerList.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -63,6 +62,7 @@ private:
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
     BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
+    PlayerListTable BAN_LIST;
 
     EventNotificationOption NOTIFICATION;
     EventNotificationsOption NOTIFICATIONS;

@@ -106,6 +106,7 @@ EggHatchFilterTable::EggHatchFilterTable()
         "Otherwise, it will be released. "
         "If multiple entries apply and have conflicting actions, the program will stop.<br>"
         "IV checking requires that your right panel be set to the IV Judge and that you have selected the correct game language above.",
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}

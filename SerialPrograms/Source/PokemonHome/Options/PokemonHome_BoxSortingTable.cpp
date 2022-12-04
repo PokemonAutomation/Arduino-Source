@@ -42,6 +42,7 @@ std::unique_ptr<EditableTableRow> BoxSortingRow::clone() const{
 BoxSortingTable::BoxSortingTable(std::string label)
     : EditableTableOption_t<BoxSortingRow>(
         std::move(label),
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}

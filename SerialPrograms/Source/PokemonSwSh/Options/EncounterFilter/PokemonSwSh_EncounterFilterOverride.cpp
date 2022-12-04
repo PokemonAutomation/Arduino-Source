@@ -99,7 +99,8 @@ EncounterFilterTable::EncounterFilterTable(bool rare_stars)
             :
                 "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names.<br>"
-                "If more than one override applies, the last one will be chosen."
+                "If more than one override applies, the last one will be chosen.",
+        LockWhileRunning::LOCKED
     )
 {}
 std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy_snapshot() const{

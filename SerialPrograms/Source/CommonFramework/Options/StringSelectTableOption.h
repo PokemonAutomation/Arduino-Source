@@ -39,7 +39,7 @@ public:
         std::string label,
         std::string header, const StringSelectDatabase& database, std::string default_slug
     )
-        : EditableTableOption(std::move(label))
+        : EditableTableOption(std::move(label), LockWhileRunning::LOCKED)
         , m_header(std::move(header))
         , m_database(database)
         , m_default_slug(std::move(default_slug))

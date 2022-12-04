@@ -33,6 +33,7 @@ std::unique_ptr<EditableTableRow> BerrySelectorRow2::clone() const{
 BerryTable::BerryTable(std::string label)
     : EditableTableOption_t<BerrySelectorRow2>(
         std::move(label),
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}

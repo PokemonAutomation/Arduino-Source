@@ -242,7 +242,8 @@ JsonValue PathMakerRow2::to_json() const{
 PathMakerTable::PathMakerTable()
     : EditableTableOption_t<PathMakerRow2>(
         "<b>Custom Path Table:</b><br>"
-        "Set a sequence of actions to navigate the map."
+        "Set a sequence of actions to navigate the map.",
+        LockWhileRunning::LOCKED
     )
 {}
 std::vector<std::string> PathMakerTable::make_header() const{

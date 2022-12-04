@@ -79,6 +79,7 @@ BattlePokemonActionTable::BattlePokemonActionTable()
         "Note: if your second last " + STRING_POKEMON + " faints, the game will send your last " + STRING_POKEMON + " automatically for you.<br>"
         "The program cannot detect this switch as there is no switch selection screen. "
         "Therefore the program will treat it as the same " + STRING_POKEMON + ".",
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}
@@ -152,6 +153,7 @@ OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
         "Set what move style to use for each " + STRING_POKEMON + " to grind against a Magikarp. "
         "Each row is the action for one " + STRING_POKEMON + ". "
         "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
+        LockWhileRunning::LOCKED,
         make_defaults()
     )
 {}
@@ -217,7 +219,8 @@ std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
 
 MoveGrinderActionTable::MoveGrinderActionTable()
     : EditableTableOption_t<MoveGrinderActionRow>(
-        "For every move you want to perform, input the style and the number of attemps you want to achieve."
+        "For every move you want to perform, input the style and the number of attemps you want to achieve.",
+        LockWhileRunning::LOCKED
     )
 {}
 Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{

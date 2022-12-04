@@ -77,7 +77,11 @@ public:
 class FossilTable : public EditableTableOption_t<FossilGame>{
 public:
     FossilTable()
-        : EditableTableOption_t<FossilGame>("<b>Game List:</b>", make_defaults())
+        : EditableTableOption_t<FossilGame>(
+            "<b>Game List:</b>",
+            LockWhileRunning::LOCKED,
+            make_defaults()
+        )
     {}
     virtual std::vector<std::string> make_header() const override{
         return std::vector<std::string>{

@@ -17,6 +17,7 @@
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
+#include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{
@@ -59,6 +60,8 @@ private:
     StaticTextOption STATIC_TEXT;
 
     StringSelectOption SELECT;
+
+    PokemonSV::PlayerListTable PLAYER_LIST;
 
     EventNotificationOption NOTIFICATION_TEST;
     EventNotificationsOption NOTIFICATIONS;

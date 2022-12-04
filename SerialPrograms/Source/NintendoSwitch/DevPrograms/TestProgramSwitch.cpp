@@ -122,6 +122,7 @@ TestProgram::TestProgram()
     )
     , STATIC_TEXT("Test text...")
     , SELECT("String Select", test_database(), LockWhileRunning::LOCKED, 0)
+    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCKED)
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -132,6 +133,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
+    PA_ADD_OPTION(PLAYER_LIST);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -232,7 +234,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    save_game_from_overworld(console, context);
 
 
-#if 1
+#if 0
     OverworldDetector overworld;
     overworld.make_overlays(overlays);
 

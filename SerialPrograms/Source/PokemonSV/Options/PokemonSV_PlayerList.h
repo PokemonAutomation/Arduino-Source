@@ -18,14 +18,13 @@ namespace PokemonSV{
 
 
 
-#if 0
 class PlayerListRow : public EditableTableRow{
 public:
     PlayerListRow();
     virtual std::unique_ptr<EditableTableRow> clone() const;
 
 public:
-    OCR::LanguageOCR language;
+    OCR::LanguageOCRCell language;
     StringCell name;
     FloatingPointCell log10p;
 };
@@ -34,16 +33,11 @@ public:
 
 class PlayerListTable : public EditableTableOption_t<PlayerListRow>{
 public:
-    PlayerListTable(std::string label);
-
-
+    PlayerListTable(std::string label, LockWhileRunning lock_while_running);
 
     virtual std::vector<std::string> make_header() const;
-
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
-#endif
-
 
 
 

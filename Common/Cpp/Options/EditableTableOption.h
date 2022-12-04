@@ -65,10 +65,13 @@ class EditableTableOption : public ConfigOption{
 public:
     EditableTableOption(
         std::string label,
+        LockWhileRunning lock_while_running,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
     EditableTableOption(
-        std::string label, bool enable_saveload,
+        std::string label,
+        LockWhileRunning lock_while_running,
+        bool enable_saveload,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 

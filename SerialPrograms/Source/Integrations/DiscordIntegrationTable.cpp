@@ -73,7 +73,8 @@ void DiscordIntegrationChannel::load_json(const JsonValue& json){
 
 DiscordIntegrationTable::DiscordIntegrationTable()
     : EditableTableOption_t<DiscordIntegrationChannel>(
-        "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in."
+        "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in.",
+        LockWhileRunning::LOCKED
     )
 {}
 std::vector<std::string> DiscordIntegrationTable::make_header() const{
