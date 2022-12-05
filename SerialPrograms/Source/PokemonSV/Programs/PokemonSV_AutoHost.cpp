@@ -215,7 +215,7 @@ WallClock AutoHost::wait_for_lobby_open(SingleSwitchProgramEnvironment& env, Bot
 void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, uint8_t player_count){
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
-    player_count = std::min<uint8_t>(player_count, 1);
+    player_count = std::max<uint8_t>(player_count, 1);
 
     if (player_count == 4){
         stats.m_full++;
