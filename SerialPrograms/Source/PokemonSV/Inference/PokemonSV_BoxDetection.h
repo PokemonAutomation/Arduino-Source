@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-//  Detect whether the cursor if over a Pokemon in the box.
+//  Detect whether the cursor is over a Pokemon in the box.
 class SomethingInBoxSlotDetector : public StaticScreenDetector{
 public:
     SomethingInBoxSlotDetector(Color color, bool true_if_exists);

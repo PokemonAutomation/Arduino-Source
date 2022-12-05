@@ -47,6 +47,7 @@ void fly_to_overworld_from_map(ConsoleHandle& console, BotBaseContext& context);
 void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 
 //  While in picnic, stop picnic and back to overworld.
+//  Will throw OperationFailedException.
 void leave_picnic(ConsoleHandle& console, BotBaseContext& context);
 
 }

@@ -15,6 +15,8 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 
+// #include <functional>
+
 namespace PokemonAutomation{
 
 class OperationFailedException;
@@ -46,8 +48,6 @@ private:
 
     size_t hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void from_pokecenter_get_meal(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
     void collect_eggs_at_pokemon_league(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void open_map(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
@@ -60,13 +60,17 @@ private:
 
     void handle_recoverable_error(SingleSwitchProgramEnvironment& env, BotBaseContext& context, OperationFailedException& e, size_t& consecutive_failures);
 
+    void dump_unrecoverable_error(SingleSwitchProgramEnvironment& env, const std::string& error_name);
+
+    // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::function<void())
+
 private:
     // Will need this to preserve raid den
     // TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    SimpleIntegerOption<uint64_t> BUDGET;
+    SimpleIntegerOption<uint64_t> MAX_NUM_SANDWICHES;
 
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
@@ -90,14 +94,18 @@ private:
     EventNotificationOption m_notification_noop;
     EventNotificationsOption NOTIFICATIONS;
 
-    // We need to keep track of when saving the game, where the player is.
-    // This is needed so that if we reset game, we know where we are
-    bool m_save_location_at_restaurant_town = true;
-
     // How many pokemon have been kept so far
     uint8_t m_num_kept = 0;
-    // How many money spent so far
-    size_t m_money_spent = 0;
+    // How many sandwich spent so far
+    size_t m_num_sandwich_spent = 0;
+    // The program first fetchs some eggs, then hatches them.
+    // If user selects AUTO_SAVING to be on, then during hatching, when a recoverable error happens, we reset game.
+    // If we have saved the game after fetching phase, then when reloading the game, we may still have eggs in boxes
+    // that need hatching.
+    // If we haven't saved after fetching, then when reloading the game, there is no eggs in boxes. We can directly
+    // go to the next egg fetching phase.
+    // To tell apart the two cases, we need this bool var:
+    bool m_saved_after_fetched_eggs = false;
 
     // Whether we have an error that is recoverable
     // In most error cases, the program will try soft resetting to recover from it.

@@ -21,6 +21,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_EggAutonomous.h"
 
 namespace PokemonAutomation{
@@ -75,10 +76,10 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 
 EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
-    , BUDGET(
-        "<b>Budget:</b><br>How much " + STRING_POKEMON + " money to use on buying meals. One meal costs 2800.",
+    , MAX_NUM_SANDWICHES(
+        "<b>Max num sandwiches:</b><br>How many " + STRING_POKEMON + " Great Peanut Butter Sandwich you can make before running out of ingredients.",
         LockWhileRunning::LOCKED,
-        28000, 0
+        100, 0
     )
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
@@ -95,9 +96,9 @@ EggAutonomous::EggAutonomous()
     )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
-        "No auto-saving: No error/crash recovery. No money permanently spent.<br>"
-        "Save at beginning and after keeping a baby: Allows for error/crash recovery. Money permanently spent after baby kept.<br>"
-        "Save before every batch: Allows you to unhatch eggs. Money permanently spent after every meal.<br><br>"
+        "No auto-saving: No error/crash recovery. No sandwich ingredients permanently spent.<br>"
+        "Save at beginning and after keeping a baby: Allows for error/crash recovery. Ingredients permanently spent after baby kept.<br>"
+        "Save before every batch: Allows you to unhatch eggs. Ingredients permanently spent after every picnic.<br><br>"
         "Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.<br>"
         "To collect (unhatched) eggs with the desired stats, set this option to \"Save before every batch\". "
         "Then set the Action Table below to \"Stop Program\" on the desired stats. "
@@ -143,7 +144,7 @@ EggAutonomous::EggAutonomous()
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    PA_ADD_OPTION(BUDGET);
+    PA_ADD_OPTION(MAX_NUM_SANDWICHES);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(MAX_NUM_BOXES);
@@ -163,36 +164,28 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
     {
-        collect_eggs_at_pokemon_league(env, context);
+        fetch_eggs_full_routine(env, context);
         // reset_game(env, context, "reset");
         return;
     }
     
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep || AUTO_SAVING == AutoSave::EveryBatch){
         save_game(env, context, true);
-        m_save_location_at_restaurant_town = true;
     }
 
-    const size_t meal_cost = 2800;
-
-    m_money_spent = 0;
+    m_num_sandwich_spent = 0;
     m_num_kept = 0;
+    m_saved_after_fetched_eggs = false;
     m_error_recoverable = true;
 
     while(true){
-        // If in a previous egg auto iteration, we save at the hatching place (pokemon league),
-        // we need to move the save back to the restaurant town:
-        if (AUTO_SAVING != AutoSave::NoAutoSave && m_save_location_at_restaurant_town == false){
-            save_game(env, context, true);
-            m_save_location_at_restaurant_town = true;
-        }
 
         // Do one iteration of the outmost loop of egg auto:
-        // start at Cascarrafa (West) Pokecenter
-        // go to Gastronome En Famille to buy meal
-        // go out of town to collect eggs at picnic
-        // go to Pokemon League to hatch eggs
-        // go back to Cascarrafa (West).
+        // - Start at Pokemon League Pokecenter
+        // - Go to front area of Pokemon League to start picnic
+        // - Make sandwich to gain egg power
+        // - Go to picnic basket to fetch eggs
+        // - Go on ride to hatch eggs
 
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -209,7 +202,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             } // end try catch
         } // end recoverable loop to fetch eggs:
 
-        // XXX  debug break here to only test restaurant part
+        // XXX  debug break here to only test egg fetching part
         break;
 
         // Recoverable loop to hatch eggs
@@ -220,9 +213,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             } catch(OperationFailedException& e){
                 handle_recoverable_error(env, context, e, consecutive_failures);
 
-                // If there is no save during egg hatching, then the game is reset to before going to restaurant
+                // If there is no save during egg hatching, then the game is reset to before fetching eggs
                 // So we need to break out of the recoverable hatch egg routine loop
-                if (m_save_location_at_restaurant_town){
+                if (m_saved_after_fetched_eggs == false){
                     break;
                 }
             } // end try catch
@@ -233,144 +226,121 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             break;
         }
 
-        // If we save at hatching location, then the save solidifies spent meal money
-        if (m_save_location_at_restaurant_town == false){
-            m_money_spent += meal_cost;
+        // If we save after fetching eggs, then the save solidifies spent sandwich ingredients
+        if (m_saved_after_fetched_eggs){
+            m_num_sandwich_spent++;
         }
 
-        if (num_newly_kept == 0 && m_save_location_at_restaurant_town){
+        if (num_newly_kept == 0 && m_saved_after_fetched_eggs == false){
             // Nothing found in this iteration
-            env.log("Resetting game since nothing found, saving restaurant meal cost.");
+            env.log("Resetting game since nothing found, saving sandwich ingredients.");
 
             reset_game(env, context, "reset to start new meal");
         }
 
-        if (m_money_spent + meal_cost > BUDGET){
-            env.console.overlay().add_log("Not enough money", COLOR_PURPLE);
-            env.log("Not enough money to buy egg power, spent " + std::to_string(m_money_spent)
-                + " budget " + std::to_string(BUDGET));
+        if (m_num_sandwich_spent >= MAX_NUM_SANDWICHES){
+            env.console.overlay().add_log("Max sandwich count: " + std::to_string(MAX_NUM_SANDWICHES), COLOR_PURPLE);
+            env.log("Max num sandwiches reached: " + std::to_string(MAX_NUM_SANDWICHES), COLOR_PURPLE);
             break;
         }
-
-        break; // TODO debug code here to prevent loop
-        // end of one full meal->picnic->hatch iteration
+        // end of one full picnic->hatch iteration
     } // end the full egg autonomous loop
 
     env.update_stats();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
-// The largest loop of egg auto:
 // start at Cascarrafa (West) Pokecenter, go to Gastronome En Famille to buy meal, go out of town to collect
 // eggs at picnic, go to Pokemon League to hatch eggs.
 void EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // Now the player character is at Cascarrafa (West) Pokecenter, go to restaurant
-    from_pokecenter_get_meal(env, context);
+    // // Use map to fly to pokemon league
+    // open_map(env, context);
+    // pbf_press_button(context, BUTTON_ZL, 30, 100);
+    // pbf_move_left_joystick(context, 230, 255, 90, 50);
+    // fly_to_overworld(env, context);
 
-    // Use map to fly to pokemon league
-    open_map(env, context);
-    pbf_press_button(context, BUTTON_ZL, 30, 100);
-    pbf_move_left_joystick(context, 230, 255, 90, 50);
-    fly_to_overworld(env, context);
+    // Orient camera to look at same direction as player character
+    // This is needed because when save-load the game, the camera is reset
+    // to this location.
+    pbf_press_button(context, BUTTON_L, 50, 100);
 
-    collect_eggs_at_pokemon_league(env, context);
+    // Move right to make player character facing the empty field in front of Pokemon League
+    pbf_move_left_joystick(context, 255, 128, 50, 50);
+    // Press L to move camera to face the same direction as the player character
+    pbf_press_button(context, BUTTON_L, 50, 70);
+    // Move forward
+    pbf_move_left_joystick(context, 128, 0, 250, 0);
+
+    try{
+        picnic_from_overworld(env.console, context);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "FailPicnic", e.message());
+    }
+
+    // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
+    
+    // Move forward to table to make sandwich
+    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    context.wait_for_all_requests();
+    
+    bool found_recipe = false;
+    try{
+        found_recipe = enter_sandwich_recipe_list(env.console, context);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "FailRecipeList", e.message());
+    }
+    if (found_recipe == false){
+        dump_unrecoverable_error(env, "NoRecipeList");
+        throw OperationFailedException(env.console, "No sandwich ingredients. Cannot open sandwich recipe list.");
+    }
+
+    found_recipe = false;
+    try{
+        found_recipe = select_sandwich_recipe(env.console, context, 17);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "FailFindRecipe", e.message());
+    }
+    if (found_recipe == false){
+        dump_unrecoverable_error(env, "RecipeNotFound");
+        throw OperationFailedException(env.console, "Cannot find sandwich recipe with enough ingredients.");
+    }
+
+
+
+    // move past the table:
+
+    // collect_eggs_at_pokemon_league(env, context);
 }
 
 size_t EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (AUTO_SAVING == AutoSave::EveryBatch){
         save_game(env, context, true);
-        m_save_location_at_restaurant_town = false;
+        m_saved_after_fetched_eggs = true;
     }
 
-    // routine should end at restaurant town
+    // Orient camera to look at same direction as player character
+    // This is needed because when save-load the game, the camera is reset
+    // to this location.
+    pbf_press_button(context, BUTTON_L, 50, 70);
+
+    // Ride on Koraidon/Miradon
+    pbf_press_button(context, BUTTON_PLUS, 50, 100);
+    // Move right to make player character facing the road leading to Cascarrafa
+    pbf_move_left_joystick(context, 255, 128, 50, 50);
+    // Press L to move camera to face the same direction as the player character
+    pbf_press_button(context, BUTTON_L, 50, 70);
+    // Move forward
+    pbf_move_left_joystick(context, 128, 0, 210, 0); // 250
+
+
+
     return 0;
 }
 
-void EggAutonomous::from_pokecenter_get_meal(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    const size_t max_restaurant_tries = 5;
-
-    for(size_t i_tries = 0; i_tries < max_restaurant_tries; i_tries++){
-        env.console.overlay().add_log("Go to restaurant", COLOR_WHITE);
-        env.log("Go to restaurant");
-        // Orient camera to look at same direction as player character
-        // This is needed because when save-load the game, the camera is reset
-        // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 70);
-
-        // Ride on Koraidon/Miradon
-        pbf_press_button(context, BUTTON_PLUS, 50, 100);
-        // Move right to make player character facing the road leading to Cascarrafa
-        pbf_move_left_joystick(context, 255, 128, 50, 50);
-        // Press L to move camera to face the same direction as the player character
-        pbf_press_button(context, BUTTON_L, 50, 70);
-        // Move forward
-        pbf_move_left_joystick(context, 128, 0, 210, 0); // 250
-
-        // Move right to make player character facing Cascarrafa
-        pbf_move_left_joystick(context, 255, 110, 50, 50);
-        // Press L to move camera to face the same direction as the player character
-        pbf_press_button(context, BUTTON_L, 50, 70);
-        // Move forward to enter Cascarrafa
-        pbf_move_left_joystick(context, 128, 0, 300, 0); // 350
-
-        // Move left to make player character facing the road leading to the restaurant
-        pbf_move_left_joystick(context, 0, 100, 50, 50);
-        // Press L to move camera to face the same direction as the player character
-        pbf_press_button(context, BUTTON_L, 50, 70);
-        // Move forward to go on the street that leads to restaurant
-        pbf_move_left_joystick(context, 128, 0, 210, 0);
-
-        context.wait_for_all_requests();
-
-        int ret = 0;
-
-        {
-            AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));        
-            ret = run_until(
-                env.console, context,
-                [](BotBaseContext& context){
-                    // Move right to make player character at front door of the restaurant
-                    pbf_move_left_joystick(context, 255, 100, 150, 50);
-                    // Enter restaurant
-                    pbf_move_left_joystick(context, 128, 0, 125, 0);
-
-                    pbf_wait(context, 600);
-                },
-                {{dialog_watcher}}
-            );
-        }
-
-        if (ret < 0){
-            // Fail to enter restaurant
-            env.console.overlay().add_log("Restaurant not found", COLOR_PURPLE);
-            env.log("Failed to enter restaurant, reset sequence");
-            
-            // Use map to reset to pokecenter
-            open_map(env, context);
-            pbf_move_left_joystick(context, 110, 250, 15, 50);
-            fly_to_overworld(env, context);
-        }
-        else{
-            env.console.overlay().add_log("Enter restaurant", COLOR_WHITE);
-            env.log("Enter restaurant");
-
-            // Eat food to gain egg power:
-            try{
-                order_compote_du_fils(env.console, context);
-            } catch(OperationFailedException &e){
-                dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                    "FailMeal", e.message());
-            }
-            
-            context.wait_for_all_requests();   
-            return;
-        }
-    } // end for going to restaurant loop
-
-    dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-        "CantGoToRestaurant", "Cannot go to restaurant from pokecenter after repeated tries.");
-}
 
 // From pokemon league pokecenter, go to the empty space in front of pokemon league to picnic and collect eggs
 void EggAutonomous::collect_eggs_at_pokemon_league(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -477,10 +447,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     } catch(OperationFailedException &e){
         // To be safe: avoid interrupting or corrupting game saving,
         // make game saving non error recoverable
-        m_error_recoverable = false;
-        env.console.overlay().add_log("Error: FailSaveGame", COLOR_RED);
-        std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-        dump_image(env.console, env.program_info(), "FailSaveGame", *screen);
+        dump_unrecoverable_error(env, "FailSaveGame");
         throw e;
     }
 }
@@ -493,10 +460,7 @@ void EggAutonomous::reset_game(SingleSwitchProgramEnvironment& env, BotBaseConte
     } catch(OperationFailedException &e){
         // To be safe: avoid doing anything outside of game on Switch,
         // make game resetting non error recoverable
-        m_error_recoverable = false;
-        env.console.overlay().add_log("Error: FailResetGame", COLOR_RED);
-        std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-        dump_image(env.console, env.program_info(), "FailResetGame", *screen);
+        dump_unrecoverable_error(env, "FailResetGame");
         throw e;
     }
 }
@@ -529,6 +493,13 @@ void EggAutonomous::handle_recoverable_error(
 
     env.log("Reset game to handle recoverable error");
     reset_game(env, context, "handling recoverable error");
+}
+
+void EggAutonomous::dump_unrecoverable_error(SingleSwitchProgramEnvironment& env, const std::string& error_name){
+    m_error_recoverable = false;
+    env.console.overlay().add_log("Error: " + error_name, COLOR_RED);
+    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+    dump_image(env.console, env.program_info(), error_name, *screen);
 }
 
 }

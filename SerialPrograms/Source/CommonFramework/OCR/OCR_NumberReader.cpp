@@ -8,9 +8,9 @@
 #include "OCR_RawOCR.h"
 #include "OCR_NumberReader.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{

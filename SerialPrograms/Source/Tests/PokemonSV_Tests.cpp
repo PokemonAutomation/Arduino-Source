@@ -14,6 +14,7 @@
 #include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
+#include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -91,13 +92,62 @@ int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool targ
     return 0;
 }
 
-int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords) {
+int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words) {
     auto& logger = global_logger_command_line();
 
     const std::string tera_type_result = TERA_TYPE_NAMES[(size_t)detect_tera_type(logger, image)];
 
-    TEST_RESULT_EQUAL(keywords.size(), 1);
-    TEST_RESULT_EQUAL(tera_type_result, keywords[0]);
+    TEST_RESULT_EQUAL(words.size(), 1);
+    TEST_RESULT_EQUAL(tera_type_result, words[0]);
+
+    return 0;
+}
+
+int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words) {
+    auto& logger = global_logger_command_line();
+
+    // seven words: the sandwich recipe IDs on the screen. Order:
+    // --------------------------------------
+    // recipe_IDs[0]  |   recipe_IDs[1]
+    // recipe_IDs[2]  |   recipe_IDs[3]
+    // recipe_IDs[4]  |   recipe_IDs[5]
+    // --------------------------------------
+    // plus the current selected cell ID (range [0, 5]).
+    if (words.size() < 7){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    int target_IDs[6] = {0, 0, 0, 0, 0, 0};
+    for(int i = 0; i < 6; i++){
+        const auto& word = words[words.size() + i - 7];
+        if (parse_int(word, target_IDs[i]) == false || target_IDs[i] < 0 || target_IDs[i] > 151){
+            cerr << "Error: word " << words[words.size() + i - 7] << " is wrong. Must be an integer in range [0, 151]. " << endl;
+            return 1;
+        }
+    }
+
+    SandwichRecipeNumberDetector detector(logger);
+
+    size_t detected_IDs[6] = {0, 0, 0, 0, 0, 0};
+    detector.detect_recipes(image, detected_IDs);
+
+    for(int i = 0; i < 6; i++){
+        TEST_RESULT_COMPONENT_EQUAL(detected_IDs[i], (size_t)target_IDs[i], "recipe at cell " + std::to_string(i));
+    }
+
+    int target_selection = 0;
+    if (parse_int(words[words.size()-1], target_selection) == false || target_selection < 0 || target_selection >= 6){
+        cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be an integer in range [0, 6). " << endl;
+    }
+    SandwichRecipeSelectionWatcher selection_watcher;
+    bool result = selection_watcher.process_frame(image, current_time());
+
+    TEST_RESULT_COMPONENT_EQUAL(result, true, "SandwichRecipeSelectionWatcher::process_frame() result");
+
+    int selected_cell = selection_watcher.selected_recipe_cell();
+
+    TEST_RESULT_COMPONENT_EQUAL(selected_cell, target_selection, "selected cell");
 
     return 0;
 }
