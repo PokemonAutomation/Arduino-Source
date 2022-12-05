@@ -160,12 +160,13 @@ void start_game_from_home(
     uint8_t user_slot,
     uint16_t start_game_mash
 ){
+    context.wait_for_all_requests();
     if (console.video().snapshot()){
-        console.log("open_game_from_home(): Video capture available. Using inference...");
+        console.log("start_game_from_home(): Video capture available. Using inference...");
         start_game_from_home_with_inference(console, context, game_slot, user_slot, start_game_mash);
         return;
     }else{
-        console.log("open_game_from_home(): Video capture not available.", COLOR_RED);
+        console.log("start_game_from_home(): Video capture not available.", COLOR_RED);
     }
 
     if (game_slot != 0){

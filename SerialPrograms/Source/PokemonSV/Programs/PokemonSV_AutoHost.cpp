@@ -260,10 +260,12 @@ bool AutoHost::start_raid(
             return false;
         case 1:
             env.log("Raid started! (white screen)", COLOR_BLUE);
-            break;
+            update_stats_on_raid_start(env, player_count);
+            return true;
         case 2:
             env.log("Raid started! (battle menu)", COLOR_BLUE);
-            break;
+            update_stats_on_raid_start(env, player_count);
+            return true;
         default:
             dump_image_and_throw_recoverable_exception(
                 env, env.console,
@@ -272,9 +274,6 @@ bool AutoHost::start_raid(
             );
         }
     }
-
-    update_stats_on_raid_start(env, player_count);
-    return true;
 }
 bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();

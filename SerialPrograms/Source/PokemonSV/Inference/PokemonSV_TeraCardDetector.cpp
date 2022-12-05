@@ -288,7 +288,14 @@ bool TeraLobbyReader::check_ban_for_image(
     if (iter == cache.end()){
         CacheEntry entry;
         entry.raw_ocr = OCR::ocr_read(ban_entry.language, image);
+        if (!entry.raw_ocr.empty() && entry.raw_ocr.back() == '\n'){
+            entry.raw_ocr.pop_back();
+        }
         entry.normalized = OCR::normalize_utf32(entry.raw_ocr);
+        logger.log(
+            "OCR Result (" + language_data(ban_entry.language).name + "): \"" +
+            entry.raw_ocr + "\" -> \"" + to_utf8(entry.normalized) + "\""
+        );
         iter = cache.emplace(ban_entry.language, std::move(entry)).first;
     }
 
@@ -397,6 +404,8 @@ PA_NO_INLINE std::vector<TeraLobbyNameMatchResult> TeraLobbyReader::check_ban_li
         if (sprite.stddev.sum() <= 80){
             continue;
         }
+
+        logger.log("Reading player " + std::to_string(c) + "'s name...");
         ImageViewRGB32 box = extract_box_reference(screen, m_player_name[c]);
         size_t pixels;
         ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
