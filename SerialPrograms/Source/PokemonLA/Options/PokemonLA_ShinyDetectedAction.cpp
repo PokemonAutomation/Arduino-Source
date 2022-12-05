@@ -106,7 +106,7 @@ bool on_shiny_callback(
 
     std::ostringstream ss;
     ss << "Error Coefficient: " << error_coefficient << "\n(Shiny may not be visible on the screen.)";
-    embeds.emplace_back("Detection Results", ss.str());
+    embeds.emplace_back("Detection Results:", ss.str());
 
     send_program_notification(
         env, options.NOTIFICATIONS,
@@ -128,7 +128,7 @@ void on_shiny_sound(
     ss << "Error Coefficient: ";
     ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";
-    embeds.emplace_back("Detection Results", ss.str());
+    embeds.emplace_back("Detection Results:", ss.str());
 
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);

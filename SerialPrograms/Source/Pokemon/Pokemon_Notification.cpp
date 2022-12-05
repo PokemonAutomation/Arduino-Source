@@ -145,13 +145,13 @@ void send_encounter_notification(
 
     std::vector<std::pair<std::string, std::string>> embeds;
     if (enable_names && !names.empty()){
-        embeds.emplace_back("Species", std::move(names));
+        embeds.emplace_back("Species:", std::move(names));
     }
     if (!shinies.empty()){
         if (!std::isnan(alpha)){
             shinies += "\n(Detection Alpha = " + tostr_default(alpha) + ")";
         }
-        embeds.emplace_back("Shininess", std::move(shinies));
+        embeds.emplace_back("Shininess:", std::move(shinies));
     }
     std::string stats_addendum;
     if (frequencies && !frequencies->empty()){
@@ -208,7 +208,7 @@ void send_catch_notification(
                 str += get_pokemon_name(slug).display_name();
             }
         }
-        embeds.emplace_back("Species", std::move(str));
+        embeds.emplace_back("Species:", std::move(str));
     }
     {
         std::string str;
@@ -222,7 +222,7 @@ void send_catch_notification(
             str += get_pokeball_name(ball_slug).display_name();
         }
         if (!str.empty()){
-            embeds.emplace_back("Balls Used", str);
+            embeds.emplace_back("Balls Used:", str);
         }
     }
 

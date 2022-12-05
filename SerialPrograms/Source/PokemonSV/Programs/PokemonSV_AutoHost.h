@@ -64,7 +64,8 @@ private:
 
     PlayerListTable BAN_LIST;
 
-    EventNotificationOption NOTIFICATION;
+    EventNotificationOption NOTIFICATION_RAID_POST;
+    EventNotificationOption NOTIFICATION_RAID_START;
     EventNotificationsOption NOTIFICATIONS;
 };
 

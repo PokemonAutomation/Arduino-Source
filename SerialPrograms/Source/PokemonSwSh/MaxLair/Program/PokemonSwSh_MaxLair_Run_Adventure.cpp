@@ -165,7 +165,7 @@ void loop_adventures(
                 send_program_telemetry(
                     env.logger(), true, COLOR_RED, env.program_info(),
                     "Error",
-                    {{"Message", "Failed to start adventure 3 times in the row."}},
+                    {{"Message:", "Failed to start adventure 3 times in the row."}},
                     ""
                 );
                 throw OperationFailedException(env.logger(), "Failed to start adventure 3 times in the row.");

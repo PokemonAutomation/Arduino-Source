@@ -172,16 +172,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-#if 0
-    ImageRGB32 image("screenshot-20221204-074557157114.png");
+#if 1
+    ImageRGB32 image("screenshot-20221204-232949766645.png");
 
-    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
-    bool detected = party_select_top.detect(image);
-    cout << detected << endl;
+    MainMenuDetector detector;
+    auto detection = detector.detect_location(image);
+    cout << (int)detection.first << " : " << detection.second << endl;
+
+//    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
+//    bool detected = party_select_top.detect(image);
+//    cout << detected << endl;
 #endif
 
 
-#if 1
+
+
+
+#if 0
 //    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
     MainMenuDetector detector;
     while (true){

@@ -66,39 +66,37 @@ void send_raid_notification(
 
     std::string description = settings.DESCRIPTION;
     if (!description.empty()){
-        embeds.emplace_back("Description", description);
+        embeds.emplace_back("Description:", description);
     }
 
     std::string slugs;
 
-    if (!screenshot){
-        if (results.type == DenMonReadResults::NOT_DETECTED){
-            slugs += "Unable to detect - Not in den lobby.";
-        }else if (results.slugs.results.empty()){
-            slugs += "Unable to detect.";
-        }else if (results.slugs.results.size() == 1){
-            slugs += results.slugs.results.begin()->second;
-        }else{
-            slugs += "Ambiguous: ";
-            size_t c = 0;
-            for (const auto& item : results.slugs.results){
-                if (c > 0){
-                    slugs += ", ";
-                }
-                slugs += item.second;
-                c++;
-                if (c >= 5){
-                    break;
-                }
+    if (results.type == DenMonReadResults::NOT_DETECTED){
+        slugs += "Unable to detect - Not in den lobby.";
+    }else if (results.slugs.results.empty()){
+        slugs += "Unable to detect.";
+    }else if (results.slugs.results.size() == 1){
+        slugs += results.slugs.results.begin()->second;
+    }else{
+        slugs += "Ambiguous: ";
+        size_t c = 0;
+        for (const auto& item : results.slugs.results){
+            if (c > 0){
+                slugs += ", ";
             }
-            if (c < results.slugs.results.size()){
-                slugs += ", (";
-                slugs += std::to_string(results.slugs.results.size() - c);
-                slugs += " more...)";
+            slugs += item.second;
+            c++;
+            if (c >= 5){
+                break;
             }
         }
-        embeds.emplace_back("Current " + STRING_POKEMON, slugs);
+        if (c < results.slugs.results.size()){
+            slugs += ", (";
+            slugs += std::to_string(results.slugs.results.size() - c);
+            slugs += " more...)";
+        }
     }
+    embeds.emplace_back("Current " + STRING_POKEMON + ":", slugs);
 
     {
         std::string code_str;
@@ -114,7 +112,7 @@ void send_raid_notification(
         }else{
             code_str += "None";
         }
-        embeds.emplace_back("Raid Code", code_str);
+        embeds.emplace_back("Raid Code:", code_str);
     }
 
     send_program_notification(

@@ -37,16 +37,16 @@ void send_status_notification(
     {
         std::string str = pokemon_name(runtime.last_boss, "N/A");
         status_str += "Last Boss: " + str + "\n";
-        embeds.emplace_back("Last Boss", std::move(str));
+        embeds.emplace_back("Last Boss:", std::move(str));
     }
     {
         std::string str = runtime.path_stats.to_str();
         status_str += "Current Path: " + str + "\n";
-        embeds.emplace_back("Current Path", std::move(str));
+        embeds.emplace_back("Current Path:", std::move(str));
     }
     for (size_t c = 0; c < env.consoles.size(); c++){
         const ConsoleRuntime& stats = runtime.consoles[c];
-        std::string label = "Console " + std::to_string(c);
+        std::string label = "Console " + std::to_string(c) + ":";
         std::string str;
         str += "Ore: " + stats.ore.to_str();
         str += " - Normal Balls: " + stats.normal_balls.to_str();
@@ -83,7 +83,7 @@ void send_raid_notification(
     {
         std::string description = settings.DESCRIPTION;
         if (!description.empty()){
-            embeds.emplace_back("Description", std::move(description));
+            embeds.emplace_back("Description:", std::move(description));
         }
     }
 
@@ -106,11 +106,11 @@ void send_raid_notification(
         }else{
             code_str += "None";
         }
-        embeds.emplace_back("Raid Code", std::move(code_str));
+        embeds.emplace_back("Raid Code:", std::move(code_str));
     }
 
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path", path_stats.to_str());
+        embeds.emplace_back("Current Path:", path_stats.to_str());
     }
 
     send_program_notification(
@@ -135,7 +135,7 @@ void send_shiny_notification(
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
     embeds.emplace_back(
-        "Adventure Result",
+        "Adventure Result:",
         shinies == 1
             ? "Shiny on console " + std::to_string(console_index) + "!"
             : std::to_string(shinies) + " shinies on console " + std::to_string(console_index) + "!"
@@ -169,10 +169,10 @@ void send_shiny_notification(
                 }
             }
         }
-        embeds.emplace_back(STRING_POKEMON, std::move(str));
+        embeds.emplace_back(STRING_POKEMON + ":", std::move(str));
     }
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path", path_stats.to_str());
+        embeds.emplace_back("Current Path:", path_stats.to_str());
     }
 
     send_program_notification(

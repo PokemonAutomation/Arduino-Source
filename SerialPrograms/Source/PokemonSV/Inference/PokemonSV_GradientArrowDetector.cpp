@@ -45,7 +45,7 @@ bool is_gradient_arrow(
     object = yellow;
     object.merge_assume_no_overlap(blue);
 
-    if (object.width() < 50){
+    if (object.width() < 20){
         return false;
     }
 
@@ -173,7 +173,7 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
             WaterfillObject object;
             if (is_gradient_arrow(m_type, region, object, yellow, blue)){
 //                hits.emplace_back(translate_to_parent(screen, m_box, object));
-                extract_box_reference(region, object).save("object.png");
+//                extract_box_reference(region, object).save("object.png");
                 box = translate_to_parent(screen, m_box, object);
                 return true;
             }

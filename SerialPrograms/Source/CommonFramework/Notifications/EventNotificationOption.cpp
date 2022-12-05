@@ -42,7 +42,7 @@ public:
                     ProgramInfo("Test Message"),
                     "Notification Test",
                     {
-                        {"Event Type", value.option.label()},
+                        {"Event Type:", value.option.label()},
                     }
                 );
             }

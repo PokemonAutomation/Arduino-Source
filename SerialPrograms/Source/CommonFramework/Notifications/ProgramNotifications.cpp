@@ -161,10 +161,10 @@ void send_program_notification(
             str += "\n";
             str += current_stats_addendum;
         }
-        messages.emplace_back("Session Stats", std::move(str));
+        messages.emplace_back("Session Stats:", std::move(str));
     }
     if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats", env.historical_stats()->to_str());
+        messages.emplace_back("Historical Stats:", env.historical_stats()->to_str());
     }
     send_program_notification(
         env.logger(),
@@ -190,7 +190,7 @@ void send_program_status_notification(
         env, settings,
         Color(),
         "Program Status",
-        {{"Message", message}}, "",
+        {{"Message:", message}}, "",
         image, keep_file
     );
 }
@@ -203,7 +203,7 @@ void send_program_finished_notification(
         env, settings,
         COLOR_GREEN,
         "Program Finished",
-        {{"Message", message}}, "",
+        {{"Message:", message}}, "",
         image, keep_file
     );
 }
@@ -216,7 +216,7 @@ void send_program_recoverable_error_notification(
         env, settings,
         COLOR_RED,
         "Program Error (Recoverable)",
-        {{"Message", message}}, "",
+        {{"Message:", message}}, "",
         image, keep_file
     );
 }
@@ -238,10 +238,10 @@ void send_program_finished_notification(
         {"Message", message},
     };
     if (!current_stats.empty()){
-        messages.emplace_back("Session Stats", std::move(current_stats));
+        messages.emplace_back("Session Stats:", std::move(current_stats));
     }
     if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats", std::move(historical_stats));
+        messages.emplace_back("Historical Stats:", std::move(historical_stats));
     }
     send_program_notification(
         logger, settings,
@@ -263,10 +263,10 @@ void send_program_fatal_error_notification(
         {"Message", message},
     };
     if (!current_stats.empty()){
-        messages.emplace_back("Session Stats", std::move(current_stats));
+        messages.emplace_back("Session Stats:", std::move(current_stats));
     }
     if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats", std::move(historical_stats));
+        messages.emplace_back("Historical Stats:", std::move(historical_stats));
     }
     send_program_notification(
         logger, settings,
