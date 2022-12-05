@@ -211,21 +211,22 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
 }
 
 void open_map_from_overworld(ConsoleHandle& console, BotBaseContext& context){
-    int ret;
-    OverworldWatcher overworld(COLOR_CYAN);
-    context.wait_for_all_requests();
-    ret = wait_until(
-        console, context,
-        std::chrono::seconds(10),
-        {overworld}
-    );
-    context.wait_for(std::chrono::milliseconds(100));
-    if (ret == 0){
-        console.log("Detected overworld.");
-        pbf_press_button(context, BUTTON_Y, 20, 105); // open map
-    }
-    else{
-        throw OperationFailedException(console.logger(), "open_map_from_overworld(): No overworld state found after 10 seconds.");
+    {
+        OverworldWatcher overworld(COLOR_CYAN);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {overworld}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        if (ret == 0){
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_Y, 20, 105); // open map
+        }
+        else{
+            throw OperationFailedException(console.logger(), "open_map_from_overworld(): No overworld state found after 10 seconds.");
+        }
     }
 
     WallClock start = current_time();
@@ -238,7 +239,7 @@ void open_map_from_overworld(ConsoleHandle& console, BotBaseContext& context){
         MapWatcher map(COLOR_RED);
 
         context.wait_for_all_requests();
-        ret = wait_until(
+        int ret = wait_until(
             console, context,
             std::chrono::seconds(30),
             {overworld, map}

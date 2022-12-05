@@ -216,7 +216,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         while(true){
             size_t consecutive_failures = 0;
             try {
-                num_newly_kept = hatch_eggs_full_routine(env, context);
+                num_newly_kept = (uint8_t)hatch_eggs_full_routine(env, context);
             } catch(OperationFailedException& e){
                 handle_recoverable_error(env, context, e, consecutive_failures);
 
