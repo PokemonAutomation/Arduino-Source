@@ -56,11 +56,17 @@ bool is_gradient_arrow(
     double aspect_ratio = object.aspect_ratio();
     switch (type){
     case GradientArrowType::RIGHT:
+        if (!(yellow.min_y < blue.min_y && blue.max_y < yellow.max_y)){
+            return false;
+        }
         if (!(0.7 < aspect_ratio && aspect_ratio < 1.0)){
             return false;
         }
         return GRADIENT_ARROW_HORIZONTAL().rmsd(cropped) <= THRESHOLD;
     case GradientArrowType::DOWN:
+        if (!(yellow.min_x < blue.min_x && blue.max_x < yellow.max_x)){
+            return false;
+        }
         if (!(1.0 < aspect_ratio && aspect_ratio < 1.43)){
             return false;
         }
@@ -167,6 +173,7 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
             WaterfillObject object;
             if (is_gradient_arrow(m_type, region, object, yellow, blue)){
 //                hits.emplace_back(translate_to_parent(screen, m_box, object));
+                extract_box_reference(region, object).save("object.png");
                 box = translate_to_parent(screen, m_box, object);
                 return true;
             }
