@@ -39,6 +39,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    WallClock wait_for_lobby_open(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, uint8_t player_count);
+    bool start_raid(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        WallClock start_time,
+        uint8_t player_count
+    );
     bool run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
