@@ -42,9 +42,9 @@ extern const std::array<std::string, NUM_WEATHER> WEATHER_NAMES;
 // From weather name (listed in WEATHER_NAMES) to enum
 Weather get_weather(const std::string& name);
 
-// The order of `TimeOfDay` enums correpsonds to the order
+// The order of `TimeOfDay` enums corresponds to the order
 // of setting the time in the camp, with `NONE` being no
-// change of time whileing using the camp
+// change of time while using the camp
 enum class TimeOfDay {
     NONE = 0,
     MORNING,

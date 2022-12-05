@@ -16,13 +16,15 @@ namespace PokemonAutomation{
 
 class ImageViewRGB32;
 
+int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
+
+int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target);
+
 int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target);
 
 int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
-
-int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target);
+int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
 }
 

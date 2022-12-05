@@ -21,6 +21,7 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
 //#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
@@ -223,7 +224,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
     if (MIN_STARS > MAX_STARS){
-        throw OperationFailedException(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
+        throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
 
     m_number_caught = 0;
@@ -266,12 +267,13 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         context.wait_for(std::chrono::milliseconds(500));
 
         VideoSnapshot screen = env.console.video().snapshot();
+        TeraType type = detect_tera_type(env.logger(), screen);
         TeraCardReader reader(COLOR_RED);
         size_t stars = reader.stars(screen);
         if (stars == 0){
             dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
         }else{
-            env.log("Detected " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
+            env.log("Detected a " + TERA_TYPE_NAMES[(size_t)type] + " " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
         }
 
         if (stars < MIN_STARS || stars > MAX_STARS){
@@ -305,7 +307,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             else{
                 ss << "lost";
             }
-            ss << " a " << stars << " stars raid";
+            ss << " a " << TERA_TYPE_NAMES[(size_t)type] << " " << stars << " stars raid";
             env.log(ss.str());
         }
     }
