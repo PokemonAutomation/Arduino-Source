@@ -341,6 +341,7 @@ bool TeraLobbyReader::check_ban_for_image(
         "Dhruv",
         "Nikki",
         "denvoros",
+        "Halazea",
     };
     for (const std::string& name : WHITELIST){
         std::u32string normalized_white_entry = OCR::normalize_utf32(name);

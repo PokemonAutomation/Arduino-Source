@@ -599,6 +599,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -1448,6 +1449,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/PokemonSV_Panels.h \

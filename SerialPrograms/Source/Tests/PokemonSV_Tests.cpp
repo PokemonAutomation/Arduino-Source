@@ -9,10 +9,11 @@
 #include "PokemonSV_Tests.h"
 #include "TestUtils.h"
 
-#include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -22,25 +23,6 @@ using std::endl;
 namespace PokemonAutomation{
 
 using namespace NintendoSwitch::PokemonSV;
-
-int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target){
-    TeraCardWatcher detector(COLOR_RED);
-
-    bool result = detector.process_frame(image, current_time());
-    TEST_RESULT_EQUAL(result, false);
-
-    result = detector.process_frame(image, current_time() + std::chrono::milliseconds(250));
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
-
-int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target){
-    TerastallizingDetector detector(COLOR_RED);
-
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
 
 int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
     // two words: <Map ready to exit> <In fixed view (instead of the rotated view)>
@@ -89,5 +71,36 @@ int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target){
 
     return 0;
 }
+
+int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target) {
+    TeraCardWatcher detector(COLOR_RED);
+
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, false);
+
+    result = detector.process_frame(image, current_time() + std::chrono::milliseconds(250));
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target) {
+    TerastallizingDetector detector(COLOR_RED);
+
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords) {
+    auto& logger = global_logger_command_line();
+
+    const std::string tera_type_result = TERA_TYPE_NAMES[(size_t)detect_tera_type(logger, image)];
+
+    TEST_RESULT_EQUAL(keywords.size(), 1);
+    TEST_RESULT_EQUAL(tera_type_result, keywords[0]);
+
+    return 0;
+}
+
 
 }

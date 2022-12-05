@@ -1211,6 +1211,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
