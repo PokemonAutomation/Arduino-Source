@@ -96,7 +96,7 @@ bool MainMenuDetector::move_cursor(
                 text += "Right";
                 break;
             }
-            text += std::to_string(current.second);
+            text += " " + std::to_string(current.second);
             console.log(text);
         }
 
