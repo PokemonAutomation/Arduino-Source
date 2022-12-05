@@ -601,7 +601,8 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -624,6 +625,7 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
+    Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1454,7 +1456,8 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.h \
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/PokemonSV_Panels.h \
@@ -1477,6 +1480,7 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
+    Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

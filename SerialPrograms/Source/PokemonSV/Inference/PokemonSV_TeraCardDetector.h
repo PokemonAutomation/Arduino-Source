@@ -1,4 +1,4 @@
-/*  Dialog Detector
+/*  Tera Card Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

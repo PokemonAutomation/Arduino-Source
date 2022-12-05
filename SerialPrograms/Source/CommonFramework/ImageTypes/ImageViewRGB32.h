@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ImageViewRGB32_H
 #define PokemonAutomation_CommonFramework_ImageViewRGB32_H
 
+#include <opencv2/core/mat.hpp>
 #include <string>
 #include "ImageViewPlanar32.h"
 
@@ -52,6 +53,8 @@ public:
     QImage to_QImage_ref() const;       //  Return a shallow copy-on-write reference that points to this buffer. (fast)
     QImage to_QImage_owning() const;    //  Return a copy that owns its own buffer. (slow)
     QImage scaled_to_QImage(size_t width, size_t height) const;
+
+    cv::Mat to_opencv_Mat() const;
 
 private:
     PA_FORCE_INLINE ImageViewRGB32(const ImageViewPlanar32& x)

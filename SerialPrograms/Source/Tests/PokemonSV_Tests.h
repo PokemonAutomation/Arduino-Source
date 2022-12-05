@@ -24,7 +24,9 @@ int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target);
 
 int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target);
 
-int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+int test_pokemonSV_TeraSilhouetteReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
+
+int test_pokemonSV_TeraTypeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords);
 
 int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
