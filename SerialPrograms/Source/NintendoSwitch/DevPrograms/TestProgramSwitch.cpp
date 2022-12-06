@@ -243,7 +243,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
-    ImageRGB32 image("20221206-020948281106.jpg");
+    ImageRGB32 image("20221206-035546876682.jpg");
 //    auto image = feed.snapshot();
 
     TeraLobbyReader reader;
