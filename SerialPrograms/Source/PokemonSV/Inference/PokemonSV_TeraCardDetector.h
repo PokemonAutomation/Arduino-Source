@@ -74,9 +74,10 @@ public:
     uint8_t total_players(const ImageViewRGB32& screen) const;
     std::string raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen);
 
-    //  Returns true if someone is on the ban list.
-    std::vector<TeraLobbyNameMatchResult> check_ban_list(
+    //  Returns the # of players banned.
+    uint8_t check_ban_list(
         Logger& logger,
+        std::vector<TeraLobbyNameMatchResult>& match_list,
         const std::vector<PlayerListRowSnapshot>& ban_list,
         const ImageViewRGB32& screen,
         bool include_host

@@ -83,7 +83,8 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
     arrow_detector.make_overlays(boxes);
     dialog_detector.make_overlays(boxes);
 
-    OverlayBoxScope ore_box(console, {0.900, 0.015, 0.020, 0.040});
+//    OverlayBoxScope ore_box(console, {0.900, 0.015, 0.020, 0.040});
+    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
     OverlayBoxScope ore_quantity(console, {0.945, 0.010, 0.0525, 0.050});
 
     size_t presses = 0;

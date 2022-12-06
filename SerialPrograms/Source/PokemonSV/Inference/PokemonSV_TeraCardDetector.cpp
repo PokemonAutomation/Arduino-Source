@@ -347,6 +347,7 @@ bool TeraLobbyReader::check_ban_for_image(
         "Gael",
         "Dhruv",
         "Nikki",
+        "Dani",
         "denvoros",
         "Halazea",
     };
@@ -383,8 +384,9 @@ bool TeraLobbyReader::check_ban_for_image(
 
     return true;
 }
-PA_NO_INLINE std::vector<TeraLobbyNameMatchResult> TeraLobbyReader::check_ban_list(
+PA_NO_INLINE uint8_t TeraLobbyReader::check_ban_list(
     Logger& logger,
+    std::vector<TeraLobbyNameMatchResult>& match_list,
     const std::vector<PlayerListRowSnapshot>& ban_list,
     const ImageViewRGB32& screen,
     bool include_host
@@ -395,10 +397,10 @@ PA_NO_INLINE std::vector<TeraLobbyNameMatchResult> TeraLobbyReader::check_ban_li
 
     const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
 
-    std::vector<TeraLobbyNameMatchResult> ret;
+//    std::vector<TeraLobbyNameMatchResult> ret;
 
     size_t start = include_host ? 0 : 1;
-
+    uint8_t banned_count = 0;
     for (size_t c = start; c < 4; c++){
         ImageStats sprite = image_stats(extract_box_reference(screen, m_player_mon[c]));
         if (sprite.stddev.sum() <= 80){
@@ -411,12 +413,16 @@ PA_NO_INLINE std::vector<TeraLobbyNameMatchResult> TeraLobbyReader::check_ban_li
         ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
 
         std::map<Language, CacheEntry> cache;
+        bool banned = false;
         for (const PlayerListRowSnapshot& entry : ban_list){
-            check_ban_for_image(logger, ret, cache, filtered, entry);
+            banned |= check_ban_for_image(logger, match_list, cache, filtered, entry);
+        }
+        if (banned){
+            banned_count++;
         }
     }
 
-    return ret;
+    return banned_count;
 }
 
 
@@ -460,14 +466,15 @@ void TeraLobbyBanWatcher::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);
 }
 bool TeraLobbyBanWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    std::vector<TeraLobbyNameMatchResult> banned = check_ban_list(
-        m_logger, m_table.snapshot(), frame, m_include_host
+    std::vector<TeraLobbyNameMatchResult> match_list;
+    uint8_t banned = check_ban_list(
+        m_logger, match_list, m_table.snapshot(), frame, m_include_host
     );
-    if (banned.empty()){
+    if (banned == 0){
         return false;
     }
     std::lock_guard<std::mutex> lg(m_lock);
-    m_last_known_bans = std::move(banned);
+    m_last_known_bans = std::move(match_list);
     return true;
 }
 

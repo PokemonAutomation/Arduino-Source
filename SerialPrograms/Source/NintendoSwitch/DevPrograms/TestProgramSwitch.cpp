@@ -172,6 +172,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    ImageRGB32 image("screenshot-20221206-143212242906.png");
+
+    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
+
+    extract_box_reference(image, ore_box).save("test.png");
+
+
 #if 0
     while (true){
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -242,7 +249,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
     ImageRGB32 image("20221206-035546876682.jpg");
 //    auto image = feed.snapshot();
 
