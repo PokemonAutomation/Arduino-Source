@@ -30,11 +30,11 @@ private:
     ImageFloatBox m_user_icons;
     ImageFloatBox m_game_slot;
 };
-class HomeWatcher : public HomeDetector, public VisualInferenceCallback{
+class HomeWatcher : public DetectorToFinder<HomeDetector>{
 public:
-    HomeWatcher();
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    HomeWatcher(std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250))
+         : DetectorToFinder("HomeWatcher", hold_duration)
+    {}
 };
 
 
@@ -53,26 +53,24 @@ private:
     ImageFloatBox m_mid_row;
     ImageFloatBox m_user_slot;
 };
-class StartGameUserSelectWatcher : public StartGameUserSelectDetector, public VisualInferenceCallback{
+class StartGameUserSelectWatcher : public DetectorToFinder<StartGameUserSelectDetector>{
 public:
-    StartGameUserSelectWatcher();
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    size_t m_consecutive_detections = 0;
+    StartGameUserSelectWatcher()
+         : DetectorToFinder("StartGameUserSelectWatcher", std::chrono::milliseconds(250))
+    {}
 };
 
 
 // Detect the Switch system update screen when you are about to enter a game from Switch Home screen
 class UpdateMenuDetector : public StaticScreenDetector{
 public:
-    UpdateMenuDetector();
+    UpdateMenuDetector(bool invert = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
+    bool m_invert;
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_mid;
     ImageFloatBox m_top;
@@ -80,14 +78,11 @@ private:
     ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
 };
-class UpdateMenuWatcher : public UpdateMenuDetector, public VisualInferenceCallback{
+class UpdateMenuWatcher : public DetectorToFinder<UpdateMenuDetector>{
 public:
-    UpdateMenuWatcher(bool invert);
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    bool m_invert;
+    UpdateMenuWatcher(bool invert)
+         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), invert)
+    {}
 };
 
 

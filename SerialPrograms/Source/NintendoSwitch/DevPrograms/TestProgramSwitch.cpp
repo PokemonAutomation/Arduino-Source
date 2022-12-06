@@ -172,7 +172,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-#if 1
+#if 0
+    while (true){
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        set_time_to_12am_from_home(console, context);
+        reset_game_from_home(env, console, context, 5 * TICKS_PER_SECOND);
+    }
+#endif
+
+
+#if 0
     ImageRGB32 image("screenshot-20221204-232949766645.png");
 
     MainMenuDetector detector;
@@ -233,12 +242,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
-    ImageRGB32 image("screenshot-20221128-214005707443.png");
+#if 1
+    ImageRGB32 image("20221206-020948281106.jpg");
 //    auto image = feed.snapshot();
 
     TeraLobbyReader reader;
     reader.make_overlays(overlays);
+#if 0
     reader.check_ban_list(
         {
             {Language::English, "Halazea"},
@@ -246,7 +256,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         image,
         true
     );
-//    reader.raid_code(logger, env.program_info(), image);
+#endif
+    reader.raid_code(logger, env.program_info(), image);
 //    cout << (int)reader.total_players(image) << endl;
 #endif
 

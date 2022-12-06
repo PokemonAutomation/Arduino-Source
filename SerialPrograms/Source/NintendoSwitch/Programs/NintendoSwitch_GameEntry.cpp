@@ -112,38 +112,40 @@ void start_game_from_home_with_inference(
         context.wait_for_all_requests();
     }
 
-    for (size_t attempts = 0;;){
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        context.wait_for_all_requests();
-        attempts++;
+    pbf_press_button(context, BUTTON_A, 20, 105);
 
-        StartGameUserSelectWatcher detector;
+    while (true){
+        HomeWatcher home(std::chrono::milliseconds(2000));
+        StartGameUserSelectWatcher user_select;
         UpdateMenuWatcher update_menu(false);
+        context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(3),
-            { detector, update_menu }
+            std::chrono::seconds(10),
+            { home, user_select, update_menu }
         );
 
         //  Wait for screen to stabilize.
         context.wait_for(std::chrono::milliseconds(100));
 
-        if (ret == 0){
+        switch (ret){
+        case 0:
+            console.log("Detected home screen (again).", COLOR_RED);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 1:
             console.log("Detected user-select screen.");
             break;
-        }
-        if (ret == 1){
+        case 2:
             console.log("Detected update menu.", COLOR_RED);
-        }else if (attempts >= 5){
-            console.log("Failed to detect user-select screen after 5 attempts.", COLOR_RED);
-            throw OperationFailedException(console, "Failed to detect user-select screen after 5 attempts.");
-        }else{
-            console.log("Failed to detect user-select screen after 3 seconds. Attempting to dodge possible update window.", COLOR_RED);
+            pbf_press_dpad(context, DPAD_UP, 5, 0);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        default:
+            console.log("No recognizable state after 10 seconds.", COLOR_RED);
+            throw OperationFailedException(console, "No recognizable state after 10 seconds.");
         }
-
-        //  Skip the update window and try again.
-        pbf_press_dpad(context, DPAD_UP, 5, 0);
-        context.wait_for_all_requests();
+        break;
     }
 
     //  Move to user and enter game.

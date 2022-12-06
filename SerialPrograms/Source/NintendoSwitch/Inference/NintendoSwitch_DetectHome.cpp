@@ -97,15 +97,6 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-HomeWatcher::HomeWatcher()
-    : VisualInferenceCallback("HomeWatcher")
-{}
-void HomeWatcher::make_overlays(VideoOverlaySet& items) const{
-    HomeDetector::make_overlays(items);
-}
-bool HomeWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return HomeDetector::detect(frame);
-}
 
 
 
@@ -176,29 +167,15 @@ bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-StartGameUserSelectWatcher::StartGameUserSelectWatcher()
-    : VisualInferenceCallback("StartGameUserSelectWatcher")
-{}
-void StartGameUserSelectWatcher::make_overlays(VideoOverlaySet& items) const{
-    StartGameUserSelectDetector::make_overlays(items);
-}
-bool StartGameUserSelectWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    if (StartGameUserSelectDetector::detect(frame)){
-        m_consecutive_detections++;
-        return m_consecutive_detections >= 5;
-    }else{
-        m_consecutive_detections = 0;
-        return false;
-    }
-}
 
 
 
 
 
 
-UpdateMenuDetector::UpdateMenuDetector()
-    : m_box_top(0.25, 0.26, 0.50, 0.02)
+UpdateMenuDetector::UpdateMenuDetector(bool invert)
+    : m_invert(invert)
+    , m_box_top(0.25, 0.26, 0.50, 0.02)
     , m_box_mid(0.25, 0.52, 0.50, 0.02)
     , m_top(0.10, 0.15, 0.80, 0.03)
     , m_left(0.08, 0.25, 0.10, 0.38)
@@ -222,27 +199,27 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
     }else if (stats_box_top.average.sum() > 500){
         white = true;
     }else{
-        return false;
+        return m_invert;
     }
     if (stats_box_top.stddev.sum() > 10){
-        return false;
+        return m_invert;
     }
 
 //    cout << "white: " << white << endl;
 
     ImageStats stats_box_mid = image_stats(extract_box_reference(screen, m_box_mid));
     if (stats_box_mid.stddev.sum() > 10){
-        return false;
+        return m_invert;
     }
     if (euclidean_distance(stats_box_top.average, stats_box_mid.average) > 10){
-        return false;
+        return m_invert;
     }
 
     ImageStats stats_left = image_stats(extract_box_reference(screen, m_left));
 //    cout << stats_left.stddev << endl;
     if (stats_left.stddev.sum() < 30){
 //        cout << "zxcv" << endl;
-        return false;
+        return m_invert;
     }
 
     ImageStats stats_top = image_stats(extract_box_reference(screen, m_top));
@@ -253,38 +230,28 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
 
     if (euclidean_distance(stats_top.average, bottom_solid.average) > 10){
 //        cout << "qwer" << endl;
-        return false;
+        return m_invert;
     }
 
     if (white){
         if (!is_grey(stats_top, 100, 300) || !is_grey(bottom_solid, 100, 300)){
 //            cout << "asdf" << endl;
-            return false;
+            return m_invert;
         }
     }else{
         if (!is_grey(stats_top, 0, 100) || !is_grey(bottom_solid, 0, 100)){
 //            cout << "zxcv" << endl;
-            return false;
+            return m_invert;
         }
     }
 
     ImageStats stats_bottom_buttons = image_stats(extract_box_reference(screen, m_bottom_buttons));
 //    cout << stats_bottom_buttons.average << stats_bottom_buttons.stddev << endl;
     if (stats_bottom_buttons.stddev.sum() < 30){
-        return false;
+        return m_invert;
     }
 
-    return true;
-}
-UpdateMenuWatcher::UpdateMenuWatcher(bool invert)
-    : VisualInferenceCallback("UpdateMenuWatcher")
-    , m_invert(invert)
-{}
-void UpdateMenuWatcher::make_overlays(VideoOverlaySet& items) const{
-    UpdateMenuDetector::make_overlays(items);
-}
-bool UpdateMenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return m_invert != UpdateMenuDetector::detect(frame);
+    return !m_invert;
 }
 
 
