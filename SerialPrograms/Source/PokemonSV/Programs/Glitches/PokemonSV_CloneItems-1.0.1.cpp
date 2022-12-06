@@ -131,11 +131,11 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
 
         OverworldWatcher overworld(COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
-        GradientArrowWatcher party_select_top(COLOR_GREEN, console.overlay(), GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
-        GradientArrowWatcher party_select_return(COLOR_GREEN, console.overlay(), GradientArrowType::RIGHT, {0.30, 0.57, 0.10, 0.08});
-        GradientArrowWatcher party_select_back(COLOR_GREEN, console.overlay(), GradientArrowType::RIGHT, {0.30, 0.64, 0.10, 0.08});
+        GradientArrowWatcher party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
+        GradientArrowWatcher party_select_return(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.57, 0.10, 0.08});
+        GradientArrowWatcher party_select_back(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.64, 0.10, 0.08});
         AdvanceDialogWatcher dialog(COLOR_CYAN);
-        GradientArrowWatcher box_slot_one(COLOR_BLUE, console.overlay(), GradientArrowType::DOWN, {0.24, 0.16, 0.05, 0.09});
+        GradientArrowWatcher box_slot_one(COLOR_BLUE, GradientArrowType::DOWN, {0.24, 0.16, 0.05, 0.09});
 
         PromptDialogDetector return_to_ride_prompt(COLOR_DARKGREEN, {0.500, 0.545, 0.400, 0.100});
         BattleTeamDetector battle_team;

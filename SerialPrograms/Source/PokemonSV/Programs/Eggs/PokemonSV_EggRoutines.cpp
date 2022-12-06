@@ -31,8 +31,8 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
         context.wait_for_all_requests();
 
         AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
-        GradientArrowWatcher menu_item_0_watcher(COLOR_BLUE, console.overlay(), GradientArrowType::RIGHT, {0.037, 0.224, 0.074, 0.104});
-        GradientArrowWatcher menu_item_1_watcher(COLOR_BLUE, console.overlay(), GradientArrowType::RIGHT, {0.037, 0.339, 0.074, 0.104});
+        GradientArrowWatcher menu_item_0_watcher(COLOR_BLUE, GradientArrowType::RIGHT, {0.037, 0.224, 0.074, 0.104});
+        GradientArrowWatcher menu_item_1_watcher(COLOR_BLUE, GradientArrowType::RIGHT, {0.037, 0.339, 0.074, 0.104});
         PromptDialogWatcher prompt_watcher(COLOR_RED, {0.535, 0.450, 0.367, 0.124});
         
         int ret = wait_until(

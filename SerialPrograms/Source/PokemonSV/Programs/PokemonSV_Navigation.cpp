@@ -37,7 +37,7 @@ void save_game_from_menu_impl(ConsoleHandle& console, BotBaseContext& context){
         }
 
         MainMenuWatcher menu(COLOR_RED);
-        GradientArrowWatcher confirmation(COLOR_YELLOW, console.overlay(), GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
+        GradientArrowWatcher confirmation(COLOR_YELLOW, GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
         AdvanceDialogWatcher finished(COLOR_GREEN);
 
         int ret = wait_until(
@@ -280,7 +280,7 @@ void fly_to_overworld_from_map(ConsoleHandle& console, BotBaseContext& context){
         {
             OverworldWatcher overworld(COLOR_CYAN);
             MapWatcher map(COLOR_RED);
-            GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, console.overlay(), GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
+            GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
             PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
 
             context.wait_for_all_requests();

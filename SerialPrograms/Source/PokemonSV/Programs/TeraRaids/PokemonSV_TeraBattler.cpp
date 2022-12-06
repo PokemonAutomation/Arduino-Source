@@ -61,7 +61,6 @@ bool run_tera_battle(
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         GradientArrowWatcher target_select_menu(
             COLOR_CYAN,
-            console.overlay(),
             GradientArrowType::DOWN,
             {0.45, 0.07, 0.10, 0.10}
         );

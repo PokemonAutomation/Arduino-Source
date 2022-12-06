@@ -55,7 +55,6 @@ public:
     ~GradientArrowWatcher();
     GradientArrowWatcher(
         Color color,
-        VideoOverlay& overlay,
         GradientArrowType type,
         const ImageFloatBox& box
     );
@@ -63,11 +62,8 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
-
 protected:
-    VideoOverlay& m_overlay;
     GradientArrowDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_arrows;
 };
 
 

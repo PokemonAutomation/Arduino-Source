@@ -192,12 +192,10 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
 GradientArrowWatcher::~GradientArrowWatcher() = default;
 GradientArrowWatcher::GradientArrowWatcher(
     Color color,
-    VideoOverlay& overlay,
     GradientArrowType type,
     const ImageFloatBox& box
 )
-    : VisualInferenceCallback("GradientArrowFinder")
-    , m_overlay(overlay)
+    : VisualInferenceCallback("GradientArrowWatcher")
     , m_detector(color, type, box)
 {}
 
@@ -205,13 +203,7 @@ void GradientArrowWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
 bool GradientArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    ImageFloatBox arrow;
-    bool found = m_detector.detect(frame);
-    m_arrows.reset(1);
-    if (found){
-        m_arrows.emplace_back(m_overlay, arrow, COLOR_MAGENTA);
-    }
-    return found;
+    return m_detector.detect(frame);
 }
 
 
