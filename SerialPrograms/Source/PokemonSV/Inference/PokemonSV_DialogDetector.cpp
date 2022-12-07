@@ -31,10 +31,11 @@ void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
+//    cout << stats_top.average << stats_top.stddev << endl;
     bool white;
     if (is_white(stats_top)){
         white = true;
-    }else if (is_black(stats_top)){
+    }else if (is_black(stats_top, 150)){
         white = false;
     }else{
         return false;
@@ -48,7 +49,7 @@ bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
             return false;
         }
     }else{
-        if (!is_black(stats_bot)){
+        if (!is_black(stats_bot, 150)){
             return false;
         }
     }

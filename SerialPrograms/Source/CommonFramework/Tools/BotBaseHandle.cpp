@@ -275,6 +275,8 @@ void BotBaseHandle::thread_body(){
             return;
         }catch (SerialProtocolException& e){
             error = e.message();
+        }catch (ConnectionException& e){
+            error = e.message();
         }
         if (!error.empty()){
             m_botbase->stop();
@@ -296,6 +298,8 @@ void BotBaseHandle::thread_body(){
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
+            error = e.message();
+        }catch (ConnectionException& e){
             error = e.message();
         }
         if (error.empty()){

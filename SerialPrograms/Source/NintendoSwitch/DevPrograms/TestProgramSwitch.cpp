@@ -172,11 +172,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    ImageRGB32 image("screenshot-20221206-143212242906.png");
+    ImageRGB32 image("20221206-225502975702-NoState.png");
 
-    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
+//    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
+//    extract_box_reference(image, ore_box).save("test.png");
 
-    extract_box_reference(image, ore_box).save("test.png");
+    AdvanceDialogDetector detector;
+    cout << detector.detect(image) << endl;
 
 
 #if 0
