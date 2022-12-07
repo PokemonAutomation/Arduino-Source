@@ -60,9 +60,9 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
 
         // filterd_image.save("./tmp_" + std::to_string(i) + ".png");
         
-        cv::Mat filtered_image_mat(filterd_image.height(), filterd_image.width(), CV_8UC4, (void*)filterd_image.data(), filterd_image.bytes_per_row());
+        cv::Mat filtered_image_mat(static_cast<int>(filterd_image.height()), static_cast<int>(filterd_image.width()), CV_8UC4, (void*)filterd_image.data(), filterd_image.bytes_per_row());
         ImageRGB32 dilated_image(filterd_image.width(), filterd_image.height());
-        cv::Mat dilated_image_mat(dilated_image.height(), dilated_image.width(), CV_8UC4, (void*)dilated_image.data(), dilated_image.bytes_per_row());
+        cv::Mat dilated_image_mat(static_cast<int>(dilated_image.height()), static_cast<int>(dilated_image.width()), CV_8UC4, (void*)dilated_image.data(), dilated_image.bytes_per_row());
         cv::dilate(filtered_image_mat, dilated_image_mat, element);
 
         // dilated_image.save("./tmp_dil_" + std::to_string(i) + ".png");
