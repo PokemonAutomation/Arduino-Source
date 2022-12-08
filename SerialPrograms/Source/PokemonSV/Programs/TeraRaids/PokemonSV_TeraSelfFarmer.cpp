@@ -85,10 +85,10 @@ const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
 //        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
 //    };
     static EnumDatabase<TeraSelfFarmer::Mode> database1{
+        {Mode::FARM_LP_ONLY,    "lp-only",      "LP only. Open the raid menu to get LP, but don't enter it."},
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
         {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
         {Mode::SHINY_HUNT,      "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
-        {Mode::FARM_LP_ONLY,    "lp-only",      "LP only. Open the raid menu to get LP, but don't enter it."},
     };
 //    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
     return database1;
@@ -105,7 +105,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         "<b>Mode:</b>",
         database(),
         LockWhileRunning::LOCKED,
-        Mode::FARM_ITEMS_ONLY
+        Mode::CATCH_ALL
     )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
