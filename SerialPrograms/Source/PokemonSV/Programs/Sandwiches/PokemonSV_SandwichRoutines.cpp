@@ -240,7 +240,7 @@ ImageFloatBox move_sandwich_hand(
     
     if (pressing_A){
         move_session.dispatch([&](BotBaseContext& context){
-            ssf_press_button(context, BUTTON_A, 0, 3000);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
         });
     }
 
@@ -320,16 +320,18 @@ ImageFloatBox move_sandwich_hand(
         // Dispatch a new series of commands that overwrites the last ones
         move_session.dispatch([&](BotBaseContext& context){
             if (pressing_A){
-                ssf_press_button(context, BUTTON_A, 0, 300);
+                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 1000);
             }
-            ssf_press_joystick(context, true, joystick_x, joystick_y, 0, 100);
+            else{
+                pbf_move_left_joystick(context, joystick_x, joystick_y, 1000, 0);
+            }
         });
         
         console.log("Moved joystick");
 
         last_loc = cur_loc;
         last_time = cur_time;
-        context.wait_for(std::chrono::milliseconds(5));
+        context.wait_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -353,15 +355,29 @@ void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& c
     }
 
     auto end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
 
-    // Drop upper bread
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, false, expand_box(end_box), upper_bread_drop_box);
-    pbf_mash_button(context, BUTTON_A, 125);
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
+
+    // XXX test combination of commands in the main thread
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 100);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
+
+    
+    
+    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
+    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
+    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
+    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+
+    // // Drop upper bread and pick
+    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, false, expand_box(end_box), upper_bread_drop_box);
+    // pbf_mash_button(context, BUTTON_A, 125 * 5);
+
+    console.log("End box " + box_to_string(end_box));
+
     context.wait_for_all_requests();
 }
 

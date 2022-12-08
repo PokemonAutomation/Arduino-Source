@@ -311,7 +311,7 @@ void EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
     try{
         make_great_peanut_butter_sandwich(env, env.console, context);
-        finish_sandwich_eating(env.console, context);
+        // finish_sandwich_eating(env.console, context);
     } catch(OperationFailedException &e){
         dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
             "MakeSandwich", e.message());
