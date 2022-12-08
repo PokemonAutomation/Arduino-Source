@@ -49,6 +49,7 @@ private:
         FARM_ITEMS_ONLY,
         CATCH_ALL,
         SHINY_HUNT,
+        FARM_LP_ONLY,
     };
     static const EnumDatabase<Mode>& database();
     EnumDropdownOption<Mode> MODE;

@@ -88,6 +88,7 @@ const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
         {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
         {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
         {Mode::SHINY_HUNT,      "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
+        {Mode::FARM_LP_ONLY,    "lp-only",      "LP only. Open the raid menu to get LP, but don't enter it."},
     };
 //    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
     return database1;
@@ -277,7 +278,17 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 //            env.log("Detected a " + TERA_TYPE_NAMES[(size_t)type] + " " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
         }
 
+        bool skip = false;
+
+        if (MODE == Mode::FARM_LP_ONLY) {
+            skip = true;
+        }
+
         if (stars < MIN_STARS || stars > MAX_STARS){
+            skip = true;
+        }
+
+        if (skip) {
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
             close_raid(env.console, context);
