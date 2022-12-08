@@ -164,6 +164,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
     {
+        // make_great_peanut_butter_sandwich(env, env.console, context);
         fetch_eggs_full_routine(env, context);
         // reset_game(env, context, "reset");
         return;
@@ -308,6 +309,13 @@ void EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         throw OperationFailedException(env.console, "Cannot find sandwich recipe with enough ingredients.");
     }
 
+    try{
+        make_great_peanut_butter_sandwich(env, env.console, context);
+        finish_sandwich_eating(env.console, context);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "MakeSandwich", e.message());
+    }
 
 
     // move past the table:

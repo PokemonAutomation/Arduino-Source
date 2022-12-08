@@ -4,7 +4,7 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
@@ -88,7 +88,7 @@ void MapExitDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_orange_exit_box);
 }
 bool MapExitDetector::detect(const ImageViewRGB32& frame) const{
-     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(100, 0, 0), combine_rgb(255, 200, 100)}
     };
 

@@ -57,8 +57,18 @@ int image_filename_detector_helper(ImageFilenameFunction test_func, const std::s
     std::string basename;
     try{
         image = ImageRGB32(test_path);
+        
         QFileInfo file_info(QString::fromStdString(test_path));
-        basename = file_info.baseName().toStdString();
+        std::string full_name = file_info.fileName().toStdString();
+
+        // Find the basename (full name without file extension)
+        // QFileInfo has a function basename() to get basename, but we shouldn't use it
+        // because for a filename like Free_0.421_0.024_0.163_0.174.png where floating point values are
+        // put into the filename, QFileInfo::basename() will return a basename of "Free_0". It finds the
+        // first "." as the separation for extension, not the last.
+        size_t dot_loc = full_name.find_last_of(".");
+        basename = full_name.substr(0, dot_loc);
+        cout << "Parse file path: file name: " << full_name << ", base name: " << basename << endl;
     }catch (FileException&){
         cout << "Skip " << test_path << " as it cannot be read as image" << endl;
         return -1;
@@ -249,6 +259,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonSV_TerastallizingDetector", std::bind(image_bool_detector_helper, test_pokemonSV_TerastallizingDetector, _1)},
     {"PokemonSV_TeraTypeDetector", std::bind(image_words_detector_helper, test_pokemonSV_TeraTypeDetector, _1)},    
     {"PokemonSV_SandwichRecipeDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichRecipeDetector, _1)},
+    {"PokemonSV_SandwichHandDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichHandDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

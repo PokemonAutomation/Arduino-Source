@@ -15,6 +15,7 @@
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
+#include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -148,6 +149,44 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     int selected_cell = selection_watcher.selected_recipe_cell();
 
     TEST_RESULT_COMPONENT_EQUAL(selected_cell, target_selection, "selected cell");
+
+    return 0;
+}
+
+int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // five words: hand_type("Free"/"Grabbing"), <image float box (four words total)>
+    if (words.size() < 5){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    const auto& hand_type_word = words[words.size() - 5];
+    SandwichHandLocator::HandType hand_type = SandwichHandLocator::HandType::FREE;
+    if (hand_type_word == "Free"){
+        hand_type = SandwichHandLocator::HandType::FREE;
+    } else if (hand_type_word == "Grabbing"){
+        hand_type = SandwichHandLocator::HandType::GRABBING;
+    } else {
+        cerr << "Error: word " << hand_type_word << " should be \"Free\" or \"Grabbing\"." << endl;
+        return 1;
+    }
+
+    float box_values[4] = {0.0f};
+    for(int i = 0; i < 4; i++){
+        if (parse_float(words[words.size() - 4 + i], box_values[i]) == false){
+            cerr << "Error: word " << words[words.size() - 4 + i] << " should be a float, range [0.0, 1.0]" << endl;
+            return 1;
+        }
+    }
+
+    ImageFloatBox box(box_values[0], box_values[1], box_values[2], box_values[3]);
+
+    SandwichHandLocator detector(hand_type, box);
+
+    auto result = detector.detect(image);
+    bool has_hand = result.first >= 0.0;
+
+    TEST_RESULT_EQUAL(has_hand, true);
 
     return 0;
 }

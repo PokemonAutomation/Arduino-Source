@@ -598,6 +598,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.cpp \
@@ -1450,6 +1451,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.h \

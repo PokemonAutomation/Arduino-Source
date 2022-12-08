@@ -28,6 +28,8 @@ int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vect
 
 int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
+int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
 }
 
 #endif

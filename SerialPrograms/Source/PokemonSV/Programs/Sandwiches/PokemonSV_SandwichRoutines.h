@@ -10,7 +10,8 @@
 #define PokemonAutomation_PokemonSV_SandwichRoutines_H
 
 namespace PokemonAutomation{
-
+    
+    class ProgramEnvironment;
     class ConsoleHandle;
     class BotBaseContext;
 
@@ -32,6 +33,13 @@ bool enter_sandwich_recipe_list(ConsoleHandle& console, BotBaseContext& context)
 // the recipe cell is semi-transparent, failed to be detected.
 // Will throw OperationFailedException if error occurs.
 bool select_sandwich_recipe(ConsoleHandle& console, BotBaseContext& context, size_t sandwich_index);
+
+// Starting at the sandwich minigame of dropping ingredients, assume the selected recipe is Great Peanut Butter Sandwich,
+// make the sandwich.
+void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+
+// Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
+void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context);
 
 }
 }

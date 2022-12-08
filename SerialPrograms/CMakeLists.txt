@@ -1209,6 +1209,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h
+    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.h
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp

@@ -26,11 +26,6 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context);
 // Will throw OperationFailedException.
 void collect_eggs_from_basket(ConsoleHandle& console, BotBaseContext& context, size_t max_eggs, size_t& num_eggs_collected);
 
-// Standing in front of picnic table, make a great peanut butter sandwich to enable egg power lv 2
-// It assumes we have enough ingredient (banana, peanut butter and a pick) and will use up the first pick in the pick selection menu.
-// Will throw OperationFailedException.
-void make_great_peanut_butter_sandwich(ConsoleHandle& console, BotBaseContext& context);
-
 
 }
 }

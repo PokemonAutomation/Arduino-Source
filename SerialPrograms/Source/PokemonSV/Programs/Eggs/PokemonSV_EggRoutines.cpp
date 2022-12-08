@@ -219,10 +219,6 @@ void collect_eggs_from_basket(ConsoleHandle& console, BotBaseContext& context, s
 }
 
 
-void make_great_peanut_butter_sandwich(ConsoleHandle& console, BotBaseContext& context){
-    
-}
-
 }
 }
 }

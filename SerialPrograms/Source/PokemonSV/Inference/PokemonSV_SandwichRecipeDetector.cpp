@@ -21,10 +21,11 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+template class FixedLimitVector<NintendoSwitch::PokemonSV::GradientArrowWatcher>;
+
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
 
 
 SandwichRecipeNumberDetector::SandwichRecipeNumberDetector(Logger& logger, Color color): m_logger(logger), m_color(color){
@@ -51,22 +52,28 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
         ImageRGB32 filterd_image = to_blackwhite_rgb32_range(cropped_image,
             combine_rgb(200, 200, 200), combine_rgb(255, 255, 255), invert_blackwhite);
 
-        const int dilation_type = cv::MORPH_ELLIPSE;
-        const int dilation_size = 1;
-
-        cv::Mat element = cv::getStructuringElement(dilation_type,
-            cv::Size(2*dilation_size + 1, 2*dilation_size+1),
-            cv::Point(dilation_size, dilation_size));
-
-        // filterd_image.save("./tmp_" + std::to_string(i) + ".png");
-        
-        cv::Mat filtered_image_mat(static_cast<int>(filterd_image.height()), static_cast<int>(filterd_image.width()), CV_8UC4, (void*)filterd_image.data(), filterd_image.bytes_per_row());
         ImageRGB32 dilated_image(filterd_image.width(), filterd_image.height());
-        cv::Mat dilated_image_mat(static_cast<int>(dilated_image.height()), static_cast<int>(dilated_image.width()), CV_8UC4, (void*)dilated_image.data(), dilated_image.bytes_per_row());
-        cv::dilate(filtered_image_mat, dilated_image_mat, element);
 
-        // dilated_image.save("./tmp_dil_" + std::to_string(i) + ".png");
+        if (screen.width() == 1920){
+            const int dilation_type = cv::MORPH_ELLIPSE;
+            const int dilation_size = 1;
 
+            cv::Mat element = cv::getStructuringElement(dilation_type,
+                cv::Size(2*dilation_size + 1, 2*dilation_size+1),
+                cv::Point(dilation_size, dilation_size));
+
+            // filterd_image.save("./tmp_" + std::to_string(i) + ".png");
+            
+            cv::Mat filtered_image_mat(static_cast<int>(filterd_image.height()), static_cast<int>(filterd_image.width()), CV_8UC4, (void*)filterd_image.data(), filterd_image.bytes_per_row());
+            
+            cv::Mat dilated_image_mat(static_cast<int>(dilated_image.height()), static_cast<int>(dilated_image.width()), CV_8UC4, (void*)dilated_image.data(), dilated_image.bytes_per_row());
+            cv::dilate(filtered_image_mat, dilated_image_mat, element);
+
+            // dilated_image.save("./tmp_dil_" + std::to_string(i) + ".png");
+        } else{
+            dilated_image = filterd_image.copy();
+        }
+        
         const int number = OCR::read_number(m_logger, dilated_image);
         if (number <= 0 || number > 151){
             recipe_IDs[i] = 0;
