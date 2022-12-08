@@ -52,11 +52,17 @@ FastCodeEntry::FastCodeEntry()
         LockWhileRunning::LOCKED,
         PreloadSettings::instance().DEVELOPER_MODE
     )
+    , SKIP_PLUS(
+        "<b>Skip the Plus: (developer only)</b>",
+        LockWhileRunning::LOCKED,
+        false
+    )
 {
     PA_ADD_OPTION(CODE);
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(FAST_MODE);
+        PA_ADD_OPTION(SKIP_PLUS);
     }
 }
 
@@ -124,7 +130,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
             }
             enter_digits_str(context, 4, code.c_str());
         }else if (code.size() == 6){
-            enter_alphanumeric_code(console.logger(), context, code, KEYBOARD_LAYOUT, FAST_MODE);
+            enter_alphanumeric_code(console.logger(), context, code, KEYBOARD_LAYOUT, !SKIP_PLUS, FAST_MODE);
         }else{
             throw UserSetupError(console.logger(), "Invalid code length. Must be 4 or 6 characters long.");
         }

@@ -11,14 +11,14 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_FastCodeEntry.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-struct CodeboardPosition{
-    uint8_t row;
-    uint8_t col;
-};
 
 const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_QWERTY(){
     static const std::map<char, CodeboardPosition> map{
@@ -104,47 +104,84 @@ const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_AZERTY(){
     return map;
 }
 
-struct DigitPath{
-    uint8_t length = 0;
-    bool left_cursor = false;
-    uint8_t path[14];
-};
-DigitPath get_codeboard_digit_path(
-    CodeboardPosition source,
-    CodeboardPosition destination
-){
+DigitPath get_codeboard_digit_path(CodeboardPosition source, CodeboardPosition destination){
+    uint8_t scroll_delay = 3;
+    uint8_t wrap_delay = 4;
+
     DigitPath path;
 
+    //  Vertical is easy since there's no wrapping and no hazards.
     if (source.row < destination.row){
         size_t diff = destination.row - source.row;
         for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = DPAD_DOWN;
+            path.path[path.length++] = {DPAD_DOWN, scroll_delay};
         }
     }else{
         size_t diff = source.row - destination.row;
         for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = DPAD_UP;
+            path.path[path.length++] = {DPAD_UP, scroll_delay};
         }
     }
 
-    uint8_t diff = (12 + destination.col - source.col) % 12;
-    if (diff <= 6){
-        for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = DPAD_RIGHT;
+    //  Horizontal is messy because we need extra delay on wrapping.
+    uint8_t col = source.col;
+    while (true){
+        if (col == destination.col){
+            if (path.length > 0){
+                path.path[path.length - 1].delay = 0;
+            }
+            break;
         }
-    }else{
-        diff = 12 - diff;
-        for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = DPAD_LEFT;
+
+        uint8_t direction;
+        if (destination.col > col){
+            if (destination.col - col <= 6){
+                direction = DPAD_RIGHT;
+                col++;
+            }else{
+                direction = DPAD_LEFT;
+                col--;
+            }
+        }else{
+            if (col - destination.col <= 6){
+                direction = DPAD_LEFT;
+                col--;
+            }else{
+                direction = DPAD_RIGHT;
+                col++;
+            }
         }
+
+        if (col == (uint8_t)-1){
+            col = 11;
+        }
+        if (col == 12){
+            col = 0;
+        }
+
+        uint8_t delay = scroll_delay;
+        if (direction == DPAD_RIGHT && col == 11){
+            delay = wrap_delay;
+        }
+
+//        cout << "col = " << (int)col << ", length = " << (int)path.length << endl;
+
+        path.path[path.length++] = {direction, delay};
     }
 
     return path;
 }
+size_t get_codeboard_path_cost(const DigitPath& path){
+    size_t total_cost = 0;
+    for (uint8_t c = 0; c < path.length; c++){
+        total_cost += path.path[c].delay;
+    }
+    return total_cost;
+}
 size_t get_codeboard_path_cost(const std::vector<DigitPath>& path){
     size_t total_cost = 0;
     for (const DigitPath& digit : path){
-        size_t cost = digit.length * 3;
+        size_t cost = get_codeboard_path_cost(digit);
         if (digit.left_cursor){
             cost++;
         }
@@ -221,21 +258,27 @@ std::vector<DigitPath> get_codeboard_path(
 }
 
 
+void move_codeboard(BotBaseContext& context, const DigitPath& path, bool fast){
+    uint8_t min_delay = fast ? 0 : 10;
+    if (path.length > 0){
+        for (size_t c = 0; c < (size_t)path.length - 0; c++){
+            ssf_issue_scroll(
+                context,
+                path.path[c].direction,
+                std::max(path.path[c].delay, min_delay)
+            );
+        }
+    }
+    ssf_press_button(context, BUTTON_A, 3);
+}
 
 void run_codeboard_path(
     BotBaseContext& context,
     const std::vector<DigitPath>& path,
     bool fast
 ){
-    uint16_t delay = fast ? 3 : 10;
     for (const DigitPath& digit : path){
-        if (digit.length > 0){
-            for (size_t c = 0; c < (size_t)digit.length - 1; c++){
-                ssf_issue_scroll(context, digit.path[c], delay);
-            }
-            ssf_issue_scroll(context, digit.path[digit.length - 1], 0);
-        }
-        ssf_press_button(context, BUTTON_A, delay);
+        move_codeboard(context, digit, fast);
         if (digit.left_cursor){
             ssf_press_button(context, BUTTON_L, 1);
         }
@@ -248,10 +291,12 @@ void enter_alphanumeric_code(
     BotBaseContext& context,
     const std::string& code,
     KeyboardLayout keyboard_layout,
-    bool fast
+    bool include_plus, bool fast
 ){
     run_codeboard_path(context, get_codeboard_path(logger, code, keyboard_layout, fast), fast);
-    pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    if (include_plus){
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    }
 }
 
 

@@ -14,9 +14,9 @@
 #include "Concurrency/SpinLock.h"
 #include "CancellableScope.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -34,9 +34,12 @@ struct CancellableData{
 
 Cancellable::Cancellable()
     : m_impl(CONSTRUCT_TOKEN)
-{}
+{
+//    cout << "Constructing: " << this << endl;
+}
 Cancellable::~Cancellable(){
     detach();
+//    cout << "Deleting: " << this << endl;
 }
 CancellableScope* Cancellable::scope() const{
     m_sanitizer.check_usage();
@@ -121,8 +124,12 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
     CancellableScopeData& data(*m_impl);
     std::lock_guard lg(data.lock);
     for (Cancellable* child : data.children){
+//        cout << "Canceling: " << child << endl;
+//        cout << "Canceling: " << child->name() << endl;
+        child->m_sanitizer.check_usage();
         child->cancel(exception);
     }
+//    cout << "Done Canceling" << endl;
     data.children.clear();
     data.cv.notify_all();
     return false;
@@ -162,6 +169,7 @@ void CancellableScope::wait_until_cancel(){
     throw_if_cancelled();
 }
 void CancellableScope::operator+=(Cancellable& cancellable){
+//    cout << "Attaching: " << &cancellable << endl;
     m_sanitizer.check_usage();
     CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);
@@ -169,6 +177,7 @@ void CancellableScope::operator+=(Cancellable& cancellable){
     data.children.insert(&cancellable);
 }
 void CancellableScope::operator-=(Cancellable& cancellable){
+//    cout << "Detaching: " << &cancellable << endl;
     m_sanitizer.check_usage();
     CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);

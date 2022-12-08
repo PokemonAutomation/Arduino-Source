@@ -35,6 +35,7 @@ private:
     TextEditOption CODE;
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
     BooleanCheckBoxOption FAST_MODE;
+    BooleanCheckBoxOption SKIP_PLUS;
 };
 
 

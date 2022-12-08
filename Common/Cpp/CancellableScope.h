@@ -46,6 +46,8 @@ class Cancellable{
 public:
     virtual ~Cancellable();
 
+//    virtual std::string name() const{ return "Cancellable"; };
+
     CancellableScope* scope() const;
 
     bool cancelled() const noexcept;
@@ -96,6 +98,7 @@ protected:
 private:
     CancellableScope* m_scope = nullptr;
     Pimpl<CancellableData> m_impl;
+public:
     LifetimeSanitizer m_sanitizer;
 };
 

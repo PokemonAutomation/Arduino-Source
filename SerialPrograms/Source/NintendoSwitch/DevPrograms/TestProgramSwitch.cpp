@@ -172,6 +172,34 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    CodeboardPosition point0{1, 0};
+    CodeboardPosition point1{1, 10};
+//    uint16_t scroll_delay = 3;
+//    uint16_t A_delay = 3;
+
+    auto path0 = get_codeboard_digit_path(point0, point1);
+    auto path1 = get_codeboard_digit_path(point1, point0);
+
+    while (true){
+        move_codeboard(context, path0, true);
+        move_codeboard(context, path1, true);
+    }
+#endif
+#if 0
+    while (true){
+        ssf_issue_scroll(context, DPAD_LEFT, 3);
+        ssf_issue_scroll(context, DPAD_LEFT, 3);
+        ssf_issue_scroll(context, DPAD_LEFT, 3);
+        ssf_issue_scroll(context, DPAD_LEFT, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT, 3);
+    }
+#endif
+
+#if 0
     ImageRGB32 image("20221206-225502975702-NoState.png");
 
 //    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
@@ -179,7 +207,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     AdvanceDialogDetector detector;
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     while (true){
