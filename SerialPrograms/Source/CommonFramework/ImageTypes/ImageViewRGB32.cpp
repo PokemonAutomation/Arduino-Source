@@ -57,6 +57,9 @@ QImage ImageViewRGB32::scaled_to_QImage(size_t width, size_t height) const{
     }
     return tmp.scaled((int)width, (int)height);
 }
+cv::Mat ImageViewRGB32::to_opencv_Mat() const{
+    return cv::Mat{ static_cast<int>(m_height), static_cast<int>(m_width), CV_8UC4, (cv::Scalar*)m_ptr, m_bytes_per_row };
+}
 
 
 

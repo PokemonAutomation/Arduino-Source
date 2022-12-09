@@ -7,11 +7,13 @@
 #include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -21,7 +23,8 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
-#include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.h"
+#include "PokemonSV/Inference/PokemonSV_TeraTypeReader.h"
 //#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
@@ -268,14 +271,35 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         context.wait_for(std::chrono::milliseconds(500));
 
         VideoSnapshot screen = env.console.video().snapshot();
-//        TeraType type = detect_tera_type(env.logger(), screen);
         TeraCardReader reader(COLOR_RED);
         size_t stars = reader.stars(screen);
+
+        VideoOverlaySet overlay_set(env.console);
+
+        TeraSilhouetteReader silhouette_reader;
+        silhouette_reader.make_overlays(overlay_set);
+        ImageMatch::ImageMatchResult silhouette = silhouette_reader.read(screen);
+        silhouette.log(env.logger(), 100);
+        std::string best_silhouette = silhouette.results.empty() ? "UnknownSilhouette" : silhouette.results.begin()->second;
+        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_silhouette, "", screen);
+        }
+
+        TeraTypeReader type_reader;
+        type_reader.make_overlays(overlay_set);
+        ImageMatch::ImageMatchResult type = type_reader.read(screen);
+        type.log(env.logger(), 100);
+        std::string best_type = type.results.empty() ? "UnknownType" : type.results.begin()->second;
+        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_type, "", screen);
+        }
+
+        env.console.overlay().add_log("Fighting a " + std::to_string(stars) + "* " + best_type + " " + best_silhouette, COLOR_GREEN);
+
         if (stars == 0){
             dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
         }else{
-            env.log("Detected " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
-//            env.log("Detected a " + TERA_TYPE_NAMES[(size_t)type] + " " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
+            env.log("Detected " + std::to_string(stars) + " star(s) raid.", COLOR_PURPLE);
         }
 
         bool skip = false;
@@ -319,9 +343,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             else{
                 ss << "lost";
             }
-            ss << " a "
-//               << TERA_TYPE_NAMES[(size_t)type] << " "
-               << stars << " star(s) raid";
+            ss << " a " << stars << "* " << best_type << " " << best_silhouette << " raid";
             env.log(ss.str());
         }
     }

@@ -13,7 +13,9 @@
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
-#include "PokemonSV/Inference/PokemonSV_TeraTypeDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.h"
+#include "PokemonSV/Inference/PokemonSV_TeraTypeReader.h"
+#include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
 
@@ -74,7 +76,7 @@ int test_pokemonSV_PicnicDetector(const ImageViewRGB32& image, bool target){
     return 0;
 }
 
-int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target){
     TeraCardWatcher detector(COLOR_RED);
 
     bool result = detector.process_frame(image, current_time());
@@ -85,7 +87,7 @@ int test_pokemonSV_TeraCardFinder(const ImageViewRGB32& image, bool target) {
     return 0;
 }
 
-int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool target){
     TerastallizingDetector detector(COLOR_RED);
 
     bool result = detector.detect(image);
@@ -93,13 +95,36 @@ int test_pokemonSV_TerastallizingDetector(const ImageViewRGB32& image, bool targ
     return 0;
 }
 
-int test_pokemonSV_TeraTypeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words) {
-    auto& logger = global_logger_command_line();
+int test_pokemonSV_TeraSilhouetteReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    TeraSilhouetteReader reader(COLOR_RED);
+    
+    ImageMatch::ImageMatchResult slugs = reader.read(image);
+    if (slugs.results.empty()){
+        return 1;
+    }
+    std::string best_match = slugs.results.begin()->second;
 
-    const std::string tera_type_result = TERA_TYPE_NAMES[(size_t)detect_tera_type(logger, image)];
+    if (keywords.empty()){
+        return 1;
+    }
+    TEST_RESULT_EQUAL(best_match, keywords[keywords.size() - 1]);
 
-    TEST_RESULT_EQUAL(words.size(), 1);
-    TEST_RESULT_EQUAL(tera_type_result, words[0]);
+    return 0;
+}
+
+int test_pokemonSV_TeraTypeReader(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
+    TeraTypeReader reader(COLOR_RED);
+
+    ImageMatch::ImageMatchResult types = reader.read(image);
+    if (types.results.empty()){
+        return 1;
+    }
+    std::string best_match = types.results.begin()->second;
+
+    if (keywords.empty()){
+        return 1;
+    }
+    TEST_RESULT_EQUAL(best_match, keywords[keywords.size() - 1]);
 
     return 0;
 }

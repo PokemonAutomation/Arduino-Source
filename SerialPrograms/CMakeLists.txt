@@ -1215,8 +1215,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeDetector.h
+    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.h
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
@@ -1261,6 +1263,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
+    Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
+    Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
