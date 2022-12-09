@@ -67,6 +67,7 @@
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
 
 
 #include <QPixmap>
@@ -170,6 +171,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+#if 1
+    AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
+    session.dispatch([](BotBaseContext& context){
+//        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 255);
+        pbf_press_button(context, BUTTON_A, 255, 0);
+    });
+    context.wait_for(std::chrono::seconds(2));
+    session.dispatch([](BotBaseContext& context){
+//        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 255);
+        pbf_press_button(context, BUTTON_B, 255, 0);
+    });
+
+#else
+    pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 500);
+    context.wait_for_all_requests();
+    pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 500);
+#endif
+
+//    pbf_press_button(context, BUTTON_B, 500, 10);
+//    pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 500);
+//    context.wait_for_all_requests();
+//    pbf_wait(context, 1);
+//    pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 500);
+
 
 
 #if 0

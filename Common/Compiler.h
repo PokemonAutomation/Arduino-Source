@@ -8,9 +8,7 @@
 #define PokemonAutomation_Compiler_H
 
 //#include <stddef.h>
-#ifdef __cplusplus
 namespace PokemonAutomation{
-#endif
 
 
 #define PA_ALIGNMENT    64
@@ -68,7 +66,5 @@ template <typename type> using r_rref = type &&__restrict__;
 
 
 
-#ifdef __cplusplus
 }
-#endif
 #endif
