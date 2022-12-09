@@ -301,7 +301,7 @@ ImageFloatBox move_sandwich_hand(
         if (last_loc.first < 0){
             speed = std::make_pair(0.0, 0.0);
         } else {
-            std::chrono::microseconds time = cur_time - last_time;
+            std::chrono::microseconds time = std::chrono::duration_cast<std::chrono::microseconds>(cur_time - last_time);
             double time_s = time.count() / 1000000.0;
             std::pair<double, double> moved((cur_loc.first - last_loc.first) * 16, (cur_loc.second - last_loc.second) * 9);
 
