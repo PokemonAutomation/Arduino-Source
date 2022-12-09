@@ -1689,7 +1689,17 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 
 if (MSVC)
-    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib opencv_world460.lib)
+    add_library(OpenCV_lib IMPORTED UNKNOWN)
+    set_target_properties(OpenCV_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE   opencv_world460.lib
+        IMPORTED_LOCATION_DEBUG     opencv_world460d.lib)
+    set_target_properties(OpenCV_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  DEBUG
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib OpenCV_lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
