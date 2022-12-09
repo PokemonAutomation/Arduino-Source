@@ -11,6 +11,7 @@
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
+class QLineEdit;
 
 namespace PokemonAutomation{
 
@@ -127,6 +128,7 @@ protected:
     // When double click, call move_to_new_window() to move to a new window to be ready for full screen.
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void paintEvent(QPaintEvent*) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
     friend class VideoSourceFPS;
@@ -136,8 +138,16 @@ private:
     const size_t m_id;
     CommandReceiver& m_command_receiver;
     VideoOverlaySession& m_overlay_session;
+
     VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay = nullptr;
+
+    QWidget* m_underlay = nullptr;
+    QLineEdit* m_width_box = nullptr;
+    QLineEdit* m_height_box = nullptr;
+    int m_last_width = 0;
+    int m_last_height = 0;
+
     std::unique_ptr<VideoDisplayWindow> m_window;
 
     VideoSourceFPS m_source_fps;

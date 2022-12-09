@@ -6,6 +6,8 @@
 
 #include <QResizeEvent>
 #include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include "Common/Cpp/PrettyPrint.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
@@ -131,6 +133,7 @@ VideoDisplayWidget::VideoDisplayWidget(
     , m_overlay_session(overlay)
     , m_video(camera.make_QtWidget(this))
     , m_overlay(new VideoOverlayWidget(*this, overlay))
+    , m_underlay(new QWidget(this))
     , m_source_fps(*this)
     , m_display_fps(*this)
 {
@@ -146,6 +149,63 @@ VideoDisplayWidget::VideoDisplayWidget(
     m_overlay->setHidden(false);
     m_overlay->raise();
 
+#if 1
+    {
+        m_underlay->setHidden(true);
+        holder.addWidget(m_underlay);
+
+        QVBoxLayout* layout = new QVBoxLayout(m_underlay);
+        layout->setAlignment(Qt::AlignTop);
+
+        QHBoxLayout* row_width = new QHBoxLayout();
+        layout->addLayout(row_width);
+        QHBoxLayout* row_height = new QHBoxLayout();
+        layout->addLayout(row_height);
+
+        row_width->addStretch(2);
+        row_height->addStretch(2);
+        row_width->addWidget(new QLabel("<b>Window Width:</b>", m_underlay), 1);
+        row_height->addWidget(new QLabel("<b>Window Height:</b>", m_underlay), 1);
+
+        m_width_box = new QLineEdit(m_underlay);
+        row_width->addWidget(m_width_box, 1);
+        m_height_box = new QLineEdit(m_underlay);
+        row_height->addWidget(m_height_box, 1);
+
+        row_width->addStretch(2);
+        row_height->addStretch(2);
+
+        connect(
+            m_width_box, &QLineEdit::editingFinished,
+            this, [this]{
+                bool ok;
+                int value = m_width_box->text().toInt(&ok);
+                if (ok && 100 <= value){
+                    m_last_width = value;
+                    if (m_window){
+                        m_window->resize(m_last_width, m_last_height);
+                    }
+                }
+                m_width_box->setText(QString::number(m_last_width));
+            }
+        );
+        connect(
+            m_height_box, &QLineEdit::editingFinished,
+            this, [this]{
+                bool ok;
+                int value = m_height_box->text().toInt(&ok);
+                if (ok && 100 <= value){
+                    m_last_height = value;
+                    if (m_window){
+                        m_window->resize(m_last_width, m_last_height);
+                    }
+                }
+                m_height_box->setText(QString::number(m_last_height));
+            }
+        );
+    }
+#endif
+
     overlay.add_stat(m_source_fps);
     overlay.add_stat(m_display_fps);
 }
@@ -154,6 +214,7 @@ VideoDisplayWidget::~VideoDisplayWidget(){
     move_back_from_window();
     m_overlay_session.remove_stat(m_display_fps);
     m_overlay_session.remove_stat(m_source_fps);
+    delete m_underlay;
 }
 
 
@@ -166,11 +227,13 @@ void VideoDisplayWidget::move_to_new_window(){
     // So there is nothing else to do in VideoDisplayWidget::move_to_new_window() besides building VideoDisplayWindow.
     this->set_size_policy(EXPAND_TO_BOX);
     m_window.reset(new VideoDisplayWindow(this));
+    m_underlay->setHidden(false);
 }
 void VideoDisplayWidget::move_back_from_window(){
     if (!m_window){
         return;
     }
+    m_underlay->setHidden(true);
     this->set_size_policy(ADJUST_HEIGHT_TO_WIDTH);
     m_holder.addWidget(this);
 //    this->resize(this->size());
@@ -199,6 +262,13 @@ void VideoDisplayWidget::paintEvent(QPaintEvent* event){
     WidgetStackFixedAspectRatio::paintEvent(event);
 //    cout << "VideoDisplayWidget: " << this->width() << " x " << this->height() << endl;
 //    cout << "VideoWidget: " << m_video->width() << " x " << m_video->height() << endl;
+}
+void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
+    WidgetStackFixedAspectRatio::resizeEvent(event);
+    m_last_width = this->width();
+    m_last_height = this->height();
+    m_width_box->setText(QString::number(m_last_width));
+    m_height_box->setText(QString::number(m_last_height));
 }
 
 
