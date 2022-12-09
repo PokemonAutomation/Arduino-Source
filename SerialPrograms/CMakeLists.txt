@@ -1691,12 +1691,12 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 if (MSVC)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     set_target_properties(OpenCV_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE   opencv_world460.lib
-        IMPORTED_LOCATION_DEBUG     opencv_world460d.lib)
+        IMPORTED_LOCATION_RELEASE   ../3rdPartyBinaries/opencv_world460.lib
+        IMPORTED_LOCATION_DEBUG     ../3rdPartyBinaries/opencv_world460d.lib)
     set_target_properties(OpenCV_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
-        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  DEBUG
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib OpenCV_lib)
