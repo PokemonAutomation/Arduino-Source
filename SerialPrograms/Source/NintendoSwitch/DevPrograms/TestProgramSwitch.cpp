@@ -172,7 +172,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-#if 1
+
+    auto image = feed.snapshot();
+    SomethingInBoxSlotDetector detector(COLOR_RED, true);
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+
+
+#if 0
     AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
     session.dispatch([](BotBaseContext& context){
 //        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 255);
@@ -185,9 +192,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     });
 
 #else
+#if 0
     pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 500);
     context.wait_for_all_requests();
     pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 500);
+#endif
 #endif
 
 //    pbf_press_button(context, BUTTON_B, 500, 10);

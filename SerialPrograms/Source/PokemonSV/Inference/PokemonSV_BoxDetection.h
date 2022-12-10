@@ -28,7 +28,10 @@ public:
 private:
     bool m_true_if_exists;
     Color m_color;
-    ImageFloatBox m_exists;
+    ImageFloatBox m_right;
+    ImageFloatBox m_top;
+    ImageFloatBox m_bottom;
+    ImageFloatBox m_body;
 };
 class SomethingInBoxSlotWatcher : public DetectorToFinder<SomethingInBoxSlotDetector>{
 public:
