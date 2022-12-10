@@ -16,6 +16,7 @@
 #include "PokemonSwSh_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class CancellableScope;
     class BotBaseContext;
     class ConsoleHandle;
 namespace NintendoSwitch{
@@ -79,7 +80,7 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, CancellableScope& context,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout
 );

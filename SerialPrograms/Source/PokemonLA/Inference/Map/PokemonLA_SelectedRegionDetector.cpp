@@ -89,7 +89,7 @@ private:
 };
 
 
-MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context){
+MapRegion detect_selected_region(ConsoleHandle& console, CancellableScope& context){
     MapLocationDetector detector;
     int ret = wait_until(
         console, context,

@@ -252,7 +252,7 @@ void determine_shiny_status(
 
 void detect_shiny_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, CancellableScope& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     EventNotificationOption& settings,

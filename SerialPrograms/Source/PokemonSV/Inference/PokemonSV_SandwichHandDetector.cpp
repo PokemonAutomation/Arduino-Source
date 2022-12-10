@@ -78,7 +78,7 @@ std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& fram
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_hand_size);
 
     std::pair<double, double> hand_location(-1.0, -1.0);
-    
+
     ImagePixelBox pixel_box = floatbox_to_pixelbox(frame.width(), frame.height(), m_box);
     match_template_by_waterfill(
         extract_box_reference(frame, m_box), 

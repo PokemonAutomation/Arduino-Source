@@ -9,22 +9,22 @@
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
 
 int wait_until(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, CancellableScope& context,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 ){
-    BotBaseContext subcontext(context, console.botbase());
+    CancellableHolder<CancellableScope> subcontext(context);
     InferenceSession session(
         subcontext, console,
         callbacks,

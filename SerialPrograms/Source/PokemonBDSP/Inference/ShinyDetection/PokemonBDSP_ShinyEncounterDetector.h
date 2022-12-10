@@ -17,6 +17,7 @@
 #include "PokemonBDSP_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class CancellableScope;
     class BotBaseContext;
     class ConsoleHandle;
     class ProgramEnvironment;
@@ -120,7 +121,7 @@ private:
 // When a shiny sound is detected, it adds 5.0 to the heighest overall alpha value.
 void detect_shiny_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, CancellableScope& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     EventNotificationOption& settings,
