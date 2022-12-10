@@ -240,6 +240,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
 
     static const std::map<char, char> SUBSTITUTIONS{
         {'I', '1'},
+        {'i', '1'},
         {'l', '1'},
         {'O', '0'},
         {'Z', 'S'},

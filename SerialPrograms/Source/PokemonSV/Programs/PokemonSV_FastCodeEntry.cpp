@@ -68,7 +68,7 @@ FastCodeEntry::FastCodeEntry()
 
 void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     static const std::map<char, char> MAP{
-        {'1', '1'},
+        {'1', '1'}, {'I', '1'}, {'i', '1'},
         {'2', '2'},
         {'3', '3'},
         {'4', '4'},
@@ -77,7 +77,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
         {'7', '7'},
         {'8', '8'},
         {'9', '9'},
-        {'0', '0'},
+        {'0', '0'}, {'O', '1'}, {'o', '1'},
 
         {'Q', 'Q'}, {'q', 'Q'},
         {'W', 'W'}, {'w', 'W'},
@@ -89,7 +89,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
         {'P', 'P'}, {'p', 'P'},
 
         {'A', 'A'}, {'a', 'A'},
-        {'S', 'S'}, {'s', 'S'},
+        {'S', 'S'}, {'s', 'S'}, {'Z', 'S'}, {'z', 'S'},
         {'D', 'D'}, {'d', 'D'},
         {'F', 'F'}, {'f', 'F'},
         {'G', 'G'}, {'g', 'G'},
@@ -100,7 +100,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
 
         {'X', 'X'}, {'x', 'X'},
         {'C', 'C'}, {'c', 'C'},
-        {'V', 'V'}, {'v', 'V'},
+        {'V', 'V'}, {'v', 'V'}, {'\\', 'V'},
         {'B', 'B'}, {'b', 'B'},
         {'N', 'N'}, {'n', 'N'},
         {'M', 'M'}, {'m', 'M'},
