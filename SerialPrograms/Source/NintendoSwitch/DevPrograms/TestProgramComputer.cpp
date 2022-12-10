@@ -75,6 +75,7 @@
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "Common/Cpp/Containers/BoxSet.h"
+#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -151,6 +152,15 @@ private:
 
 
 
+
+
+
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -159,6 +169,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ScheduledTaskRunner scheduler(env.inference_dispatcher());
+
+    scheduler.add_event(std::chrono::seconds(5), []{ cout << "5 seconds" << endl; });
+    scheduler.add_event(std::chrono::seconds(2), []{ cout << "2 seconds" << endl; });
+    scheduler.add_event(std::chrono::seconds(7), []{ cout << "7 seconds" << endl; });
+
+    scope.wait_for(std::chrono::seconds(100));
+
+
+#if 0
     BoxSet<size_t> set;
     cout << set.dump() << endl;
 
@@ -171,7 +191,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     for (; iter != set.end_min_y(); ++iter){
         cout << iter->first << endl;
     }
-
+#endif
 
 //    ImageRGB32 image("SV-Buttons2.png");
 //    WhiteButtonDetector detector(WhiteButton::ButtonB, ImageFloatBox{0, 0, 1, 1});

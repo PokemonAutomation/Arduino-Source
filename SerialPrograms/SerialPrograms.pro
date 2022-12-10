@@ -78,6 +78,7 @@ SOURCES += \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp \
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp \
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp \
     ../Common/Cpp/Concurrency/SpinLock.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
@@ -845,6 +846,7 @@ HEADERS += \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.h \
     ../Common/Cpp/Concurrency/PeriodicScheduler.h \
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.h \
     ../Common/Cpp/Concurrency/SpinLock.h \
     ../Common/Cpp/Concurrency/SpinPause.h \
     ../Common/Cpp/Containers/AlignedMalloc.h \

@@ -116,8 +116,8 @@ bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, Wa
     m_pending_waits--;
 
     //  Thread not started yet. Do this first for strong exception safety.
-    if (!m_task){
-        m_task = m_dispatcher.dispatch([this]{ thread_loop(); });
+    if (!m_runner){
+        m_runner = m_dispatcher.dispatch([this]{ thread_loop(); });
     }
 
     bool ret = m_scheduler.add_event(event, period, start);
@@ -198,7 +198,7 @@ void PeriodicRunner::thread_loop(){
 }
 void PeriodicRunner::stop_thread(){
     PeriodicRunner::cancel(nullptr);
-    m_task.reset();
+    m_runner.reset();
 }
 
 double PeriodicRunner::current_utilization() const{

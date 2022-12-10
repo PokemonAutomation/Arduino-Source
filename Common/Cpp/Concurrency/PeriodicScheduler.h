@@ -101,7 +101,7 @@ private:
 
     PeriodicScheduler m_scheduler;
 
-    std::unique_ptr<AsyncTask> m_task;
+    std::unique_ptr<AsyncTask> m_runner;
 };
 
 

@@ -150,9 +150,6 @@ using namespace Kernels::Waterfill;
 
 
 
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;

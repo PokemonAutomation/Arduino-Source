@@ -73,6 +73,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Concurrency/ParallelTaskRunner.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
     ../Common/Cpp/Concurrency/PeriodicScheduler.h
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
+    ../Common/Cpp/Concurrency/ScheduledTaskRunner.h
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
