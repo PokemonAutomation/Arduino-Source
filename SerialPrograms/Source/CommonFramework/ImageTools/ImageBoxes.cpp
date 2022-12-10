@@ -179,8 +179,8 @@ ImageFloatBox translate_to_parent(
 
 ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloatBox& float_box){
     return ImagePixelBox(
-        (size_t)(width * float_box.x + 0.5),
-        (size_t)(height * float_box.y + 0.5),
+        (size_t)std::max<double>(width * float_box.x + 0.5, 0),
+        (size_t)std::max<double>(height * float_box.y + 0.5, 0),
         (size_t)(width * (float_box.x + float_box.width) + 0.5),
         (size_t)(height * (float_box.y + float_box.height) + 0.5)
     );
