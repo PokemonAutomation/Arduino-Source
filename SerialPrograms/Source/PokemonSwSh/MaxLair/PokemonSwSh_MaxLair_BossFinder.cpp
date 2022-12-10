@@ -67,7 +67,8 @@ public:
 
 
 MaxLairBossFinder::MaxLairBossFinder()
-    : GO_HOME_WHEN_DONE(false)
+    : MultiSwitchProgramInstance({"Notifs", "LiveHost"})
+    , GO_HOME_WHEN_DONE(false)
     , CONSOLES(MaxLairBossFinder_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})

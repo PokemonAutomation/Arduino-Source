@@ -241,6 +241,9 @@ std::vector<std::string> EventNotificationOption::tags() const{
     return parse_tags(m_data->m_tags);
 }
 
+//void EventNotificationOption::set_tags(std::vector<std::string> tags){
+//    m_data->m_tags.set(tags_to_str(tags));
+//}
 
 void EventNotificationOption::set_global_enable(bool enabled){
     m_data->m_global_enable.store(enabled, std::memory_order_release);

@@ -82,7 +82,8 @@ std::unique_ptr<StatsTracker> AutoHost_Descriptor::make_stats() const{
 
 
 AutoHost::AutoHost()
-    : MODE(
+    : SingleSwitchProgramInstance({"Notifs", "LiveHost"})
+    , MODE(
         "<b>Hosting Mode:</b>",
         {
             {Mode::LOCAL,           "local",            "Host Locally"},
@@ -142,7 +143,7 @@ AutoHost::AutoHost()
     )
     , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
-    , NOTIFICATIONS({
+    , NOTIFICATIONS0({
         &NOTIFICATION_RAID_POST,
         &NOTIFICATION_RAID_START,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -161,7 +162,7 @@ AutoHost::AutoHost()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(IGNORE_WHITELIST);
     }
-    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_OPTION(NOTIFICATIONS0);
 }
 
 

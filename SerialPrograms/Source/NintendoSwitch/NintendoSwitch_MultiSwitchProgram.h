@@ -122,7 +122,9 @@ public:
     MultiSwitchProgramInstance(const MultiSwitchProgramInstance&) = delete;
     void operator=(const MultiSwitchProgramInstance&) = delete;
 
-    MultiSwitchProgramInstance();
+    MultiSwitchProgramInstance(
+        const std::vector<std::string>& error_notification_tags = {"Notifs"}
+    );
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 

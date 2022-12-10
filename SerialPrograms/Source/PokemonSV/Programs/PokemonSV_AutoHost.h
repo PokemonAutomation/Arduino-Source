@@ -74,7 +74,7 @@ private:
 
     EventNotificationOption NOTIFICATION_RAID_POST;
     EventNotificationOption NOTIFICATION_RAID_START;
-    EventNotificationsOption NOTIFICATIONS;
+    EventNotificationsOption NOTIFICATIONS0;
 };
 
 

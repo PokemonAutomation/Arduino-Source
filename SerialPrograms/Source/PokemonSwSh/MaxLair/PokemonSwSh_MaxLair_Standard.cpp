@@ -84,7 +84,8 @@ public:
 
 
 MaxLairStandard::MaxLairStandard()
-    : GO_HOME_WHEN_DONE(false)
+    : MultiSwitchProgramInstance({"Notifs", "LiveHost"})
+    , GO_HOME_WHEN_DONE(false)
     , CONSOLES(MaxLairStandard_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})

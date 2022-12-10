@@ -88,19 +88,21 @@ std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 
-MultiSwitchProgramInstance::MultiSwitchProgramInstance()
+MultiSwitchProgramInstance::MultiSwitchProgramInstance(
+    const std::vector<std::string>& error_notification_tags
+)
     : m_options(LockWhileRunning::UNLOCKED)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
         true, false,
         ImageAttachmentMode::PNG,
-        {"Notifs"}
+        error_notification_tags
     )
     , NOTIFICATION_ERROR_FATAL(
         "Program Error (Fatal)",
         true, true,
-        {"Notifs"}
+        error_notification_tags
     )
 {}
 void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){

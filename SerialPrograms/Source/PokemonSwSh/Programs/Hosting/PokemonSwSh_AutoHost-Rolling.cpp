@@ -44,7 +44,8 @@ std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
 
 
 AutoHostRolling::AutoHostRolling()
-    : RAID_CODE(8)
+    : SingleSwitchProgramInstance({"Notifs", "LiveHost"})
+    , RAID_CODE(8)
     , SKIPS("<b>Day Skips:</b>", LockWhileRunning::LOCKED, 3)
     , BACKUP_SAVE(
         "<b>Load Backup Save:</b><br>For backup save soft-locking method.",

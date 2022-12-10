@@ -62,6 +62,8 @@ public:
     ImageAttachmentMode screenshot  () const;
     std::vector<std::string> tags   () const;
 
+//    void set_tags(std::vector<std::string> tags);
+
     void set_global_enable(bool enabled);
     void reset_rate_limit();
 

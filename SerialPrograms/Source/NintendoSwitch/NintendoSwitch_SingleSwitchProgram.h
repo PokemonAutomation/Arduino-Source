@@ -105,7 +105,9 @@ public:
     SingleSwitchProgramInstance(const SingleSwitchProgramInstance&) = delete;
     void operator=(const SingleSwitchProgramInstance&) = delete;
 
-    SingleSwitchProgramInstance();
+    SingleSwitchProgramInstance(
+        const std::vector<std::string>& error_notification_tags = {"Notifs"}
+    );
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
 

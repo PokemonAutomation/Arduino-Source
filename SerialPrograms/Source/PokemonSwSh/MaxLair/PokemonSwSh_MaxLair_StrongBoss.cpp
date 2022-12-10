@@ -102,7 +102,8 @@ public:
 
 
 MaxLairStrongBoss::MaxLairStrongBoss()
-    : GO_HOME_WHEN_DONE(false)
+    : MultiSwitchProgramInstance({"Notifs", "LiveHost"})
+    , GO_HOME_WHEN_DONE(false)
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
