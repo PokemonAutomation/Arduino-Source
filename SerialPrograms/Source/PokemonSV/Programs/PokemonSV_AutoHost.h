@@ -69,7 +69,8 @@ private:
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
     BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
-    PlayerListTable BAN_LIST;
+    RaidPlayerBanList BAN_LIST;
+    BooleanCheckBoxOption IGNORE_WHITELIST;
 
     EventNotificationOption NOTIFICATION_RAID_POST;
     EventNotificationOption NOTIFICATION_RAID_START;

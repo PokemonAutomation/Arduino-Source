@@ -56,6 +56,8 @@ struct TeraLobbyNameMatchResult{
     std::string raw_ocr;
     std::string normalized_ocr;
     double log10p;
+    bool exact_match;
+    std::string notes;
 
     std::string to_str() const;
 };
@@ -80,7 +82,7 @@ public:
         std::vector<TeraLobbyNameMatchResult>& match_list,
         const std::vector<PlayerListRowSnapshot>& ban_list,
         const ImageViewRGB32& screen,
-        bool include_host
+        bool include_host, bool ignore_whitelist
     ) const;
 
 private:
@@ -92,7 +94,8 @@ private:
         Logger& logger,
         std::vector<TeraLobbyNameMatchResult>& matches,
         std::map<Language, CacheEntry>& cache, const ImageViewRGB32& image,
-        const PlayerListRowSnapshot& entry
+        const PlayerListRowSnapshot& entry,
+        bool ignore_whitelist
     ) const;
 
 
@@ -133,7 +136,11 @@ private:
 };
 class TeraLobbyBanWatcher : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyBanWatcher(Logger& logger, Color color, PlayerListTable& table, bool include_host);
+    TeraLobbyBanWatcher(
+        Logger& logger, Color color,
+        PlayerListTable& table,
+        bool include_host, bool ignore_whitelist
+    );
 
     std::vector<TeraLobbyNameMatchResult> detected_banned_players() const;
 
@@ -144,6 +151,7 @@ private:
     Logger& m_logger;
     PlayerListTable& m_table;
     bool m_include_host;
+    bool m_ignore_whitelist;
     mutable std::mutex m_lock;
     std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };

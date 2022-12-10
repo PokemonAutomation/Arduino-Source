@@ -134,16 +134,11 @@ AutoHost::AutoHost()
         "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
-    , BAN_LIST(
-        "<b>Ban List:</b><br>Ban these people from this raid. "
-        "If anyone's name matches anything in this table, the raid will be reset.<br>"
-        "The last column is a tuning parameter that specifies how well the name needs to match. "
-        "Optical Character Recognition (OCR) is imperfect. So exact matches are rare and unreliable. "
-        "The value is the estimated log10 probability of matching by chance against random characters. "
-        "It is always negative. Lower value means the match needs to be more perfect to be a match.<br><br>"
-        "If you are getting false positive hits, decrease this value. (make it more negative)<br>"
-        "If it is failing to match, increase this value. (make it less negative)",
-        LockWhileRunning::UNLOCKED
+    , BAN_LIST(LockWhileRunning::UNLOCKED)
+    , IGNORE_WHITELIST(
+        "<b>Ignore Whitelist:</b><br>Ignore the developer whitelist.",
+        LockWhileRunning::UNLOCKED,
+        false
     )
     , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
@@ -163,6 +158,9 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(TRY_TO_TERASTILIZE);
     PA_ADD_OPTION(BAN_LIST);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(IGNORE_WHITELIST);
+    }
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -290,7 +288,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-        TeraLobbyBanWatcher ban_watcher(env.logger(), COLOR_RED, BAN_LIST, true);
+        TeraLobbyBanWatcher ban_watcher(env.logger(), COLOR_RED, BAN_LIST, true, IGNORE_WHITELIST);
         context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(
@@ -347,6 +345,10 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.log("Banned User: " + user.to_str(), COLOR_RED);
                 message += user.to_str();
                 message += "\n";
+                if (!user.notes.empty()){
+                    message += "Reason: " + user.notes;
+                    message += "\n";
+                }
             }
             stats.m_banned += detected_banned_players.size();
             send_program_notification(
