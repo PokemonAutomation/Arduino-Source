@@ -100,7 +100,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
 
         {'X', 'X'}, {'x', 'X'},
         {'C', 'C'}, {'c', 'C'},
-        {'V', 'V'}, {'v', 'V'}, {'\\', 'V'},
+        {'V', 'V'}, {'v', 'V'},
         {'B', 'B'}, {'b', 'B'},
         {'N', 'N'}, {'n', 'N'},
         {'M', 'M'}, {'m', 'M'},
