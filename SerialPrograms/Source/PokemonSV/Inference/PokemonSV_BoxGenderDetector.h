@@ -12,7 +12,7 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace PokemonSV{
 
 
 class BoxGenderDetector : public Pokemon::BoxGenderDetector{

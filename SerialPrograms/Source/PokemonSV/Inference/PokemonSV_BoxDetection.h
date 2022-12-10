@@ -20,7 +20,7 @@ namespace PokemonSV{
 //  Detect whether the cursor is over a Pokemon in the box.
 class SomethingInBoxSlotDetector : public StaticScreenDetector{
 public:
-    SomethingInBoxSlotDetector(Color color, bool true_if_exists);
+    SomethingInBoxSlotDetector(Color color, bool true_if_exists = true);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -42,11 +42,12 @@ public:
 
 
 
-//  Detect whether you have a Pokemon selected in the box system.
+//  Detect whether you have a Pokemon with its menu open in the box system.
 class BoxSelectDetector : public StaticScreenDetector{
 public:
     BoxSelectDetector(Color color);
 
+    // If there is a pokemon/egg in the current slot in box or party, while in box system view
     bool exists(const ImageViewRGB32& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -70,12 +71,13 @@ public:
 
 enum class BoxCursorLocation{
     NONE,
-    PARTY,
-    BOX_CHANGE,
-    ALL_BOXES,
-    SEARCH,
-    SLOTS,
+    PARTY,      // player's party
+    BOX_CHANGE, // on the box title bar
+    ALL_BOXES,  // bottom-middle "All Boxes" button
+    SEARCH,     // bottom-right "Search" button
+    SLOTS,      // one of the 5 x 6 slots in the box
 };
+
 struct BoxCursorCoordinates{
     uint8_t row;
     uint8_t col;
@@ -89,7 +91,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
     std::pair<BoxCursorLocation, BoxCursorCoordinates> detect_location(const ImageViewRGB32& screen) const;
 
-    //  While sitting on the menu, move the cursor to the desired slot.
+    //  While in the box system view, move the cursor to the desired slot.
     void move_cursor(
         ConsoleHandle& console, BotBaseContext& context,
         BoxCursorLocation side, uint8_t row, uint8_t col

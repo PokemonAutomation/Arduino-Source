@@ -50,6 +50,14 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 //  Will throw OperationFailedException.
 void leave_picnic(ConsoleHandle& console, BotBaseContext& context);
 
+//  Enter box system from overworld.
+//  Will throw OperationFailedException.
+void enter_box_system_from_overworld(ConsoleHandle& console, BotBaseContext& context);
+
+//  From box system go to overworld.
+//  Will throw OperationFailedException.
+void leave_box_system_to_overworld(ConsoleHandle& console, BotBaseContext& context);
+
 }
 }
 }

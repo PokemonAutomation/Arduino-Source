@@ -27,7 +27,6 @@ template class FixedLimitVector<NintendoSwitch::PokemonSV::GradientArrowWatcher>
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
 SandwichRecipeNumberDetector::SandwichRecipeNumberDetector(Logger& logger, Color color): m_logger(logger), m_color(color){
     for(int y = 0; y < 3; y++){
         for(int x = 0; x < 2; x++){

@@ -16,6 +16,17 @@
 using std::cout;
 using std::endl;
 
+// #define DEBUG_STACK_TRACE
+
+#ifdef DEBUG_STACK_TRACE
+
+#if defined(__APPLE__)
+#include <execinfo.h>
+#include <stdio.h>
+#endif
+
+#endif // DEBUG_STACK_TRACE
+
 namespace PokemonAutomation{
 
 
@@ -128,6 +139,22 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
 }
 
 bool PABotBase::try_stop_all_commands(){
+
+#ifdef DEBUG_STACK_TRACE
+    cout << __FILE__ << ":" << __LINE__ <<  " PABotBase::try_stop_all_commands()" << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+#if defined(__APPLE__)
+    void* callstack[128];
+    int i, frames = backtrace(callstack, 128);
+    char** strs = backtrace_symbols(callstack, frames);
+    for (i = 0; i < frames; ++i) {
+        cout << strs[i] << endl;
+    }
+    free(strs);
+#endif
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+#endif
+
     m_sanitizer.check_usage();
 
     uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true, MAX_PENDING_REQUESTS);
@@ -139,6 +166,22 @@ bool PABotBase::try_stop_all_commands(){
     }
 }
 void PABotBase::stop_all_commands(){
+
+#ifdef DEBUG_STACK_TRACE
+    cout << __FILE__ << ":" << __LINE__ <<  " PABotBase::stop_all_commands()" << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+#if defined(__APPLE__)
+    void* callstack[128];
+    int i, frames = backtrace(callstack, 128);
+    char** strs = backtrace_symbols(callstack, frames);
+    for (i = 0; i < frames; ++i) {
+        cout << strs[i] << endl;
+    }
+    free(strs);
+#endif
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+#endif
+
     m_sanitizer.check_usage();
 
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);

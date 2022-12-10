@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -15,6 +14,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassRelease.h"
 
 namespace PokemonAutomation{
@@ -84,86 +84,21 @@ MassRelease::MassRelease()
 void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
-    context.wait_for_all_requests();
-
     env.log("Selecting " + STRING_POKEMON + "...");
-    {
-        BoxSelectWatcher selected(COLOR_RED);
-        if (!selected.exists(env.console.video().snapshot())){
-            stats.m_empty++;
-            env.log("Slot is empty.");
-            return;
-        }
-        int ret = run_until(
-            env.console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_A, 20, 230);
-            },
-            {selected}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            dump_image(
-                env.console, env.program_info(),
-                "SelectionArrowNotFound",
-                env.console.video().snapshot()
-            );
-            throw OperationFailedException(env.logger(), "Unable to detect selection arrow.");
-        }
-        context.wait_for(std::chrono::milliseconds(100));
+    
+    bool released = false;
+    try {
+        released = release_one_pokemon(env, env.console, context);
+    } catch(OperationFailedException& e){
+        stats.m_errors++;
+        throw e;
     }
 
-    pbf_press_dpad(context, DPAD_UP, 20, 30);
-    pbf_press_dpad(context, DPAD_UP, 20, 30);
-    context.wait_for_all_requests();
-
-    env.log("Releasing...");
-    {
-        PromptDialogWatcher confirm(COLOR_CYAN);
-        int ret = run_until(
-            env.console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_A, 20, 230);
-            },
-            {confirm}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            dump_image(
-                env.console, env.program_info(),
-                "ConfirmationNotFound",
-                env.console.video().snapshot()
-            );
-            throw OperationFailedException(env.logger(), "Release confirmation not found.");
-        }
-        context.wait_for(std::chrono::milliseconds(500));
+    if (released){
+        stats.m_released++;
+    } else {
+        stats.m_empty++;
     }
-
-    pbf_press_dpad(context, DPAD_UP, 20, 30);
-    context.wait_for_all_requests();
-
-    env.log("Waiting for release to finish...");
-    {
-        SomethingInBoxSlotWatcher done_releasing(COLOR_RED, false);
-        int ret = run_until(
-            env.console, context,
-            [](BotBaseContext& context){
-                pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
-            },
-            {done_releasing}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            dump_image(
-                env.console, env.program_info(),
-                "ReleaseFailed",
-                env.console.video().snapshot()
-            );
-            throw OperationFailedException(env.logger(), "Unable to release " + STRING_POKEMON + ".");
-        }
-        context.wait_for(std::chrono::milliseconds(100));
-    }
-    stats.m_released++;
 }
 void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     for (uint8_t row = 0; row < 5; row++){

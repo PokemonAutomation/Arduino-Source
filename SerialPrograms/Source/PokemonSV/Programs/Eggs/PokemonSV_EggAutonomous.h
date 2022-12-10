@@ -44,15 +44,27 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    size_t hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
 
-    void collect_eggs_at_pokemon_league(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void collect_eggs_at_picnic(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void move_circles_to_hatch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
+
+    uint8_t read_party_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void open_map(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void fly_to_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void enter_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void leave_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
 
@@ -81,8 +93,6 @@ private:
         EveryBatch,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
-
-    SimpleIntegerOption<uint8_t> MAX_NUM_BOXES;
 
     Pokemon::EggHatchFilterTable FILTERS;
 

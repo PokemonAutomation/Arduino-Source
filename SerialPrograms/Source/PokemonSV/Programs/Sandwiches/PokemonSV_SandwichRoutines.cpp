@@ -211,7 +211,12 @@ namespace {
 
 // expand the hand bounding box so that the hand watcher can pick the hand in the next iteration
 ImageFloatBox expand_box(const ImageFloatBox& box){
-    return ImageFloatBox(box.x - box.width, box.y - box.height, box.width*3, box.height*3);
+    return ImageFloatBox(box.x - box.width * 1.5, box.y - box.height * 1.5, box.width*4, box.height*4);
+}
+
+ImageFloatBox hand_location_to_box(const std::pair<double, double>& loc){
+    const double hand_width = 0.071, hand_height = 0.106;
+    return {loc.first - hand_width/2, loc.second - hand_height/2, hand_width, hand_height};
 }
 
 std::string box_to_string(const ImageFloatBox& box){
@@ -233,13 +238,17 @@ ImageFloatBox move_sandwich_hand(
     env.log(std::string("Start moving sandwich hand: ") + ((hand_type == SandwichHandType::FREE) ? "FREE" : "GRABBING")
         + " start box " + box_to_string(start_box) + " end box " + box_to_string(end_box));
 
+    
+    uint8_t joystick_x = 128;
+    uint8_t joystick_y = 128;
+
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
     AsyncCommandSession move_session(context, console.logger(), env.realtime_dispatcher(), console.botbase());
     
     if (pressing_A){
-        move_session.dispatch([&](BotBaseContext& context){
+        move_session.dispatch([](BotBaseContext& context){
             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
         });
     }
@@ -261,10 +270,8 @@ ImageFloatBox move_sandwich_hand(
         console.log("Hand location: " + std::to_string(cur_loc.first) + ", " + std::to_string(cur_loc.second));
         cur_time = current_time();
 
-        const double hand_width = 0.071, hand_height = 0.106;
-        const ImageFloatBox hand_bb(cur_loc.first - hand_width/2, cur_loc.second - hand_height/2, hand_width, hand_height);
+        const ImageFloatBox hand_bb = hand_location_to_box(cur_loc); 
         const ImageFloatBox expanded_hand_bb = expand_box(hand_bb);
-        console.log("Hand bb " + box_to_string(hand_bb) + " expanded " + box_to_string(expanded_hand_bb));
         hand_watcher.change_box(expanded_hand_bb);
 
         overlay_set.clear();
@@ -272,7 +279,7 @@ ImageFloatBox move_sandwich_hand(
         overlay_set.add(COLOR_BLUE, expanded_hand_bb);
 
         std::pair<double, double> dif(target_loc.first - cur_loc.first, target_loc.second - cur_loc.second);
-        console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
+        // console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
         if (std::fabs(dif.first) < end_box.width/2 && std::fabs(dif.second) < end_box.height/2){
             console.log("Free hand reached target.");
             move_session.stop_session_and_rethrow(); // Stop the commands
@@ -286,8 +293,8 @@ ImageFloatBox move_sandwich_hand(
         // Assume screen width is 16.0, then the screen height is 9.0
         std::pair<double, double> real_dif(dif.first * 16, dif.second * 9);
         double distance = std::sqrt(real_dif.first * real_dif.first + real_dif.second * real_dif.second);
-        console.log("scaled diff to target: " + std::to_string(real_dif.first) + ", " + std::to_string(real_dif.second)
-            + " distance " + std::to_string(distance));
+        // console.log("scaled diff to target: " + std::to_string(real_dif.first) + ", " + std::to_string(real_dif.second)
+        //     + " distance " + std::to_string(distance));
 
         // Build a P-D controller!
 
@@ -296,7 +303,7 @@ ImageFloatBox move_sandwich_hand(
         double target_joystick_push = std::min(distance * 32, 128.0);
 
         std::pair<double, double> push(real_dif.first * target_joystick_push / distance, real_dif.second * target_joystick_push / distance);
-        console.log("push force " + std::to_string(push.first) + ", " + std::to_string(push.second));
+        // console.log("push force " + std::to_string(push.first) + ", " + std::to_string(push.second));
 
         if (last_loc.first < 0){
             speed = std::make_pair(0.0, 0.0);
@@ -305,6 +312,7 @@ ImageFloatBox move_sandwich_hand(
             double time_s = time.count() / 1000000.0;
             std::pair<double, double> moved((cur_loc.first - last_loc.first) * 16, (cur_loc.second - last_loc.second) * 9);
 
+            // Currently set to zero damping as it seems we don't need them for now
             double damping_factor = 0.0;
             double damping_multiplier = (-1.0) * damping_factor / time_s;
             std::pair<double, double> damped_push_offset(moved.first * damping_multiplier, moved.second * damping_multiplier);
@@ -313,13 +321,14 @@ ImageFloatBox move_sandwich_hand(
             push.second += damped_push_offset.second;
         }
 
-        uint8_t joystick_x = (uint8_t) std::max(std::min(int(push.first + 0.5) + 128, 255), 0);
-        uint8_t joystick_y = (uint8_t) std::max(std::min(int(push.second + 0.5) + 128, 255), 0);
-        console.log("joystick push " + std::to_string(joystick_x) + ", " + std::to_string(joystick_y));
+        joystick_x = (uint8_t) std::max(std::min(int(push.first + 0.5) + 128, 255), 0);
+        joystick_y = (uint8_t) std::max(std::min(int(push.second + 0.5) + 128, 255), 0);
+        // console.log("joystick push " + std::to_string(joystick_x) + ", " + std::to_string(joystick_y));
 
         // Dispatch a new series of commands that overwrites the last ones
         move_session.dispatch([&](BotBaseContext& context){
             if (pressing_A){
+                // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
                 pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 1000);
             }
             else{
@@ -340,13 +349,13 @@ ImageFloatBox move_sandwich_hand(
 void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
 
     const ImageFloatBox initial_box{0.440, 0.455, 0.112, 0.179};
-    const ImageFloatBox ingredient_box{0.455, 0.090, 0.090, 0.089};
+    const ImageFloatBox ingredient_box{0.455, 0.130, 0.090, 0.030};
 
-    const ImageFloatBox sandwich_target_box_left{0.386, 0.500, 0.060, 0.069};
-    const ImageFloatBox sandwich_target_box_middle{0.470, 0.500, 0.060, 0.069};
-    const ImageFloatBox sandwich_target_box_right{0.554, 0.500, 0.060, 0.069};
+    const ImageFloatBox sandwich_target_box_left  {0.386, 0.507, 0.060, 0.055};
+    const ImageFloatBox sandwich_target_box_middle{0.470, 0.507, 0.060, 0.055};
+    const ImageFloatBox sandwich_target_box_right {0.554, 0.507, 0.060, 0.055};
 
-    const ImageFloatBox upper_bread_drop_box{0.482, 0.363, 0.036, 0.045};
+    const ImageFloatBox upper_bread_drop_box{0.482, 0.400, 0.036, 0.030};
 
     SandwichHandWatcher free_hand(SandwichHandType::FREE, initial_box);
     int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
@@ -354,40 +363,77 @@ void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& c
         throw OperationFailedException(console.logger(), "make_great_peanut_butter_sandwich(): Cannot detect starting hand.");
     }
 
+    console.overlay().add_log("Pick first banana", COLOR_WHITE);
     auto end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
 
+    console.overlay().add_log("Drop first banana", COLOR_WHITE);
+    // visual feedback grabbing is not reliable. Switch to blind grabbing:
     end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-
-    // XXX test combination of commands in the main thread
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 100);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 30);
-
     
+    // XXX DEBUG ingredient dropping!
+    // {
+    //     AsyncCommandSession move_session(context, console.logger(), env.realtime_dispatcher(), console.botbase());
+    //     move_session.dispatch([&](BotBaseContext& context){
+    //         pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
+    //     });
+
+    //     for(int i = 0; i < 20; i++){
+    //         move_session.dispatch([&](BotBaseContext& context){
+    //             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100 - i/5, 200 + i/3, 128, 128, 1000);
+    //         });
+    //         context.wait_for(std::chrono::milliseconds(100));
+    //     }
+    // }
     
-    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
-    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
-    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, expand_box(end_box), ingredient_box);
-    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100, 200, 128, 128, 120);
+    // context.wait_for(std::chrono::milliseconds(100));
+    // context.wait_for_all_requests();
 
-    // // Drop upper bread and pick
-    // end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, false, expand_box(end_box), upper_bread_drop_box);
-    // pbf_mash_button(context, BUTTON_A, 125 * 5);
+    console.overlay().add_log("Pick second banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
 
-    console.log("End box " + box_to_string(end_box));
+    console.overlay().add_log("Drop second banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 200, 128, 128, 120);
+    // context.wait_for(std::chrono::milliseconds(100));
+    // context.wait_for_all_requests();
+
+    console.overlay().add_log("Pick third banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    
+    console.overlay().add_log("Drop third banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 156, 200, 128, 128, 120);
+    // context.wait_for(std::chrono::milliseconds(100));
+    // context.wait_for_all_requests();
+
+    // Drop upper bread and pick
+    console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
+    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
+    ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
+    if (ret < 0){
+        throw OperationFailedException(console.logger(), "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.");
+    }
+
+    auto hand_box = hand_location_to_box(grabbing_hand.location());
+
+    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
+    pbf_mash_button(context, BUTTON_A, 125 * 5);
+
+    console.log("Hand end box " + box_to_string(end_box));
+    console.overlay().add_log("Built sandwich", COLOR_WHITE);
 
     context.wait_for_all_requests();
 }
 
 void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context){
+    console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
-            for(int i = 0; i < 60; i++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+            for(int i = 0; i < 20; i++){
+                pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND - 20);
             }
         },
         {picnic_watcher}
@@ -395,6 +441,7 @@ void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context){
     if (ret < 0){
         throw OperationFailedException(console.logger(), "finish_sandwich_eating(): cannot detect picnic after 60 seconds.");
     }
+    console.overlay().add_log("Finish eating", COLOR_WHITE);
     context.wait_for(std::chrono::seconds(1));
 }
 

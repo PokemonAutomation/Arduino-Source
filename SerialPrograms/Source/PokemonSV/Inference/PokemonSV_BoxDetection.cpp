@@ -25,7 +25,7 @@ SomethingInBoxSlotDetector::SomethingInBoxSlotDetector(Color color, bool true_if
     , m_color(color)
     , m_right(0.985, 0.010, 0.010, 0.050)
     , m_top(0.660, 0.005, 0.330, 0.006)
-    , m_bottom(0.660, 0.063, 0.330, 0.005)
+    , m_bottom(0.660, 0.064, 0.330, 0.005)
     , m_body(0.670, 0.010, 0.060, 0.050)
 {}
 void SomethingInBoxSlotDetector::make_overlays(VideoOverlaySet& items) const{
@@ -36,25 +36,26 @@ void SomethingInBoxSlotDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool SomethingInBoxSlotDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
-//    cout << right.average << right.stddev << endl;
+    // cout << right.average << right.stddev << endl;
     if (!is_solid(right, {0.533473, 0.466527, 0.0})){
-//        cout << "asdf" << endl;
+        // cout << "asdf" << endl;
         return !m_true_if_exists;
     }
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
-//    cout << top.average << top.stddev << endl;
+    // cout << top.average << top.stddev << endl;
     if (!is_solid(top, {0.533473, 0.466527, 0.0})){
-//        cout << "qwer" << endl;
+        // cout << "qwer" << endl;
         return !m_true_if_exists;
     }
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-//    cout << bottom.average << bottom.stddev << endl;
-    if (!is_solid(bottom, {0.533473, 0.466527, 0.0})){
-//        cout << "zxcv" << endl;
+    // cout << bottom.average << bottom.stddev << endl;
+    // extract_box_reference(screen, m_bottom).save("./tmp_bottom.png");
+    if (!is_solid(bottom, {0.533473, 0.466527, 0.0}, 0.15, 15.0)){
+        // cout << "zxcv" << endl;
         return !m_true_if_exists;
     }
     ImageStats body = image_stats(extract_box_reference(screen, m_body));
-//    cout << body.average << body.stddev << endl;
+    // cout << body.average << body.stddev << endl;
     if (body.stddev.sum() < 100){
         return !m_true_if_exists;
     }

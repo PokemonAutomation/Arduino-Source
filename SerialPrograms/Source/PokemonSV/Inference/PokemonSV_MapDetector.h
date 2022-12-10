@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 
 // It detects the orange exit map button background on upper right corner of the map.
-// Note: if the map is during zooming, thise area becomes gray and will not be detected.
+// Note: if the map is during zooming or having a menu opened, thise area becomes gray and will not be detected.
 class MapExitDetector : public StaticScreenDetector{
 public:
     MapExitDetector(Color color = COLOR_RED);

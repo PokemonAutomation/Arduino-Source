@@ -24,11 +24,19 @@ public:
 
 
 //  Wrap a detector into a finder.
-//  This one requires the detector to return true consecutively for X time
-//  before returning true.
+//  This one requires the detector to return the same result consecutively for X time
+//  before returning true from process_frame().
 template <typename Detector>
 class DetectorToFinder : public Detector, public VisualInferenceCallback{
 public:
+    // whether a finder is to find an object is detected by the detector or find
+    // that it's no longer detected.
+    enum class FinderType {
+        PRESENT,    // process_frame() returns true only when detected consecutively
+        GONE,       // process_frame() returns true only when not detected consecutively
+        CONSISTENT, // process_frame() returns true when detected consecutively or not detected consecutively
+    };
+
     template <class... Args>
     DetectorToFinder(
         std::string label,
@@ -38,26 +46,70 @@ public:
         : Detector(std::forward<Args>(args)...)
         , VisualInferenceCallback(std::move(label))
         , m_duration(duration)
+        , m_finder_type(FinderType::PRESENT)
+    {}
+
+    
+    template <class... Args>
+    DetectorToFinder(
+        std::string label,
+        FinderType finder_type,
+        std::chrono::milliseconds duration,
+        Args&&... args
+    )
+        : Detector(std::forward<Args>(args)...)
+        , VisualInferenceCallback(std::move(label))
+        , m_duration(duration)
+        , m_finder_type(finder_type)
     {}
 
     virtual void make_overlays(VideoOverlaySet& items) const override{
         Detector::make_overlays(items);
     }
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
-        if (!this->detect(frame)){
-            m_start_of_detection = WallClock::min();
-            return false;
-        }
-        if (m_start_of_detection == WallClock::min()){
-            m_start_of_detection = timestamp;
-        }
 
-        return timestamp - m_start_of_detection >= m_duration;
+    // If m_finder_type is PRESENT, return true only when it is consecutively detectd.
+    // If m_finder_type is GONE, return true only when it  is consecutively not detected.
+    // if m_finder_type is CONSISTENT, return true when it is consecutively detected, or consectuively not detected.
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        switch (m_finder_type){
+        case FinderType::PRESENT:
+        case FinderType::GONE:
+            if (this->detect(frame) == (m_finder_type == FinderType::GONE)){
+                m_start_of_detection = WallClock::min();
+                return false;
+            }
+            if (m_start_of_detection == WallClock::min()){
+                m_start_of_detection = timestamp;
+            }
+            return timestamp - m_start_of_detection >= m_duration;
+        case FinderType::CONSISTENT:
+            {
+                const bool result = this->detect(frame);
+                const bool result_changed = (result && m_last_detected < 0) || (!result && m_last_detected > 0);
+
+                m_last_detected = (result ? 1 : -1);
+
+                if (result_changed){    
+                    m_start_of_detection = WallClock::min();
+                    return false;
+                }
+                if (m_start_of_detection == WallClock::min()){
+                    m_start_of_detection = timestamp;
+                }
+                return timestamp - m_start_of_detection >= m_duration;
+            }
+        }
     }
+
+    // If m_finder_type is CONSISTENT and process_frame() returns true,
+    // whether it is consecutively detected , or consecutively not detected.
+    bool consistent_result() const { return m_last_detected > 0; }
 
 private:
     std::chrono::milliseconds m_duration;
+    FinderType m_finder_type;
     WallClock m_start_of_detection = WallClock::min();
+    int8_t m_last_detected = 0; // 0: no prior detection, 1: last detected positive, -1: last detected negative
 };
 
 

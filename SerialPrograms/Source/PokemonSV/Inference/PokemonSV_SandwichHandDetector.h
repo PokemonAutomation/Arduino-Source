@@ -48,7 +48,7 @@ class SandwichHandWatcher : public VisualInferenceCallback{
 public:
     using HandType = SandwichHandType;
 
-    SandwichHandWatcher(SandwichHandLocator::HandType hand_type, const ImageFloatBox& box, Color color = COLOR_RED);
+    SandwichHandWatcher(HandType hand_type, const ImageFloatBox& box, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 

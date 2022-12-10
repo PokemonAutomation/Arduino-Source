@@ -9,13 +9,13 @@
 #include "PokemonSwSh_Tests.h"
 #include "TestUtils.h"
 
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -119,7 +119,8 @@ int test_pokemonSwSh_BoxShinySymbolDetector(const ImageViewRGB32& image, bool ta
 }
 
 int test_pokemonSwSh_BoxGenderDetector(const ImageViewRGB32& image, int target){
-    const int result = int(BoxGenderDetector::detect(image));
+    BoxGenderDetector detector;
+    const int result = int(detector.detect(image));
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }

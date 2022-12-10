@@ -17,6 +17,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
@@ -27,13 +28,13 @@
 #include "PokemonSwSh_EggAutonomous.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
 
 using namespace Pokemon;
+
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 namespace {
 
@@ -565,7 +566,8 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         // Define the scope of video overlay rendering for various checks:
         VideoOverlaySet overlay_set(env.console.overlay());
         BoxShinySymbolDetector::make_overlays(overlay_set);
-        BoxGenderDetector::make_overlays(overlay_set);
+        BoxGenderDetector gender_detector;
+        gender_detector.make_overlays(overlay_set);
         IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
@@ -594,16 +596,13 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             //   In this way we can detect pokemon stats.
 
             IVCheckerReader::Results IVs = iv_reader.read(env.console, screen);
-            EggHatchGenderFilter gender = BoxGenderDetector::detect(screen);
+            EggHatchGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
 
             EggHatchAction action = FILTERS.get_action(shiny, IVs, gender);
 
-            switch (action){
-            case EggHatchAction::StopProgram:
-                env.log("Program stop requested...");
-                env.console.overlay().add_log("Request program stop", COLOR_WHITE);
+            auto send_keep_notification = [&](){
                 if (!shiny){
                     send_encounter_notification(
                         env,
@@ -613,20 +612,18 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                         screen
                     );
                 }
+            };
+            switch (action){
+            case EggHatchAction::StopProgram:
+                env.log("Program stop requested...");
+                env.console.overlay().add_log("Request program stop", COLOR_WHITE);
+                send_keep_notification();
                 return true;
             case EggHatchAction::Keep:
                 env.log("Moving Pokemon to keep box...", COLOR_BLUE);
                 m_num_pokemon_kept++;
                 env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
-                if (!shiny){
-                    send_encounter_notification(
-                        env,
-                        NOTIFICATION_NONSHINY_KEEP,
-                        NOTIFICATION_SHINY,
-                        false, false, {}, std::nan(""),
-                        screen
-                    );
-                }
+                send_keep_notification();
 
                 // Press A twice to pick the pokemon
                 ssf_press_button2(context, BUTTON_A, 60, EGG_BUTTON_HOLD_DELAY);

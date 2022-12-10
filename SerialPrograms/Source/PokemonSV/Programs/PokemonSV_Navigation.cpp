@@ -270,6 +270,9 @@ void open_map_from_overworld(ConsoleHandle& console, BotBaseContext& context){
 
 void fly_to_overworld_from_map(ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
+    // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
+    pbf_press_button(context, BUTTON_A, 20, 130);
+
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
@@ -279,7 +282,7 @@ void fly_to_overworld_from_map(ConsoleHandle& console, BotBaseContext& context){
         int ret = 0;
         {
             OverworldWatcher overworld(COLOR_CYAN);
-            MapWatcher map(COLOR_RED);
+            MapExitWatcher map(COLOR_RED);
             GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
             PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
 
@@ -302,7 +305,7 @@ void fly_to_overworld_from_map(ConsoleHandle& console, BotBaseContext& context){
             continue;
         case 2:
             console.log("Detected fly here prompt dialog.");
-            console.overlay().add_log("Fly here", COLOR_WHITE);
+            console.overlay().add_log("Fly", COLOR_WHITE);
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 3:
@@ -336,6 +339,7 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context){
             {overworld, main_menu, picnic}
         );
         context.wait_for(std::chrono::milliseconds(100));
+        const bool fast_mode = false;
         switch (ret){
         case 0:
             console.log("Detected overworld.");
@@ -343,7 +347,7 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context){
             continue;
         case 1:
             console.log("Detected main menu.");
-            main_menu.move_cursor(console, context, MenuSide::RIGHT, 2, true);
+            main_menu.move_cursor(console, context, MenuSide::RIGHT, 2, fast_mode);
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
             continue;
         case 2:
@@ -355,7 +359,7 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context){
             context.wait_for_all_requests();
             return;
         default:
-            throw OperationFailedException(console.logger(), "picnic_from_overworld(): No recognized state after 60 seconds.");
+            throw OperationFailedException(console.logger(), "picnic_from_overworld(): No recognized state after 30 seconds.");
         }
     }
 }
@@ -407,6 +411,67 @@ void leave_picnic(ConsoleHandle& console, BotBaseContext& context){
     context.wait_for(std::chrono::seconds(3));
 }
 
+
+void enter_box_system_from_overworld(ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    console.log("Enter box system from overworld...");
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(3)){
+            throw OperationFailedException(console, "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.");
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        MainMenuWatcher main_menu(COLOR_RED);
+        GradientArrowWatcher box_slot_one(COLOR_BLUE, GradientArrowType::DOWN, {0.24, 0.16, 0.05, 0.09});
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {overworld, main_menu, box_slot_one}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        const bool fast_mode = false;
+        switch (ret){
+        case 0:
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            continue;
+        case 1:
+            console.log("Detected main menu.");
+            console.overlay().add_log("Enter box", COLOR_WHITE);
+            main_menu.move_cursor(console, context, MenuSide::RIGHT, 1, fast_mode);
+            pbf_press_button(context, BUTTON_A, 20, 50);
+            continue;
+        case 2:
+            console.log("Detected box.");
+            context.wait_for(std::chrono::milliseconds(200));
+            return;
+        default:
+            throw OperationFailedException(console.logger(), "enter_box_system_from_overworld(): No recognized state after 30 seconds.");
+        }
+    }
+}
+
+
+void leave_box_system_to_overworld(ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    console.log("Leave box system to overworld...");
+    OverworldWatcher overworld(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_B, 20, 230);
+            }
+        },
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console.logger(), "leave_box_system_to_overworld(): Unknown state after 10 button B presses.");
+    }
+}
 
 }
 }

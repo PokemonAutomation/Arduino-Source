@@ -10,6 +10,8 @@
 #include "TestUtils.h"
 
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BoxGenderDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
@@ -18,6 +20,8 @@
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+
 
 #include <iostream>
 using std::cout;
@@ -212,6 +216,48 @@ int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::
     bool has_hand = result.first >= 0.0;
 
     TEST_RESULT_EQUAL(has_hand, true);
+
+    return 0;
+}
+
+int test_pokemonSV_BoxPokemonInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
+    if (words.size() < 2){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    bool target_shiny = false;
+    int target_gender = 0;
+    if (parse_bool(words[words.size()-2], target_shiny) == false){
+        cerr << "Error: word " << words[words.size()-2] << " is wrong. Must be True or False. " << endl;
+        return 1;
+    }
+    if (parse_int(words[words.size()-1], target_gender) == false){
+        cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be int (1: male, 2: female, 3: genderless). " << endl;
+        return 1;
+    }
+
+    SomethingInBoxSlotDetector sth_detector(COLOR_RED);
+    bool sth = sth_detector.detect(image);
+    TEST_RESULT_EQUAL(sth, true);
+
+    BoxShinyDetector shiny_detector;
+    bool shiny_result = shiny_detector.detect(image);
+
+    TEST_RESULT_EQUAL(shiny_result, target_shiny);
+
+    BoxGenderDetector gender_detector;
+    int gender_result = (int)gender_detector.detect(image);
+    TEST_RESULT_EQUAL(gender_result, target_gender);
+
+    return 0;
+}
+
+int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool target){
+    SomethingInBoxSlotDetector sth_detector(COLOR_RED);
+    bool sth = sth_detector.detect(image);
+    TEST_RESULT_EQUAL(sth, target);
 
     return 0;
 }

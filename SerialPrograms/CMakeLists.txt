@@ -795,6 +795,8 @@ file(GLOB MAIN_SOURCES
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h
+    Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp
+    Source/Pokemon/Inference/Pokemon_BoxGenderDetector.h
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h
     Source/Pokemon/Inference/Pokemon_NameReader.cpp
@@ -1193,12 +1195,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp
     Source/PokemonSV/Inference/PokemonSV_BoxDetection.h
+    Source/PokemonSV/Inference/PokemonSV_BoxGenderDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_BoxGenderDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BoxShinyDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_BoxShinyDetector.h
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_DialogDetector.h
+    Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_EggDetector.h
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/PokemonSV_IVCheckerReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_IVCheckerReader.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp
@@ -1229,6 +1239,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.cpp
+    Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp

@@ -32,6 +32,10 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
 
 int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
+int test_pokemonSV_BoxPokemonInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
+int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif
