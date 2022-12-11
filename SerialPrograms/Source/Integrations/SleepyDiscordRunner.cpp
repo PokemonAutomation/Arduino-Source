@@ -602,7 +602,7 @@ void send_message_sleepy(
                 channel.channel_id,
                 std::chrono::seconds(channel.delay),
                 str,
-                file == nullptr ? nullptr : std::move(file)
+                file == nullptr ? nullptr : file
             );
         }
 
