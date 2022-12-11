@@ -8,6 +8,7 @@
 #define PokemonAutomation_DiscordWebhookSettings_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
@@ -27,6 +28,7 @@ public:
     StringCell label;
     BooleanCheckBoxCell ping;
     StringCell tags_text;
+    SimpleIntegerCell<uint8_t> delay;
     StringCell url;
 };
 
@@ -45,6 +47,7 @@ public:
     DiscordWebhookSettingsOption();
 
     DiscordWebhookSettingsTable urls;
+    SimpleIntegerOption<uint8_t> sends_per_second;
 };
 
 

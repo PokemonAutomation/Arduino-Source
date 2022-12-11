@@ -22,7 +22,12 @@ public:
     ~ScheduledTaskRunner();
     ScheduledTaskRunner(AsyncDispatcher& dispatcher);
 
+    //  Returns the # of events in the schedule.
     size_t size() const;
+
+    //  Returns the time of the next event. Returns WallClock::max() is no
+    //  events are scheduled.
+    WallClock next_event() const;
 
     void add_event(WallClock time, std::function<void()> callback);
     void add_event(std::chrono::milliseconds time_from_now, std::function<void()> callback);

@@ -347,9 +347,9 @@ void send_program_telemetry(
 
     DiscordWebhookSender& sender = DiscordWebhookSender::instance();
     if (hasFile){
-        sender.send_json(logger, QString::fromStdString(url), jsonContent, pending);
+        sender.send_json(logger, QString::fromStdString(url), std::chrono::milliseconds(0), jsonContent, pending);
     }else{
-        sender.send_json(logger, QString::fromStdString(url), jsonContent, nullptr);
+        sender.send_json(logger, QString::fromStdString(url), std::chrono::milliseconds(0), jsonContent, nullptr);
     }
 #endif
 }

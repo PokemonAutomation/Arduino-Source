@@ -8,6 +8,10 @@
 
 #include "ScheduledTaskRunner.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -23,13 +27,22 @@ size_t ScheduledTaskRunner::size() const{
     std::lock_guard<std::mutex> lg(m_lock);
     return m_schedule.size();
 }
+WallClock ScheduledTaskRunner::next_event() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_schedule.empty()){
+        return WallClock::max();
+    }
+    return m_schedule.begin()->first;
+}
 void ScheduledTaskRunner::add_event(WallClock time, std::function<void()> callback){
     std::lock_guard<std::mutex> lg(m_lock);
     m_schedule.emplace(time, std::move(callback));
+    m_cv.notify_all();
 }
 void ScheduledTaskRunner::add_event(std::chrono::milliseconds time_from_now, std::function<void()> callback){
     std::lock_guard<std::mutex> lg(m_lock);
     m_schedule.emplace(current_time() + time_from_now, std::move(callback));
+    m_cv.notify_all();
 }
 bool ScheduledTaskRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){

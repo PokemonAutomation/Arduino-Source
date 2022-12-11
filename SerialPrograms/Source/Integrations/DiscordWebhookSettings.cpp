@@ -20,6 +20,7 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     , label(false, LockWhileRunning::LOCKED, "", "My test server")
     , ping(LockWhileRunning::LOCKED, true)
     , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
+    , delay(LockWhileRunning::LOCKED, 0, 0, 60)
     , url(true, LockWhileRunning::LOCKED, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {
     //  Keep the old JSON tags for backwards compatibility.
@@ -27,6 +28,7 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     add_option(label, "Label");
     add_option(ping, "Ping");
     add_option(tags_text, "Tags");
+    add_option(delay, "Delay");
     add_option(url, "URL");
 }
 std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
@@ -35,6 +37,7 @@ std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
     ret->label.set(label);
     ret->ping = (bool)ping;
     ret->tags_text.set(tags_text);
+    ret->delay.set(delay);
     ret->url.set(url);
     return ret;
 }
@@ -80,6 +83,7 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
         "Description",
         "Allow Pings",
         "Tags",
+        "Delay (seconds)",
         "Webhook URL",
     };
 }
@@ -89,8 +93,13 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
     : GroupOption("Discord Webhook Settings", LockWhileRunning::LOCKED, true, false)
+    , sends_per_second(
+        "<b>Rate Limit:</b><br>Maximum number of sends per second.",
+        LockWhileRunning::LOCKED, 2
+    )
 {
     PA_ADD_OPTION(urls);
+    PA_ADD_OPTION(sends_per_second);
 }
 
 
