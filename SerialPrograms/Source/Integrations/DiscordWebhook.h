@@ -9,7 +9,6 @@
 
 #include <deque>
 #include <condition_variable>
-#include <thread>
 #include <QNetworkReply>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
@@ -26,19 +25,6 @@ namespace Integration{
 namespace DiscordWebhook{
 
 
-#if 0
-struct DiscordWebhookRequest{
-    DiscordWebhookRequest() = default;
-    DiscordWebhookRequest(QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> file);
-    DiscordWebhookRequest(QUrl p_url, std::shared_ptr<PendingFileSend> p_file);
-
-    WallClock timestamp = current_time();
-    QUrl url;
-
-    QByteArray data;
-    std::shared_ptr<PendingFileSend> file;
-};
-#endif
 
 class DiscordWebhookSender : public QObject{
     Q_OBJECT
@@ -85,12 +71,10 @@ private:
     bool m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
-//    std::deque<DiscordWebhookRequest> m_queue;
 
     std::deque<WallClock> m_sent;
     AsyncDispatcher m_dispatcher;
     ScheduledTaskRunner m_queue;
-//    std::thread m_thread;
 };
 
 

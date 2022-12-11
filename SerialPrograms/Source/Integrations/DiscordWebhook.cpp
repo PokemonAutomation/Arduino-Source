@@ -21,27 +21,14 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "DiscordWebhook.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Integration{
 namespace DiscordWebhook{
 
-
-#if 0
-DiscordWebhookRequest::DiscordWebhookRequest(QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> p_file)
-    : url(std::move(p_url))
-    , data(std::move(p_data))
-    , file(std::move(p_file))
-{}
-
-DiscordWebhookRequest::DiscordWebhookRequest( QUrl p_url, std::shared_ptr<PendingFileSend> p_file)
-    : url(std::move(p_url))
-    , file(std::move(p_file))
-{}
-#endif
 
 
 DiscordWebhookSender::DiscordWebhookSender()
@@ -49,7 +36,6 @@ DiscordWebhookSender::DiscordWebhookSender()
     , m_stopping(false)
     , m_dispatcher(nullptr, 1)
     , m_queue(m_dispatcher)
-//    , m_thread(run_with_catch, "DiscordWebhookSender::thread_loop()", [this]{ thread_loop(); })
 {}
 
 DiscordWebhookSender::~DiscordWebhookSender(){
@@ -58,7 +44,6 @@ DiscordWebhookSender::~DiscordWebhookSender(){
         m_stopping = true;
         m_cv.notify_all();
     }
-//    m_thread.join();
 }
 
 DiscordWebhookSender& DiscordWebhookSender::instance(){
@@ -72,13 +57,7 @@ void DiscordWebhookSender::send_json(
     const JsonObject& obj,
     std::shared_ptr<PendingFileSend> file
 ){
-    std::lock_guard<std::mutex> lg(m_lock);
     cleanup_stuck_requests();
-//    m_queue.emplace_back(
-//        url,
-//        QByteArray::fromStdString(obj.dump()),
-//        file
-//    );
     m_queue.add_event(
         delay,
         [this, url, data = QByteArray::fromStdString(obj.dump()), file = std::move(file)]{
@@ -93,7 +72,6 @@ void DiscordWebhookSender::send_json(
         }
     );
     logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
-    m_cv.notify_all();
 }
 
 void DiscordWebhookSender::send_file(
@@ -101,7 +79,6 @@ void DiscordWebhookSender::send_file(
     const QUrl& url, std::chrono::milliseconds delay,
     std::shared_ptr<PendingFileSend> file
 ){
-    std::lock_guard<std::mutex> lg(m_lock);
     cleanup_stuck_requests();
 //    m_queue.emplace_back(url, file);
     m_queue.add_event(
@@ -112,10 +89,10 @@ void DiscordWebhookSender::send_file(
         }
     );
     logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
-    m_cv.notify_all();
 }
 
 void DiscordWebhookSender::cleanup_stuck_requests(){
+    std::lock_guard<std::mutex> lg(m_lock);
     WallClock next = m_queue.next_event();
     if (next == WallClock::max()){
         return;
@@ -127,33 +104,9 @@ void DiscordWebhookSender::cleanup_stuck_requests(){
         m_logger.log("Purging request that appears to be stuck.", COLOR_RED);
         emit stop_event_loop();
     }
-
-#if 0
-    if (m_queue.empty()){
-        return;
-    }
-    WallClock now = current_time();
-    WallClock threshold = now - std::chrono::seconds(60);
-    size_t reqs_purged = 0;
-    while (!m_queue.empty()){
-        if (m_queue.front().timestamp < threshold){
-            m_queue.pop_front();
-            reqs_purged++;
-        }else{
-            break;
-        }
-    }
-    if (reqs_purged == 0){
-        return;
-    }
-    m_logger.log("Purged " + std::to_string(reqs_purged) + " requests which appear to be stuck.", COLOR_RED);
-
-    emit stop_event_loop();
-#endif
 }
 void DiscordWebhookSender::throttle(){
     //  Throttle the messages.
-    std::unique_lock<std::mutex> lg(m_lock);
     auto duration = THROTTLE_DURATION;
     auto now = current_time();
     while (!m_sent.empty() && m_sent[0] + duration < now){
@@ -161,65 +114,19 @@ void DiscordWebhookSender::throttle(){
     }
     if (m_sent.size() >= GlobalSettings::instance().DISCORD.webhooks.sends_per_second){
         m_logger.log("Throttling webhook messages due to rate limit...", COLOR_RED);
+        std::unique_lock<std::mutex> lg(m_lock);
         m_cv.wait_for(
             lg, duration,
-            [&]{ return m_sent[0] + duration < now; }
+            [&]{ return m_sent[0] + duration < now || m_stopping; }
         );
+        if (m_stopping){
+            return;
+        }
         m_sent.clear();
     }
     m_sent.push_back(now);
 }
 
-#if 0
-void DiscordWebhookSender::thread_loop(){
-//    QEventLoop event_loop;
-//    connect(
-//        this, &DiscordWebhookSender::stop_event_loop,
-//        &event_loop, &QEventLoop::quit
-//    );
-    while (true){
-        DiscordWebhookRequest item;
-        {
-            std::unique_lock<std::mutex> lg(m_lock);
-            if (m_stopping){
-                break;
-            }
-            if (m_queue.empty()){
-                m_cv.wait(lg);
-                continue;
-            }
-
-            item = std::move(m_queue.front());
-            m_queue.pop_front();
-
-            //  Throttle the messages.
-            auto duration = THROTTLE_DURATION;
-            auto now = current_time();
-            while (!m_sent.empty() && m_sent[0] + duration < now){
-                m_sent.pop_front();
-            }
-            if (m_sent.size() >= MAX_IN_WINDOW){
-                m_cv.wait_for(
-                    lg, duration,
-                    [&]{
-                        return m_sent[0] + duration < now;
-                    }
-                );
-                m_sent.clear();
-            }
-            m_sent.push_back(now);
-        }
-
-        if (!item.file && !item.data.isEmpty()){
-            internal_send_json(item.url, item.data);
-        }else if (item.file && !item.data.isEmpty()){
-            internal_send_image_embed(item.url, item.data, item.file->filepath(), item.file->filename());
-        }else{
-            internal_send_file(item.url, item.file->filepath());
-        }
-    }
-}
-#endif
 
 void DiscordWebhookSender::process_reply(QNetworkReply* reply){
     if (!reply){

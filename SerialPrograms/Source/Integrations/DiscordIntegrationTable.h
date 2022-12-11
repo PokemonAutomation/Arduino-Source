@@ -8,6 +8,7 @@
 #define PokemonAutomation_DiscordIntegrationTable_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 
@@ -28,6 +29,7 @@ public:
     BooleanCheckBoxCell ping;
     StringCell tags_text;
     BooleanCheckBoxCell allow_commands;
+    SimpleIntegerCell<uint8_t> delay;
     StringCell channel_id;
 };
 

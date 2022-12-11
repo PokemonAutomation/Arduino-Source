@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/StringTools.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -119,16 +120,18 @@ struct SleepyDiscordRequest {
 class SleepyDiscordSender {
 private:
     SleepyDiscordSender()
-        : m_stopping(false)
-        , m_thread(run_with_catch, "SleepyDiscordSender::thread_loop()", [this]{ thread_loop(); })
+//        : m_stopping(false)
+//        , m_thread(run_with_catch, "SleepyDiscordSender::thread_loop()", [this]{ thread_loop(); })
+        : m_dispatcher(nullptr, 1)
+        , m_queue(m_dispatcher)
     {}
     ~SleepyDiscordSender() {
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_stopping = true;
-            m_cv.notify_all();
-        }
-        m_thread.join();
+//        {
+//            std::lock_guard<std::mutex> lg(m_lock);
+//            m_stopping = true;
+//            m_cv.notify_all();
+//        }
+//        m_thread.join();
     }
 
 public:
@@ -137,14 +140,33 @@ public:
         return sender;
     }
 
-    void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
-        std::lock_guard<std::mutex> lg(m_lock);
+    void send(
+        std::string embed,
+        std::string channels,
+        std::chrono::milliseconds delay,
+        std::string messages,
+        std::shared_ptr<PendingFileSend> file
+    ){
+//        std::lock_guard<std::mutex> lg(m_lock);
+        m_queue.add_event(
+            delay,
+            [embed = std::move(embed), channels = std::move(channels), messages = std::move(messages), file = std::move(file)]() mutable {
+                if (file == nullptr || file->filepath().empty()){
+                    sendMessage(&channels[0], &messages[0], &embed[0], nullptr);
+                }else{
+                    std::string filepath = file->filepath();
+                    sendMessage(&channels[0], &messages[0], &embed[0], &filepath[0]);
+                }
+            }
+        );
         sleepy_logger().log("Sending notification... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
-        m_queue.emplace_back(embed, channels, messages, std::move(file));
-        m_cv.notify_all();
+//        m_queue.emplace_back(embed, channels, messages, std::move(file));
+//        m_cv.notify_all();
+
     }
 
 private:
+#if 0
     void thread_loop() {
         while (true) {
             SleepyDiscordRequest item;
@@ -169,13 +191,16 @@ private:
             else sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], nullptr);
         }
     }
+#endif
 
 private:
-    bool m_stopping;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    std::deque<SleepyDiscordRequest> m_queue;
-    std::thread m_thread;
+//    bool m_stopping;
+//    std::mutex m_lock;
+//    std::condition_variable m_cv;
+//    std::deque<SleepyDiscordRequest> m_queue;
+//    std::thread m_thread;
+    AsyncDispatcher m_dispatcher;
+    ScheduledTaskRunner m_queue;
 };
 
 class SleepyDiscordClient;
@@ -202,13 +227,19 @@ public:
     bool m_connected = false;
 
 public:
-    void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
+    void send(
+        std::string embed,
+        std::string channels,
+        std::chrono::milliseconds delay,
+        std::string messages,
+        std::shared_ptr<PendingFileSend> file
+    ) {
         if (m_sleepy_client != nullptr) {
             if (file){
 //                cout << "Sending: " << file->filepath().toStdString() << endl;
                 m_active_list.emplace(file->filepath(), file);
             }
-            SleepyDiscordSender::instance().send(embed, channels, messages, std::move(file));
+            SleepyDiscordSender::instance().send(embed, channels, delay, messages, std::move(file));
         }else{
             sleepy_logger().log("SleepyDiscordClient::send(): Not connected.", COLOR_RED);
         }
@@ -315,7 +346,7 @@ private:
         if ((int)request <= 11) {
             program_response(request, channel, &message[0], &filename[0]);
         }else{
-            send("", channel, &message[0], std::move(file));
+            send("", channel, std::chrono::milliseconds(0), &message[0], std::move(file));
         }
     }
 
@@ -493,7 +524,13 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
     }
 }
 
-void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags, const std::string& message, const JsonObject& embed, std::shared_ptr<PendingFileSend> file) {
+void send_message_sleepy(
+    bool should_ping,
+    const std::vector<std::string>& tags,
+    const std::string& message,
+    const JsonObject& embed,
+    std::shared_ptr<PendingFileSend> file
+){
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
 
@@ -557,8 +594,19 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
                 str += message;
             }
             message_vector.emplace_back(str);
+
+            std::string json = embed.dump();
+            sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
+            m_sleepy_client->send(
+                json,
+                channel.channel_id,
+                std::chrono::seconds(channel.delay),
+                str,
+                file == nullptr ? nullptr : std::move(file)
+            );
         }
 
+#if 0
         if (channel_vector.empty()){
             return;
         }
@@ -574,7 +622,8 @@ void send_message_sleepy(bool should_ping, const std::vector<std::string>& tags,
 
         std::string json = embed.dump();
         sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
-        m_sleepy_client->send(json, chanStr, messages, file == nullptr ? nullptr : std::move(file));
+        m_sleepy_client->send(json, chanStr, std::chrono::seconds(0), messages, file == nullptr ? nullptr : std::move(file));
+#endif
     }
 }
 

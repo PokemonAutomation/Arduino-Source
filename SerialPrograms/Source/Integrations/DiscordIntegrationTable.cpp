@@ -21,6 +21,7 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     , ping(LockWhileRunning::LOCKED, true)
     , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
     , allow_commands(LockWhileRunning::LOCKED, true)
+    , delay(LockWhileRunning::LOCKED, 0, 0, 60)
     , channel_id(false, LockWhileRunning::LOCKED, "", "123456789012345678")
 {
     //  Keep the old JSON tags for backwards compatibility.
@@ -29,6 +30,7 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     add_option(ping, "Ping");
     add_option(tags_text, "Tags");
     add_option(allow_commands, "Commands");
+    add_option(delay, "Delay");
     add_option(channel_id, "Channel");
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
@@ -38,6 +40,7 @@ std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
     ret->ping = (bool)ping;
     ret->tags_text.set(tags_text);
     ret->allow_commands = (bool)allow_commands;
+    ret->delay.set(delay);
     ret->channel_id.set(channel_id);
     return ret;
 }
@@ -84,6 +87,7 @@ std::vector<std::string> DiscordIntegrationTable::make_header() const{
         "Allow Pings",
         "Tags",
         "Allow Commands",
+        "Delay (seconds)",
         "Channel ID",
     };
 }
