@@ -19,9 +19,10 @@
 #include "PokemonSV_GimmighoulRoamingFarm.h"
 
 namespace PokemonAutomation {
-    namespace NintendoSwitch {
-        namespace PokemonSV {
-            using namespace Pokemon;
+namespace NintendoSwitch {
+namespace PokemonSV {
+
+using namespace Pokemon;
 
             GimmighoulRoamingFarm_Descriptor::GimmighoulRoamingFarm_Descriptor()
                 : SingleSwitchProgramDescriptor(
@@ -93,7 +94,7 @@ namespace PokemonAutomation {
             }
 
 
-        }
-    }
+}
+}
 }
 
