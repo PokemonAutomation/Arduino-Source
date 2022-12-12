@@ -361,11 +361,11 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         leave_box_system(env, context);
     }
 
+    bool need_to_save_after_kept = false;
+    uint8_t next_egg_column = 0; // next egg column in box
     // The loop to hatch batches of eggs.
     // Each batch consists of at most five eggs.
     // There are at most six batches of eggs in a box.
-
-    bool need_to_save_after_kept = false;
     while(true){
         if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && need_to_save_after_kept)){
             save_game(env, context, true);
@@ -511,21 +511,20 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         } // end for each hatched pokemon in party
 
         // Get the next egg column
-        bool found_eggs = false;
-        for (uint8_t col = 0; col < 6; col++){
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, 0, col);
+        for (; next_egg_column < 6; next_egg_column++){
+            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, 0, next_egg_column);
             context.wait_for_all_requests();
             // If there is pokemon in slot row 0, col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
-                env.log("Found next column of eggs at col " + std::to_string(col));
+                env.log("Found next column of eggs at col " + std::to_string(next_egg_column));
                 env.console.overlay().add_log("Add next column", COLOR_WHITE);
-                found_eggs = true;
                 break;
             }
         }
 
         context.wait_for_all_requests();
-        if (found_eggs){
+        if (next_egg_column < 6){
+
             hold_one_column(context);
             // Move the new column to party
             box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
@@ -556,17 +555,20 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
             // Drop rest of the party
             pbf_press_button(context, BUTTON_A, 20, 80);
+            // Move back to middle box
+            pbf_press_button(context, BUTTON_L, 20, 40);
         }
 
         leave_box_system(env, context);
 
-        if (found_eggs == false){ // no more eggs to hatch
+        if (next_egg_column == 6){ // no more eggs to hatch
             if ((AUTO_SAVING == AutoSave::AfterStartAndKeep && need_to_save_after_kept) || AUTO_SAVING == AutoSave::EveryBatch){
                 save_game(env, context, true);
                 m_saved_after_fetched_eggs = true;
             }
             break; // break egg batch loop. This is the only place to break out of the loop
         }
+        next_egg_column++;
     } // end egg batch loop
     
     return false;
