@@ -18,7 +18,7 @@ PlayerListRow::PlayerListRow()
         LockWhileRunning::UNLOCKED
     )
     , name(false, LockWhileRunning::UNLOCKED, "", "Ash")
-    , log10p(LockWhileRunning::UNLOCKED, -2.0, -10, 0)
+    , log10p(LockWhileRunning::UNLOCKED, -2.5, -10, 0)
 {
     PA_ADD_OPTION(language);
     PA_ADD_OPTION(name);
@@ -59,7 +59,7 @@ std::vector<std::string> PlayerListTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> PlayerListTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<PlayerListRow>());
+//    ret.emplace_back(std::make_unique<PlayerListRow>());
     return ret;
 }
 
