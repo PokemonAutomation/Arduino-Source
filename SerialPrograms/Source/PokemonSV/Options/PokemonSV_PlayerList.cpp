@@ -72,7 +72,7 @@ std::vector<std::string> PlayerListTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> PlayerListTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<PlayerListRow>());
+//    ret.emplace_back(std::make_unique<PlayerListRow>());
     return ret;
 }
 
