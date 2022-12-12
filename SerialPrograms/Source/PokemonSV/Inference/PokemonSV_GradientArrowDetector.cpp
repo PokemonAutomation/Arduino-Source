@@ -51,26 +51,31 @@ bool is_gradient_arrow(
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
-    const double THRESHOLD = 80;
+    const double THRESHOLD = 70;
 
     double aspect_ratio = object.aspect_ratio();
     switch (type){
-    case GradientArrowType::RIGHT:
+    case GradientArrowType::RIGHT:{
         if (!(yellow.min_y < blue.min_y && blue.max_y < yellow.max_y)){
             return false;
         }
         if (!(0.7 < aspect_ratio && aspect_ratio < 1.0)){
             return false;
         }
-        return GRADIENT_ARROW_HORIZONTAL().rmsd(cropped) <= THRESHOLD;
-    case GradientArrowType::DOWN:
+        double rmsd = GRADIENT_ARROW_HORIZONTAL().rmsd(cropped);
+//        cout << "rmsd = " << rmsd << endl;
+        return rmsd <= THRESHOLD;
+    }
+    case GradientArrowType::DOWN:{
         if (!(yellow.min_x < blue.min_x && blue.max_x < yellow.max_x)){
             return false;
         }
         if (!(1.0 < aspect_ratio && aspect_ratio < 1.43)){
             return false;
         }
-        return GRADIENT_ARROW_VERTICAL().rmsd(cropped) <= THRESHOLD;
+        double rmsd = GRADIENT_ARROW_VERTICAL().rmsd(cropped);
+        return rmsd <= THRESHOLD;
+    }
     }
 
     return false;

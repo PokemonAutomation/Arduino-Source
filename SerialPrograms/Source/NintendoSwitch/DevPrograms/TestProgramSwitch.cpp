@@ -170,11 +170,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
+    auto image = feed.snapshot();
+    cout << party_select_top.detect(image) << endl;
+
+
+#if 0
     auto image = feed.snapshot();
     SomethingInBoxSlotDetector detector(COLOR_RED, true);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
