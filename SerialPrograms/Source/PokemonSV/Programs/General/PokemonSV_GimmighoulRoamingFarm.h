@@ -30,8 +30,8 @@ namespace PokemonAutomation {
                 virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
             private:
-                GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
                 SimpleIntegerOption<uint32_t> SKIPS;
+                GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
                 BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
                 EventNotificationsOption NOTIFICATIONS;
             };
