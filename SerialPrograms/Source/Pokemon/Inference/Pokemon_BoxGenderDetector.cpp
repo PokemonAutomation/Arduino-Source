@@ -23,7 +23,7 @@ using std::endl;
 namespace PokemonAutomation{
 namespace Pokemon{
 
-BoxGenderDetector::BoxGenderDetector(const ImageFloatBox& box, float area_ratio_threshold, Color color)
+BoxGenderDetector::BoxGenderDetector(const ImageFloatBox& box, double area_ratio_threshold, Color color)
 : m_box(box), m_area_ratio_threshold(area_ratio_threshold), m_color(color) {}
 
 void BoxGenderDetector::make_overlays(VideoOverlaySet& items) const {
@@ -48,7 +48,7 @@ EggHatchGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& screen) con
     );
     const size_t num_blue_pixels = image_stats(blue_region).count;
 
-    const float threshold = region.width() * region.height() * m_area_ratio_threshold;
+    const double threshold = region.width() * region.height() * m_area_ratio_threshold;
 
     if (PreloadSettings::debug().COLOR_CHECK){
         cout << "num_red_pixels: " << num_red_pixels << ", num_blue_pixels: " << num_blue_pixels

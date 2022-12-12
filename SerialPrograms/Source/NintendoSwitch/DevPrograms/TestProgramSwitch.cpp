@@ -170,10 +170,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
     GradientArrowDetector party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
     auto image = feed.snapshot();
     cout << party_select_top.detect(image) << endl;
-
+#endif
 
 #if 0
     auto image = feed.snapshot();
@@ -224,16 +225,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         move_codeboard(context, path1, true);
     }
 #endif
-#if 0
+#if 1
     while (true){
-        ssf_issue_scroll(context, DPAD_LEFT, 3);
-        ssf_issue_scroll(context, DPAD_LEFT, 3);
-        ssf_issue_scroll(context, DPAD_LEFT, 3);
-        ssf_issue_scroll(context, DPAD_LEFT, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 3);
+        ssf_issue_scroll(context, DPAD_LEFT, 10, 6);
+        ssf_issue_scroll(context, DPAD_LEFT, 4, 6);
+        ssf_issue_scroll(context, DPAD_LEFT, 4, 6);
+        ssf_issue_scroll(context, DPAD_LEFT, 10, 6);
+        ssf_issue_scroll(context, DPAD_RIGHT, 10, 6);
+        ssf_issue_scroll(context, DPAD_RIGHT, 4, 6);
+        ssf_issue_scroll(context, DPAD_RIGHT, 4, 6);
+        ssf_issue_scroll(context, DPAD_RIGHT, 10, 6);
     }
 #endif
 

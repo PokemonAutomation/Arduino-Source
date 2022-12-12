@@ -104,10 +104,11 @@ const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_AZERTY(){
     return map;
 }
 
-DigitPath get_codeboard_digit_path(CodeboardPosition source, CodeboardPosition destination){
-    uint8_t scroll_delay = 3;
-    uint8_t wrap_delay = 4;
-
+DigitPath get_codeboard_digit_path(
+    CodeboardPosition source, CodeboardPosition destination,
+    uint8_t scroll_delay, uint8_t wrap_delay
+){
+//    cout << (size_t)scroll_delay << ", " << (size_t)wrap_delay << endl;
     DigitPath path;
 
     //  Vertical is easy since there's no wrapping and no hazards.
@@ -127,9 +128,9 @@ DigitPath get_codeboard_digit_path(CodeboardPosition source, CodeboardPosition d
     uint8_t col = source.col;
     while (true){
         if (col == destination.col){
-            if (path.length > 0){
-                path.path[path.length - 1].delay = 0;
-            }
+//            if (path.length > 0){
+//                path.path[path.length - 1].delay = 0;
+//            }
             break;
         }
 
@@ -152,17 +153,19 @@ DigitPath get_codeboard_digit_path(CodeboardPosition source, CodeboardPosition d
             }
         }
 
+        uint8_t delay = scroll_delay;
         if (col == (uint8_t)-1){
             col = 11;
+            delay = wrap_delay;
         }
         if (col == 12){
             col = 0;
-        }
-
-        uint8_t delay = scroll_delay;
-        if (direction == DPAD_RIGHT && col == 11){
             delay = wrap_delay;
         }
+
+//        if (direction == DPAD_RIGHT && col == 11){
+//            delay = wrap_delay;
+//        }
 
 //        cout << "col = " << (int)col << ", length = " << (int)path.length << endl;
 
@@ -192,35 +195,44 @@ size_t get_codeboard_path_cost(const std::vector<DigitPath>& path){
 }
 
 std::vector<DigitPath> get_codeboard_path(
+    KeyboardLayout keyboard_layout,
     const std::vector<CodeboardPosition>& positions, size_t s, size_t e,
     CodeboardPosition start,
-    KeyboardLayout keyboard_layout,
-    bool fast
+    uint8_t scroll_delay, uint8_t wrap_delay
 ){
     if (e - s == 1){
-        return {get_codeboard_digit_path(start, positions[s])};
+        return {get_codeboard_digit_path(start, positions[s], scroll_delay, wrap_delay)};
     }
 
     std::vector<DigitPath> forward;
     {
         CodeboardPosition position = positions[s];
-        forward.emplace_back(get_codeboard_digit_path(start, position));
-        std::vector<DigitPath> remaining = get_codeboard_path(positions, s + 1, e, position, keyboard_layout, fast);
+        forward.emplace_back(get_codeboard_digit_path(start, position, scroll_delay, wrap_delay));
+        std::vector<DigitPath> remaining = get_codeboard_path(
+            keyboard_layout,
+            positions, s + 1, e,
+            position,
+            scroll_delay, wrap_delay
+        );
         forward.insert(forward.end(), remaining.begin(), remaining.end());
     }
 
     std::vector<DigitPath> reverse;
     {
         CodeboardPosition position = positions[e - 1];
-        reverse.emplace_back(get_codeboard_digit_path(start, position));
+        reverse.emplace_back(get_codeboard_digit_path(start, position, scroll_delay, wrap_delay));
         reverse.back().left_cursor = true;
-        std::vector<DigitPath> remaining = get_codeboard_path(positions, s, e - 1, position, keyboard_layout, fast);
+        std::vector<DigitPath> remaining = get_codeboard_path(
+            keyboard_layout,
+            positions, s, e - 1, position,
+            scroll_delay, wrap_delay
+        );
         reverse.insert(reverse.end(), remaining.begin(), remaining.end());
     }
 
-    if (!fast){
-        return forward;
-    }
+//    if (!fast){
+//        return forward;
+//    }
 
     if (get_codeboard_path_cost(forward) <= get_codeboard_path_cost(reverse)){
         return forward;
@@ -230,9 +242,8 @@ std::vector<DigitPath> get_codeboard_path(
 }
 std::vector<DigitPath> get_codeboard_path(
     Logger& logger,
-    const std::string& code,
-    KeyboardLayout keyboard_layout,
-    bool fast,
+    KeyboardLayout keyboard_layout, const std::string& code,
+    uint8_t scroll_delay, uint8_t wrap_delay,
     CodeboardPosition start = {0, 0}
 ){
     auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
@@ -254,31 +265,41 @@ std::vector<DigitPath> get_codeboard_path(
         }
         positions.emplace_back(iter->second);
     }
-    return get_codeboard_path(positions, 0, positions.size(), start, keyboard_layout, fast);
+    return get_codeboard_path(
+        keyboard_layout,
+        positions, 0, positions.size(),
+        start,
+        scroll_delay, wrap_delay
+    );
 }
 
 
-void move_codeboard(BotBaseContext& context, const DigitPath& path, bool fast){
-    uint8_t min_delay = fast ? 0 : 10;
+void move_codeboard(BotBaseContext& context, const DigitPath& path){
+    uint16_t delay = 3;
     if (path.length > 0){
-        for (size_t c = 0; c < (size_t)path.length - 0; c++){
+        size_t last = (size_t)path.length - 1;
+        for (size_t c = 0; c < last; c++){
             ssf_issue_scroll(
                 context,
                 path.path[c].direction,
-                std::max(path.path[c].delay, min_delay)
+                path.path[c].delay,
+                6
             );
         }
+        ssf_issue_scroll(
+            context,
+            path.path[last].direction,
+            0,
+            6
+        );
+        delay = path.path[last].delay;
     }
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, delay);
 }
 
-void run_codeboard_path(
-    BotBaseContext& context,
-    const std::vector<DigitPath>& path,
-    bool fast
-){
+void run_codeboard_path(BotBaseContext& context, const std::vector<DigitPath>& path){
     for (const DigitPath& digit : path){
-        move_codeboard(context, digit, fast);
+        move_codeboard(context, digit);
         if (digit.left_cursor){
             ssf_press_button(context, BUTTON_L, 1);
         }
@@ -289,11 +310,15 @@ void run_codeboard_path(
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    const std::string& code,
-    KeyboardLayout keyboard_layout,
-    bool include_plus, bool fast
+    KeyboardLayout keyboard_layout, const std::string& code,
+    bool include_plus,
+    uint8_t scroll_delay, uint8_t wrap_delay
 ){
-    run_codeboard_path(context, get_codeboard_path(logger, code, keyboard_layout, fast), fast);
+    run_codeboard_path(context, get_codeboard_path(
+        logger,
+        keyboard_layout, code,
+        scroll_delay, wrap_delay
+    ));
     if (include_plus){
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
     }

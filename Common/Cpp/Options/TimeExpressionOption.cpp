@@ -364,11 +364,13 @@ ConfigWidget* TimeExpressionOption<Type>::make_QtWidget(QWidget& parent){
 }
 
 
+template class TimeExpressionCell<uint8_t>;
 template class TimeExpressionCell<uint16_t>;
 template class TimeExpressionCell<uint32_t>;
 template class TimeExpressionCell<int16_t>;
 template class TimeExpressionCell<int32_t>;
 
+template class TimeExpressionOption<uint8_t>;
 template class TimeExpressionOption<uint16_t>;
 template class TimeExpressionOption<uint32_t>;
 template class TimeExpressionOption<int16_t>;

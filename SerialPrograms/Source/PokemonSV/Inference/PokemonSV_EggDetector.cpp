@@ -81,8 +81,13 @@ bool EggDetector::detect(const ImageViewRGB32& frame) const{
 }
 
 EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallback("EggPartyColumnWatcher"), m_egg_watchers(5) {
-    for(int i = 0; i < 5; i++){
-        m_egg_watchers.emplace_back(BoxCursorLocation::PARTY, i+1, 0, EggWatcher::FinderType::CONSISTENT, color);
+    for(uint8_t i = 0; i < 5; i++){
+        m_egg_watchers.emplace_back(
+            BoxCursorLocation::PARTY,
+            (uint8_t)(i + 1), (uint8_t)0,
+            EggWatcher::FinderType::CONSISTENT,
+            color
+        );
     }
 }
 

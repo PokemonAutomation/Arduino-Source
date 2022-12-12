@@ -107,11 +107,13 @@ void TimeExpressionOptionWidget<Type>::value_changed(){
 
 
 
+template class TimeExpressionCellWidget<uint8_t>;
 template class TimeExpressionCellWidget<uint16_t>;
 template class TimeExpressionCellWidget<uint32_t>;
 template class TimeExpressionCellWidget<int16_t>;
 template class TimeExpressionCellWidget<int32_t>;
 
+template class TimeExpressionOptionWidget<uint8_t>;
 template class TimeExpressionOptionWidget<uint16_t>;
 template class TimeExpressionOptionWidget<uint32_t>;
 template class TimeExpressionOptionWidget<int16_t>;

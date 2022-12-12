@@ -44,20 +44,22 @@ bool release_one_pokemon(ProgramEnvironment& env, ConsoleHandle& console, BotBas
         console.log("Slot is empty.");
         return false;
     }
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
-            pbf_press_button(context, BUTTON_A, 20, 230);
-        },
-        {selected}
-    );
-    if (ret < 0){
-        dump_image(
-            console, env.program_info(),
-            "SelectionArrowNotFound",
-            console.video().snapshot()
+    {
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_A, 20, 230);
+            },
+            {selected}
         );
-        throw OperationFailedException(console.logger(), "Unable to detect selection arrow.");
+        if (ret < 0){
+            dump_image(
+                console, env.program_info(),
+                "SelectionArrowNotFound",
+                console.video().snapshot()
+            );
+            throw OperationFailedException(console.logger(), "Unable to detect selection arrow.");
+        }
     }
     context.wait_for(std::chrono::milliseconds(100));
 

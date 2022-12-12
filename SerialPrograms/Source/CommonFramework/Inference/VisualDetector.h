@@ -29,12 +29,12 @@ public:
 template <typename Detector>
 class DetectorToFinder : public Detector, public VisualInferenceCallback{
 public:
-    // whether a finder is to find an object is detected by the detector or find
-    // that it's no longer detected.
+    //  Whether a finder is to find an object is detected by the detector or find
+    //  that it's no longer detected.
     enum class FinderType {
-        PRESENT,    // process_frame() returns true only when detected consecutively
-        GONE,       // process_frame() returns true only when not detected consecutively
-        CONSISTENT, // process_frame() returns true when detected consecutively or not detected consecutively
+        PRESENT,    //  process_frame() returns true only when detected consecutively
+        GONE,       //  process_frame() returns true only when not detected consecutively
+        CONSISTENT, //  process_frame() returns true when detected consecutively or not detected consecutively
     };
 
     template <class... Args>
@@ -67,9 +67,9 @@ public:
         Detector::make_overlays(items);
     }
 
-    // If m_finder_type is PRESENT, return true only when it is consecutively detectd.
-    // If m_finder_type is GONE, return true only when it  is consecutively not detected.
-    // if m_finder_type is CONSISTENT, return true when it is consecutively detected, or consectuively not detected.
+    //  If m_finder_type is PRESENT, return true only when it is consecutively detected.
+    //  If m_finder_type is GONE, return true only when it  is consecutively not detected.
+    //  if m_finder_type is CONSISTENT, return true when it is consecutively detected, or consecutively not detected.
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         switch (m_finder_type){
         case FinderType::PRESENT:
@@ -82,27 +82,28 @@ public:
                 m_start_of_detection = timestamp;
             }
             return timestamp - m_start_of_detection >= m_duration;
-        case FinderType::CONSISTENT:
-            {
-                const bool result = this->detect(frame);
-                const bool result_changed = (result && m_last_detected < 0) || (!result && m_last_detected > 0);
+        case FinderType::CONSISTENT:{
+            const bool result = this->detect(frame);
+            const bool result_changed = (result && m_last_detected < 0) || (!result && m_last_detected > 0);
 
-                m_last_detected = (result ? 1 : -1);
+            m_last_detected = (result ? 1 : -1);
 
-                if (result_changed){    
-                    m_start_of_detection = WallClock::min();
-                    return false;
-                }
-                if (m_start_of_detection == WallClock::min()){
-                    m_start_of_detection = timestamp;
-                }
-                return timestamp - m_start_of_detection >= m_duration;
+            if (result_changed){
+                m_start_of_detection = WallClock::min();
+                return false;
             }
+            if (m_start_of_detection == WallClock::min()){
+                m_start_of_detection = timestamp;
+            }
+            return timestamp - m_start_of_detection >= m_duration;
         }
+        default:;
+        }
+        return false;
     }
 
-    // If m_finder_type is CONSISTENT and process_frame() returns true,
-    // whether it is consecutively detected , or consecutively not detected.
+    //  If m_finder_type is CONSISTENT and process_frame() returns true,
+    //  whether it is consecutively detected , or consecutively not detected.
     bool consistent_result() const { return m_last_detected > 0; }
 
 private:

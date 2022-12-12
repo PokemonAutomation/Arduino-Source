@@ -34,8 +34,11 @@ struct DigitPath{
     bool left_cursor = false;
     CodeboardScroll path[14];
 };
-DigitPath get_codeboard_digit_path(CodeboardPosition source, CodeboardPosition destination);
-void move_codeboard(BotBaseContext& context, const DigitPath& path, bool fast);
+DigitPath get_codeboard_digit_path(
+    CodeboardPosition source, CodeboardPosition destination,
+    uint8_t scroll_delay, uint8_t wrap_delay
+);
+void move_codeboard(BotBaseContext& context, const DigitPath& path);
 
 
 
@@ -48,9 +51,9 @@ enum class KeyboardLayout{
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    const std::string& code,
-    KeyboardLayout keyboard_layout,
-    bool include_plus, bool fast
+    KeyboardLayout keyboard_layout, const std::string& code,
+    bool include_plus,
+    uint8_t scroll_delay, uint8_t wrap_delay
 );
 
 

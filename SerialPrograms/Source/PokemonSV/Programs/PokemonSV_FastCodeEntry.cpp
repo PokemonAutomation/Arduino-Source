@@ -12,6 +12,10 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_FastCodeEntry.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -47,22 +51,38 @@ FastCodeEntry::FastCodeEntry()
         LockWhileRunning::LOCKED,
         KeyboardLayout::QWERTY
     )
-    , FAST_MODE(
-        "<b>Fast Mode: (developer only)</b>",
-        LockWhileRunning::LOCKED,
-        PreloadSettings::instance().DEVELOPER_MODE
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options: (developer only)</b></font>"
     )
     , SKIP_PLUS(
-        "<b>Skip the Plus: (developer only)</b>",
+        "<b>Skip the Plus:</b>",
         LockWhileRunning::LOCKED,
         false
+    )
+    , SCROLL_DELAY(
+        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
+        LockWhileRunning::LOCKED,
+        TICKS_PER_SECOND,
+        3, 15,
+        PreloadSettings::instance().DEVELOPER_MODE ? "3" : "10",
+        PreloadSettings::instance().DEVELOPER_MODE ? "3" : "10"
+    )
+    , WRAP_DELAY(
+        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
+        LockWhileRunning::LOCKED,
+        TICKS_PER_SECOND,
+        3, 15,
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10",
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10"
     )
 {
     PA_ADD_OPTION(CODE);
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(FAST_MODE);
+        PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(SKIP_PLUS);
+        PA_ADD_OPTION(SCROLL_DELAY);
+        PA_ADD_OPTION(WRAP_DELAY);
     }
 }
 
@@ -130,7 +150,12 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
             }
             enter_digits_str(context, 4, code.c_str());
         }else if (code.size() == 6){
-            enter_alphanumeric_code(console.logger(), context, code, KEYBOARD_LAYOUT, !SKIP_PLUS, FAST_MODE);
+            enter_alphanumeric_code(
+                console.logger(), context,
+                KEYBOARD_LAYOUT, code,
+                !SKIP_PLUS,
+                SCROLL_DELAY, WRAP_DELAY
+            );
         }else{
             throw UserSetupError(console.logger(), "Invalid code length. Must be 4 or 6 characters long.");
         }
