@@ -15,7 +15,6 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_GimmighoulRoamingFarm.h"
 
@@ -58,8 +57,7 @@ namespace PokemonAutomation {
             }
 
             void GimmighoulRoamingFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-                //uint8_t year = MAX_YEAR;
-
+                //Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
                 for (uint32_t c = 0; c < SKIPS; c++) {
                     //Grab coin assuming there is one
                     env.log("Fetch Attempts: " + tostr_u_commas(c));
