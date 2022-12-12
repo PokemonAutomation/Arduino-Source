@@ -59,21 +59,27 @@ FastCodeEntry::FastCodeEntry()
         LockWhileRunning::LOCKED,
         false
     )
+    , DIGIT_REORDERING(
+        "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
+        LockWhileRunning::LOCKED,
+        PreloadSettings::instance().DEVELOPER_MODE,
+        PreloadSettings::instance().DEVELOPER_MODE
+    )
     , SCROLL_DELAY(
         "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "3" : "10",
-        PreloadSettings::instance().DEVELOPER_MODE ? "3" : "10"
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10",
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10"
     )
     , WRAP_DELAY(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10",
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10"
+        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "10",
+        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "10"
     )
 {
     PA_ADD_OPTION(CODE);
@@ -81,6 +87,7 @@ FastCodeEntry::FastCodeEntry()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(SKIP_PLUS);
+        PA_ADD_OPTION(DIGIT_REORDERING);
         PA_ADD_OPTION(SCROLL_DELAY);
         PA_ADD_OPTION(WRAP_DELAY);
     }
@@ -154,7 +161,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
                 console.logger(), context,
                 KEYBOARD_LAYOUT, code,
                 !SKIP_PLUS,
-                SCROLL_DELAY, WRAP_DELAY
+                SCROLL_DELAY, WRAP_DELAY, DIGIT_REORDERING
             );
         }else{
             throw UserSetupError(console.logger(), "Invalid code length. Must be 4 or 6 characters long.");

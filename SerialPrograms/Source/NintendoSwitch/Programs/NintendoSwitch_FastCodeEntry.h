@@ -36,7 +36,7 @@ struct DigitPath{
 };
 DigitPath get_codeboard_digit_path(
     CodeboardPosition source, CodeboardPosition destination,
-    uint8_t scroll_delay, uint8_t wrap_delay
+    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 );
 void move_codeboard(BotBaseContext& context, const DigitPath& path);
 
@@ -53,7 +53,7 @@ void enter_alphanumeric_code(
     BotBaseContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus,
-    uint8_t scroll_delay, uint8_t wrap_delay
+    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 );
 
 

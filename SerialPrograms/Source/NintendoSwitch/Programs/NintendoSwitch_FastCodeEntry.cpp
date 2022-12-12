@@ -198,7 +198,7 @@ std::vector<DigitPath> get_codeboard_path(
     KeyboardLayout keyboard_layout,
     const std::vector<CodeboardPosition>& positions, size_t s, size_t e,
     CodeboardPosition start,
-    uint8_t scroll_delay, uint8_t wrap_delay
+    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 ){
     if (e - s == 1){
         return {get_codeboard_digit_path(start, positions[s], scroll_delay, wrap_delay)};
@@ -212,7 +212,7 @@ std::vector<DigitPath> get_codeboard_path(
             keyboard_layout,
             positions, s + 1, e,
             position,
-            scroll_delay, wrap_delay
+            scroll_delay, wrap_delay, reordering
         );
         forward.insert(forward.end(), remaining.begin(), remaining.end());
     }
@@ -225,14 +225,14 @@ std::vector<DigitPath> get_codeboard_path(
         std::vector<DigitPath> remaining = get_codeboard_path(
             keyboard_layout,
             positions, s, e - 1, position,
-            scroll_delay, wrap_delay
+            scroll_delay, wrap_delay, reordering
         );
         reverse.insert(reverse.end(), remaining.begin(), remaining.end());
     }
 
-//    if (!fast){
-//        return forward;
-//    }
+    if (!reordering){
+        return forward;
+    }
 
     if (get_codeboard_path_cost(forward) <= get_codeboard_path_cost(reverse)){
         return forward;
@@ -243,7 +243,7 @@ std::vector<DigitPath> get_codeboard_path(
 std::vector<DigitPath> get_codeboard_path(
     Logger& logger,
     KeyboardLayout keyboard_layout, const std::string& code,
-    uint8_t scroll_delay, uint8_t wrap_delay,
+    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering,
     CodeboardPosition start = {0, 0}
 ){
     auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
@@ -269,7 +269,7 @@ std::vector<DigitPath> get_codeboard_path(
         keyboard_layout,
         positions, 0, positions.size(),
         start,
-        scroll_delay, wrap_delay
+        scroll_delay, wrap_delay, reordering
     );
 }
 
@@ -312,12 +312,12 @@ void enter_alphanumeric_code(
     BotBaseContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus,
-    uint8_t scroll_delay, uint8_t wrap_delay
+    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 ){
     run_codeboard_path(context, get_codeboard_path(
         logger,
         keyboard_layout, code,
-        scroll_delay, wrap_delay
+        scroll_delay, wrap_delay, reordering
     ));
     if (include_plus){
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
