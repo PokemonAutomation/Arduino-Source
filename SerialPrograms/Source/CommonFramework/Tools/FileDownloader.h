@@ -10,8 +10,18 @@
 #include <string>
 
 namespace PokemonAutomation{
+    class Logger;
+    class JsonValue;
 namespace FileDownloader{
-	std::string download_json_file(const std::string& url);
+
+//  Throws OperationFailedException if failed to download.
+std::string download_file(Logger& logger, const std::string& url);
+
+//  Throws OperationFailedException if failed to download.
+//  Returns empty value if invalid JSON.
+JsonValue download_json_file(Logger& logger, const std::string& url);
+
+
 }
 }
 #endif
