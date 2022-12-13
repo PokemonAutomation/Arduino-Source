@@ -474,6 +474,8 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
                                 // Press A to drop the held pokemon to the empty slot
                                 pbf_press_button(context, BUTTON_A, 20, 80);
+                                // Move cursor back to party
+                                box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
                                 found_empty_slot = true;
                                 break;
                             }
