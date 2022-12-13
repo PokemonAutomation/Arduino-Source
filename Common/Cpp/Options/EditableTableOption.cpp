@@ -108,6 +108,10 @@ std::vector<std::shared_ptr<EditableTableRow>> EditableTableOption::current_refs
     return m_current;
 }
 
+void EditableTableOption::clear(){
+    SpinLockGuard lg(m_lock);
+    m_current.clear();
+}
 void EditableTableOption::load_json(const JsonValue& json){
     const JsonArray* array = json.get_array();
     if (array == nullptr){

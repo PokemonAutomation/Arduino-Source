@@ -111,6 +111,8 @@ public:
         return ret;
     }
 
+    void clear();
+
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 

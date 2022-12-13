@@ -135,8 +135,7 @@ std::vector<PlayerListRowSnapshot> RaidPlayerBanList::current_banlist() const{
 void RaidPlayerBanList::refresh_online_table(Logger& logger){
     std::string url = online_table_url;
     if (url.empty()){
-        //  COMPILER-BUG-GCC: Cannot see inherited member.
-        static_cast<EditableTableOption&>(online_table).clear();
+        online_table.clear();
         return;
     }
     logger.log("Refreshing online ban list...");
