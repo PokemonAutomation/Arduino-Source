@@ -484,6 +484,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h
+    Source/CommonFramework/Tools/FileDownloader.cpp
+    Source/CommonFramework/Tools/FileDownloader.h
     Source/CommonFramework/Tools/InterruptableCommands.cpp
     Source/CommonFramework/Tools/InterruptableCommands.h
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp

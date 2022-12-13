@@ -6,6 +6,7 @@
 
 #include <set>
 #include <mutex>
+#include <fstream>
 #include <condition_variable>
 #include <QImage>
 #include <QJsonObject>
@@ -39,6 +40,7 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -168,7 +170,14 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    {
+        std::string json = FileDownloader::download_json_file("https://raw.githubusercontent.com/PokemonAutomation/Packages/master/SerialPrograms/Resources/PokemonSV/PokemonSprites.json");
 
+        std::ofstream file("test.json");
+        file << json;
+    }
+
+#if 0
     ScheduledTaskRunner scheduler(env.inference_dispatcher());
 
     scheduler.add_event(std::chrono::seconds(5), []{ cout << "5 seconds" << endl; });
@@ -176,7 +185,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     scheduler.add_event(std::chrono::seconds(7), []{ cout << "7 seconds" << endl; });
 
     scope.wait_for(std::chrono::seconds(100));
-
+#endif
 
 #if 0
     BoxSet<size_t> set;
@@ -210,7 +219,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     auto objects = Waterfill::find_objects_inplace(matrix, 20);
     extract_box_reference(region, objects[0]).save("cropped.png");
 #endif
-
 
 //    DialogArrowDetector detector({0.45, 0.9, .1, .05});
 //    detector.detect(image);
