@@ -14,6 +14,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassRelease.h"
 
@@ -39,16 +40,19 @@ struct MassRelease_Descriptor::Stats : public StatsTracker{
         : m_boxes(m_stats["Boxes Cleared"])
         , m_released(m_stats["Released"])
         , m_empty(m_stats["Empty Slots"])
+        , m_shinies(m_stats["Shinies"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Boxes Cleared");
         m_display_order.emplace_back("Released");
         m_display_order.emplace_back("Empty Slots");
+        m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_boxes;
     std::atomic<uint64_t>& m_released;
     std::atomic<uint64_t>& m_empty;
+    std::atomic<uint64_t>& m_shinies;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> MassRelease_Descriptor::make_stats() const{
@@ -64,6 +68,7 @@ MassRelease::MassRelease()
         LockWhileRunning::UNLOCKED,
         2, 0, 32
     )
+    , SKIP_SHINIES("<b>Skip shinies pokemon:</b>", LockWhileRunning::UNLOCKED, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
@@ -72,6 +77,7 @@ MassRelease::MassRelease()
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(BOXES_TO_RELEASE);
+    PA_ADD_OPTION(SKIP_SHINIES);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -85,7 +91,16 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
     env.log("Selecting " + STRING_POKEMON + "...");
-    
+
+    if (SKIP_SHINIES){
+        context.wait_for_all_requests();
+        BoxShinyDetector reader;
+        if (reader.detect(env.console.video().snapshot())){
+            stats.m_shinies++;
+            return;
+        }
+    }
+
     bool released = false;
     try {
         released = release_one_pokemon(env, env.console, context);

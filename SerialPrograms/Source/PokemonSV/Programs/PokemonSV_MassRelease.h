@@ -43,6 +43,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint8_t> BOXES_TO_RELEASE;
+    BooleanCheckBoxOption SKIP_SHINIES;
     EventNotificationsOption NOTIFICATIONS;
 };
 
