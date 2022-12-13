@@ -138,8 +138,8 @@ class TeraLobbyBanWatcher : public TeraLobbyReader, public VisualInferenceCallba
 public:
     TeraLobbyBanWatcher(
         Logger& logger, Color color,
-        PlayerListTable& table,
-        bool include_host, bool ignore_whitelist
+        RaidPlayerBanList& bans,
+        bool include_host
     );
 
     std::vector<TeraLobbyNameMatchResult> detected_banned_players() const;
@@ -149,9 +149,8 @@ public:
 
 private:
     Logger& m_logger;
-    PlayerListTable& m_table;
+    RaidPlayerBanList& m_bans;
     bool m_include_host;
-    bool m_ignore_whitelist;
     mutable std::mutex m_lock;
     std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };

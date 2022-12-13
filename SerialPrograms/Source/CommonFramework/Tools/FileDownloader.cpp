@@ -4,6 +4,7 @@
  *
  */
 
+#include <memory>
 #include <QObject>
 #include <QByteArray>
 #include <QEventLoop>
@@ -57,7 +58,7 @@ std::string download_file(Logger& logger, const std::string& url){
 
     if (!reply){
         std::string str = "QNetworkReply is null.";
-        logger.log(str, COLOR_RED);
+//        logger.log(str, COLOR_RED);
         throw OperationFailedException(logger, str);
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
@@ -65,7 +66,7 @@ std::string download_file(Logger& logger, const std::string& url){
     }else{
         QString error_string = reply->errorString();
         std::string str = "Network Error: " + error_string.toStdString();
-        logger.log(str, COLOR_RED);
+//        logger.log(str, COLOR_RED);
         throw OperationFailedException(logger, str);
 //        QString err = reply->errorString();
 //        qDebug() << err;

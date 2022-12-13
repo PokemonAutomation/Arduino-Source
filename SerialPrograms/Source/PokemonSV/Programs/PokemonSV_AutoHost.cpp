@@ -135,12 +135,6 @@ AutoHost::AutoHost()
         "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
         LockWhileRunning::UNLOCKED, true
     )
-    , BAN_LIST(LockWhileRunning::UNLOCKED)
-    , IGNORE_WHITELIST(
-        "<b>Ignore Whitelist:</b><br>Ignore the developer whitelist.",
-        LockWhileRunning::UNLOCKED,
-        false
-    )
     , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATIONS0({
@@ -159,9 +153,6 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(TRY_TO_TERASTILIZE);
     PA_ADD_OPTION(BAN_LIST);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(IGNORE_WHITELIST);
-    }
     PA_ADD_OPTION(NOTIFICATIONS0);
 }
 
@@ -289,7 +280,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-        TeraLobbyBanWatcher ban_watcher(env.logger(), COLOR_RED, BAN_LIST, true, IGNORE_WHITELIST);
+        TeraLobbyBanWatcher ban_watcher(env.logger(), COLOR_RED, BAN_LIST, true);
         context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
         int ret = wait_until(
@@ -353,7 +344,7 @@ bool AutoHost::run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
             stats.m_banned += detected_banned_players.size();
             send_program_notification(
-                env, NOTIFICATION_RAID_POST,
+                env, NOTIFICATION_RAID_START,
                 COLOR_RED,
                 "Raid Canceled Due to Banned User",
                 {{"Banned User(s):", std::move(message)}}, "",
@@ -462,6 +453,8 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         env.log("Tera raid found!", COLOR_BLUE);
 
         context.wait_for(std::chrono::milliseconds(100));
+
+        BAN_LIST.refresh_online_table(env.logger());
 
         pbf_press_button(context, BUTTON_A, 20, 230);
         if (mode != Mode::LOCAL){

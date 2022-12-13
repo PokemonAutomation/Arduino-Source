@@ -171,15 +171,15 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
     {
-        std::string json = FileDownloader::download_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ComputerControl/master/README.md");
+        std::string json = FileDownloader::download_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json");
         cout << "Done loading..." << endl;
 
         std::ofstream file("test.txt");
         file << json;
     }
-#if 0
+#if 1
     {
-        JsonValue json = FileDownloader::download_json_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/Packages/master/SerialPrograms/Resources/PokemonSV/PokemonSprites.json");
+        JsonValue json = FileDownloader::download_json_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json");
         cout << "Done loading..." << endl;
         cout << json.dump() << endl;
     }

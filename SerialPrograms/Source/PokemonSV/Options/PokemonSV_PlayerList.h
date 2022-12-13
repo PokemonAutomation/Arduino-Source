@@ -7,13 +7,16 @@
 #ifndef PokemonAutomation_PokemonSV_PlayerList_H
 #define PokemonAutomation_PokemonSV_PlayerList_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 
 namespace PokemonAutomation{
+    class Logger;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -57,9 +60,7 @@ public:
     virtual std::vector<std::string> make_header() const;
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
-    std::vector<PlayerListRowSnapshot> snapshot() const{
-        return EditableTableOption_t<PlayerListRow>::snapshot<PlayerListRowSnapshot>();
-    }
+    std::vector<PlayerListRowSnapshot> snapshot() const;
 
 private:
     std::string m_notes_label;
@@ -68,22 +69,22 @@ private:
 
 
 
-class RaidPlayerBanList : public PlayerListTable{
+class RaidPlayerBanList : public GroupOption{
 public:
-    RaidPlayerBanList(LockWhileRunning lock_while_running)
-        : PlayerListTable(
-            "<b>Ban List:</b><br>Ban these people from the raid. "
-            "If anyone's name matches anything in this table, the raid will be reset.<br>"
-            "The last column is a tuning parameter that specifies how well the name needs to match. "
-            "Optical Character Recognition (OCR) is imperfect. So exact matches are rare and unreliable. "
-            "The value is the estimated log10 probability of matching by chance against random characters. "
-            "It is always negative. Lower value means the match needs to be more perfect to be a match.<br><br>"
-            "If you are getting false positive hits, decrease this value. (make it more negative)<br>"
-            "If it is failing to match, increase this value. (make it less negative)",
-            LockWhileRunning::UNLOCKED,
-            "Ban Reason (shown publicly)"
-        )
-    {}
+    RaidPlayerBanList();
+
+    void refresh_online_table(Logger& logger);
+
+    std::vector<PlayerListRowSnapshot> current_banlist() const;
+
+public:
+    StaticTextOption text;
+    PlayerListTable local_table;
+    StringOption online_table_url;
+    BooleanCheckBoxOption ignore_whitelist;
+
+private:
+    PlayerListTable online_table;
 };
 
 
