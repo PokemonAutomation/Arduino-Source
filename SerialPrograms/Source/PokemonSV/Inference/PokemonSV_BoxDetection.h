@@ -17,7 +17,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-//  Detect whether the cursor is over a Pokemon in the box.
+//  Detect whether the cursor is over a Pokemon or egg in the box.
+//  It detects the yellow title bar on top-right corner of the screen when the cursor is on a pokemon or egg
 class SomethingInBoxSlotDetector : public StaticScreenDetector{
 public:
     SomethingInBoxSlotDetector(Color color, bool true_if_exists = true);
@@ -83,6 +84,7 @@ struct BoxCursorCoordinates{
     uint8_t col;
 };
 
+// Detect if the game is in box system view
 class BoxDetector : public StaticScreenDetector{
 public:
     BoxDetector(Color color = COLOR_RED);
@@ -114,6 +116,26 @@ class BoxWatcher : public DetectorToFinder<BoxDetector>{
 public:
     BoxWatcher(Color color)
          : DetectorToFinder("BoxFinder", std::chrono::milliseconds(250), color)
+    {}
+};
+
+// Detect whether a box slot is empty by checking color stddev on that slot
+// Note: due to the very slow loading of sprites in Pokemon SV box system, you need to make sure the sprites
+// are fully loaded before calling this detector.
+class BoxEmptySlotDetector : public StaticScreenDetector{
+public:
+    BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+private:
+    Color m_color;
+    ImageFloatBox m_box;
+};
+class BoxEmptySlotWatcher : public DetectorToFinder<BoxEmptySlotDetector>{
+public:
+    BoxEmptySlotWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_RED)
+         : DetectorToFinder("BoxEmptySlotWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
     {}
 };
 

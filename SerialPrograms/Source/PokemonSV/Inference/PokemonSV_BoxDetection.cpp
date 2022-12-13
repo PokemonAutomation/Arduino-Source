@@ -297,10 +297,25 @@ void BoxDetector::move_cursor(
     }
 }
 
+BoxEmptySlotDetector::BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color)
+: m_color(color) {
+    if (side == BoxCursorLocation::PARTY){
+        m_box = ImageFloatBox(0.142, 0.1165 * row + 0.201, 0.048, 0.082);
+    } else if (side == BoxCursorLocation::SLOTS){
+        m_box = ImageFloatBox(0.0656 * col + 0.242, 0.1165 * row + 0.201, 0.048, 0.082);
+    } else {
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for BoxEmptySlotDetector");
+    }
+}
 
+void BoxEmptySlotDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
 
-
-
+bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame) const{
+    const auto stats = image_stats(extract_box_reference(frame, m_box));
+    return stats.stddev.sum() < 20.0;
+}
 
 
 

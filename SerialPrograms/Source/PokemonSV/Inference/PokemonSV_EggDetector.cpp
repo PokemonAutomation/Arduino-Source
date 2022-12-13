@@ -53,7 +53,7 @@ EggDetector::EggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color
     } else if (side == BoxCursorLocation::SLOTS){
         m_box = ImageFloatBox(0.0656 * col + 0.249, 0.1165 * row + 0.235, 0.033, 0.066);
     } else {
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for egg detector");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for EggDetector");
     }
 }
 
