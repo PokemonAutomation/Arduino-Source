@@ -211,7 +211,11 @@ namespace {
 
 // expand the hand bounding box so that the hand watcher can pick the hand in the next iteration
 ImageFloatBox expand_box(const ImageFloatBox& box){
-    return ImageFloatBox(box.x - box.width * 1.5, box.y - box.height * 1.5, box.width*4, box.height*4);
+    const double x = std::max(0.0, box.x - box.width * 1.5);
+    const double y = std::max(0.0, box.y - box.height * 1.5);
+    const double width = std::min(box.width*4, 1.0 - x);
+    const double height = std::min(box.height*4, 1.0 - y);
+    return ImageFloatBox(x, y, width, height);
 }
 
 ImageFloatBox hand_location_to_box(const std::pair<double, double>& loc){
@@ -340,7 +344,7 @@ ImageFloatBox move_sandwich_hand(
 
         last_loc = cur_loc;
         last_time = cur_time;
-        context.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(80));
     }
 }
 
