@@ -93,7 +93,7 @@ RaidPlayerBanList::RaidPlayerBanList()
     , local_table(
         "<b>Ban Table:</b><br>A table of users to ban by IGN. "
         "The last column is a tuning parameter that specifies how well the name needs to match. "
-        "Optical Character Recognition (OCR) is imperfect. So exact matches are rare and unreliable. "
+        "Text recognition is imperfect. So exact matches are rare and unreliable. "
         "The value is the estimated log10 probability of matching by chance against random characters. "
         "It is always negative. Lower value means the match needs to be more perfect to be a match.<br><br>"
         "If you are getting false positive hits, decrease this value. (make it more negative)<br>"
@@ -106,7 +106,8 @@ RaidPlayerBanList::RaidPlayerBanList()
         "<b>Online Ban Table:</b><br> In addition to the above table, download a ban list from this URL.<br>"
         "Thus the list of banned players is the combined table.",
         LockWhileRunning::UNLOCKED,
-        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json", ""
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json",
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json"
     )
     , ignore_whitelist(
         "<b>Ignore Whitelist:</b><br>Ignore the developer whitelist.",

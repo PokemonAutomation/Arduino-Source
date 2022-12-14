@@ -78,6 +78,7 @@
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "Common/Cpp/Containers/BoxSet.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
+#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -170,6 +171,15 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+
+    ImageRGB32 image("20221213-225954706643.png");
+    TeraCatchDetector detector(COLOR_RED);
+    cout << detector.detect(image) << endl;
+
+    extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
+
+#if 0
     {
         std::string json = FileDownloader::download_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json");
         cout << "Done loading..." << endl;
@@ -183,6 +193,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         cout << "Done loading..." << endl;
         cout << json.dump() << endl;
     }
+#endif
 #endif
 
 #if 0

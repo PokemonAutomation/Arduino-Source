@@ -78,8 +78,8 @@ FastCodeEntry::FastCodeEntry()
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "10",
-        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "10"
+        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "10",
+        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "10"
     )
 {
     PA_ADD_OPTION(CODE);

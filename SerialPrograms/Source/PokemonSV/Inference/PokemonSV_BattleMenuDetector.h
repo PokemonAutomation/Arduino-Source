@@ -81,7 +81,8 @@ public:
 
 private:
     Color m_color;
-    ImageFloatBox m_box;
+    ImageFloatBox m_button;
+    ImageFloatBox m_box_right;
     GradientArrowDetector m_arrow;
 };
 class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
