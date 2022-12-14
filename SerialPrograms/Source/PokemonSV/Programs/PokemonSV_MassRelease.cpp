@@ -68,7 +68,11 @@ MassRelease::MassRelease()
         LockWhileRunning::UNLOCKED,
         2, 0, 32
     )
-    , SKIP_SHINIES("<b>Skip shinies pokemon:</b>", LockWhileRunning::UNLOCKED, true)
+    , SKIP_SHINIES(
+        "<b>Skip Shinies:</b><br>Do not release shiny " + STRING_POKEMON + ".",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
