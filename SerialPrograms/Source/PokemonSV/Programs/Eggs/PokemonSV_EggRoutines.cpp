@@ -4,17 +4,25 @@
  *
  */
 
-
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/PokemonSV_BoxGenderDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_EggDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_EggRoutines.h"
 
 namespace PokemonAutomation{
@@ -118,8 +126,89 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
     }
 }
 
+void picnic_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
+    // Orient camera to look at same direction as player character
+    // This is needed because when save-load the game, the camera is reset
+    // to this location.
+    pbf_press_button(context, BUTTON_L, 50, 40);
 
-void collect_eggs_from_basket(ConsoleHandle& console, BotBaseContext& context, size_t max_eggs, size_t& num_eggs_collected){
+    // Move right to make player character facing away from Aera Zero observation station
+    pbf_move_left_joystick(context, 255, 0, 50, 50);
+    // Press L to move camera to face the same direction as the player character
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    // Move forward
+    pbf_move_left_joystick(context, 128, 0, 125, 0);
+
+    picnic_from_overworld(console, context);
+}
+
+bool eat_egg_sandwich_at_picnic(AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
+    // Move forward to table to make sandwich
+    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    context.wait_for_all_requests();
+    
+    bool can_make_sandwich = (
+        enter_sandwich_recipe_list(console, context) && select_sandwich_recipe(console, context, 17)
+    );
+
+    if (can_make_sandwich == false){
+        return false;
+    }
+
+    make_great_peanut_butter_sandwich(dispatcher, console, context);
+    finish_sandwich_eating(console, context);
+
+    return true;
+}
+
+void collect_eggs_after_sandwich(ConsoleHandle& console, BotBaseContext& context,
+    size_t max_eggs, size_t& num_eggs_collected,
+    std::function<void(size_t new_eggs)> basket_check_callback
+){
+    context.wait_for_all_requests();
+    console.log("Move past picnic table");
+    console.overlay().add_log("Move past picnic table", COLOR_WHITE);
+
+    // Move left
+    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    // Move forward to pass table
+    pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
+    // Move right
+    pbf_move_left_joystick(context, 255, 128, 40, 40);
+    // Move back to face basket
+    pbf_move_left_joystick(context, 128, 255, 10, 40);
+
+    context.wait_for_all_requests();
+    
+    const auto egg_collection_interval = std::chrono::minutes(3);
+    const auto max_egg_wait_time = std::chrono::minutes(30);
+
+    WallClock start = current_time();
+    while(true){
+        const size_t last_num_eggs_collected = num_eggs_collected;
+        check_basket_to_collect_eggs(console, context, max_eggs, num_eggs_collected);
+
+        basket_check_callback(num_eggs_collected - last_num_eggs_collected);
+
+        if (num_eggs_collected == max_eggs){
+            console.log("Collected enough eggs: " + std::to_string(max_eggs));
+            break;
+        }
+
+        if (current_time() - start > max_egg_wait_time){
+            console.log("Picnic time up.");
+            console.overlay().add_log("Picnic time up", COLOR_YELLOW);
+            break;
+        }
+        
+        context.wait_for_all_requests();
+        console.log("Wait 3 minutes.");
+        console.overlay().add_log("Wait 3 min", COLOR_WHITE);
+        context.wait_for(egg_collection_interval);
+    }
+}
+
+void check_basket_to_collect_eggs(ConsoleHandle& console, BotBaseContext& context, size_t max_eggs, size_t& num_eggs_collected){
     pbf_press_button(context, BUTTON_A, 20, 80);
 
     bool basket_found = false;
@@ -335,6 +424,36 @@ void reset_position_at_zero_gate(ConsoleHandle& console, BotBaseContext& context
 
     fly_to_overworld_from_map(console, context);
 }
+
+
+void check_baby_info(ConsoleHandle& console, BotBaseContext& context,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
+    std::function<void(bool, const PokemonAutomation::ImageViewRGB32&)> shiny_callback,
+    Pokemon::EggHatchAction& action
+){
+    context.wait_for_all_requests();
+    auto screen = console.video().snapshot();
+
+    VideoOverlaySet overlay_set(console.overlay());
+
+    BoxShinyDetector shiny_detector;
+    shiny_detector.make_overlays(overlay_set);
+    IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
+    BoxGenderDetector gender_detector;
+    gender_detector.make_overlays(overlay_set);
+
+    const bool shiny = shiny_detector.detect(screen);
+    shiny_callback(shiny, screen);
+
+    IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    EggHatchGenderFilter gender = gender_detector.detect(screen);
+
+    console.log(IVs.to_string(), COLOR_GREEN);
+    console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+
+    action = FILTERS.get_action(shiny, IVs, gender);
+}
+
 
 
 }

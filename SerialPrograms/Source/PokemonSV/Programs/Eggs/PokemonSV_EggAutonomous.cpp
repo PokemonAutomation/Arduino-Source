@@ -270,64 +270,28 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
 // start at Area Zero flyting spot, start picnic, make sandwich, then fetch eggs at basket.
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // Orient camera to look at same direction as player character
-    // This is needed because when save-load the game, the camera is reset
-    // to this location.
-    pbf_press_button(context, BUTTON_L, 50, 100);
-
-    // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 0, 50, 50);
-    // Press L to move camera to face the same direction as the player character
-    pbf_press_button(context, BUTTON_L, 50, 70);
-    // Move forward
-    pbf_move_left_joystick(context, 128, 0, 125, 0);
-
     try{
-        picnic_from_overworld(env.console, context);
+        picnic_at_zero_gate(env.console, context);
     } catch(OperationFailedException &e){
         dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailPicnic", e.message());
+            "PicnicFailed", e.message());
     }
-
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     
-    // Move forward to table to make sandwich
-    pbf_move_left_joystick(context, 128, 0, 30, 40);
-    context.wait_for_all_requests();
+    bool can_make_sandwich = 0;
     
-    bool found_recipe = false;
     try{
-        found_recipe = enter_sandwich_recipe_list(env.console, context);
+        can_make_sandwich = eat_egg_sandwich_at_picnic(env.realtime_dispatcher(), env.console, context);
     } catch(OperationFailedException &e){
         dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailRecipeList", e.message());
+            "SandwichFailed", e.message());
     }
-    if (found_recipe == false){
-        dump_unrecoverable_error(env, "NoRecipeList");
-        throw OperationFailedException(env.console, "No sandwich ingredients. Cannot open sandwich recipe list.");
+    if (can_make_sandwich == false){
+        dump_unrecoverable_error(env, "NoRecipeOrIngredients");
+        throw OperationFailedException(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
     }
-
-    found_recipe = false;
-    try{
-        found_recipe = select_sandwich_recipe(env.console, context, 17);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailFindRecipe", e.message());
-    }
-    if (found_recipe == false){
-        dump_unrecoverable_error(env, "RecipeNotFound");
-        throw OperationFailedException(env.console, "Cannot find sandwich recipe with enough ingredients.");
-    }
-
-    try{
-        make_great_peanut_butter_sandwich(env, env.console, context);
-        finish_sandwich_eating(env.console, context);
-        env.current_stats<EggAutonomous_Descriptor::Stats>().m_sandwiches++;
-        env.update_stats();
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "MakeSandwich", e.message());
-    }
+    env.current_stats<EggAutonomous_Descriptor::Stats>().m_sandwiches++;
+    env.update_stats();
 
     // move past the table and collect eggs
     collect_eggs_at_picnic(env, context);
@@ -393,50 +357,38 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             context.wait_for_all_requests();
 
             env.log("Check hatched pokemon at party slot " + std::to_string(i+1));
-            // If no pokemon in the slot:
-            auto screen = env.console.video().snapshot();
+            
+            bool found_shiny = false;
+            auto shiny_callback = [&](bool shiny, const PokemonAutomation::ImageViewRGB32& screen){
+                if (shiny){
+                    found_shiny = true;
+                    env.console.log("Shiny found!");
+                    env.console.overlay().add_log("Shiny " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);        
+                    stats.m_shinies++;
+                    env.update_stats();
+                    send_encounter_notification(
+                        env,
+                        m_notification_noop,
+                        NOTIFICATION_SHINY,
+                        false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                        screen
+                    );
+                } else{
+                    env.console.overlay().add_log("Not shiny " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_WHITE);
+                }
+            };
 
-            VideoOverlaySet overlay_set(env.console.overlay());
-
-            BoxShinyDetector shiny_detector;
-            shiny_detector.make_overlays(overlay_set);
-            IVCheckerReaderScope iv_reader_scope(env.console.overlay(), LANGUAGE);
-            BoxGenderDetector gender_detector;
-            gender_detector.make_overlays(overlay_set);
-
-            const bool shiny = shiny_detector.detect(screen);
-            if (shiny){
-                env.log("Shiny found!");
-                env.console.overlay().add_log("Shiny " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
-                stats.m_shinies++;
-                env.update_stats();
-                send_encounter_notification(
-                    env,
-                    m_notification_noop,
-                    NOTIFICATION_SHINY,
-                    false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                    screen
-                );
-            } else{
-                env.console.overlay().add_log("Not shiny " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_WHITE);
-            }
-
-            IVCheckerReader::Results IVs = iv_reader_scope.read(env.logger(), screen);
-            EggHatchGenderFilter gender = gender_detector.detect(screen);
-
-            env.log(IVs.to_string(), COLOR_GREEN);
-            env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-
-            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender);
+            EggHatchAction action = EggHatchAction::Release;
+            check_baby_info(env.console, context, LANGUAGE, FILTERS, shiny_callback, action);
 
             auto send_keep_notification = [&](){
-                if (!shiny){
+                if (!found_shiny){
                     send_encounter_notification(
                         env,
                         NOTIFICATION_NONSHINY_KEEP,
                         NOTIFICATION_SHINY,
                         false, false, {}, std::nan(""),
-                        screen
+                        env.console.video().snapshot()
                     );
                 }
             };
@@ -664,55 +616,19 @@ uint8_t EggAutonomous::read_party_eggs(SingleSwitchProgramEnvironment& env, BotB
 void EggAutonomous::collect_eggs_at_picnic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
-    context.wait_for_all_requests();
-    env.log("Move past picnic table");
-    env.console.overlay().add_log("Move past picnic table", COLOR_WHITE);
-
-    // Move left
-    pbf_move_left_joystick(context, 0, 128, 40, 40);
-    // Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
-    // Move right
-    pbf_move_left_joystick(context, 255, 128, 40, 40);
-    // Move back to face basket
-    pbf_move_left_joystick(context, 128, 255, 10, 40);
-
-    context.wait_for_all_requests();
+    auto basket_check_callback = [&](size_t new_eggs){
+        stats.m_fetch_attempts++;
+        stats.m_eggs += new_eggs;
+        env.update_stats();
+    };
 
     const size_t max_eggs = 30;
     size_t num_eggs_collected = 0;
-    
-    const auto egg_collection_interval = std::chrono::minutes(3);
-    const auto max_egg_wait_time = std::chrono::minutes(25);
-
-    WallClock start = current_time();
-    while(true){
-        const size_t last_num_eggs_collected = num_eggs_collected;
-        try{
-            collect_eggs_from_basket(env.console, context, max_eggs, num_eggs_collected);
-        } catch(OperationFailedException &e){
-            dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "FailEggBasket", e.message());
-        }
-
-        stats.m_fetch_attempts++;
-        stats.m_eggs += num_eggs_collected - last_num_eggs_collected;
-        env.update_stats();
-        if (num_eggs_collected == max_eggs){
-            env.log("Collected enough eggs.");
-            break;
-        }
-
-        if (current_time() - start > max_egg_wait_time){
-            env.log("Picnic time up.");
-            env.console.overlay().add_log("Picnic tiem up", COLOR_YELLOW);
-            break;
-        }
-        
-        context.wait_for_all_requests();
-        env.log("Wait 3 minutes.");
-        env.console.overlay().add_log("Wait 3 min", COLOR_WHITE);
-        context.wait_for(egg_collection_interval);
+    try{
+        collect_eggs_after_sandwich(env.console, context, max_eggs, num_eggs_collected, basket_check_callback);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "CheckBasketFailed", e.message());
     }
 }
 

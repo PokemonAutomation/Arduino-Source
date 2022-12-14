@@ -4,7 +4,7 @@
  *
  */
 
-
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -230,7 +230,7 @@ std::string box_to_string(const ImageFloatBox& box){
 }
 
 ImageFloatBox move_sandwich_hand(
-    ProgramEnvironment& env,
+    AsyncDispatcher& dispatcher,
     ConsoleHandle& console,
     BotBaseContext& context,
     SandwichHandType hand_type,
@@ -239,7 +239,7 @@ ImageFloatBox move_sandwich_hand(
     const ImageFloatBox& end_box
 ){
     context.wait_for_all_requests();
-    env.log(std::string("Start moving sandwich hand: ") + ((hand_type == SandwichHandType::FREE) ? "FREE" : "GRABBING")
+    console.log(std::string("Start moving sandwich hand: ") + ((hand_type == SandwichHandType::FREE) ? "FREE" : "GRABBING")
         + " start box " + box_to_string(start_box) + " end box " + box_to_string(end_box));
 
     
@@ -249,7 +249,7 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession move_session(context, console.logger(), env.realtime_dispatcher(), console.botbase());
+    AsyncCommandSession move_session(context, console.logger(), dispatcher, console.botbase());
     
     if (pressing_A){
         move_session.dispatch([](BotBaseContext& context){
@@ -350,7 +350,7 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
 
     const ImageFloatBox initial_box{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox ingredient_box{0.455, 0.130, 0.090, 0.030};
@@ -368,45 +368,30 @@ void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& c
     }
 
     console.overlay().add_log("Pick first banana", COLOR_WHITE);
-    auto end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
+    auto end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
 
     console.overlay().add_log("Drop first banana", COLOR_WHITE);
     // visual feedback grabbing is not reliable. Switch to blind grabbing:
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-    
-    // XXX DEBUG ingredient dropping!
-    // {
-    //     AsyncCommandSession move_session(context, console.logger(), env.realtime_dispatcher(), console.botbase());
-    //     move_session.dispatch([&](BotBaseContext& context){
-    //         pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
-    //     });
-
-    //     for(int i = 0; i < 20; i++){
-    //         move_session.dispatch([&](BotBaseContext& context){
-    //             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100 - i/5, 200 + i/3, 128, 128, 1000);
-    //         });
-    //         context.wait_for(std::chrono::milliseconds(100));
-    //     }
-    // }
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
     
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
     console.overlay().add_log("Pick second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
 
     console.overlay().add_log("Drop second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
     console.overlay().add_log("Pick third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
     
     console.overlay().add_log("Drop third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 156, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
@@ -421,7 +406,7 @@ void make_great_peanut_butter_sandwich(ProgramEnvironment& env, ConsoleHandle& c
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
-    end_box = move_sandwich_hand(env, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
+    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
     pbf_mash_button(context, BUTTON_A, 125 * 5);
 
     console.log("Hand end box " + box_to_string(end_box));

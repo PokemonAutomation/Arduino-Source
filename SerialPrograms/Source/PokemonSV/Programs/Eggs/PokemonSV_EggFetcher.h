@@ -37,13 +37,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    size_t fetch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     SimpleIntegerOption<uint16_t> EGGS_TO_FETCH;
-    TimeExpressionOption<uint32_t> FETCH_PERIOD;
+    SimpleIntegerOption<uint16_t> MAX_NUM_SANDWICHES;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
