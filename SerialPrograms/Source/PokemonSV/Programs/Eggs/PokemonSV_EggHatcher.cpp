@@ -75,7 +75,7 @@ EggHatcher::EggHatcher()
 void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
-    for(int column_index = 0; column_index < 6; column_index++){
+    for(uint8_t column_index = 0; column_index < 6; column_index++){
         uint8_t num_eggs = 0, num_non_egg_pokemon = 0;
 
         if (check_party_empty(env.console, context) == false){
