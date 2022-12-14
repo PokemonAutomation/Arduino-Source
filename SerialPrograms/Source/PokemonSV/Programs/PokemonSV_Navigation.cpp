@@ -324,6 +324,7 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     console.log("Start picnic from overworld...");
     WallClock start = current_time();
+    bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(console, "picnic_from_overworld(): Failed to start picnic after 3 minutes.");
@@ -347,7 +348,10 @@ void picnic_from_overworld(ConsoleHandle& console, BotBaseContext& context){
             continue;
         case 1:
             console.log("Detected main menu.");
-            main_menu.move_cursor(console, context, MenuSide::RIGHT, 2, fast_mode);
+            success = main_menu.move_cursor(console, context, MenuSide::RIGHT, 2, fast_mode);
+            if (success == false){
+                throw OperationFailedException(console.logger(), "picnic_from_overworld(): Cannot move menu cursor to picnic.");
+            }
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
             continue;
         case 2:
@@ -416,6 +420,7 @@ void enter_box_system_from_overworld(ConsoleHandle& console, BotBaseContext& con
     context.wait_for_all_requests();
     console.log("Enter box system from overworld...");
     WallClock start = current_time();
+    bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(console, "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.");
@@ -440,7 +445,10 @@ void enter_box_system_from_overworld(ConsoleHandle& console, BotBaseContext& con
         case 1:
             console.log("Detected main menu.");
             console.overlay().add_log("Enter box", COLOR_WHITE);
-            main_menu.move_cursor(console, context, MenuSide::RIGHT, 1, fast_mode);
+            success = main_menu.move_cursor(console, context, MenuSide::RIGHT, 1, fast_mode);
+            if (success == false){
+                throw OperationFailedException(console.logger(), "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.");
+            }
             pbf_press_button(context, BUTTON_A, 20, 50);
             continue;
         case 2:

@@ -273,6 +273,9 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         VideoSnapshot screen = env.console.video().snapshot();
         TeraCardReader reader(COLOR_RED);
         size_t stars = reader.stars(screen);
+        if (stars == 0){
+            dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
+        }
 
         VideoOverlaySet overlay_set(env.console);
 
@@ -281,7 +284,10 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         ImageMatch::ImageMatchResult silhouette = silhouette_reader.read(screen);
         silhouette.log(env.logger(), 100);
         std::string best_silhouette = silhouette.results.empty() ? "UnknownSilhouette" : silhouette.results.begin()->second;
-        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (silhouette.results.empty()){
+            dump_image(env.logger(), env.program_info(), "ReadSilhouetteFailed", *screen.frame);
+        }
+        else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
             dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_silhouette, "", screen);
         }
 
@@ -290,16 +296,17 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         ImageMatch::ImageMatchResult type = type_reader.read(screen);
         type.log(env.logger(), 100);
         std::string best_type = type.results.empty() ? "UnknownType" : type.results.begin()->second;
-        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (type.results.empty()){
+            dump_image(env.logger(), env.program_info(), "ReadTypeFailed", *screen.frame);
+        }
+        else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
             dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_type, "", screen);
         }
 
-        env.console.overlay().add_log("Fighting a " + std::to_string(stars) + "* " + best_type + " " + best_silhouette, COLOR_GREEN);
-
-        if (stars == 0){
-            dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
-        }else{
-            env.log("Detected " + std::to_string(stars) + " star(s) raid.", COLOR_PURPLE);
+        {
+            std::string log = "Detected a " + std::to_string(stars) + "* " + best_type + " " + best_silhouette;
+            env.console.overlay().add_log(log, COLOR_GREEN);
+            env.log(log);
         }
 
         bool skip = false;
@@ -345,6 +352,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             }
             ss << " a " << stars << "* " << best_type << " " << best_silhouette << " raid";
             env.log(ss.str());
+            env.console.overlay().add_log(ss.str(), COLOR_GREEN);
         }
     }
 

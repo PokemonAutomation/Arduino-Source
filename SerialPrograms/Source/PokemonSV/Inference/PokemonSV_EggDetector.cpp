@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV_EggDetector.h"
 
 #include <iostream>
@@ -53,7 +54,7 @@ EggDetector::EggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color
     } else if (side == BoxCursorLocation::SLOTS){
         m_box = ImageFloatBox(0.0656 * col + 0.249, 0.1165 * row + 0.235, 0.033, 0.066);
     } else {
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for egg detector");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for EggDetector");
     }
 }
 
@@ -80,12 +81,18 @@ bool EggDetector::detect(const ImageViewRGB32& frame) const{
     );
 }
 
-EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallback("EggPartyColumnWatcher"), m_egg_watchers(5) {
+EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallback("EggPartyColumnWatcher"), m_egg_watchers(5), m_empty_watchers(5) {
     for(uint8_t i = 0; i < 5; i++){
         m_egg_watchers.emplace_back(
             BoxCursorLocation::PARTY,
             (uint8_t)(i + 1), (uint8_t)0,
             EggWatcher::FinderType::CONSISTENT,
+            color
+        );
+        m_empty_watchers.emplace_back(
+            BoxCursorLocation::PARTY,
+            (uint8_t)(i + 1), (uint8_t)0,
+            BoxEmptySlotWatcher::FinderType::CONSISTENT,
             color
         );
     }
@@ -94,17 +101,23 @@ EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallb
 void EggPartyColumnWatcher::make_overlays(VideoOverlaySet& items) const{
     for(int i = 0; i < 5; i++){
         m_egg_watchers[i].make_overlays(items);
+        m_empty_watchers[i].make_overlays(items);
     }
 }
 
 bool EggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    bool all_found = true;
+    bool all_certain = true;
     for(int i = 0; i < 5; i++){
-        if (m_egg_watchers[i].process_frame(frame, timestamp) == false){
-            all_found = false;
+        // Return true if an egg is detected
+        const bool egg_certain =  m_egg_watchers[i].process_frame(frame, timestamp);
+        // Return true if it is sure that the slot is empty or not
+        const bool empty_certain = m_empty_watchers[i].process_frame(frame, timestamp);
+
+        if (!egg_certain || !empty_certain){
+            all_certain = false;
         }
     }
-    return all_found;
+    return all_certain;
 }
 
 uint8_t EggPartyColumnWatcher::num_eggs_found() const{
@@ -115,6 +128,16 @@ uint8_t EggPartyColumnWatcher::num_eggs_found() const{
         }
     }
     return num_eggs;
+}
+
+uint8_t EggPartyColumnWatcher::num_non_egg_pokemon_found() const{
+    uint8_t num_pokemon = 0;
+    for(int i = 0; i < 5; i++){
+        if (m_empty_watchers[i].consistent_result() == false){
+            num_pokemon++;
+        }
+    }
+    return num_pokemon;
 }
 
 

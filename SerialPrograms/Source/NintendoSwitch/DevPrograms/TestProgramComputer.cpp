@@ -6,6 +6,7 @@
 
 #include <set>
 #include <mutex>
+#include <fstream>
 #include <condition_variable>
 #include <QImage>
 #include <QJsonObject>
@@ -39,6 +40,7 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -76,6 +78,7 @@
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "Common/Cpp/Containers/BoxSet.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
+#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -169,6 +172,31 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+    ImageRGB32 image("20221213-225954706643.png");
+    TeraCatchDetector detector(COLOR_RED);
+    cout << detector.detect(image) << endl;
+
+    extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
+
+#if 0
+    {
+        std::string json = FileDownloader::download_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json");
+        cout << "Done loading..." << endl;
+
+        std::ofstream file("test.txt");
+        file << json;
+    }
+#if 1
+    {
+        JsonValue json = FileDownloader::download_json_file(env.logger(), "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json");
+        cout << "Done loading..." << endl;
+        cout << json.dump() << endl;
+    }
+#endif
+#endif
+
+#if 0
     ScheduledTaskRunner scheduler(env.inference_dispatcher());
 
     scheduler.add_event(std::chrono::seconds(5), []{ cout << "5 seconds" << endl; });
@@ -176,7 +204,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     scheduler.add_event(std::chrono::seconds(7), []{ cout << "7 seconds" << endl; });
 
     scope.wait_for(std::chrono::seconds(100));
-
+#endif
 
 #if 0
     BoxSet<size_t> set;
@@ -210,7 +238,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     auto objects = Waterfill::find_objects_inplace(matrix, 20);
     extract_box_reference(region, objects[0]).save("cropped.png");
 #endif
-
 
 //    DialogArrowDetector detector({0.45, 0.9, .1, .05});
 //    detector.detect(image);

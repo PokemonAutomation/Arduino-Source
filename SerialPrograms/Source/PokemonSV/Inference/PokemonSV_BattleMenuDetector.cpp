@@ -74,19 +74,28 @@ bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
 
 TeraCatchDetector::TeraCatchDetector(Color color)
     : m_color(color)
-    , m_box(0.95, 0.81, 0.02, 0.06)
+    , m_button(0.801, 0.818, 0.005, 0.047)
+    , m_box_right(0.95, 0.81, 0.02, 0.06)
     , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.80, 0.08, 0.09})
 {}
 void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_box);
+    items.add(m_color, m_box_right);
     m_arrow.make_overlays(items);
 }
 bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats box = image_stats(extract_box_reference(screen, m_box));
-//    cout << box.average << box.stddev << endl;
+    ImageStats button = image_stats(extract_box_reference(screen, m_button));
+//    cout << button.average << button.stddev << endl;
+//    extract_box_reference(screen, m_button).save("temp.png");
+    if (!is_solid(button, {0.117281, 0.311767, 0.570951}, 0.15, 20)){
+        return false;
+    }
+#if 0
+    ImageStats box = image_stats(extract_box_reference(screen, m_box_right));
+    cout << box.average << box.stddev << endl;
     if (!is_solid(box, {0.554348, 0.445652, 0.}, 0.15, 20)){
         return false;
     }
+#endif
     if (!m_arrow.detect(screen)){
         return false;
     }

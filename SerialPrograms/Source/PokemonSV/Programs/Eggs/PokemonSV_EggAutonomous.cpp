@@ -474,6 +474,8 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
                                 // Press A to drop the held pokemon to the empty slot
                                 pbf_press_button(context, BUTTON_A, 20, 80);
+                                // Move cursor back to party
+                                box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
                                 found_empty_slot = true;
                                 break;
                             }
@@ -635,86 +637,28 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
 void EggAutonomous::move_circles_to_hatch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
-    for(int i = 0; i < num_eggs_in_party; i++){
-        env.console.overlay().add_log("Hatching egg " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
-
-        // Orient camera to look at same direction as player character
-        // This is needed because when save-load the game, the camera is reset
-        // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 70);
-
-        context.wait_for_all_requests();
-
-        AdvanceDialogWatcher dialog(COLOR_RED);
-
-        int ret = run_until(
-            env.console, context,
-            [&](BotBaseContext& context){
-                if (i == 0){
-                    // At beginning, ride on Koraidon/Miradon and go off ramp:
-                    pbf_press_button(context, BUTTON_PLUS, 50, 100);
-                    // Move right to make player character facing away from Aera Zero observation station
-                    pbf_move_left_joystick(context, 255, 0, 50, 50);
-                    // Press L to move camera to face the same direction as the player character
-                    pbf_press_button(context, BUTTON_L, 50, 70);
-                    // Move forward
-                    pbf_move_left_joystick(context, 128, 0, 350, 0);
-                }
-
-                for(int j = 0; j < 600; j++){
-                    // hatch circle:
-                    // Left joystick forward, right joystick right
-                    pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-                        128, 0, 255, 128, TICKS_PER_SECOND);
-                }
-            },
-            {dialog}
-        );
-
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "EggNotHatch", "No more egg hatch after 10 minutes.");
-        }
-
-        env.console.overlay().add_log("Hatched " + std::to_string(i+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
-        OverworldWatcher overworld(COLOR_CYAN);
-        ret = run_until(
-            env.console, context,
-            [](BotBaseContext& context){
-                for(int i = 0; i < 60; i++){
-                    pbf_mash_button(context, BUTTON_A, 125);
-                }
-            },
-            {overworld}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-                "EggHatch", "No end of egg hatching detected after one minute.");
-        }
-
+    auto hatched_callback = [&](uint8_t){  
         stats.m_hatched++;
         env.update_stats();
-    } // end hatching each egg
+    };
+    try{
+        hatch_eggs_at_zero_gate(env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+    } catch(OperationFailedException &e){
+        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
+            "HatchEgg", e.message());
+    }
 
     reset_position_to_flying_spot(env, context);
 }
 
 uint8_t EggAutonomous::read_party_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    context.wait_for_all_requests();
-    EggPartyColumnWatcher egg_column_watcher;
-    int ret = wait_until(
-        env.console, context,
-        std::chrono::seconds(10),
-        {egg_column_watcher}
-    );
-    if (ret < 0){
+    try{
+        return check_egg_party_column(env.console, context).first;
+    } catch(OperationFailedException &e){
         dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "CantReadPartyEggs", "Cannot read party eggs in box system.");
+            "CantReadPartyEggs", e.message());
     }
-    return egg_column_watcher.num_eggs_found();
 }
-
-
 
 // from one end of the picnic table, go around the table to reach basket and collect eggs
 void EggAutonomous::collect_eggs_at_picnic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

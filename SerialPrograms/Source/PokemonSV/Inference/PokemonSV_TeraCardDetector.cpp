@@ -352,10 +352,10 @@ bool TeraLobbyReader::check_ban_for_image(
     if (!ignore_whitelist){
         //  Matched. Check against the whitelist.
         static const std::vector<std::string> WHITELIST{
-            "Alice",
             "Gael",
-            "Dhruv",
+//            "Dhruv",
             "Nikki",
+            "Alice",
             "Dani",
             "denvoros",
             "Halazea",
@@ -472,15 +472,14 @@ bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock 
 
 TeraLobbyBanWatcher::TeraLobbyBanWatcher(
     Logger& logger, Color color,
-    PlayerListTable& table,
-    bool include_host, bool ignore_whitelist
+    RaidPlayerBanList& bans,
+    bool include_host
 )
     : TeraLobbyReader(color)
     , VisualInferenceCallback("TeraLobbyBanWatcher")
     , m_logger(logger)
-    , m_table(table)
+    , m_bans(bans)
     , m_include_host(include_host)
-    , m_ignore_whitelist(ignore_whitelist)
 {}
 std::vector<TeraLobbyNameMatchResult> TeraLobbyBanWatcher::detected_banned_players() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -490,11 +489,14 @@ void TeraLobbyBanWatcher::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);
 }
 bool TeraLobbyBanWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    if (!m_bans.enabled()){
+        return false;
+    }
     std::vector<TeraLobbyNameMatchResult> match_list;
     uint8_t banned = check_ban_list(
         m_logger, match_list,
-        m_table.snapshot(), frame,
-        m_include_host, m_ignore_whitelist
+        m_bans.current_banlist(), frame,
+        m_include_host, m_bans.ignore_whitelist
     );
     if (banned == 0){
         return false;

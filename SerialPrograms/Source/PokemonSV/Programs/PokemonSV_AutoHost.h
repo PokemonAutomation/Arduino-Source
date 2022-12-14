@@ -70,7 +70,6 @@ private:
     BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
     RaidPlayerBanList BAN_LIST;
-    BooleanCheckBoxOption IGNORE_WHITELIST;
 
     EventNotificationOption NOTIFICATION_RAID_POST;
     EventNotificationOption NOTIFICATION_RAID_START;

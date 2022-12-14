@@ -53,7 +53,9 @@ void enter_alphanumeric_code(
     BotBaseContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
+    uint8_t scroll_delay = 4,
+    uint8_t wrap_delay = 6,
+    bool reordering = true
 );
 
 

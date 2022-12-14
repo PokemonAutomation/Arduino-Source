@@ -139,6 +139,53 @@ bool release_one_pokemon(ProgramEnvironment& env, ConsoleHandle& console, BotBas
     return true;
 }
 
+bool check_party_empty(ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    BoxEmptyPartyWatcher watcher;
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(10),
+        {watcher}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console.logger(), "check_party_empty(): Cannot read party emptyness in box system.");
+    }
+
+    return watcher.num_empty_slots_found() == 5;
+}
+
+void load_one_column_to_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index){
+    BoxDetector box_detector;
+    // Move cursor to the current column
+    box_detector.move_cursor(console, context, BoxCursorLocation::SLOTS, 0, column_index);
+
+    hold_one_column(context);
+    // Move the held column to party
+    box_detector.move_cursor(console, context, BoxCursorLocation::PARTY, 1, 0);
+
+    // Drop the column to party
+    pbf_press_button(context, BUTTON_A, 20, 80);
+
+    context.wait_for_all_requests();
+}
+
+void unload_one_column_from_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index){
+    BoxDetector box_detector;
+    // Move cursor to party column
+    box_detector.move_cursor(console, context, BoxCursorLocation::PARTY, 1, 0);
+
+    hold_one_column(context);
+
+    // Move the held column to target
+    box_detector.move_cursor(console, context, BoxCursorLocation::SLOTS, 0, column_index);
+
+    // Drop the column
+    pbf_press_button(context, BUTTON_A, 20, 80);
+
+    context.wait_for_all_requests();
+}
+
+
 }
 }
 }
