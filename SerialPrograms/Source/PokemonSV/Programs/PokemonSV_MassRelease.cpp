@@ -30,7 +30,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "PokemonSV:MassRelease",
         STRING_POKEMON + " SV", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassRelease.md",
-        "Farm items from Tera raids.",
+        "Mass release boxes of Pokémon.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
