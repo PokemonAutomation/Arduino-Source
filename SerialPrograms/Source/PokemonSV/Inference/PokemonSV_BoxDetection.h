@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BoxDetection_H
 #define PokemonAutomation_PokemonSV_BoxDetection_H
 
+#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "PokemonSV_DialogDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
 
@@ -137,6 +138,23 @@ public:
     BoxEmptySlotWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_RED)
          : DetectorToFinder("BoxEmptySlotWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
     {}
+};
+
+
+// Detect party empty slots (the five slots after the party lead). Useful for egg hatching.
+class BoxEmptyPartyWatcher : public VisualInferenceCallback{
+public:
+    BoxEmptyPartyWatcher(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    
+    // Return true when the watcher is sure that each of the five slots is either egg, non-egg pokemon or empty.
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+    uint8_t num_empty_slots_found() const;
+
+private:
+    FixedLimitVector<BoxEmptySlotWatcher> m_empty_watchers;
 };
 
 

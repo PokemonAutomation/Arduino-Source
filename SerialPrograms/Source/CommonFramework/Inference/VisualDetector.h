@@ -95,7 +95,12 @@ public:
             if (m_start_of_detection == WallClock::min()){
                 m_start_of_detection = timestamp;
             }
-            return timestamp - m_start_of_detection >= m_duration;
+
+            const bool enough_time = timestamp - m_start_of_detection >= m_duration;
+            if (enough_time){
+                m_consistent_result = m_last_detected > 0;
+            }
+            return enough_time;
         }
         default:;
         }
@@ -104,13 +109,14 @@ public:
 
     //  If m_finder_type is CONSISTENT and process_frame() returns true,
     //  whether it is consecutively detected , or consecutively not detected.
-    bool consistent_result() const { return m_last_detected > 0; }
+    bool consistent_result() const { return m_consistent_result; }
 
 private:
     std::chrono::milliseconds m_duration;
     FinderType m_finder_type;
     WallClock m_start_of_detection = WallClock::min();
     int8_t m_last_detected = 0; // 0: no prior detection, 1: last detected positive, -1: last detected negative
+    bool m_consistent_result = false;
 };
 
 

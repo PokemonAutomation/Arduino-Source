@@ -1247,6 +1247,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp

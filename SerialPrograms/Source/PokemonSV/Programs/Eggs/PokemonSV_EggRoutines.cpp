@@ -13,6 +13,8 @@
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/PokemonSV_EggDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_EggRoutines.h"
 
 namespace PokemonAutomation{
@@ -216,6 +218,122 @@ void collect_eggs_from_basket(ConsoleHandle& console, BotBaseContext& context, s
             return;
         }
     } // end while true reading basket dialogs
+}
+
+
+std::pair<uint8_t, uint8_t> check_egg_party_column(ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    EggPartyColumnWatcher egg_column_watcher;
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(10),
+        {egg_column_watcher}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console.logger(), "check_egg_party_column(): Cannot read party eggs in box system.");
+    }
+    return {egg_column_watcher.num_eggs_found(), egg_column_watcher.num_non_egg_pokemon_found()};
+}
+
+void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
+    uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
+{
+    auto handle_egg_hatching = [&](uint8_t egg_idx){
+        console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
+        OverworldWatcher overworld(COLOR_CYAN);
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                for(int i = 0; i < 60; i++){
+                    pbf_mash_button(context, BUTTON_A, 125);
+                }
+            },
+            {overworld}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console.logger(), "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
+        }
+
+        if (egg_hatched_callback){
+            egg_hatched_callback(egg_idx);
+        }
+    };
+
+    bool got_off_ramp = false;
+    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        console.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        // Orient camera to look at same direction as player character
+        // This is needed because when save-load the game, the camera is reset
+        // to this location.
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        context.wait_for_all_requests();
+
+        AdvanceDialogWatcher dialog(COLOR_RED);
+
+        int ret = 0;
+        if (got_off_ramp == false){
+            // first, get off ramp to the empty field for circling motions
+            ret = run_until(
+                console, context,
+                [&](BotBaseContext& context){
+                    if (egg_idx == 0){
+                        // At beginning, ride on Koraidon/Miradon and go off ramp:
+                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        // Move right to make player character facing away from Aera Zero observation station
+                        pbf_move_left_joystick(context, 255, 0, 50, 50);
+                        // Press L to move camera to face the same direction as the player character
+                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        // Move forward
+                        pbf_move_left_joystick(context, 128, 0, 350, 0);
+                    }
+                },
+                {dialog}
+            );
+            if (ret == 0){
+                // egg hatching when going off ramp:
+                handle_egg_hatching(egg_idx);
+                reset_position_at_zero_gate(console, context);
+                continue;
+            }
+
+            got_off_ramp = true;
+        }
+
+        // Circular motions:
+        ret = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                // hatch circle:
+                // Left joystick forward, right joystick right
+                // click left joystick
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
+                    128, 0, 255, 128, 20);
+                pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 255, 128, 20);
+                for(int j = 0; j < 600; j++){
+                    pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
+                        128, 0, 255, 128, TICKS_PER_SECOND);
+                }
+            },
+            {dialog}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console.logger(), "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes.");
+        }
+
+        handle_egg_hatching(egg_idx);
+    } // end hatching each egg
+}
+
+
+void reset_position_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
+    // Use map to fly back to the flying spot
+    open_map_from_overworld(console, context);
+
+    pbf_move_left_joystick(context, 128, 160, 20, 50);
+
+    fly_to_overworld_from_map(console, context);
 }
 
 

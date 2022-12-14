@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -16,6 +17,9 @@ using std::cout;
 using std::endl;;
 
 namespace PokemonAutomation{
+
+template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEmptySlotWatcher>;
+
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -319,7 +323,45 @@ bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame) const{
 
 
 
+BoxEmptyPartyWatcher::BoxEmptyPartyWatcher(Color color) : VisualInferenceCallback("BoxEmptyPartyWatcher"), m_empty_watchers(5) {
+    for(uint8_t i = 0; i < 5; i++){
+        m_empty_watchers.emplace_back(
+            BoxCursorLocation::PARTY,
+            (uint8_t)(i + 1), (uint8_t)0,
+            BoxEmptySlotWatcher::FinderType::CONSISTENT,
+            color
+        );
+    }
+}
 
+void BoxEmptyPartyWatcher::make_overlays(VideoOverlaySet& items) const{
+    for(int i = 0; i < 5; i++){
+        m_empty_watchers[i].make_overlays(items);
+    }
+}
+
+bool BoxEmptyPartyWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    bool all_certain = true;
+    for(int i = 0; i < 5; i++){
+        // Return true if it is sure that the slot is empty or not
+        const bool empty_certain = m_empty_watchers[i].process_frame(frame, timestamp);
+
+        if (!empty_certain){
+            all_certain = false;
+        }
+    }
+    return all_certain;
+}
+
+uint8_t BoxEmptyPartyWatcher::num_empty_slots_found() const{
+    uint8_t num_empty = 0;
+    for(int i = 0; i < 5; i++){
+        if (m_empty_watchers[i].consistent_result()){
+            num_empty++;
+        }
+    }
+    return num_empty;
+}
 
 
 

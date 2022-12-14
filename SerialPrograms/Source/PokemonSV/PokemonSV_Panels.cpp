@@ -23,6 +23,7 @@
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
+#include "Programs/Eggs/PokemonSV_EggHatcher.h"
 #include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 
 namespace PokemonAutomation{
@@ -52,7 +53,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
+
+
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Eggs ----");
+        ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
         ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
     }
 

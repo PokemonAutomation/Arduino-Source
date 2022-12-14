@@ -617,6 +617,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
@@ -1480,6 +1481,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
+    Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
