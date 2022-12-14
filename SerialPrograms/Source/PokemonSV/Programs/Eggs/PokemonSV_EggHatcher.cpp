@@ -131,21 +131,25 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 }
 
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
-    enter_box_system_from_overworld(env.console, context);
-    // // Wait one second to let game load box UI
-    // context.wait_for(std::chrono::seconds(1));
+    try{
+        enter_box_system_from_overworld(env.console, context);
+        // // Wait one second to let game load box UI
+        // context.wait_for(std::chrono::seconds(1));
 
-    for (uint8_t i = 0; i < BOXES; i++){
+        for (uint8_t i = 0; i < BOXES; i++){
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            hatch_one_box(env, context);
+        }
+    } catch(OperationFailedException& e){
+        stats.m_errors++;
         env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-
-        hatch_one_box(env, context);
+        throw e;
     }
 
-    env.update_stats();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
