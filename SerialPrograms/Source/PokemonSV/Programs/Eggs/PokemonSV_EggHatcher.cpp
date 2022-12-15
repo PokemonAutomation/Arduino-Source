@@ -124,9 +124,6 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         unload_one_column_from_party(env.console, context, column_index);
     }
 
-    env.log("Go to next box.");
-    env.console.overlay().add_log("Next box", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_R, 20, 80);
     context.wait_for_all_requests();
 }
 
@@ -141,7 +138,15 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         // context.wait_for(std::chrono::seconds(1));
 
         for (uint8_t i = 0; i < BOXES; i++){
+            if (i > 0){
+                env.log("Go to next box.");
+                env.console.overlay().add_log("Next box", COLOR_WHITE);
+                pbf_press_button(context, BUTTON_R, 20, 80);
+            }
+            context.wait_for_all_requests();
+
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
             hatch_one_box(env, context);
         }
     } catch(OperationFailedException& e){

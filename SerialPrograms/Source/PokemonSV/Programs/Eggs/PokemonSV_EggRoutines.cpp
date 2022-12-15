@@ -328,6 +328,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
     auto handle_egg_hatching = [&](uint8_t egg_idx){
+        console.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
         console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
         OverworldWatcher overworld(COLOR_CYAN);
         int ret = run_until(
@@ -342,6 +343,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
         if (ret < 0){
             throw OperationFailedException(console.logger(), "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
         }
+        console.log("Finished hatching animation and dialog.");
 
         if (egg_hatched_callback){
             egg_hatched_callback(egg_idx);
@@ -350,6 +352,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
 
     bool got_off_ramp = false;
     for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        console.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
         console.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
 
         // Orient camera to look at same direction as player character
@@ -375,7 +378,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
                         // Press L to move camera to face the same direction as the player character
                         pbf_press_button(context, BUTTON_L, 50, 40);
                         // Move forward
-                        pbf_move_left_joystick(context, 128, 0, 350, 0);
+                        pbf_move_left_joystick(context, 128, 0, 200, 0);
                     }
                 },
                 {dialog}
@@ -388,6 +391,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
             }
 
             got_off_ramp = true;
+            console.log("Got off ramp");
         }
 
         // Circular motions:
@@ -417,6 +421,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
 
 
 void reset_position_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
+    console.log("Open map and reset location to Zero Gate.");
     // Use map to fly back to the flying spot
     open_map_from_overworld(console, context);
 
