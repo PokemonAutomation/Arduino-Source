@@ -620,13 +620,15 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
-    Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp \
+    Source/PokemonSV/Programs/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
@@ -1484,13 +1486,15 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.h \
+    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
-    Source/PokemonSV/Programs/PokemonSV_MassRelease.h \
+    Source/PokemonSV/Programs/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \

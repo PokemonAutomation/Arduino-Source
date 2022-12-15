@@ -7,10 +7,8 @@
 #include <cmath>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Qt/StringToolsQt.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -19,8 +17,6 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
@@ -286,162 +282,42 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
     return normalized;
 }
 
-bool TeraLobbyReader::check_ban_for_image(
+std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
     Logger& logger,
-    std::vector<TeraLobbyNameMatchResult>& matches,
-    std::map<Language, CacheEntry>& cache, const ImageViewRGB32& image,
-    const PlayerListRowSnapshot& ban_entry,
-    bool ignore_whitelist
+    const std::set<Language>& languages, bool include_host,
+    const ImageViewRGB32& screen
 ) const{
-    auto iter = cache.find(ban_entry.language);
-    if (iter == cache.end()){
-        CacheEntry entry;
-        entry.raw_ocr = OCR::ocr_read(ban_entry.language, image);
-        if (!entry.raw_ocr.empty() && entry.raw_ocr.back() == '\n'){
-            entry.raw_ocr.pop_back();
-        }
-        entry.normalized = OCR::normalize_utf32(entry.raw_ocr);
-        logger.log(
-            "OCR Result (" + language_data(ban_entry.language).name + "): \"" +
-            entry.raw_ocr + "\" -> \"" + to_utf8(entry.normalized) + "\""
-        );
-        iter = cache.emplace(ban_entry.language, std::move(entry)).first;
-    }
-
-    if (iter->second.normalized.empty()){
-        return false;
-    }
-
-    std::u32string normalized_ban_entry = OCR::normalize_utf32(ban_entry.name);
-
-    size_t distance = OCR::levenshtein_distance(
-        iter->second.normalized,
-        normalized_ban_entry
-    );
-
-    if (distance >= normalized_ban_entry.size()){
-        return false;
-    }
-
-    double probability = OCR::random_match_probability(
-        normalized_ban_entry.size(),
-        normalized_ban_entry.size() - distance,
-        language_data(ban_entry.language).random_match_chance
-    );
-    double log10p = std::log10(probability);
-
-//    cout << ban_entry.name << " -> " << to_utf8(normalized_ban_entry)
-//         << " : " << to_utf8(iter->second.normalized) << ", log10p = " << log10p << endl;
-
-#if 0
-    TeraLobbyNameMatchResult result{
-        ban_entry,
-        iter->second.raw_ocr,
-        to_utf8(iter->second.normalized),
-        log10p
-    };
-    cout << result.to_str() << endl;
-#endif
-
-    //  Not a match. Return now.
-    if (log10p > ban_entry.log10p && distance != 0){
-        return false;
-    }
-
-
-    if (!ignore_whitelist){
-        //  Matched. Check against the whitelist.
-        static const std::vector<std::string> WHITELIST{
-            "Gael",
-//            "Dhruv",
-            "Nikki",
-            "Alice",
-            "Dani",
-            "denvoros",
-            "Halazea",
-        };
-        for (const std::string& name : WHITELIST){
-            std::u32string normalized_white_entry = OCR::normalize_utf32(name);
-            size_t w_distance = OCR::levenshtein_distance(
-                OCR::normalize_utf32(name),
-                normalized_ban_entry
-            );
-            if (w_distance >= normalized_white_entry.size()){
-                continue;
-            }
-            double w_probability = OCR::random_match_probability(
-                normalized_white_entry.size(),
-                normalized_white_entry.size() - w_distance,
-                language_data(ban_entry.language).random_match_chance
-            );
-            double w_log10p = std::log10(w_probability);
-            if (w_log10p <= ban_entry.log10p){
-                if (PreloadSettings::instance().DEVELOPER_MODE){
-                    logger.log("Cannot ban whitelisted user: " + name + " (log10p = " + tostr_default(w_log10p) + ")", COLOR_RED);
-                }
-                return false;
-            }
-        }
-    }
-
-    matches.emplace_back(TeraLobbyNameMatchResult{
-        ban_entry,
-        iter->second.raw_ocr,
-        to_utf8(iter->second.normalized),
-        log10p, distance == 0,
-        ban_entry.notes
-    });
-
-    return true;
-}
-PA_NO_INLINE uint8_t TeraLobbyReader::check_ban_list(
-    Logger& logger,
-    std::vector<TeraLobbyNameMatchResult>& match_list,
-    const std::vector<PlayerListRowSnapshot>& ban_list,
-    const ImageViewRGB32& screen,
-    bool include_host, bool ignore_whitelist
-) const{
-    if (ban_list.empty()){
-        return {};
-    }
-
     const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
 
-//    std::vector<TeraLobbyNameMatchResult> ret;
-
+    std::array<std::map<Language, std::string>, 4> ret;
     size_t start = include_host ? 0 : 1;
-    uint8_t banned_count = 0;
     for (size_t c = start; c < 4; c++){
         ImageStats sprite = image_stats(extract_box_reference(screen, m_player_mon[c]));
         if (sprite.stddev.sum() <= 80){
             continue;
         }
+//        logger.log("Reading player " + std::to_string(c) + "'s name...");
+        std::string str = "Player " + std::to_string(c) + ": ";
+        bool first = true;
+        for (Language language : languages){
+            ImageViewRGB32 box = extract_box_reference(screen, m_player_name[c]);
+            size_t pixels;
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
 
-        logger.log("Reading player " + std::to_string(c) + "'s name...");
-        ImageViewRGB32 box = extract_box_reference(screen, m_player_name[c]);
-        size_t pixels;
-        ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
-
-        std::map<Language, CacheEntry> cache;
-        bool banned = false;
-        for (const PlayerListRowSnapshot& entry : ban_list){
-            if (!entry.enabled){
-                continue;
+            std::string raw = OCR::ocr_read(language, filtered);
+            if (!raw.empty() && raw.back() == '\n'){
+                raw.pop_back();
             }
-            banned |= check_ban_for_image(
-                logger,
-                match_list,
-                cache, filtered,
-                entry,
-                ignore_whitelist
-            );
+            if (!first){
+                str += ", ";
+            }
+            first = false;
+            str += language_data(language).code + "=\"" + raw + "\"";
+            ret[c][language] = std::move(raw);
         }
-        if (banned){
-            banned_count++;
-        }
+        logger.log(str);
     }
-
-    return banned_count;
+    return ret;
 }
 
 
@@ -466,48 +342,6 @@ bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock 
     m_last_known_player_count.store(players);
     return players >= m_desired_players;
 }
-
-
-
-
-TeraLobbyBanWatcher::TeraLobbyBanWatcher(
-    Logger& logger, Color color,
-    RaidPlayerBanList& bans,
-    bool include_host
-)
-    : TeraLobbyReader(color)
-    , VisualInferenceCallback("TeraLobbyBanWatcher")
-    , m_logger(logger)
-    , m_bans(bans)
-    , m_include_host(include_host)
-{}
-std::vector<TeraLobbyNameMatchResult> TeraLobbyBanWatcher::detected_banned_players() const{
-    std::lock_guard<std::mutex> lg(m_lock);
-    return m_last_known_bans;
-}
-void TeraLobbyBanWatcher::make_overlays(VideoOverlaySet& items) const{
-    TeraLobbyReader::make_overlays(items);
-}
-bool TeraLobbyBanWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    if (!m_bans.enabled()){
-        return false;
-    }
-    std::vector<TeraLobbyNameMatchResult> match_list;
-    uint8_t banned = check_ban_list(
-        m_logger, match_list,
-        m_bans.current_banlist(), frame,
-        m_include_host, m_bans.ignore_whitelist
-    );
-    if (banned == 0){
-        return false;
-    }
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_last_known_bans = std::move(match_list);
-    return true;
-}
-
-
-
 
 
 

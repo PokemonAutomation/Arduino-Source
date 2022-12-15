@@ -238,10 +238,15 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         }
         default:
             stats.m_errors++;
-            dump_image_and_throw_recoverable_exception(
-                env, console, NOTIFICATION_ERROR_RECOVERABLE,
-                "NoState", "No recognized state after 10 seconds."
+            console.overlay().add_log("Error: No State", COLOR_RED);
+            VideoSnapshot screen = console.video().snapshot();
+            send_program_recoverable_error_notification(
+                env,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                "No recognized state after 10 seconds.",
+                screen
             );
+            throw OperationFailedException(console, "No recognized state after 10 seconds.");
         }
 
     }

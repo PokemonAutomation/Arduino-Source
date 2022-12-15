@@ -46,9 +46,6 @@ public:
     FloatingPointCell log10p;
     StringCell notes;
 };
-
-
-
 class PlayerListTable : public EditableTableOption_t<PlayerListRow>{
 public:
     PlayerListTable(
@@ -86,6 +83,7 @@ public:
 private:
     PlayerListTable online_table;
 };
+
 
 
 

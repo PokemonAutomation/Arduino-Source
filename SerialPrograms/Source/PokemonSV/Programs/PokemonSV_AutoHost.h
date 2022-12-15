@@ -14,6 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,14 +40,21 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    WallClock wait_for_lobby_open(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    WallClock wait_for_lobby_open(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        std::string& lobby_code
+    );
     void update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, uint8_t player_count);
     bool start_raid(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         WallClock start_time,
         uint8_t player_count
     );
-    bool run_lobby(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_lobby(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        std::string& lobby_code,
+        std::array<std::map<Language, std::string>, 4>& player_names
+    );
 
 private:
 //    OCR::LanguageOCR LANGUAGE;
@@ -70,9 +78,11 @@ private:
     BooleanCheckBoxOption TRY_TO_TERASTILIZE;
 
     RaidPlayerBanList BAN_LIST;
+    RaidJoinReportOption JOIN_REPORT;
 
     EventNotificationOption NOTIFICATION_RAID_POST;
     EventNotificationOption NOTIFICATION_RAID_START;
+    EventNotificationOption NOTIFICATION_JOIN_REPORT;
     EventNotificationsOption NOTIFICATIONS0;
 };
 

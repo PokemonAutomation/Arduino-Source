@@ -79,6 +79,8 @@
 #include "Common/Cpp/Containers/BoxSet.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "Integrations/DiscordWebhook.h"
+#include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -161,9 +163,6 @@ private:
 
 
 
-
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -173,11 +172,46 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
+    MultiLanguageJoinTracker tracker;
+    tracker.add(Language::English, "Alice", "RNS308");
+    tracker.add(Language::English, "Alice", "RNS308");
+    tracker.add(Language::English, "Alice", "RNS308");
+    tracker.add(Language::English, "Dhruv", "UCCJ9H");
+    tracker.add(Language::English, "Dhruv", "EKNQY9");
+    tracker.add(Language::English, "Gael", "X89986");
+    tracker.add(Language::English, "Gael", "X89986");
+    tracker.add(Language::ChineseSimplified, "Gael", "X89986");
+    tracker.add(Language::ChineseSimplified, "Gael", "X89986");
+
+    tracker.dump("test.txt");
+
+#if 0
+    cout << tracker.dump() << endl;
+
+    std::ofstream file("test.txt");
+    file << tracker.dump();
+    file.close();
+#endif
+
+#if 1
+    Integration::DiscordWebhook::send_message(
+        env.logger(), false,
+        {"Notifs"},
+        "Test Join Tracker output...",
+        JsonArray(),
+        std::make_shared<PendingFileSend>("test.txt", false)
+    );
+#endif
+
+
+#if 0
     ImageRGB32 image("20221213-225954706643.png");
     TeraCatchDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
 
     extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
+#endif
+
 
 #if 0
     {

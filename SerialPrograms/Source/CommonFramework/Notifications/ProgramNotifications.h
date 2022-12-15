@@ -21,10 +21,17 @@ class StatsTracker;
 class ProgramEnvironment;
 
 
-#if 1
-//  This is the generic notification function. You shouldn't need to call this
-//  one directly.
-void send_program_notification(
+
+//  Raw Notification
+void send_raw_program_notification_with_file(
+    Logger& logger, EventNotificationOption& settings,
+    Color color,
+    const ProgramInfo& info,
+    const std::string& title,
+    const std::vector<std::pair<std::string, std::string>>& messages,
+    const std::string& filepath
+);
+void send_raw_program_notification(
     Logger& logger, EventNotificationOption& settings,
     Color color,
     const ProgramInfo& info,
@@ -32,9 +39,18 @@ void send_program_notification(
     const std::vector<std::pair<std::string, std::string>>& messages,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
-#endif
 
 
+
+//  Program notification with stats.
+void send_program_notification_with_file(
+    ProgramEnvironment& env, EventNotificationOption& settings,
+    Color color,
+    const std::string& title,
+    std::vector<std::pair<std::string, std::string>> messages,
+    const std::string& current_stats_addendum,
+    const std::string& filepath
+);
 void send_program_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     Color color,
@@ -46,6 +62,7 @@ void send_program_notification(
 
 
 
+//  Other common program notification types.
 void send_program_status_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message = "",

@@ -76,26 +76,12 @@ public:
     uint8_t total_players(const ImageViewRGB32& screen) const;
     std::string raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen);
 
-    //  Returns the # of players banned.
-    uint8_t check_ban_list(
+    //  OCR the player names in all the specified languages.
+    //  The returned strings are raw OCR output and are unprocessed.
+    std::array<std::map<Language, std::string>, 4> read_names(
         Logger& logger,
-        std::vector<TeraLobbyNameMatchResult>& match_list,
-        const std::vector<PlayerListRowSnapshot>& ban_list,
-        const ImageViewRGB32& screen,
-        bool include_host, bool ignore_whitelist
-    ) const;
-
-private:
-    struct CacheEntry{
-        std::string raw_ocr;
-        std::u32string normalized;
-    };
-    bool check_ban_for_image(
-        Logger& logger,
-        std::vector<TeraLobbyNameMatchResult>& matches,
-        std::map<Language, CacheEntry>& cache, const ImageViewRGB32& image,
-        const PlayerListRowSnapshot& entry,
-        bool ignore_whitelist
+        const std::set<Language>& languages, bool include_host,
+        const ImageViewRGB32& screen
     ) const;
 
 
@@ -133,26 +119,6 @@ public:
 private:
     uint8_t m_desired_players;
     std::atomic<int8_t> m_last_known_player_count;
-};
-class TeraLobbyBanWatcher : public TeraLobbyReader, public VisualInferenceCallback{
-public:
-    TeraLobbyBanWatcher(
-        Logger& logger, Color color,
-        RaidPlayerBanList& bans,
-        bool include_host
-    );
-
-    std::vector<TeraLobbyNameMatchResult> detected_banned_players() const;
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    Logger& m_logger;
-    RaidPlayerBanList& m_bans;
-    bool m_include_host;
-    mutable std::mutex m_lock;
-    std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };
 
 

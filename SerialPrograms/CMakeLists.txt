@@ -1255,6 +1255,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.cpp
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.h
+    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
@@ -1267,8 +1269,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h
-    Source/PokemonSV/Programs/PokemonSV_MassRelease.cpp
-    Source/PokemonSV/Programs/PokemonSV_MassRelease.h
+    Source/PokemonSV/Programs/PokemonSV_JoinTracker.cpp
+    Source/PokemonSV/Programs/PokemonSV_JoinTracker.h
+    Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
+    Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp

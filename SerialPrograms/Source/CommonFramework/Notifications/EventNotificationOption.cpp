@@ -36,7 +36,7 @@ public:
         button->connect(
             button, &QPushButton::clicked,
             button, [&](bool){
-                send_program_notification(
+                send_raw_program_notification(
                     global_logger_tagged(), value.option,
                     COLOR_GREEN,
                     ProgramInfo("Test Message"),

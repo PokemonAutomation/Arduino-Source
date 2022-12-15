@@ -157,6 +157,10 @@ void RaidPlayerBanList::refresh_online_table(Logger& logger){
 
 
 
+
+
+
+
 }
 }
 }

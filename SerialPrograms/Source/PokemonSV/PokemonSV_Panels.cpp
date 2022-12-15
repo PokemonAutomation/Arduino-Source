@@ -10,7 +10,7 @@
 
 #include "PokemonSV_Settings.h"
 
-#include "Programs/PokemonSV_MassRelease.h"
+#include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_GimmighoulRoamingFarm.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"

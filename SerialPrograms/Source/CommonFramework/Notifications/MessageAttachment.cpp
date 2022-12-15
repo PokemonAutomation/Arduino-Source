@@ -48,6 +48,16 @@ PendingFileSend::PendingFileSend(const std::string& file, bool keep_file)
     QFileInfo info(QString::fromStdString(file));
     m_filename = info.fileName().toStdString();
 }
+#if 0
+PendingFileSend::PendingFileSend(Logger& logger, const std::string& text_attachment)
+    : m_keep_file(false)
+    , m_extend_lifetime(false)
+    , m_filename(now_to_filestring() + ".txt")
+    , m_filepath("TempFiles/" + m_filename)
+{
+    QFile file(QString::fromStdString(m_filepath));
+}
+#endif
 PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     : m_keep_file(image.keep_file)
     , m_extend_lifetime(false)
@@ -77,9 +87,9 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     if (image.keep_file){
         m_filepath = m_filename;
     }else{
-        QDir().mkdir("TempImages");
+        QDir().mkdir("TempFiles");
 //        m_filename = "temp-" + m_filename;
-        m_filepath = "TempImages/" + m_filename;
+        m_filepath = "TempFiles/" + m_filename;
     }
 
     if (image.image.save(m_filepath)){
