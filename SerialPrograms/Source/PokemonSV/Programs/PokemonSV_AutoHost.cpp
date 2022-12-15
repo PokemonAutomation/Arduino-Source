@@ -138,7 +138,7 @@ AutoHost::AutoHost()
     )
     , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
-    , NOTIFICATION_JOIN_REPORT("Player Join Reports", true, false, {"Notifs"})
+    , NOTIFICATION_JOIN_REPORT("Player Join Reports", true, false, {"Telemetry"})
     , NOTIFICATIONS0({
         &NOTIFICATION_RAID_POST,
         &NOTIFICATION_RAID_START,
@@ -496,6 +496,11 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             stats.m_raids++;
             bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, TRY_TO_TERASTILIZE);
             env.update_stats();
+            if (win){
+                stats.m_wins++;
+            }else{
+                stats.m_losses++;
+            }
             if (JOIN_REPORT.enabled() && (win || !JOIN_REPORT.wins_only)){
                 TeraLobbyJoinWatcher::append_report(join_tracker, player_names, lobby_code);
                 join_tracker.dump(report_name);
@@ -509,10 +514,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                 );
             }
             if (win){
-                stats.m_wins++;
                 exit_tera_win_without_catching(env.console, context);
-            }else{
-                stats.m_losses++;
             }
             completed_one = true;
             consecutive_failures = 0;

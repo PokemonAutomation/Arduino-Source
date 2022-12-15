@@ -194,7 +194,7 @@ RaidJoinReportOption::RaidJoinReportOption()
         "should not be used for the purpose of automatic banning."
     )
     , wins_only(
-        "<b>Track Wins Only:</b><br>Track wins only. Ignore losses.",
+        "<b>Track Wins Only:</b><br>Track wins only. Ignore losses and incomplete raids.",
         LockWhileRunning::UNLOCKED,
         true
     )
@@ -350,7 +350,7 @@ void TeraLobbyJoinWatcher::append_report(
     const std::array<std::map<Language, std::string>, 4>& names,
     const std::string& lobby_code
 ){
-    for (size_t c = 0; c < 4; c++){
+    for (size_t c = 1; c < 4; c++){
         for (const auto& item : names[c]){
             report.add(item.first, item.second, lobby_code);
         }
