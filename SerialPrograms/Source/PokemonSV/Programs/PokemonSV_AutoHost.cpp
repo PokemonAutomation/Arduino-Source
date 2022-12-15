@@ -339,7 +339,7 @@ bool AutoHost::run_lobby(
                         message += "\n";
                     }
                 }
-                stats.m_banned += last_known_bans.size();
+                stats.m_banned++;
                 send_program_notification(
                     env, NOTIFICATION_RAID_START,
                     COLOR_RED,

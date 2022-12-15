@@ -194,7 +194,7 @@ RaidJoinReportOption::RaidJoinReportOption()
         "should not be used for the purpose of automatic banning."
     )
     , wins_only(
-        "<b>Languages to Read:</b><br>Track wins only. Ignore losses.",
+        "<b>Track Wins Only:</b><br>Track wins only. Ignore losses.",
         LockWhileRunning::UNLOCKED,
         true
     )
