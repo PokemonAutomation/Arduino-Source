@@ -86,16 +86,16 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats button = image_stats(extract_box_reference(screen, m_button));
 //    cout << button.average << button.stddev << endl;
 //    extract_box_reference(screen, m_button).save("temp.png");
-    if (!is_solid(button, {0.117281, 0.311767, 0.570951}, 0.15, 20)){
+
+    ImageStats yellow = image_stats(extract_box_reference(screen, m_box_right));
+//    cout << box.average << box.stddev << endl;
+
+    bool button_ok = is_solid(button, {0.117281, 0.311767, 0.570951}, 0.20, 20) || is_black(button, 100, 15);
+    bool yellow_ok = is_solid(yellow, {0.554348, 0.445652, 0.}, 0.15, 20);
+    if (!button_ok && !yellow_ok){
         return false;
     }
-#if 0
-    ImageStats box = image_stats(extract_box_reference(screen, m_box_right));
-    cout << box.average << box.stddev << endl;
-    if (!is_solid(box, {0.554348, 0.445652, 0.}, 0.15, 20)){
-        return false;
-    }
-#endif
+
     if (!m_arrow.detect(screen)){
         return false;
     }

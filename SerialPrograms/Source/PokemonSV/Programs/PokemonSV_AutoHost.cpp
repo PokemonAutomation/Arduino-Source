@@ -325,6 +325,7 @@ bool AutoHost::run_lobby(
             return true;
         case 2:
             join_watcher.process_frame(snapshot, snapshot.timestamp);
+            last_known_player_count = join_watcher.get_last_known_state(player_names, last_known_bans);
             //  Intentional fall-through.
         case 3:{
             if (!last_known_bans.empty()){
@@ -367,6 +368,7 @@ bool AutoHost::run_lobby(
                 break;
             }
 
+            continue;
         }
         default:
             if (current_time() - start_time > std::chrono::minutes(4)){

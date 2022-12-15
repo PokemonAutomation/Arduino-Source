@@ -172,6 +172,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
+#if 0
     MultiLanguageJoinTracker tracker;
     tracker.add(Language::English, "Alice", "RNS308");
     tracker.add(Language::English, "Alice", "RNS308");
@@ -184,6 +185,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     tracker.add(Language::ChineseSimplified, "Gael", "X89986");
 
     tracker.dump("test.txt");
+#endif
 
 #if 0
     cout << tracker.dump() << endl;
@@ -193,7 +195,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     file.close();
 #endif
 
-#if 1
+#if 0
     Integration::DiscordWebhook::send_message(
         env.logger(), false,
         {"Notifs"},
@@ -204,12 +206,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 0
-    ImageRGB32 image("20221213-225954706643.png");
+#if 1
+    ImageRGB32 image("20221214-231841174428.png");
     TeraCatchDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
 
-    extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
+//    extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
 #endif
 
 

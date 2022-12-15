@@ -88,7 +88,7 @@ private:
 class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
 public:
     TeraCatchWatcher(Color color)
-         : DetectorToFinder("TeraCatchFinder", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("TeraCatchFinder", std::chrono::milliseconds(1000), color)
     {}
 };
 
