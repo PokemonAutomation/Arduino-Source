@@ -70,9 +70,9 @@ using namespace Pokemon;
             "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
             LockWhileRunning::LOCKED, false
         )
-		, NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+        , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
         , NOTIFICATIONS({
-			&NOTIFICATION_STATUS_UPDATE,
+            &NOTIFICATION_STATUS_UPDATE,
             &NOTIFICATION_PROGRAM_FINISH,
             &NOTIFICATION_ERROR_FATAL,
             })
@@ -85,9 +85,9 @@ using namespace Pokemon;
 
     void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
 
-		GimmighoulChestFarm_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarm_Descriptor::Stats>();
-		uint32_t c = 0;
-		while(c < PP) {
+	    GimmighoulChestFarm_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarm_Descriptor::Stats>();
+	    uint32_t c = 0;
+	    while(c < PP) {
             //Press A to enter battle, assuming there is a chest
             env.log("Fetch Attempts: " + tostr_u_commas(c));
             pbf_mash_button(context, BUTTON_A, 90);
@@ -126,31 +126,31 @@ using namespace Pokemon;
 			}
 
             //Close the game
-			save_game_from_overworld(env.console, context);
+            save_game_from_overworld(env.console, context);
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             context.wait_for_all_requests();
             close_game(context);
 			
             //Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
-			//This isn't perfect because 12 hour format but it works
+            //This isn't perfect because 12 hour format but it works
             home_to_date_time(context, true, false);
-			pbf_press_dpad(context, DPAD_DOWN, 10, 100);
-			pbf_press_dpad(context, DPAD_DOWN, 10, 100);
-			pbf_press_button(context, BUTTON_A, 10, 100);
-			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-			pbf_press_dpad(context, DPAD_UP, 10, 100);
-			pbf_press_dpad(context, DPAD_UP, 10, 100);
-			pbf_press_button(context, BUTTON_A, 10, 100);
-			pbf_press_button(context, BUTTON_A, 10, 100);
-			pbf_press_button(context, BUTTON_A, 10, 100);
-			pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+            pbf_press_dpad(context, DPAD_UP, 10, 100);
+            pbf_press_dpad(context, DPAD_UP, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
             pbf_press_button(context, BUTTON_HOME, 10, 90);
 
-			stats.resets++;
-			env.update_stats();
-			send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+	    stats.resets++;
+	    env.update_stats();
+	    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
             reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
         }
 
