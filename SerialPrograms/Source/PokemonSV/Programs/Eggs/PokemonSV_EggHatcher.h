@@ -48,6 +48,7 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     SimpleIntegerOption<uint8_t> BOXES;
+    BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

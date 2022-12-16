@@ -26,12 +26,12 @@ void hold_one_column(BotBaseContext& context);
 //       Because game will automatically fill the hole in the party. To release party pokemon, set `ensure_empty` to false.
 bool release_one_pokemon(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, bool ensure_empty = false);
 
-// In box system, check if the five party slots after the party lead are all empty
-bool check_party_empty(ConsoleHandle& console, BotBaseContext& context);
+// In box system, check how many slots in the party are empty
+uint8_t check_empty_slots_in_party(ConsoleHandle& console, BotBaseContext& context);
 
-void load_one_column_to_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index);
+void load_one_column_to_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index, bool has_clone_ride_pokemon);
 
-void unload_one_column_from_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index);
+void unload_one_column_from_party(ConsoleHandle& console, BotBaseContext& context, uint8_t column_index, bool has_clone_ride_pokemon);
 
 }
 }
