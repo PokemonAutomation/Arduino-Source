@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_GimmighoulChestFarm_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

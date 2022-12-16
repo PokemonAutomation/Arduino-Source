@@ -11,16 +11,14 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/PokemonSV_Settings.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
@@ -36,7 +34,7 @@ using namespace Pokemon;
         : SingleSwitchProgramDescriptor(
             "PokemonSV:GimmighoulChestFarm",
             STRING_POKEMON + " SV", "Gimmighoul Chest Farmer",
-            "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulChestFarm.md",
+            "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulChestFarmer.md",
             "Farm Chest Gimmighoul for coins.",
             FeedbackType::REQUIRED, true,
             PABotBaseLevel::PABOTBASE_12KB
@@ -86,15 +84,10 @@ using namespace Pokemon;
     }
 
     void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-        //Start in game facing a Chest Gimmighoul spawn in a Watchtower
-        //Your lead Pokemon must be able to kill Gimmighoul in one hit with its first move.
-		//Pick a move with an accuracy of 100 and use a high leveled lead, Gimmighoul isn't hard to one-shot.
-		//None of the pokemon in your party are able to level up or evolve
-		//please use a fast attack for speed
+
 		GimmighoulChestFarm_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarm_Descriptor::Stats>();
 		uint32_t c = 0;
 		while(c < PP) {
-		//for (uint32_t c = 0; c < SKIPS; c++) {
             //Press A to enter battle, assuming there is a chest
             env.log("Fetch Attempts: " + tostr_u_commas(c));
             pbf_mash_button(context, BUTTON_A, 90);
@@ -128,24 +121,33 @@ using namespace Pokemon;
 				send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
 				//Walk forward since battles force you to jump back
-				//Bumping into the wall seems to work to reset the position
 				pbf_press_button(context, BUTTON_L, 50, 40);
-				pbf_move_left_joystick(context, 128, 0, 280, 0);
+				pbf_move_left_joystick(context, 128, 0, 120, 0);
 			}
-			//Save game
+
+            //Close the game
 			save_game_from_overworld(env.console, context);
-            //Save the game then close it
-            //save_game_from_overworld(env.console, context);
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             context.wait_for_all_requests();
             close_game(context);
 			
-            //Date skip
+            //Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
+			//This isn't perfect because 12 hour format but it works
             home_to_date_time(context, true, false);
-            roll_date_forward_1(context, false);
+			pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+			pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+			pbf_press_button(context, BUTTON_A, 10, 100);
+			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+			pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+			pbf_press_dpad(context, DPAD_UP, 10, 100);
+			pbf_press_dpad(context, DPAD_UP, 10, 100);
+			pbf_press_button(context, BUTTON_A, 10, 100);
+			pbf_press_button(context, BUTTON_A, 10, 100);
+			pbf_press_button(context, BUTTON_A, 10, 100);
+			pbf_press_button(context, BUTTON_A, 10, 100);
             pbf_press_button(context, BUTTON_HOME, 10, 90);
 
-            //Enter game
 			stats.resets++;
 			env.update_stats();
 			send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
