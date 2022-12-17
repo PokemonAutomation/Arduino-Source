@@ -121,7 +121,9 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 }
 void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     for (uint8_t row = 0; row < 5; row++){
-        for (uint8_t col = 0; col < 6; col++){
+        for (uint8_t j_col = 0; j_col < 6; j_col++){
+            // Go through slots in a Z-shape pattern
+            uint8_t col = (row % 2 == 0 ? j_col : 5 - j_col);
             box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, row, col);
             release_one(box_detector, env, context);
             env.update_stats();
@@ -142,11 +144,15 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     box_detector.make_overlays(overlays);
 
     for (uint8_t box = 0; box < BOXES_TO_RELEASE; box++){
+        if (box > 0){
+            pbf_press_button(context, BUTTON_R, 20, 105);
+        }
+        context.wait_for_all_requests();
+
         env.update_stats();
 
         release_box(box_detector, env, context);
 
-        pbf_press_button(context, BUTTON_R, 20, 105);
         stats.m_boxes++;
     }
 
