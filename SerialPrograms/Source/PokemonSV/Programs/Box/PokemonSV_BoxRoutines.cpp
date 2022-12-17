@@ -27,13 +27,15 @@ namespace PokemonSV{
 
 void hold_one_column(BotBaseContext& context){
      // Minus to draw selection box
-    pbf_press_button(context, BUTTON_MINUS, 20, 40);
+    pbf_press_button(context, BUTTON_MINUS, 30, 50);
     // Select rest of the pary
-    for(int i = 0; i < 4; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
+    // Press down 5 times, with one extra press to make sure we select full party
+    // in case the game drops one press
+    for(int i = 0; i < 5; i++){
+        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
     }
     // Hold rest of the pary
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 30, 50);
 }
 
 bool release_one_pokemon(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, bool ensure_empty){
