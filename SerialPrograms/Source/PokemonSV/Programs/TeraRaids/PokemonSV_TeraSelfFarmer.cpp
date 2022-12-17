@@ -192,7 +192,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 
     if (MODE == Mode::FARM_ITEMS_ONLY){
-        exit_tera_win_without_catching(env.console, context);
+        exit_tera_win_without_catching(env.program_info(), env.console, context);
         return true;
     }
 
@@ -322,13 +322,13 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         if (skip) {
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
-            close_raid(env.console, context);
+            close_raid(env.program_info(), env.console, context);
             continue;
         }
 
         if (MODE == Mode::SHINY_HUNT){
-            close_raid(env.console, context);
-            save_game_from_overworld(env.console, context);
+            close_raid(env.program_info(), env.console, context);
+            save_game_from_overworld(env.program_info(), env.console, context);
             context.wait_for_all_requests();
             if (open_raid(env.console, context)){
                 env.log("Tera raid found!", COLOR_BLUE);

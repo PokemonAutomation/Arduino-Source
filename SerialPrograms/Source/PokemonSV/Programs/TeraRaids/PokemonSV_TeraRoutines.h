@@ -18,6 +18,7 @@ namespace PokemonAutomation{
     class ProgramEnvironment;
     class EventNotificationOption;
     class ImageViewRGB32;
+    struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -28,7 +29,7 @@ namespace PokemonSV{
 bool open_raid(ConsoleHandle& console, BotBaseContext& context);
 
 //  While viewing a raid card, close and return to the overworld.
-void close_raid(ConsoleHandle& console, BotBaseContext& context);
+void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 
@@ -37,6 +38,7 @@ void close_raid(ConsoleHandle& console, BotBaseContext& context);
 //  The entry point is with the catch/no-catch option up.
 //  Upon returning, you will be in the overworld.
 void exit_tera_win_without_catching(
+    const ProgramInfo& info,
     ConsoleHandle& console,
     BotBaseContext& context
 );

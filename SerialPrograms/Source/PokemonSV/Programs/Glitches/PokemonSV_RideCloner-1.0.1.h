@@ -16,6 +16,7 @@
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{
+    struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -39,7 +40,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void setup(ConsoleHandle& console, BotBaseContext& context);
+    void setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
         ConsoleHandle& console,

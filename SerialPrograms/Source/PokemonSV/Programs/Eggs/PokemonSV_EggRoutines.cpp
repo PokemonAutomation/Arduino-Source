@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -29,7 +30,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
+void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     // We start this function when we enter the restaurant without pressing any button.
 
     // Se we first press A to clear a dialog:
@@ -80,7 +81,8 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
             paid = true;
             break;
         default:
-            throw OperationFailedException(console.logger(), "order_compote_du_fils(): No recognized state in restaurant menu after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "ErrorOrderFood",
+                "order_compote_du_fils(): No recognized state in restaurant menu after 60 seconds.");
         }
     } // end state machine for restaurant menu
 
@@ -96,7 +98,8 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
             {{dialog_watcher}}
         );
         if (ret < 0){
-            throw OperationFailedException(console.logger(), "order_compote_du_fils(): No end of eating after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "EndDiningNotDetected",
+                "order_compote_du_fils(): No end of eating after 60 seconds.");
         }
     }
 
@@ -121,12 +124,13 @@ void order_compote_du_fils(ConsoleHandle& console, BotBaseContext& context){
             return; // outside restaurant
         }
         else{
-            throw OperationFailedException(console.logger(), "order_compote_du_fils(): No end of leaving restaurant after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "EndLeavingRestaurantNotDetected",
+                "order_compote_du_fils(): No end of leaving restaurant after 60 seconds.");
         }
     }
 }
 
-void picnic_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
+void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
     // to this location.
@@ -139,29 +143,29 @@ void picnic_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
     // Move forward
     pbf_move_left_joystick(context, 128, 0, 125, 0);
 
-    picnic_from_overworld(console, context);
+    picnic_from_overworld(info, console, context);
 }
 
-bool eat_egg_sandwich_at_picnic(AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
+bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
     
     bool can_make_sandwich = (
-        enter_sandwich_recipe_list(console, context) && select_sandwich_recipe(console, context, 17)
+        enter_sandwich_recipe_list(info, console, context) && select_sandwich_recipe(info, console, context, 17)
     );
 
     if (can_make_sandwich == false){
         return false;
     }
 
-    make_great_peanut_butter_sandwich(dispatcher, console, context);
-    finish_sandwich_eating(console, context);
+    make_great_peanut_butter_sandwich(info, dispatcher, console, context);
+    finish_sandwich_eating(info, console, context);
 
     return true;
 }
 
-void collect_eggs_after_sandwich(ConsoleHandle& console, BotBaseContext& context,
+void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t max_eggs, size_t& num_eggs_collected,
     std::function<void(size_t new_eggs)> basket_check_callback
 ){
@@ -186,7 +190,7 @@ void collect_eggs_after_sandwich(ConsoleHandle& console, BotBaseContext& context
     WallClock start = current_time();
     while(true){
         const size_t last_num_eggs_collected = num_eggs_collected;
-        check_basket_to_collect_eggs(console, context, max_eggs, num_eggs_collected);
+        check_basket_to_collect_eggs(info, console, context, max_eggs, num_eggs_collected);
 
         basket_check_callback(num_eggs_collected - last_num_eggs_collected);
 
@@ -208,7 +212,10 @@ void collect_eggs_after_sandwich(ConsoleHandle& console, BotBaseContext& context
     }
 }
 
-void check_basket_to_collect_eggs(ConsoleHandle& console, BotBaseContext& context, size_t max_eggs, size_t& num_eggs_collected){
+void check_basket_to_collect_eggs(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    size_t max_eggs, size_t& num_eggs_collected)
+{
     pbf_press_button(context, BUTTON_A, 20, 80);
 
     bool basket_found = false;
@@ -233,7 +240,8 @@ void check_basket_to_collect_eggs(ConsoleHandle& console, BotBaseContext& contex
     }
 
     if (basket_found == false){
-        throw OperationFailedException(console.logger(), "collect_eggs_from_basket(): Basket not found.");
+        dump_image_and_throw_recoverable_exception(info, console, "BasketNotFound",
+            "collect_eggs_from_basket(): Basket not found.");
     }
 
     // Press A to clear the current dialog
@@ -310,7 +318,7 @@ void check_basket_to_collect_eggs(ConsoleHandle& console, BotBaseContext& contex
 }
 
 
-std::pair<uint8_t, uint8_t> check_egg_party_column(ConsoleHandle& console, BotBaseContext& context){
+std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     EggPartyColumnWatcher egg_column_watcher;
     int ret = wait_until(
@@ -319,12 +327,13 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(ConsoleHandle& console, BotBa
         {egg_column_watcher}
     );
     if (ret < 0){
-        throw OperationFailedException(console.logger(), "check_egg_party_column(): Cannot read party eggs in box system.");
+        dump_image_and_throw_recoverable_exception(info, console, "CannotReadPartyEggs",
+            "check_egg_party_column(): Cannot read party eggs in box system.");
     }
     return {egg_column_watcher.num_eggs_found(), egg_column_watcher.num_non_egg_pokemon_found()};
 }
 
-void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
+void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
     auto handle_egg_hatching = [&](uint8_t egg_idx){
@@ -341,7 +350,8 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
             {overworld}
         );
         if (ret < 0){
-            throw OperationFailedException(console.logger(), "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
+            dump_image_and_throw_recoverable_exception(info, console, "NoHatchingEnd",
+                "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
         }
         console.log("Finished hatching animation and dialog.");
 
@@ -386,7 +396,7 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
             if (ret == 0){
                 // egg hatching when going off ramp:
                 handle_egg_hatching(egg_idx);
-                reset_position_at_zero_gate(console, context);
+                reset_position_at_zero_gate(info, console, context);
                 continue;
             }
 
@@ -412,7 +422,8 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
             {dialog}
         );
         if (ret < 0){
-            throw OperationFailedException(console.logger(), "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes.");
+            dump_image_and_throw_recoverable_exception(info, console, "NoEggToHatch",
+                "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes.");
         }
 
         handle_egg_hatching(egg_idx);
@@ -420,14 +431,14 @@ void hatch_eggs_at_zero_gate(ConsoleHandle& console, BotBaseContext& context,
 }
 
 
-void reset_position_at_zero_gate(ConsoleHandle& console, BotBaseContext& context){
+void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Open map and reset location to Zero Gate.");
     // Use map to fly back to the flying spot
-    open_map_from_overworld(console, context);
+    open_map_from_overworld(info, console, context);
 
     pbf_move_left_joystick(context, 128, 160, 20, 50);
 
-    fly_to_overworld_from_map(console, context);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 

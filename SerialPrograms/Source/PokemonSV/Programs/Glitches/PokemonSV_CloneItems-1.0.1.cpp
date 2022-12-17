@@ -126,7 +126,8 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to clone an item after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(env.program_info(), console, "CloneItemFailed",
+                "Failed to clone an item after 5 minutes.");
         }
 
         OverworldWatcher overworld(COLOR_RED);
@@ -165,10 +166,10 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         case 1:
             console.log("Detected main menu.");
             if (item_held){
-                main_menu.move_cursor(console, context, MenuSide::RIGHT, 1, true);
+                main_menu.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 1, true);
                 pbf_press_button(context, BUTTON_A, 20, 20);
             }else{
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 1, true);
+                main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 1, true);
                 pbf_press_button(context, BUTTON_A, 20, 50);
                 pbf_press_dpad(context, DPAD_UP, 10, 10);
                 pbf_press_dpad(context, DPAD_UP, 20, 10);
@@ -238,15 +239,9 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         }
         default:
             stats.m_errors++;
-            console.overlay().add_log("Error: No State", COLOR_RED);
-            VideoSnapshot screen = console.video().snapshot();
-            send_program_recoverable_error_notification(
-                env,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                "No recognized state after 10 seconds.",
-                screen
-            );
-            throw OperationFailedException(console, "No recognized state after 10 seconds.");
+
+            dump_image_and_throw_recoverable_exception(env, console, NOTIFICATION_ERROR_RECOVERABLE,
+                "CloneItemNoState", "No recognized state after 10 seconds.");
         }
 
     }
@@ -282,7 +277,8 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         );
         context.wait_for(std::chrono::milliseconds(50));
         if (ret < 0){
-            throw OperationFailedException(env. console.logger(), "Unable to recover from error state.");
+            dump_image(env.logger(), env.program_info(), "CannotRecoverFromError", env.console.video().snapshot());
+            throw FatalProgramException(env.console.logger(), "Unable to recover from error state.");
         }
     }
 

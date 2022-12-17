@@ -7,8 +7,9 @@
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
@@ -48,14 +49,16 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
     console.log("Tera raid found!", COLOR_BLUE);
     return true;
 }
-void close_raid(ConsoleHandle& console, BotBaseContext& context){
+
+void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Closing raid...");
 
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(info, console, "CloseRaidFailed",
+                "Failed to return to overworld after 5 minutes.");
         }
 
         TeraCardWatcher card_detector(COLOR_RED);
@@ -74,7 +77,8 @@ void close_raid(ConsoleHandle& console, BotBaseContext& context){
             console.log("Detected overworld.");
             return;
         default:
-            throw OperationFailedException(console.logger(), "close_raid(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "CloseRaidFailed",
+                "close_raid(): No recognized state after 60 seconds.");
         }
     }
 }
@@ -82,6 +86,7 @@ void close_raid(ConsoleHandle& console, BotBaseContext& context){
 
 
 void exit_tera_win_without_catching(
+    const ProgramInfo& info,
     ConsoleHandle& console,
     BotBaseContext& context
 ){
@@ -91,7 +96,8 @@ void exit_tera_win_without_catching(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(info, console, "ExitTeraWinFailed",
+                "Failed to return to overworld after 5 minutes.");
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -128,7 +134,8 @@ void exit_tera_win_without_catching(
             console.log("Detected overworld.");
             return;
         default:
-            throw OperationFailedException(console.logger(), "exit_tera_win_without_catching(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "ExitTeraWinFailed",
+                "exit_tera_win_without_catching(): No recognized state after 60 seconds.");
         }
     }
 }
@@ -154,7 +161,8 @@ TeraResult exit_tera_win_by_catching(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(env.program_info(), console, "ExitTeraWinFailed",
+                "Failed to return to overworld after 5 minutes.");
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -255,7 +263,8 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected overworld.");
             return result;
         default:
-            throw OperationFailedException(console.logger(), "exit_tera_win_by_catching(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(env.program_info(), console, "ExitTeraWinFailed",
+                "exit_tera_win_by_catching(): No recognized state after 60 seconds.");
         }
     }
 }

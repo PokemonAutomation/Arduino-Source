@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_MainMenuDetector.h"
@@ -66,7 +66,7 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 
 
 bool MainMenuDetector::move_cursor(
-    ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     MenuSide side, int row, bool fast
 ) const{
     if (side == MenuSide::NONE){
@@ -104,7 +104,7 @@ bool MainMenuDetector::move_cursor(
         if (current.first == MenuSide::NONE){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                throw OperationFailedException(console.logger(), "Unable to detect menu.");
+                dump_image_and_throw_recoverable_exception(info, console, "UnableToDetectMenu", "Unable to detect menu.");
             }
             context.wait_for(std::chrono::milliseconds(50));
             continue;

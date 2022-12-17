@@ -22,8 +22,8 @@ enum class BoxCursorLocation;
 // Hold one column of five pokemon
 void hold_one_column(BotBaseContext& context);
 
-// Release current selected pokemon in the box system. May thow OperationFailedException.
-// If `ensure_empty` is true, it will make sure the pokemon is release and throw OperationFailedException if releasing failed.
+// Release current selected pokemon in the box system.
+// If `ensure_empty` is true, it will make sure the pokemon is released and throw OperationFailedException if releasing failed.
 // Note: if `ensure_empty` is true, this function will fail if releasing a party pokemon that is not the last of the party!
 //       Because game will automatically fill the hole in the party. To release party pokemon, set `ensure_empty` to false.
 bool release_one_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool ensure_empty = false);

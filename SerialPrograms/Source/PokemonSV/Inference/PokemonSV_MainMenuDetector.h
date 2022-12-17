@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
     class ConsoleHandle;
     class BotBaseContext;
+    struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -44,7 +45,7 @@ public:
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
     bool move_cursor(
-        ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
         MenuSide side, int row, bool fast
     ) const;
 

@@ -11,6 +11,7 @@
 
 namespace PokemonAutomation{
     
+    struct ProgramInfo;
     class AsyncDispatcher;
     class ProgramEnvironment;
     class ConsoleHandle;
@@ -23,8 +24,7 @@ namespace PokemonSV{
 // The function returns when the game shows the sandwich recipe menu.
 // Return true if it enters the recipe menu. Return false if there is no ingredients on the plyaer character so
 // no sandwich can be made.
-// Will throw OperationFailedException if error occurs.
-bool enter_sandwich_recipe_list(ConsoleHandle& console, BotBaseContext& context);
+bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 // Starting at sandwich recipe selection menu, select the desired sandwich recipe and press A to enter
 // the making sandwich mini game. It will use the first sandwich pick in the sandwich pick selection list.
@@ -32,15 +32,14 @@ bool enter_sandwich_recipe_list(ConsoleHandle& console, BotBaseContext& context)
 // Return true if it successfully finds and starts the recipe.
 // Return false if the function fails to find the recipe. This could be that ingredients are not enough, and therefore
 // the recipe cell is semi-transparent, failed to be detected.
-// Will throw OperationFailedException if error occurs.
-bool select_sandwich_recipe(ConsoleHandle& console, BotBaseContext& context, size_t sandwich_index);
+bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, size_t sandwich_index);
 
 // Starting at the sandwich minigame of dropping ingredients, assume the selected recipe is Great Peanut Butter Sandwich,
 // make the sandwich.
-void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context);
+void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context);
 
 // Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
-void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context);
+void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }

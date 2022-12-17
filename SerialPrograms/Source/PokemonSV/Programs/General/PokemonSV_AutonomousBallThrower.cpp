@@ -7,7 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -110,7 +112,8 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             env.update_stats();
             break;
         default:
-            throw OperationFailedException(env.console.logger(), "Failed to detect battle menu after 60 seconds, did you caught the pokemon ?");
+            dump_image(env.logger(), env.program_info(), "BattleMenuNotDetected", env.console.video().snapshot());
+            throw FatalProgramException(env.console.logger(), "Failed to detect battle menu after 60 seconds, did you caught the pokemon ?");
         }
 
     }

@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -134,12 +135,16 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 
 
 void DateReader::set_hours(
-    ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t hour
 ){
     context.wait_for_all_requests();
-    if (!detect(console.video().snapshot())){
-        throw OperationFailedException(console.logger(), "Expected date change menu.");
+    {
+        auto snapshot = console.video().snapshot();
+        if (!detect(snapshot)){
+            dump_image(console.logger(), info, "DateChangeMenuNotDetected", snapshot);
+            throw FatalProgramException(console.logger(), "Expected date change menu.");
+        }
     }
 
     for (size_t attempts = 0; attempts < 10; attempts++){
@@ -154,8 +159,8 @@ void DateReader::set_hours(
         VideoSnapshot snapshot = console.video().snapshot();
         int8_t current_hour = read_hours(console.logger(), snapshot);
         if (current_hour < 0){
-            snapshot.frame->save("test.png");
-            throw OperationFailedException(console.logger(), "Unable to read the hour.");
+            dump_image(console.logger(), info, "CannotReadHour", snapshot);
+            throw FatalProgramException(console.logger(), "Unable to read the hour.");
         }
 
         //  We're done.
@@ -205,7 +210,9 @@ void DateReader::set_hours(
         }
     }
 
-    throw OperationFailedException(console.logger(), "Failed to set the hour after 10 attempts.");
+    auto snapshot = console.video().snapshot();
+    dump_image(console.logger(), info, "FailToSetHour", snapshot);
+    throw FatalProgramException(console.logger(), "Failed to set the hour after 10 attempts.");
 }
 
 

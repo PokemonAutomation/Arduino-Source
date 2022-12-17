@@ -192,7 +192,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
     m_saved_after_fetched_eggs = false;
-    m_error_recoverable = true;
 
     while(true){
 
@@ -270,38 +269,30 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
 // start at Area Zero flyting spot, start picnic, make sandwich, then fetch eggs at basket.
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    try{
-        picnic_at_zero_gate(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "PicnicFailed", e.message());
-    }
+    auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
+
+    picnic_at_zero_gate(env.program_info(), env.console, context);
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     
-    bool can_make_sandwich = 0;
-    
-    try{
-        can_make_sandwich = eat_egg_sandwich_at_picnic(env.realtime_dispatcher(), env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "SandwichFailed", e.message());
-    }
+    bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context);
     if (can_make_sandwich == false){
-        dump_unrecoverable_error(env, "NoRecipeOrIngredients");
-        throw OperationFailedException(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
+        throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
     }
     env.current_stats<EggAutonomous_Descriptor::Stats>().m_sandwiches++;
     env.update_stats();
 
     // move past the table and collect eggs
-    collect_eggs_at_picnic(env, context);
+    auto basket_check_callback = [&](size_t new_eggs){
+        stats.m_fetch_attempts++;
+        stats.m_eggs += new_eggs;
+        env.update_stats();
+    };
 
-    try{
-        leave_picnic(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailLeavePicnic", e.message());
-    }
+    const size_t max_eggs = 30;
+    size_t num_eggs_collected = 0;
+    collect_eggs_after_sandwich(env.program_info(), env.console, context, max_eggs, num_eggs_collected, basket_check_callback);
+
+    leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
     reset_position_to_flying_spot(env, context);
@@ -313,16 +304,16 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     if (num_eggs_in_party < 0){
         // detect how many eggs in party
-        enter_box_system(env, context);
+        enter_box_system_from_overworld(env.program_info(), env.console, context);
     
         context.wait_for_all_requests();
         context.wait_for(std::chrono::seconds(1)); // wait for one second to let box UI fully loaded
 
-        num_eggs_in_party = read_party_eggs(env, context);
+        num_eggs_in_party = check_egg_party_column(env.program_info(), env.console, context).first;
         env.log("Read " + std::to_string(num_eggs_in_party) + " eggs.");
         env.console.overlay().add_log("Party eggs: " + std::to_string(num_eggs_in_party), COLOR_WHITE);
 
-        leave_box_system(env, context);
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
     }
 
     bool need_to_save_after_kept = false;
@@ -336,10 +327,15 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             m_saved_after_fetched_eggs = true;
             need_to_save_after_kept = false;
         }
-        
-        move_circles_to_hatch_eggs(env, context, num_eggs_in_party);
 
-        enter_box_system(env, context);
+        auto hatched_callback = [&](uint8_t){  
+            stats.m_hatched++;
+            env.update_stats();
+        };
+        hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+        reset_position_to_flying_spot(env, context);
+
+        enter_box_system_from_overworld(env.program_info(), env.console, context);
         
         context.wait_for_all_requests();
         context.wait_for(std::chrono::seconds(1)); // wait for one second to let box UI fully loaded
@@ -485,7 +481,7 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             // Drop the column to pary
             pbf_press_button(context, BUTTON_A, 20, 80);
 
-            num_eggs_in_party = read_party_eggs(env, context);
+            num_eggs_in_party = check_egg_party_column(env.program_info(), env.console, context).first;
         } else {
             // no more eggs in box, change to hatching mode:
             env.log("Replace party with picnic team");
@@ -513,7 +509,7 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             pbf_press_button(context, BUTTON_L, 20, 40);
         }
 
-        leave_box_system(env, context);
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         if (next_egg_column == 6){ // no more eggs to hatch
             if ((AUTO_SAVING == AutoSave::AfterStartAndKeep && need_to_save_after_kept) || AUTO_SAVING == AutoSave::EveryBatch){
@@ -530,9 +526,9 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Use map to fly back to the flying spot
-    open_map(env, context);
+    open_map_from_overworld(env.program_info(), env.console, context);
     pbf_move_left_joystick(context, 128, 160, 20, 50);
-    fly_to_overworld(env, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
 }
 
 // From overworld, change pokemon party from the one used for getting eggs, to the one used for hatching
@@ -542,7 +538,7 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
     env.console.overlay().add_log("Change to hatching", COLOR_WHITE);
     // change pokemon party from used for fetching eggs in picnic, to hatching on your ride.
 
-    enter_box_system(env, context);
+    enter_box_system_from_overworld(env.program_info(), env.console, context);
 
     // Move to right box
     pbf_press_button(context, BUTTON_R, 20, 40);
@@ -579,110 +575,25 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
     context.wait_for_all_requests();
     context.wait_for(std::chrono::milliseconds(500)); // wait for one second to let box UI fully loaded
 
-    int num_eggs_in_party = read_party_eggs(env, context);
+    int num_eggs_in_party = check_egg_party_column(env.program_info(), env.console, context).first;
 
-    leave_box_system(env, context);
+    leave_box_system_to_overworld(env.program_info(), env.console, context);
 
     return num_eggs_in_party;
-}
-
-void EggAutonomous::move_circles_to_hatch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){
-    auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
-
-    auto hatched_callback = [&](uint8_t){  
-        stats.m_hatched++;
-        env.update_stats();
-    };
-    try{
-        hatch_eggs_at_zero_gate(env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "HatchEgg", e.message());
-    }
-
-    reset_position_to_flying_spot(env, context);
-}
-
-uint8_t EggAutonomous::read_party_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    try{
-        return check_egg_party_column(env.console, context).first;
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "CantReadPartyEggs", e.message());
-    }
-}
-
-// from one end of the picnic table, go around the table to reach basket and collect eggs
-void EggAutonomous::collect_eggs_at_picnic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
-    auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
-    auto basket_check_callback = [&](size_t new_eggs){
-        stats.m_fetch_attempts++;
-        stats.m_eggs += new_eggs;
-        env.update_stats();
-    };
-
-    const size_t max_eggs = 30;
-    size_t num_eggs_collected = 0;
-    try{
-        collect_eggs_after_sandwich(env.console, context, max_eggs, num_eggs_collected, basket_check_callback);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "CheckBasketFailed", e.message());
-    }
-}
-
-void EggAutonomous::open_map(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // Open map to fly to flying spot
-    try{
-        open_map_from_overworld(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailOpenMap", e.message());
-    }
-}
-
-void EggAutonomous::fly_to_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    try{
-        fly_to_overworld_from_map(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailFlyToOverworld", e.message());
-    }
-}
-
-void EggAutonomous::enter_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    try{
-        enter_box_system_from_overworld(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailEnterBoxSystem", e.message());
-    }
-
-}
-
-void EggAutonomous::leave_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    try{
-        leave_box_system_to_overworld(env.console, context);
-    } catch(OperationFailedException &e){
-        dump_image_and_throw_recoverable_exception(env, env.console, NOTIFICATION_ERROR_RECOVERABLE,
-            "FailLeaveBoxSystem", e.message());
-    }
 }
 
 
 void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld){
     try{
         if (from_overworld){
-            save_game_from_overworld(env.console, context);
+            save_game_from_overworld(env.program_info(), env.console, context);
         } else{
-            save_game_from_menu(env.console, context);
+            save_game_from_menu(env.program_info(), env.console, context);
         }
     } catch(OperationFailedException &e){
         // To be safe: avoid interrupting or corrupting game saving,
         // make game saving non error recoverable
-        dump_unrecoverable_error(env, "FailSaveGame");
-        throw e;
+        throw FatalProgramException(env.logger(), e.message());
     }
 }
 
@@ -694,8 +605,7 @@ void EggAutonomous::reset_game(SingleSwitchProgramEnvironment& env, BotBaseConte
     } catch(OperationFailedException &e){
         // To be safe: avoid doing anything outside of game on Switch,
         // make game resetting non error recoverable
-        dump_unrecoverable_error(env, "FailResetGame");
-        throw e;
+        throw FatalProgramException(env.logger(), e.message());
     }
 }
 
@@ -714,9 +624,8 @@ void EggAutonomous::handle_recoverable_error(
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
     }
-    // If error is not recoverable, or if there is no auto save, then we shouldn't reset game to
-    // lose previous progress.
-    if (m_error_recoverable == false || AUTO_SAVING == AutoSave::NoAutoSave){
+    // if there is no auto save, then we shouldn't reset game to lose previous progress.
+    if (AUTO_SAVING == AutoSave::NoAutoSave){
         throw e;
     }
 
@@ -729,12 +638,6 @@ void EggAutonomous::handle_recoverable_error(
     reset_game(env, context, "handling recoverable error");
 }
 
-void EggAutonomous::dump_unrecoverable_error(SingleSwitchProgramEnvironment& env, const std::string& error_name){
-    m_error_recoverable = false;
-    env.console.overlay().add_log("Error: " + error_name, COLOR_RED);
-    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-    dump_image(env.console, env.program_info(), error_name, *screen);
-}
 
 }
 }

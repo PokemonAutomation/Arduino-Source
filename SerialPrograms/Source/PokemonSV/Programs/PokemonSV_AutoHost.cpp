@@ -413,13 +413,13 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         env.update_stats();
 
         if (consecutive_failures > 0 && !completed_one){
-            throw OperationFailedException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
+            throw FatalProgramException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
         }
         size_t fail_threshold = CONSECUTIVE_FAILURE_PAUSE;
         if (consecutive_failures >= fail_threshold){
             uint16_t minutes = FAILURE_PAUSE_MINUTES;
             if (minutes == 0){
-                throw OperationFailedException(
+                throw FatalProgramException(
                     env.logger(),
                     "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
                     "Stopping to prevent possible ban."
@@ -440,7 +440,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             if (ROLLOVER_PREVENTION){
                 WallClock now = current_time();
                 if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){
-                    set_time_to_12am_from_home(env.console, context);
+                    set_time_to_12am_from_home(env.program_info(), env.console, context);
                     last_time_fix = now;
                 }
             }
@@ -456,7 +456,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             //  Connect to internet.
 //            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Online mode has not been implemented yet.");
             try{
-                connect_to_internet_from_overworld(env.console, context);
+                connect_to_internet_from_overworld(env.program_info(), env.console, context);
             }catch (OperationFailedException&){
                 consecutive_failures++;
                 stats.m_errors++;
@@ -514,7 +514,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                 );
             }
             if (win){
-                exit_tera_win_without_catching(env.console, context);
+                exit_tera_win_without_catching(env.program_info(), env.console, context);
             }
             completed_one = true;
             consecutive_failures = 0;

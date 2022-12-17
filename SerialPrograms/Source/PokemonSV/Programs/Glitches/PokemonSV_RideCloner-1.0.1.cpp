@@ -167,14 +167,14 @@ RideCloner101::RideCloner101()
 
 //  Start from the overworld with 5 (non-ride legendary) Pokemon in your
 //  party. Move your ride legendary into the 6th slot in your party.
-void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
+void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Running setup...");
 
     bool in_party = false;
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to setup after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(info, console, "RideCloneSetupFailed", "Failed to setup after 5 minutes.");
         }
 
         OverworldWatcher overworld(COLOR_RED);
@@ -210,12 +210,12 @@ void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
             if (advance.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false);
+                main_menu.move_cursor(info, console, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
                 //  Otherwise we try to move the ride legendary to the party.
-                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 6, false)){
+                if (main_menu.move_cursor(info, console, context, MenuSide::LEFT, 6, false)){
                     //  Success, continue.
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }else{
@@ -230,7 +230,7 @@ void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
             if (main_menu.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false);
+                main_menu.move_cursor(info, console, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
@@ -242,7 +242,8 @@ void RideCloner101::setup(ConsoleHandle& console, BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
-            throw OperationFailedException(console.logger(), "setup(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "RideCloneSetupFailed",
+                "setup(): No recognized state after 60 seconds.");
         }
     }
 }
@@ -272,7 +273,8 @@ bool RideCloner101::run_post_win(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(env.program_info(), console, "RideCloneReturnToOverworldFailed",
+                "Failed to return to overworld after 5 minutes.");
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -371,7 +373,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected party swap.");
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
-                if (main_menu.move_cursor(console, context, MenuSide::LEFT, 5, false)){
+                if (main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 5, false)){
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
@@ -381,7 +383,8 @@ bool RideCloner101::run_post_win(
             console.log("Detected overworld.");
             break;
         default:
-            throw OperationFailedException(console.logger(), "run_post_win(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(env.program_info(), console, "FailedPostRaidWin",
+                "run_post_win(): No recognized state after 60 seconds.");
         }
         break;
     }
@@ -414,7 +417,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        setup(env.console, context);
+        setup(env.program_info(), env.console, context);
 
         //  Find raid.
         while (true){
@@ -444,7 +447,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (stars > MAX_STARS){
                 env.log("Skipping raid...", COLOR_ORANGE);
                 stats.m_skipped++;
-                close_raid(env.console, context);
+                close_raid(env.program_info(), env.console, context);
                 continue;
             }
 
@@ -452,11 +455,11 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             bool fix_position = move_counter % 5 == 1;
             Mode mode = MODE;
             if (fix_position || mode == Mode::SHINY_HUNT){
-                close_raid(env.console, context);
+                close_raid(env.program_info(), env.console, context);
 
                 //  Save game because we're shiny-hunting.
                 if (mode == Mode::SHINY_HUNT){
-                    save_game_from_overworld(env.console, context);
+                    save_game_from_overworld(env.program_info(), env.console, context);
                 }
 
                 //  Fix our position.

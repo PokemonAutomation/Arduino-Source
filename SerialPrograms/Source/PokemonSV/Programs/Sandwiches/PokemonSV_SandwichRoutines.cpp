@@ -9,6 +9,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -31,7 +32,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-bool enter_sandwich_recipe_list(ConsoleHandle& console, BotBaseContext& context){
+bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     console.log("Opening sandwich menu at picnic table.");
 
@@ -77,13 +78,14 @@ bool enter_sandwich_recipe_list(ConsoleHandle& console, BotBaseContext& context)
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         default:
-            throw OperationFailedException(console.logger(), "enter_sandwich_recipe_list(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(info, console, "NotEnterSandwichList",
+                "enter_sandwich_recipe_list(): No recognized state after 60 seconds.");
         }
     }
 }
 
 
-bool select_sandwich_recipe(ConsoleHandle& console, BotBaseContext& context, size_t target_sandwich_ID){
+bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, size_t target_sandwich_ID){
     context.wait_for_all_requests();
     console.log("Choosing sandwich recipe: " + std::to_string(target_sandwich_ID));
     console.overlay().add_log("Search recipe " + std::to_string(target_sandwich_ID), COLOR_WHITE);
@@ -145,7 +147,8 @@ bool select_sandwich_recipe(ConsoleHandle& console, BotBaseContext& context, siz
             int ret = wait_until(console, context, std::chrono::seconds(10), {selection_watcher});
             int selected_cell = selection_watcher.selected_recipe_cell();
             if (ret < 0 || selected_cell < 0){
-                throw OperationFailedException(console.logger(), "select_sandwich_recipe(): Cannot detect recipe selection arrow.");
+                dump_image_and_throw_recoverable_exception(info, console, "RecipeSelectionArrowNotDetected",
+                    "select_sandwich_recipe(): Cannot detect recipe selection arrow.");
             }
 
             console.log("Current selected cell " + std::to_string(selected_cell));
@@ -230,6 +233,7 @@ std::string box_to_string(const ImageFloatBox& box){
 }
 
 ImageFloatBox move_sandwich_hand(
+    const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console,
     BotBaseContext& context,
@@ -267,7 +271,7 @@ ImageFloatBox move_sandwich_hand(
     while(true){
         int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
-            throw OperationFailedException(console.logger(), "move_sandwich_hand(): Cannot detect hand.");
+            dump_image_and_throw_recoverable_exception(info, console, "SandwichHandNotDetected", "move_sandwich_hand(): Cannot detect hand.");
         }
 
         auto cur_loc = hand_watcher.location();
@@ -350,7 +354,7 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
+void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
 
     const ImageFloatBox initial_box{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox ingredient_box{0.455, 0.130, 0.090, 0.030};
@@ -364,34 +368,35 @@ void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandl
     SandwichHandWatcher free_hand(SandwichHandType::FREE, initial_box);
     int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
     if (ret < 0){
-        throw OperationFailedException(console.logger(), "make_great_peanut_butter_sandwich(): Cannot detect starting hand.");
+        dump_image_and_throw_recoverable_exception(info, console, "FreeHandNotDetected",
+            "make_great_peanut_butter_sandwich(): Cannot detect starting hand.");
     }
 
     console.overlay().add_log("Pick first banana", COLOR_WHITE);
-    auto end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
+    auto end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
 
     console.overlay().add_log("Drop first banana", COLOR_WHITE);
     // visual feedback grabbing is not reliable. Switch to blind grabbing:
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
     
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
     console.overlay().add_log("Pick second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
 
     console.overlay().add_log("Drop second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
     console.overlay().add_log("Pick third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
     
     console.overlay().add_log("Drop third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 156, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
@@ -401,12 +406,13 @@ void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandl
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
     ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
     if (ret < 0){
-        throw OperationFailedException(console.logger(), "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.");
+        dump_image_and_throw_recoverable_exception(info, console, "GrabbingHandNotDetected",
+            "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.");
     }
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
-    end_box = move_sandwich_hand(dispatcher, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
     pbf_mash_button(context, BUTTON_A, 125 * 5);
 
     console.log("Hand end box " + box_to_string(end_box));
@@ -415,7 +421,7 @@ void make_great_peanut_butter_sandwich(AsyncDispatcher& dispatcher, ConsoleHandl
     context.wait_for_all_requests();
 }
 
-void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context){
+void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
     int ret = run_until(
@@ -428,7 +434,8 @@ void finish_sandwich_eating(ConsoleHandle& console, BotBaseContext& context){
         {picnic_watcher}
     );
     if (ret < 0){
-        throw OperationFailedException(console.logger(), "finish_sandwich_eating(): cannot detect picnic after 60 seconds.");
+        dump_image_and_throw_recoverable_exception(info, console, "PicnicNotDetected",
+            "finish_sandwich_eating(): cannot detect picnic after 60 seconds.");
     }
     console.overlay().add_log("Finish eating", COLOR_WHITE);
     context.wait_for(std::chrono::seconds(1));

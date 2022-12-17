@@ -48,31 +48,15 @@ private:
 
     bool hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
 
-    void collect_eggs_at_picnic(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
     void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void move_circles_to_hatch_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
-
-    uint8_t read_party_eggs(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void open_map(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void fly_to_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void enter_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void leave_box_system(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
 
     void reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg);
 
     void handle_recoverable_error(SingleSwitchProgramEnvironment& env, BotBaseContext& context, OperationFailedException& e, size_t& consecutive_failures);
-
-    void dump_unrecoverable_error(SingleSwitchProgramEnvironment& env, const std::string& error_name);
 
     // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::function<void())
 
@@ -116,13 +100,6 @@ private:
     // go to the next egg fetching phase.
     // To tell apart the two cases, we need this bool var:
     bool m_saved_after_fetched_eggs = false;
-
-    // Whether we have an error that is recoverable
-    // In most error cases, the program will try soft resetting to recover from it.
-    // But if there is error during saving the game, or resetting the game,
-    // we don't recover from that and instead stop the program to let user handle it.
-    // So the code needs a flag to know whether an error occured during those cases.
-    bool m_error_recoverable = true;
 };
 
 

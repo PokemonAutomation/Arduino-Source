@@ -95,12 +95,12 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         for(uint16_t i = 0; i < MAX_NUM_SANDWICHES; i++){
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-            picnic_at_zero_gate(env.console, context);
+            picnic_at_zero_gate(env.program_info(), env.console, context);
             // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     
-            bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.realtime_dispatcher(), env.console, context);
+            bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context);
             if (can_make_sandwich == false){
-                throw OperationFailedException(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
+                throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
             }
             stats.m_sandwiches++;
             env.update_stats();
@@ -112,12 +112,12 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.update_stats();
             };
 
-            collect_eggs_after_sandwich(env.console, context, EGGS_TO_FETCH, num_eggs_collected, basket_check_callback);
+            collect_eggs_after_sandwich(env.program_info(), env.console, context, EGGS_TO_FETCH, num_eggs_collected, basket_check_callback);
 
-            leave_picnic(env.console, context);
+            leave_picnic(env.program_info(), env.console, context);
             
             // Reset position to flying spot:
-            reset_position_at_zero_gate(env.console, context);
+            reset_position_at_zero_gate(env.program_info(), env.console, context);
 
             if (num_eggs_collected >= EGGS_TO_FETCH){
                 break;
@@ -126,8 +126,6 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     } catch(OperationFailedException& e){
         stats.m_errors++;
         env.update_stats();
-
-        dump_image(env.logger(), env.program_info(), "EggHatcher", env.console.video().snapshot());
         throw e;
     }
 

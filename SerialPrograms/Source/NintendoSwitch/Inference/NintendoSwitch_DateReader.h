@@ -12,6 +12,7 @@
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
+    struct ProgramInfo;
     class Logger;
     class ConsoleHandle;
     class BotBaseContext;
@@ -32,7 +33,7 @@ public:
     int8_t read_hours(Logger& logger, const ImageViewRGB32& screen) const;
 
     void set_hours(
-        ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
         uint8_t hour    //  0 - 23
     );
 

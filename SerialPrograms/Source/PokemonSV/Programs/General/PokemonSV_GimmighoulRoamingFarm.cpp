@@ -64,7 +64,7 @@ void GimmighoulRoamingFarm::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_wait(context, 2 * TICKS_PER_SECOND);
 
         //Save the game then close it
-        save_game_from_overworld(env.console, context);
+        save_game_from_overworld(env.program_info(), env.console, context);
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
         close_game(context);

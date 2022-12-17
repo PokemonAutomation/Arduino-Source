@@ -89,13 +89,14 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         {
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
-                throw OperationFailedException(env.logger(), "party not empty when loading one column for hatching.");
+                dump_image(env.logger(), env.program_info(), "PartyNotEmpty", env.console.video().snapshot());
+                throw FatalProgramException(env.logger(), "party not empty when loading one column for hatching.");
             }
         }
 
         load_one_column_to_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
 
-        std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.console, context);
+        std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.program_info(), env.console, context);
         if (num_eggs == 0){
             if (num_non_egg_pokemon == 0){
                 // nothing in this column
@@ -114,22 +115,23 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         
         env.log("Loaded " + std::to_string(num_eggs) + " eggs to party.");
         env.console.overlay().add_log("Load " + std::to_string(num_eggs) + " eggs", COLOR_WHITE);
-        leave_box_system_to_overworld(env.console, context);
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         auto hatched_callback = [&](uint8_t){  
             stats.m_hatched++;
             env.update_stats();
         };
         
-        hatch_eggs_at_zero_gate(env.console, context, num_eggs, hatched_callback);
+        hatch_eggs_at_zero_gate(env.program_info(), env.console, context, num_eggs, hatched_callback);
 
-        reset_position_at_zero_gate(env.console, context);
+        reset_position_at_zero_gate(env.program_info(), env.console, context);
 
-        enter_box_system_from_overworld(env.console, context);
+        enter_box_system_from_overworld(env.program_info(), env.console, context);
 
-        std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.console, context);
+        std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.program_info(), env.console, context);
         if (num_eggs > 0){
-            throw OperationFailedException(env.logger(), "detected egg in party after hatching.");
+            dump_image(env.logger(), env.program_info(), "EggInPartyAfterHatching", env.console.video().snapshot());
+            throw FatalProgramException(env.logger(), "detected egg in party after hatching.");
         }
 
         unload_one_column_from_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
@@ -144,7 +146,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
     try{
-        enter_box_system_from_overworld(env.console, context);
+        enter_box_system_from_overworld(env.program_info(), env.console, context);
         // // Wait one second to let game load box UI
         // context.wait_for(std::chrono::seconds(1));
 
@@ -163,8 +165,6 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     } catch(OperationFailedException& e){
         stats.m_errors++;
         env.update_stats();
-
-        dump_image(env.logger(), env.program_info(), "EggHatcher", env.console.video().snapshot());
         throw e;
     }
 
