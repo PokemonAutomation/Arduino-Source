@@ -1241,8 +1241,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
-    Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.cpp
-    Source/PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp

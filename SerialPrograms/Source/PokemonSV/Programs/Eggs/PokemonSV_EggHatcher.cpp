@@ -17,7 +17,7 @@
 #include "PokemonSV/Inference/PokemonSV_EggDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
-#include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_EggHatcher.h"
 
 namespace PokemonAutomation{

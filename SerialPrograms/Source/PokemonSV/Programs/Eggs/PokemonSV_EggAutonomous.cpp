@@ -24,7 +24,7 @@
 #include "PokemonSV/Inference/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"

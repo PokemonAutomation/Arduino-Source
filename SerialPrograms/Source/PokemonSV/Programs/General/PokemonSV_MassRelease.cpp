@@ -15,7 +15,7 @@
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassRelease.h"
 
 namespace PokemonAutomation{
