@@ -104,11 +104,13 @@ int test_pokemonSV_TeraSilhouetteReader(const ImageViewRGB32& image, const std::
     
     ImageMatch::ImageMatchResult slugs = reader.read(image);
     if (slugs.results.empty()){
+        cerr << "No silhouette detected" << endl;
         return 1;
     }
     std::string best_match = slugs.results.begin()->second;
 
     if (keywords.empty()){
+        cerr << "Must provide a pokemon silhouette slug" << endl;
         return 1;
     }
     TEST_RESULT_EQUAL(best_match, keywords[keywords.size() - 1]);

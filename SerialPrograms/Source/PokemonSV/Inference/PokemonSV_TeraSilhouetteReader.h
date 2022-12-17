@@ -28,7 +28,6 @@ public:
     ImageMatch::ImageMatchResult read(const ImageViewRGB32& screen) const;
 
 private:
-    const ImageMatch::SilhouetteDictionaryMatcher& m_matcher;
     Color m_color;
     ImageFloatBox m_box;
 };

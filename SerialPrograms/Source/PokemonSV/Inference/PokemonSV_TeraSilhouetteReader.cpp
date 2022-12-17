@@ -36,8 +36,7 @@ const ImageMatch::SilhouetteDictionaryMatcher& TERA_RAID_SILHOUETTE_MATCHER(){
 }
 
 TeraSilhouetteReader::TeraSilhouetteReader(Color color)
-    : m_matcher(TERA_RAID_SILHOUETTE_MATCHER())
-    , m_color(color)
+    : m_color(color)
     , m_box(0.536, 0.122, 0.252, 0.430)
 {}
 
@@ -46,7 +45,7 @@ void TeraSilhouetteReader::make_overlays(VideoOverlaySet& items) const{
 }
 
 ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& screen) const{
-    static constexpr double MAX_ALPHA = 100;
+    static constexpr double MAX_ALPHA = 110;
     static constexpr double ALPHA_SPREAD = 20;
 
     // Get a loose crop of the silhouette icon
@@ -66,12 +65,12 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
         }
     );
     ImageRGB32 processed_image = extract_box_reference(preprocessed_image, tight_box).copy();
-    //processed_image.save("processed_image.png");
+    // processed_image.save("processed_image.png");
 
     ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
-    //filtered_image.save("filtered_image.png");
+    // filtered_image.save("filtered_image.png");
 
-    ImageMatch::ImageMatchResult slugs = m_matcher.match(filtered_image, ALPHA_SPREAD);
+    ImageMatch::ImageMatchResult slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
     slugs.clear_beyond_alpha(MAX_ALPHA);
 
     return slugs;
