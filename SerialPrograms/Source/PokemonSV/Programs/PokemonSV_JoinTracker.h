@@ -118,7 +118,7 @@ private:
     const bool m_include_host;
 
     mutable std::mutex m_lock;
-    uint8_t m_last_known_players = 0;
+    std::atomic<uint8_t> m_last_known_players = 0;
     std::array<std::map<Language, std::string>, 4> m_last_known_names;
     std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };

@@ -286,7 +286,7 @@ uint8_t TeraLobbyJoinWatcher::get_last_known_state(
     std::lock_guard<std::mutex> lg(m_lock);
     names = m_last_known_names;
     bans = m_last_known_bans;
-    return m_last_known_players;
+    return m_last_known_players.load(std::memory_order_relaxed);
 }
 
 void TeraLobbyJoinWatcher::make_overlays(VideoOverlaySet& items) const{
@@ -298,14 +298,15 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
         return false;
     }
 
+    uint8_t players = total_players(frame);
+    m_last_known_players.store(players, std::memory_order_relaxed);
+
     //  Nothing enabled.
     bool bans_enabled = m_ban_settings.enabled();
     bool report_enabled = m_report_settings.enabled();
     if (!bans_enabled && !report_enabled){
         return false;
     }
-
-    uint8_t players = total_players(frame);
 
     //  Get language list.
     std::set<Language> languages;
@@ -337,7 +338,7 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
 
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_last_known_players = players;
+//        m_last_known_players.store(players, std::memory_order_relaxed);
         m_last_known_names = std::move(names);
         m_last_known_bans = std::move(match_list);
     }
