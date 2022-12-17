@@ -5,8 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -160,6 +161,8 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     } catch(OperationFailedException& e){
         stats.m_errors++;
         env.update_stats();
+
+        dump_image(env.logger(), env.program_info(), "EggHatcher", env.console.video().snapshot());
         throw e;
     }
 

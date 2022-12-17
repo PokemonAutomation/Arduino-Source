@@ -26,20 +26,32 @@ std::string dump_image(
     const ImageViewRGB32& image
 );
 
-// dump a current screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
+// dump a screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
 // Also send image as telemetry if user allows.
 // notification_error: the notification option used to set whether user wants to receive notifiction for
 //   recoverable error.
-// name: the error name, used as the image name and show up on video overlay log. Typical format example:
+// error_name: the error name, used as the image name and show up on video overlay log. Typical format example:
 //   "NoHatchEnd", "NoYCommFound".
-// message: the exception mesage.
+// error_message: the exception mesage.
 [[noreturn]] void dump_image_and_throw_recoverable_exception(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     EventNotificationOption& notification_error,
     const std::string& error_name,
-    const std::string& message
+    const std::string& error_message
 );
+
+// dump a screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
+// error_name: the error name, used as the image name and show up on video overlay log. Typical format example:
+//   "NoHatchEnd", "NoYCommFound".
+// error_message: the exception mesage.
+[[noreturn]] void dump_image_and_throw_recoverable_exception(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    const std::string& error_name,
+    const std::string& error_message
+);
+
 
 }
 #endif

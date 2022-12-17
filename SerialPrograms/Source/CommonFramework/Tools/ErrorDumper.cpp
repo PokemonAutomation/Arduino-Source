@@ -56,7 +56,6 @@ void dump_image_and_throw_recoverable_exception(
     const std::string& message
 ){
     // m_stats.m_errors++;
-    env.log(message, COLOR_RED);
     console.overlay().add_log("Error: " + error_name, COLOR_RED);
     std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
     dump_image(
@@ -73,5 +72,21 @@ void dump_image_and_throw_recoverable_exception(
     throw OperationFailedException(console, message);
 }
 
+
+void dump_image_and_throw_recoverable_exception(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    const std::string& error_name,
+    const std::string& error_message
+){
+    console.overlay().add_log("Error: " + error_name, COLOR_RED);
+    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    dump_image(
+        console, env.program_info(),
+        error_name,
+        *screen
+    );
+    throw OperationFailedException(console, error_message);
+}
 
 }
