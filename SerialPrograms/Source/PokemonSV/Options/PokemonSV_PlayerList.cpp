@@ -104,7 +104,8 @@ RaidPlayerBanList::RaidPlayerBanList()
     , online_table_url(
         false,
         "<b>Online Ban Table:</b><br> In addition to the above table, download a ban list from this URL.<br>"
-        "Thus the list of banned players is the combined table.",
+        "Thus the list of banned players is the combination of both your local table above and the downloaded one.<br>"
+        "This online ban list is automatically refreshed every raid - thus allowing the maintainer of the online list to manage bans for you.",
         LockWhileRunning::UNLOCKED,
         "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json",
         "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json"
