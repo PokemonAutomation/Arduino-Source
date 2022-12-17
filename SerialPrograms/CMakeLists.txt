@@ -1273,8 +1273,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_JoinTracker.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
-    Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
-    Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp
@@ -1673,6 +1671,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/ShinyHuntTracker.h
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
+    Source/Tests/CommonFramework_Tests.cpp
+    Source/Tests/CommonFramework_Tests.h
     Source/Tests/Kernels_Tests.cpp
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp

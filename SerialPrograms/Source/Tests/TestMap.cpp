@@ -6,6 +6,7 @@
 
 
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CommonFramework_Tests.h"
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
 #include "PokemonLA_Tests.h"
@@ -220,6 +221,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_ImageScaleBrightness", std::bind(image_void_detector_helper, test_kernels_ImageScaleBrightness, _1)},
+    {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
     {"NintendoSwitch_UpdateMenuDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdateMenuDetector, _1)},
     {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
     {"PokemonSwSh_MaxLair_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_MaxLair_BattleMenuDetector, _1)},
