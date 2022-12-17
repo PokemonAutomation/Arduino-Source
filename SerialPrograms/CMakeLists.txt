@@ -1253,6 +1253,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarm.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarm.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.cpp
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.h
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp
