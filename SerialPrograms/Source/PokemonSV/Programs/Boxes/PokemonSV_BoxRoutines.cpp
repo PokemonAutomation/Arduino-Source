@@ -29,10 +29,9 @@ void hold_one_column(BotBaseContext& context){
      // Minus to draw selection box
     pbf_press_button(context, BUTTON_MINUS, 30, 50);
     // Select rest of the pary
-    // Press down 5 times, with one extra press to make sure we select full party
-    // in case the game drops one press
-    for(int i = 0; i < 5; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+    // Press down multiple times to make sure we select full party in case the game drops some presses
+    for(int i = 0; i < 30; i++){
+        pbf_press_dpad(context, DPAD_DOWN, 5, 3);
     }
     // Hold rest of the pary
     pbf_press_button(context, BUTTON_A, 30, 50);
