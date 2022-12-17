@@ -74,7 +74,7 @@ void dump_image_and_throw_recoverable_exception(
 
 
 void dump_image_and_throw_recoverable_exception(
-    ProgramEnvironment& env,
+    const ProgramInfo& program_info,
     ConsoleHandle& console,
     const std::string& error_name,
     const std::string& error_message
@@ -82,7 +82,7 @@ void dump_image_and_throw_recoverable_exception(
     console.overlay().add_log("Error: " + error_name, COLOR_RED);
     std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
     dump_image(
-        console, env.program_info(),
+        console, program_info,
         error_name,
         *screen
     );

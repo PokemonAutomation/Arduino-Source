@@ -6,10 +6,11 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxDetection.h"
 
 #include <iostream>
@@ -223,7 +224,7 @@ void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desi
 
 
 void BoxDetector::move_cursor(
-    ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
     int desired_x, desired_y;
@@ -245,7 +246,7 @@ void BoxDetector::move_cursor(
         if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
             consecutive_fails++;
             if (consecutive_fails > 10){
-                throw OperationFailedException(console.logger(), "Unable to detect box system.");
+                dump_image_and_throw_recoverable_exception(info, console, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
             }
             context.wait_for(std::chrono::milliseconds(100));
             continue;

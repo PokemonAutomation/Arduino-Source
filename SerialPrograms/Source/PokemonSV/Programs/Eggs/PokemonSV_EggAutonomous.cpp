@@ -413,21 +413,21 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                     pbf_press_button(context, BUTTON_L, 20, 40);
                     for (uint8_t row = 0; row < 5; row++){
                         for (uint8_t col = 0; col < 6; col++){
-                            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, row, col);
+                            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
                             context.wait_for_all_requests();
                             // If no pokemon in the slot:
                             if (!sth_in_box_detector.detect(env.console.video().snapshot())){
-                                box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
+                                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 1, 0);
                                 // Hold the pokemon to keep
                                 pbf_press_button(context, BUTTON_Y, 20, 40);
                                 // Move the pokemon to the empty spot
-                                box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, row, col);
+                                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
                                 context.wait_for_all_requests();
 
                                 // Press A to drop the held pokemon to the empty slot
                                 pbf_press_button(context, BUTTON_A, 20, 80);
                                 // Move cursor back to party
-                                box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
+                                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 1, 0);
                                 found_empty_slot = true;
                                 break;
                             }
@@ -458,7 +458,7 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                         // Because game will fill hole in party automatically, so we don't want to 
                         // detect a hole in the pary:
                         const bool ensure_slot_empty = false;
-                        release_one_pokemon(env, env.console, context, ensure_slot_empty);
+                        release_one_pokemon(env.program_info(), env.console, context, ensure_slot_empty);
                     }
                     break;
             } // end switch EggHatchAction
@@ -466,7 +466,7 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
         // Get the next egg column
         for (; next_egg_column < 6; next_egg_column++){
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, 0, next_egg_column);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, next_egg_column);
             context.wait_for_all_requests();
             // If there is pokemon in slot row 0, col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
@@ -481,7 +481,7 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
             hold_one_column(context);
             // Move the new column to party
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 1, 0);
             // Drop the column to pary
             pbf_press_button(context, BUTTON_A, 20, 80);
 
@@ -494,19 +494,19 @@ bool EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             // Move to right box
             pbf_press_button(context, BUTTON_R, 20, 40);
             // Move to party lead, the flame body pokemon
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 0, 0);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
             // Hold the flame body pokemon at slot row 0, col 0
             pbf_press_button(context, BUTTON_Y, 20, 40);
             // Move to box row 0 col 0
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, 0, 0);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, 0);
             // Swap lead with this one
             pbf_press_button(context, BUTTON_A, 20, 40);
             // Move to box row 0 col 1
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, 0, 1);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, 1);
 
             hold_one_column(context);
             // Move to party
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::PARTY, 1, 0);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 1, 0);
             // Drop rest of the party
             pbf_press_button(context, BUTTON_A, 20, 80);
             // Move back to middle box

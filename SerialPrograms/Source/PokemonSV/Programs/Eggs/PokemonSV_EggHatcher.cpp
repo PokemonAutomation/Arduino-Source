@@ -62,7 +62,10 @@ EggHatcher::EggHatcher()
         1, 1, 32
     )
     , HAS_CLONE_RIDE_POKEMON(
-        "<b>Do you have your cloned ride pokemon as second Pokemon:</b>",
+        "<b>Have cloned ride " + STRING_POKEMON + " as second in party:</b>"
+        "Ride legendary cannot be cloned after patch 1.1.0. To preserve the existing clone while hatching eggs, "
+        "place it as second in party before starting the program.</b>"
+        "The program will skip the first row of eggs in the box as a result.",
         LockWhileRunning::LOCKED,
         false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -83,15 +86,14 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 
     for(uint8_t column_index = 0; column_index < 6; column_index++){
         uint8_t num_eggs = 0, num_non_egg_pokemon = 0;
-
         {
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
-            if (check_empty_slots_in_party(env.console, context) != expected_empty_slots_in_party){
+            if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
                 throw OperationFailedException(env.logger(), "party not empty when loading one column for hatching.");
             }
         }
 
-        load_one_column_to_party(env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+        load_one_column_to_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
 
         std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.console, context);
         if (num_eggs == 0){
@@ -106,7 +108,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             // Move them back
             env.log("Only non-egg pokemon in column, move them back.");
             env.console.overlay().add_log("No egg in column", COLOR_WHITE);
-            unload_one_column_from_party(env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+            unload_one_column_from_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
             continue;
         }
         
@@ -130,7 +132,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             throw OperationFailedException(env.logger(), "detected egg in party after hatching.");
         }
 
-        unload_one_column_from_party(env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+        unload_one_column_from_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
     }
 
     context.wait_for_all_requests();
@@ -150,7 +152,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             if (i > 0){
                 env.log("Go to next box.");
                 env.console.overlay().add_log("Next box", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_R, 20, 80);
+                pbf_press_button(context, BUTTON_R, 40, 80);
             }
             context.wait_for_all_requests();
 

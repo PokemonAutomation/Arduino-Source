@@ -46,7 +46,7 @@ std::string dump_image(
 //   "NoHatchEnd", "NoYCommFound".
 // error_message: the exception mesage.
 [[noreturn]] void dump_image_and_throw_recoverable_exception(
-    ProgramEnvironment& env,
+    const ProgramInfo& program_info,
     ConsoleHandle& console,
     const std::string& error_name,
     const std::string& error_message

@@ -15,6 +15,7 @@
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Programs/Box/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_TradeRoutines.h"
 
 namespace PokemonAutomation{
@@ -186,11 +187,9 @@ void trade_current_box(
 
             MultiConsoleErrorState error_state;
             env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-                BoxDetector box_detector;
                 VideoOverlaySet overlays(console.overlay());
-                box_detector.make_overlays(overlays);
 
-                box_detector.move_cursor(console, context, BoxCursorLocation::SLOTS, row, col);
+                move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, row, col);
 
                 trade_current_pokemon(console, context, error_state, stats);
             });

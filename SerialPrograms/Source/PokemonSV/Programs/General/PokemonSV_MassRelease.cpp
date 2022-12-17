@@ -107,7 +107,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     bool released = false;
     try {
-        released = release_one_pokemon(env, env.console, context);
+        released = release_one_pokemon(env.program_info(), env.console, context);
     } catch(OperationFailedException& e){
         stats.m_errors++;
         throw e;
@@ -124,7 +124,7 @@ void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvi
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
             uint8_t col = (row % 2 == 0 ? j_col : 5 - j_col);
-            box_detector.move_cursor(env.console, context, BoxCursorLocation::SLOTS, row, col);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
             release_one(box_detector, env, context);
             env.update_stats();
         }
