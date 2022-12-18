@@ -33,7 +33,7 @@ public:
         "PokemonSV/Egg-Template.png", Color(100,100,100), Color(255, 255, 255), 50
     ) {
         m_aspect_ratio_lower = 0.9;
-        m_aspect_ratio_upper = 1.1;
+        m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.9;
         m_area_ratio_upper = 1.1;
     }
@@ -76,7 +76,7 @@ bool EggDetector::detect(const ImageViewRGB32& frame) const{
         EggMatcher::instance(),
         filters,
         {min_size, SIZE_MAX},
-        60,
+        75,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
     );
 }

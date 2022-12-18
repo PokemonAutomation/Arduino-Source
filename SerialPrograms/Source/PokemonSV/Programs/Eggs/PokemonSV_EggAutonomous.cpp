@@ -146,6 +146,7 @@ EggAutonomous::EggAutonomous()
     // - the second leftmost column of the box to the right of the current box is empty. It is used to place the hatching party column
     // - box in judge view
     // - What to do when party pokemon gain exp after sandwich?
+    // - auto save off if you want to use autosave option
 
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(MAX_NUM_SANDWICHES);

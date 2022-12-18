@@ -85,6 +85,9 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
         auto iter = session->make_iterator(50);
         WaterfillObject object;
         while (iter->find_next(object, false)){
+            // c++;
+            // extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
+
             //  Exclude if it touches the borders.
             if (object.min_x == 0 || object.min_y == 0 ||
                 object.max_x == image.width() || object.max_y == image.height()
@@ -92,17 +95,18 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
                 continue;
             }
             double aspect_ratio = object.aspect_ratio();
+            // cout << "object " << c << " ratio " << aspect_ratio << " area " << object.area_ratio() << endl;
             if (!(0.8 < aspect_ratio && aspect_ratio < 1.2)){
                 continue;
             }
             double area_ratio = object.area_ratio();
-            if (!(0.5 < area_ratio && area_ratio < 0.9)){
+            if (!(0.4 < area_ratio && area_ratio < 0.9)){
                 continue;
             }
 
-//            extract_box_reference(image, object).save("ball-" + std::to_string(c++) + ".png");
+            // extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
             double rmsd = RADAR_BALL().rmsd(extract_box_reference(image, object));
-//            cout << "rmsd = " << rmsd << endl;
+            // cout << "rmsd = " << rmsd << endl;
             if (rmsd < 50){
                 return true;
             }

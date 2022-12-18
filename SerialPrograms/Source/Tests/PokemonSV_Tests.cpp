@@ -22,6 +22,7 @@
 #include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/PokemonSV_EggDetector.h"
+#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 
 
 #include <iostream>
@@ -274,7 +275,14 @@ int test_pokemonSV_BoxPartyEggDetector(const ImageViewRGB32& image, int target){
         }
     }
 
-    TEST_RESULT_EQUAL(num_eggs, target);
+    TEST_RESULT_EQUAL((int)num_eggs, (int)target);
+    return 0;
+}
+
+int test_pokemonSV_OverworldDetector(const ImageViewRGB32& image, bool target){
+    OverworldDetector detector;
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
