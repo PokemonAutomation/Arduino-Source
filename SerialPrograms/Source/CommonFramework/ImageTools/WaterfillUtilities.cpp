@@ -103,7 +103,7 @@ bool match_template_by_waterfill(
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "Object area: " << object.area << std::endl;
             }
-            
+
             if (object.area > area_thresholds.second){
                 continue;
             }
@@ -111,7 +111,7 @@ bool match_template_by_waterfill(
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "Object rmsd: " << rmsd << std::endl;
             }
-            
+
             if (rmsd < rmsd_threshold){
                 detected = true;
                 
