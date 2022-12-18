@@ -185,10 +185,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
-    m_saved_after_fetched_eggs = false;
-    m_in_critical_to_save_stage = false;
 
     while(true){
+        m_saved_after_fetched_eggs = false;
+        m_in_critical_to_save_stage = false;
 
         // Do one iteration of the outmost loop of egg auto:
         // - Start at Aera Zero flying spot
@@ -227,6 +227,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 // If there is no save during egg hatching, then the game is reset to before fetching eggs
                 // So we need to break out of the recoverable hatch egg routine loop
                 if (m_saved_after_fetched_eggs == false){
+                    env.log("No save during egg hatching routine. After this reset, we should start the egg fetching routine now.");
                     game_already_resetted = true;
                     break;
                 }
@@ -241,13 +242,18 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         if (AUTO_SAVING == AutoSave::NoAutoSave){
             m_num_sandwich_spent++;
         } else if (m_saved_after_fetched_eggs){
+            env.log("Game already saved during egg hatching routine, so we cannot reset game to reset sandwich.");
             // If we save after fetching eggs, then the save solidifies spent sandwich ingredients.
             m_num_sandwich_spent++;
-            m_saved_after_fetched_eggs = false;
+
+            env.log("Saving game here so that we can reset sandwich later");
+            save_game(env, context, true);
         } else if (game_already_resetted == false){
             // Nothing found in this iteration
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
             reset_game(env, context, "reset to start new meal");
+        } else { // game_already_resetted == true
+            env.log("Game resetted back to egg fetching routine.");
         }
 
         if (m_num_sandwich_spent >= MAX_NUM_SANDWICHES){
@@ -312,6 +318,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
     auto save_game_if_needed = [&](){
         if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
+            env.log("Saving game during egg hatching routine.");
             save_game(env, context, true);
             m_saved_after_fetched_eggs = true;
             m_in_critical_to_save_stage = false;
