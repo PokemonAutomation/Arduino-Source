@@ -216,6 +216,8 @@ bool BoxDetector::to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t
         x = col;
         y = row;
         break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown BoxCursorLocation");
     }
     return true;
 }
@@ -250,7 +252,7 @@ void BoxDetector::move_cursor(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
-    int desired_x, desired_y;
+    int desired_x = 0, desired_y = 0;
     if (!to_coordinates(desired_x, desired_y, side, row, col)){
         throw InternalProgramError(
             &console.logger(), PA_CURRENT_FUNCTION,
@@ -265,7 +267,7 @@ void BoxDetector::move_cursor(
         VideoSnapshot screen = console.video().snapshot();
         std::pair<BoxCursorLocation, BoxCursorCoordinates> current = this->detect_location(screen);
 
-        int current_x, current_y;
+        int current_x = 0, current_y = 0;
         if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
             consecutive_fails++;
             if (consecutive_fails > 10){
@@ -281,21 +283,21 @@ void BoxDetector::move_cursor(
             return;
         }
 
-        //  If we're on the party, always move horizontally off it first.
+        //  If we're on the party, always move horizontally first.
         if (current_x == -1){
             if (desired_x == -1){
                 if (row < current.second.row){
-                    for (uint8_t r = current.second.row; r != row; r--){
+                    for (uint8_t r = row; r < current.second.row; r++){
                         pbf_press_dpad(context, DPAD_UP, 20, 30);
                     }
-                }else{
-                    for (uint8_t r = current.second.row; r != row; r--){
+                }else{ // row >= current.second.row
+                    for (uint8_t r = current.second.row; r < row; r++){
                         pbf_press_dpad(context, DPAD_DOWN, 20, 30);
                     }
                 }
                 continue;
             }
-            if (desired_x < 3){
+            else if (desired_x < 3){
                 pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
             }else{
                 pbf_press_dpad(context, DPAD_LEFT, 20, 30);
