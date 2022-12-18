@@ -398,7 +398,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     context.wait_for_all_requests();
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 
-    env.log("Check hatched pokemon at party slot " + std::to_string(party_row+2));
+    env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
     
     bool found_shiny = false;
     EggHatchAction action = EggHatchAction::Release;
@@ -446,7 +446,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
             send_keep_notification();
 
-            if (move_pokemon_to_keep(env, context, 1) == false) {
+            if (move_pokemon_to_keep(env, context, party_row) == false) {
                 env.log("No empty slot availble to place new pokemon.");
                 env.console.overlay().add_log("No box space", COLOR_RED);
                 throw ProgramFinishedException();
