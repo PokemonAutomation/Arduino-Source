@@ -145,7 +145,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
     for (uint8_t box = 0; box < BOXES_TO_RELEASE; box++){
         if (box > 0){
-            pbf_press_button(context, BUTTON_R, 20, 105);
+            move_to_right_box(context);
         }
         context.wait_for_all_requests();
 

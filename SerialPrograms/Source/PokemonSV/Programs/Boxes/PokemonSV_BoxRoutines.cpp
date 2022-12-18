@@ -37,6 +37,15 @@ void hold_one_column(BotBaseContext& context){
     pbf_press_button(context, BUTTON_A, 30, 50);
 }
 
+// Moving to left/right box is blind sequence. To prevent game dropping button inputs,
+// press the button longer.
+void move_to_left_box(BotBaseContext& context){
+    pbf_press_button(context, BUTTON_L, 60, 100);
+}
+void move_to_right_box(BotBaseContext& context){
+    pbf_press_button(context, BUTTON_R, 60, 100);
+}
+
 bool release_one_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool ensure_empty){
     context.wait_for_all_requests();
     BoxSelectWatcher selected(COLOR_RED);
@@ -189,6 +198,24 @@ void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     detector.move_cursor(info, console, context, side, row, col);
 }
 
+void swap_two_box_slots(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
+    const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col)
+{
+    BoxDetector detector;
+    VideoOverlaySet overlay_set(console.overlay());
+    detector.make_overlays(overlay_set);
+
+    detector.move_cursor(info, console, context, source_side, source_row, source_col);
+
+    pbf_press_button(context, BUTTON_Y, 60, 60);
+
+    detector.move_cursor(info, console, context, target_side, target_row, target_col);
+
+    pbf_press_button(context, BUTTON_A, 60, 60);
+
+    context.wait_for_all_requests();
+}
 
 }
 }

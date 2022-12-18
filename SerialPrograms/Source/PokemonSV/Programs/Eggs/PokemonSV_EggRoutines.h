@@ -61,14 +61,19 @@ void check_basket_to_collect_eggs(const ProgramInfo& info, ConsoleHandle& consol
 // return how many eggs in the five slots, and how many non-egg pokemon in the five slots.
 std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+// In box view, check whether there are only eggs in the five slots in the party column, after party lead.
+// return how many eggs in the five slots.
+// Throw OperationFailedException if found non-egg pokemon in the slots.
+uint8_t check_only_eggs_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 
 // When hatching at Zero Gate, use this function to reset player character position back to Zero Gate flying spot
 void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-// Check hatched pokemon info to determine what to do with it
-void check_baby_info(ConsoleHandle& console, BotBaseContext& context,
+// Check hatched pokemon info to determine what to do with it.
+// Return if the pokemon is shiny. The action to handle the pokemon is returned in `action`.
+bool check_baby_info(ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
-    std::function<void(bool, const PokemonAutomation::ImageViewRGB32&)> shiny_callback,
     Pokemon::EggHatchAction& action
 );
 

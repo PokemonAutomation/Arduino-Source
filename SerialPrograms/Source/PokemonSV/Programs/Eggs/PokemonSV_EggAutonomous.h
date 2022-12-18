@@ -46,11 +46,15 @@ public:
 private:
     int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    bool hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
+    void hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
 
     void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    bool process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party);
+
+    bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party);
 
     void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
 
@@ -100,6 +104,9 @@ private:
     // go to the next egg fetching phase.
     // To tell apart the two cases, we need this bool var:
     bool m_saved_after_fetched_eggs = false;
+    // When we find a pokemon to keep, we don't want the game to be reset if we haven't placed a save to protect the
+    // kept the pokemon. This flag is used to signal when we are in this "don't reset" stage.
+    bool m_in_critical_to_save_stage = false;
 };
 
 

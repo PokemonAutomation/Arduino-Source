@@ -133,7 +133,7 @@ uint8_t EggPartyColumnWatcher::num_eggs_found() const{
 uint8_t EggPartyColumnWatcher::num_non_egg_pokemon_found() const{
     uint8_t num_pokemon = 0;
     for(int i = 0; i < 5; i++){
-        if (m_empty_watchers[i].consistent_result() == false){
+        if (m_empty_watchers[i].consistent_result() == false && m_egg_watchers[i].consistent_result() == false){
             num_pokemon++;
         }
     }

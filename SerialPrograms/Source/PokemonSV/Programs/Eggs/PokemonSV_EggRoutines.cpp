@@ -333,6 +333,15 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, Cons
     return {egg_column_watcher.num_eggs_found(), egg_column_watcher.num_non_egg_pokemon_found()};
 }
 
+uint8_t check_only_eggs_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    auto counts = check_egg_party_column(info, console, context);
+    if (counts.second > 0){
+        dump_image_and_throw_recoverable_exception(info, console, "NonEggPokemonInParty",
+            "check_only_eggs_in_party: Found non-egg pokemon in party");
+    }
+    return counts.first;
+}
+
 void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -442,9 +451,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 }
 
 
-void check_baby_info(ConsoleHandle& console, BotBaseContext& context,
+bool check_baby_info(ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
-    std::function<void(bool, const PokemonAutomation::ImageViewRGB32&)> shiny_callback,
     Pokemon::EggHatchAction& action
 ){
     context.wait_for_all_requests();
@@ -459,7 +467,6 @@ void check_baby_info(ConsoleHandle& console, BotBaseContext& context,
     gender_detector.make_overlays(overlay_set);
 
     const bool shiny = shiny_detector.detect(screen);
-    shiny_callback(shiny, screen);
 
     IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
     EggHatchGenderFilter gender = gender_detector.detect(screen);
@@ -468,7 +475,11 @@ void check_baby_info(ConsoleHandle& console, BotBaseContext& context,
     console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
 
     action = FILTERS.get_action(shiny, IVs, gender);
+
+    return shiny;
 }
+
+
 
 
 

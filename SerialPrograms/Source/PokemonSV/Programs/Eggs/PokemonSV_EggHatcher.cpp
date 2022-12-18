@@ -128,7 +128,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
 
-        std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.program_info(), env.console, context);
+        num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
             dump_image(env.logger(), env.program_info(), "EggInPartyAfterHatching", env.console.video().snapshot());
             throw FatalProgramException(env.logger(), "detected egg in party after hatching.");
@@ -154,7 +154,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             if (i > 0){
                 env.log("Go to next box.");
                 env.console.overlay().add_log("Next box", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_R, 40, 80);
+                move_to_right_box(context);
             }
             context.wait_for_all_requests();
 
