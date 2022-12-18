@@ -6,18 +6,16 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
@@ -84,6 +82,7 @@ GimmighoulChestFarm::GimmighoulChestFarm()
 }
 
 void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    assert_16_9_720p_min(env.logger(), env.console);
 
     GimmighoulChestFarm_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarm_Descriptor::Stats>();
     uint32_t c = 0;

@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -12,7 +14,6 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_GimmighoulRoamingFarm.h"
 
@@ -56,6 +57,8 @@ GimmighoulRoamingFarm::GimmighoulRoamingFarm()
 }
 
 void GimmighoulRoamingFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    assert_16_9_720p_min(env.logger(), env.console);
+
     //Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
     for (uint32_t c = 0; c < SKIPS; c++) {
         //Grab coin assuming there is one

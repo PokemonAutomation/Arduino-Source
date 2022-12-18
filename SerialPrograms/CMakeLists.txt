@@ -498,6 +498,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsTracking.h
     Source/CommonFramework/Tools/SuperControlSession.cpp
     Source/CommonFramework/Tools/SuperControlSession.h
+    Source/CommonFramework/Tools/VideoResolutionCheck.cpp
+    Source/CommonFramework/Tools/VideoResolutionCheck.h
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp

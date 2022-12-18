@@ -5,17 +5,17 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_AutonomousBallThrower.h"
 
@@ -91,6 +91,8 @@ void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& c
 }
 
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
 
     while (true)

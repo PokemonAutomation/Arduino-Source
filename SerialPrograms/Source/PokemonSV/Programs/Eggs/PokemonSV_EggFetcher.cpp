@@ -6,13 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_EggFetcher.h"
@@ -84,7 +81,9 @@ EggFetcher::EggFetcher()
 
 
 void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-   EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
+    assert_16_9_720p_min(env.logger(), env.console);
+
+    EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);

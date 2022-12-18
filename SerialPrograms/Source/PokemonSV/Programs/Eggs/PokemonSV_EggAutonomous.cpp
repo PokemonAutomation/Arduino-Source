@@ -6,23 +6,14 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/PokemonSV_EggDetector.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Inference/PokemonSV_IVCheckerReader.h"
-#include "PokemonSV/Inference/PokemonSV_BoxGenderDetector.h"
-#include "PokemonSV/Inference/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -172,6 +163,8 @@ EggAutonomous::EggAutonomous()
 
 
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 

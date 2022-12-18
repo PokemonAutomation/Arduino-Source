@@ -8,12 +8,13 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -225,6 +226,8 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 
 void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
     if (MIN_STARS > MAX_STARS){

@@ -259,6 +259,7 @@ SOURCES += \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
     Source/CommonFramework/Tools/SuperControlSession.cpp \
+    Source/CommonFramework/Tools/VideoResolutionCheck.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp \
@@ -1099,6 +1100,7 @@ HEADERS += \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/SuperControlSession.h \
+    Source/CommonFramework/Tools/VideoResolutionCheck.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h \

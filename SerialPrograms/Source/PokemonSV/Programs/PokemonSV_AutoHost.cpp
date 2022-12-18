@@ -7,13 +7,14 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -397,6 +398,8 @@ bool AutoHost::run_lobby(
 }
 
 void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
     //  Connect the controller.

@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
@@ -408,6 +408,8 @@ bool RideCloner101::run_post_win(
 
 
 void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
 
