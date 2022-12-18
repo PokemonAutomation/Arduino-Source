@@ -592,9 +592,11 @@ void EggAutonomous::handle_recoverable_error(
         throw e;
     }
 
-    if (m_in_critical_to_save_stage){
+    if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage){
         // We have found a pokemon to keep, but before we can save the game to protect the pokemon, an error occurred.
-        // To not lose the pokemon, don't reset:
+        // To not lose the pokemon, don't reset.
+        // Note: if AUTO_SAVING == AutoSave::EveryBatch, then we don't need to care about this critical stage, because
+        // in this auto saving mode, every batch of eggs have been saved beforehand.
         env.log("Found an error before we can save the game to protect the newly kept pokemon.", COLOR_RED);
         env.log("Don't reset game to protect it.", COLOR_RED);
         throw e;
