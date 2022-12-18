@@ -470,7 +470,7 @@ bool EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             release_one_pokemon(env.program_info(), env.console, context);
             break;
     } // end switch EggHatchAction
-    return true;
+    return m_in_critical_to_save_stage;
 }
 
 // From the egg box, move left to the kept box, drop the pokemon to an empty spot in the box, move back to the egg box.
