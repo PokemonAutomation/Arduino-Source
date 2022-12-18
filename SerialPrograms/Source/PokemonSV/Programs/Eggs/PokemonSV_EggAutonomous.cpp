@@ -192,6 +192,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
     m_saved_after_fetched_eggs = false;
+    m_in_critical_to_save_stage = false;
 
     while(true){
 
@@ -315,17 +316,20 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         leave_box_system_to_overworld(env.program_info(), env.console, context);
     }
 
-    bool need_to_save_after_kept = false;
+    auto save_game_if_needed = [&](){
+        if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
+            save_game(env, context, true);
+            m_saved_after_fetched_eggs = true;
+            m_in_critical_to_save_stage = false;
+        }
+    };
+
     // The loop to hatch batches of eggs.
     // Each batch consists of at most five eggs.
     // There are at most six batches of eggs in a box.
     uint8_t next_egg_column = 0; // next egg column in box
     while(true){
-        if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && need_to_save_after_kept)){
-            save_game(env, context, true);
-            m_saved_after_fetched_eggs = true;
-            need_to_save_after_kept = false;
-        }
+        save_game_if_needed();
 
         auto hatched_callback = [&](uint8_t){  
             stats.m_hatched++;
@@ -337,9 +341,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         enter_box_system_from_overworld(env.program_info(), env.console, context);
         
         for(int i = 0; i < num_eggs_in_party; i++){
-            if (process_one_baby(env, context, i, num_eggs_in_party)){
-                need_to_save_after_kept = true;
-            }
+            process_one_baby(env, context, i, num_eggs_in_party);
         } // end for each hatched pokemon in party
 
         // Get the next egg column
@@ -384,19 +386,17 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         if (next_egg_column == 6){ // no more eggs to hatch
-            if ((AUTO_SAVING == AutoSave::AfterStartAndKeep && need_to_save_after_kept) || AUTO_SAVING == AutoSave::EveryBatch){
-                save_game(env, context, true);
-                m_saved_after_fetched_eggs = true;
-            }
             break; // break egg batch loop. This is the only place to break out of the loop
         }
         next_egg_column++;
     } // end egg batch loop
+    
+    save_game_if_needed();
 }
 
 // While in box system and the current box is egg box, process one baby pokemon in party
 // Return true if the program finds a pokemon to keep
-bool EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party){
+void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     // Check each pokemon from bottom to top. In this way we can reliably detect end of releasing the pokemon.
@@ -470,7 +470,6 @@ bool EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             release_one_pokemon(env.program_info(), env.console, context);
             break;
     } // end switch EggHatchAction
-    return m_in_critical_to_save_stage;
 }
 
 // From the egg box, move left to the kept box, drop the pokemon to an empty spot in the box, move back to the egg box.
@@ -552,7 +551,6 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
         } else{
             save_game_from_menu(env.program_info(), env.console, context);
         }
-        m_in_critical_to_save_stage = false;
     } catch(OperationFailedException &e){
         // To be safe: avoid interrupting or corrupting game saving,
         // make game saving non error recoverable
