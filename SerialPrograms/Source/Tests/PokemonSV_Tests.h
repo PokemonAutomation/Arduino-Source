@@ -36,6 +36,8 @@ int test_pokemonSV_BoxPokemonInfoDetector(const ImageViewRGB32& image, const std
 
 int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSV_BoxPartyEggDetector(const ImageViewRGB32& image, int target);
+
 }
 
 #endif

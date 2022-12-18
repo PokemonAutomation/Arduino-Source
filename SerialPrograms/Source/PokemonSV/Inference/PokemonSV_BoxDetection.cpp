@@ -24,6 +24,29 @@ template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEmptySlotWatcher>;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+std::string BOX_CURSOR_LOCATION_NAMES(BoxCursorLocation location){
+    switch(location){
+    case BoxCursorLocation::NONE:
+        return "NONE";
+    case BoxCursorLocation::PARTY:
+        return "PARTY";
+    case BoxCursorLocation::BOX_CHANGE:
+        return "BOX_CHANGE";
+    case BoxCursorLocation::ALL_BOXES:
+        return "ALL_BOXES";
+    case BoxCursorLocation::SEARCH:
+        return "SEARCH";
+    case BoxCursorLocation::SLOTS:
+        return "SLOTS";
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown BoxCursorLocation");
+    }
+}
+
+std::string BOX_LOCATION_STRING(BoxCursorLocation location, uint8_t row, uint8_t col){
+    return "(" + BOX_CURSOR_LOCATION_NAMES(location) + " row " + std::to_string(row) + " col " + std::to_string(col) + ")";
+}
+
 
 SomethingInBoxSlotDetector::SomethingInBoxSlotDetector(Color color, bool true_if_exists)
     : m_true_if_exists(true_if_exists)

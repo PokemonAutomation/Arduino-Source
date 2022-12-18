@@ -158,6 +158,10 @@ void load_one_column_to_party(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t column_index, bool has_clone_ride_pokemon)
 {
+    context.wait_for_all_requests();
+    console.log("Load column " + std::to_string(column_index) + " to party.");
+    console.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
+
     // Move cursor to the current column
     move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
 
@@ -166,15 +170,19 @@ void load_one_column_to_party(
     move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
 
     // Drop the column to party
-    pbf_press_button(context, BUTTON_A, 20, 80);
+    pbf_press_button(context, BUTTON_A, 60, 60);
 
     context.wait_for_all_requests();
+    console.log("Loaded column " + std::to_string(column_index) + " to party.");
 }
 
 void unload_one_column_from_party(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
+    context.wait_for_all_requests();
+    console.log("Unload party to column " + std::to_string(column_index) + ".");
+    console.overlay().add_log("Unload to column " + std::to_string(column_index+1), COLOR_WHITE);
     // Move cursor to party column
     move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
 
@@ -184,24 +192,33 @@ void unload_one_column_from_party(
     move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
 
     // Drop the column
-    pbf_press_button(context, BUTTON_A, 20, 80);
+    pbf_press_button(context, BUTTON_A, 60, 60);
 
     context.wait_for_all_requests();
+    console.log("Unloaded party to column " + std::to_string(column_index) + ".");
 }
 
 void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& side, uint8_t row, uint8_t col)
 {
+    context.wait_for_all_requests();
+    console.log("Move cursor to " + BOX_LOCATION_STRING(side, row, col) + ".");
     BoxDetector detector;
     VideoOverlaySet overlay_set(console.overlay());
     detector.make_overlays(overlay_set);
     detector.move_cursor(info, console, context, side, row, col);
+    console.log("Cursor moved.");
 }
 
 void swap_two_box_slots(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
     const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col)
 {
+    context.wait_for_all_requests();
+    console.log("Swap two slots " + BOX_LOCATION_STRING(source_side, source_row, source_col)
+        + " and " + BOX_LOCATION_STRING(target_side, target_row, target_col) + ".");
+    console.overlay().add_log("Swap slots", COLOR_WHITE);
+
     BoxDetector detector;
     VideoOverlaySet overlay_set(console.overlay());
     detector.make_overlays(overlay_set);
@@ -215,6 +232,7 @@ void swap_two_box_slots(const ProgramInfo& info, ConsoleHandle& console, BotBase
     pbf_press_button(context, BUTTON_A, 60, 60);
 
     context.wait_for_all_requests();
+    console.log("Swapped slots.");
 }
 
 }

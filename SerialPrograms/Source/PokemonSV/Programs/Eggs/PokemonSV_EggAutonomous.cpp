@@ -306,8 +306,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // detect how many eggs in party
         enter_box_system_from_overworld(env.program_info(), env.console, context);
     
-        context.wait_for_all_requests();
-        context.wait_for(std::chrono::seconds(1)); // wait for one second to let box UI fully loaded
+        context.wait_for(std::chrono::milliseconds(400)); // wait until box UI fully loaded
 
         num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
         env.log("Read " + std::to_string(num_eggs_in_party) + " eggs.");
@@ -358,6 +357,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         context.wait_for_all_requests();
         if (next_egg_column < 6){
             load_one_column_to_party(env.program_info(), env.console, context, next_egg_column);
+            // Move cursor to party lead so that we can examine rest of party to detect eggs.
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
             
             num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
         } else {
@@ -533,9 +534,8 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
 
     // Load first egg column to party
     load_one_column_to_party(env.program_info(), env.console, context, 0);
-
-    context.wait_for_all_requests();
-    context.wait_for(std::chrono::milliseconds(300)); // wait until box UI fully loaded
+    // Move cursor to party lead so that we can examine rest of party to detect eggs.
+    move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
 
     const uint8_t num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
     

@@ -95,6 +95,8 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
 
         load_one_column_to_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+        // Move cursor to party lead so that we can examine rest of party to detect eggs.
+        move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
 
         std::tie(num_eggs, num_non_egg_pokemon) = check_egg_party_column(env.program_info(), env.console, context);
         if (num_eggs == 0){

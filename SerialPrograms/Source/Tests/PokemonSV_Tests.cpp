@@ -21,6 +21,7 @@
 #include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/PokemonSV_EggDetector.h"
 
 
 #include <iostream>
@@ -261,6 +262,19 @@ int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool 
     bool sth = sth_detector.detect(image);
     TEST_RESULT_EQUAL(sth, target);
 
+    return 0;
+}
+
+int test_pokemonSV_BoxPartyEggDetector(const ImageViewRGB32& image, int target){
+    int num_eggs = 0;
+    for(int i = 0; i < 5; i++){
+        EggDetector detector(BoxCursorLocation::PARTY, i+1, 0);
+        if (detector.detect(image)){
+            num_eggs++;
+        }
+    }
+
+    TEST_RESULT_EQUAL(num_eggs, target);
     return 0;
 }
 

@@ -80,6 +80,9 @@ enum class BoxCursorLocation{
     SEARCH,     // bottom-right "Search" button
     SLOTS,      // one of the 5 x 6 slots in the box
 };
+std::string BOX_CURSOR_LOCATION_NAMES(BoxCursorLocation location);
+
+std::string BOX_LOCATION_STRING(BoxCursorLocation location, uint8_t row, uint8_t col);
 
 struct BoxCursorCoordinates{
     uint8_t row;
