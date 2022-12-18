@@ -81,8 +81,8 @@ bool release_one_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBas
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
-                for(int i = 0; i < 5; i++){
-                    pbf_press_button(context, BUTTON_A, 20, 230);
+                for(int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_A, 40, 230);
                 }
             },
             {confirm}
