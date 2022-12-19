@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
 //#include <iostream>
@@ -93,10 +93,12 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     bool button_ok = is_solid(button, {0.117281, 0.311767, 0.570951}, 0.20, 20) || is_black(button, 100, 15);
     bool yellow_ok = is_solid(yellow, {0.554348, 0.445652, 0.}, 0.15, 20);
     if (!button_ok && !yellow_ok){
+//        cout << "button and yellow bad" << endl;
         return false;
     }
 
     if (!m_arrow.detect(screen)){
+//        cout << "arrow bad" << endl;
         return false;
     }
     return true;

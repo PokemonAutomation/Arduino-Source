@@ -81,6 +81,7 @@
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -207,9 +208,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 #if 1
-    ImageRGB32 image("20221214-231841174428.png");
+    ImageRGB32 image("BadArrow.png");
     TeraCatchDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
+
 
 //    extract_box_reference(image, ImageFloatBox{0.95, 0.81, 0.02, 0.06}).save("test.png");
 #endif

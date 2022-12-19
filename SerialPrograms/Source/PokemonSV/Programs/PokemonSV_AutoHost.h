@@ -56,6 +56,19 @@ private:
         std::array<std::map<Language, std::string>, 4>& player_names
     );
 
+    //  Returns true if raid should be canceled due a ban.
+    bool process_bans(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        const std::vector<TeraLobbyNameMatchResult>& bans,
+        const ImageViewRGB32& snapshot
+    );
+    void send_full_start_notification(
+        SingleSwitchProgramEnvironment& env,
+        uint8_t player_count,
+        std::array<std::map<Language, std::string>, 4>& player_names,
+        const ImageViewRGB32& snapshot
+    );
+
 private:
 //    OCR::LanguageOCR LANGUAGE;
 

@@ -301,24 +301,25 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
     uint8_t players = total_players(frame);
     m_last_known_players.store(players, std::memory_order_relaxed);
 
-    //  Nothing enabled.
     bool bans_enabled = m_ban_settings.enabled();
     bool report_enabled = m_report_settings.enabled();
-    if (!bans_enabled && !report_enabled){
-        return false;
-    }
 
     //  Get language list.
     std::set<Language> languages;
-    for (const auto& item : m_report_settings.table.table()){
-        const JoinReportRow& row = static_cast<const JoinReportRow&>(*item);
-        if (row.enabled){
-            languages.insert(language_code_to_enum(item->slug()));
+    languages.insert(Language::English);
+    if (report_enabled){
+        for (const auto& item : m_report_settings.table.table()){
+            const JoinReportRow& row = static_cast<const JoinReportRow&>(*item);
+            if (row.enabled){
+                languages.insert(language_code_to_enum(item->slug()));
+            }
         }
     }
     std::vector<PlayerListRowSnapshot> banslist = m_ban_settings.current_banlist();
-    for (const auto& item :banslist){
-        languages.insert(item.language);
+    if (bans_enabled){
+        for (const auto& item : banslist){
+            languages.insert(item.language);
+        }
     }
 
     //  Read names.
@@ -328,13 +329,16 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
 
     //  Process bans.
     std::vector<TeraLobbyNameMatchResult> match_list;
-    uint8_t banned = check_ban_list(
-        m_logger,
-        match_list,
-        m_ban_settings.current_banlist(),
-        names,
-        m_include_host, m_ban_settings.ignore_whitelist
-    );
+    uint8_t banned = 0;
+    if (bans_enabled){
+        banned = check_ban_list(
+            m_logger,
+            match_list,
+            m_ban_settings.current_banlist(),
+            names,
+            m_include_host, m_ban_settings.ignore_whitelist
+        );
+    }
 
     {
         std::lock_guard<std::mutex> lg(m_lock);

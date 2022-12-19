@@ -10,13 +10,13 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_GradientArrowDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,15 +51,17 @@ bool is_gradient_arrow(
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
 
-    const double THRESHOLD = 70;
+    const double THRESHOLD = 80;
 
     double aspect_ratio = object.aspect_ratio();
     switch (type){
     case GradientArrowType::RIGHT:{
         if (!(yellow.min_y < blue.min_y && blue.max_y < yellow.max_y)){
+//            cout << "bad position" << endl;
             return false;
         }
         if (!(0.7 < aspect_ratio && aspect_ratio < 1.0)){
+//            cout << "bad aspect ratio" << endl;
             return false;
         }
         double rmsd = GRADIENT_ARROW_HORIZONTAL().rmsd(cropped);
@@ -68,12 +70,15 @@ bool is_gradient_arrow(
     }
     case GradientArrowType::DOWN:{
         if (!(yellow.min_x < blue.min_x && blue.max_x < yellow.max_x)){
+//            cout << "bad position" << endl;
             return false;
         }
         if (!(1.0 < aspect_ratio && aspect_ratio < 1.43)){
+//            cout << "bad aspect ratio" << endl;
             return false;
         }
         double rmsd = GRADIENT_ARROW_VERTICAL().rmsd(cropped);
+//        cout << "rmsd = " << rmsd << endl;
         return rmsd <= THRESHOLD;
     }
     }

@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -273,6 +274,94 @@ bool AutoHost::start_raid(
         }
     }
 }
+bool AutoHost::process_bans(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    const std::vector<TeraLobbyNameMatchResult>& bans,
+    const ImageViewRGB32& snapshot
+){
+    if (bans.empty()){
+        return false;
+    }
+
+    env.log("Detected banned user!", COLOR_RED);
+    std::string message;
+    for (const TeraLobbyNameMatchResult& user : bans){
+        env.log("Banned User: " + user.to_str(), COLOR_RED);
+        message += user.to_str();
+        message += "\n";
+        if (!user.notes.empty()){
+            message += "Reason: " + user.notes;
+            message += "\n";
+        }
+    }
+    AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
+    stats.m_banned++;
+    send_program_notification(
+        env, NOTIFICATION_RAID_START,
+        COLOR_RED,
+        "Raid Canceled Due to Banned User",
+        {{"Banned User(s):", std::move(message)}}, "",
+        snapshot
+    );
+    pbf_press_button(context, BUTTON_B, 20, 230);
+    pbf_press_button(context, BUTTON_A, 20, 230);
+
+    return true;
+}
+void AutoHost::send_full_start_notification(
+    SingleSwitchProgramEnvironment& env,
+    uint8_t player_count,
+    std::array<std::map<Language, std::string>, 4>& player_names,
+    const ImageViewRGB32& snapshot
+){
+    //  Check for hat trick. (English Only)
+    do{
+        if (player_count != 4){
+            break;
+        }
+        auto iter1 = player_names[1].find(Language::English);
+        if (iter1 == player_names[1].end()) break;
+        auto iter2 = player_names[2].find(Language::English);
+        if (iter2 == player_names[2].end()) break;
+        auto iter3 = player_names[3].find(Language::English);
+        if (iter3 == player_names[3].end()) break;
+        std::u32string name1 = OCR::normalize_utf32(iter1->second);
+        if (name1.size() < 4) break;
+        std::u32string name2 = OCR::normalize_utf32(iter2->second);
+        if (name2.size() < 4) break;
+        std::u32string name3 = OCR::normalize_utf32(iter3->second);
+        if (name3.size() < 4) break;
+        if (name1 != name2 || name1 != name3){
+            break;
+        }
+
+        env.log(iter1->second + " with the Hat Trick!", COLOR_BLUE);
+        send_program_notification(
+            env, NOTIFICATION_RAID_START,
+            COLOR_GREEN,
+            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the hat trick! \u2728\U0001F3A9\U0001FA84",
+            {{
+                "Start Reason:",
+                "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
+            }}, "",
+            snapshot
+        );
+
+        return;
+    }while (false);
+
+    env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
+    send_program_notification(
+        env, NOTIFICATION_RAID_START,
+        COLOR_GREEN,
+        "Tera Raid is Starting!",
+        {{
+            "Start Reason:",
+            "Lobby has reached " + std::to_string(player_count) + " players."
+        }}, "",
+        snapshot
+    );
+}
 bool AutoHost::run_lobby(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     std::string& lobby_code,
@@ -329,43 +418,12 @@ bool AutoHost::run_lobby(
             last_known_player_count = join_watcher.get_last_known_state(player_names, last_known_bans);
             //  Intentional fall-through.
         case 3:{
-            if (!last_known_bans.empty()){
-                env.log("Detected banned user!", COLOR_RED);
-                std::string message;
-                for (const TeraLobbyNameMatchResult& user : last_known_bans){
-                    env.log("Banned User: " + user.to_str(), COLOR_RED);
-                    message += user.to_str();
-                    message += "\n";
-                    if (!user.notes.empty()){
-                        message += "Reason: " + user.notes;
-                        message += "\n";
-                    }
-                }
-                stats.m_banned++;
-                send_program_notification(
-                    env, NOTIFICATION_RAID_START,
-                    COLOR_RED,
-                    "Raid Canceled Due to Banned User",
-                    {{"Banned User(s):", std::move(message)}}, "",
-                    snapshot
-                );
-                pbf_press_button(context, BUTTON_B, 20, 230);
-                pbf_press_button(context, BUTTON_A, 20, 230);
+            if (process_bans(env, context, last_known_bans, snapshot)){
                 return false;
             }
 
             if (last_known_player_count >= (uint8_t)START_RAID_PLAYERS.current_value()){
-                env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
-                send_program_notification(
-                    env, NOTIFICATION_RAID_START,
-                    COLOR_GREEN,
-                    "Tera Raid is Starting!",
-                    {{
-                        "Start Reason:",
-                        "Lobby has reached " + std::to_string(last_known_player_count) + " players."
-                    }}, "",
-                    snapshot
-                );
+                send_full_start_notification(env, last_known_player_count, player_names, snapshot);
                 break;
             }
 
