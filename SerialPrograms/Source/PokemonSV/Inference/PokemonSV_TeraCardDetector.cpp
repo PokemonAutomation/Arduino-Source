@@ -7,6 +7,7 @@
 #include <cmath>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/StringToolsQt.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -157,7 +158,7 @@ TeraLobbyReader::TeraLobbyReader(Color color)
 {
     for (size_t c = 0; c < 4; c++){
         m_player_spinner[c] = ImageFloatBox{0.157, 0.575 + 0.070*c, 0.037, 0.060};
-        m_player_name[c] = ImageFloatBox{0.200, 0.575 + 0.070*c, 0.200, 0.060};
+        m_player_name[c] = ImageFloatBox{0.200, 0.575 + 0.070*c, 0.095, 0.060};
         m_player_mon[c] = ImageFloatBox{0.425, 0.575 + 0.070*c, 0.037, 0.060};
     }
 }
@@ -222,7 +223,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(50);
         WaterfillObject object;
-        while (iter->find_next(object, true)){
+        while (iter->find_next(object, false)){
 //                cout << object.packed_matrix()->dump() << endl;
             ImageViewRGB32 character = extract_box_reference(filtered, object);
             ImageRGB32 padded = pad_image(character, character.width(), 0xffffffff);
@@ -282,13 +283,55 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
     return normalized;
 }
 
+ImageRGB32 filter_name_image(const ImageViewRGB32& image){
+    using namespace Kernels::Waterfill;
+
+    const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
+
+    //  Waterfill the image and throw out everything that touches the border.
+
+    ImageRGB32 filtered(image.width(), image.height());
+    filtered.fill(0xffffffff);
+//    cout << image.width() << " x " << image.height() << endl;
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, COLOR_THRESHOLD);
+    {
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(4);
+        WaterfillObject object;
+        while (iter->find_next(object, true)){
+            auto packed = object.packed_matrix();
+//            cout << packed->width() << " x " << packed->height() << " : " << object.min_x << " x " << object.min_y << endl;
+
+            //  Touches border.
+            if (object.min_x == 0 ||
+                object.min_y == 0 ||
+                object.max_x == filtered.width() ||
+                object.max_y == filtered.height()
+            ){
+                continue;
+            }
+            filter_by_mask(
+                std::move(packed),
+                filtered, object.min_x, object.min_y,
+                Color(0xff000000),
+                false
+            );
+        }
+    }
+//    filtered.save("filtered.png");
+    return filtered;
+
+//    size_t pixels;
+//    return to_blackwhite_rgb32_range(pixels, image, 0xff000000, COLOR_THRESHOLD, true);
+}
+
+
 std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
     Logger& logger,
     const std::set<Language>& languages, bool include_host,
     const ImageViewRGB32& screen
 ) const{
-    const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
-
     std::array<std::map<Language, std::string>, 4> ret;
     size_t start = include_host ? 0 : 1;
     for (size_t c = start; c < 4; c++){
@@ -301,12 +344,27 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
         bool first = true;
         for (Language language : languages){
             ImageViewRGB32 box = extract_box_reference(screen, m_player_name[c]);
-            size_t pixels;
-            ImageRGB32 filtered = to_blackwhite_rgb32_range(pixels, box, 0xff000000, COLOR_THRESHOLD, true);
+            ImageRGB32 filtered = filter_name_image(box);
+//            filtered.save("name" + std::to_string(c) + ".png");
 
             std::string raw = OCR::ocr_read(language, filtered);
-            if (!raw.empty() && raw.back() == '\n'){
-                raw.pop_back();
+            while (!raw.empty()){
+                char ch = raw.back();
+                if (ch <= 32 || ch == '/' || ch == '.'){
+                    raw.pop_back();
+                }
+
+#if 0
+                //  Special case with 6-star raids where the dark blue background
+                //  causes misreads.
+                size_t length = raw.size();
+                if (length > 2 && raw[length - 2] == ' ' && raw[length - 2] == '7'){
+                    raw.pop_back();
+                    raw.pop_back();
+                }
+#endif
+
+                break;
             }
             if (!first){
                 str += ", ";

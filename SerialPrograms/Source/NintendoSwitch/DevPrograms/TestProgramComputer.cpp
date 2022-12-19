@@ -172,6 +172,33 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("20221219-140347621956.jpg");
+    TeraLobbyReader reader;
+    auto names = reader.read_names(env.logger(), {Language::English}, true, image);
+
+#if 0
+    for (size_t row = 0; row < image.height(); row++){
+        for (size_t col = 0; col < image.width(); col++){
+            uint32_t pixel = image.pixel(col, row);
+            uint32_t r = (pixel >> 16) & 0xff;
+            uint32_t g = (pixel >>  8) & 0xff;
+            uint32_t b = (pixel >>  0) & 0xff;
+#if 0
+            if (b > 2*r + 10 || b > 2*g + 10){
+                pixel = 0xffffffff;
+            }
+#endif
+#if 1
+            if (r + g + b < 150){
+                pixel = 0xffffffff;
+            }
+#endif
+            image.pixel(col, row) = pixel;
+        }
+    }
+    image.save("test.png");
+#endif
+
 
 #if 0
     MultiLanguageJoinTracker tracker;
@@ -207,7 +234,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 1
+#if 0
     ImageRGB32 image("BadArrow.png");
     TeraCatchDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;

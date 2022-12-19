@@ -25,6 +25,12 @@ void filter_by_mask(
     Color replace_with,
     bool replace_if_zero    //  If false, replace if one.
 );
+void filter_by_mask(
+    const PackedBinaryMatrix& matrix,
+    ImageRGB32& image, size_t offset_x, size_t offset_y,
+    Color replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+);
 
 
 

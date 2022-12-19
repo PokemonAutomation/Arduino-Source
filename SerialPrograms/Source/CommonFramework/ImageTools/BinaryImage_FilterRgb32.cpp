@@ -36,6 +36,26 @@ void filter_by_mask(
         (uint32_t)replace_with, replace_if_zero
     );
 }
+void filter_by_mask(
+    const PackedBinaryMatrix& matrix,
+    ImageRGB32& image, size_t offset_x, size_t offset_y,
+    Color replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+){
+    if (matrix.width() > image.width()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
+    }
+    if (matrix.height() > image.height()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
+    }
+    size_t bytes_per_row = image.bytes_per_row();
+    Kernels::filter_by_mask(
+        matrix,
+        (uint32_t*)((char*)image.data() + bytes_per_row * offset_y + offset_x * sizeof(uint32_t)),
+        bytes_per_row,
+        (uint32_t)replace_with, replace_if_zero
+    );
+}
 
 
 
