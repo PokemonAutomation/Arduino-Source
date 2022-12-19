@@ -127,8 +127,10 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "CloneItemFailed",
-                "Failed to clone an item after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), console, "CloneItemFailed",
+                "Failed to clone an item after 5 minutes."
+            );
         }
 
         OverworldWatcher overworld(COLOR_RED);

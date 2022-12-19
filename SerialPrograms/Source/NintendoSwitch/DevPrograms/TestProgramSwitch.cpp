@@ -68,6 +68,7 @@
 #include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 
 
 #include <QPixmap>
@@ -173,6 +174,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    auto image = feed.snapshot();
 //    TeraCatchDetector detector(COLOR_RED);
 //    cout << detector.detect(image) << endl;
+
+    size_t errors;
+    release_one_pokemon(env.program_info(), console, context, errors);
+
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    BoxDetector detector;
+    cout << detector.detect(image) << endl;
+
+    while (true){
+        scope.wait_for(std::chrono::milliseconds(50));
+        image = feed.snapshot();
+        std::pair<BoxCursorLocation, BoxCursorCoordinates> location = detector.detect_location(image);
+        cout << (int)location.first << ": " << (int)location.second.row << "," << (int)location.second.col << endl;
+    }
+#endif
 
 
 #if 0

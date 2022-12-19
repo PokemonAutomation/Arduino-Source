@@ -5,15 +5,14 @@
  */
 
 
-#include "Common/Cpp/Exceptions.h"
 #include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_BoxRoutines.h"
 
 
@@ -46,7 +45,106 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
-bool release_one_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool ensure_empty){
+bool release_one_pokemon(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    size_t& errors
+){
+#if 1
+    errors = 0;
+
+    bool released = false;
+    int expected = 0;
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(10)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "ReleaseFailed",
+                "Failed to release " + Pokemon::STRING_POKEMON + " after 1 minute."
+            );
+        }
+
+        SomethingInBoxSlotDetector exists(COLOR_BLUE);
+        BoxWatcher box_detector(COLOR_RED);
+        BoxSelectWatcher selected(COLOR_YELLOW, std::chrono::milliseconds(100));
+        PromptDialogWatcher confirm(COLOR_CYAN, std::chrono::milliseconds(100));
+        AdvanceDialogWatcher advance_dialog(COLOR_GREEN, std::chrono::milliseconds(250));
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {
+                box_detector,
+                selected,
+                confirm,
+                advance_dialog,
+            }
+        );
+        context.wait_for(std::chrono::milliseconds(50));
+        switch (ret){
+        case 0:{
+            if (ret == expected){
+                console.log("Detected box neutral.");
+            }else{
+                console.log("Detected box neutral. (unexpected)", COLOR_RED);
+                errors++;
+            }
+            auto screenshot = console.video().snapshot();
+            if (exists.detect(screenshot)){
+                if (released){
+                    return true;
+                }
+                pbf_press_button(context, BUTTON_A, 20, 20);
+                expected = 1;
+                continue;
+            }else{
+                console.log("Slot is empty.");
+                return released;
+            }
+        }
+        case 1:
+            if (ret == expected){
+                console.log("Detected selection. Releasing...");
+            }else{
+                console.log("Detected selection. Releasing... (unexpected)", COLOR_RED);
+                errors++;
+            }
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_button(context, BUTTON_A, 20, 20);
+            expected = 2;
+            continue;
+        case 2:
+            if (ret == expected){
+                console.log("Detected release confirmation.");
+            }else{
+                console.log("Detected release confirmation. (unexpected)", COLOR_RED);
+                errors++;
+            }
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_button(context, BUTTON_A, 20, 20);
+            released = true;
+            expected = 3;
+            continue;
+        case 3:
+            if (ret == expected){
+                console.log("Detected advance dialog.");
+            }else{
+                console.log("Detected advance dialog. (unexpected)", COLOR_RED);
+                errors++;
+            }
+            pbf_press_button(context, BUTTON_B, 20, 20);
+            expected = 0;
+            continue;
+        default:;
+            dump_image_and_throw_recoverable_exception(
+                info, console, "NoState", "No recognized state after 10 seconds."
+            );
+        }
+    }
+
+#else
+
     context.wait_for_all_requests();
     BoxSelectWatcher selected(COLOR_RED);
     // If no pokemon in the slot:
@@ -137,6 +235,7 @@ bool release_one_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBas
     }
     
     return true;
+#endif
 }
 
 uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){

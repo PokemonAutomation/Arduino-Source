@@ -62,10 +62,17 @@ protected:
 };
 class PromptDialogWatcher : public DetectorToFinder<PromptDialogDetector>{
 public:
-    PromptDialogWatcher(Color color)
+    PromptDialogWatcher(
+        Color color,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
          : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color)
     {}
-    PromptDialogWatcher(Color color, const ImageFloatBox& arrow_box)
+    PromptDialogWatcher(
+        Color color,
+        const ImageFloatBox& arrow_box,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
          : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color, arrow_box)
     {}
 };

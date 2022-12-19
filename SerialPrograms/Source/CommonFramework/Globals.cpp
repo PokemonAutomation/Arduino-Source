@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const std::string PROGRAM_VERSION_BASE = "v0.23.14";
+const std::string PROGRAM_VERSION_BASE = "v0.23.15";
 
 #ifdef PA_OFFICIAL
 const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE;

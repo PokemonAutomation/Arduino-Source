@@ -64,8 +64,11 @@ private:
 };
 class BoxSelectWatcher : public DetectorToFinder<BoxSelectDetector>{
 public:
-    BoxSelectWatcher(Color color)
-         : DetectorToFinder("BoxSelectFinder", std::chrono::milliseconds(250), color)
+    BoxSelectWatcher(
+        Color color,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("BoxSelectFinder", duration, color)
     {}
 };
 

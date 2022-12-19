@@ -105,7 +105,9 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     bool released = false;
     try {
-        released = release_one_pokemon(env.program_info(), env.console, context);
+        size_t errors = 0;
+        released = release_one_pokemon(env.program_info(), env.console, context, errors);
+        stats.m_errors += errors;
     } catch(OperationFailedException& e){
         stats.m_errors++;
         throw e;
