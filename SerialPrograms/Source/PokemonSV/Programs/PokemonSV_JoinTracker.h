@@ -92,7 +92,7 @@ public:
     TeraLobbyJoinWatcher(
         Logger& logger, Color color,
         RaidJoinReportOption& report_settings,
-        RaidPlayerBanList& ban_settings, bool include_host
+        RaidPlayerBanList& ban_settings
     );
 
     //  Returns the # of players.
@@ -115,7 +115,6 @@ private:
     Logger& m_logger;
     RaidJoinReportOption& m_report_settings;
     RaidPlayerBanList& m_ban_settings;
-    const bool m_include_host;
 
     mutable std::mutex m_lock;
     std::atomic<uint8_t> m_last_known_players = 0;

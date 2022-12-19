@@ -276,12 +276,43 @@ bool AutoHost::start_raid(
 }
 bool AutoHost::process_bans(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    uint8_t player_count,
+    std::array<std::map<Language, std::string>, 4>& player_names,
     const std::vector<TeraLobbyNameMatchResult>& bans,
-    const ImageViewRGB32& snapshot
+    const ImageViewRGB32& snapshot,
+    bool use_grace_period
 ){
     if (bans.empty()){
+        m_ban_timer = WallClock::max();
         return false;
     }
+
+    //  Grace period.
+    do{
+        if (player_count == 4){
+            break;
+        }
+        std::set<std::u32string> normalized_names;
+        for (size_t c = 1; c < 4; c++){
+            auto iter = player_names[c].find(Language::English);
+            if (iter == player_names[c].end()){
+                continue;
+            }
+            normalized_names.insert(OCR::normalize_utf32(iter->second));
+        }
+        if (normalized_names.size() > 1){
+            break;
+        }
+
+        if (m_ban_timer == WallClock::max()){
+            m_ban_timer = current_time();
+            return false;
+        }
+        if (current_time() - m_ban_timer < std::chrono::seconds(10)){
+            return false;
+        }
+
+    }while (false);
 
     env.log("Detected banned user!", COLOR_RED);
     std::string message;
@@ -308,48 +339,15 @@ bool AutoHost::process_bans(
 
     return true;
 }
-void AutoHost::send_full_start_notification(
+bool AutoHost::check_enough_players(
     SingleSwitchProgramEnvironment& env,
     uint8_t player_count,
     std::array<std::map<Language, std::string>, 4>& player_names,
     const ImageViewRGB32& snapshot
 ){
-    //  Check for hat trick. (English Only)
-    do{
-        if (player_count != 4){
-            break;
-        }
-        auto iter1 = player_names[1].find(Language::English);
-        if (iter1 == player_names[1].end()) break;
-        auto iter2 = player_names[2].find(Language::English);
-        if (iter2 == player_names[2].end()) break;
-        auto iter3 = player_names[3].find(Language::English);
-        if (iter3 == player_names[3].end()) break;
-        std::u32string name1 = OCR::normalize_utf32(iter1->second);
-        if (name1.size() < 4) break;
-        std::u32string name2 = OCR::normalize_utf32(iter2->second);
-        if (name2.size() < 4) break;
-        std::u32string name3 = OCR::normalize_utf32(iter3->second);
-        if (name3.size() < 4) break;
-        if (name1 != name2 || name1 != name3){
-            break;
-        }
-
-        env.log(iter1->second + " with the Hat Trick!", COLOR_BLUE);
-        send_program_notification(
-            env, NOTIFICATION_RAID_START,
-            COLOR_GREEN,
-            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the hat trick! \u2728\U0001F3A9\U0001FA84",
-            {{
-                "Start Reason:",
-                "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
-            }}, "",
-            snapshot
-        );
-
-        return;
-    }while (false);
-
+    if (player_count < (uint8_t)START_RAID_PLAYERS.current_value()){
+        return false;
+    }
     env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
     send_program_notification(
         env, NOTIFICATION_RAID_START,
@@ -361,6 +359,45 @@ void AutoHost::send_full_start_notification(
         }}, "",
         snapshot
     );
+    return true;
+}
+bool AutoHost::check_hat_trick(
+    SingleSwitchProgramEnvironment& env,
+    uint8_t player_count,
+    std::array<std::map<Language, std::string>, 4>& player_names,
+    const ImageViewRGB32& snapshot
+){
+    if (player_count != 4){
+        return false;
+    }
+    auto iter1 = player_names[1].find(Language::English);
+    if (iter1 == player_names[1].end()) return false;
+    auto iter2 = player_names[2].find(Language::English);
+    if (iter2 == player_names[2].end()) return false;
+    auto iter3 = player_names[3].find(Language::English);
+    if (iter3 == player_names[3].end()) return false;
+    std::u32string name1 = OCR::normalize_utf32(iter1->second);
+    if (name1.size() < 4) return false;
+    std::u32string name2 = OCR::normalize_utf32(iter2->second);
+    if (name2.size() < 4) return false;
+    std::u32string name3 = OCR::normalize_utf32(iter3->second);
+    if (name3.size() < 4) return false;
+    if (name1 != name2 || name1 != name3){
+        return false;
+    }
+
+    env.log(iter1->second + " with the Hat Trick!", COLOR_BLUE);
+    send_program_notification(
+        env, NOTIFICATION_RAID_START,
+        COLOR_GREEN,
+        "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the hat trick! \u2728\U0001F3A9\U0001FA84",
+        {{
+            "Start Reason:",
+            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
+        }}, "",
+        snapshot
+    );
+    return true;
 }
 bool AutoHost::run_lobby(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
@@ -372,6 +409,7 @@ bool AutoHost::run_lobby(
     VideoOverlaySet overlays(env.console.overlay());
 
     WallClock start_time = wait_for_lobby_open(env, context, lobby_code);
+    m_ban_timer = WallClock::max();
 
     //  This state machine is while the lobby is running and we haven't decided
     //  whether to start or cancel the raid.
@@ -386,7 +424,7 @@ bool AutoHost::run_lobby(
             env.logger(),
             COLOR_RED,
             JOIN_REPORT,
-            BAN_LIST, true
+            BAN_LIST
         );
         context.wait_for_all_requests();
         WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
@@ -395,8 +433,7 @@ bool AutoHost::run_lobby(
             end_time,
             {
                 dialog, start_raid, ready,
-//                {ban_watcher, std::chrono::seconds(1)},
-                {join_watcher, std::chrono::seconds(1)}
+                {join_watcher, std::chrono::seconds(2)}
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -418,15 +455,16 @@ bool AutoHost::run_lobby(
             last_known_player_count = join_watcher.get_last_known_state(player_names, last_known_bans);
             //  Intentional fall-through.
         case 3:{
-            if (process_bans(env, context, last_known_bans, snapshot)){
-                return false;
-            }
-
-            if (last_known_player_count >= (uint8_t)START_RAID_PLAYERS.current_value()){
-                send_full_start_notification(env, last_known_player_count, player_names, snapshot);
+            if (check_hat_trick(env, last_known_player_count, player_names, snapshot)){
                 break;
             }
-
+            if (process_bans(env, context, last_known_player_count, player_names, last_known_bans, snapshot, true)){
+                return false;
+            }
+            if (check_enough_players(env, last_known_player_count, player_names, snapshot)){
+                break;
+            }
+            context.wait_for(std::chrono::seconds(5));
             continue;
         }
         default:
@@ -438,6 +476,9 @@ bool AutoHost::run_lobby(
                 );
             }
             env.log("Timeout reached. Starting raid now...", COLOR_PURPLE);
+            if (process_bans(env, context, last_known_player_count, player_names, last_known_bans, snapshot, false)){
+                return false;
+            }
             send_program_notification(
                 env, NOTIFICATION_RAID_START,
                 COLOR_GREEN,

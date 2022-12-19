@@ -54,10 +54,11 @@ bool check_ban_for_name(
     if (!ignore_whitelist){
         //  Matched. Check against the whitelist.
         static const std::vector<std::string> WHITELIST{
+            "Kuroneko",
+            "Kurbo",
             "Gael",
-//            "Dhruv",
+            "Dhruv",
             "Nikki",
-            "Alice",
             "Dani",
             "denvoros",
             "Halazea",
@@ -101,7 +102,7 @@ uint8_t check_ban_list(
     std::vector<TeraLobbyNameMatchResult>& match_list,
     const std::vector<PlayerListRowSnapshot>& ban_list,
     const std::array<std::map<Language, std::string>, 4>& player_names,
-    bool include_host, bool ignore_whitelist
+    bool ignore_whitelist
 ){
     if (ban_list.empty()){
         return {};
@@ -109,7 +110,8 @@ uint8_t check_ban_list(
 
     //  Check each name against ban list.
     uint8_t banned_count = 0;
-    for (const auto& name : player_names){
+    for (size_t c = 1; c < 4; c++){
+        const auto& name = player_names[c];
         if (name.empty()){
             continue;
         }
@@ -270,13 +272,13 @@ void MultiLanguageJoinTracker::dump(const std::string& filename) const{
 TeraLobbyJoinWatcher::TeraLobbyJoinWatcher(
     Logger& logger, Color color,
     RaidJoinReportOption& report_settings,
-    RaidPlayerBanList& ban_settings, bool include_host
+    RaidPlayerBanList& ban_settings
 )
     : TeraLobbyReader(color)
     , VisualInferenceCallback("TeraLobbyJoinWatcher")
     , m_logger(logger)
     , m_report_settings(report_settings)
-    , m_ban_settings(ban_settings), m_include_host(include_host)
+    , m_ban_settings(ban_settings)
 {}
 
 uint8_t TeraLobbyJoinWatcher::get_last_known_state(
@@ -336,7 +338,7 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
             match_list,
             m_ban_settings.current_banlist(),
             names,
-            m_include_host, m_ban_settings.ignore_whitelist
+            m_ban_settings.ignore_whitelist
         );
     }
 

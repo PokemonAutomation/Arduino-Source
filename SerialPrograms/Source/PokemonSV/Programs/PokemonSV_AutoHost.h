@@ -59,10 +59,19 @@ private:
     //  Returns true if raid should be canceled due a ban.
     bool process_bans(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        uint8_t player_count,
+        std::array<std::map<Language, std::string>, 4>& player_names,
         const std::vector<TeraLobbyNameMatchResult>& bans,
+        const ImageViewRGB32& snapshot,
+        bool use_grace_period
+    );
+    bool check_enough_players(
+        SingleSwitchProgramEnvironment& env,
+        uint8_t player_count,
+        std::array<std::map<Language, std::string>, 4>& player_names,
         const ImageViewRGB32& snapshot
     );
-    void send_full_start_notification(
+    bool check_hat_trick(
         SingleSwitchProgramEnvironment& env,
         uint8_t player_count,
         std::array<std::map<Language, std::string>, 4>& player_names,
@@ -97,6 +106,8 @@ private:
     EventNotificationOption NOTIFICATION_RAID_START;
     EventNotificationOption NOTIFICATION_JOIN_REPORT;
     EventNotificationsOption NOTIFICATIONS0;
+
+    WallClock m_ban_timer;
 };
 
 
