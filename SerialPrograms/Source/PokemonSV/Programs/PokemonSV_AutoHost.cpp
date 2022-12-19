@@ -433,7 +433,7 @@ bool AutoHost::run_lobby(
             end_time,
             {
                 dialog, start_raid, ready,
-                {join_watcher, std::chrono::seconds(2)}
+                {join_watcher, std::chrono::seconds(1)}
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
