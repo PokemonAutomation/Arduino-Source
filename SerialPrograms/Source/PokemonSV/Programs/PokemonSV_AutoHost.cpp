@@ -393,7 +393,7 @@ bool AutoHost::check_hat_trick(
         "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the Hat Trick! \u2728\U0001F3A9\U0001FA84",
         {{
             "Start Reason:",
-            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
+            "\U0001FA84\U0001F3A9\u2728 Hat Trick! \u2728\U0001F3A9\U0001FA84"
         }}, "",
         snapshot
     );

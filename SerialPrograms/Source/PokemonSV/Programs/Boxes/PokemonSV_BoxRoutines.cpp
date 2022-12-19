@@ -5,7 +5,9 @@
  */
 
 
-#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include <cmath>
+#include <algorithm>
+#include <sstream>
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -13,12 +15,12 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
 #include "PokemonSV_BoxRoutines.h"
 
-
-#include <cmath>
-#include <algorithm>
-#include <sstream>
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -56,7 +58,7 @@ bool release_one_pokemon(
     int expected = 0;
     WallClock start = current_time();
     while (true){
-        if (current_time() - start > std::chrono::seconds(10)){
+        if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
                 info, console, "ReleaseFailed",
                 "Failed to release " + Pokemon::STRING_POKEMON + " after 1 minute."
@@ -81,6 +83,16 @@ bool release_one_pokemon(
             }
         );
         context.wait_for(std::chrono::milliseconds(50));
+        if (ret == 3){
+            //  Make sure we're not mistakening this for the other dialogs.
+            auto screenshot = console.video().snapshot();
+            if (selected.detect(screenshot)){
+                ret = 1;
+            }else if (confirm.detect(screenshot)){
+                ret = 2;
+            }
+        }
+
         switch (ret){
         case 0:{
             if (ret == expected){
@@ -133,7 +145,7 @@ bool release_one_pokemon(
                 console.log("Detected advance dialog. (unexpected)", COLOR_RED);
                 errors++;
             }
-            pbf_press_button(context, BUTTON_B, 20, 20);
+            pbf_press_button(context, BUTTON_A, 20, 20);
             expected = 0;
             continue;
         default:;
