@@ -111,9 +111,14 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
     std::vector<ImageFloatBox> hits;
 
     std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-    auto iter = session->make_iterator(20);
+    auto iter = session->make_iterator(50);
     WaterfillObject object;
     while (iter->find_next(object, false)){
+        if (object.min_x == 0 || object.min_y == 0 ||
+            object.max_x == region.width() || object.max_y == region.height()
+        ){
+            continue;
+        }
         double rmsd = m_matcher.rmsd_original(region, object);
 //        cout << "rmsd = " << rmsd << endl;
         if (rmsd < m_matcher.m_max_rmsd){

@@ -27,6 +27,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_status_button.detect(screen)){
+//        cout << "status button" << endl;
         return false;
     }
     if (!m_arrow.detect(screen)){

@@ -178,6 +178,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+    BattleMenuDetector detector(COLOR_RED);
+    while (true){
+        scope.wait_for(std::chrono::milliseconds(50));
+        auto image = feed.snapshot();
+        cout << detector.detect(image) << endl;
+    }
+
+
+
+#if 0
     auto image = feed.snapshot();
     TeraCatchWatcher detector(COLOR_RED);
     bool ok = detector.detect(image);
@@ -185,12 +195,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     if (!ok){
         image.frame->save("tmp.png");
     }
+
 #if 0
     int ret = wait_until(
         console, context, std::chrono::seconds(60),
         {detector}
     );
     cout << "ret = " << ret << endl;
+#endif
 #endif
 
 
