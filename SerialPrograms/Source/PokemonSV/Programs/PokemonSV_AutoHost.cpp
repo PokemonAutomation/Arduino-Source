@@ -390,7 +390,7 @@ bool AutoHost::check_hat_trick(
     send_program_notification(
         env, NOTIFICATION_RAID_START,
         COLOR_GREEN,
-        "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the hat trick! \u2728\U0001F3A9\U0001FA84",
+        "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the Hat Trick! \u2728\U0001F3A9\U0001FA84",
         {{
             "Start Reason:",
             "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
