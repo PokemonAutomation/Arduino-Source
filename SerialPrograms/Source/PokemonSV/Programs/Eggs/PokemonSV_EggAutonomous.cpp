@@ -56,6 +56,8 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Kept");
         m_display_order.emplace_back("Errors", true);
+
+        m_aliases.emplace(STRING_POKEMON + " Kept", "Kept");
     }
 
     std::atomic<uint64_t>& m_sandwiches;
