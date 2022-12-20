@@ -214,8 +214,89 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
 
 void check_basket_to_collect_eggs(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t max_eggs, size_t& num_eggs_collected)
-{
+    size_t max_eggs, size_t& num_eggs_collected
+){
+#if 1
+    bool checked = false;
+    bool last_prompt = false;
+    size_t consecutive_nothing = 0;
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "CheckEggsTimedOut",
+                "check_basket_to_collect_eggs(): Still picking up eggs after 5 minutes."
+            );
+        }
+
+        DialogBoxWatcher picnic(COLOR_RED, false, std::chrono::milliseconds(500));
+        AdvanceDialogWatcher advance(COLOR_YELLOW);
+        PromptDialogWatcher prompt(COLOR_RED, {0.623, 0.530, 0.243, 0.119});
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(5),
+            {
+                picnic,
+                advance,
+                prompt,
+            }
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected no dialog.");
+            consecutive_nothing++;
+            last_prompt = false;
+            if (consecutive_nothing >= 10){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "BasketNotFound",
+                    "collect_eggs_from_basket(): Basket not found after 10 attempts."
+                );
+            }
+            if (checked){
+                console.log("Done talking to basket.");
+                return;
+            }
+            console.log("Attempting to talk to basket...");
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            continue;
+        case 1:
+            console.log("Detected advanced dialog.");
+            last_prompt = false;
+            pbf_press_button(context, BUTTON_B, 20, 30);
+            checked = true;
+            continue;
+        case 2:
+            if (last_prompt){
+                console.log("Detected 2nd consecutive prompt. (unexpected)", COLOR_RED);
+            }
+            if (num_eggs_collected < max_eggs){
+                console.log("Found an egg! Keeping...");
+                pbf_press_button(context, BUTTON_A, 20, 30);
+                if (!last_prompt){
+                    num_eggs_collected++;
+                }
+            }else{
+                console.log("Found an egg! But we already have enough...");
+                pbf_press_button(context, BUTTON_B, 20, 30);
+            }
+            last_prompt = true;
+            continue;
+        default:
+            dump_image_and_throw_recoverable_exception(
+                info, console, "CheckEggsNoState",
+                "check_basket_to_collect_eggs(): No state detected after 10 seconds."
+            );
+            console.log("Rotating view and trying again...", COLOR_RED);
+            pbf_move_right_joystick(context, 0, 128, 30, 0);
+        }
+
+    }
+
+
+#else
     pbf_press_button(context, BUTTON_A, 20, 80);
 
     bool basket_found = false;
@@ -324,6 +405,7 @@ void check_basket_to_collect_eggs(
             "check_basket_to_collect_eggs(): States of skipping egg timeouts, current state " + std::to_string(skip_egg_stage));
     }
     console.log("Finish talking to basket.");
+#endif
 }
 
 

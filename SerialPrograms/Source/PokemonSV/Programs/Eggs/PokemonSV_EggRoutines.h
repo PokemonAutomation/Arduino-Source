@@ -50,12 +50,17 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
 
 // Start at Zero Gate flying spot, go in circles in front of the lab to hatch eggs.
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed) 
-void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback = nullptr);
+void hatch_eggs_at_zero_gate(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback = nullptr
+);
 
 
 // Standing in front of basket during picnic, check basket and update egg count.
-void check_basket_to_collect_eggs(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, size_t max_eggs, size_t& num_eggs_collected);
+void check_basket_to_collect_eggs(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    size_t max_eggs, size_t& num_eggs_collected
+);
 
 // In box view, check the five slots in the party column, after party lead.
 // return how many eggs in the five slots, and how many non-egg pokemon in the five slots.

@@ -69,6 +69,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 
 
 #include <QPixmap>
@@ -178,11 +179,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+    size_t eggs_collected = 0;
+    check_basket_to_collect_eggs(
+        env.program_info(), console, context,
+        10, eggs_collected
+    );
 
+
+#if 0
     auto image = feed.snapshot();
     DialogBoxDetector detector;
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     BattleMenuDetector detector(COLOR_RED);
