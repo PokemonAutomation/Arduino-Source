@@ -54,7 +54,8 @@ bool release_one_pokemon(
 #if 1
     errors = 0;
 
-    bool released = false;
+    bool release_attempted = false;
+    bool release_completed = false;
     int expected = 0;
     WallClock start = current_time();
     while (true){
@@ -103,15 +104,17 @@ bool release_one_pokemon(
             }
             auto screenshot = console.video().snapshot();
             if (exists.detect(screenshot)){
-                if (released){
+                if (release_attempted && release_completed){
                     return true;
                 }
+                release_attempted = false;
+                release_completed = false;
                 pbf_press_button(context, BUTTON_A, 20, 20);
                 expected = 1;
                 continue;
             }else{
                 console.log("Slot is empty.");
-                return released;
+                return release_attempted && release_completed;
             }
         }
         case 1:
@@ -135,7 +138,7 @@ bool release_one_pokemon(
             }
             pbf_press_dpad(context, DPAD_UP, 10, 10);
             pbf_press_button(context, BUTTON_A, 20, 20);
-            released = true;
+            release_attempted = true;
             expected = 3;
             continue;
         case 3:
@@ -146,6 +149,7 @@ bool release_one_pokemon(
                 errors++;
             }
             pbf_press_button(context, BUTTON_A, 20, 20);
+            release_completed = true;
             expected = 0;
             continue;
         default:;
