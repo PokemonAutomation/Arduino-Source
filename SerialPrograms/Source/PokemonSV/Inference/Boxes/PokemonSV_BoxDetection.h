@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSV_BoxDetection_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "PokemonSV_DialogDetector.h"
-#include "PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
     class ConsoleHandle;

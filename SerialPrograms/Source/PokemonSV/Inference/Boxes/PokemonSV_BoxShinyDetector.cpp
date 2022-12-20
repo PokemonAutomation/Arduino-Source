@@ -4,8 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"

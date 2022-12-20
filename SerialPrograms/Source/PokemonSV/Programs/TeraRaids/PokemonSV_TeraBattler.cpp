@@ -6,10 +6,9 @@
 
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_TeraBattler.h"
 

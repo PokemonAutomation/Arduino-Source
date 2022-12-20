@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV_EggDetector.h"
 
 #include <iostream>

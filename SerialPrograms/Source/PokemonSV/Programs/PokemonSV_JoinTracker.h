@@ -16,7 +16,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
-#include "PokemonSV/Inference/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

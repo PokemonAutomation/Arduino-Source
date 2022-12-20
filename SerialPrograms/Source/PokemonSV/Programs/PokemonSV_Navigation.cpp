@@ -13,11 +13,11 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{

@@ -18,7 +18,7 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_GimmighoulChestFarm.h"
 

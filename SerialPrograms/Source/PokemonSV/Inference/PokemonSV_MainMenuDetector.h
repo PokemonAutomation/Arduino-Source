@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
     class ConsoleHandle;

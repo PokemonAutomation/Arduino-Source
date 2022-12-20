@@ -590,27 +590,27 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
-    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.cpp \
-    Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_BoxDetection.cpp \
-    Source/PokemonSV/Inference/PokemonSV_BoxGenderDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_BoxShinyDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_DialogDetector.cpp \
+    Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
+    Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp \
+    Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_IVCheckerReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_PicnicDetector.cpp \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
-    Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.cpp \
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -1459,27 +1459,27 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
-    Source/PokemonSV/Inference/PokemonSV_BattleBallReader.h \
-    Source/PokemonSV/Inference/PokemonSV_BattleMenuDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_BoxDetection.h \
-    Source/PokemonSV/Inference/PokemonSV_BoxGenderDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_BoxShinyDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_DialogArrowDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_DialogDetector.h \
+    Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
+    Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h \
+    Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
+    Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
     Source/PokemonSV/Inference/PokemonSV_EggDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_GradientArrowDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_IVCheckerReader.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_PicnicDetector.h \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
-    Source/PokemonSV/Inference/PokemonSV_PostCatchDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_SandwichHandDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_TeraCardDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_TeraSilhouetteReader.h \
-    Source/PokemonSV/Inference/PokemonSV_TeraTypeReader.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/PokemonSV_Panels.h \

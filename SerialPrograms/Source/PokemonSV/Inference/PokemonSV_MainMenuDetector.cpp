@@ -9,7 +9,6 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_MainMenuDetector.h"
 
 #include <iostream>

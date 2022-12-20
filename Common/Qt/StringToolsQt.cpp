@@ -29,6 +29,10 @@ void to_lower(std::u32string& str){
     }
 }
 
+bool is_alphanumberic(char32_t ch){
+    return QChar::isLetterOrNumber(ch);
+}
+
 bool has_extension(const std::string& str, const std::string& extension){
     if (extension.empty()){
         return true;

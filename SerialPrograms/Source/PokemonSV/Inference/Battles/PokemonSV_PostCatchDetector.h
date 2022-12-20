@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

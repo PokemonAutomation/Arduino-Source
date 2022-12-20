@@ -8,11 +8,10 @@
 #define PokemonAutomation_PokemonSV_BoxShinyDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

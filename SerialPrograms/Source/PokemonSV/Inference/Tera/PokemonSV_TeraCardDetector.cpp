@@ -21,7 +21,7 @@
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
-#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraCardDetector.h"
 
 //#include <iostream>

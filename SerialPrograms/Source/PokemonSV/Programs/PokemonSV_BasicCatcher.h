@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_BasicCatcher_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -12,9 +12,9 @@
 //#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_TradeRoutines.h"
 

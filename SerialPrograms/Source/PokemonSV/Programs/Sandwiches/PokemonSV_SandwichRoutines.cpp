@@ -16,11 +16,11 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_PicnicDetector.h"
-#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
-#include "PokemonSV/Inference/PokemonSV_SandwichHandDetector.h"
-#include "PokemonSV/Inference/PokemonSV_SandwichRecipeDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV_SandwichRoutines.h"
 
 

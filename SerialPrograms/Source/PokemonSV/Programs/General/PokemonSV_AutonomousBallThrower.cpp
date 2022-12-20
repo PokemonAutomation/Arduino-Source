@@ -14,8 +14,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/PokemonSV_BattleBallReader.h"
-#include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_AutonomousBallThrower.h"
 
