@@ -370,7 +370,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             env.console.overlay().add_log("Change to picnic pokemon", COLOR_WHITE);
             
             // Move to right box
-            move_to_right_box(context);
+            move_to_left_box(context);
 
             // Swap the party lead, the flame body pokemon with the stored first fetching pokemon
             swap_two_box_slots(env.program_info(), env.console, context,
@@ -381,7 +381,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             load_one_column_to_party(env.program_info(), env.console, context, 1);
             
             // Move back to middle box
-            move_to_left_box(context);
+            move_to_right_box(context);
         }
 
         leave_box_system_to_overworld(env.program_info(), env.console, context);
@@ -478,7 +478,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 // Return false if it does not find an empty spot.
 bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party){
     SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-    move_to_left_box(context);
+    move_to_right_box(context);
     context.wait_for_all_requests();
 
     for (uint8_t row = 0; row < 5; row++){
@@ -494,7 +494,7 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
                     BoxCursorLocation::SLOTS, row, col);
 
                 // Move back to middle box
-                move_to_right_box(context);
+                move_to_left_box(context);
                 context.wait_for_all_requests();
                 return true;
             }
@@ -520,7 +520,7 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
     enter_box_system_from_overworld(env.program_info(), env.console, context);
 
     // Move to right box
-    move_to_right_box(context);
+    move_to_left_box(context);
     
     // Swap the stored the flame body pokemon with the stored first fetching pokemon
     swap_two_box_slots(env.program_info(), env.console, context,
@@ -531,7 +531,7 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
     unload_one_column_from_party(env.program_info(), env.console, context, 1);
     
     // Move to middle box
-    move_to_left_box(context);
+    move_to_right_box(context);
 
     // Load first egg column to party
     load_one_column_to_party(env.program_info(), env.console, context, 0);
