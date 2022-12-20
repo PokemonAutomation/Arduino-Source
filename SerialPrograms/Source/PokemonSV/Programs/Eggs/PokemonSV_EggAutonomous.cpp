@@ -468,9 +468,8 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
         
         case EggHatchAction::Release:
         default:
-            size_t errors = 0;
-            release_one_pokemon(env.program_info(), env.console, context, errors);
-            stats.m_errors += errors;
+            size_t local_errors = 0;
+            release_one_pokemon(env.program_info(), env.console, context, local_errors);
             break;
     } // end switch EggHatchAction
 }

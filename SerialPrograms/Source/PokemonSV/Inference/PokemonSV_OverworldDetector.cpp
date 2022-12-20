@@ -79,7 +79,6 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
     );
 
 //    size_t c = 0;
-//    cout << "asdf" << endl;
     for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
         auto iter = session->make_iterator(50);

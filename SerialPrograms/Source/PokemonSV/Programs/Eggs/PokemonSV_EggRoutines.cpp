@@ -312,9 +312,18 @@ void check_basket_to_collect_eggs(
             }
         }
         else { // No more dialog, the basket checking ends
-            return;
+            break;
         }
     } // end while true reading basket dialogs
+
+    if (taking_egg){
+        dump_image_and_throw_recoverable_exception(info, console, "CollectEggConfirmationNotDetected",
+            "check_basket_to_collect_eggs(): Confirmation dialog to of taking egg not detected.");
+    } else if (skip_egg_stage > 0){
+        dump_image_and_throw_recoverable_exception(info, console, "SkipEggFailure",
+            "check_basket_to_collect_eggs(): States of skipping egg timeouts, current state " + std::to_string(skip_egg_stage));
+    }
+    console.log("Finish talking to basket.");
 }
 
 
