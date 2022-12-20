@@ -46,7 +46,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         , m_eggs(m_stats["Eggs"])
         , m_hatched(m_stats["Hatched"])
         , m_shinies(m_stats["Shinies"])
-        , m_kept(m_stats[STRING_POKEMON + " Kept"])
+        , m_kept(m_stats["Kept"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Sandwiches");
@@ -54,7 +54,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Eggs");
         m_display_order.emplace_back("Hatched");
         m_display_order.emplace_back("Shinies");
-        m_display_order.emplace_back(STRING_POKEMON + " Kept");
+        m_display_order.emplace_back("Kept");
         m_display_order.emplace_back("Errors", true);
     }
 
