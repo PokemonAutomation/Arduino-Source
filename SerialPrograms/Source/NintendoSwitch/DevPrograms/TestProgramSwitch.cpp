@@ -182,7 +182,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     size_t eggs_collected = 0;
     check_basket_to_collect_eggs(
         env.program_info(), console, context,
-        10, eggs_collected
+        1, eggs_collected
     );
 
 

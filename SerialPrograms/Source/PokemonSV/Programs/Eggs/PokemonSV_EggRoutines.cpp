@@ -218,8 +218,10 @@ void check_basket_to_collect_eggs(
 ){
 #if 1
     bool checked = false;
-    bool last_prompt = false;
     size_t consecutive_nothing = 0;
+    Button last_prompt = 0;
+    bool pending_refuse = false;
+
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
@@ -244,11 +246,16 @@ void check_basket_to_collect_eggs(
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
+
+        if (ret != 0){
+            consecutive_nothing = 0;
+        }
+
         switch (ret){
         case 0:
             console.log("Detected no dialog.");
             consecutive_nothing++;
-            last_prompt = false;
+            last_prompt = 0;
             if (consecutive_nothing >= 10){
                 dump_image_and_throw_recoverable_exception(
                     info, console, "BasketNotFound",
@@ -262,35 +269,49 @@ void check_basket_to_collect_eggs(
             console.log("Attempting to talk to basket...");
             pbf_press_button(context, BUTTON_A, 20, 30);
             continue;
+
         case 1:
             console.log("Detected advanced dialog.");
-            last_prompt = false;
+            last_prompt = 0;
             pbf_press_button(context, BUTTON_B, 20, 30);
             checked = true;
             continue;
+
         case 2:
-            if (last_prompt){
+            if (last_prompt != 0){
                 console.log("Detected 2nd consecutive prompt. (unexpected)", COLOR_RED);
+                //  Repeat the previous button press.
+                pbf_press_button(context, last_prompt, 20, 80);
+                continue;
             }
+
+            if (pending_refuse){
+                console.log("Confirming refused egg...");
+                pbf_press_button(context, BUTTON_A, 20, 80);
+                pending_refuse = false;
+                continue;
+            }
+
             if (num_eggs_collected < max_eggs){
                 console.log("Found an egg! Keeping...");
                 std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
                 console.overlay().add_log("Egg " + msg, COLOR_GREEN);
-                pbf_press_button(context, BUTTON_A, 20, 30);
-                if (!last_prompt){
-                    num_eggs_collected++;
-                }
+                pbf_press_button(context, BUTTON_A, 20, 80);
+                num_eggs_collected++;
+                last_prompt = BUTTON_A;
             }else{
                 console.log("Found an egg! But we already have enough...");
                 console.overlay().add_log("Full. Skip egg.", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_B, 20, 30);
+                pbf_press_button(context, BUTTON_B, 20, 80);
+                last_prompt = BUTTON_B;
+                pending_refuse = true;
             }
-            last_prompt = true;
             continue;
+
         default:
             dump_image_and_throw_recoverable_exception(
                 info, console, "CheckEggsNoState",
-                "check_basket_to_collect_eggs(): No state detected after 10 seconds."
+                "check_basket_to_collect_eggs(): No state detected after 5 seconds."
             );
             console.log("Rotating view and trying again...", COLOR_RED);
             pbf_move_right_joystick(context, 0, 128, 30, 0);
