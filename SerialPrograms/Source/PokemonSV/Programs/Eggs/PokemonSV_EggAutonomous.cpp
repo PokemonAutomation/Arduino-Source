@@ -75,7 +75,7 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
     , MAX_NUM_SANDWICHES(
-        "<b>Max num sandwiches:</b><br>How many " + STRING_POKEMON + " Great Peanut Butter Sandwich you can make before running out of ingredients.",
+        "<b>Num Sandwiches:</b><br>How many Great Peanut Butter Sandwiches you can make before running out of ingredients.",
         LockWhileRunning::LOCKED,
         100, 0
     )
@@ -95,12 +95,8 @@ EggAutonomous::EggAutonomous()
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "No auto-saving: No error/crash recovery. No sandwich ingredients permanently spent.<br>"
-        "Save before picnic and after keeping a baby: Allows for error/crash recovery. Ingredients permanently spent after baby kept.<br>"
-        "Save before every batch: Allows you to unhatch eggs. Ingredients permanently spent after every picnic.<br><br>"
-        "Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.<br>"
-        "To collect (unhatched) eggs with the desired stats, set this option to \"Save before every batch\". "
-        "Then set the Action Table below to \"Stop Program\" on the desired stats. "
-        "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
+        "Save before picnic and after keeping a baby: Allows for error/crash recovery. Reset game if no baby to keep. Low sandwich ingredients usage.<br>"
+        "Save before every batch: Allows you to unhatch eggs. High sandwich ingredients usage.<br><br>",
         {
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
@@ -135,19 +131,6 @@ EggAutonomous::EggAutonomous()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    // Program requirement:
-    // - At Area Zero flying spot
-    // - Text Fast
-    // - unlock sandwich No. 17
-    // - has enough ingredients to make sandwich No. 17
-    // - Current box is empty, to hold eggs
-    // - The box to the left of the current box has empty slots for found baby pokemon (shiny or matching user defined requirements)
-    // - The box to the right of the current box has a flame body pokemon at row 0, col 0 (0-indexed).
-    // - the second leftmost column of the box to the right of the current box is empty. It is used to place the hatching party column
-    // - box in judge view
-    // - What to do when party pokemon gain exp after sandwich?
-    // - auto save off if you want to use autosave option
-
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(MAX_NUM_SANDWICHES);
     PA_ADD_OPTION(LANGUAGE);
