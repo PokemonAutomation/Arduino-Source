@@ -178,13 +178,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+
+    auto image = feed.snapshot();
+    DialogBoxDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+#if 0
     BattleMenuDetector detector(COLOR_RED);
     while (true){
         scope.wait_for(std::chrono::milliseconds(50));
         auto image = feed.snapshot();
         cout << detector.detect(image) << endl;
     }
-
+#endif
 
 
 #if 0

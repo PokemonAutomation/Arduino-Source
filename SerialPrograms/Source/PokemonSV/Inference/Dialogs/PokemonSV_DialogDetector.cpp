@@ -18,42 +18,75 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-AdvanceDialogDetector::AdvanceDialogDetector(Color color)
+DialogBoxDetector::DialogBoxDetector(Color color, bool true_if_detected)
     : m_color(color)
+    , m_true_if_detected(true_if_detected)
     , m_box_top(0.50, 0.74, 0.20, 0.01)
     , m_box_bot(0.30, 0.88, 0.40, 0.01)
-    , m_arrow(0.710, 0.850, 0.030, 0.042)
+    , m_border_top(0.24, 0.71, 0.52, 0.04)
+    , m_border_bot(0.24, 0.88, 0.52, 0.04)
 {}
-void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
+void DialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
     items.add(m_color, m_box_bot);
-    items.add(m_color, m_arrow);
+    items.add(m_color, m_border_top);
+    items.add(m_color, m_border_bot);
 }
-bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
-//    cout << stats_top.average << stats_top.stddev << endl;
+bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
+//    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
-    if (is_white(stats_top)){
+    if (is_white(stats_box_top)){
         white = true;
-    }else if (is_black(stats_top, 150)){
+    }else if (is_black(stats_box_top, 150)){
         white = false;
     }else{
-        return false;
+        return !m_true_if_detected;
     }
 
 //    cout << "white = " << white << endl;
 
-    ImageStats stats_bot = image_stats(extract_box_reference(screen, m_box_bot));
+    ImageStats stats_box_bot = image_stats(extract_box_reference(screen, m_box_bot));
     if (white){
-        if (!is_white(stats_bot)){
-            return false;
+        if (!is_white(stats_box_bot)){
+            return !m_true_if_detected;
         }
     }else{
-        if (!is_black(stats_bot, 150)){
-            return false;
+        if (!is_black(stats_box_bot, 150)){
+            return !m_true_if_detected;
         }
     }
-//    cout << "asdf" << endl;
+
+    ImageStats stats_border_top = image_stats(extract_box_reference(screen, m_border_top));
+//    cout << stats_border_top.average << stats_border_top.stddev << endl;
+    if (stats_border_top.stddev.sum() < 100){
+        return !m_true_if_detected;
+    }
+
+    ImageStats stats_border_bot = image_stats(extract_box_reference(screen, m_border_bot));
+//    cout << stats_border_bot.average << stats_border_bot.stddev << endl;
+    if (stats_border_bot.stddev.sum() < 100){
+        return !m_true_if_detected;
+    }
+
+    return m_true_if_detected;
+}
+
+
+
+
+AdvanceDialogDetector::AdvanceDialogDetector(Color color)
+    : m_box(color)
+    , m_arrow(0.710, 0.850, 0.030, 0.042)
+{}
+void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    m_box.make_overlays(items);
+    items.add(m_box.color(), m_arrow);
+}
+bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
+    if (!m_box.detect(screen)){
+        return false;
+    }
 
     DialogArrowDetector arrow_detector(COLOR_RED, m_arrow);
     return arrow_detector.detect(screen);
@@ -66,36 +99,16 @@ PromptDialogDetector::PromptDialogDetector(Color color)
     : PromptDialogDetector(color, {0.50, 0.40, 0.40, 0.50})
 {}
 PromptDialogDetector::PromptDialogDetector(Color color, const ImageFloatBox& arrow_box)
-    : m_color(color)
-    , m_box_top(0.50, 0.74, 0.20, 0.01)
-    , m_box_bot(0.30, 0.88, 0.40, 0.01)
+    : m_box(color)
     , m_gradient(arrow_box)
 {}
 void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_box_top);
-    items.add(m_color, m_box_bot);
-    items.add(m_color, m_gradient);
+    m_box.make_overlays(items);
+    items.add(m_box.color(), m_gradient);
 }
 bool PromptDialogDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats stats_top = image_stats(extract_box_reference(screen, m_box_top));
-    bool white;
-    if (is_white(stats_top)){
-        white = true;
-    }else if (is_black(stats_top)){
-        white = false;
-    }else{
+    if (!m_box.detect(screen)){
         return false;
-    }
-
-    ImageStats stats_bot = image_stats(extract_box_reference(screen, m_box_bot));
-    if (white){
-        if (!is_white(stats_bot)){
-            return false;
-        }
-    }else{
-        if (!is_black(stats_bot)){
-            return false;
-        }
     }
 
     GradientArrowDetector gradiant_detector(COLOR_RED, GradientArrowType::RIGHT, m_gradient);

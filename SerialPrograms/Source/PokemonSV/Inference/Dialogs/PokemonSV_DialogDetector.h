@@ -18,6 +18,38 @@ namespace PokemonSV{
 
 
 
+//  Detect any dialog box.
+class DialogBoxDetector : public StaticScreenDetector{
+public:
+    DialogBoxDetector(Color color = COLOR_RED, bool true_if_detected = true);
+
+    Color color() const{ return m_color; }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    bool m_true_if_detected;
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_bot;
+    ImageFloatBox m_border_top;
+    ImageFloatBox m_border_bot;
+};
+class DialogBoxWatcher : public DetectorToFinder<DialogBoxDetector>{
+public:
+    DialogBoxWatcher(
+        Color color,
+        bool trigger_if_detected,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("DialogBoxWatcher", duration, color, trigger_if_detected)
+    {}
+};
+
+
+
+
 //  Detect dialog that has the small arrow at bottom to show the next dialog.
 //  It should be able to detect both the white background dialog and black background dialog.
 class AdvanceDialogDetector : public StaticScreenDetector{
@@ -27,16 +59,14 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-protected:
-    Color m_color;
-    ImageFloatBox m_box_top;
-    ImageFloatBox m_box_bot;
+private:
+    DialogBoxDetector m_box;
     ImageFloatBox m_arrow;
 };
 class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
 public:
     AdvanceDialogWatcher(Color color, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
-         : DetectorToFinder("AdvanceDialogFinder", duration, color)
+         : DetectorToFinder("AdvanceDialogWatcher", duration, color)
     {}
 };
 
@@ -54,10 +84,8 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-protected:
-    Color m_color;
-    ImageFloatBox m_box_top;
-    ImageFloatBox m_box_bot;
+private:
+    DialogBoxDetector m_box;
     ImageFloatBox m_gradient;
 };
 class PromptDialogWatcher : public DetectorToFinder<PromptDialogDetector>{
@@ -66,14 +94,14 @@ public:
         Color color,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("PromptDialogWatcher", std::chrono::milliseconds(250), color)
     {}
     PromptDialogWatcher(
         Color color,
         const ImageFloatBox& arrow_box,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("PromptDialogFinder", std::chrono::milliseconds(250), color, arrow_box)
+         : DetectorToFinder("PromptDialogWatcher", std::chrono::milliseconds(250), color, arrow_box)
     {}
 };
 
