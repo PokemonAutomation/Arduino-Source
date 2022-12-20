@@ -76,9 +76,11 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/PokemonSV_DialogDetector.h"
 #include "Common/Cpp/Containers/BoxSet.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "PokemonSV/Inference/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -172,10 +174,23 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("ZeroGateNightBike_2_True.png");
+    OverworldDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+#if 0
+    ImageRGB32 image("screenshot-20221219-201912436404.png");
+    PromptDialogDetector prompt(COLOR_RED, {0.623, 0.530, 0.243, 0.119});
+    cout << prompt.detect(image) << endl;
+#endif
+
+
+#if 0
     ImageRGB32 image("20221219-140347621956.jpg");
     TeraLobbyReader reader;
     auto names = reader.read_names(env.logger(), {Language::English}, true, image);
-
+#endif
 #if 0
     for (size_t row = 0; row < image.height(); row++){
         for (size_t col = 0; col < image.width(); col++){

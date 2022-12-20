@@ -60,21 +60,25 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
             {0xffd0d000, 0xffffff1f},
             {0xffe0e000, 0xffffff1f},
             {0xfff0f000, 0xffffff1f},
+            {0xfff8f800, 0xffffff1f},
 
             {0xffc0c000, 0xffffff3f},
             {0xffd0d000, 0xffffff3f},
             {0xffe0e000, 0xffffff3f},
             {0xfff0f000, 0xffffff3f},
+            {0xfff8f800, 0xffffff3f},
 
             {0xffc0c000, 0xffffff5f},
             {0xffd0d000, 0xffffff5f},
             {0xffe0e000, 0xffffff5f},
             {0xfff0f000, 0xffffff5f},
+            {0xfff8f800, 0xffffff5f},
 
             {0xffc0c000, 0xffffff7f},
             {0xffd0d000, 0xffffff7f},
             {0xffe0e000, 0xffffff7f},
             {0xfff0f000, 0xffffff7f},
+            {0xfff8f800, 0xffffff7f},
         }
     );
 
@@ -84,8 +88,8 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
         auto iter = session->make_iterator(50);
         WaterfillObject object;
         while (iter->find_next(object, false)){
-            // c++;
-            // extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
+//             c++;
+//             extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
 
             //  Exclude if it touches the borders.
             if (object.min_x == 0 || object.min_y == 0 ||

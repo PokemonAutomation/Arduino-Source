@@ -95,6 +95,9 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
 
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
 
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+
     while (true)
     {
         BattleMenuWatcher battle_menu(COLOR_RED);
@@ -115,7 +118,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             break;
         default:
             dump_image(env.logger(), env.program_info(), "BattleMenuNotDetected", env.console.video().snapshot());
-            throw FatalProgramException(env.console.logger(), "Failed to detect battle menu after 60 seconds, did you caught the pokemon ?");
+            throw FatalProgramException(env.console.logger(), "Failed to detect battle menu after 60 seconds, did you catch or fail?");
         }
 
     }
