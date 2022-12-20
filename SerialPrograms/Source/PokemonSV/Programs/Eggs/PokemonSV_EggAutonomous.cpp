@@ -106,7 +106,8 @@ EggAutonomous::EggAutonomous()
         AutoSave::AfterStartAndKeep
     )
     , SAVE_DEBUG_VIDEO(
-        "<b>Save debug videos to Switch:</b>",
+        "<b>Save debug videos to Switch:</b><br>"
+        "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
         LockWhileRunning::LOCKED,
         false
     )
@@ -131,6 +132,9 @@ EggAutonomous::EggAutonomous()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+    }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(MAX_NUM_SANDWICHES);
     PA_ADD_OPTION(LANGUAGE);
@@ -139,10 +143,6 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(FILTERS);
 
     PA_ADD_OPTION(NOTIFICATIONS);
-
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-    }
 }
 
 
