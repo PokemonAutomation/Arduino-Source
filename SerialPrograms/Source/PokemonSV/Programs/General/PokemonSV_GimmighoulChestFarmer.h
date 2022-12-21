@@ -17,16 +17,16 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonSV {
 
-class GimmighoulChestFarm_Descriptor : public SingleSwitchProgramDescriptor {
+class GimmighoulChestFarmer_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    GimmighoulChestFarm_Descriptor();
+    GimmighoulChestFarmer_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class GimmighoulChestFarm : public SingleSwitchProgramInstance {
+class GimmighoulChestFarmer : public SingleSwitchProgramInstance {
 public:
-    GimmighoulChestFarm();
+    GimmighoulChestFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
