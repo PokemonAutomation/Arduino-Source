@@ -12,8 +12,8 @@
 
 #include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
-#include "Programs/General/PokemonSV_GimmighoulChestFarm.h"
-#include "Programs/General/PokemonSV_GimmighoulRoamingFarm.h"
+#include "Programs/General/PokemonSV_GimmighoulChestFarmer.h"
+#include "Programs/General/PokemonSV_GimmighoulRoamingFarmer.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
@@ -54,7 +54,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
 //    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarm_Descriptor, GimmighoulRoamingFarm>());
+        ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
         ret.emplace_back(make_single_switch_program<GimmighoulChestFarm_Descriptor, GimmighoulChestFarm>());
 //    }
 

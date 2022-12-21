@@ -20,7 +20,7 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
-#include "PokemonSV_GimmighoulChestFarm.h"
+#include "PokemonSV_GimmighoulChestFarmer.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {

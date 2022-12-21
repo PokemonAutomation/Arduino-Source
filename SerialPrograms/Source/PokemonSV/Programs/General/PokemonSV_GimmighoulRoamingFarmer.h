@@ -18,14 +18,14 @@ namespace NintendoSwitch {
 namespace PokemonSV {
 
 
-class GimmighoulRoamingFarm_Descriptor : public SingleSwitchProgramDescriptor {
+class GimmighoulRoamingFarmer_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    GimmighoulRoamingFarm_Descriptor();
+    GimmighoulRoamingFarmer_Descriptor();
 };
 
-class GimmighoulRoamingFarm : public SingleSwitchProgramInstance {
+class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance {
 public:
-    GimmighoulRoamingFarm();
+    GimmighoulRoamingFarmer();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
