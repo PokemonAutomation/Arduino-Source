@@ -11,8 +11,9 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -20,7 +21,7 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
-#include "PokemonSV_GimmighoulChestFarm.h"
+#include "PokemonSV_GimmighoulChestFarmer.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -28,9 +29,9 @@ namespace PokemonSV {
 
 using namespace Pokemon;
 
-GimmighoulChestFarm_Descriptor::GimmighoulChestFarm_Descriptor()
+GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:GimmighoulChestFarm",
+        "PokemonSV:GimmighoulChestFarerm",
         STRING_POKEMON + " SV", "Gimmighoul Chest Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulChestFarmer.md",
         "Farm Chest Gimmighoul for coins.",
@@ -39,7 +40,7 @@ GimmighoulChestFarm_Descriptor::GimmighoulChestFarm_Descriptor()
     )
 {}
 
-struct GimmighoulChestFarm_Descriptor::Stats : public StatsTracker {
+struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker {
     Stats()
         : pokemon_fainted(m_stats["Chests farmed"])
         , resets(m_stats["Resets"])
@@ -53,11 +54,11 @@ struct GimmighoulChestFarm_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> GimmighoulChestFarm_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> GimmighoulChestFarmer_Descriptor::make_stats() const {
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-GimmighoulChestFarm::GimmighoulChestFarm()
+GimmighoulChestFarmer::GimmighoulChestFarmer()
     : PP(
         "<b>First Attack PP:</b><br>The amount of PP remaining on your lead's first attack.",
         LockWhileRunning::LOCKED,
@@ -66,7 +67,7 @@ GimmighoulChestFarm::GimmighoulChestFarm()
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
-        LockWhileRunning::LOCKED, false
+        LockWhileRunning::UNLOCKED, false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -81,13 +82,13 @@ GimmighoulChestFarm::GimmighoulChestFarm()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
-    GimmighoulChestFarm_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarm_Descriptor::Stats>();
+    GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
     uint32_t c = 0;
     while(c < PP) {
-        //Press A to enter battle, assuming there is a chest
+        //  Press A to enter battle, assuming there is a chest
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 90);
 
@@ -100,7 +101,7 @@ void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         );
 
         if (ret == 0) {
-            //Attack using your first move
+            //  Attack using your first move
             pbf_mash_button(context, BUTTON_A, 90);
             c++;
             context.wait_for_all_requests();
@@ -119,37 +120,34 @@ void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-            //Walk forward since battles force you to jump back
+            //  Walk forward since battles force you to jump back
             pbf_press_button(context, BUTTON_L, 50, 40);
             pbf_move_left_joystick(context, 128, 0, 120, 0);
         }
 
-        //Close the game
+        //  Save the game
         save_game_from_overworld(env.program_info(), env.console, context);
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        context.wait_for_all_requests();
-        close_game(context);
 
-        //Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
-        //This isn't perfect because 12 hour format but it works
+        //  Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
+        //  This isn't perfect because 12 hour format but it works
         home_to_date_time(context, true, false);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 100);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-        pbf_press_dpad(context, DPAD_UP, 10, 100);
-        pbf_press_dpad(context, DPAD_UP, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_HOME, 10, 90);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, DPAD_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
-    stats.resets++;
-    env.update_stats();
-    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        stats.resets++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
     }
 
@@ -159,7 +157,7 @@ void GimmighoulChestFarm::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

@@ -8,14 +8,14 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV_GimmighoulRoamingFarm.h"
+#include "PokemonSV_GimmighoulRoamingFarmer.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -23,9 +23,9 @@ namespace PokemonSV {
 
 using namespace Pokemon;
 
-GimmighoulRoamingFarm_Descriptor::GimmighoulRoamingFarm_Descriptor()
+GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:GimmighoulRoamingFarm",
+        "PokemonSV:GimmighoulRoamingFarmer",
         STRING_POKEMON + " SV", "Gimmighoul Roaming Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulRoamingFarmer.md",
         "Farm roaming Gimmighoul for coins.",
@@ -34,7 +34,7 @@ GimmighoulRoamingFarm_Descriptor::GimmighoulRoamingFarm_Descriptor()
     )
 {}
 
-GimmighoulRoamingFarm::GimmighoulRoamingFarm()
+GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
     : SKIPS(
         "<b>Number of Attempts:</b>",
         LockWhileRunning::UNLOCKED,
@@ -56,30 +56,27 @@ GimmighoulRoamingFarm::GimmighoulRoamingFarm()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulRoamingFarm::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
-    //Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
+    //  Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
     for (uint32_t c = 0; c < SKIPS; c++) {
-        //Grab coin assuming there is one
+        //  Grab coin assuming there is one
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 90);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
 
-        //Save the game then close it
+        //  Save the game
         save_game_from_overworld(env.program_info(), env.console, context);
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        context.wait_for_all_requests();
-        close_game(context);
 
-        //Date skip
+        //  Date skip
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, true, false);
         roll_date_forward_1(context, false);
-        pbf_press_button(context, BUTTON_HOME, 10, 90);
+        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
-        //Enter game
+        //  Reset game
         reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
-
     }
 
     if (FIX_TIME_WHEN_DONE) {
@@ -88,7 +85,7 @@ void GimmighoulRoamingFarm::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

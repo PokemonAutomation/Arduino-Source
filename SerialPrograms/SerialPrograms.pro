@@ -621,8 +621,8 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarm.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
@@ -1490,8 +1490,8 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarm.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarm.h \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
+    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \

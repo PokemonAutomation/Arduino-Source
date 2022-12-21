@@ -1,11 +1,11 @@
-/*  Gimmighoul Chest Farmer
+/*  Gimmighoul Roaming Farmer
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_GimmighoulChestFarm_H
-#define PokemonAutomation_PokemonSwSh_GimmighoulChestFarm_H
+#ifndef PokemonAutomation_PokemonSwSh_GimmighoulRoamingFarm_H
+#define PokemonAutomation_PokemonSwSh_GimmighoulRoamingFarm_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,25 +17,25 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonSV {
 
-class GimmighoulChestFarm_Descriptor : public SingleSwitchProgramDescriptor {
+
+class GimmighoulRoamingFarmer_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    GimmighoulChestFarm_Descriptor();
-    struct Stats;
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+    GimmighoulRoamingFarmer_Descriptor();
 };
 
-class GimmighoulChestFarm : public SingleSwitchProgramInstance {
+class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance {
 public:
-    GimmighoulChestFarm();
+    GimmighoulRoamingFarmer();
+
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    SimpleIntegerOption<uint32_t> PP;
+    SimpleIntegerOption<uint32_t> SKIPS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
+
 
 }
 }
