@@ -77,6 +77,7 @@ bool MainMenuDetector::move_cursor(
 
     size_t consecutive_detection_fails = 0;
     size_t moves = 0;
+    bool target_reached = false;
     while (true){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
@@ -117,8 +118,17 @@ bool MainMenuDetector::move_cursor(
 
         //  We're done!
         if (current.first == side && current.second == row){
-            return true;
+            if (target_reached || fast){
+                return true;
+            }else{
+                //  Don't return yet. Wait a second to make sure the video is
+                //  in steady state before we return.
+                target_reached = true;
+                context.wait_for(std::chrono::seconds(1));
+                continue;
+            }
         }
+        target_reached = false;
 
         moves++;
 

@@ -179,11 +179,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+
+    MainMenuDetector detector;
+    detector.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 1);
+    cout << "done" << endl;
+
+
+
+#if 0
     size_t eggs_collected = 0;
     check_basket_to_collect_eggs(
         env.program_info(), console, context,
         1, eggs_collected
     );
+#endif
 
 
 #if 0
