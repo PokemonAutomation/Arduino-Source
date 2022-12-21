@@ -44,9 +44,11 @@ public:
 
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
+    //  If (fast = true) it will be faster, but may be unreliable. It may not
+    //  actually land on the desired slot if the capture card is slow.
     bool move_cursor(
         const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-        MenuSide side, int row, bool fast
+        MenuSide side, int row, bool fast = false
     ) const;
 
 
