@@ -154,8 +154,8 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     int target_IDs[6] = {0, 0, 0, 0, 0, 0};
     for(int i = 0; i < 6; i++){
         const auto& word = words[words.size() + i - 7];
-        if (parse_int(word, target_IDs[i]) == false || target_IDs[i] < 0 || target_IDs[i] > 151){
-            cerr << "Error: word " << words[words.size() + i - 7] << " is wrong. Must be an integer in range [0, 151]. " << endl;
+        if (parse_int(word, target_IDs[i]) == false || target_IDs[i] > 151){
+            cerr << "Error: word " << words[words.size() + i - 7] << " is wrong. Must be an integer < 151. " << endl;
             return 1;
         }
     }
@@ -166,6 +166,9 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     detector.detect_recipes(image, detected_IDs);
 
     for(int i = 0; i < 6; i++){
+        if (target_IDs[i] < 0){
+            continue;
+        }
         TEST_RESULT_COMPONENT_EQUAL(detected_IDs[i], (size_t)target_IDs[i], "recipe at cell " + std::to_string(i));
     }
 
