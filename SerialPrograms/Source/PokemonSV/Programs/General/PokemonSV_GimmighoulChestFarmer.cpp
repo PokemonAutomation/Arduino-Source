@@ -148,7 +148,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             pbf_press_button(context, BUTTON_L, 50, 40);
             pbf_move_left_joystick(context, 128, 0, 2350, 0);
             pbf_press_button(context, BUTTON_L, 50, 40);
-            pbf_move_left_joystick(context, 128, 0, 140, 0);
+            pbf_move_left_joystick(context, 128, 0, 150, 0);
             context.wait_for_all_requests();
 
             //Check for tauros interrupt before pressing A - reset position if there was one
@@ -180,7 +180,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 pbf_press_button(context, BUTTON_L, 50, 40);
                 pbf_move_left_joystick(context, 128, 0, 2350, 0);
                 pbf_press_button(context, BUTTON_L, 50, 40);
-                pbf_move_left_joystick(context, 128, 0, 140, 0);
+                pbf_move_left_joystick(context, 128, 0, 145, 0);
                 context.wait_for_all_requests();
 
                 stats.wild_interrupts++;
