@@ -60,8 +60,8 @@ EggHatcher::EggHatcher()
         1, 1, 32
     )
     , HAS_CLONE_RIDE_POKEMON(
-        "<b>Have cloned ride " + STRING_POKEMON + " as second in party:</b>"
-        "Ride legendary cannot be cloned after patch 1.1.0. To preserve the existing clone while hatching eggs, "
+        "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
+        "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
         "place it as second in party before starting the program.</b>"
         "The program will skip the first row of eggs in the box as a result.",
         LockWhileRunning::LOCKED,
