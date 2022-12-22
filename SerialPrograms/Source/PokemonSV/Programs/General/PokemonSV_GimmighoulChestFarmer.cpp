@@ -43,14 +43,17 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
 struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker {
     Stats()
         : pokemon_fainted(m_stats["Chests farmed"])
+        , wild_interrupts(m_stats["Wild interrupts"])
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back(Stat("Chests farmed"));
+        m_display_order.emplace_back(Stat("Wild interrupts"));
         m_display_order.emplace_back(Stat("Resets"));
         m_display_order.emplace_back(Stat("Errors"));
     }
     std::atomic<uint64_t>& pokemon_fainted;
+    std::atomic<uint64_t>& wild_interrupts;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -85,9 +88,23 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
 void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //Set starting position by flying - must fly to East Province (Area One) Watchtower, do not move from fly point
+    open_map_from_overworld(env.program_info(), env.console, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
+    pbf_move_left_joystick(context, 0, 0, 158, 0);
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_move_left_joystick(context, 128, 0, 100, 0);
+    //snake eater
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_move_left_joystick(context, 128, 0, 2350, 0);
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_move_left_joystick(context, 128, 0, 160, 0);
+    context.wait_for_all_requests();
+
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
     uint32_t c = 0;
     while(c < PP) {
+        
         //  Press A to enter battle, assuming there is a chest
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 90);
@@ -120,9 +137,57 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-            //  Walk forward since battles force you to jump back
+            //Set starting position by flying - move map cursor
+            open_map_from_overworld(env.program_info(), env.console, context);
+            pbf_press_button(context, BUTTON_ZR, 50, 40);
+            pbf_move_left_joystick(context, 48, 192, 10, 0);
+            fly_to_overworld_from_map(env.program_info(), env.console, context);
+            pbf_move_left_joystick(context, 0, 0, 158, 0);
             pbf_press_button(context, BUTTON_L, 50, 40);
-            pbf_move_left_joystick(context, 128, 0, 120, 0);
+            pbf_move_left_joystick(context, 128, 0, 100, 0);
+            pbf_press_button(context, BUTTON_L, 50, 40);
+            pbf_move_left_joystick(context, 128, 0, 2350, 0);
+            pbf_press_button(context, BUTTON_L, 50, 40);
+            pbf_move_left_joystick(context, 128, 0, 140, 0);
+            context.wait_for_all_requests();
+
+            //Check for tauros interrupt before pressing A - reset position if there was one
+            ret = wait_until(
+                env.console, context,
+                std::chrono::seconds(1),
+                { battle_menu }
+            );
+            if (ret == 0) {
+                pbf_mash_button(context, BUTTON_A, 90);
+                c++;
+                context.wait_for_all_requests();
+                ret2 = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(120),
+                    { overworld }
+                );
+                if (ret2 != 0) {
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(env.console, "Failed to return to Overworld after two minutes.");
+                }
+                //Don't move map cursor this time
+                open_map_from_overworld(env.program_info(), env.console, context);
+                fly_to_overworld_from_map(env.program_info(), env.console, context);
+                pbf_move_left_joystick(context, 0, 0, 158, 0);
+                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_move_left_joystick(context, 128, 0, 100, 0);
+                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_move_left_joystick(context, 128, 0, 2350, 0);
+                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_move_left_joystick(context, 128, 0, 140, 0);
+                context.wait_for_all_requests();
+
+                stats.wild_interrupts++;
+                env.update_stats();
+                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            }
+
         }
 
         //  Save the game
