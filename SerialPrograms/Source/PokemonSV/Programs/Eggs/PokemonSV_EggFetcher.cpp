@@ -59,12 +59,12 @@ EggFetcher::EggFetcher()
     , EGGS_TO_FETCH(
         "<b>Fetch this many eggs:</b>",
         LockWhileRunning::LOCKED,
-        90
+        900
     )
     , MAX_NUM_SANDWICHES(
         "<b>Max number of sandwiches to make:</b>",
         LockWhileRunning::UNLOCKED,
-        3, 1
+        10, 1
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

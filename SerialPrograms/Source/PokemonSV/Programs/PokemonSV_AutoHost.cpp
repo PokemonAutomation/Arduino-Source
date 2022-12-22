@@ -389,11 +389,11 @@ bool AutoHost::check_hat_trick(
     env.log(iter1->second + " with the Hat Trick!", COLOR_BLUE);
     send_program_notification(
         env, NOTIFICATION_RAID_START,
-        COLOR_GREEN,
+        COLOR_PURPLE,
         "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the Hat Trick! \u2728\U0001F3A9\U0001FA84",
         {{
             "Start Reason:",
-            "\U0001FA84\U0001F3A9\u2728 Hat Trick! \u2728\U0001F3A9\U0001FA84"
+            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
         }}, "",
         snapshot
     );
