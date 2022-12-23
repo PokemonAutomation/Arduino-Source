@@ -56,7 +56,7 @@ EggHatcher::EggHatcher()
     : GO_HOME_WHEN_DONE(false)
     , BOXES(
         "<b>How many boxes of eggs to hatch:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         1, 1, 32
     )
     , HAS_CLONE_RIDE_POKEMON(
