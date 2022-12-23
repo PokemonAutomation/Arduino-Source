@@ -80,10 +80,10 @@ bool TeraLobbyWaiter::check_bans(){
         return false;
     }
 
-//        //  Enough people have joined.
-//        if (m_total_players >= 4){
-//            return true;
-//        }
+//    //  Enough people have joined.
+//    if (m_total_players >= 4){
+//        return true;
+//    }
 
     //  Names are different.
     std::set<std::u32string> normalized_names;
@@ -107,11 +107,11 @@ bool TeraLobbyWaiter::check_bans(){
 
     //  Haven't waited long enough yet.
     if (current_time() - m_ban_timer < std::chrono::seconds(10)){
-//            cout << "Ban grace period." << endl;
+//        cout << "Ban grace period." << endl;
         return false;
     }
 
-//        cout << "Ban passed." << endl;
+//    cout << "Ban passed." << endl;
 
     return true;
 }
@@ -244,6 +244,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         }
     );
 
+    WallClock end_time = m_start_time + std::chrono::seconds(170);
     int ret = -1;
     while (true){
         try{
@@ -264,7 +265,8 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         if (check_hat_trick().empty() &&
             !check_bans() &&
             !check_start_timeout() &&
-            !check_enough_players()
+            !check_enough_players() &&
+            !(end_time < current_time())
         ){
             continue;
         }
@@ -291,6 +293,24 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
 
         //  Enough players in and all are ready.
         if (process_enough_players(snapshot)){
+            return LobbyResult::RAID_STARTED;
+        }
+
+        //  Almost out of time.
+        if (end_time < snapshot.timestamp){
+            m_console.log("Clock running down, attempting to start raid!", COLOR_BLUE);
+            send_program_notification(
+                m_env, m_notification_raid_start,
+                COLOR_GREEN,
+                m_lobby_code.empty()
+                    ? "Tera Raid is Starting!"
+                    : "Tera Raid (" + m_lobby_code + ") is Starting!",
+                {{
+                    "Start Reason:",
+                    "Clock is running out!"
+                }}, "",
+                snapshot
+            );
             return LobbyResult::RAID_STARTED;
         }
 
