@@ -94,10 +94,12 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     env.log("Selecting " + STRING_POKEMON + "...");
 
+    BoxShinyDetector shiny_detector;
+    VideoOverlaySet overlays(env.console.overlay());
+    shiny_detector.make_overlays(overlays);
     if (SKIP_SHINIES){
         context.wait_for_all_requests();
-        BoxShinyDetector reader;
-        if (reader.detect(env.console.video().snapshot())){
+        if (shiny_detector.detect(env.console.video().snapshot())){
             stats.m_shinies++;
             return;
         }
