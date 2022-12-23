@@ -305,6 +305,8 @@ bool AutoHost::run_lobby2(
     );
 
     TeraLobbyWaiter::LobbyResult result = waiter.run_lobby();
+    player_names = waiter.names();
+
     if (result == TeraLobbyWaiter::LobbyResult::BANNED_PLAYER){
         stats.m_banned++;
     }

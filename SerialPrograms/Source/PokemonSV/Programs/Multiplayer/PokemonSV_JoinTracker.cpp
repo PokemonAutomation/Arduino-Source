@@ -280,10 +280,9 @@ void MultiLanguageJoinTracker::dump(const std::string& filename) const{
 
 
 
-TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(Logger& logger, Color color)
+TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(Color color)
     : TeraLobbyReader(color)
     , VisualInferenceCallback("TeraLobbyJoinWatcher2")
-    , m_logger(logger)
 {}
 void TeraLobbyJoinWatcher2::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);

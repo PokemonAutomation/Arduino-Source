@@ -41,6 +41,9 @@ public:
     uint8_t last_known_players(){
         return m_total_players;
     }
+    const std::array<std::map<Language, std::string>, 4>& names(){
+        return m_names;
+    }
 
     enum class LobbyResult{
         RAID_STARTED,
