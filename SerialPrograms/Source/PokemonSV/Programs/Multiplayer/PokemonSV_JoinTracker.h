@@ -77,6 +77,11 @@ class MultiLanguageJoinTracker{
 public:
     void add(Language language, const std::string& name, std::string lobby_code);
 
+    void append(
+        const std::array<std::map<Language, std::string>, 4>& names,
+        const std::string& lobby_code
+    );
+
     std::string dump() const;
     void dump(const std::string& filename) const;
 
@@ -87,16 +92,32 @@ private:
 
 
 
-class TeraLobbyJoinWatcher : public TeraLobbyReader, public VisualInferenceCallback{
+class TeraLobbyJoinWatcher2 : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyJoinWatcher(
+    TeraLobbyJoinWatcher2(Logger& logger, Color color);
+
+    uint8_t last_known_total_players() const{ return m_last_known_total_players.load(std::memory_order_relaxed); }
+    uint8_t last_known_ready_players() const{ return m_last_known_ready_players.load(std::memory_order_relaxed); }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    Logger& m_logger;
+    std::atomic<uint8_t> m_last_known_total_players = 0;
+    std::atomic<uint8_t> m_last_known_ready_players = 0;
+};
+
+
+class TeraLobbyNameWatcher : public TeraLobbyReader, public VisualInferenceCallback{
+public:
+    TeraLobbyNameWatcher(
         Logger& logger, Color color,
         RaidJoinReportOption& report_settings,
         RaidPlayerBanList& ban_settings
     );
 
-    //  Returns the # of players.
-    uint8_t get_last_known_state(
+    void get_last_known_state(
         std::array<std::map<Language, std::string>, 4>& names,
         std::vector<TeraLobbyNameMatchResult>& bans
     );
@@ -104,24 +125,15 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
-public:
-    static void append_report(
-        MultiLanguageJoinTracker& report,
-        const std::array<std::map<Language, std::string>, 4>& names,
-        const std::string& lobby_code
-    );
-
 private:
     Logger& m_logger;
     RaidJoinReportOption& m_report_settings;
     RaidPlayerBanList& m_ban_settings;
 
     mutable std::mutex m_lock;
-    std::atomic<uint8_t> m_last_known_players = 0;
     std::array<std::map<Language, std::string>, 4> m_last_known_names;
     std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };
-
 
 
 

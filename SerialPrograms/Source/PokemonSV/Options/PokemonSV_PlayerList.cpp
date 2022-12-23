@@ -88,7 +88,7 @@ std::vector<PlayerListRowSnapshot> PlayerListTable::snapshot() const{
 
 
 RaidPlayerBanList::RaidPlayerBanList()
-    : GroupOption("Bans:", LockWhileRunning::UNLOCKED, true, false)
+    : GroupOption("Bans:", LockWhileRunning::UNLOCKED, true, true)
     , text("Ban users from this raid. If a banned person tries to join, the raid will be reset.")
     , local_table(
         "<b>Ban Table:</b><br>A table of users to ban by IGN. "

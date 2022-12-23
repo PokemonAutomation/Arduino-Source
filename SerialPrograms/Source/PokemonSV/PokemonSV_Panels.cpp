@@ -18,8 +18,8 @@
 
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 
-#include "Programs/PokemonSV_FastCodeEntry.h"
-#include "Programs/PokemonSV_AutoHost.h"
+#include "Programs/Multiplayer/PokemonSV_FastCodeEntry.h"
+#include "Programs/Multiplayer/PokemonSV_AutoHost.h"
 
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"

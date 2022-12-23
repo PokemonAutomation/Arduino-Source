@@ -14,7 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
-#include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
+#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,32 +50,10 @@ private:
         WallClock start_time,
         uint8_t player_count
     );
-    bool run_lobby(
+    bool run_lobby2(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         std::string& lobby_code,
         std::array<std::map<Language, std::string>, 4>& player_names
-    );
-
-    //  Returns true if raid should be canceled due a ban.
-    bool process_bans(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-        uint8_t player_count,
-        std::array<std::map<Language, std::string>, 4>& player_names,
-        const std::vector<TeraLobbyNameMatchResult>& bans,
-        const ImageViewRGB32& snapshot,
-        bool use_grace_period
-    );
-    bool check_enough_players(
-        SingleSwitchProgramEnvironment& env,
-        uint8_t player_count,
-        std::array<std::map<Language, std::string>, 4>& player_names,
-        const ImageViewRGB32& snapshot
-    );
-    bool check_hat_trick(
-        SingleSwitchProgramEnvironment& env,
-        uint8_t player_count,
-        std::array<std::map<Language, std::string>, 4>& player_names,
-        const ImageViewRGB32& snapshot
     );
 
 private:

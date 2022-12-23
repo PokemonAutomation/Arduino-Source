@@ -18,6 +18,8 @@ namespace PokemonAutomation{
 //  Represents a row of the table. Users should subclass this and add all the
 //  configs/fields that is in the row.
 class StaticTableRow{
+    StaticTableRow(const StaticTableRow&) = delete;
+    void operator=(const StaticTableRow&) = delete;
 public:
     virtual ~StaticTableRow() = default;
     StaticTableRow(std::string slug);

@@ -160,6 +160,7 @@ TeraLobbyReader::TeraLobbyReader(Color color)
         m_player_spinner[c] = ImageFloatBox{0.157, 0.575 + 0.070*c, 0.037, 0.060};
         m_player_name[c] = ImageFloatBox{0.200, 0.575 + 0.070*c, 0.095, 0.060};
         m_player_mon[c] = ImageFloatBox{0.425, 0.575 + 0.070*c, 0.037, 0.060};
+        m_player_ready[c] = ImageFloatBox{0.465, 0.575 + 0.070*c, 0.037, 0.060};
     }
 }
 void TeraLobbyReader::make_overlays(VideoOverlaySet& items) const{
@@ -172,6 +173,7 @@ void TeraLobbyReader::make_overlays(VideoOverlaySet& items) const{
         items.add(m_color, m_player_spinner[c]);
         items.add(m_color, m_player_name[c]);
         items.add(m_color, m_player_mon[c]);
+        items.add(m_color, m_player_ready[c]);
     }
 }
 bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
@@ -204,6 +206,17 @@ uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
         }
     }
     return std::max(total, (uint8_t)1);
+}
+uint8_t TeraLobbyReader::ready_players(const ImageViewRGB32& screen) const{
+    uint8_t total = 0;
+    for (size_t c = 0; c < 4; c++){
+        ImageStats player = image_stats(extract_box_reference(screen, m_player_ready[c]));
+//        cout << "Player " << c << ": " << player.average << player.stddev << endl;
+        if (player.stddev.sum() > 80){
+            total++;
+        }
+    }
+    return total;
 }
 
 std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen){
@@ -386,7 +399,7 @@ TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(Color color, uint8_t desired_players)
     : TeraLobbyReader(color)
     , VisualInferenceCallback("TeraLobbyReadyWaiter")
     , m_desired_players(desired_players)
-    , m_last_known_player_count(-1)
+    , m_last_known_total_players(-1)
 {}
 
 void TeraLobbyReadyWaiter::make_overlays(VideoOverlaySet& items) const{
@@ -396,9 +409,10 @@ bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock 
     if (!detect(frame)){
         return false;
     }
-    uint8_t players = total_players(frame);
-    m_last_known_player_count.store(players);
-    return players >= m_desired_players;
+    uint8_t total_players = this->total_players(frame);
+    uint8_t ready_players = this->ready_players(frame);
+    m_last_known_total_players.store(total_players);
+    return ready_players + 1 >= m_desired_players;
 }
 
 

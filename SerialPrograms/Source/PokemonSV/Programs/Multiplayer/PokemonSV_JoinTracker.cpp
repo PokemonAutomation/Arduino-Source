@@ -186,7 +186,7 @@ std::vector<std::string> JoinReportTable::make_header() const{
 
 
 RaidJoinReportOption::RaidJoinReportOption()
-    : GroupOption("Join Reports:", LockWhileRunning::UNLOCKED, true, false)
+    : GroupOption("Join Reports:", LockWhileRunning::UNLOCKED, true, true)
     , text(
         "Track how many times each IGN has joined and generate a report. "
         "This can be used to help identify people who join too many times for "
@@ -247,6 +247,16 @@ std::string JoinTracker::dump(size_t indent) const{
 void MultiLanguageJoinTracker::add(Language language, const std::string& name, std::string lobby_code){
     m_databases[language].add(name, lobby_code);
 }
+void MultiLanguageJoinTracker::append(
+    const std::array<std::map<Language, std::string>, 4>& names,
+    const std::string& lobby_code
+){
+    for (size_t c = 1; c < 4; c++){
+        for (const auto& item : names[c]){
+            add(item.first, item.second, lobby_code);
+        }
+    }
+}
 std::string MultiLanguageJoinTracker::dump() const{
     std::string ret;
     for (const auto& database : m_databases){
@@ -269,39 +279,58 @@ void MultiLanguageJoinTracker::dump(const std::string& filename) const{
 
 
 
-TeraLobbyJoinWatcher::TeraLobbyJoinWatcher(
+
+TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(Logger& logger, Color color)
+    : TeraLobbyReader(color)
+    , VisualInferenceCallback("TeraLobbyJoinWatcher2")
+    , m_logger(logger)
+{}
+void TeraLobbyJoinWatcher2::make_overlays(VideoOverlaySet& items) const{
+    TeraLobbyReader::make_overlays(items);
+}
+bool TeraLobbyJoinWatcher2::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    //  No lobby detected.
+    if (!detect(frame)){
+        return false;
+    }
+
+    uint8_t total_players = this->total_players(frame);
+    uint8_t ready_players = this->ready_players(frame);
+    m_last_known_total_players.store(total_players, std::memory_order_relaxed);
+    m_last_known_ready_players.store(ready_players, std::memory_order_relaxed);
+    return false;
+}
+
+
+
+TeraLobbyNameWatcher::TeraLobbyNameWatcher(
     Logger& logger, Color color,
     RaidJoinReportOption& report_settings,
     RaidPlayerBanList& ban_settings
 )
     : TeraLobbyReader(color)
-    , VisualInferenceCallback("TeraLobbyJoinWatcher")
+    , VisualInferenceCallback("TeraLobbyNameWatcher")
     , m_logger(logger)
     , m_report_settings(report_settings)
     , m_ban_settings(ban_settings)
 {}
 
-uint8_t TeraLobbyJoinWatcher::get_last_known_state(
+void TeraLobbyNameWatcher::get_last_known_state(
     std::array<std::map<Language, std::string>, 4>& names,
     std::vector<TeraLobbyNameMatchResult>& bans
 ){
     std::lock_guard<std::mutex> lg(m_lock);
     names = m_last_known_names;
     bans = m_last_known_bans;
-    return m_last_known_players.load(std::memory_order_relaxed);
 }
-
-void TeraLobbyJoinWatcher::make_overlays(VideoOverlaySet& items) const{
+void TeraLobbyNameWatcher::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);
 }
-bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     //  No lobby detected.
     if (!detect(frame)){
         return false;
     }
-
-    uint8_t players = total_players(frame);
-    m_last_known_players.store(players, std::memory_order_relaxed);
 
     bool bans_enabled = m_ban_settings.enabled();
     bool report_enabled = m_report_settings.enabled();
@@ -331,9 +360,8 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
 
     //  Process bans.
     std::vector<TeraLobbyNameMatchResult> match_list;
-    uint8_t banned = 0;
     if (bans_enabled){
-        banned = check_ban_list(
+        check_ban_list(
             m_logger,
             match_list,
             m_ban_settings.current_banlist(),
@@ -349,20 +377,11 @@ bool TeraLobbyJoinWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
         m_last_known_bans = std::move(match_list);
     }
 
-    return banned != 0;
+    return false;
 }
 
-void TeraLobbyJoinWatcher::append_report(
-    MultiLanguageJoinTracker& report,
-    const std::array<std::map<Language, std::string>, 4>& names,
-    const std::string& lobby_code
-){
-    for (size_t c = 1; c < 4; c++){
-        for (const auto& item : names[c]){
-            report.add(item.first, item.second, lobby_code);
-        }
-    }
-}
+
+
 
 
 

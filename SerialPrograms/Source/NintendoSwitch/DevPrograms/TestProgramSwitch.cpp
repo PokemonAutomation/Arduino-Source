@@ -179,11 +179,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+    auto image = feed.snapshot();
 
+    TeraLobbyReader detector;
+    detector.make_overlays(overlays);
+    detector.ready_players(image);
+
+
+#if 0
     MainMenuDetector detector;
     detector.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 1);
     cout << "done" << endl;
-
+#endif
 
 
 #if 0

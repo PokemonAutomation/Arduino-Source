@@ -82,7 +82,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "Integrations/DiscordWebhook.h"
-#include "PokemonSV/Programs/PokemonSV_JoinTracker.h"
+#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 
 #ifdef PA_ARCH_x86

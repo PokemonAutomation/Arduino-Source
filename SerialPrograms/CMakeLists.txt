@@ -1265,16 +1265,18 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
-    Source/PokemonSV/Programs/PokemonSV_AutoHost.cpp
-    Source/PokemonSV/Programs/PokemonSV_AutoHost.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
-    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.cpp
-    Source/PokemonSV/Programs/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h
-    Source/PokemonSV/Programs/PokemonSV_JoinTracker.cpp
-    Source/PokemonSV/Programs/PokemonSV_JoinTracker.h
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp

@@ -74,6 +74,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
     uint8_t total_players(const ImageViewRGB32& screen) const;
+    uint8_t ready_players(const ImageViewRGB32& screen) const;
     std::string raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen);
 
     //  OCR the player names in all the specified languages.
@@ -98,6 +99,7 @@ private:
     ImageFloatBox m_player_spinner[4];
     ImageFloatBox m_player_name[4];
     ImageFloatBox m_player_mon[4];
+    ImageFloatBox m_player_ready[4];
 };
 class TeraLobbyWatcher : public DetectorToFinder<TeraLobbyReader>{
 public:
@@ -109,8 +111,11 @@ class TeraLobbyReadyWaiter : public TeraLobbyReader, public VisualInferenceCallb
 public:
     TeraLobbyReadyWaiter(Color color, uint8_t desired_players);
 
-    int8_t last_known_player_count() const{
-        return m_last_known_player_count.load(std::memory_order_relaxed);
+    int8_t last_known_total_players() const{
+        return m_last_known_total_players.load(std::memory_order_relaxed);
+    }
+    int8_t last_known_ready_players() const{
+        return m_last_known_ready_players.load(std::memory_order_relaxed);
     }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -118,7 +123,8 @@ public:
 
 private:
     uint8_t m_desired_players;
-    std::atomic<int8_t> m_last_known_player_count;
+    std::atomic<int8_t> m_last_known_total_players;
+    std::atomic<int8_t> m_last_known_ready_players;
 };
 
 

@@ -43,6 +43,8 @@ class CancellableScope;
 
 struct CancellableData;
 class Cancellable{
+    Cancellable(const Cancellable&) = delete;
+    void operator=(const Cancellable&) = delete;
 public:
     virtual ~Cancellable();
 

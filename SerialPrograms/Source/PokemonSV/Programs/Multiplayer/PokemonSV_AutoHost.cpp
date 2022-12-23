@@ -6,10 +6,12 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
@@ -27,10 +29,11 @@
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV_AutoHost.h"
+#include "PokemonSV_AutoHostLobbyWaiter.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -274,226 +277,42 @@ bool AutoHost::start_raid(
         }
     }
 }
-bool AutoHost::process_bans(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-    uint8_t player_count,
-    std::array<std::map<Language, std::string>, 4>& player_names,
-    const std::vector<TeraLobbyNameMatchResult>& bans,
-    const ImageViewRGB32& snapshot,
-    bool use_grace_period
-){
-    if (bans.empty()){
-        m_ban_timer = WallClock::max();
-        return false;
-    }
 
-    //  Grace period.
-    do{
-        if (player_count == 4){
-            break;
-        }
-        std::set<std::u32string> normalized_names;
-        for (size_t c = 1; c < 4; c++){
-            auto iter = player_names[c].find(Language::English);
-            if (iter == player_names[c].end()){
-                continue;
-            }
-            normalized_names.insert(OCR::normalize_utf32(iter->second));
-        }
-        if (normalized_names.size() > 1){
-            break;
-        }
 
-        if (m_ban_timer == WallClock::max()){
-            m_ban_timer = current_time();
-            return false;
-        }
-        if (current_time() - m_ban_timer < std::chrono::seconds(10)){
-            return false;
-        }
 
-    }while (false);
 
-    env.log("Detected banned user!", COLOR_RED);
-    std::string message;
-    for (const TeraLobbyNameMatchResult& user : bans){
-        env.log("Banned User: " + user.to_str(), COLOR_RED);
-        message += user.to_str();
-        message += "\n";
-        if (!user.notes.empty()){
-            message += "Reason: " + user.notes;
-            message += "\n";
-        }
-    }
-    AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
-    stats.m_banned++;
-    send_program_notification(
-        env, NOTIFICATION_RAID_START,
-        COLOR_RED,
-        "Raid Canceled Due to Banned User",
-        {{"Banned User(s):", std::move(message)}}, "",
-        snapshot
-    );
-    pbf_press_button(context, BUTTON_B, 20, 230);
-    pbf_press_button(context, BUTTON_A, 20, 230);
 
-    return true;
-}
-bool AutoHost::check_enough_players(
-    SingleSwitchProgramEnvironment& env,
-    uint8_t player_count,
-    std::array<std::map<Language, std::string>, 4>& player_names,
-    const ImageViewRGB32& snapshot
-){
-    if (player_count < (uint8_t)START_RAID_PLAYERS.current_value()){
-        return false;
-    }
-    env.log("Enough players joined, attempting to start raid!", COLOR_BLUE);
-    send_program_notification(
-        env, NOTIFICATION_RAID_START,
-        COLOR_GREEN,
-        "Tera Raid is Starting!",
-        {{
-            "Start Reason:",
-            "Lobby has reached " + std::to_string(player_count) + " players."
-        }}, "",
-        snapshot
-    );
-    return true;
-}
-bool AutoHost::check_hat_trick(
-    SingleSwitchProgramEnvironment& env,
-    uint8_t player_count,
-    std::array<std::map<Language, std::string>, 4>& player_names,
-    const ImageViewRGB32& snapshot
-){
-    if (player_count != 4){
-        return false;
-    }
-    auto iter1 = player_names[1].find(Language::English);
-    if (iter1 == player_names[1].end()) return false;
-    auto iter2 = player_names[2].find(Language::English);
-    if (iter2 == player_names[2].end()) return false;
-    auto iter3 = player_names[3].find(Language::English);
-    if (iter3 == player_names[3].end()) return false;
-    std::u32string name1 = OCR::normalize_utf32(iter1->second);
-    if (name1.size() < 4) return false;
-    std::u32string name2 = OCR::normalize_utf32(iter2->second);
-    if (name2.size() < 4) return false;
-    std::u32string name3 = OCR::normalize_utf32(iter3->second);
-    if (name3.size() < 4) return false;
-    if (name1 != name2 || name1 != name3){
-        return false;
-    }
 
-    env.log(iter1->second + " with the Hat Trick!", COLOR_BLUE);
-    send_program_notification(
-        env, NOTIFICATION_RAID_START,
-        COLOR_PURPLE,
-        "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " with the Hat Trick! \u2728\U0001F3A9\U0001FA84",
-        {{
-            "Start Reason:",
-            "\U0001FA84\U0001F3A9\u2728 " + iter1->second + " Hat Trick! \u2728\U0001F3A9\U0001FA84"
-        }}, "",
-        snapshot
-    );
-    return true;
-}
-bool AutoHost::run_lobby(
+
+
+bool AutoHost::run_lobby2(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
-    VideoOverlaySet overlays(env.console.overlay());
-
     WallClock start_time = wait_for_lobby_open(env, context, lobby_code);
-    m_ban_timer = WallClock::max();
 
-    //  This state machine is while the lobby is running and we haven't decided
-    //  whether to start or cancel the raid.
+    TeraLobbyWaiter waiter(
+        env, env.console, context,
+        lobby_code, start_time,
+        LOBBY_WAIT_DELAY,
+        START_RAID_PLAYERS,
+        NOTIFICATION_RAID_START,
+        BAN_LIST,
+        JOIN_REPORT
+    );
 
-    uint8_t last_known_player_count = 1;
-    std::vector<TeraLobbyNameMatchResult> last_known_bans;
-    while (true){
-        AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        WhiteScreenOverWatcher start_raid(COLOR_BLUE);
-        TeraLobbyReadyWaiter ready(COLOR_RED, (uint8_t)START_RAID_PLAYERS.current_value());
-        TeraLobbyJoinWatcher join_watcher(
-            env.logger(),
-            COLOR_RED,
-            JOIN_REPORT,
-            BAN_LIST
-        );
-        context.wait_for_all_requests();
-        WallClock end_time = start_time + std::chrono::seconds(LOBBY_WAIT_DELAY);
-        int ret = wait_until(
-            env.console, context,
-            end_time,
-            {
-                dialog, start_raid, ready,
-                {join_watcher, std::chrono::seconds(1)}
-            }
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        last_known_player_count = join_watcher.get_last_known_state(player_names, last_known_bans);
-        env.log("Currently there are " + std::to_string(last_known_player_count) + " player(s).");
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        switch (ret){
-        case 0:
-            env.log("Raid timed out!", COLOR_ORANGE);
-//            pbf_press_button(context, BUTTON_B, 20, 230);
-            stats.m_empty++;
-            return false;
-        case 1:
-            env.log("Raid started!", COLOR_BLUE);
-            update_stats_on_raid_start(env, last_known_player_count);
-            return true;
-        case 2:
-            join_watcher.process_frame(snapshot, snapshot.timestamp);
-            last_known_player_count = join_watcher.get_last_known_state(player_names, last_known_bans);
-            //  Intentional fall-through.
-        case 3:{
-            if (check_hat_trick(env, last_known_player_count, player_names, snapshot)){
-                break;
-            }
-            if (process_bans(env, context, last_known_player_count, player_names, last_known_bans, snapshot, true)){
-                return false;
-            }
-            if (check_enough_players(env, last_known_player_count, player_names, snapshot)){
-                break;
-            }
-            context.wait_for(std::chrono::seconds(5));
-            continue;
-        }
-        default:
-            if (current_time() - start_time > std::chrono::minutes(4)){
-                dump_image_and_throw_recoverable_exception(
-                    env, env.console,
-                    NOTIFICATION_ERROR_RECOVERABLE,
-                    "StuckLobby", "Stuck in lobby for 4 minutes."
-                );
-            }
-            env.log("Timeout reached. Starting raid now...", COLOR_PURPLE);
-            if (process_bans(env, context, last_known_player_count, player_names, last_known_bans, snapshot, false)){
-                return false;
-            }
-            send_program_notification(
-                env, NOTIFICATION_RAID_START,
-                COLOR_GREEN,
-                "Tera Raid is Starting!",
-                {{
-                    "Start Reason:",
-                    "Waited more than " + std::to_string(LOBBY_WAIT_DELAY) + " seconds."
-                }}, "",
-                snapshot
-            );
-        }
-        break;
+    TeraLobbyWaiter::LobbyResult result = waiter.run_lobby();
+    if (result == TeraLobbyWaiter::LobbyResult::BANNED_PLAYER){
+        stats.m_banned++;
+    }
+    if (result != TeraLobbyWaiter::LobbyResult::RAID_STARTED){
+        return false;
     }
 
-    return start_raid(env, context, start_time, last_known_player_count);
+    return start_raid(env, context, start_time, waiter.last_known_players());
 }
 
 void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -590,7 +409,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             std::string lobby_code;
             std::array<std::map<Language, std::string>, 4> player_names;
 
-            if (!run_lobby(env, context, lobby_code, player_names)){
+            if (!run_lobby2(env, context, lobby_code, player_names)){
                 continue;
             }
             env.update_stats();
@@ -604,7 +423,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                 stats.m_losses++;
             }
             if (JOIN_REPORT.enabled() && (win || !JOIN_REPORT.wins_only)){
-                TeraLobbyJoinWatcher::append_report(join_tracker, player_names, lobby_code);
+                join_tracker.append(player_names, lobby_code);
                 join_tracker.dump(report_name);
                 send_program_notification_with_file(
                     env,
