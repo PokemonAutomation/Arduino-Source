@@ -170,6 +170,8 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         throw e;
     }
 
+    env.update_stats();
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
