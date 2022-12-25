@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassRelease.h"
@@ -39,18 +40,21 @@ struct MassRelease_Descriptor::Stats : public StatsTracker{
         , m_released(m_stats["Released"])
         , m_empty(m_stats["Empty Slots"])
         , m_shinies(m_stats["Shinies"])
+        , m_eggs(m_stats["Eggs"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Boxes Cleared");
         m_display_order.emplace_back("Released");
         m_display_order.emplace_back("Empty Slots");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Eggs");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_boxes;
     std::atomic<uint64_t>& m_released;
     std::atomic<uint64_t>& m_empty;
     std::atomic<uint64_t>& m_shinies;
+    std::atomic<uint64_t>& m_eggs;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> MassRelease_Descriptor::make_stats() const{
@@ -95,14 +99,22 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
     env.log("Selecting " + STRING_POKEMON + "...");
 
     BoxShinyDetector shiny_detector;
+    BoxEggsDetector eggs_detector;
     VideoOverlaySet overlays(env.console.overlay());
     shiny_detector.make_overlays(overlays);
-    if (SKIP_SHINIES){
-        context.wait_for_all_requests();
-        if (shiny_detector.detect(env.console.video().snapshot())){
-            stats.m_shinies++;
+    eggs_detector.make_overlays(overlays);
+    context.wait_for_all_requests();
+
+    if (shiny_detector.detect(env.console.video().snapshot())){
+        stats.m_shinies++;
+        if (SKIP_SHINIES){
             return;
         }
+    }
+
+    if (eggs_detector.detect(env.console.video().snapshot())){
+        stats.m_eggs++;
+        return;
     }
 
     bool released = false;
