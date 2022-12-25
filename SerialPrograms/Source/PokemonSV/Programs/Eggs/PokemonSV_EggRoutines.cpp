@@ -11,10 +11,10 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
@@ -190,6 +190,16 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
     WallClock start = current_time();
     while(true){
         const size_t last_num_eggs_collected = num_eggs_collected;
+
+        {
+            WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
+            while (detector.detect(console.video().snapshot())){
+                console.log(Pokemon::STRING_POKEMON + " is standing in the way. Throwing ball and waiting 5 seconds...", COLOR_RED);
+                pbf_press_button(context, BUTTON_ZR, 20, 5 * TICKS_PER_SECOND);
+//                context.wait_for(std::chrono::seconds(5));
+                context.wait_for_all_requests();
+            }
+        }
         check_basket_to_collect_eggs(info, console, context, max_eggs, num_eggs_collected);
 
         basket_check_callback(num_eggs_collected - last_num_eggs_collected);
@@ -216,7 +226,6 @@ void check_basket_to_collect_eggs(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t max_eggs, size_t& num_eggs_collected
 ){
-#if 1
     bool checked = false;
     size_t consecutive_nothing = 0;
     Button last_prompt = 0;
@@ -232,7 +241,7 @@ void check_basket_to_collect_eggs(
         }
 
         DialogBoxWatcher picnic(COLOR_RED, false, std::chrono::milliseconds(500));
-        AdvanceDialogWatcher advance(COLOR_YELLOW);
+        AdvanceDialogWatcher advance(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_RED, {0.623, 0.530, 0.243, 0.119});
 
         context.wait_for_all_requests();
@@ -318,118 +327,6 @@ void check_basket_to_collect_eggs(
         }
 
     }
-
-
-#else
-    pbf_press_button(context, BUTTON_A, 20, 80);
-
-    bool basket_found = false;
-    for(int i = 0; i < 5; i++){
-        context.wait_for_all_requests();
-        AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(3),
-            {dialog_watcher}
-        );
-        if (ret == 0){
-            console.log("Found basket.");
-            console.overlay().add_log("Found basket", COLOR_WHITE);
-            // found dialog, so we are interacting with a basket
-            basket_found = true;
-            break;
-        }
-
-        // no dialog found, maybe the game dropped the button A press? Try again
-        pbf_press_button(context, BUTTON_A, 20, 80);
-    }
-
-    if (basket_found == false){
-        dump_image_and_throw_recoverable_exception(info, console, "BasketNotFound",
-            "collect_eggs_from_basket(): Basket not found.");
-    }
-
-    // Press A to clear the current dialog
-    pbf_press_button(context, BUTTON_A, 20, 80);
-    bool taking_egg = false;
-    // skipping egg is quite complex, with several stages:
-    // stage 0: no egg skipping
-    // stage 1: press B to not collect eggs, waiting for game to show text of "sending to academy".
-    // stage 2: press A to show the yes/no prompt for "sending to academy", waiting for selection on prompt
-    // stage 3: press A to confirm sending to academy, waiting for next advance dialog
-    int skip_egg_stage = 0;
-    while (true) {
-        context.wait_for_all_requests();
-
-        AdvanceDialogWatcher advance(COLOR_RED);
-        PromptDialogWatcher prompt(COLOR_RED, {0.623, 0.530, 0.243, 0.119});
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(5),
-            {advance, prompt}
-        );
-        if (ret == 0){
-            console.log("Detected dialog box.");
-            if (taking_egg){
-                num_eggs_collected++;
-                std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
-                console.log("Egg taken. " + msg);
-                console.overlay().add_log("Egg " + msg, COLOR_GREEN);
-                taking_egg = false;
-            }
-            else if (skip_egg_stage == 1){
-                console.log("Enter skip egg stage 2.");
-                skip_egg_stage = 2;
-            }
-            else if (skip_egg_stage == 2){
-                console.log("Drop button? Still in skip egg stage 2.");
-            }
-            else if (skip_egg_stage == 3){
-                console.log("Skip egg all stage complete.");
-                console.overlay().add_log("Full. Skip egg.", COLOR_WHITE);
-                skip_egg_stage = 0;
-            }
-            pbf_press_button(context, BUTTON_A, 20, 80);
-        }
-        else if (ret == 1){
-            console.log("Detected prompt.");
-            if (skip_egg_stage == 1){
-                console.log("Try to skip egg, still in stage 1");
-                pbf_press_button(context, BUTTON_B, 20, 80);
-            }
-            else if (skip_egg_stage == 2){
-                console.log("Confirm skip egg. Enter stage 3.");
-                skip_egg_stage = 3;
-                pbf_press_button(context, BUTTON_A, 20, 80);
-            }
-            else if (skip_egg_stage == 3){
-                console.log("Drop button? Still in stage 3.");
-                pbf_press_button(context, BUTTON_A, 20, 80);
-            }
-            else if (num_eggs_collected == max_eggs){
-                console.log("Try to skip egg, enter stage 1");
-                skip_egg_stage = 1;
-                pbf_press_button(context, BUTTON_B, 20, 80);
-            } else {
-                console.log("Try to take egg");
-                taking_egg = true;
-                pbf_press_button(context, BUTTON_A, 20, 80);
-            }
-        }
-        else { // No more dialog, the basket checking ends
-            break;
-        }
-    } // end while true reading basket dialogs
-
-    if (taking_egg){
-        dump_image_and_throw_recoverable_exception(info, console, "CollectEggConfirmationNotDetected",
-            "check_basket_to_collect_eggs(): Confirmation dialog to of taking egg not detected.");
-    } else if (skip_egg_stage > 0){
-        dump_image_and_throw_recoverable_exception(info, console, "SkipEggFailure",
-            "check_basket_to_collect_eggs(): States of skipping egg timeouts, current state " + std::to_string(skip_egg_stage));
-    }
-    console.log("Finish talking to basket.");
-#endif
 }
 
 

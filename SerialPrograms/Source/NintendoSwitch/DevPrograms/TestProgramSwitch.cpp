@@ -172,6 +172,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    ImageFloatBox box(0.02, );
+    auto image = feed.snapshot();
+    WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
+    cout << detector.detect(image) << endl;
+
+
+
 //    auto image = feed.snapshot();
 //    TeraCatchDetector detector(COLOR_RED);
 //    cout << detector.detect(image) << endl;
@@ -179,12 +186,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    size_t errors;
 //    release_one_pokemon(env.program_info(), console, context, errors);
 
+
+#if 0
     auto image = feed.snapshot();
 
     TeraLobbyReader detector;
     detector.make_overlays(overlays);
     detector.ready_players(image);
-
+#endif
 
 #if 0
     MainMenuDetector detector;
