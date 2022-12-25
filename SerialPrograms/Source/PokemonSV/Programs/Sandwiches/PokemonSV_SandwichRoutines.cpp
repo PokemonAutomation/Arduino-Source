@@ -337,11 +337,10 @@ ImageFloatBox move_sandwich_hand(
         move_session.dispatch([&](BotBaseContext& context){
             if (pressing_A){
                 // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
-                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 1000);
+//                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
+                ssf_press_button(context, BUTTON_A, 0, 1000, 0);
             }
-            else{
-                pbf_move_left_joystick(context, joystick_x, joystick_y, 1000, 0);
-            }
+            pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
         });
         
         console.log("Moved joystick");
