@@ -208,10 +208,10 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
             int ret = run_until(
                 console, context,
                 [&](BotBaseContext& context){
-                    for (size_t c = 0; c < 10; c++){
+                    for (size_t c = 0; c < 20; c++){
                         context.wait_for_all_requests();
-                        context.wait_for(std::chrono::seconds(60));
-                        console.log(Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 60 seconds...", COLOR_RED);
+                        context.wait_for(std::chrono::seconds(30));
+                        console.log(Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
                         pbf_press_button(context, BUTTON_R, 20, 0);
                     }
                 },
