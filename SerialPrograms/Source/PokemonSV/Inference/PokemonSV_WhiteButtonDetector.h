@@ -53,7 +53,11 @@ public:
 
 class WhiteButtonDetector : public StaticScreenDetector{
 public:
-    WhiteButtonDetector(Color color, WhiteButton button, const ImageFloatBox& box);
+    WhiteButtonDetector(
+        Color color,
+        WhiteButton button,
+        const ImageFloatBox& box
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -65,9 +69,21 @@ protected:
     Color m_color;
     ImageFloatBox m_box;
 };
+class WhiteButtonWatcher : public DetectorToFinder<WhiteButtonDetector>{
+public:
+    WhiteButtonWatcher(
+        Color color,
+        WhiteButton button,
+        const ImageFloatBox& box,
+        FinderType finder_type = FinderType::PRESENT,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("WhiteButtonWatcher", finder_type, duration, color, button, box)
+    {}
+};
 
 
-
+#if 0
 class WhiteButtonWatcher : public VisualInferenceCallback{
 public:
     ~WhiteButtonWatcher();
@@ -89,7 +105,7 @@ protected:
     size_t m_consecutive_detections;
     size_t m_trigger_count = 0;
 };
-
+#endif
 
 
 

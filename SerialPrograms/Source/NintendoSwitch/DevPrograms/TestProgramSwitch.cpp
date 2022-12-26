@@ -172,11 +172,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    // Move forward to pass table
+    pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
+    // Move right
+    pbf_move_left_joystick(context, 255, 128, 40, 40);
+    // Move back to face basket
+    pbf_move_left_joystick(context, 128, 255, 10, 40);
+
+
+#if 0
 //    ImageFloatBox box(0.02, );
     auto image = feed.snapshot();
     WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 //    auto image = feed.snapshot();

@@ -280,8 +280,7 @@ bool RideCloner101::run_post_win(
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
-            WhiteButton::ButtonA, 20,
-            console.overlay(),
+            WhiteButton::ButtonA,
             {0.8, 0.93, 0.2, 0.07}
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);

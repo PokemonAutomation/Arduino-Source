@@ -103,8 +103,7 @@ void exit_tera_win_without_catching(
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
-            WhiteButton::ButtonA, 20,
-            console.overlay(),
+            WhiteButton::ButtonA,
             {0.8, 0.93, 0.2, 0.07}
         );
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
@@ -168,8 +167,7 @@ TeraResult exit_tera_win_by_catching(
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
-            WhiteButton::ButtonA, 20,
-            console.overlay(),
+            WhiteButton::ButtonA,
             {0.8, 0.93, 0.2, 0.07}
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);

@@ -91,7 +91,11 @@ const WhiteButtonMatcher& WhiteButtonMatcher::Minus(){
 
 
 
-WhiteButtonDetector::WhiteButtonDetector(Color color, WhiteButton button, const ImageFloatBox& box)
+WhiteButtonDetector::WhiteButtonDetector(
+    Color color,
+    WhiteButton button,
+    const ImageFloatBox& box
+)
     : m_matcher(get_button_matcher(button))
     , m_color(color)
     , m_box(box)
@@ -130,6 +134,7 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 
 
+#if 0
 WhiteButtonWatcher::~WhiteButtonWatcher() = default;
 WhiteButtonWatcher::WhiteButtonWatcher(
     Color color,
@@ -165,7 +170,7 @@ bool WhiteButtonWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
     m_trigger_count++;
     return m_trigger_count >= m_consecutive_detections;
 }
-
+#endif
 
 
 

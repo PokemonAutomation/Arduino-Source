@@ -173,18 +173,26 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
     console.log("Move past picnic table");
     console.overlay().add_log("Move past picnic table", COLOR_WHITE);
 
-    // Move left
+    //  Recall your ride to reduce obstacles.
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+    //  Move left
     pbf_move_left_joystick(context, 0, 128, 40, 40);
-    // Move forward to pass table
+    //  Move forward to pass table
     pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
-    // Move right
-    pbf_move_left_joystick(context, 255, 128, 40, 40);
-    // Move back to face basket
+    //  Move right
+    pbf_move_left_joystick(context, 255, 128, 50, 40);
+    //  Move back to face basket
     pbf_move_left_joystick(context, 128, 255, 10, 40);
+
+    //  Move closer to the basket.
+    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 10, 40);
+
 
     context.wait_for_all_requests();
     
-    const auto egg_collection_interval = std::chrono::minutes(3);
+    const auto egg_collection_interval = std::chrono::seconds(180);
     const auto max_egg_wait_time = std::chrono::minutes(30);
 
     WallClock start = current_time();
@@ -192,13 +200,36 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
         const size_t last_num_eggs_collected = num_eggs_collected;
 
         {
+            WhiteButtonWatcher button(
+                COLOR_YELLOW, WhiteButton::ButtonA,
+                {0.020, 0.590, 0.035, 0.060},
+                WhiteButtonWatcher::FinderType::GONE
+            );
+            int ret = run_until(
+                console, context,
+                [&](BotBaseContext& context){
+                    for (size_t c = 0; c < 10; c++){
+                        context.wait_for_all_requests();
+                        context.wait_for(std::chrono::seconds(60));
+                        console.log(Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 60 seconds...", COLOR_RED);
+                        pbf_press_button(context, BUTTON_R, 20, 0);
+                    }
+                },
+                {button}
+            );
+            if (ret < 0){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "UnableToClearObstacle",
+                    "Unable to clear " + STRING_POKEMON + " in front of you after 10 min."
+                );
+            }
+#if 0
             WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
             while (detector.detect(console.video().snapshot())){
-                console.log(Pokemon::STRING_POKEMON + " is standing in the way. Throwing ball and waiting 5 seconds...", COLOR_RED);
-                pbf_press_button(context, BUTTON_ZR, 20, 5 * TICKS_PER_SECOND);
-//                context.wait_for(std::chrono::seconds(5));
+                pbf_press_button(context, BUTTON_R, 20, 30 * TICKS_PER_SECOND);
                 context.wait_for_all_requests();
             }
+#endif
         }
         check_basket_to_collect_eggs(info, console, context, max_eggs, num_eggs_collected);
 
