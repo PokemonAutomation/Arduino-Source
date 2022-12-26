@@ -1201,6 +1201,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp
@@ -1213,6 +1215,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
+    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_EggDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
@@ -1221,22 +1229,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
-    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
-    Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
-    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
-    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h
-    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp
-    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
+    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h
-    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/PokemonSV_Panels.cpp
