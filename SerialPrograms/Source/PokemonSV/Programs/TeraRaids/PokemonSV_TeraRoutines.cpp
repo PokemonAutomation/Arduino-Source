@@ -104,7 +104,9 @@ void exit_tera_win_without_catching(
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
             WhiteButton::ButtonA,
-            {0.8, 0.93, 0.2, 0.07}
+            {0.8, 0.93, 0.2, 0.07},
+            WhiteButtonWatcher::FinderType::PRESENT,
+            std::chrono::seconds(1)
         );
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         OverworldWatcher overworld(COLOR_RED);
@@ -168,7 +170,9 @@ TeraResult exit_tera_win_by_catching(
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
             WhiteButton::ButtonA,
-            {0.8, 0.93, 0.2, 0.07}
+            {0.8, 0.93, 0.2, 0.07},
+            WhiteButtonWatcher::FinderType::PRESENT,
+            std::chrono::seconds(1)
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});

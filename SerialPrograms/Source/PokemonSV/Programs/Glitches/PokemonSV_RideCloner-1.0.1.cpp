@@ -281,7 +281,9 @@ bool RideCloner101::run_post_win(
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
             WhiteButton::ButtonA,
-            {0.8, 0.93, 0.2, 0.07}
+            {0.8, 0.93, 0.2, 0.07},
+            WhiteButtonWatcher::FinderType::PRESENT,
+            std::chrono::seconds(1)
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
