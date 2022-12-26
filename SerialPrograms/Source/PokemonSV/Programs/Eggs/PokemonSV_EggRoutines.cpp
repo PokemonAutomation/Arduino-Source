@@ -376,11 +376,11 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, Cons
     return {egg_column_watcher.num_eggs_found(), egg_column_watcher.num_non_egg_pokemon_found()};
 }
 
-uint8_t check_only_eggs_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint8_t expected_non_eggs_count_in_party){
     auto counts = check_egg_party_column(info, console, context);
-    if (counts.second > 0){
+    if (counts.second != expected_non_eggs_count_in_party){
         dump_image_and_throw_recoverable_exception(info, console, "NonEggPokemonInParty",
-            "check_only_eggs_in_party: Found non-egg pokemon in party");
+            "check_non_eggs_count_in_party: Found non-egg pokemon in party");
     }
     return counts.first;
 }

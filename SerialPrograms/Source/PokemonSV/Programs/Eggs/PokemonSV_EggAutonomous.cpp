@@ -78,7 +78,7 @@ EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
     , MAX_NUM_SANDWICHES(
         "<b>Num Sandwiches:</b><br>How many Great Peanut Butter Sandwiches you can make before running out of ingredients.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         100, 0
     )
     , LANGUAGE(
@@ -91,7 +91,7 @@ EggAutonomous::EggAutonomous()
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in the box left to your current box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         10, 1, 30
     )
     , AUTO_SAVING(
@@ -107,6 +107,13 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
+    , HAS_CLONE_RIDE_POKEMON(
+        "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
+        "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
+        "place it as second in party before starting the program.</b>"
+        "The program will skip the first row of eggs in the box as a result, so you will need to this row full.",
+        LockWhileRunning::LOCKED,
+        false)
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
@@ -142,6 +149,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(AUTO_SAVING);
+    PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
     PA_ADD_OPTION(FILTERS);
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -163,7 +171,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // hatch_eggs_full_routine(env, context, -1);
         // return;
     }
-    
+
     if (AUTO_SAVING != AutoSave::NoAutoSave){
         save_game(env, context, true);
     }
@@ -184,7 +192,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        
+
         // Recoverable loop to fetch eggs:
         int num_party_eggs = -1;
         while(true){
@@ -254,13 +262,13 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
-// start at Area Zero flyting spot, start picnic, make sandwich, then fetch eggs at basket.
+// start at Area Zero flying spot, start picnic, make sandwich, then fetch eggs at basket.
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     picnic_at_zero_gate(env.program_info(), env.console, context);
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
-    
+
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context);
     if (can_make_sandwich == false){
         throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
@@ -275,7 +283,7 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
         env.update_stats();
     };
 
-    const size_t max_eggs = 30;
+    const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
     collect_eggs_after_sandwich(env.program_info(), env.console, context, max_eggs, num_eggs_collected, basket_check_callback);
 
@@ -287,15 +295,16 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     return picnic_party_to_hatch_party(env, context);
 }
 
-void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){    
+void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     if (num_eggs_in_party < 0){
         // detect how many eggs in party
         enter_box_system_from_overworld(env.program_info(), env.console, context);
-    
+
         context.wait_for(std::chrono::milliseconds(400)); // wait until box UI fully loaded
 
-        num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
+        const uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
+        num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
         env.log("Read " + std::to_string(num_eggs_in_party) + " eggs.");
         env.console.overlay().add_log("Party eggs: " + std::to_string(num_eggs_in_party), COLOR_WHITE);
 
@@ -318,7 +327,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     while(true){
         save_game_if_needed();
 
-        auto hatched_callback = [&](uint8_t){  
+        auto hatched_callback = [&](uint8_t){
             stats.m_hatched++;
             env.update_stats();
         };
@@ -326,9 +335,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         reset_position_to_flying_spot(env, context);
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
-        
+
         for(int i = 0; i < num_eggs_in_party; i++){
-            process_one_baby(env, context, i, num_eggs_in_party);
+            process_one_baby(env, context, HAS_CLONE_RIDE_POKEMON ? i - 1 : i, num_eggs_in_party);
         } // end for each hatched pokemon in party
 
         // Get the next egg column
@@ -345,16 +354,17 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         }
         context.wait_for_all_requests();
         if (next_egg_column < 6){
-            load_one_column_to_party(env.program_info(), env.console, context, next_egg_column);
+            load_one_column_to_party(env.program_info(), env.console, context, next_egg_column, HAS_CLONE_RIDE_POKEMON);
             // Move cursor to party lead so that we can examine rest of party to detect eggs.
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
-            
-            num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
+
+            uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
+            num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
         } else {
             // no more eggs in box, change to fetching mode:
             env.log("Replace party with picnic team");
             env.console.overlay().add_log("Change to picnic pokemon", COLOR_WHITE);
-            
+
             // Move to right box
             move_to_left_box(context);
 
@@ -362,10 +372,10 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             swap_two_box_slots(env.program_info(), env.console, context,
                 BoxCursorLocation::PARTY, 0, 0,
                 BoxCursorLocation::SLOTS, 0, 0);
-            
+
             // Load rest of the fetching pokemon to party
-            load_one_column_to_party(env.program_info(), env.console, context, 1);
-            
+            load_one_column_to_party(env.program_info(), env.console, context, 1, HAS_CLONE_RIDE_POKEMON);
+
             // Move back to middle box
             move_to_right_box(context);
         }
@@ -377,7 +387,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         }
         next_egg_column++;
     } // end egg batch loop
-    
+
     save_game_if_needed();
 }
 
@@ -392,13 +402,13 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 
     env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
-    
+
     bool found_shiny = false;
     EggHatchAction action = EggHatchAction::Release;
     if (check_baby_info(env.console, context, LANGUAGE, FILTERS, action)){
         found_shiny = true;
         env.console.log("Shiny found!");
-        env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);        
+        env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
         stats.m_shinies++;
         env.update_stats();
         send_encounter_notification(
@@ -451,7 +461,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
                 throw ProgramFinishedException();
             }
             break;
-        
+
         case EggHatchAction::Release:
         default:
             size_t local_errors = 0;
@@ -473,7 +483,7 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
             context.wait_for_all_requests();
             // If no pokemon in the slot:
             if (!sth_in_box_detector.detect(env.console.video().snapshot())){
-                
+
                 // Move the to-keep pokemon in party to the empty slot.
                 swap_two_box_slots(env.program_info(), env.console, context,
                     BoxCursorLocation::PARTY, pokemon_row_in_party, 0,
@@ -507,25 +517,26 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
 
     // Move to right box
     move_to_left_box(context);
-    
+
     // Swap the stored the flame body pokemon with the stored first fetching pokemon
     swap_two_box_slots(env.program_info(), env.console, context,
         BoxCursorLocation::SLOTS, 0, 0,
         BoxCursorLocation::PARTY, 0, 0);
 
     // Unload rest of party to the 2nd column (col 1) in box
-    unload_one_column_from_party(env.program_info(), env.console, context, 1);
-    
+    unload_one_column_from_party(env.program_info(), env.console, context, 1, HAS_CLONE_RIDE_POKEMON);
+
     // Move to middle box
     move_to_right_box(context);
 
     // Load first egg column to party
-    load_one_column_to_party(env.program_info(), env.console, context, 0);
+    load_one_column_to_party(env.program_info(), env.console, context, 0, HAS_CLONE_RIDE_POKEMON);
     // Move cursor to party lead so that we can examine rest of party to detect eggs.
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
 
-    const uint8_t num_eggs_in_party = check_only_eggs_in_party(env.program_info(), env.console, context);
-    
+    uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
+    const uint8_t num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
+
     leave_box_system_to_overworld(env.program_info(), env.console, context);
 
     return num_eggs_in_party;
@@ -567,7 +578,7 @@ void EggAutonomous::handle_recoverable_error(
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     stats.m_errors++;
     env.update_stats();
-    
+
     if (SAVE_DEBUG_VIDEO){
         // Take a video to give more context for debugging
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);

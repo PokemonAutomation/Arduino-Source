@@ -81,6 +81,7 @@ private:
         EveryBatch,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
+    BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     Pokemon::EggHatchFilterTable FILTERS;
 

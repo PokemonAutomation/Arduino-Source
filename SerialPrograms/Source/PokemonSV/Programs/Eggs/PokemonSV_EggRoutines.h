@@ -67,11 +67,11 @@ void check_basket_to_collect_eggs(
 // Note: make sure the current cursor does not float above the five slots, otherwise it may affect detection.
 std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-// In box view, check whether there are only eggs in the five slots in the party column, after party lead.
+// In box view, check whether there is the right amount of non eggs in the five slots in the party column, after party lead.
 // return how many eggs in the five slots.
 // Throw OperationFailedException if found non-egg pokemon in the slots.
 // Note: make sure the current cursor does not float above the five slots, otherwise it may affect detection.
-uint8_t check_only_eggs_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint8_t expected_non_eggs_count_in_party);
 
 
 // When hatching at Zero Gate, use this function to reset player character position back to Zero Gate flying spot
