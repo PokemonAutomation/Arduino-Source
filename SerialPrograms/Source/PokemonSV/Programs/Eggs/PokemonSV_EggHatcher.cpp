@@ -54,6 +54,19 @@ std::unique_ptr<StatsTracker> EggHatcher_Descriptor::make_stats() const{
 
 EggHatcher::EggHatcher()
     : GO_HOME_WHEN_DONE(false)
+    , START_LOCATION(
+        "<b>Start location:</b><br>Where to start the hatcher program.<br>"
+        "Zero Gate Flying Spot: Stand at Zero Gate flying spot. The flying spot is already unlocked.<br>"
+        "Anywhere safe, on ride: You are in a safe location free of wild encounters or NPCs. You are on your ride lengendary.<br>"
+        "Anywhere safe, on foot: You are in a safe location free of wild encounters or NPCs. You stand on foot.<br>",
+        {
+            {StartLocation::ZeroGateFlyingSpot, "zero-gate", "Zero Gate Flying Spot"},
+            {StartLocation::AnywhereOnRide, "anywhere-on-ride", "Anywhere safe, on ride."},
+            {StartLocation::AnywhereOffRide, "anywhere-off-ride", "Anywhere safe, on foot."},
+        },
+        LockWhileRunning::LOCKED,
+        StartLocation::ZeroGateFlyingSpot
+    )
     , BOXES(
         "<b>How many boxes of eggs to hatch:</b>",
         LockWhileRunning::UNLOCKED,
@@ -74,6 +87,7 @@ EggHatcher::EggHatcher()
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(BOXES);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -121,10 +135,22 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             stats.m_hatched++;
             env.update_stats();
         };
-        
-        hatch_eggs_at_zero_gate(env.program_info(), env.console, context, num_eggs, hatched_callback);
 
-        reset_position_at_zero_gate(env.program_info(), env.console, context);
+        switch (START_LOCATION){
+        case StartLocation::ZeroGateFlyingSpot:
+            hatch_eggs_at_zero_gate(env.program_info(), env.console, context, num_eggs, hatched_callback);
+            reset_position_at_zero_gate(env.program_info(), env.console, context);
+            break;
+        case StartLocation::AnywhereOnRide:
+        case StartLocation::AnywhereOffRide: // the program already pressed + to get on ride at start
+        {
+            const bool on_ride = true;
+            hatch_eggs_anywhere(env.program_info(), env.console, context, on_ride, num_eggs, hatched_callback);
+            break;
+        }
+        default:
+            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Unknown StartLocation");
+        }
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
 
@@ -146,6 +172,12 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+
+    if (START_LOCATION == StartLocation::AnywhereOffRide){
+        // Get on ride:
+        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+        context.wait_for_all_requests();
+    }
 
     try{
         enter_box_system_from_overworld(env.program_info(), env.console, context);

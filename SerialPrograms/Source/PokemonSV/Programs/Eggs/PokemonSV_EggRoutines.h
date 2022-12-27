@@ -55,6 +55,14 @@ void hatch_eggs_at_zero_gate(
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
 
+// From overworld, go in circles to hatch eggs.
+// `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
+// `already_on_ride`: whether the player character is on ride when starting the function.
+void hatch_eggs_anywhere(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool already_on_ride, uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback = nullptr
+);
+
 
 // Standing in front of basket during picnic, check basket and update egg count.
 void check_basket_to_collect_eggs(

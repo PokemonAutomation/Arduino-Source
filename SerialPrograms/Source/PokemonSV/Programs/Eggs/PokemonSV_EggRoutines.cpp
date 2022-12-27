@@ -30,6 +30,69 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+
+namespace {
+
+// Call this function when an egg hatching dialog is detected.
+// This function presses A to finish the egg hatching dialogs and updates logs and calls callback functions.
+// egg_idx: currently which egg in the party is hatching. 0-indexed.
+void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint8_t num_eggs_in_party, uint8_t egg_idx, std::function<void(uint8_t)> egg_hatched_callback)
+{
+    console.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
+    console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
+    OverworldWatcher overworld(COLOR_CYAN);
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for(int i = 0; i < 60; i++){
+                pbf_mash_button(context, BUTTON_A, 125);
+            }
+        },
+        {overworld}
+    );
+    if (ret < 0){
+        dump_image_and_throw_recoverable_exception(info, console, "NoHatchingEnd",
+            "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
+    }
+    console.log("Finished hatching animation and dialog.");
+
+    if (egg_hatched_callback){
+        egg_hatched_callback(egg_idx);
+    }
+}
+
+// Assuming on your legendary ride and camera facing the same direction as the player character,
+// Turning right to do circullar motion to hatch eggs.
+// Function returns when a dialog is detected, meaning an egg is hatching.
+// Throw exception when no egg hatching detected after 10 minutes.
+void do_egg_cycle_motion(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context)
+{
+    AdvanceDialogWatcher dialog(COLOR_RED);
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            // hatch circle:
+            // Left joystick forward, right joystick right
+            // click left joystick
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
+                128, 0, 255, 128, 20);
+            pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 255, 128, 20);
+            for(int j = 0; j < 600; j++){
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
+                    128, 0, 255, 128, TICKS_PER_SECOND);
+            }
+        },
+        {dialog}
+    );
+    if (ret < 0){
+        dump_image_and_throw_recoverable_exception(info, console, "NoEggToHatch",
+            "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes.");
+    }
+}
+
+} // annoymous namespace
+
 void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     // We start this function when we enter the restaurant without pressing any button.
 
@@ -388,30 +451,6 @@ uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& co
 void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
-    auto handle_egg_hatching = [&](uint8_t egg_idx){
-        console.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
-        console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
-        OverworldWatcher overworld(COLOR_CYAN);
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
-                for(int i = 0; i < 60; i++){
-                    pbf_mash_button(context, BUTTON_A, 125);
-                }
-            },
-            {overworld}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(info, console, "NoHatchingEnd",
-                "hatch_eggs_at_zero_gate(): No end of egg hatching detected after one minute.");
-        }
-        console.log("Finished hatching animation and dialog.");
-
-        if (egg_hatched_callback){
-            egg_hatched_callback(egg_idx);
-        }
-    };
-
     bool got_off_ramp = false;
     for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
         console.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
@@ -424,12 +463,10 @@ void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, Bo
 
         context.wait_for_all_requests();
 
-        AdvanceDialogWatcher dialog(COLOR_RED);
-
-        int ret = 0;
         if (got_off_ramp == false){
+            AdvanceDialogWatcher dialog(COLOR_RED);
             // first, get off ramp to the empty field for circling motions
-            ret = run_until(
+            int ret = run_until(
                 console, context,
                 [&](BotBaseContext& context){
                     if (egg_idx == 0){
@@ -447,7 +484,7 @@ void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, Bo
             );
             if (ret == 0){
                 // egg hatching when going off ramp:
-                handle_egg_hatching(egg_idx);
+                handle_egg_hatching(info, console, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
                 reset_position_at_zero_gate(info, console, context);
                 continue;
             }
@@ -457,28 +494,37 @@ void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, Bo
         }
 
         // Circular motions:
-        ret = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                // hatch circle:
-                // Left joystick forward, right joystick right
-                // click left joystick
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-                    128, 0, 255, 128, 20);
-                pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 255, 128, 20);
-                for(int j = 0; j < 600; j++){
-                    pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-                        128, 0, 255, 128, TICKS_PER_SECOND);
-                }
-            },
-            {dialog}
-        );
-        if (ret < 0){
-            dump_image_and_throw_recoverable_exception(info, console, "NoEggToHatch",
-                "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes.");
-        }
+        do_egg_cycle_motion(info, console, context);
 
-        handle_egg_hatching(egg_idx);
+        handle_egg_hatching(info, console, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+    } // end hatching each egg
+}
+
+void hatch_eggs_anywhere(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool already_on_ride, uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
+{
+    if (!already_on_ride){
+        // At beginning, ride on Koraidon/Miradon and go off ramp:
+        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+        context.wait_for_all_requests();
+    }
+
+    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        console.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
+        console.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        // Orient camera to look at same direction as player character
+        // This is needed because when save-load the game, the camera is reset
+        // to this location.
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        context.wait_for_all_requests();
+
+        // Circular motions:
+        do_egg_cycle_motion(info, console, context);
+
+        handle_egg_hatching(info, console, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
     } // end hatching each egg
 }
 

@@ -47,6 +47,13 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    enum class StartLocation{
+        ZeroGateFlyingSpot,
+        AnywhereOnRide,
+        AnywhereOffRide,
+    };
+    EnumDropdownOption<StartLocation> START_LOCATION;
+
     SimpleIntegerOption<uint8_t> BOXES;
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
