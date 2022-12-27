@@ -178,7 +178,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
-
+    size_t consecutive_failures = 0;
     while(true){
         m_saved_after_fetched_eggs = false;
         m_in_critical_to_save_stage = false;
@@ -196,7 +196,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // Recoverable loop to fetch eggs:
         int num_party_eggs = -1;
         while(true){
-            size_t consecutive_failures = 0;
             try {
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
@@ -208,9 +207,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // Recoverable loop to hatch eggs
         bool game_already_resetted = false;
         while(true){
-            size_t consecutive_failures = 0;
             try {
                 hatch_eggs_full_routine(env, context, num_party_eggs);
+                consecutive_failures = 0;
                 break;
             } catch(OperationFailedException& e){
                 handle_recoverable_error(env, context, e, consecutive_failures);
