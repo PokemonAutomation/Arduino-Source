@@ -1203,6 +1203,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEmptyDetector.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEmptyDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp

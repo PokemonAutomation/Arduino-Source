@@ -13,6 +13,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxEmptyDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassRelease.h"
@@ -98,12 +99,19 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
     env.log("Selecting " + STRING_POKEMON + "...");
 
+    BoxEmptyDetector empty_detector;
     BoxShinyDetector shiny_detector;
     BoxEggsDetector eggs_detector;
     VideoOverlaySet overlays(env.console.overlay());
+    empty_detector.make_overlays(overlays);
     shiny_detector.make_overlays(overlays);
     eggs_detector.make_overlays(overlays);
     context.wait_for_all_requests();
+
+    if (empty_detector.detect(env.console.video().snapshot())){
+        stats.m_empty++;
+        return;
+    }
 
     if (shiny_detector.detect(env.console.video().snapshot())){
         stats.m_shinies++;
@@ -117,20 +125,14 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         return;
     }
 
-    bool released = false;
     try {
         size_t errors = 0;
-        released = release_one_pokemon(env.program_info(), env.console, context, errors);
+        release_one_pokemon(env.program_info(), env.console, context, errors);
+        stats.m_released++;
         stats.m_errors += errors;
     } catch(OperationFailedException& e){
         stats.m_errors++;
         throw e;
-    }
-
-    if (released){
-        stats.m_released++;
-    } else {
-        stats.m_empty++;
     }
 }
 void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
