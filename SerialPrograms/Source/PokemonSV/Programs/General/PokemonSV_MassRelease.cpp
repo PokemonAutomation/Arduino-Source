@@ -40,21 +40,21 @@ struct MassRelease_Descriptor::Stats : public StatsTracker{
         , m_released(m_stats["Released"])
         , m_empty(m_stats["Empty Slots"])
         , m_shinies(m_stats["Shinies"])
-        , m_eggs(m_stats["Eggs"])
+//        , m_eggs(m_stats["Eggs"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Boxes Cleared");
         m_display_order.emplace_back("Released");
         m_display_order.emplace_back("Empty Slots");
         m_display_order.emplace_back("Shinies");
-        m_display_order.emplace_back("Eggs");
+//        m_display_order.emplace_back("Eggs");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_boxes;
     std::atomic<uint64_t>& m_released;
     std::atomic<uint64_t>& m_empty;
     std::atomic<uint64_t>& m_shinies;
-    std::atomic<uint64_t>& m_eggs;
+//    std::atomic<uint64_t>& m_eggs;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> MassRelease_Descriptor::make_stats() const{
@@ -112,10 +112,10 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         }
     }
 
-    if (eggs_detector.detect(env.console.video().snapshot())){
-        stats.m_eggs++;
-        return;
-    }
+//    if (eggs_detector.detect(env.console.video().snapshot())){
+//        stats.m_eggs++;
+//        return;
+//    }
 
     bool released = false;
     try {
