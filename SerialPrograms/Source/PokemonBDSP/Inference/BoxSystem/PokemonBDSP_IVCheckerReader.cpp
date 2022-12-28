@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "PokemonBDSP_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -25,7 +26,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 
 IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
-    OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
+    OCR::StringMatchResult result = PokemonSwSh::IV_READER().read_substring(
         logger, m_language, image,
         OCR::BLACK_TEXT_FILTERS()
     );

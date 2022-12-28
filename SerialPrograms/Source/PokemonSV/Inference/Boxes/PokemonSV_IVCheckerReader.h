@@ -16,6 +16,9 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
+const IVCheckerReader& IV_READER();
+
+
 class IVCheckerReaderScope{
 public:
     IVCheckerReaderScope(VideoOverlay& overlay, Language language);

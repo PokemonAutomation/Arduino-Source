@@ -12,6 +12,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+const IVCheckerReader& IV_READER(){
+    const static Pokemon::IVCheckerReader reader("PokemonSwSh/IVCheckerOCR.json");
+    return reader;
+}
+
+
+
 
 IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language language)
     : m_language(language)
@@ -24,9 +31,11 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
+
+
 IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
-    OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
+    OCR::StringMatchResult result = IV_READER().read_substring(
         logger, m_language, image,
         OCR::BLACK_TEXT_FILTERS()
     );

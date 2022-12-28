@@ -62,7 +62,7 @@ StatsResetMoltres::StatsResetMoltres()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        IVCheckerReader::instance().languages(),
+        IV_READER().languages(),
         LockWhileRunning::LOCKED,
         true
     )

@@ -28,13 +28,8 @@ std::string iv_checker_value_to_string(IVCheckerValue value){
 
 }
 
-const IVCheckerReader& IVCheckerReader::instance(){
-    static IVCheckerReader reader;
-    return reader;
-}
-
-IVCheckerReader::IVCheckerReader()
-    : SmallDictionaryMatcher("Pokemon/IVCheckerOCR.json")
+IVCheckerReader::IVCheckerReader(const std::string& json_path)
+    : SmallDictionaryMatcher(json_path)
 {}
 
 OCR::StringMatchResult IVCheckerReader::read_substring(

@@ -32,7 +32,7 @@ public:
         std::string to_string() const;
     };
 
-    static const IVCheckerReader& instance();
+    IVCheckerReader(const std::string& json_path);
 
     OCR::StringMatchResult read_substring(
         Logger& logger,
@@ -42,8 +42,6 @@ public:
         double min_text_ratio = 0.01, double max_text_ratio = 0.50
     ) const;
 
-private:
-    IVCheckerReader();
 };
 
 

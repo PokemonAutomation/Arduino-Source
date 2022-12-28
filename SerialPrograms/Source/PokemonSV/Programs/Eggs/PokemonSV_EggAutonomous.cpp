@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Inference/PokemonSV_EggDetector.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
@@ -83,7 +84,7 @@ EggAutonomous::EggAutonomous()
     )
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
-        IVCheckerReader::instance().languages(),
+        IV_READER().languages(),
         LockWhileRunning::LOCKED,
         false
     )

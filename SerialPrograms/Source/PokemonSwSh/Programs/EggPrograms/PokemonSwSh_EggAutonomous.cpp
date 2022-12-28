@@ -89,7 +89,7 @@ EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
-        IVCheckerReader::instance().languages(),
+        IV_READER().languages(),
         LockWhileRunning::LOCKED,
         false
     )

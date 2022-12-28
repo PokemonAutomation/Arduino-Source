@@ -74,7 +74,7 @@ StatsResetCalyrex::StatsResetCalyrex()
     )
     , LANGUAGE(
         "<b>Game Language:</b>",
-        IVCheckerReader::instance().languages(),
+        IV_READER().languages(),
         LockWhileRunning::LOCKED,
         true
     )
