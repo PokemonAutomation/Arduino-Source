@@ -33,6 +33,46 @@ namespace PokemonSV{
 
 namespace {
 
+
+void clear_mons_in_front(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+){
+    console.log("Waiting for all " + STRING_POKEMON + " in front of you to get out of the way...");
+    WhiteButtonWatcher button(
+        COLOR_YELLOW, WhiteButton::ButtonA,
+        {0.020, 0.590, 0.035, 0.060},
+        WhiteButtonWatcher::FinderType::GONE
+    );
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            for (size_t c = 0; c < 20; c++){
+                context.wait_for_all_requests();
+                context.wait_for(std::chrono::seconds(30));
+                console.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
+                pbf_press_button(context, BUTTON_R, 20, 0);
+            }
+        },
+        {button}
+    );
+    if (ret < 0){
+        dump_image_and_throw_recoverable_exception(
+            info, console, "UnableToClearObstacle",
+            "Unable to clear " + STRING_POKEMON + " in front of you after 10 min."
+        );
+    }
+#if 0
+    WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
+    while (detector.detect(console.video().snapshot())){
+        pbf_press_button(context, BUTTON_R, 20, 30 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
+    }
+#endif
+}
+
+
+
+
 // Call this function when an egg hatching dialog is detected.
 // This function presses A to finish the egg hatching dialogs and updates logs and calls callback functions.
 // egg_idx: currently which egg in the party is hatching. 0-indexed.
@@ -213,6 +253,8 @@ bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispat
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
+
+    clear_mons_in_front(info, console, context);
     
     bool can_make_sandwich = (
         enter_sandwich_recipe_list(info, console, context) && select_sandwich_recipe(info, console, context, 17)
@@ -262,38 +304,7 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
     while(true){
         const size_t last_num_eggs_collected = num_eggs_collected;
 
-        {
-            WhiteButtonWatcher button(
-                COLOR_YELLOW, WhiteButton::ButtonA,
-                {0.020, 0.590, 0.035, 0.060},
-                WhiteButtonWatcher::FinderType::GONE
-            );
-            int ret = run_until(
-                console, context,
-                [&](BotBaseContext& context){
-                    for (size_t c = 0; c < 20; c++){
-                        context.wait_for_all_requests();
-                        context.wait_for(std::chrono::seconds(30));
-                        console.log(Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
-                        pbf_press_button(context, BUTTON_R, 20, 0);
-                    }
-                },
-                {button}
-            );
-            if (ret < 0){
-                dump_image_and_throw_recoverable_exception(
-                    info, console, "UnableToClearObstacle",
-                    "Unable to clear " + STRING_POKEMON + " in front of you after 10 min."
-                );
-            }
-#if 0
-            WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
-            while (detector.detect(console.video().snapshot())){
-                pbf_press_button(context, BUTTON_R, 20, 30 * TICKS_PER_SECOND);
-                context.wait_for_all_requests();
-            }
-#endif
-        }
+        clear_mons_in_front(info, console, context);
         check_basket_to_collect_eggs(info, console, context, max_eggs, num_eggs_collected);
 
         basket_check_callback(num_eggs_collected - last_num_eggs_collected);
