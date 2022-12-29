@@ -34,7 +34,8 @@ void hold_one_column(BotBaseContext& context){
     for(int i = 0; i < 20; i++){
         pbf_press_dpad(context, DPAD_DOWN, 5, 3);
     }
-    // Hold rest of the pary
+    // Hold rest of the party
+    pbf_wait(context, 60);
     pbf_press_button(context, BUTTON_A, 30, 50);
 }
 
