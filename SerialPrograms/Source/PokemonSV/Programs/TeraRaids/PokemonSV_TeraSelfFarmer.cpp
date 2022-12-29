@@ -121,10 +121,6 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::UNLOCKED,
         4, 1, 7
     )
-    , TRY_TO_TERASTILLIZE(
-        "<b>Try to Terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
-        LockWhileRunning::UNLOCKED, true
-    )
     , MAX_CATCHES(
         "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
         LockWhileRunning::UNLOCKED,
@@ -164,7 +160,7 @@ TeraSelfFarmer::TeraSelfFarmer()
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
-    PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
+    PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(MAX_CATCHES);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
@@ -181,7 +177,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     bool win = run_tera_battle(
         env, env.console, context,
         NOTIFICATION_ERROR_RECOVERABLE,
-        TRY_TO_TERASTILLIZE
+        BATTLE_AI
     );
 
     if (win){

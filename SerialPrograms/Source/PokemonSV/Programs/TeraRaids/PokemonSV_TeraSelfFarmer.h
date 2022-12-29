@@ -14,6 +14,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{
     struct VideoSnapshot;
@@ -56,7 +57,7 @@ private:
 
     SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
-    BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
+    TeraAIOption BATTLE_AI;
 
     SimpleIntegerOption<uint16_t> MAX_CATCHES;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

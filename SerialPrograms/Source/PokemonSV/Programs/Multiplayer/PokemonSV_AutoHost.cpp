@@ -137,10 +137,6 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         0, 0
     )
-    , TRY_TO_TERASTILIZE(
-        "<b>Try to Terastillize:</b><br>Try to terastilize if available. Add 4s per try but greatly increase win rate.",
-        LockWhileRunning::UNLOCKED, true
-    )
     , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
     , NOTIFICATION_JOIN_REPORT("Player Join Reports", true, false, {"Telemetry"})
@@ -159,7 +155,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
-    PA_ADD_OPTION(TRY_TO_TERASTILIZE);
+    PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(BAN_LIST);
     PA_ADD_OPTION(JOIN_REPORT);
     PA_ADD_OPTION(NOTIFICATIONS0);
@@ -417,7 +413,11 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             env.update_stats();
 
             stats.m_raids++;
-            bool win = run_tera_battle(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, TRY_TO_TERASTILIZE);
+            bool win = run_tera_battle(
+                env, env.console, context,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                BATTLE_AI
+            );
             env.update_stats();
             if (win){
                 stats.m_wins++;

@@ -14,6 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
@@ -75,7 +76,7 @@ private:
 
     SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
-    BooleanCheckBoxOption TRY_TO_TERASTILIZE;
+    TeraAIOption BATTLE_AI;
 
     RaidPlayerBanList BAN_LIST;
     RaidJoinReportOption JOIN_REPORT;

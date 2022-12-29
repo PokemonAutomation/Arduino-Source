@@ -11,6 +11,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,7 +24,7 @@ bool run_tera_battle(
     ConsoleHandle& console,
     BotBaseContext& context,
     EventNotificationOption& error_notification,
-    bool terastillize_if_available
+    TeraAIOption& battle_AI
 );
 
 

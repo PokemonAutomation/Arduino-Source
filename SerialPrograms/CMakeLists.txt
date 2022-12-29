@@ -1241,6 +1241,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
+    Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
+    Source/PokemonSV/Options/PokemonSV_TeraAIOption.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp

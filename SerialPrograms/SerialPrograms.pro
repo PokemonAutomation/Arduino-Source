@@ -614,6 +614,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
@@ -1485,6 +1486,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
+    Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \

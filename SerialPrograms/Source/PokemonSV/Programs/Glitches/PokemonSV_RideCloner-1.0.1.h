@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -66,7 +67,7 @@ private:
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
     TimeExpressionOption<uint16_t> A_TO_B_DELAY;
-    BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
+    TeraAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;
