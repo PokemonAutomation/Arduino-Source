@@ -100,6 +100,8 @@ bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
+    }else{
+        m_botbase.stop_all_commands();
     }
     m_cv.notify_all();
     return false;
