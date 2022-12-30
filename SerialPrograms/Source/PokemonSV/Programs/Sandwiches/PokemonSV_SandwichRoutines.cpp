@@ -243,10 +243,9 @@ ImageFloatBox move_sandwich_hand(
     const ImageFloatBox& end_box
 ){
     context.wait_for_all_requests();
-    console.log(std::string("Start moving sandwich hand: ") + ((hand_type == SandwichHandType::FREE) ? "FREE" : "GRABBING")
+    console.log("Start moving sandwich hand: " + SANDWOCH_HAND_TYPE_NAMES(hand_type)
         + " start box " + box_to_string(start_box) + " end box " + box_to_string(end_box));
 
-    
     uint8_t joystick_x = 128;
     uint8_t joystick_y = 128;
 
@@ -271,7 +270,9 @@ ImageFloatBox move_sandwich_hand(
     while(true){
         int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
-            dump_image_and_throw_recoverable_exception(info, console, "SandwichHandNotDetected", "move_sandwich_hand(): Cannot detect hand.");
+            dump_image_and_throw_recoverable_exception(info, console,
+                SANDWOCH_HAND_TYPE_NAMES(hand_type) + "SandwichHandNotDetected",
+                "move_sandwich_hand(): Cannot detect " + SANDWOCH_HAND_TYPE_NAMES(hand_type) + " hand.");
         }
 
         auto cur_loc = hand_watcher.location();
@@ -289,7 +290,7 @@ ImageFloatBox move_sandwich_hand(
         std::pair<double, double> dif(target_loc.first - cur_loc.first, target_loc.second - cur_loc.second);
         // console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
         if (std::fabs(dif.first) < end_box.width/2 && std::fabs(dif.second) < end_box.height/2){
-            console.log("Free hand reached target.");
+            console.log(SANDWOCH_HAND_TYPE_NAMES(hand_type) + " hand reached target.");
             move_session.stop_session_and_rethrow(); // Stop the commands
             if (hand_type == SandwichHandType::GRABBING){
                 // wait for some time to let hand release ingredient

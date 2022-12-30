@@ -22,6 +22,9 @@ enum class SandwichHandType {
     GRABBING,
 };
 
+// Type enum to string
+std::string SANDWOCH_HAND_TYPE_NAMES(SandwichHandType type);
+
 // Detect the hand used to make sandwich in the sandwich minigame.
 class SandwichHandLocator{
 public:
