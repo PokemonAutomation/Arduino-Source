@@ -126,6 +126,10 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
                 {0xffc0c000, 0xffffff3f},
                 {0xffe0e000, 0xffffff7f},
                 {0xffe0e000, 0xffffff3f},
+                {0xfff0f000, 0xffffff7f},
+                {0xfff0f000, 0xffffff3f},
+                {0xfff8f800, 0xffffff7f},
+                {0xfff8f800, 0xffffff3f},
             }
         );
 

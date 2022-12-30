@@ -84,6 +84,7 @@
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -174,10 +175,24 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("20221230-075353892425-BoxSystemNotDetected.png");
+    BoxDetector detector;
+//    cout << detector.detect(image) << endl;
+
+    auto ret = detector.detect_location(image);
+    cout << (int)ret.first << " : " << (int)ret.second.row << ", " << (int)ret.second.col << endl;
+
+    GradientArrowDetector arrow(COLOR_RED, GradientArrowType::DOWN, {0.140, 0.150, 0.050, 0.700});
+    cout << arrow.detect(image) << endl;
+
+
+
+
+#if 0
     ImageRGB32 image("ZeroGateNightBike_2_True.png");
     OverworldDetector detector;
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     ImageRGB32 image("screenshot-20221219-201912436404.png");

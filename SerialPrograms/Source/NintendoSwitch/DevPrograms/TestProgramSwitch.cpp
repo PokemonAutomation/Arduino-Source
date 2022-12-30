@@ -172,6 +172,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+#if 0
     pbf_move_left_joystick(context, 0, 128, 40, 40);
     // Move forward to pass table
     pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
@@ -179,6 +181,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     pbf_move_left_joystick(context, 255, 128, 40, 40);
     // Move back to face basket
     pbf_move_left_joystick(context, 128, 255, 10, 40);
+#endif
 
 
 #if 0
