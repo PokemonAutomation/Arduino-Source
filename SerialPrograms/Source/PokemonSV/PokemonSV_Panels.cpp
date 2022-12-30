@@ -59,9 +59,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
     ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
-    }
+//    }
 
     ret.emplace_back("---- Multiplayer ----");
     ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
