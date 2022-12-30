@@ -1,0 +1,8 @@
+
+---- General ----
+MassRelease
+MassPurchase
+RoamingGimmighoulFarmer
+
+---- Glitches ----
+ItemDupe
