@@ -47,7 +47,7 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
-bool release_one_pokemon(
+void release_one_pokemon(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t& errors
 ){
@@ -104,7 +104,7 @@ bool release_one_pokemon(
             auto screenshot = console.video().snapshot();
             if (exists.detect(screenshot)){
                 if (release_attempted && release_completed){
-                    return true;
+                    return;
                 }
                 release_attempted = false;
                 release_completed = false;
@@ -113,7 +113,7 @@ bool release_one_pokemon(
                 continue;
             }else{
                 console.log("Slot is empty.");
-                return release_attempted && release_completed;
+                return;
             }
         }
         case 1:
@@ -151,7 +151,7 @@ bool release_one_pokemon(
             release_completed = true;
             expected = 0;
             continue;
-        default:;
+        default:
             dump_image_and_throw_recoverable_exception(
                 info, console, "NoState", "No recognized state after 10 seconds."
             );

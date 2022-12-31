@@ -31,11 +31,10 @@ void move_to_left_box(BotBaseContext& context);
 void move_to_right_box(BotBaseContext& context);
 
 //  Release current selected pokemon in the box system.
-//  Returns true if a release happened. Returns false if the slot was empty.
 //  Throws OperationFailedException, if it got stuck or timed out.
 //  The # of errors are stored into "errors". These are usually dropped button
 //  presses that the function recovered from.
-bool release_one_pokemon(
+void release_one_pokemon(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t& errors
 );

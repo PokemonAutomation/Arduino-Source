@@ -11,6 +11,7 @@
 
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
@@ -264,6 +265,14 @@ int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool 
     SomethingInBoxSlotDetector sth_detector(COLOR_RED);
     bool sth = sth_detector.detect(image);
     TEST_RESULT_EQUAL(sth, target);
+
+    return 0;
+}
+
+int test_pokemonSV_BoxEggDetector(const ImageViewRGB32& image, bool target){
+    BoxEggDetector box_egg_detector(COLOR_RED);
+    bool egg = box_egg_detector.detect(image);
+    TEST_RESULT_EQUAL(egg, target);
 
     return 0;
 }
