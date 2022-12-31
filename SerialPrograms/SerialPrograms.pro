@@ -595,7 +595,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
@@ -1468,7 +1468,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
