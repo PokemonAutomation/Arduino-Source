@@ -343,9 +343,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Get the next egg column
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
         for (; next_egg_column < 6; next_egg_column++){
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, next_egg_column);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
-            // If there is pokemon in slot row 0, col `col`,
+            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
                 env.log("Found next column of eggs at col " + std::to_string(next_egg_column));
                 env.console.overlay().add_log("Add next column", COLOR_WHITE);
