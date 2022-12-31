@@ -1221,6 +1221,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
     Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_EggDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
@@ -1239,6 +1241,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
@@ -1257,6 +1263,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp
@@ -1295,6 +1303,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
