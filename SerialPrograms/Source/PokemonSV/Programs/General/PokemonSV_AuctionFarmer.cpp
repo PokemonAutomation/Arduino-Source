@@ -24,6 +24,7 @@
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Resources/PokemonSV_AuctionItemNames.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
@@ -269,6 +270,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
 }
 
 // Dialog is the only piece of orientation we have, so the goal is to put it into the center of the screen so we know in which direction the character walks.
+// This is only used for multiple NPCs.
 void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted) {
     float center_x = 0.0f;
     float center_y = 0.0f;
@@ -387,7 +389,6 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
         default:
             break;
         }
-
         context.wait_for_all_requests();
     }
 
@@ -397,6 +398,14 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.m_money += current_bid;
         }
         env.update_stats();
+        send_program_notification(
+            env, NOTIFICATION_AUCTION_WIN,
+            COLOR_GREEN, "Auction won!",
+            {
+                { "Item:", get_auction_item_name(offer.item).display_name() },
+                { "Final Bid:", std::to_string(current_bid) },
+            }
+            , "");
     }
 
     return;
