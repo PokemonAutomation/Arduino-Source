@@ -72,7 +72,7 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle){
         return WallClock::duration::min();
     }
 
-    uint64_t nanos = ts.tv_sec * 1000000000 + ts.tv_nsec;
+    uint64_t nanos = (uint64_t)ts.tv_sec * 1000000000 + ts.tv_nsec;
 
     return std::chrono::duration_cast<WallClock::duration>(std::chrono::nanoseconds(nanos));
 }

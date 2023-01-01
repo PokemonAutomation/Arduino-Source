@@ -38,7 +38,7 @@ SwitchSystemSession::SwitchSystemSession(
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)
     , m_overlay(option.m_overlay)
-    , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Thread:"))
+    , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
     m_camera->set_resolution(option.m_camera.current_resolution);
     m_camera->set_source(option.m_camera.info);

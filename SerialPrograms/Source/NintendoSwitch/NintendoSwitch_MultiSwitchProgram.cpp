@@ -8,6 +8,8 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/ThreadUtilizationStats.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 
@@ -45,9 +47,18 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     realtime_dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
-            BotBaseContext context(scope, consoles[index].botbase());
-            func(consoles[index], context);
-            context.wait_for_all_requests();
+            ConsoleHandle& console = consoles[index];
+            ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
+            console.overlay().add_stat(stat);
+            try{
+                BotBaseContext context(scope, consoles[index].botbase());
+                func(console, context);
+                context.wait_for_all_requests();
+                console.overlay().remove_stat(stat);
+            }catch (...){
+                console.overlay().remove_stat(stat);
+                throw;
+            }
         }
     );
 }
