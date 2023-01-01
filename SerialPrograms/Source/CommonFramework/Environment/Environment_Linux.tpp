@@ -15,7 +15,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
+
+#if defined(__APPLE__)
 #include <libproc.h>
+#endif
 
 // #include <iostream>
 
@@ -67,7 +70,7 @@ ThreadHandle current_thread_handle(){
 WallClock::duration thread_cpu_time(const ThreadHandle& handle){
     uint64_t nanos = 0;
 
-// #if defined(__APPLE__)
+#if defined(__APPLE__)
     uint64_t tid = 0;
     pthread_threadid_np(handle.handle, &tid);
     struct proc_threadinfo pth;
@@ -80,20 +83,20 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle){
         return WallClock::duration::min();
     }
 
-// #else
-//     clockid_t clockid;
-//     int error = pthread_getcpuclockid(handle.handle, &clockid);
-//     if (error){
-//         return WallClock::duration::min();
-//     }
+#else
+    clockid_t clockid;
+    int error = pthread_getcpuclockid(handle.handle, &clockid);
+    if (error){
+        return WallClock::duration::min();
+    }
 
-//     struct timespec ts;
-//     if (clock_gettime(clockid, &ts) == -1){
-//         return WallClock::duration::min();
-//     }
+    struct timespec ts;
+    if (clock_gettime(clockid, &ts) == -1){
+        return WallClock::duration::min();
+    }
 
-//     nanos = (uint64_t)ts.tv_sec * 1000000000 + ts.tv_nsec;
-// #endif
+    nanos = (uint64_t)ts.tv_sec * 1000000000 + ts.tv_nsec;
+#endif
 
     return std::chrono::duration_cast<WallClock::duration>(std::chrono::nanoseconds(nanos));
 }
