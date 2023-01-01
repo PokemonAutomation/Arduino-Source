@@ -25,7 +25,8 @@ constexpr ThreadPriority DEFAULT_PRIORITY_COMPUTE   = ThreadPriority::Min;
 
 
 
-struct ThreadHandle{
+class ThreadHandle{
+public:
     pthread_t handle;
 };
 ThreadHandle current_thread_handle();
