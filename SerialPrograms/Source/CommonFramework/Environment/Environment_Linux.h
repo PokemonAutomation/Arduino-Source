@@ -30,6 +30,8 @@ public:
     pthread_t handle;
 };
 ThreadHandle current_thread_handle();
+// Get the cpu time of the thread.
+// This function must be called in the same process the thread belongs to.
 WallClock::duration thread_cpu_time(const ThreadHandle& handle);
 
 
