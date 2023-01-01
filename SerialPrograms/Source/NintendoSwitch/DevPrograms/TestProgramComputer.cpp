@@ -85,6 +85,7 @@
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "CommonFramework/Environment/Environment.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -175,6 +176,30 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ThreadHandle handle = current_thread_handle();
+    cout << thread_cpu_time(handle).count() << endl;
+
+    WallClock start = current_time();
+    while (current_time() - start < std::chrono::seconds(1));
+
+    cout << thread_cpu_time(handle).count() << endl;
+
+
+
+#if 0
+    ImageRGB32 image("20221230-232826566125-BoxSystemNotDetected.png");
+    BoxDetector detector;
+//    cout << detector.detect(image) << endl;
+
+    auto ret = detector.detect_location(image);
+    cout << (int)ret.first << " : " << (int)ret.second.row << ", " << (int)ret.second.col << endl;
+
+    GradientArrowDetector arrow(COLOR_RED, GradientArrowType::DOWN, {0.240, 0.160, 0.380, 0.550});
+    cout << arrow.detect(image) << endl;
+#endif
+
+
+#if 0
     ImageRGB32 image("20221230-075353892425-BoxSystemNotDetected.png");
     BoxDetector detector;
 //    cout << detector.detect(image) << endl;
@@ -184,7 +209,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     GradientArrowDetector arrow(COLOR_RED, GradientArrowType::DOWN, {0.140, 0.150, 0.050, 0.700});
     cout << arrow.detect(image) << endl;
-
+#endif
 
 
 

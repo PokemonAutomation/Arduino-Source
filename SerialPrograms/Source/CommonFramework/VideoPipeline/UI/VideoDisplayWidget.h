@@ -78,7 +78,7 @@ public:
     VideoSourceFPS(VideoDisplayWidget& parent)
         : m_parent(parent)
     {}
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     VideoDisplayWidget& m_parent;
@@ -89,7 +89,7 @@ public:
     VideoDisplayFPS(VideoDisplayWidget& parent)
         : m_parent(parent)
     {}
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     VideoDisplayWidget& m_parent;

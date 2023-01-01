@@ -172,6 +172,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    while (true){
+
+//    }
 
 #if 0
     pbf_move_left_joystick(context, 0, 128, 40, 40);

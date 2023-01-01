@@ -6,6 +6,7 @@
 
 #if defined(__linux) || defined(__APPLE__)
 
+#include <time.h>
 #include <set>
 #include <iostream>
 #include <sys/types.h>
@@ -56,6 +57,25 @@ bool set_thread_priority(ThreadPriority priority){
 
 
 
+ThreadHandle current_thread_handle(){
+    return ThreadHandle{pthread_self()};
+}
+WallClock::duration thread_cpu_time(const ThreadHandle& handle){
+    clockid_t clockid;
+    int error = pthread_getcpuclockid(handle.handle, &clockid);
+    if (error){
+        return WallClock::duration::min();
+    }
+
+    struct timespec ts;
+    if (clock_gettime(clockid, &ts) == -1){
+        return WallClock::duration::min();
+    }
+
+    uint64_t nanos = ts.tv_sec * 1000000000 + ts.tv_nsec;
+
+    return std::chrono::duration_cast<WallClock::duration>(std::chrono::nanoseconds(nanos));
+}
 
 
 

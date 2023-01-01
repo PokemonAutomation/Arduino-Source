@@ -272,14 +272,14 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 
-OverlayStatSnapshot VideoSourceFPS::get_current() const{
+OverlayStatSnapshot VideoSourceFPS::get_current(){
     double fps = m_parent.m_video->camera().fps_source();
     return OverlayStatSnapshot{
         "Video Source FPS: " + tostr_fixed(fps, 2),
         fps < 20 ? COLOR_RED : COLOR_WHITE
     };
 }
-OverlayStatSnapshot VideoDisplayFPS::get_current() const{
+OverlayStatSnapshot VideoDisplayFPS::get_current(){
     double fps = m_parent.m_video->camera().fps_display();
     return OverlayStatSnapshot{
         "Video Display FPS: " + (fps < 0 ? "???" : tostr_fixed(fps, 2)),

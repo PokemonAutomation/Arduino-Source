@@ -40,7 +40,7 @@ public:
 
 private:
     virtual void run(void* event, bool is_back_to_back) noexcept override;
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     struct PeriodicCallback;
@@ -50,6 +50,8 @@ private:
     std::map<AudioInferenceCallback*, PeriodicCallback> m_map;
 
     uint64_t m_last_seqnum = ~(uint64_t)0;
+
+    OverlayStatUtilizationPrinter m_printer;
 };
 
 

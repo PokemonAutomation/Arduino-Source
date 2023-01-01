@@ -521,6 +521,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoOverlayOption.cpp

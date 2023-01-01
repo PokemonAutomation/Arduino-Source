@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
@@ -78,7 +79,7 @@ struct OverlayLogLine{
 
 
 struct OverlayStatSnapshot{
-    std::string text = "---";
+    std::string text;
     Color color = COLOR_WHITE;
 };
 
@@ -91,9 +92,18 @@ public:
     virtual ~OverlayStat() = default;
     OverlayStat() = default;
 
-    virtual OverlayStatSnapshot get_current() const = 0;
+    virtual OverlayStatSnapshot get_current() = 0;
 };
 
+
+class OverlayStatUtilizationPrinter{
+public:
+    OverlayStatUtilizationPrinter();
+    OverlayStatSnapshot get_snapshot(const std::string& label, double utilization);
+
+private:
+    WallClock m_last_active;
+};
 
 
 
