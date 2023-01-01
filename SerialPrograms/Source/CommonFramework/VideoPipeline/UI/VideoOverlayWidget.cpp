@@ -233,7 +233,7 @@ void VideoOverlayWidget::update_stats(QPainter& painter){
 
     int width = this->width();
     int height = this->height();
-    int start_x = (int)(width * 0.7);
+    int start_x = (int)(width * 0.75);
 
     std::vector<OverlayStatSnapshot> lines;
     for (const auto& stat : *m_stats){
