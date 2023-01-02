@@ -87,6 +87,11 @@ ClipboardFastCodeEntry::ClipboardFastCodeEntry()
 
 
 void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
+    //  Connect the controller.
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    });
+
     FastCodeEntrySettings settings{
         KEYBOARD_LAYOUT,
         !SKIP_PLUS,
@@ -112,7 +117,7 @@ void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancell
     while (true){
         std::string code = clipboard->text().toStdString();
         if (code != start_text && !code.empty()){
-            const char* error = enter_code(env, scope, settings, code);
+            const char* error = enter_code(env, scope, settings, code, false);
             if (error == nullptr){
                 return;
             }

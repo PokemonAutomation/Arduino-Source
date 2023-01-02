@@ -28,7 +28,8 @@ using namespace Pokemon;
 
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-    const FastCodeEntrySettings& settings, const std::string& code
+    const FastCodeEntrySettings& settings, const std::string& code,
+    bool connect_controller_press
 ){
     static const std::map<char, char> MAP{
         {'1', '1'}, {'I', '1'}, {'i', '1'},
@@ -101,8 +102,10 @@ const char* enter_code(
     }
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-        //  Connect the controller.
-        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+        if (connect_controller_press){
+            //  Connect the controller.
+            pbf_press_button(context, BUTTON_PLUS, 5, 3);
+        }
 
         switch (normalized_code.size()){
         case 4:
@@ -246,7 +249,7 @@ public:
 //                code = clipboard->text().toStdString();
 //            }
             if (!code.empty()){
-                const char* error = enter_code(env, scope, settings, code);
+                const char* error = enter_code(env, scope, settings, code, false);
                 if (error == nullptr){
                     return;
                 }
@@ -271,12 +274,17 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     };
 
     if (MODE == Mode::NORMAL){
-        const char* error = enter_code(env, scope, settings, CODE);
+        const char* error = enter_code(env, scope, settings, CODE, true);
         if (error){
             throw UserSetupError(env.logger(), error);
         }
         return;
     }
+
+    //  Connect the controller.
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+    });
 
     FceCodeListener listener(CODE);
     listener.run(env, scope, settings);

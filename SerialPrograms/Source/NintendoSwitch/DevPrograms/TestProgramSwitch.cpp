@@ -7,6 +7,8 @@
 #include "TestProgramSwitch.h"
 
 //#include <immintrin.h>
+#include <QApplication>
+#include <QClipboard>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
@@ -170,6 +172,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+    QClipboard* clipboard = QApplication::clipboard();
+    cout << clipboard->supportsSelection() << endl;
+
+    while (true){
+        std::string code = clipboard->text(QClipboard::Selection).toStdString();
+        cout << code << endl;
+        scope.wait_for(std::chrono::milliseconds(1000));
+    }
+
 
 
 //    while (true){
