@@ -112,7 +112,7 @@ const char* enter_code(
             enter_alphanumeric_code(
                 console.logger(), context,
                 settings,
-                code
+                normalized_code
             );
             break;
         case 8:
