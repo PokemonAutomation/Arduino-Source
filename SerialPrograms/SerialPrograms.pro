@@ -631,6 +631,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
@@ -1504,6 +1505,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \

@@ -41,18 +41,28 @@ public:
 
 //        QColor default_color = this->textColor();
 
-#if 0
-        connect(
-            this, &QTextEdit::textChanged,
-            [this]{
-                style()->polish(this);
-            }
-        );
-#endif
+        if (parent.m_value.signal_all_text_changes()){
+            connect(
+                this, &QTextEdit::textChanged,
+                [this]{
+                    std::string new_value = (std::string)m_parent.m_value;
+                    std::string text = this->toPlainText().toStdString();
+                    if (new_value == text){
+                        return;
+                    }
+//                    cout << new_value << " : " << text << endl;
+                    m_parent.m_value.set(std::move(text));
+                }
+            );
+        }
 
 //        this->hide();
     }
 
+    virtual void focusInEvent(QFocusEvent* event) override{
+        QTextEdit::focusInEvent(event);
+        m_parent.m_value.report_focus_in();
+    }
     virtual void focusOutEvent(QFocusEvent* event) override{
         QTextEdit::focusOutEvent(event);
 //        static size_t c = 0;
@@ -69,7 +79,7 @@ private:
 
 
 TextEditWidget::~TextEditWidget(){
-    m_value.remove_listener(*this);
+    m_value.ConfigOption::remove_listener(*this);
 }
 TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     : QWidget(&parent)
@@ -85,9 +95,14 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     m_box->setText(QString::fromStdString(value));
     layout->addWidget(m_box);
 
-    m_value.add_listener(*this);
+    m_value.ConfigOption::add_listener(*this);
 }
 void TextEditWidget::update_value(){
+    std::string new_value = (std::string)m_value;
+    std::string text = m_box->toPlainText().toStdString();
+    if (new_value == text){
+        return;
+    }
     m_box->setText(QString::fromStdString(m_value));
 }
 void TextEditWidget::value_changed(){

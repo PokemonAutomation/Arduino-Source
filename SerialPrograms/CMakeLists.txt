@@ -1275,6 +1275,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp

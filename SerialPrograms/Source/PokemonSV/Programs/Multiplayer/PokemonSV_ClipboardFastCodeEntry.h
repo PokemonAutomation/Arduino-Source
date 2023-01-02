@@ -1,11 +1,11 @@
-/*  Fast Code Entry
+/*  Fast Code Entry (Clipboard)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_FastCodeEntry_H
-#define PokemonAutomation_PokemonSV_FastCodeEntry_H
+#ifndef PokemonAutomation_PokemonSV_ClipboardFastCodeEntry_H
+#define PokemonAutomation_PokemonSV_ClipboardFastCodeEntry_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -19,34 +19,20 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const char* enter_code(
-    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-    const FastCodeEntrySettings& settings, const std::string& code
-);
-
-
-class FastCodeEntry_Descriptor : public MultiSwitchProgramDescriptor{
+class ClipboardFastCodeEntry_Descriptor : public MultiSwitchProgramDescriptor{
 public:
-    FastCodeEntry_Descriptor();
+    ClipboardFastCodeEntry_Descriptor();
 };
 
 
 
 
-class FastCodeEntry : public MultiSwitchProgramInstance{
+class ClipboardFastCodeEntry : public MultiSwitchProgramInstance{
 public:
-    FastCodeEntry();
+    ClipboardFastCodeEntry();
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    enum class Mode{
-        NORMAL,
-        ENTER_ON_PASTE,
-    };
-    EnumDropdownOption<Mode> MODE;
-
-    TextEditOption CODE;
-
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SKIP_PLUS;

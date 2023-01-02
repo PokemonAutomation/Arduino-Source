@@ -15,17 +15,29 @@ namespace PokemonAutomation{
 
 class TextEditOption : public ConfigOption{
 public:
+    //  Listeners for when the user focuses on this box.
+    struct FocusListener{
+        virtual void focus_in(){}
+    };
+    void add_listener(FocusListener& listener);
+    void remove_listener(FocusListener& listener);
+
+    void report_focus_in();
+
+public:
     ~TextEditOption();
     TextEditOption(
         std::string label,
         LockWhileRunning lock_while_program_is_running,
         std::string default_value,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool signal_all_text_changes = false
     );
 //    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     const std::string& label() const;
     const std::string& placeholder_text() const;
+    bool signal_all_text_changes() const;
 
     operator std::string() const;
     void set(std::string x);

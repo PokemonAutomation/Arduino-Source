@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -16,32 +17,54 @@ struct TextEditOption::Data{
     const std::string m_label;
     const std::string m_default;
     const std::string m_placeholder_text;
+    const bool m_report_all_text_changes;
 
     mutable SpinLock m_lock;
     std::string m_current;
+    std::set<FocusListener*> listeners;
 
     Data(
         std::string label,
         std::string default_value,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool report_all_text_changes
     )
         : m_label(std::move(label))
         , m_default(std::move(default_value))
         , m_placeholder_text(std::move(placeholder_text))
+        , m_report_all_text_changes(report_all_text_changes)
         , m_current(m_default)
     {}
 };
 
+void TextEditOption::add_listener(FocusListener& listener){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    data.listeners.insert(&listener);
+}
+void TextEditOption::remove_listener(FocusListener& listener){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    data.listeners.erase(&listener);
+}
+void TextEditOption::report_focus_in(){
+    Data& data = *m_data;
+    SpinLockGuard lg(data.m_lock);
+    for (FocusListener* listener : data.listeners){
+        listener->focus_in();
+    }
+}
 
 TextEditOption::~TextEditOption() = default;
 TextEditOption::TextEditOption(
     std::string label,
     LockWhileRunning lock_while_program_is_running,
     std::string default_value,
-    std::string placeholder_text
+    std::string placeholder_text,
+    bool signal_all_text_changes
 )
     : ConfigOption(lock_while_program_is_running)
-    , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text))
+    , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 #if 0
 std::unique_ptr<ConfigOption> TextEditOption::clone() const{
@@ -56,6 +79,9 @@ const std::string& TextEditOption::label() const{
 }
 const std::string& TextEditOption::placeholder_text() const{
     return m_data->m_placeholder_text;
+}
+bool TextEditOption::signal_all_text_changes() const{
+    return m_data->m_report_all_text_changes;
 }
 
 TextEditOption::operator std::string() const{

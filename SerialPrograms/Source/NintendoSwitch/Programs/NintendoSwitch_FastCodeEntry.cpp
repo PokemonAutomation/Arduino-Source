@@ -310,16 +310,16 @@ void run_codeboard_path(BotBaseContext& context, const std::vector<DigitPath>& p
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
+    const FastCodeEntrySettings& settings,
+    const std::string& code
 ){
     run_codeboard_path(context, get_codeboard_path(
         logger,
-        keyboard_layout, code,
-        scroll_delay, wrap_delay, reordering
+        settings.keyboard_layout, code,
+        settings.scroll_delay, settings.wrap_delay, settings.digit_reordering
     ));
-    if (include_plus){
+    if (settings.include_plus){
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
     }
 }
