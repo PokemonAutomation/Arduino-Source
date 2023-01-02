@@ -6,3 +6,6 @@ RoamingGimmighoulFarmer
 
 ---- Glitches ----
 ItemDupe
+
+---- Eggs ----
+EggFetcher
