@@ -5,7 +5,7 @@
     "3-Parameters": [
         {
             "00-Type": "BooleanCheckBox",
-            "01-Label": "<b>Use Sweet Herba Mystica:</b>,
+            "01-Label": "<b>Use Sweet Herba Mystica:</b>",
             "02-Declaration": "const bool USE_HM",
             "98-Default": true,
             "99-Current": true
