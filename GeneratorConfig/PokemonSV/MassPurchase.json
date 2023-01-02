@@ -5,7 +5,7 @@
     "3-Parameters": [
         {
             "00-Type": "BooleanCheckBox",
-            "01-Label": "<b>Pay with LP:</b>,
+            "01-Label": "<b>Pay with LP:</b>",
             "02-Declaration": "const bool PAY_LP",
             "98-Default": false,
             "99-Current": false
