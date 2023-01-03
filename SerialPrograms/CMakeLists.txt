@@ -225,6 +225,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
+    ../Common/Qt/TimeQt.cpp
+    ../Common/Qt/TimeQt.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp

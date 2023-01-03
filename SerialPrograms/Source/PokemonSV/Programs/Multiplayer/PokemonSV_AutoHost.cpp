@@ -6,18 +6,20 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/TimeQt.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+//#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+//#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -125,6 +127,14 @@ AutoHost::AutoHost()
         "",
         "Auto-Hosting Shiny Eevee"
     )
+    , REMOTE_KILL_SWITCH(
+        false,
+        "<b>Remote Kill Switch:</b><br>Stop the auto-host if the session crosses the date/time specified in this URL. "
+        "The default URL is maintained by the PA/SHA staff which updates this with the event change dates.",
+        LockWhileRunning::UNLOCKED,
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.txt",
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.txt"
+    )
     , CONSECUTIVE_FAILURE_PAUSE(
         "<b>Consecutive Failure Stop/Pause:</b><br>Pause or stop the program if this many consecutive raids fail.<br>"
         "It is not recommended to set this higher than 3 since soft bans start after 3 disconnects.",
@@ -153,6 +163,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(START_RAID_PLAYERS);
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(REMOTE_KILL_SWITCH);
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(BATTLE_AI);
@@ -321,6 +332,9 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
 
+    WallClock start_time = current_time();
+    WallClock kill_time = WallClock::max();
+
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
     MultiLanguageJoinTracker join_tracker;
 
@@ -366,6 +380,26 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
         }
         skip_reset = false;
+
+        std::string kill_switch_url = REMOTE_KILL_SWITCH;
+        if (MODE != Mode::LOCAL && !kill_switch_url.empty()){
+            env.log("Loading remote kill switch time...");
+            std::string kill_time_str = FileDownloader::download_file(env.logger(), kill_switch_url);
+            try{
+                kill_time = parse_utc_time_str(kill_time_str);
+            }catch (ParseException& e){
+                env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
+            }
+            WallClock now = current_time();
+            env.log(
+                "Start UTC: " + to_utc_time_str(start_time) +
+                ", Current UTC: " + to_utc_time_str(now) +
+                ", Kill UTC: " + to_utc_time_str(kill_time)
+            );
+            if (start_time < kill_time && now > kill_time){
+                throw FatalProgramException(env.logger(), "Stopped by remote kill switch. This usually happens when the event changes.");
+            }
+        }
 
         //  Store the mode locally in case the user changes in the middle of
         //  this iteration.

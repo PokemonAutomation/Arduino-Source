@@ -74,6 +74,8 @@ private:
 
     TextEditOption DESCRIPTION;
 
+    StringOption REMOTE_KILL_SWITCH;
+
     SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
     TeraAIOption BATTLE_AI;

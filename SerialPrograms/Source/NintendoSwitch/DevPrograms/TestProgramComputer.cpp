@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QJsonObject>
 #include <QDir>
+#include <QDateTime>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
@@ -86,6 +87,8 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "CommonFramework/Environment/Environment.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/TimeQt.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -167,7 +170,6 @@ private:
 
 
 
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -176,6 +178,20 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+
+
+//    cout << current_time() << endl;
+
+    std::string str = to_utc_time_str(current_time());
+    cout << str << endl;
+
+    WallClock time = parse_utc_time_str(str);
+    cout << to_utc_time_str(time) << endl;
+
+//    parse_utc_time_str(str);
+
+#if 0
     ThreadHandle handle = current_thread_handle();
     cout << thread_cpu_time(handle).count() << endl;
 
@@ -183,7 +199,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     while (current_time() - start < std::chrono::seconds(1));
 
     cout << thread_cpu_time(handle).count() << endl;
-
+#endif
 
 
 #if 0
