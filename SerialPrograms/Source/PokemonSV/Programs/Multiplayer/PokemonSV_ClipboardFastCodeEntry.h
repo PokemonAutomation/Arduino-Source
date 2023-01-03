@@ -10,7 +10,6 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 
@@ -33,12 +32,7 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
-    SectionDividerOption m_advanced_options;
-    BooleanCheckBoxOption SKIP_PLUS;
-    BooleanCheckBoxOption DIGIT_REORDERING;
-    TimeExpressionOption<uint8_t> SCROLL_DELAY;
-    TimeExpressionOption<uint8_t> WRAP_DELAY;
+    FastCodeEntrySettingsOption SETTINGS;
 };
 
 

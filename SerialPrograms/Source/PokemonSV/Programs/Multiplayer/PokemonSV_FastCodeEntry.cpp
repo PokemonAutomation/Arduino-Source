@@ -159,58 +159,10 @@ FastCodeEntry::FastCodeEntry()
         "0123", "0123",
         true
     )
-    , KEYBOARD_LAYOUT(
-        "<b>Keyboard Layout:</b>",
-        {
-            {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
-            {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
-        },
-        LockWhileRunning::LOCKED,
-        KeyboardLayout::QWERTY
-    )
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options: (developer only)</b></font>"
-    )
-    , SKIP_PLUS(
-        "<b>Skip the Plus:</b>",
-        LockWhileRunning::LOCKED,
-        false
-    )
-    , DIGIT_REORDERING(
-        "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
-        LockWhileRunning::LOCKED,
-        PreloadSettings::instance().DEVELOPER_MODE,
-        PreloadSettings::instance().DEVELOPER_MODE
-    )
-    , SCROLL_DELAY(
-        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
-        LockWhileRunning::LOCKED,
-        TICKS_PER_SECOND,
-        3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10",
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "10"
-    )
-    , WRAP_DELAY(
-        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
-        LockWhileRunning::LOCKED,
-        TICKS_PER_SECOND,
-        3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "10",
-        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "10"
-    )
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(MODE);
-    }
+    PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);
-    PA_ADD_OPTION(KEYBOARD_LAYOUT);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(SKIP_PLUS);
-        PA_ADD_OPTION(DIGIT_REORDERING);
-        PA_ADD_OPTION(SCROLL_DELAY);
-        PA_ADD_OPTION(WRAP_DELAY);
-    }
+    PA_ADD_OPTION(SETTINGS);
 }
 
 
@@ -267,11 +219,7 @@ private:
 
 
 void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    FastCodeEntrySettings settings{
-        KEYBOARD_LAYOUT,
-        !SKIP_PLUS,
-        SCROLL_DELAY, WRAP_DELAY, DIGIT_REORDERING
-    };
+    FastCodeEntrySettings settings(SETTINGS);
 
     if (MODE == Mode::NORMAL){
         const char* error = enter_code(env, scope, settings, CODE, true);

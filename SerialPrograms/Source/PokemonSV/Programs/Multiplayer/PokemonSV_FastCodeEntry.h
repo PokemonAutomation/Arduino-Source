@@ -48,12 +48,7 @@ private:
 
     TextEditOption CODE;
 
-    EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
-    SectionDividerOption m_advanced_options;
-    BooleanCheckBoxOption SKIP_PLUS;
-    BooleanCheckBoxOption DIGIT_REORDERING;
-    TimeExpressionOption<uint8_t> SCROLL_DELAY;
-    TimeExpressionOption<uint8_t> WRAP_DELAY;
+    FastCodeEntrySettingsOption SETTINGS;
 };
 
 
