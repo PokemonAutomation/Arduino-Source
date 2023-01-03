@@ -614,6 +614,8 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -623,6 +625,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
@@ -643,6 +646,8 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
@@ -1488,6 +1493,8 @@ HEADERS += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/PokemonSV_Panels.h \
@@ -1497,6 +1504,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
+    Source/PokemonSV/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
@@ -1517,6 +1525,8 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.h \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \

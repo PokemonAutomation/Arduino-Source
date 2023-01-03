@@ -10,6 +10,7 @@
 
 #include "PokemonSV_Settings.h"
 
+#include "Programs/General/PokemonSV_AuctionFarmer.h"
 #include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_GimmighoulChestFarmer.h"
@@ -41,7 +42,7 @@ PanelListFactory::PanelListFactory()
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
-
+    
     ret.emplace_back("---- Settings ----");
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
@@ -56,6 +57,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE) {
+        ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
+    }
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
