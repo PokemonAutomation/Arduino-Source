@@ -6,7 +6,7 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

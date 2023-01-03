@@ -5,17 +5,17 @@
  */
 
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+//#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
@@ -39,9 +39,16 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
     // Firt, try pressing button A to bring up the menu to make sandwich
     pbf_press_button(context, BUTTON_A, 20, 80);
 
+    WallClock start = current_time();
     bool opened_table_menu = false;
     while(true){
         context.wait_for_all_requests();
+        if (current_time() - start > std::chrono::minutes(1)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToSandwich",
+                "enter_sandwich_recipe_list(): Failed to open sandwich menu after 1 minute."
+            );
+        }
 
         PicnicWatcher picnic_watcher;
         GradientArrowWatcher sandwich_arrow(COLOR_YELLOW, GradientArrowType::RIGHT, {0.551, 0.311, 0.310, 0.106});

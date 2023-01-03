@@ -338,8 +338,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            dump_image_and_throw_recoverable_exception(info, console, "FailToPicnic",
-                "picnic_from_overworld(): Failed to start picnic after 3 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToPicnic",
+                "picnic_from_overworld(): Failed to start picnic after 3 minutes."
+            );
         }
 
         OverworldWatcher overworld(COLOR_CYAN);
