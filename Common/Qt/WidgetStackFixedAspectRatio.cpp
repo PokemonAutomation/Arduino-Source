@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <QResizeEvent>
 #include <QVBoxLayout>
 #include "WidgetStackFixedAspectRatio.h"
