@@ -407,11 +407,13 @@ void check_basket_to_collect_eggs(
             }
 
             if (num_eggs_collected < max_eggs){
-                console.log("Found an egg! Keeping...");
+                num_eggs_collected++;
+                
                 std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
+                console.log("Found an egg " + msg + ". Keeping...");
                 console.overlay().add_log("Egg " + msg, COLOR_GREEN);
                 pbf_press_button(context, BUTTON_A, 20, 80);
-                num_eggs_collected++;
+                
                 last_prompt = BUTTON_A;
             }else{
                 console.log("Found an egg! But we already have enough...");
