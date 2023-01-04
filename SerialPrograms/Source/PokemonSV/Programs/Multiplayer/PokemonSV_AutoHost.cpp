@@ -329,17 +329,19 @@ void AutoHost::check_kill_switch(ProgramEnvironment& env){
 
     if (kill_switch_url.ends_with(".txt")){
         env.log("Loading remote kill switch time...");
-        std::string kill_time_str = FileDownloader::download_file(env.logger(), kill_switch_url);
         try{
+            std::string kill_time_str = FileDownloader::download_file(env.logger(), kill_switch_url);
             m_killswitch_time = parse_utc_time_str(kill_time_str);
+        }catch (OperationFailedException& e){
+            env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
         }catch (ParseException& e){
             env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
         }
     }else if (kill_switch_url.ends_with(".json")){
         env.log("Loading remote kill switch time...");
-        JsonValue json = FileDownloader::download_json_file(env.logger(), kill_switch_url);
 
         try{
+            JsonValue json = FileDownloader::download_json_file(env.logger(), kill_switch_url);
             const JsonObject* obj = json.get_object();
             if (obj == nullptr){
                 throw ParseException("Invalid kill-switch Json.");
@@ -356,6 +358,8 @@ void AutoHost::check_kill_switch(ProgramEnvironment& env){
             }else{
                 m_killswitch_reason = *reason;
             }
+        }catch (OperationFailedException& e){
+            env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
         }catch (ParseException& e){
             env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
         }
