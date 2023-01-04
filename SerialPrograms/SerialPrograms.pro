@@ -137,6 +137,7 @@ SOURCES += \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
     ../Common/Qt/TimeQt.cpp \
+    ../Common/Qt/WidgetStackFixedAspectRatio.cpp \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioOption.cpp \
@@ -232,9 +233,11 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
+    Source/CommonFramework/Options/ScreenWatchOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.cpp \
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
@@ -614,6 +617,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
@@ -965,6 +969,7 @@ HEADERS += \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
     ../Common/Qt/TimeQt.h \
+    ../Common/Qt/WidgetStackFixedAspectRatio.h \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
@@ -1083,10 +1088,12 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \
+    Source/CommonFramework/Options/ScreenWatchOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
     Source/CommonFramework/Options/UI/LabelCellWidget.h \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.h \
     Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelInstance.h \
@@ -1495,6 +1502,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \

@@ -30,6 +30,10 @@
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
 #include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 
+#ifdef PA_OFFICIAL
+#include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
+#endif
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -76,6 +80,13 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
+
+#ifdef PA_OFFICIAL
+    if (PreloadSettings::instance().DEVELOPER_MODE) {
+        ret.emplace_back("---- Research ----");
+        add_panels(ret);
+    }
+#endif
 
     return ret;
 }

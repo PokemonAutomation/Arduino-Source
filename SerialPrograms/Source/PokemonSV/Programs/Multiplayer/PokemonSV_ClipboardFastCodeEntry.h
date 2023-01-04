@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonSV_ClipboardFastCodeEntry_H
 #define PokemonAutomation_PokemonSV_ClipboardFastCodeEntry_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 

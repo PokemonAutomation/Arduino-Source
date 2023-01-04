@@ -227,6 +227,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/StringToolsQt.h
     ../Common/Qt/TimeQt.cpp
     ../Common/Qt/TimeQt.h
+    ../Common/Qt/WidgetStackFixedAspectRatio.cpp
+    ../Common/Qt/WidgetStackFixedAspectRatio.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -441,6 +443,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
+    Source/CommonFramework/Options/ScreenWatchOption.cpp
+    Source/CommonFramework/Options/ScreenWatchOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/StringSelectTableOption.h
@@ -449,6 +453,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/UI/LabelCellWidget.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.cpp
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.h
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp
     Source/CommonFramework/Options/UI/StringSelectWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
@@ -1241,6 +1247,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp

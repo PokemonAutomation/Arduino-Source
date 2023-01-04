@@ -12,6 +12,9 @@
 #include <QJsonObject>
 #include <QDir>
 #include <QDateTime>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QPixmap>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
@@ -128,8 +131,10 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 {}
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
+    , SCREEN_WATCHER("Capture Box", 0.40, 0.34, 0.1, 0.04)
 {
     PA_ADD_OPTION(STATIC_TEXT);
+    PA_ADD_OPTION(SCREEN_WATCHER);
 }
 
 WallClock REFERENCE = current_time();
@@ -170,6 +175,9 @@ private:
 
 
 
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -177,10 +185,29 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    SCREEN_WATCHER.screenshot().frame->save("test.png");
 
 
 
+#if 0
+    auto screens = QGuiApplication::screens();
+    cout << screens.size() << endl;
 
+    for (QScreen* screen : screens){
+        cout << screen->name().toStdString() << endl;
+    }
+#endif
+
+#if 0
+    QScreen* screen = QGuiApplication::primaryScreen();
+    QPixmap px = screen->grabWindow(0);
+
+    px.save("text.png");
+#endif
+
+
+
+#if 0
 //    cout << current_time() << endl;
 
     std::string str = to_utc_time_str(current_time());
@@ -190,6 +217,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << to_utc_time_str(time) << endl;
 
 //    parse_utc_time_str(str);
+#endif
 
 #if 0
     ThreadHandle handle = current_thread_handle();
