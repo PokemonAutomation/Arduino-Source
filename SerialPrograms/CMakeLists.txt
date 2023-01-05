@@ -442,9 +442,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
-    Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/ScreenWatchOption.cpp
     Source/CommonFramework/Options/ScreenWatchOption.h
+    Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/StringSelectTableOption.h
@@ -520,6 +520,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
     Source/CommonFramework/VideoPipeline/CameraSession.h
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp
@@ -529,8 +531,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
-    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp
-    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoOverlayOption.cpp
