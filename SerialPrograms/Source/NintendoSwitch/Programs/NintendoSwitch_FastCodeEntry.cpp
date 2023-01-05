@@ -34,13 +34,13 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
         LockWhileRunning::LOCKED,
         KeyboardLayout::QWERTY
     )
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options: (developer only)</b></font>"
-    )
     , SKIP_PLUS(
-        "<b>Skip the Plus:</b>",
+        "<b>Skip the Plus:</b><br>Don't press + to finalize the code. Useful for testing.",
         LockWhileRunning::LOCKED,
         false
+    )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options: (developer only)</b></font>"
     )
     , DIGIT_REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
@@ -66,9 +66,9 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
     )
 {
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
+    PA_ADD_OPTION(SKIP_PLUS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(SKIP_PLUS);
         PA_ADD_OPTION(DIGIT_REORDERING);
         PA_ADD_OPTION(SCROLL_DELAY);
         PA_ADD_OPTION(WRAP_DELAY);

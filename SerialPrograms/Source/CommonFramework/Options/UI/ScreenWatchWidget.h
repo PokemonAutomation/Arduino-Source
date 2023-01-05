@@ -13,6 +13,8 @@
 #include <QWidget>
 #include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
 #include "CommonFramework/Options/ScreenWatchOption.h"
 
 namespace PokemonAutomation{
@@ -35,6 +37,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
     bool m_stop;
+    VideoSnapshot m_last_frame;
     std::thread m_updater;
 };
 
@@ -44,6 +47,7 @@ public:
 
 private:
     QWidget* m_widget;
+    VideoOverlayWidget* m_overlay;
 };
 
 

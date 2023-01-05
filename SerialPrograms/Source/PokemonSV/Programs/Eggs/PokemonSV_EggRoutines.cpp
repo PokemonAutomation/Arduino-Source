@@ -46,7 +46,7 @@ void clear_mons_in_front(
     int ret = run_until(
         console, context,
         [&](BotBaseContext& context){
-            for (size_t c = 0; c < 20; c++){
+            for (size_t c = 0; c < 40; c++){
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
                 console.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
@@ -58,7 +58,7 @@ void clear_mons_in_front(
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(
             info, console, "UnableToClearObstacle",
-            "Unable to clear " + STRING_POKEMON + " in front of you after 10 min."
+            "Unable to clear " + STRING_POKEMON + " in front of you after 20 min."
         );
     }
 #if 0

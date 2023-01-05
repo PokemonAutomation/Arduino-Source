@@ -34,8 +34,9 @@ public:
 
 public:
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
-    SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SKIP_PLUS;
+
+    SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption DIGIT_REORDERING;
     TimeExpressionOption<uint8_t> SCROLL_DELAY;
     TimeExpressionOption<uint8_t> WRAP_DELAY;

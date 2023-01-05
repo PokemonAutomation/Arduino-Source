@@ -41,6 +41,7 @@ ScreenWatchOption::ScreenWatchOption(
     , WIDTH("<b>Width:</b>", LockWhileRunning::UNLOCKED, default_width, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockWhileRunning::UNLOCKED, default_height, 0.0, 1.0)
     , m_display(CONSTRUCT_TOKEN, *this)
+    , m_overlay(m_overlay_option)
 {
     PA_ADD_OPTION(*m_display);
     PA_ADD_OPTION(MONITOR_INDEX);
@@ -87,6 +88,10 @@ VideoSnapshot ScreenWatchOption::screenshot(){
     return VideoSnapshot(pm.toImage(), now);
 }
 
+
+VideoOverlaySession& ScreenWatchOption::overlay(){
+    return m_overlay;
+}
 
 
 

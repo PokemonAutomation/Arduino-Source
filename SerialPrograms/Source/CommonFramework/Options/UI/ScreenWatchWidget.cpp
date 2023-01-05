@@ -5,7 +5,6 @@
  */
 
 #include <QPainter>
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ScreenWatchWidget.h"
 
 namespace PokemonAutomation{
@@ -34,7 +33,7 @@ ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
 void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 //        cout << "asdf" << endl;
     QWidget::paintEvent(event);
-    VideoSnapshot snapshot = m_option.screenshot();
+    VideoSnapshot snapshot = m_last_frame;
     m_holder.set_aspect_ratio((double)snapshot.frame->width() / snapshot.frame->height());
     QRect rect(0, 0, this->width(), this->height());
     QPainter painter(this);
@@ -45,6 +44,7 @@ void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 void ScreenWatchDisplayWidget::thread_loop(){
     std::unique_lock lg(m_lock);
     while (!m_stop){
+        m_last_frame = m_option.screenshot();;
         QMetaObject::invokeMethod(this, [&]{
             this->update();
         }, Qt::QueuedConnection);
@@ -58,6 +58,8 @@ ScreenWatchWidget::ScreenWatchWidget(ScreenWatchDisplay& option, QWidget& parent
 {
     m_widget = new ScreenWatchDisplayWidget(option.m_option, *this);
     add_widget(*m_widget);
+    m_overlay = new VideoOverlayWidget(*this, option.m_option.overlay());
+    add_widget(*m_overlay);
 }
 
 

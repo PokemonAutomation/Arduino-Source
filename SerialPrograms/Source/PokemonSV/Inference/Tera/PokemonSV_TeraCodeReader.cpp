@@ -34,7 +34,7 @@ std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
     std::map<size_t, std::string> map;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-        auto iter = session->make_iterator(50);
+        auto iter = session->make_iterator(20);
         WaterfillObject object;
         while (iter->find_next(object, false)){
 //                cout << object.packed_matrix()->dump() << endl;

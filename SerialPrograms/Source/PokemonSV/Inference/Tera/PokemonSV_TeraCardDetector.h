@@ -22,6 +22,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
+ImageRGB32 filter_name_image(const ImageViewRGB32& image);
+
+
 
 class TeraCardReader : public StaticScreenDetector{
 public:

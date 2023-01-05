@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
 namespace PokemonAutomation{
 
@@ -48,6 +49,8 @@ public:
     double aspect_ratio();
     VideoSnapshot screenshot();
 
+    VideoOverlaySession& overlay();
+
 private:
     SimpleIntegerOption<uint64_t> MONITOR_INDEX;
     FloatingPointOption X;
@@ -56,6 +59,9 @@ private:
     FloatingPointOption HEIGHT;
 
     Pimpl<ScreenWatchDisplay> m_display;
+
+    VideoOverlayOption m_overlay_option;
+    VideoOverlaySession m_overlay;
 };
 
 
