@@ -1516,7 +1516,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
-    Source/PokemonSV/General/PokemonSV_AuctionFarmer.h \
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
