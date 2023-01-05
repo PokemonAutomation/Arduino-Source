@@ -228,7 +228,7 @@ std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, 
 ImageRGB32 filter_name_image(const ImageViewRGB32& image){
     using namespace Kernels::Waterfill;
 
-    const uint32_t COLOR_THRESHOLD = 0xff5f5f5f;
+    const uint32_t COLOR_THRESHOLD = 0xff8f8f8f;
 
     //  Waterfill the image and throw out everything that touches the border.
 

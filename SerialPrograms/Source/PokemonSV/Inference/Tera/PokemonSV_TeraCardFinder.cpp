@@ -15,9 +15,9 @@
 #include "PokemonSV_TeraCodeReader.h"
 #include "PokemonSV_TeraCardFinder.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -74,6 +74,7 @@ std::map<Language, std::string> partial_tera_card_read_host(
     bool first = true;
     for (Language language : languages){
         ImageRGB32 filtered = filter_name_image(box);
+//        filtered.save("test.png");
         std::string raw = OCR::ocr_read(language, filtered);
         while (!raw.empty()){
             char ch = raw.back();

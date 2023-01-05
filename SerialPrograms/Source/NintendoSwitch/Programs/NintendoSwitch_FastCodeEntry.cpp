@@ -36,7 +36,7 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
     )
     , SKIP_PLUS(
         "<b>Skip the Plus:</b><br>Don't press + to finalize the code. Useful for testing.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         false
     )
     , m_advanced_options(
