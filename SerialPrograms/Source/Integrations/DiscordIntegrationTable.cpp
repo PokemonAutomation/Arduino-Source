@@ -21,7 +21,7 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     , ping(LockWhileRunning::LOCKED, true)
     , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
     , allow_commands(LockWhileRunning::LOCKED, true)
-    , delay(LockWhileRunning::LOCKED, 0, 0, 60)
+    , delay(LockWhileRunning::LOCKED, 0, 0, 10)
     , channel_id(false, LockWhileRunning::LOCKED, "", "123456789012345678")
 {
     //  Keep the old JSON tags for backwards compatibility.
