@@ -57,17 +57,17 @@ void dump_image_and_throw_recoverable_exception(
 ){
     // m_stats.m_errors++;
     console.overlay().add_log("Error: " + error_name, COLOR_RED);
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
     dump_image(
         console, env.program_info(),
         error_name,
-        *screen
+        screen
     );
     send_program_recoverable_error_notification(
         env,
         notification_error,
         message,
-        *screen
+        screen
     );
     throw OperationFailedException(console, message);
 }
@@ -80,13 +80,49 @@ void dump_image_and_throw_recoverable_exception(
     const std::string& error_message
 ){
     console.overlay().add_log("Error: " + error_name, COLOR_RED);
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
     dump_image(
         console, program_info,
         error_name,
-        *screen
+        screen
     );
     throw OperationFailedException(console, error_message);
 }
+void dump_image_and_throw_recoverable_exception(
+    const ProgramInfo& program_info,
+    ConsoleHandle& console,
+    const std::string& error_name,
+    const std::string& error_message,
+    const ImageViewRGB32& screenshot
+){
+    console.overlay().add_log("Error: " + error_name, COLOR_RED);
+    if (screenshot){
+        dump_image(
+            console, program_info,
+            error_name,
+            screenshot
+        );
+    }else{
+        VideoSnapshot screen = console.video().snapshot();
+        dump_image(
+            console, program_info,
+            error_name,
+            screen
+        );
+    }
+    throw OperationFailedException(console, error_message);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -42,14 +42,14 @@ StandardEncounterDetection::StandardEncounterDetection(
 
     context.wait_for_all_requests();
     context.wait_for(std::chrono::milliseconds(100));
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
 
     //  Check if it's a double battle.
     do{
-        if (!is_white(extract_box_reference(*screen, left_mon_white))){
+        if (!is_white(extract_box_reference(screen, left_mon_white))){
             break;
         }
-        ImageStats stats_hp = image_stats(extract_box_reference(*screen, left_mon_hp));
+        ImageStats stats_hp = image_stats(extract_box_reference(screen, left_mon_hp));
 //        cout << stats_hp.average << stats_hp.stddev << endl;
         if (!is_solid(stats_hp, {0.27731, 0.461346, 0.261344}, 0.1, 50)){
             break;
@@ -64,10 +64,10 @@ StandardEncounterDetection::StandardEncounterDetection(
     if (m_language != Language::None){
         if (m_double_battle){
             m_pokemon_left.detection_enabled = true;
-            m_pokemon_left.slugs = read_name(*screen, left_name);
+            m_pokemon_left.slugs = read_name(screen, left_name);
         }
         m_pokemon_right.detection_enabled = true;
-        m_pokemon_right.slugs = read_name(*screen, right_name);
+        m_pokemon_right.slugs = read_name(screen, right_name);
     }
 
     //  Not a double battle. Pass overall shiny detection to right side.

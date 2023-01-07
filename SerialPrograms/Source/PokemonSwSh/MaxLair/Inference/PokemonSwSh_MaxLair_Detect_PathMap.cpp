@@ -71,15 +71,15 @@ std::shared_ptr<const ImageRGB32> read_type_array_retry(
     PokemonType* type, ImagePixelBox* boxes,
     size_t max_attempts = 3
 ){
-    std::shared_ptr<const ImageRGB32> screen;
+    VideoSnapshot screen;
     for (size_t c = 0; c < max_attempts; c++){
         screen = console.video().snapshot();
-        if (read_type_array(console, *screen, box, hits, count, type, boxes)){
+        if (read_type_array(console, screen, box, hits, count, type, boxes)){
             return nullptr;
         }
         scope.wait_for(std::chrono::milliseconds(200));
     }
-    return screen;
+    return std::move(screen.frame);
 }
 
 

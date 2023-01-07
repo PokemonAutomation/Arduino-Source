@@ -95,7 +95,7 @@ void VisualInferencePivot::run(void* event, bool is_back_to_back) noexcept{
         }
 
         WallClock time0 = current_time();
-        bool stop = callback.callback.process_frame(m_last.frame, m_last.timestamp);
+        bool stop = callback.callback.process_frame(m_last);
         WallClock time1 = current_time();
         callback.stats += (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
         callback.last_seqnum = m_seqnum;

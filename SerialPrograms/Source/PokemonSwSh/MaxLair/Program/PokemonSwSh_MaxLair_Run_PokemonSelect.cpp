@@ -49,12 +49,12 @@ void run_select_pokemon(
 //    context.wait_for_all_requests();
 
     //  Read the bottom two options first.
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-    options[1] = reader.read_option(*screen, 1);
-    options[2] = reader.read_option(*screen, 2);
+    VideoSnapshot screen = console.video().snapshot();
+    options[1] = reader.read_option(screen, 1);
+    options[2] = reader.read_option(screen, 2);
 
 //    reader.read_options(screen, options);
-    int8_t player_index = reader.who_is_selecting(*screen);
+    int8_t player_index = reader.who_is_selecting(screen);
     if (player_index >= 0){
         state.players[player_index].console_id = (int8_t)console_index;
     }else{
@@ -65,7 +65,7 @@ void run_select_pokemon(
     pbf_press_dpad(context, DPAD_DOWN, 10, 80);
     context.wait_for_all_requests();
     screen = console.video().snapshot();
-    options[0] = reader.read_option(*screen, 0);
+    options[0] = reader.read_option(screen, 0);
 
     state.add_seen(options[0]);
     state.add_seen(options[1]);

@@ -34,19 +34,19 @@ public:
 //        }
     }
 
-    virtual bool process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp) override{
-        if (!*frame){
+    virtual bool process_frame(const VideoSnapshot& frame) override{
+        if (!frame){
             return false;
         }
         if (m_regions.empty()){
-            reload_reference(frame);
+            reload_reference(frame.frame);
         }
 
         for (RegionState& region : m_regions){
-            ImageViewRGB32 current = extract_box_reference(*frame, region.box);
+            ImageViewRGB32 current = extract_box_reference(frame, region.box);
 
             if (current.width() != (size_t)region.start.width() || current.height() != (size_t)region.start.height()){
-                reload_reference(frame);
+                reload_reference(frame.frame);
                 return false;
             }
 

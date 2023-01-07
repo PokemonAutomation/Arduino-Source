@@ -93,6 +93,7 @@
 #include "CommonFramework/Environment/Environment.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -132,10 +133,10 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 {}
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
-    , SCREEN_WATCHER("Capture Box", 0.40, 0.34, 0.1, 0.04)
+//    , SCREEN_WATCHER("Capture Box", 0.40, 0.34, 0.1, 0.04)
 {
     PA_ADD_OPTION(STATIC_TEXT);
-    PA_ADD_OPTION(SCREEN_WATCHER);
+//    PA_ADD_OPTION(SCREEN_WATCHER);
 }
 
 WallClock REFERENCE = current_time();
@@ -185,6 +186,36 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+
+    ImageRGB32 image("20230107-053814058280-FREESandwichHandNotDetected.png");
+
+    SandwichHandLocator detector(SandwichHandType::FREE, {0, 0, 1, 1});
+    auto ret = detector.detect(image);
+    cout << ret.first << " " << ret.second << endl;
+
+
+
+#if 0
+    PartialTeraCardTracker tracker(
+        SCREEN_WATCHER.overlay(), COLOR_RED, {0, 0, 1, 1},
+        [](const ImageViewRGB32& card){
+//            card.save("test.png");
+            return false;
+        }
+    );
+#if 1
+    while (true){
+        scope.throw_if_cancelled();
+
+        tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
+
+        scope.wait_for(std::chrono::milliseconds(20));
+    }
+#endif
+    tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
+#endif
+
 
 
 

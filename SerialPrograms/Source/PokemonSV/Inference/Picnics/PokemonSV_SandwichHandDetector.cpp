@@ -60,7 +60,7 @@ public:
 
 } // anonymous namespace
 
-std::string SANDWOCH_HAND_TYPE_NAMES(SandwichHandType type){
+std::string SANDWICH_HAND_TYPE_NAMES(SandwichHandType type){
     switch (type)
     {
     case SandwichHandType::FREE:
@@ -122,7 +122,8 @@ void SandwichHandWatcher::make_overlays(VideoOverlaySet& items) const{
     m_locator.make_overlays(items);
 }
 
-bool SandwichHandWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool SandwichHandWatcher::process_frame(const VideoSnapshot& frame){
+    m_last_snapshot = frame;
     m_location = m_locator.detect(frame);
     return m_location.first >= 0.0;
 }

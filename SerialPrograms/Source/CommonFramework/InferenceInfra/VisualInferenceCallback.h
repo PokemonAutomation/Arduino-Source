@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 
 class ImageViewRGB32;
 class ImageRGB32;
+struct VideoSnapshot;
 class VideoOverlaySet;
 
 //  Base class for a visual inference object to be called perioridically by
@@ -33,7 +34,7 @@ public:
 
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
-    virtual bool process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp);
+    virtual bool process_frame(const VideoSnapshot& snapshot);
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp);

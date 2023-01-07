@@ -166,10 +166,10 @@ void run_autohost(
         context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        VideoSnapshot screen = console.video().snapshot();
         DenMonReadResults results;
-        if (*screen){
-            results = reader.read(*screen);
+        if (screen){
+            results = reader.read(screen);
             switch (results.type){
             case DenMonReadResults::RED_BEAM:
             case DenMonReadResults::PURPLE_BEAM:
@@ -201,7 +201,7 @@ void run_autohost(
             console,
             notifications,
             has_code, code,
-            *screen, results, stats
+            screen, results, stats
         );
     }
 

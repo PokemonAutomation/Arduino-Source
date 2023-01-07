@@ -14,6 +14,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
@@ -62,45 +63,49 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_sparkle_tracker_wild.make_overlays(items);
     m_sparkle_tracker_own.make_overlays(items);
 }
-bool ShinyEncounterTracker::process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp){
+bool ShinyEncounterTracker::process_frame(const VideoSnapshot& frame){
     using PokemonSwSh::EncounterState;
 
-    if (!*frame){
+    if (!frame){
         return false;
     }
-    if (frame->height() < 720){
+
+    size_t width = frame->width();
+    size_t height = frame->height();
+
+    if (height < 720){
         throw UserSetupError(m_logger, "Video resolution must be at least 720p.");
     }
-    double aspect_ratio = (double)frame->width() / frame->height();
+    double aspect_ratio = (double)width / height;
     if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
         throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
     }
 
     // End shiny detection when we reach the battle menu
-    bool battle_menu = m_battle_menu.process_frame(*frame, timestamp);
+    bool battle_menu = m_battle_menu.process_frame(frame);
     if (battle_menu){
-        m_dialog_tracker.push_end(timestamp);
+        m_dialog_tracker.push_end(frame.timestamp);
         return true;
     }
 
     // Use m_dialog_tracker to track dialog timings. Dialogs partitions the opening of a battle into:
     // before anything -> wild pokemon animation -> player pokemon animation -> battle menu detected
-    m_dialog_tracker.process_frame(*frame, timestamp);
+    m_dialog_tracker.process_frame(frame);
 
     switch (m_dialog_tracker.encounter_state()){
     case EncounterState::BEFORE_ANYTHING:
         break;
     case EncounterState::WILD_ANIMATION:{
         // Update the timestamp that records the end of wild animation
-        m_wild_animation_end_timestamp = timestamp;
+        m_wild_animation_end_timestamp = frame.timestamp;
 
-        m_sparkle_tracker_wild.process_frame(*frame, timestamp);
+        m_sparkle_tracker_wild.process_frame(frame);
         m_sparkle_tracker_own.clear_boxes();
-        m_best_wild_overall.add_frame(frame, m_sparkles_wild);
+        m_best_wild_overall.add_frame(frame.frame, m_sparkles_wild);
 
-        ImagePixelBox box_overall = floatbox_to_pixelbox(frame->width(), frame->height(), {0.4, 0.02, 0.60, 0.93});
-        ImagePixelBox box_left = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_left);
-        ImagePixelBox box_right = floatbox_to_pixelbox(frame->width(), frame->height(), m_box_wild_right);
+        ImagePixelBox box_overall = floatbox_to_pixelbox(width, height, {0.4, 0.02, 0.60, 0.93});
+        ImagePixelBox box_left = floatbox_to_pixelbox(width, height, m_box_wild_left);
+        ImagePixelBox box_right = floatbox_to_pixelbox(width, height, m_box_wild_right);
         box_left.clip(box_overall);
         box_right.clip(box_overall);
         box_left.min_x -= box_overall.min_x;
@@ -118,11 +123,11 @@ bool ShinyEncounterTracker::process_frame(const std::shared_ptr<const ImageRGB32
     }
     case EncounterState::YOUR_ANIMATION:
         // Update the timestamp that records the end of player pokemon animation
-        m_your_animation_end_timestamp = timestamp;
+        m_your_animation_end_timestamp = frame.timestamp;
 
         m_sparkle_tracker_wild.clear_boxes();
-        m_sparkle_tracker_own.process_frame(*frame, timestamp);
-        m_best_own.add_frame(frame, m_sparkles_own);
+        m_sparkle_tracker_own.process_frame(frame);
+        m_best_own.add_frame(frame.frame, m_sparkles_own);
         break;
     case EncounterState::POST_ENTRY:
         break;

@@ -71,6 +71,7 @@ private:
 
     SimpleIntegerOption<uint16_t> LOBBY_WAIT_DELAY;
     IntegerEnumDropdownOption START_RAID_PLAYERS;
+    BooleanCheckBoxOption SHOW_RAID_CODE;
     BooleanCheckBoxOption ROLLOVER_PREVENTION;
 
     TextEditOption DESCRIPTION;

@@ -103,7 +103,7 @@ AuctionFarmer::AuctionFarmer()
 }
 
 
-std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageRGB32& screen) {
+std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB32& screen) {
     using namespace Kernels::Waterfill;
 
     uint32_t MIN_BORDER_THRESHOLD = 0xffc07000;
@@ -192,13 +192,13 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     pbf_wait(context, 2 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
     
-    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-    std::vector<ImageFloatBox> dialog_boxes = detect_dialog_boxes(*screen);
+    VideoSnapshot screen = env.console.video().snapshot();
+    std::vector<ImageFloatBox> dialog_boxes = detect_dialog_boxes(screen);
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers;
 
     if (dialog_boxes.empty()) {
         stats.m_errors++;
-        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect any offer dialogs.", *screen);
+        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect any offer dialogs.", screen);
     }
 
     // read dialog bubble
@@ -206,10 +206,10 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
         OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
 
         ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
-        ImageFloatBox translated_offer_box = translate_to_parent(*screen, dialog_box, floatbox_to_pixelbox(dialog_box.width, dialog_box.height, offer_box));
+        ImageFloatBox translated_offer_box = translate_to_parent(screen, dialog_box, floatbox_to_pixelbox(dialog_box.width, dialog_box.height, offer_box));
         OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
         
-        ImageViewRGB32 dialog = extract_box_reference(*screen, dialog_box);
+        ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
         ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
 
 
@@ -332,8 +332,8 @@ uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool hig
 
     // read next bid multiple times since the selection arrow sometimes blocks the first digit
     for (size_t i = 0; i < 10; i++) {
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        uint64_t read_bid = OCR::read_number(console.logger(), extract_box_reference(*screen, box));
+        VideoSnapshot screen = console.video().snapshot();
+        uint64_t read_bid = OCR::read_number(console.logger(), extract_box_reference(screen, box));
 
         if (read_bids.find(read_bid) == read_bids.end()) {
             read_bids[read_bid] = 0;

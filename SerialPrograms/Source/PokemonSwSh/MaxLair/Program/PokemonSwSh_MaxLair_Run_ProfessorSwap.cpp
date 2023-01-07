@@ -31,9 +31,9 @@ void run_professor_swap(
 
     PathReader reader(console, player_index);
     {
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        reader.read_sprites(console, state, *screen);
-        reader.read_hp(console, state, *screen);
+        VideoSnapshot screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
     }
 
 
@@ -88,9 +88,9 @@ void run_professor_swap(
     context.wait_for(std::chrono::milliseconds(100));
 
     {
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        reader.read_sprites(console, state, *screen);
-        reader.read_hp(console, state, *screen);
+        VideoSnapshot screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
     }
 }
 

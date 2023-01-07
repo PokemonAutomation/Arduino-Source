@@ -72,8 +72,8 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     for (const std::string& slug : slugs){
         context.wait_for_all_requests();
 
-        std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-        ImageViewRGB32 image = extract_box_reference(*screen, box);
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageViewRGB32 image = extract_box_reference(screen, box);
 
         std::string path = "PokemonNameOCR/";
         path += language_code;

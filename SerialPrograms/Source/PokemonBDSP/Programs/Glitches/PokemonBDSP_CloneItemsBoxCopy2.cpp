@@ -102,8 +102,8 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     menu_to_box(context);
 
     context.wait_for_all_requests();
-    std::shared_ptr<const ImageRGB32> expected = env.console.video().snapshot();
-    ImageMatchWatcher matcher(std::move(expected), {0.02, 0.25, 0.96, 0.73}, 20);
+    VideoSnapshot expected = env.console.video().snapshot();
+    ImageMatchWatcher matcher(std::move(expected.frame), {0.02, 0.25, 0.96, 0.73}, 20);
 
     for (uint16_t box = 0; box < BOXES; box++){
         env.update_stats();

@@ -76,7 +76,7 @@ void send_raid_notification(
         return;
     }
 
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
 
     std::vector<std::pair<std::string, std::string>> embeds;
 
@@ -118,7 +118,7 @@ void send_raid_notification(
         Color(),
         "Max Lair Notification",
         embeds, "",
-        *screen, false
+        screen, false
     );
 
 }

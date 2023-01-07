@@ -128,13 +128,13 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         ShortDialogDetector dialog_detector;
         // VideoOverlaySet set(env.console);
         // dialog_detector.make_overlays(set);
-        std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-        if (!dialog_detector.detect(*screen)){
+        VideoSnapshot screen = env.console.video().snapshot();
+        if (!dialog_detector.detect(screen)){
             throw OperationFailedException(env.console, "No npc dialog box found when reading berry name");
         }
 
         ImageFloatBox dialog_box(0.218, 0.835, 0.657, 0.12);
-        ImageViewRGB32 dialog_image = extract_box_reference(*screen, dialog_box);
+        ImageViewRGB32 dialog_image = extract_box_reference(screen, dialog_box);
         const auto result = Pokemon::BerryNameReader::instance().read_substring(
             env.console, LANGUAGE, dialog_image,
             OCR::BLACK_TEXT_FILTERS()

@@ -236,10 +236,10 @@ std::set<std::string> BattleMenuReader::read_opponent(
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
-    std::shared_ptr<const ImageRGB32> screen;
+    VideoSnapshot screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
-        ImageViewRGB32 image = extract_box_reference(*screen, m_opponent_name);
+        ImageViewRGB32 image = extract_box_reference(screen, m_opponent_name);
         result = read_pokemon_name(logger, m_language, image);
         if (!result.empty()){
             return result;
@@ -247,7 +247,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
         logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
         scope.wait_for(std::chrono::seconds(1));
     }
-    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", *screen);
+    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
     return result;
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const{

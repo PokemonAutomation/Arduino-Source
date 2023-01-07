@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -23,7 +24,7 @@ enum class SandwichHandType {
 };
 
 // Type enum to string
-std::string SANDWOCH_HAND_TYPE_NAMES(SandwichHandType type);
+std::string SANDWICH_HAND_TYPE_NAMES(SandwichHandType type);
 
 // Detect the hand used to make sandwich in the sandwich minigame.
 class SandwichHandLocator{
@@ -53,9 +54,10 @@ public:
 
     SandwichHandWatcher(HandType hand_type, const ImageFloatBox& box, Color color = COLOR_RED);
 
-    virtual void make_overlays(VideoOverlaySet& items) const override;
+    const VideoSnapshot& last_snapshot() const{ return m_last_snapshot; }
 
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
 
     const std::pair<double, double>& location() const { return m_location; }
 
@@ -64,6 +66,7 @@ public:
 private:
     SandwichHandLocator m_locator;
     std::pair<double, double> m_location;
+    VideoSnapshot m_last_snapshot;
 };
 
 

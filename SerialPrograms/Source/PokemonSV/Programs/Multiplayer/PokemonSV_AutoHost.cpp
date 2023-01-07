@@ -10,7 +10,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/TimeQt.h"
 #include "ClientSource/Connection/BotBase.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -118,6 +118,11 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         4
     )
+    , SHOW_RAID_CODE(
+        "<b>Show Raid Code:</b><br>Include the raid code in the post notifications. This allows FCE users to copy-paste the code.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
     , ROLLOVER_PREVENTION(
         "<b>Rollover Prevention:</b><br>Periodically set the time back to 12AM to prevent the date from rolling over and losing the raid.",
         LockWhileRunning::UNLOCKED,
@@ -163,6 +168,9 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SHOW_RAID_CODE);
+    }
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(REMOTE_KILL_SWITCH0);
@@ -209,7 +217,7 @@ WallClock AutoHost::wait_for_lobby_open(
 
     VideoSnapshot snapshot = env.console.video().snapshot();
     lobby_code = lobby.raid_code(env.logger(), snapshot);
-    if (!lobby_code.empty()){
+    if (SHOW_RAID_CODE && !lobby_code.empty()){
         messages.emplace_back("Raid Code:", lobby_code);
     }
 

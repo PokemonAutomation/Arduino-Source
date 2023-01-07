@@ -342,18 +342,18 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
         pbf_press_button(context, BUTTON_B, 10, 165);
         context.wait_for_all_requests();
 
-        std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+        VideoSnapshot screen = env.console.video().snapshot();
         if (SAVE_SCREENSHOTS) {
-            dump_debug_image(env.logger(), "cramomatic-rng", "receive", *screen);
+            dump_debug_image(env.logger(), "cramomatic-rng", "receive", screen);
         }
 
         //  If we detect a dialog box, attempt to read the ball that was received.
-        ImageStats stats = image_stats(extract_box_reference(*screen, dialog_box));
+        ImageStats stats = image_stats(extract_box_reference(screen, dialog_box));
 //        cout << stats.average << stats.stddev << endl;
         if (is_grey(stats, 0, 200, 5)){
             OCR::StringMatchResult result = PokeballNameReader::instance().read_substring(
                 env.console, LANGUAGE,
-                extract_box_reference(*screen, dialog_text),
+                extract_box_reference(screen, dialog_text),
                 {{0xff007f7f, 0xffc0ffff}}
             );
             result.clear_beyond_log10p(LOG10P_THRESHOLD);
@@ -365,7 +365,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
             }
         }
 
-        if (arrow_detector.detect(*screen)) {
+        if (arrow_detector.detect(screen)) {
             arrow_detected = true;
         }
     }
@@ -469,8 +469,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (state_errors >= 3) {
                 throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
             }
-            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", *screen);
+            VideoSnapshot screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", screen);
             recover_from_wrong_state(env, context);
             is_state_valid = false;
             continue;
@@ -496,8 +496,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (apricorn_selection_errors >= 3) {
                 throw OperationFailedException(env.console, "Could not detect the bag three times on a row.");
             }
-            std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", *screen);
+            VideoSnapshot screen = env.console.video().snapshot();
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", screen);
             is_state_valid = false;
             recover_from_wrong_state(env, context);
             continue;

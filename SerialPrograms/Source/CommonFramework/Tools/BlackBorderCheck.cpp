@@ -20,9 +20,9 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
         return;
     }
 
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
 
-    if (!screen || !*screen){
+    if (!screen){
         if (feedback == FeedbackType::REQUIRED){
             throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
         }
@@ -33,7 +33,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
     VideoOverlaySet set(console);
     detector.make_overlays(set);
 
-    if (detector.detect(*screen)){
+    if (detector.detect(screen)){
         throw UserSetupError(console, "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
     }
 }

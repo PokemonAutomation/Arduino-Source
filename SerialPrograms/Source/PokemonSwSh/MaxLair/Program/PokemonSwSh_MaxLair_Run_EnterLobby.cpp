@@ -95,8 +95,8 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        if (!arrow_detector.detect(*screen)){
+        VideoSnapshot screen = console.video().snapshot();
+        if (!arrow_detector.detect(screen)){
             continue;
         }
 
@@ -106,13 +106,13 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 //        screen.save("test.png");
 
         //  We need to pay ore.
-        ImageStats ore_stats = image_stats(extract_box_reference(*screen, ore_box));
+        ImageStats ore_stats = image_stats(extract_box_reference(screen, ore_box));
         if (is_solid(ore_stats, {0.594724, 0.405276, 0.})){
             console.log("Need to pay ore.", COLOR_PURPLE);
 
             arrow_count = 0;
             ImageRGB32 image = to_blackwhite_rgb32_range(
-                extract_box_reference(*screen, ore_quantity),
+                extract_box_reference(screen, ore_quantity),
                 0xff808080, 0xffffffff, true
             );
             ore.update_with_ocr(console.logger(), image);
@@ -130,13 +130,13 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
         }
 
         //  Detected save dialog.
-        if (dialog_detector.detect(*screen)){
+        if (dialog_detector.detect(screen)){
             console.log("Detected save dialog.");
             context.wait_for_all_requests();
-            std::shared_ptr<const ImageRGB32> entrance = console.video().snapshot();
+            VideoSnapshot entrance = console.video().snapshot();
             pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
-            return entrance;
+            return std::move(entrance.frame);
         }
 
         //  Select a boss.

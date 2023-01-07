@@ -258,8 +258,8 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t VIDEO_DELAY){
 
     ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
-    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-    FloatPixel image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
+    VideoSnapshot screen = env.console.video().snapshot();
+    FloatPixel image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
     env.console.log("Cursor color detection: " + image_value.to_string());
     VideoOverlaySet BoxRender(env.console);
 
@@ -273,7 +273,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_LEFT, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
+                image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
                 env.console.log("Cursor color detection: " + image_value.to_string());
 
                 if(image_value.r > image_value.g + image_value.b){
@@ -285,7 +285,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
                 pbf_press_dpad(context, DPAD_UP, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, cursor_check)).average;
+                image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
                 env.console.log("Cursor color detection: " + image_value.to_string());
 
                 if(image_value.r > image_value.g + image_value.b){
@@ -479,13 +479,13 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     Cursor cur_cursor{static_cast<uint16_t>(BOX_NUMBER-1), 0, 0};
 
-    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
+    VideoSnapshot screen = env.console.video().snapshot();
 
     VideoOverlaySet box_render(env.console);
 
     std::ostringstream ss;
 
-    FloatPixel image_value = image_stats(extract_box_reference(*screen, select_check)).average;
+    FloatPixel image_value = image_stats(extract_box_reference(screen, select_check)).average;
 
     env.console.log("Color detected from the select square: " + image_value.to_string());
 
@@ -498,19 +498,19 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(VIDEO_DELAY));
         screen = env.console.video().snapshot();
-        image_value = image_stats(extract_box_reference(*screen, select_check)).average;
+        image_value = image_stats(extract_box_reference(screen, select_check)).average;
         env.console.log("Color detected from the select square: " + image_value.to_string());
         if(image_value.r <= image_value.g + image_value.b){
             for (int i = 0; i < 2; ++i){
                 pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+20); //additional delay because this animation is slower than the rest
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(*screen, select_check)).average;
+                image_value = image_stats(extract_box_reference(screen, select_check)).average;
                 env.console.log("Color detected from the select square: " + image_value.to_string());
                 if(image_value.r > image_value.g + image_value.b){
                     break;
                 }else if(i==1){
-                    dump_image(env.console, ProgramInfo(), "SelectSquare", *screen);
+                    dump_image(env.console, ProgramInfo(), "SelectSquare", screen);
                     env.console.log("ERROR: Could not find correct color mode please check color logs and timings\n", COLOR_RED);
                     return;
                 }
@@ -545,7 +545,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             for (size_t column = 0; column < MAX_COLUMNS; column++){
 
                 ImageFloatBox slot_box(0.06 + (0.072 * column), 0.2 + (0.1035 * row), 0.03, 0.057);
-                int current_box_value = image_stddev(extract_box_reference(*screen, slot_box)).sum();
+                int current_box_value = image_stddev(extract_box_reference(screen, slot_box)).sum();
 
                 ss << current_box_value;
 
@@ -618,42 +618,42 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 if(boxes_data[get_index(box_nb, row, column)].has_value()){
                     screen = env.console.video().snapshot();
                     ImageRGB32 image = to_blackwhite_rgb32_range(
-                        extract_box_reference(*screen, national_dex_number_box),
+                        extract_box_reference(screen, national_dex_number_box),
                         0xff808080, 0xffffffff, true
                     );
 
                     int national_dex_number = OCR::read_number(env.console, image);
                     if (national_dex_number == -1){
-                        dump_image(env.console, ProgramInfo(), "ReadSummary", *screen);
+                        dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
                     }
                     boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
 
-                    int shiny_stddev_value = image_stddev(extract_box_reference(*screen, shiny_symbol_box)).sum();
+                    int shiny_stddev_value = image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
                     bool is_shiny = shiny_stddev_value > 30;
                     boxes_data[get_index(box_nb, row, column)]->shiny = is_shiny;
                     env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
-                    int gmax_stddev_value = image_stddev(extract_box_reference(*screen, gmax_symbol_box)).sum();
+                    int gmax_stddev_value = image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
                     bool is_gmax = gmax_stddev_value > 30;
                     boxes_data[get_index(box_nb, row, column)]->gmax = is_gmax;
                     env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
 
                     BallReader ball_reader(env.console);
-                    boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(*screen);
+                    boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
 
                     BoxGenderDetector::make_overlays(box_render);
-                    EggHatchGenderFilter gender = BoxGenderDetector::detect(*screen);
+                    EggHatchGenderFilter gender = BoxGenderDetector::detect(screen);
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                     boxes_data[get_index(box_nb, row, column)]->gender = gender;
 
                     image = to_blackwhite_rgb32_range(
-                        extract_box_reference(*screen, ot_id_box),
+                        extract_box_reference(screen, ot_id_box),
                         0xff808080, 0xffffffff, true
                     );
 
                     int ot_id = OCR::read_number(env.console, image);
                     if (ot_id == -1){
-                        dump_image(env.console, ProgramInfo(), "ReadSummary", *screen);
+                        dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
                     }
                     boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
 

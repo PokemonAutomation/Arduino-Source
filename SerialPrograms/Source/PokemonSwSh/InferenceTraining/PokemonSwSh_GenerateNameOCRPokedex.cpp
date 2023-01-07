@@ -162,14 +162,14 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
         }
 //        cout << "dex: " << c << endl;
 
-        std::shared_ptr<const ImageRGB32> frame = env.console.video().snapshot();
-        ImageViewRGB32 image0 = extract_box_reference(*frame, box0);
-        ImageViewRGB32 image1 = extract_box_reference(*frame, box1);
-        ImageViewRGB32 image2 = extract_box_reference(*frame, box2);
-        ImageViewRGB32 image3 = extract_box_reference(*frame, box3);
-        ImageViewRGB32 image4 = extract_box_reference(*frame, box4);
-        ImageViewRGB32 image5 = extract_box_reference(*frame, box5);
-        ImageViewRGB32 image6 = extract_box_reference(*frame, box6);
+        VideoSnapshot frame = env.console.video().snapshot();
+        ImageViewRGB32 image0 = extract_box_reference(frame, box0);
+        ImageViewRGB32 image1 = extract_box_reference(frame, box1);
+        ImageViewRGB32 image2 = extract_box_reference(frame, box2);
+        ImageViewRGB32 image3 = extract_box_reference(frame, box3);
+        ImageViewRGB32 image4 = extract_box_reference(frame, box4);
+        ImageViewRGB32 image5 = extract_box_reference(frame, box5);
+        ImageViewRGB32 image6 = extract_box_reference(frame, box6);
 
 //        image1.save("test.png");
 
