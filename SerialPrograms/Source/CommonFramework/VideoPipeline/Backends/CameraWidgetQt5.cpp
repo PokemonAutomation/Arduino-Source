@@ -235,9 +235,9 @@ bool CameraSession::determine_frame_orientation(){
     //  This function cannot be called on the UI thread.
     //  This function must be called under the lock.
 
-    std::shared_ptr<const ImageRGB32> reference = direct_snapshot_image();
+    VideoSnapshot reference = direct_snapshot_image();
     QImage frame = direct_snapshot_probe(false);
-    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, *reference, frame, m_flip_vertical);
+    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
     return m_orientation_known;
 }
 VideoSnapshot CameraSession::snapshot(){

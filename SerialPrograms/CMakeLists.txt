@@ -1299,6 +1299,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp

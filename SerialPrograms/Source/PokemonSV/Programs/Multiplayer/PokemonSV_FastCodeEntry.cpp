@@ -104,7 +104,7 @@ const char* enter_code(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         if (connect_controller_press){
             //  Connect the controller.
-            pbf_press_button(context, BUTTON_PLUS, 5, 3);
+            pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
         }
 
         switch (normalized_code.size()){
@@ -231,7 +231,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
 
     //  Connect the controller.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+        pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
     });
 
     FceCodeListener listener(CODE);
