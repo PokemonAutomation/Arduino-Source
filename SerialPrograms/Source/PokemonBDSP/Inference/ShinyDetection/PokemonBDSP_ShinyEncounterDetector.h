@@ -67,7 +67,7 @@ public:
     const WallClock& your_animation_end_timestamp() const { return m_your_animation_end_timestamp; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const std::shared_ptr<const ImageRGB32>& frame, WallClock timestamp) override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
 
     ShinyType get_results() const;
 

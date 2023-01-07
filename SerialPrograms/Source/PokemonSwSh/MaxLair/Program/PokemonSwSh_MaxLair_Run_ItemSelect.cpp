@@ -29,9 +29,9 @@ void run_item_select(
 
     PathReader reader(console, player_index);
     {
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        reader.read_sprites(console, state, *screen);
-        reader.read_hp(console, state, *screen);
+        VideoSnapshot screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
     }
 
 

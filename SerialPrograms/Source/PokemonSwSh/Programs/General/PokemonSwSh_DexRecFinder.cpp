@@ -191,17 +191,17 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
             context.wait_for_all_requests();
 
-            std::shared_ptr<const ImageRGB32> frame = env.console.video().snapshot();
+            VideoSnapshot frame = env.console.video().snapshot();
             bool found = false;
             bool excluded = false;
             bool bad_read = false;
-            if (!*frame){
+            if (!frame){
                 bad_read = true;
             }else{
-                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, *frame, box0, desired, exclusions);
-                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, *frame, box1, desired, exclusions);
-                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, *frame, box2, desired, exclusions);
-                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, *frame, box3, desired, exclusions);
+                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, frame, box0, desired, exclusions);
+                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, frame, box1, desired, exclusions);
+                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, frame, box2, desired, exclusions);
+                read_line(found, excluded, bad_read, env.console, FILTERS.LANGUAGE, frame, box3, desired, exclusions);
             }
 
             stats.attempts++;

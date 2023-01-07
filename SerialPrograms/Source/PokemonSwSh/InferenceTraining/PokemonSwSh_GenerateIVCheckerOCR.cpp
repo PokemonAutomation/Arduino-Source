@@ -75,8 +75,8 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseC
     }
     path += "/";
 
-    std::shared_ptr<const ImageRGB32> screen = env.console.video().snapshot();
-    std::vector<ImageViewRGB32> images = reader.dump_images(*screen);
+    VideoSnapshot screen = env.console.video().snapshot();
+    std::vector<ImageViewRGB32> images = reader.dump_images(screen);
 
     std::string now = now_to_filestring();
 

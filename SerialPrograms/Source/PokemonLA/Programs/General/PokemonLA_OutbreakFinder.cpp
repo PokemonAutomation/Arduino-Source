@@ -491,10 +491,10 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     context.wait_for_all_requests();
 
     // Take a photo of the map before 
-    std::shared_ptr<const ImageRGB32> question_mark_image = env.console.video().snapshot();
+    VideoSnapshot question_mark_image = env.console.video().snapshot();
 
     // Fix zoom level:
-    const int zoom_level = read_map_zoom_level(*question_mark_image);
+    const int zoom_level = read_map_zoom_level(question_mark_image);
     if (zoom_level < 0){
         throw OperationFailedException(env.console, "Canot read map zoom level.");
     }
@@ -514,7 +514,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     context.wait_for_all_requests();
 
     // Fix Missions & Requests tab:
-    if (is_map_mission_tab_raised(*question_mark_image)){
+    if (is_map_mission_tab_raised(question_mark_image)){
         pbf_press_button(context, BUTTON_R, 50, 100);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
@@ -523,7 +523,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     // Now detect question marks:
     MMOQuestionMarkDetector question_mark_detector(env.logger());
 
-    const auto quest_results = question_mark_detector.detect_MMOs_on_region_map(*question_mark_image);
+    const auto quest_results = question_mark_detector.detect_MMOs_on_region_map(question_mark_image);
     env.log("Detected MMO question marks:");
     for(const auto& box : quest_results){
         std::ostringstream os;
@@ -572,7 +572,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
     VideoOverlaySet mmo_sprites_overlay(env.console);
     for (size_t i = 0; i < new_boxes.size(); i++){
-        mmo_sprites_overlay.add(COLOR_BLUE, pixelbox_to_floatbox(*question_mark_image, new_boxes[i]));
+        mmo_sprites_overlay.add(COLOR_BLUE, pixelbox_to_floatbox(question_mark_image, new_boxes[i]));
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
@@ -583,9 +583,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
     // Check MMO results:
     std::vector<std::string> sprites;
-    std::shared_ptr<const ImageRGB32> sprites_screen = env.console.video().snapshot();
+    VideoSnapshot sprites_screen = env.console.video().snapshot();
     for (size_t i = 0; i < new_boxes.size(); i++){
-        auto result = match_sprite_on_map(env.logger(), *sprites_screen, new_boxes[i], region, DEBUG_MODE);
+        auto result = match_sprite_on_map(env.logger(), sprites_screen, new_boxes[i], region, DEBUG_MODE);
         env.console.log("Found MMO sprite " + result.slug);
         stats.mmo_pokemon++;
 
@@ -611,7 +611,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         star_boxes.push_back(std::move(star_box));
     }
 
-    MMOSpriteStarSymbolDetector star_detector(*sprites_screen, star_boxes);
+    MMOSpriteStarSymbolDetector star_detector(sprites_screen, star_boxes);
 
     env.log("Detect star symbols...");
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});

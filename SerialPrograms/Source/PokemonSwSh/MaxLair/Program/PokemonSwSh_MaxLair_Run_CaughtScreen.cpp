@@ -120,7 +120,7 @@ StateMachineAction run_caught_screen(
     for (size_t index : shinies){
         tracker.scroll_to(index);
         tracker.leave_summary();
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+        VideoSnapshot screen = console.video().snapshot();
 
         SpinLockGuard lg(runtime.m_lock);
         send_shiny_notification(
@@ -130,7 +130,7 @@ StateMachineAction run_caught_screen(
             nullptr,
             runtime.path_stats,
             runtime.session_stats,
-            *screen
+            screen
         );
     }
 

@@ -45,6 +45,7 @@ public:
     void clear_boxes();
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    using VisualInferenceCallback::process_frame;
 
 private:
     ImageFloatBox m_box;

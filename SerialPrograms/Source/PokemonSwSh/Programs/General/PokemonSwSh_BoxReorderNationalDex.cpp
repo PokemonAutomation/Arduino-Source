@@ -95,8 +95,8 @@ std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& contex
     OverlayBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
     context.wait_for(k_wait_after_read);
 
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-    ImageViewRGB32 frame = extract_box_reference(*screen, box);
+    VideoSnapshot screen = console.video().snapshot();
+    ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         console, language, frame,

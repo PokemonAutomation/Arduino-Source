@@ -43,8 +43,8 @@ void trade_current_pokemon(
     tracker.check_unrecoverable_error(console);
 
     context.wait_for_all_requests();
-    std::shared_ptr<const ImageRGB32> box_image = console.video().snapshot();
-    ImageMatchWatcher box_detector(box_image, {0.02, 0.15, 0.15, 0.80}, 50);
+    VideoSnapshot box_image = console.video().snapshot();
+    ImageMatchWatcher box_detector(std::move(box_image.frame), {0.02, 0.15, 0.15, 0.80}, 50);
 
     {
         pbf_press_button(context, BUTTON_A, 20, 0);

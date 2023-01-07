@@ -194,8 +194,8 @@ bool EggAutonomousState::process_party(){
     shiny_reader.make_overlays(set);
 
     //  Make sure the stats menu is up.
-    std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();
-    if (!shiny_reader.is_panel(*screen)){
+    VideoSnapshot screen = m_console.video().snapshot();
+    if (!shiny_reader.is_panel(screen)){
         process_error("StatsPanel", "Stats panel not detected.");
     }
 
@@ -209,21 +209,21 @@ bool EggAutonomousState::process_party(){
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
 
             screen = m_console.video().snapshot();
-            if (!shiny_reader.is_panel(*screen)){
+            if (!shiny_reader.is_panel(screen)){
                 process_error("StatsPanel", "Stats panel not detected.");
             }
         }
 //        m_context.wait_for_all_requests();
 
-        bool shiny = shiny_reader.detect(*screen);
+        bool shiny = shiny_reader.detect(screen);
         if (shiny){
             m_console.log("Pokemon " + std::to_string(c) + " is shiny!", COLOR_BLUE);
-            process_shiny(*screen);
+            process_shiny(screen);
         }else{
             m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
-        IVCheckerReader::Results IVs = iv_reader.read(m_console, *screen);
-        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, *screen);
+        IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
+        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
 
         EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
 
@@ -236,7 +236,7 @@ bool EggAutonomousState::process_party(){
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
                     false, false, {}, std::nan(""),
-                    *screen
+                    screen
                 );
             }
             return true;
@@ -248,7 +248,7 @@ bool EggAutonomousState::process_party(){
                     m_notification_nonshiny_keep,
                     m_notification_shiny,
                     false, false, {}, std::nan(""),
-                    *screen
+                    screen
                 );
             }
             pbf_press_button(m_context, BUTTON_ZL, 20, 105);
@@ -392,7 +392,7 @@ void EggAutonomousState::hatch_egg(){
     }
 
     //  Hatch the egg.
-    std::shared_ptr<const ImageRGB32> overworld = m_console.video().snapshot();
+    VideoSnapshot overworld = m_console.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -419,7 +419,7 @@ void EggAutonomousState::hatch_egg(){
 
         //  Wait for steady state and read it again.
         m_context.wait_for(std::chrono::milliseconds(200));
-        ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
+        ImageMatchWatcher matcher(overworld.frame, {0.10, 0.10, 0.80, 0.60}, 100);
         ShortDialogPromptDetector prompt(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
             m_console, m_context, std::chrono::seconds(30),

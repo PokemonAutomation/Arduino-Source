@@ -34,7 +34,9 @@ struct VideoSnapshot{
     //  Returns true if the snapshot is valid.
     operator bool() const{ return frame && *frame; }
 
-    operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame); }
+    const ImageRGB32* operator->() const{ return frame.get(); }
+
+//    operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame); }
     operator ImageViewRGB32() const{ return *frame; }
 };
 

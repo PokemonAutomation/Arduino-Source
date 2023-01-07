@@ -72,12 +72,12 @@ void enter_loading_game(
         while (true){
             context.throw_if_cancelled();
 
-            std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+            VideoSnapshot screen = console.video().snapshot();
             if (!screen){
                 console.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
-                bool black = is_black(extract_box_reference(*screen, box));
+                bool black = is_black(extract_box_reference(screen, box));
                 if (black){
                     if (!black_found){
                         console.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);

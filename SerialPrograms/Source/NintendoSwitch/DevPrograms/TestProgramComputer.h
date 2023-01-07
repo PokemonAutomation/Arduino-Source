@@ -29,7 +29,7 @@ public:
 
 private:
     StaticTextOption STATIC_TEXT;
-    ScreenWatchOption SCREEN_WATCHER;
+//    ScreenWatchOption SCREEN_WATCHER;
 };
 
 

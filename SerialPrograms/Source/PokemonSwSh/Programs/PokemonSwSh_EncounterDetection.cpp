@@ -64,8 +64,8 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     OverlayBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
     m_context.wait_for(m_read_name_delay);
 
-    std::shared_ptr<const ImageRGB32> screen = m_console.video().snapshot();
-    ImageViewRGB32 frame = extract_box_reference(*screen, box);
+    VideoSnapshot screen = m_console.video().snapshot();
+    ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         m_console, m_language, frame,
@@ -75,7 +75,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
         dump_image(
             m_console, m_env.program_info(),
             "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
-            *screen
+            screen
         );
     }else{
         m_candidates.clear();

@@ -59,8 +59,8 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         // Check whether we can send this pokemon to battle:
         const bool stop_on_detected = true;
         BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
-        std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-        if (switch_detector.process_frame(*screen, current_time()) == false){
+        VideoSnapshot screen = console.video().snapshot();
+        if (switch_detector.process_frame(screen, current_time()) == false){
             // No longer at the switching pokemon screen
             break;
         }
@@ -121,14 +121,14 @@ bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemo
         {0.5985, 0.8185, 0.2500, 0.0320},
     };
 
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
-    ImageMatchDetector move_slot_detector(std::move(screen), move_slot_boxes[cur_move], 10.0);
+    VideoSnapshot screen = console.video().snapshot();
+    ImageMatchDetector move_slot_detector(std::move(screen.frame), move_slot_boxes[cur_move], 10.0);
 
     use_move_blindly(console, context, style, cur_pokemon, cur_move);
 
     screen = console.video().snapshot();
 
-    const bool still_on_move_screen = move_slot_detector.detect(*screen);
+    const bool still_on_move_screen = move_slot_detector.detect(screen);
 
 #ifdef DEBUG_NO_PP
     if (still_on_move_screen == false){

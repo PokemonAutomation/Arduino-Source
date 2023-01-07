@@ -195,8 +195,8 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
 
     MountDetector mount_detector;
 
-    std::shared_ptr<const ImageRGB32> snapshot = console.video().snapshot();
-    MountState mount = mount_detector.detect(*snapshot);
+    VideoSnapshot snapshot = console.video().snapshot();
+    MountState mount = mount_detector.detect(snapshot);
     bool found = false;
     for (int i = 0; i < 4; i++){
         if (mount == MountState::NOTHING){
@@ -208,7 +208,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
             context.wait_for_all_requests();
             snapshot = console.video().snapshot();
         }
-        mount = mount_detector.detect(*snapshot);
+        mount = mount_detector.detect(snapshot);
     }
 
     if (!found){
@@ -258,9 +258,9 @@ PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& conte
     pbf_wait(context, (1 * TICKS_PER_SECOND));
 
     context.wait_for_all_requests();
-    std::shared_ptr<const ImageRGB32> screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
 
-    return read_status_info(console, console, *screen, language);
+    return read_status_info(console, console, screen, language);
 }
 
 

@@ -93,7 +93,9 @@ int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
             ch = iter->second;
         }
 
-        normalized += ch;
+        if ('0' <= ch && ch <= '9'){
+            normalized += ch;
+        }
     }
 
     std::string log = "Timer OCR: \"" + raw + "\" -> \"" + normalized + "\"";

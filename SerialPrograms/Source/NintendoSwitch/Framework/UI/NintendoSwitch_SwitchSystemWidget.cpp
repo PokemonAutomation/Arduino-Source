@@ -136,8 +136,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [this](){
             global_dispatcher.dispatch([this]{
-                std::shared_ptr<const ImageRGB32> image = m_session.camera_session().snapshot();
-                if (!*image){
+                VideoSnapshot image = m_session.camera_session().snapshot();
+                if (!image){
                     return;
                 }
                 std::string filename = "screenshot-" + now_to_filestring() + ".png";

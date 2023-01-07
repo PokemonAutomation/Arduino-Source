@@ -8,6 +8,7 @@
 #define PokemonAutomation_ErrorDumper_H
 
 #include <string>
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 
@@ -49,7 +50,8 @@ std::string dump_image(
     const ProgramInfo& program_info,
     ConsoleHandle& console,
     const std::string& error_name,
-    const std::string& error_message
+    const std::string& error_message,
+    const ImageViewRGB32& screenshot = ImageViewRGB32()
 );
 
 

@@ -50,6 +50,7 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
+    using VisualInferenceCallback::process_frame;
 
 private:
     size_t m_trigger_count = 0;

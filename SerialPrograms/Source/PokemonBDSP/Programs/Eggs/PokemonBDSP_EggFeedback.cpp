@@ -58,7 +58,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
 
 
     //  Hatch the egg.
-    std::shared_ptr<const ImageRGB32> overworld = console.video().snapshot();
+    VideoSnapshot overworld = console.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -82,7 +82,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
 
         //  Wait for steady state and read it again.
         context.wait_for(std::chrono::milliseconds(200));
-        ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
+        ImageMatchWatcher matcher(overworld.frame, {0.10, 0.10, 0.80, 0.60}, 100);
         SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
             console, context, std::chrono::seconds(30),

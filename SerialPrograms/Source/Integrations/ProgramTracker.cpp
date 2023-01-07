@@ -61,7 +61,8 @@ std::string ProgramTracker::grab_screenshot(uint64_t console_id, std::shared_ptr
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    image = iter->second.first->video().snapshot();
+    VideoSnapshot snapshot = iter->second.first->video().snapshot();
+    image = std::move(snapshot.frame);
     return "";
 }
 std::string ProgramTracker::reset_camera(uint64_t console_id){
