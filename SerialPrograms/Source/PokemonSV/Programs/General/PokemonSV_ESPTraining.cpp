@@ -100,7 +100,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         env.log("Round: " + tostr_u_commas(c));
 
         //Yes let's train
-        pbf_mash_button(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 340);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
@@ -127,11 +127,14 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             ESPShowNewEmotionDetector ESPstop;
             {
                 //Countdown -> Dialog w/emotion
-                int ret2 = wait_until(
+                int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(15),
                     { { ESPstart } }
                 );
+                if (ret < 0) {
+                    env.log("Timeout waiting for dialog.");
+                }
                 ESPEmotionDetector detector(env.console, env.console);
                 detection = detector.wait_for_detection(context, env.console);
                 switch (detection) {
@@ -173,11 +176,14 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     break;
                 }
                 //Look for the brief moment the dialog bubble vanishes
-                ret2 = wait_until(
+                ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(15),
                     { { ESPstop } }
                 );
+                if (ret < 0) {
+                    env.log("Timeout waiting for dialog to vanish.");
+                }
             }
             context.wait_for_all_requests();
         }
