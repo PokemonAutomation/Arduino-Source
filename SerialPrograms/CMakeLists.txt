@@ -1283,8 +1283,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h
-    Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp
-    Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
