@@ -136,6 +136,8 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
+    ../Common/Qt/TimeQt.cpp \
+    ../Common/Qt/WidgetStackFixedAspectRatio.cpp \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioOption.cpp \
@@ -231,9 +233,11 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
+    Source/CommonFramework/Options/ScreenWatchOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.cpp \
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
@@ -265,6 +269,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp \
     Source/CommonFramework/VideoPipeline/CameraOption.cpp \
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp \
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.cpp \
@@ -594,7 +599,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
@@ -604,6 +609,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
@@ -611,8 +617,11 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -622,6 +631,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
@@ -630,6 +640,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
@@ -641,6 +652,8 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
@@ -955,6 +968,8 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
+    ../Common/Qt/TimeQt.h \
+    ../Common/Qt/WidgetStackFixedAspectRatio.h \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
@@ -1073,10 +1088,12 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \
+    Source/CommonFramework/Options/ScreenWatchOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
     Source/CommonFramework/Options/UI/LabelCellWidget.h \
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.h \
     Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelInstance.h \
@@ -1111,6 +1128,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \
     Source/CommonFramework/VideoPipeline/CameraOption.h \
     Source/CommonFramework/VideoPipeline/CameraSession.h \
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h \
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.h \
@@ -1466,7 +1484,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
@@ -1476,6 +1494,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_EggDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
@@ -1483,8 +1502,11 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/PokemonSV_Panels.h \
@@ -1494,6 +1516,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
@@ -1502,6 +1525,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
@@ -1513,6 +1537,8 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.h \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \

@@ -270,7 +270,7 @@ void BoxDetector::move_cursor(
         int current_x = 0, current_y = 0;
         if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
             consecutive_fails++;
-            if (consecutive_fails > 10){
+            if (consecutive_fails > 100){
                 dump_image_and_throw_recoverable_exception(info, console, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
             }
             context.wait_for(std::chrono::milliseconds(100));

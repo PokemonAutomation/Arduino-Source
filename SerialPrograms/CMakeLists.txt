@@ -225,6 +225,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
+    ../Common/Qt/TimeQt.cpp
+    ../Common/Qt/TimeQt.h
+    ../Common/Qt/WidgetStackFixedAspectRatio.cpp
+    ../Common/Qt/WidgetStackFixedAspectRatio.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -438,6 +442,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
+    Source/CommonFramework/Options/ScreenWatchOption.cpp
+    Source/CommonFramework/Options/ScreenWatchOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
@@ -447,6 +453,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/UI/LabelCellWidget.h
     Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp
     Source/CommonFramework/Options/UI/LanguageOCRWidget.h
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.cpp
+    Source/CommonFramework/Options/UI/ScreenWatchWidget.h
     Source/CommonFramework/Options/UI/StringSelectWidget.cpp
     Source/CommonFramework/Options/UI/StringSelectWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
@@ -512,6 +520,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
     Source/CommonFramework/VideoPipeline/CameraSession.h
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp
+    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp
@@ -1201,8 +1211,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.cpp
-    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggsDetector.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp
@@ -1221,6 +1231,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
     Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_EggDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
@@ -1235,10 +1247,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp
+    Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp
+    Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
@@ -1257,6 +1275,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp
@@ -1273,6 +1293,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp
@@ -1295,6 +1317,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
+    Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
+    Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp

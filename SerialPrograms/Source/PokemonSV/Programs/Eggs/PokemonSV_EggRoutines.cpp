@@ -46,7 +46,7 @@ void clear_mons_in_front(
     int ret = run_until(
         console, context,
         [&](BotBaseContext& context){
-            for (size_t c = 0; c < 20; c++){
+            for (size_t c = 0; c < 40; c++){
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
                 console.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
@@ -58,7 +58,7 @@ void clear_mons_in_front(
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(
             info, console, "UnableToClearObstacle",
-            "Unable to clear " + STRING_POKEMON + " in front of you after 10 min."
+            "Unable to clear " + STRING_POKEMON + " in front of you after 20 min."
         );
     }
 #if 0
@@ -407,11 +407,13 @@ void check_basket_to_collect_eggs(
             }
 
             if (num_eggs_collected < max_eggs){
-                console.log("Found an egg! Keeping...");
+                num_eggs_collected++;
+                
                 std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
+                console.log("Found an egg " + msg + ". Keeping...");
                 console.overlay().add_log("Egg " + msg, COLOR_GREEN);
                 pbf_press_button(context, BUTTON_A, 20, 80);
-                num_eggs_collected++;
+                
                 last_prompt = BUTTON_A;
             }else{
                 console.log("Found an egg! But we already have enough...");

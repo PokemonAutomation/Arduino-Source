@@ -20,7 +20,7 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     , label(false, LockWhileRunning::LOCKED, "", "My test server")
     , ping(LockWhileRunning::LOCKED, true)
     , tags_text(false, LockWhileRunning::LOCKED, "Notifs, Showcase, LiveHost", "")
-    , delay(LockWhileRunning::LOCKED, 0, 0, 60)
+    , delay(LockWhileRunning::LOCKED, 0, 0, 10)
     , url(true, LockWhileRunning::LOCKED, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {
     //  Keep the old JSON tags for backwards compatibility.

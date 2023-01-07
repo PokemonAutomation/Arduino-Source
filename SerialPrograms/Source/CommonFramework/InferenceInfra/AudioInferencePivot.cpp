@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioInferencePivot.h"
 
@@ -118,20 +117,8 @@ void AudioInferencePivot::run(void* event, bool is_back_to_back) noexcept{
 }
 
 
-OverlayStatSnapshot AudioInferencePivot::get_current() const{
-    double utilization = this->current_utilization();
-    Color color = COLOR_WHITE;
-    if (utilization > 0.90){
-        color = COLOR_RED;
-    }else if (utilization > 0.80){
-        color = COLOR_ORANGE;
-    }else if (utilization > 0.50){
-        color = COLOR_YELLOW;
-    }
-    return OverlayStatSnapshot{
-        "Audio Pivot Utilization: " + tostr_fixed(utilization * 100, 2) + " %",
-        color
-    };
+OverlayStatSnapshot AudioInferencePivot::get_current(){
+    return m_printer.get_snapshot("Audio Pivot Utilization:", this->current_utilization());
 }
 
 

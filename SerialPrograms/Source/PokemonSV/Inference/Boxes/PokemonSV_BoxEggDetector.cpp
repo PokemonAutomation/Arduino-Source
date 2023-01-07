@@ -7,7 +7,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "PokemonSV_BoxEggsDetector.h"
+#include "PokemonSV_BoxEggDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -18,16 +18,16 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BoxEggsDetector::BoxEggsDetector(Color color)
+BoxEggDetector::BoxEggDetector(Color color)
 : m_color(color), m_box{0.659, 0.082, 0.329, 0.043} {}
 
-void BoxEggsDetector::make_overlays(VideoOverlaySet& items) const{
+void BoxEggDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool BoxEggsDetector::detect(const ImageViewRGB32& frame) const{
+bool BoxEggDetector::detect(const ImageViewRGB32& frame) const{
     const auto stats = image_stats(extract_box_reference(frame, m_box));
-    return stats.stddev.sum() < 100;
+    return stats.stddev.sum() < 20;
 }
 
 

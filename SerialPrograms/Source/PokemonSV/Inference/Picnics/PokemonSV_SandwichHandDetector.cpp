@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
@@ -58,6 +59,18 @@ public:
 };
 
 } // anonymous namespace
+
+std::string SANDWOCH_HAND_TYPE_NAMES(SandwichHandType type){
+    switch (type)
+    {
+    case SandwichHandType::FREE:
+        return "FREE";
+    case SandwichHandType::GRABBING:
+        return "GRABBING";
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown SandwichHandType");
+    }
+}
 
 SandwichHandLocator::SandwichHandLocator(HandType hand_type, const ImageFloatBox& box, Color color)
 : m_type(hand_type), m_box(box), m_color(color) {}

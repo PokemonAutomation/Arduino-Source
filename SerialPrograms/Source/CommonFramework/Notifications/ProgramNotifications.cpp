@@ -341,7 +341,7 @@ void send_program_finished_notification(
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
+        {"Message:", message},
     };
     if (!current_stats.empty()){
         messages.emplace_back("Session Stats:", std::move(current_stats));
@@ -366,7 +366,7 @@ void send_program_fatal_error_notification(
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
-        {"Message", message},
+        {"Message:", message},
     };
     if (!current_stats.empty()){
         messages.emplace_back("Session Stats:", std::move(current_stats));

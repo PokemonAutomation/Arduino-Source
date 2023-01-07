@@ -45,7 +45,7 @@ DaySkipperUS::DaySkipperUS()
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
         LockWhileRunning::LOCKED,
-        2022, 2000, 2060
+        2023, 2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

@@ -8,6 +8,7 @@
 #define PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 
 #include "Common/Cpp/ValueDebouncer.h"
+#include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
@@ -32,44 +33,6 @@ struct CommandReceiver{
 
 
 
-class WidgetStackFixedAspectRatio : public QWidget{
-public:
-    enum SizePolicy{
-        EXPAND_TO_BOX,
-        ADJUST_HEIGHT_TO_WIDTH,
-    };
-
-public:
-    WidgetStackFixedAspectRatio(QWidget& parent, SizePolicy size_policy, double aspect_ratio = 16 / 9.);
-
-    void set_size_policy(SizePolicy size_policy);
-    void set_aspect_ratio(double aspect_ratio);
-    void add_widget(QWidget& widget);
-
-    virtual void resizeEvent(QResizeEvent* event) override;
-
-private:
-    void clear_fixed_dimensions();
-    void resize_to_box(QSize enclosing_box);
-    void resize_to_width(int width);
-
-    void update_size(QSize size);
-
-private:
-    SizePolicy m_size_policy;
-    double m_aspect_ratio;
-    std::set<QWidget*> m_widgets;
-
-    QWidget* m_detached_internal;
-    QWidget* m_stack_holder;
-
-    ValueDebouncer<int> m_debouncer;
-};
-
-
-
-
-
 
 class VideoDisplayWidget;
 
@@ -78,7 +41,7 @@ public:
     VideoSourceFPS(VideoDisplayWidget& parent)
         : m_parent(parent)
     {}
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     VideoDisplayWidget& m_parent;
@@ -89,7 +52,7 @@ public:
     VideoDisplayFPS(VideoDisplayWidget& parent)
         : m_parent(parent)
     {}
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     VideoDisplayWidget& m_parent;

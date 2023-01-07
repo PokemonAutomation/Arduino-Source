@@ -6,18 +6,22 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Qt/TimeQt.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+//#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+//#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -125,6 +129,14 @@ AutoHost::AutoHost()
         "",
         "Auto-Hosting Shiny Eevee"
     )
+    , REMOTE_KILL_SWITCH0(
+        false,
+        "<b>Remote Kill Switch:</b><br>Stop the auto-host if the session crosses the date/time specified in this URL. "
+        "The default URL is maintained by the PA/SHA staff which updates this with the event change dates.",
+        LockWhileRunning::UNLOCKED,
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.json",
+        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.json"
+    )
     , CONSECUTIVE_FAILURE_PAUSE(
         "<b>Consecutive Failure Stop/Pause:</b><br>Pause or stop the program if this many consecutive raids fail.<br>"
         "It is not recommended to set this higher than 3 since soft bans start after 3 disconnects.",
@@ -153,6 +165,7 @@ AutoHost::AutoHost()
     PA_ADD_OPTION(START_RAID_PLAYERS);
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(REMOTE_KILL_SWITCH0);
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
     PA_ADD_OPTION(BATTLE_AI);
@@ -195,7 +208,7 @@ WallClock AutoHost::wait_for_lobby_open(
     }
 
     VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), env.program_info(), snapshot);
+    lobby_code = lobby.raid_code(env.logger(), snapshot);
     if (!lobby_code.empty()){
         messages.emplace_back("Raid Code:", lobby_code);
     }
@@ -275,13 +288,7 @@ bool AutoHost::start_raid(
 }
 
 
-
-
-
-
-
-
-bool AutoHost::run_lobby2(
+bool AutoHost::run_lobby(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
@@ -312,6 +319,68 @@ bool AutoHost::run_lobby2(
 
     return start_raid(env, context, start_time, waiter.last_known_players());
 }
+void AutoHost::check_kill_switch(ProgramEnvironment& env){
+    std::string kill_switch_url = REMOTE_KILL_SWITCH0;
+    if (MODE == Mode::LOCAL || kill_switch_url.empty()){
+        return;
+    }
+
+    WallClock start_time = env.program_info().start_time;
+
+    if (kill_switch_url.ends_with(".txt")){
+        env.log("Loading remote kill switch time...");
+        try{
+            std::string kill_time_str = FileDownloader::download_file(env.logger(), kill_switch_url);
+            m_killswitch_time = parse_utc_time_str(kill_time_str);
+        }catch (OperationFailedException& e){
+            env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
+        }catch (ParseException& e){
+            env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
+        }
+    }else if (kill_switch_url.ends_with(".json")){
+        env.log("Loading remote kill switch time...");
+
+        try{
+            JsonValue json = FileDownloader::download_json_file(env.logger(), kill_switch_url);
+            const JsonObject* obj = json.get_object();
+            if (obj == nullptr){
+                throw ParseException("Invalid kill-switch Json.");
+            }
+            const std::string* date = obj->get_string("date");
+            if (date == nullptr){
+                env.log("Invalid Kill Switch Json", COLOR_RED);
+            }else{
+                m_killswitch_time = parse_utc_time_str(*date);
+            }
+            const std::string* reason = obj->get_string("reason");
+            if (date == nullptr){
+                env.log("Invalid Kill Switch Json", COLOR_RED);
+            }else{
+                m_killswitch_reason = *reason;
+            }
+        }catch (OperationFailedException& e){
+            env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
+        }catch (ParseException& e){
+            env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
+        }
+    }else{
+        throw UserSetupError(env.logger(), "Invalid kill switch URL extension.");
+    }
+
+    WallClock now = current_time();
+    env.log(
+        "Start UTC: " + to_utc_time_str(start_time) +
+        ", Current UTC: " + to_utc_time_str(now) +
+        ", Kill UTC: " + to_utc_time_str(m_killswitch_time)
+    );
+    if (start_time < m_killswitch_time && now > m_killswitch_time){
+        if (m_killswitch_reason.empty()){
+            throw FatalProgramException(env.logger(), "Stopped by remote kill switch. No reason specified.");
+        }else{
+            throw FatalProgramException(env.logger(), "Stopped by remote kill switch. Reason: " + m_killswitch_reason);
+        }
+    }
+}
 
 void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -320,6 +389,8 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+
+    m_killswitch_time = WallClock::max();
 
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
     MultiLanguageJoinTracker join_tracker;
@@ -367,6 +438,9 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         }
         skip_reset = false;
 
+        //  Check kill-switch now before we go online.
+        check_kill_switch(env);
+
         //  Store the mode locally in case the user changes in the middle of
         //  this iteration.
         Mode mode = MODE;
@@ -407,7 +481,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             std::string lobby_code;
             std::array<std::map<Language, std::string>, 4> player_names;
 
-            if (!run_lobby2(env, context, lobby_code, player_names)){
+            if (!run_lobby(env, context, lobby_code, player_names)){
                 continue;
             }
             env.update_stats();

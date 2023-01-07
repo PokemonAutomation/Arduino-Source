@@ -1,11 +1,11 @@
-/*  Box Eggs Detector
+/*  Box Egg Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_BoxEggsDetector_H
-#define PokemonAutomation_PokemonSV_BoxEggsDetector_H
+#ifndef PokemonAutomation_PokemonSV_BoxEggDetector_H
+#define PokemonAutomation_PokemonSV_BoxEggDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -18,9 +18,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 // Detect if the currently selected pokemon is an egg or not
-class BoxEggsDetector : public StaticScreenDetector{
+class BoxEggDetector : public StaticScreenDetector{
 public:
-    BoxEggsDetector(Color color = COLOR_BLUE);
+    BoxEggDetector(Color color = COLOR_BLUE);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;

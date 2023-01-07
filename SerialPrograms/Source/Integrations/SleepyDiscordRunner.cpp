@@ -149,7 +149,7 @@ public:
     ){
 //        std::lock_guard<std::mutex> lg(m_lock);
         m_queue.add_event(
-            delay,
+            delay > std::chrono::milliseconds(10000) ? std::chrono::milliseconds(0) : delay,
             [embed = std::move(embed), channels = std::move(channels), messages = std::move(messages), file = std::move(file)]() mutable {
                 if (file == nullptr || file->filepath().empty()){
                     sendMessage(&channels[0], &messages[0], &embed[0], nullptr);

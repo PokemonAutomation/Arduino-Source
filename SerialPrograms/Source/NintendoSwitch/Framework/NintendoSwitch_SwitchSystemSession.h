@@ -29,6 +29,7 @@
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
+    class ThreadUtilizationStat;
 namespace NintendoSwitch{
 
 class SwitchSystemOption;
@@ -82,6 +83,8 @@ private:
     std::unique_ptr<CameraSession> m_camera;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
+
+    std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;
 };
 
 

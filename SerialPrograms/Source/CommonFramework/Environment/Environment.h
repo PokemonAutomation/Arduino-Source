@@ -29,6 +29,9 @@ const EnumDatabase<ThreadPriority>& PRIORITY_DATABASE();
 bool set_thread_priority(ThreadPriority priority);
 
 
+class ThreadHandle;
+
+
 
 std::string get_processor_name();
 struct ProcessorSpecs{
@@ -40,6 +43,7 @@ struct ProcessorSpecs{
     size_t base_frequency = 0;
 };
 ProcessorSpecs get_processor_specs();
+
 
 
 

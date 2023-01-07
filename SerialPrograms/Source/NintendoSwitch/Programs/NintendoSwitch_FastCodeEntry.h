@@ -10,11 +10,38 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
     class Logger;
     class BotBaseContext;
 namespace NintendoSwitch{
+
+
+
+enum class KeyboardLayout{
+    QWERTY,
+    AZERTY
+};
+
+class FastCodeEntrySettingsOption : public BatchOption{
+public:
+    FastCodeEntrySettingsOption();
+
+public:
+    EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
+    BooleanCheckBoxOption SKIP_PLUS;
+
+    SectionDividerOption m_advanced_options;
+    BooleanCheckBoxOption DIGIT_REORDERING;
+    TimeExpressionOption<uint8_t> SCROLL_DELAY;
+    TimeExpressionOption<uint8_t> WRAP_DELAY;
+};
+
 
 
 
@@ -44,19 +71,28 @@ void move_codeboard(BotBaseContext& context, const DigitPath& path);
 
 //  This is the one you want to call.
 
-enum class KeyboardLayout{
-    QWERTY,
-    AZERTY
+struct FastCodeEntrySettings{
+    KeyboardLayout keyboard_layout = KeyboardLayout::QWERTY;
+    bool include_plus = true;
+    uint8_t scroll_delay = 4;
+    uint8_t wrap_delay = 6;
+    bool digit_reordering = true;
+
+    FastCodeEntrySettings(FastCodeEntrySettingsOption& option);
 };
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus,
-    uint8_t scroll_delay = 4,
-    uint8_t wrap_delay = 6,
-    bool reordering = true
+    const FastCodeEntrySettings& settings,
+    const std::string& code
 );
+
+
+
+
+
+
+
 
 
 

@@ -89,7 +89,7 @@ bool read_battle_menu(
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",
-//            {{"Message", "Boss found before 3 wins."}},
+//            {{"Message:", "Boss found before 3 wins."}},
 //            ""
 //        );
         return false;

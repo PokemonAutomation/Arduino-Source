@@ -45,7 +45,7 @@ DaySkipperEU::DaySkipperEU()
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
         LockWhileRunning::LOCKED,
-        2022, 2000, 2060
+        2023, 2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)

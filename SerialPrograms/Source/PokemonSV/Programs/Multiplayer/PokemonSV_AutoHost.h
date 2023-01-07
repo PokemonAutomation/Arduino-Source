@@ -51,11 +51,12 @@ private:
         WallClock start_time,
         uint8_t player_count
     );
-    bool run_lobby2(
+    bool run_lobby(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         std::string& lobby_code,
         std::array<std::map<Language, std::string>, 4>& player_names
     );
+    void check_kill_switch(ProgramEnvironment& env);
 
 private:
 //    OCR::LanguageOCR LANGUAGE;
@@ -74,6 +75,8 @@ private:
 
     TextEditOption DESCRIPTION;
 
+    StringOption REMOTE_KILL_SWITCH0;
+
     SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
     SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
     TeraAIOption BATTLE_AI;
@@ -87,6 +90,8 @@ private:
     EventNotificationsOption NOTIFICATIONS0;
 
     WallClock m_ban_timer;
+    WallClock m_killswitch_time;
+    std::string m_killswitch_reason;
 };
 
 

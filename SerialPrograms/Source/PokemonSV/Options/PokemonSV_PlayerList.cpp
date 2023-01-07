@@ -24,7 +24,7 @@ PlayerListRow::PlayerListRow()
     )
     , name(false, LockWhileRunning::UNLOCKED, "", "Ash")
     , log10p(LockWhileRunning::UNLOCKED, -2.5, -10, 0)
-    , notes(false, LockWhileRunning::UNLOCKED, "", "Joined Kim's raid 10 times.")
+    , notes(false, LockWhileRunning::UNLOCKED, "", "")
 {
     PA_ADD_OPTION(enabled);
     PA_ADD_OPTION(language);

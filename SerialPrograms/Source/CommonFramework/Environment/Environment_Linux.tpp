@@ -6,6 +6,7 @@
 
 #if defined(__linux) || defined(__APPLE__)
 
+#include <time.h>
 #include <set>
 #include <iostream>
 #include <sys/types.h>
@@ -14,6 +15,13 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
+
+#if defined(__APPLE__)
+#include <libproc.h>
+#endif
+
+// #include <iostream>
+
 
 namespace PokemonAutomation{
 
@@ -56,6 +64,42 @@ bool set_thread_priority(ThreadPriority priority){
 
 
 
+ThreadHandle current_thread_handle(){
+    return ThreadHandle{pthread_self()};
+}
+WallClock::duration thread_cpu_time(const ThreadHandle& handle){
+    uint64_t nanos = 0;
+
+#if defined(__APPLE__)
+    uint64_t tid = 0;
+    pthread_threadid_np(handle.handle, &tid);
+    struct proc_threadinfo pth;
+    if (PROC_PIDTHREADINFO_SIZE ==
+        proc_pidinfo(getpid(), PROC_PIDTHREADID64INFO, tid, &pth,
+                    PROC_PIDTHREADINFO_SIZE)) {
+        nanos = pth.pth_user_time + pth.pth_system_time; // user time + system time in ns
+    }
+    else{
+        return WallClock::duration::min();
+    }
+
+#else
+    clockid_t clockid;
+    int error = pthread_getcpuclockid(handle.handle, &clockid);
+    if (error){
+        return WallClock::duration::min();
+    }
+
+    struct timespec ts;
+    if (clock_gettime(clockid, &ts) == -1){
+        return WallClock::duration::min();
+    }
+
+    nanos = (uint64_t)ts.tv_sec * 1000000000 + ts.tv_nsec;
+#endif
+
+    return std::chrono::duration_cast<WallClock::duration>(std::chrono::nanoseconds(nanos));
+}
 
 
 

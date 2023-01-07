@@ -14,10 +14,12 @@ namespace PokemonAutomation{
 
 class CancellableScope;
 class AsyncDispatcher;
+class ThreadHandle;
 class BotBase;
 class VideoFeed;
 class VideoOverlay;
 class AudioFeed;
+class ThreadUtilizationStat;
 class VisualInferencePivot;
 class AudioInferencePivot;
 
@@ -34,6 +36,7 @@ public:
     ConsoleHandle(
         size_t index,
         Logger& logger,
+//        ThreadHandle& handle,
         BotBase& botbase,
         VideoFeed& video,
         VideoOverlay& overlay,
@@ -74,6 +77,7 @@ private:
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
     AudioFeed& m_audio;
+    std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
     std::unique_ptr<VisualInferencePivot> m_video_pivot;
     std::unique_ptr<AudioInferencePivot> m_audio_pivot;
 };

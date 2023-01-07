@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_FastCodeEntry.h"
@@ -17,6 +18,66 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+
+
+
+FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
+    : BatchOption(LockWhileRunning::LOCKED)
+    , KEYBOARD_LAYOUT(
+        "<b>Keyboard Layout:</b>",
+        {
+            {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
+            {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
+        },
+        LockWhileRunning::LOCKED,
+        KeyboardLayout::QWERTY
+    )
+    , SKIP_PLUS(
+        "<b>Skip the Plus:</b><br>Don't press + to finalize the code. Useful for testing.",
+        LockWhileRunning::UNLOCKED,
+        false
+    )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options: (developer only)</b></font>"
+    )
+    , DIGIT_REORDERING(
+        "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
+        LockWhileRunning::LOCKED,
+        PreloadSettings::instance().DEVELOPER_MODE,
+        PreloadSettings::instance().DEVELOPER_MODE
+    )
+    , SCROLL_DELAY(
+        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
+        LockWhileRunning::LOCKED,
+        TICKS_PER_SECOND,
+        3, 15,
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "7",
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "7"
+    )
+    , WRAP_DELAY(
+        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
+        LockWhileRunning::LOCKED,
+        TICKS_PER_SECOND,
+        3, 15,
+        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "7",
+        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "7"
+    )
+{
+    PA_ADD_OPTION(KEYBOARD_LAYOUT);
+    PA_ADD_OPTION(SKIP_PLUS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(m_advanced_options);
+        PA_ADD_OPTION(DIGIT_REORDERING);
+        PA_ADD_OPTION(SCROLL_DELAY);
+        PA_ADD_OPTION(WRAP_DELAY);
+    }
+}
+
+
+
+
 
 
 
@@ -307,22 +368,51 @@ void run_codeboard_path(BotBaseContext& context, const std::vector<DigitPath>& p
 }
 
 
+
+FastCodeEntrySettings::FastCodeEntrySettings(FastCodeEntrySettingsOption& option)
+    : keyboard_layout(option.KEYBOARD_LAYOUT)
+    , include_plus(!option.SKIP_PLUS)
+    , scroll_delay(option.SCROLL_DELAY)
+    , wrap_delay(option.WRAP_DELAY)
+    , digit_reordering(option.DIGIT_REORDERING)
+{}
+
+
 void enter_alphanumeric_code(
     Logger& logger,
     BotBaseContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
+    const FastCodeEntrySettings& settings,
+    const std::string& code
 ){
     run_codeboard_path(context, get_codeboard_path(
         logger,
-        keyboard_layout, code,
-        scroll_delay, wrap_delay, reordering
+        settings.keyboard_layout, code,
+        settings.scroll_delay, settings.wrap_delay, settings.digit_reordering
     ));
-    if (include_plus){
+    if (settings.include_plus){
+        pbf_press_button(context, BUTTON_PLUS, 5, 3);
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

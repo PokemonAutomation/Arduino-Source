@@ -41,7 +41,7 @@ public:
 
 private:
     virtual void run(void* event, bool is_back_to_back) noexcept override;
-    virtual OverlayStatSnapshot get_current() const override;
+    virtual OverlayStatSnapshot get_current() override;
 
 private:
     struct PeriodicCallback;
@@ -51,6 +51,8 @@ private:
     std::map<VisualInferenceCallback*, PeriodicCallback> m_map;
     VideoSnapshot m_last;
     uint64_t m_seqnum = 0;
+
+    OverlayStatUtilizationPrinter m_printer;
 };
 
 

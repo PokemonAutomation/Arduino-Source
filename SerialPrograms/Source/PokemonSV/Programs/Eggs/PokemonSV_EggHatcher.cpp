@@ -57,8 +57,8 @@ EggHatcher::EggHatcher()
     , START_LOCATION(
         "<b>Start location:</b><br>Where to start the hatcher program.<br>"
         "Zero Gate Flying Spot: Stand at Zero Gate flying spot. The flying spot is already unlocked.<br>"
-        "Anywhere safe, on ride: You are in a safe location free of wild encounters or NPCs. You are on your ride lengendary.<br>"
-        "Anywhere safe, on foot: You are in a safe location free of wild encounters or NPCs. You stand on foot.<br>",
+        "Anywhere safe, on ride: You are in a safe location with no wild encounters or NPCs. You are on your ride lengendary.<br>"
+        "Anywhere safe, on foot: You are in a safe location with no wild encounters or NPCs. You stand on foot.<br>",
         {
             {StartLocation::ZeroGateFlyingSpot, "zero-gate", "Zero Gate Flying Spot"},
             {StartLocation::AnywhereOnRide, "anywhere-on-ride", "Anywhere safe, on ride."},

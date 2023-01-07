@@ -7,6 +7,8 @@
 #include "TestProgramSwitch.h"
 
 //#include <immintrin.h>
+#include <QApplication>
+#include <QClipboard>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
@@ -172,6 +174,32 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    auto image = feed.snapshot();
+
+    TeraLobbyReader detector;
+    cout << detector.seconds_left(env.logger(), image) << endl;
+
+
+
+
+#if 0
+    QClipboard* clipboard = QApplication::clipboard();
+    cout << clipboard->supportsSelection() << endl;
+
+    while (true){
+        std::string code = clipboard->text(QClipboard::Selection).toStdString();
+        cout << code << endl;
+        scope.wait_for(std::chrono::milliseconds(1000));
+    }
+#endif
+
+
+//    while (true){
+
+//    }
+
+#if 0
     pbf_move_left_joystick(context, 0, 128, 40, 40);
     // Move forward to pass table
     pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
@@ -179,6 +207,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     pbf_move_left_joystick(context, 255, 128, 40, 40);
     // Move back to face basket
     pbf_move_left_joystick(context, 128, 255, 10, 40);
+#endif
 
 
 #if 0

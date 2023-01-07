@@ -233,21 +233,28 @@ void VideoOverlayWidget::update_stats(QPainter& painter){
 
     int width = this->width();
     int height = this->height();
-    int start_x = (int)(width * 0.7);
+    int start_x = (int)(width * 0.75);
+
+    std::vector<OverlayStatSnapshot> lines;
+    for (const auto& stat : *m_stats){
+        OverlayStatSnapshot snapshot = stat->get_current();
+        if (!snapshot.text.empty()){
+            lines.emplace_back(std::move(snapshot));
+        }
+    }
+
 
     painter.fillRect(
         start_x,
         0,
         width - start_x,
-        (int)(height * (m_stats->size() * ROW_HEIGHT + 0.02)),
+        (int)(height * (lines.size() * ROW_HEIGHT + 0.02)),
         box_color
     );
 
     size_t c = 0;
-    for (const auto& stat : *m_stats){
-        OverlayStatSnapshot snapshot = stat->get_current();
-
-        painter.setPen(QColor((uint32_t)snapshot.color));
+    for (const auto& stat : lines){
+        painter.setPen(QColor((uint32_t)stat.color));
 
         QFont text_font = this->font();
         text_font.setPointSizeF(height * TEXT_SIZE);
@@ -256,7 +263,7 @@ void VideoOverlayWidget::update_stats(QPainter& painter){
         int x = start_x + width * 0.01;
         int y = height * ((c + 1) * ROW_HEIGHT + 0.005);
 
-        painter.drawText(QPoint(x, y), QString::fromStdString(snapshot.text));
+        painter.drawText(QPoint(x, y), QString::fromStdString(stat.text));
 
         c++;
     }

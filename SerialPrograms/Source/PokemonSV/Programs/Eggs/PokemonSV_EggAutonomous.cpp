@@ -226,6 +226,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 }
             } catch (ProgramFinishedException&){
                 env.update_stats();
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
                 send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                 return;
             } // end try catch
@@ -343,9 +344,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Get the next egg column
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
         for (; next_egg_column < 6; next_egg_column++){
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, next_egg_column);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
-            // If there is pokemon in slot row 0, col `col`,
+            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
                 env.log("Found next column of eggs at col " + std::to_string(next_egg_column));
                 env.console.overlay().add_log("Add next column", COLOR_WHITE);
@@ -361,7 +362,20 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
             num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
         } else {
-            // no more eggs in box, change to fetching mode:
+            // no more eggs to hatch in box
+            
+            // Check if we will reset game:
+            // We reset game if the auto save mode is AfterStartAndKeep and we have no pokemon kept during hatching this box
+            // m_in_critical_to_save_stage: whether we need to save the game for the current batch of eggs
+            // m_saved_after_fetched_eggs: whether we have saved the game already for a past batch of eggs in this box
+            if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage == false && m_saved_after_fetched_eggs == false){
+                // Yes, we will reset game
+                // So exit this loop early here
+                env.log("Early exit of egg hatching routine to reset game.");
+                return;
+            }
+            
+            // otherwise, change to fetching mode:
             env.log("Replace party with picnic team");
             env.console.overlay().add_log("Change to picnic pokemon", COLOR_WHITE);
 
