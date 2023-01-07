@@ -11,6 +11,7 @@
 #include "PokemonSV_Settings.h"
 
 #include "Programs/General/PokemonSV_AuctionFarmer.h"
+#include "Programs/General/PokemonSV_MassPurchase.h"
 #include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_GimmighoulChestFarmer.h"
@@ -51,6 +52,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
+    ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
