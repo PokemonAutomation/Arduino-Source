@@ -220,7 +220,11 @@ uint8_t TeraLobbyReader::ready_players(const ImageViewRGB32& screen) const{
     return total;
 }
 
-std::string TeraLobbyReader::raid_code(Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen){
+int16_t TeraLobbyReader::seconds_left(Logger& logger, const ImageViewRGB32& screen){
+    ImageViewRGB32 image = extract_box_reference(screen, m_timer);
+    return read_raid_timer(logger, image);
+}
+std::string TeraLobbyReader::raid_code(Logger& logger, const ImageViewRGB32& screen){
     ImageViewRGB32 image = extract_box_reference(screen, m_code);
     return read_raid_code(logger, image);
 }

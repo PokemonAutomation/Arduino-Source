@@ -208,7 +208,7 @@ WallClock AutoHost::wait_for_lobby_open(
     }
 
     VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), env.program_info(), snapshot);
+    lobby_code = lobby.raid_code(env.logger(), snapshot);
     if (!lobby_code.empty()){
         messages.emplace_back("Raid Code:", lobby_code);
     }

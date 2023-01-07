@@ -1247,8 +1247,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
-    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardFinder.cpp
-    Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardFinder.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp

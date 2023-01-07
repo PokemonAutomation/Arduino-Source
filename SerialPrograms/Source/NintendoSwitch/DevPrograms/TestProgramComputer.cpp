@@ -93,7 +93,6 @@
 #include "CommonFramework/Environment/Environment.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardFinder.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -186,42 +185,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
-
-
-
-    ImageRGB32 image("PartialCard.png");
-    cout << partial_tera_card_read_code(env.logger(), image) << endl;
-
-    auto names = partial_tera_card_read_host(env.logger(), image, {Language::English});
-    for (auto& item : names){
-        cout << item.second << endl;
-    }
-
-//    extract_box_reference(image, ImageFloatBox(0.13, 0.60, 0.30, 0.07)).save("test.png");
-
-
-
-
-#if 0
-    PartialTeraCardTracker tracker(
-        SCREEN_WATCHER.overlay(), COLOR_RED, {0, 0, 1, 1},
-        [](const ImageViewRGB32& card){
-//            card.save("test.png");
-            return false;
-        }
-    );
-#if 1
-    while (true){
-        scope.throw_if_cancelled();
-
-        tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
-
-        scope.wait_for(std::chrono::milliseconds(20));
-    }
-#endif
-    tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
-#endif
-
 
 
 

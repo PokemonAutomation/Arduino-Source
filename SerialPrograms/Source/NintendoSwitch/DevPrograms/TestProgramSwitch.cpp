@@ -174,6 +174,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    auto image = feed.snapshot();
+
+    TeraLobbyReader detector;
+    cout << detector.seconds_left(env.logger(), image) << endl;
+
+
+
+
+#if 0
     QClipboard* clipboard = QApplication::clipboard();
     cout << clipboard->supportsSelection() << endl;
 
@@ -182,7 +192,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         cout << code << endl;
         scope.wait_for(std::chrono::milliseconds(1000));
     }
-
+#endif
 
 
 //    while (true){
