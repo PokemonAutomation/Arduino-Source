@@ -112,7 +112,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
         //mash past other dialog
         pbf_mash_button(context, BUTTON_A, 360);
-			
+            
         //wait for start
         context.wait_for(std::chrono::milliseconds(13000));
         context.wait_for_all_requests();

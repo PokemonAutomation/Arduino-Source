@@ -28,9 +28,9 @@ public:
         NO_DETECTION,
         RED,
         YELLOW,
-		BLUE,
-		GREEN,
-		GREY,
+        BLUE,
+        GREEN,
+        GREY,
     };
 
 public:

@@ -21,24 +21,24 @@ ESPEmotionDetector::ESPEmotionDetector(Logger& logger, VideoOverlay& overlay)
 {}
 
 ESPEmotionDetector::Detection ESPEmotionDetector::detect(const ImageViewRGB32& screen){
-	ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
+    ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
 
-	//Color ratio: R/(R+G+B), G/(R+G+B), B/(R+G+B)
-	if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.1, 10)) {
-		return Detection::RED;
-	}
-	if (is_solid(symbol, { 0.529, 0.447, 0.0258}, 0.1, 10)) {
-		return Detection::YELLOW;
-	}
-	if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.1, 10)) {
-		return Detection::BLUE; //Picks up the grey as well but that works
-	}
-	if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.1, 10)) {
-		return Detection::GREEN;
-	}
-	if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.1, 10)) {
-		return Detection::GREY;
-	}
+    //Color ratio: R/(R+G+B), G/(R+G+B), B/(R+G+B)
+    if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.1, 10)) {
+        return Detection::RED;
+    }
+    if (is_solid(symbol, { 0.529, 0.447, 0.0258}, 0.1, 10)) {
+        return Detection::YELLOW;
+    }
+    if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.1, 10)) {
+        return Detection::BLUE; //Picks up the grey as well but that works
+    }
+    if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.1, 10)) {
+        return Detection::GREEN;
+    }
+    if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.1, 10)) {
+        return Detection::GREY;
+    }
     return Detection::NO_DETECTION;
 }
 ESPEmotionDetector::Detection ESPEmotionDetector::wait_for_detection(
@@ -79,15 +79,15 @@ ESPEmotionDetector::Detection ESPEmotionDetector::wait_for_detection(
     case Detection::YELLOW:
         m_logger.log("ESPEmotionDetector: Joy - Yellow - Press A", COLOR_BLACK);
         break;
-	case Detection::BLUE:
-		m_logger.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
-		break;
-	case Detection::GREEN:
-		m_logger.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
-		break;
-	case Detection::GREY:
-		m_logger.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
-		break;
+    case Detection::BLUE:
+        m_logger.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
+        break;
+    case Detection::GREEN:
+        m_logger.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
+        break;
+    case Detection::GREY:
+        m_logger.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
+        break;
     }
     return last_detection;
 }
