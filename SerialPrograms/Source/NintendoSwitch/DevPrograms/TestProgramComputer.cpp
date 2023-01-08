@@ -188,11 +188,55 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+#if 0
+    ImageRGB32 image("testB-1.png");
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
+            uint32_t pixel = image.pixel(c, r);
+            uint32_t sum = pixel & 0xff;
+            sum += (pixel >> 16) & 0xff;
+            sum += (pixel >> 8) & 0xff;
+            if (sum > 400){
+                image.pixel(c, r) = 0;
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+
+#if 1
+    {
+        ImageRGB32 image("TeraCodeTest-50.png");
+        TeraLobbyReader reader;
+        reader.raid_code(env.logger(), image);
+    }
+    {
+        ImageRGB32 image("TeraCodeTest-S0.png");
+        TeraLobbyReader reader;
+        reader.raid_code(env.logger(), image);
+    }
+    {
+        ImageRGB32 image("TeraCodeTest-S1.png");
+        TeraLobbyReader reader;
+        reader.raid_code(env.logger(), image);
+    }
+#endif
+
+
+
+
+
+
+#if 0
     ImageRGB32 image("20230107-053814058280-FREESandwichHandNotDetected.png");
 
     SandwichHandLocator detector(SandwichHandType::FREE, {0, 0, 1, 1});
     auto ret = detector.detect(image);
     cout << ret.first << " " << ret.second << endl;
+#endif
+
 
 
 

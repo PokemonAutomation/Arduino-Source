@@ -24,7 +24,61 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-std::map<size_t, std::string> waterfill_OCR(const ImageViewRGB32& image){
+char read_5S(const ImageViewRGB32& image, char OCR_result){
+    //  5 and S are commonly misread as each other. Here we try an extra step to
+    //  distinguish them.
+
+//    static int c = 0;
+//    image.save("testB-" + std::to_string(c++) + ".png");
+
+    if (image.height() < 2){
+        return OCR_result;
+    }
+
+    size_t width = image.width();
+
+    size_t top_black_pixels = 0;
+    for (size_t c = 0; c < width; c++){
+        uint32_t pixel = image.pixel(c, 0);
+        uint32_t sum = pixel & 0xff;
+        sum += (pixel >> 16) & 0xff;
+        sum += (pixel >> 8) & 0xff;
+        if (sum < 400){
+            top_black_pixels++;
+        }
+    }
+    double ratio = (double)top_black_pixels / width;
+    if (ratio > 0.60){
+        return '5';
+    }
+
+    top_black_pixels = 0;
+    for (size_t c = 0; c < width; c++){
+        uint32_t pixel = image.pixel(c, 1);
+        uint32_t sum = pixel & 0xff;
+        sum += (pixel >> 16) & 0xff;
+        sum += (pixel >> 8) & 0xff;
+        if (sum < 400){
+            top_black_pixels++;
+        }
+    }
+    ratio = (double)top_black_pixels / width;
+    if (ratio > 0.70){
+        return '5';
+    }
+//    cout << "top_black_pixels = " << top_black_pixels << ", " << (double)top_black_pixels / width << endl;
+
+    return 'S';
+}
+
+
+struct WaterfillOCRResult{
+    ImageViewRGB32 cropped_image;
+    std::string ocr;
+};
+
+
+std::map<size_t, WaterfillOCRResult> waterfill_OCR(const ImageViewRGB32& image){
     using namespace Kernels::Waterfill;
 
     //  Direct OCR is unreliable. Instead, we will waterfill each character
@@ -35,18 +89,25 @@ std::map<size_t, std::string> waterfill_OCR(const ImageViewRGB32& image){
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, THRESHOLD, true);
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, THRESHOLD);
 
-    std::map<size_t, std::string> map;
+    std::map<size_t, WaterfillOCRResult> map;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(20);
         WaterfillObject object;
         while (iter->find_next(object, true)){
 //            cout << object.packed_matrix()->dump() << endl;
-            ImageViewRGB32 character = extract_box_reference(filtered, object);
-            ImageRGB32 padded = pad_image(character, character.width(), 0xffffffff);
+            ImageViewRGB32 cropped = extract_box_reference(filtered, object);
+
+//            static int c = 0;
+//            cropped.save("testA-" + std::to_string(c++) + ".png");
+
+            ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
 
             std::string raw = OCR::ocr_read(Language::English, padded);
-            map.emplace(object.min_x, std::move(raw));
+            map.emplace(
+                object.min_x,
+                WaterfillOCRResult{extract_box_reference(image, object), std::move(raw)}
+            );
         }
     }
 
@@ -55,7 +116,7 @@ std::map<size_t, std::string> waterfill_OCR(const ImageViewRGB32& image){
 
 
 int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
-    std::map<size_t, std::string> map = waterfill_OCR(image);
+    std::map<size_t, WaterfillOCRResult> map = waterfill_OCR(image);
 
 //    cout << "map.size() = " << map.size() << endl;
 //    for (auto& item : map){
@@ -76,16 +137,17 @@ int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
     std::string raw;
     std::string normalized;
     for (const auto& item : map){
-        if (item.second.empty()){
+        const std::string& ocr = item.second.ocr;
+        if (ocr.empty()){
             continue;
         }
-        if ((uint8_t)item.second.back() < (uint8_t)32){
-            raw += item.second.substr(0, item.second.size() - 1);
+        if ((uint8_t)ocr.back() < (uint8_t)32){
+            raw += ocr.substr(0, ocr.size() - 1);
         }else{
-            raw += item.second;
+            raw += ocr;
         }
 
-        char ch = item.second[0];
+        char ch = ocr[0];
 
         //  Character substitution.
         auto iter = SUBSTITUTIONS.find(ch);
@@ -115,8 +177,7 @@ int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
 
 
 std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
-    std::map<size_t, std::string> map = waterfill_OCR(image);
-
+    std::map<size_t, WaterfillOCRResult> map = waterfill_OCR(image);
 
     static const std::map<char, char> SUBSTITUTIONS{
         {'I', '1'},
@@ -133,16 +194,17 @@ std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
     std::string raw;
     std::string normalized;
     for (const auto& item : map){
-        if (item.second.empty()){
+        const std::string& ocr = item.second.ocr;
+        if (ocr.empty()){
             continue;
         }
-        if ((uint8_t)item.second.back() < (uint8_t)32){
-            raw += item.second.substr(0, item.second.size() - 1);
+        if ((uint8_t)ocr.back() < (uint8_t)32){
+            raw += ocr.substr(0, ocr.size() - 1);
         }else{
-            raw += item.second;
+            raw += ocr;
         }
 
-        char ch = item.second[0];
+        char ch = ocr[0];
 
         //  Upper case.
         if ('a' <= ch && ch <= 'z'){
@@ -153,6 +215,13 @@ std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
         auto iter = SUBSTITUTIONS.find(ch);
         if (iter != SUBSTITUTIONS.end()){
             ch = iter->second;
+        }
+
+        //  Distinguish 5 and S.
+        switch (ch){
+        case '5':
+        case 'S':
+            ch = read_5S(item.second.cropped_image, ch);
         }
 
         normalized += ch;

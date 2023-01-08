@@ -265,7 +265,10 @@ ImageRGB32 filter_name_image(const ImageViewRGB32& image){
             );
         }
     }
-//    filtered.save("filtered.png");
+
+//    static int c = 0;
+//    filtered.save("filtered" + std::to_string(c++) + ".png");
+
     return filtered;
 
 //    size_t pixels;
