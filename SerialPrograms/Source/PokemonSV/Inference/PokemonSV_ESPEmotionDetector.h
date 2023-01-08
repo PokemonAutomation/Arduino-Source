@@ -31,19 +31,18 @@ enum class Detection {
 };
 class ESPEmotionReader {
 public:
-    ESPEmotionReader(Logger& logger);
+    ESPEmotionReader();
 
     void make_overlays(VideoOverlaySet& items) const;
     Detection detect(const ImageViewRGB32& screen) const;
 
 private:
-    Logger& m_logger;
     ImageFloatBox m_symbol_box;
 };
 
 class ESPEmotionDetector : public VisualInferenceCallback {
 public:
-    ESPEmotionDetector(Logger& logger);
+    ESPEmotionDetector();
 
     Detection result() const {
         return m_last.load(std::memory_order_acquire);

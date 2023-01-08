@@ -15,9 +15,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-ESPEmotionReader::ESPEmotionReader(Logger& logger)
-    : m_logger(logger)
-    , m_symbol_box(0.297, 0.137, 0.010, 0.016)
+ESPEmotionReader::ESPEmotionReader()
+    : m_symbol_box(0.297, 0.137, 0.010, 0.016)
 {}
 
 void ESPEmotionReader::make_overlays(VideoOverlaySet& items) const {
@@ -45,9 +44,8 @@ Detection ESPEmotionReader::detect(const ImageViewRGB32& screen) const {
     return Detection::NO_DETECTION;
 }
 
-ESPEmotionDetector::ESPEmotionDetector(Logger& logger)
+ESPEmotionDetector::ESPEmotionDetector()
     : VisualInferenceCallback("ESPEmotionDetector")
-    , m_reader(logger)
     , m_last(Detection::NO_DETECTION)
 {}
 

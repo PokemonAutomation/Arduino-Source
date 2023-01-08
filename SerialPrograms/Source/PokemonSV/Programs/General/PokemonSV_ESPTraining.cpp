@@ -103,8 +103,8 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-        if (retD == 0) {
-            return;
+        if (retD < 0) {
+            env.log("Dialog detected.");
         }
         pbf_press_button(context, BUTTON_A, 10, 50);
 
@@ -133,7 +133,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         while (endflag) {
             ESPStartDetector ESPstart;
             ESPShowNewEmotionDetector ESPstop;
-            ESPEmotionDetector detector(env.console);
+            ESPEmotionDetector detector;
             {
                 //Countdown -> Dialog w/emotion
                 int ret = wait_until(
