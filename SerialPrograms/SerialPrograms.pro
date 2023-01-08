@@ -643,6 +643,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
@@ -1528,6 +1529,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h \
+    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
