@@ -54,7 +54,7 @@ struct ESPTraining_Descriptor::Stats : public StatsTracker {
         m_display_order.emplace_back("Excitement");
         m_display_order.emplace_back("Anger");
         m_display_order.emplace_back("Times Cleared");
-        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_emotions;
     std::atomic<uint64_t>& m_joy;
