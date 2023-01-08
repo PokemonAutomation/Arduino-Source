@@ -262,7 +262,15 @@ void BoxDetector::move_cursor(
 //    cout << "desired_x = " << desired_x << ", desired_y = " << desired_y << endl;
 
     size_t consecutive_fails = 0;
+    WallClock start = current_time();
     while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "BoxMoveCursor",
+                "Failed to move cursor to desired location after 1 minute."
+            );
+        }
+
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
         std::pair<BoxCursorLocation, BoxCursorCoordinates> current = this->detect_location(screen);
