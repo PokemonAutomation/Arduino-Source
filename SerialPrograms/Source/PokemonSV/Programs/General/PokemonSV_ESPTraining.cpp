@@ -96,11 +96,20 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     ESPTraining_Descriptor::Stats& stats = env.current_stats<ESPTraining_Descriptor::Stats>();
 
     for (uint32_t c = 0; c < ROUNDS; c++) {
-        //Initiate dialog with Dendra
         env.log("Round: " + tostr_u_commas(c));
 
+        //Initiate dialog with Dendra
+        //Dendra needs time to turn and face the player
+        AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
+        pbf_press_button(context, BUTTON_A, 10, 50);
+        int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
+        if (retD == 0) {
+            return;
+        }
+        pbf_press_button(context, BUTTON_A, 10, 50);
+
         //Yes let's train
-        pbf_mash_button(context, BUTTON_A, 340);
+        pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
@@ -122,9 +131,9 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         //Note: can hit the wrong emotion and then the right one right after, as long as its before the timer
         bool endflag = true;
         while (endflag) {
-            ESPEmotionDetector::Detection detection;
             ESPStartDetector ESPstart;
             ESPShowNewEmotionDetector ESPstop;
+            ESPEmotionDetector detector(env.console);
             {
                 //Countdown -> Dialog w/emotion
                 int ret = wait_until(
@@ -135,28 +144,38 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 if (ret < 0) {
                     env.log("Timeout waiting for dialog.");
                 }
-                ESPEmotionDetector detector(env.console, env.console);
-                detection = detector.wait_for_detection(context, env.console);
-                switch (detection) {
+                int ret2 = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(5),
+                    { { detector } }
+                );
+                if (ret2 < 0) {
+                    env.log("Timeout waiting for emotion.");
+                }
+                switch (detector.result()) {
                 case Detection::RED:
+                    env.log("ESPEmotionDetector: Angry - Red - Press X", COLOR_BLACK);
                     pbf_press_button(context, BUTTON_X, 10, 50);
                     stats.m_emotions++;
                     stats.m_anger++;
                     env.update_stats();
                     break;
                 case Detection::YELLOW:
+                    env.log("ESPEmotionDetector: Joy - Yellow - Press A", COLOR_BLACK);
                     pbf_press_button(context, BUTTON_A, 10, 50);
                     stats.m_emotions++;
                     stats.m_joy++;
                     env.update_stats();
                     break;
                 case Detection::BLUE:
+                    env.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
                     pbf_press_button(context, BUTTON_B, 10, 50);
                     stats.m_emotions++;
                     stats.m_surprise++;
                     env.update_stats();
                     break;
                 case Detection::GREEN:
+                    env.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
                     pbf_press_button(context, BUTTON_Y, 10, 50);
                     stats.m_emotions++;
                     stats.m_excitement++;
@@ -166,13 +185,11 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     //Press any button to start next round
                     //Pressing A tends to make Dendra :D two extra times during the transistion so press B instead
                     //Sometimes this is detected as blue, the B press there also works
+                    env.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
                     pbf_press_button(context, BUTTON_B, 10, 50);
                     break;
                 default:
                     endflag = false;
-                    //stats.errors++;
-                    //env.update_stats();
-                    //throw OperationFailedException(env.console, "Failed to detect emotion color.");
                     break;
                 }
                 //Look for the brief moment the dialog bubble vanishes

@@ -30,7 +30,6 @@ public:
 };
 
 class ESPTraining : public SingleSwitchProgramInstance {
-using Detection = ESPEmotionDetector::Detection;
 public:
     ESPTraining();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

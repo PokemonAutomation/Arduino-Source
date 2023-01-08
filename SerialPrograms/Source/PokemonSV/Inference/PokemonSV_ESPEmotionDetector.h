@@ -21,29 +21,40 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
-class ESPEmotionDetector{
+enum class Detection {
+    NO_DETECTION,
+    RED,
+    YELLOW,
+    BLUE,
+    GREEN,
+    GREY,
+};
+class ESPEmotionReader {
 public:
-    enum Detection{
-        NO_DETECTION,
-        RED,
-        YELLOW,
-        BLUE,
-        GREEN,
-        GREY,
-    };
+    ESPEmotionReader(Logger& logger);
 
-public:
-    ESPEmotionDetector(Logger& logger, VideoOverlay& overlay);
+    void make_overlays(VideoOverlaySet& items) const;
+    Detection detect(const ImageViewRGB32& screen) const;
 
-    Detection detect(const ImageViewRGB32& screen);
-    Detection wait_for_detection(
-        CancellableScope& scope, VideoFeed& feed,
-        std::chrono::seconds timeout = std::chrono::seconds(10)
-    );
 private:
     Logger& m_logger;
-    OverlayBoxScope m_symbol_box;
+    ImageFloatBox m_symbol_box;
+};
+
+class ESPEmotionDetector : public VisualInferenceCallback {
+public:
+    ESPEmotionDetector(Logger& logger);
+
+    Detection result() const {
+        return m_last.load(std::memory_order_acquire);
+    }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    ESPEmotionReader m_reader;
+    std::atomic<Detection> m_last;
 };
 
 //This checks for the Dendra's dialog box
