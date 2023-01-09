@@ -21,6 +21,12 @@ namespace PokemonSV{
 
 enum class BoxCursorLocation;
 
+//  Try to change the view to the judge. However, it may land on the stats instead.
+//  If it can't land on either stats or judge, it will throw an exception.
+void change_stats_view_to_judge(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+);
+
 //  Hold one column of at most five pokemon
 void hold_one_column(BotBaseContext& context);
 
@@ -57,9 +63,11 @@ void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     const BoxCursorLocation& side, uint8_t row, uint8_t col);
 
 //  In box system, use button Y to swap two slots
-void swap_two_box_slots(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void swap_two_box_slots(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
-    const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col);
+    const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col
+);
 
 }
 }

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -24,6 +25,44 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+
+void change_stats_view_to_judge(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+){
+    ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
+    OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
+#if 1
+    for (size_t attempts = 0;; attempts++){
+        if (attempts == 10){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "ChangePokemonView",
+                "check_baby_info: Unable to change Pokemon view after 10 tries."
+            );
+        }
+
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        ImageStats stats = image_stats(extract_box_reference(screen, name_bar));
+        if (stats.stddev.sum() > 100){
+            break;
+        }
+
+        console.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
+
+        //  Alternate one and two + presses. If IV checker is enabled, we should
+        //  land on the IV checker. Otherwise, it will land us back to nothing.
+        //  Then the next press will be a single which will put us on the stats
+        //  with no IV checker.
+        pbf_press_button(context, BUTTON_PLUS, 20, 230);
+        if (attempts % 2 == 0){
+            pbf_press_button(context, BUTTON_PLUS, 20, 230);
+        }
+    }
+#endif
+}
+
 
 void hold_one_column(BotBaseContext& context){
      // Minus to draw selection box
@@ -232,9 +271,11 @@ void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     console.log("Cursor moved.");
 }
 
-void swap_two_box_slots(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void swap_two_box_slots(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
-    const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col)
+    const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col
+)
 {
     context.wait_for_all_requests();
     console.log("Swap two slots " + BOX_LOCATION_STRING(source_side, source_row, source_col)

@@ -158,6 +158,8 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
+    change_stats_view_to_judge(env.program_info(), env.console, context);
+
     BoxDetector box_detector;
     VideoOverlaySet overlays(env.console.overlay());
     box_detector.make_overlays(overlays);

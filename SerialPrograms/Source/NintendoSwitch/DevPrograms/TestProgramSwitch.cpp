@@ -174,11 +174,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    change_stats_view_to_judge(env.program_info(), console, context);
+
+
+#if 0
     auto image = feed.snapshot();
     ImageFloatBox box(0.66, 0.08, 0.52, 0.04);
     ImageStats stats = image_stats(extract_box_reference(image, box));
     cout << stats.average << stats.stddev << endl;
-
+#endif
 
 
 
