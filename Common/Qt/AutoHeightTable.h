@@ -16,6 +16,9 @@ class AutoHeightTableWidget : public QTableWidget{
 public:
     using QTableWidget::QTableWidget;
 
+    //  Suppress mouse-over events since they change focus.
+    virtual void mouseMoveEvent(QMouseEvent*) override{}
+
     void setRowCount(int rows);
     void insertRow(int row);
     void removeRow(int row);

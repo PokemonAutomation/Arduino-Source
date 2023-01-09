@@ -178,7 +178,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     auto image = feed.snapshot();
 
     TeraLobbyReader detector;
-    cout << detector.seconds_left(env.logger(), image) << endl;
+//    cout << detector.seconds_left(env.logger(), image) << endl;
+    cout << detector.raid_code(env.logger(), image) << endl;
 
 
 

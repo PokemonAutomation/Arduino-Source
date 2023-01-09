@@ -46,6 +46,7 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
+//    m_table->setMouseTracking(false);
 
     QStringList header;
     for (const std::string& name : m_value.make_header()){
