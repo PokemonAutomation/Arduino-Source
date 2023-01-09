@@ -174,13 +174,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    auto image = feed.snapshot();
+    ImageFloatBox box(0.66, 0.08, 0.52, 0.04);
+    ImageStats stats = image_stats(extract_box_reference(image, box));
+    cout << stats.average << stats.stddev << endl;
 
+
+
+
+#if 0
     auto image = feed.snapshot();
 
     TeraLobbyReader detector;
 //    cout << detector.seconds_left(env.logger(), image) << endl;
     cout << detector.raid_code(env.logger(), image) << endl;
-
+#endif
 
 
 

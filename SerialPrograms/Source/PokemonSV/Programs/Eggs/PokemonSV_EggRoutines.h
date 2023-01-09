@@ -87,7 +87,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 // Check hatched pokemon info to determine what to do with it.
 // Return if the pokemon is shiny. The action to handle the pokemon is returned in `action`.
-bool check_baby_info(ConsoleHandle& console, BotBaseContext& context,
+bool check_baby_info(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
     Pokemon::EggHatchAction& action
 );

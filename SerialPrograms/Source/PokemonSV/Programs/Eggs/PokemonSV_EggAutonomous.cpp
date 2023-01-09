@@ -419,7 +419,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
     bool found_shiny = false;
     EggHatchAction action = EggHatchAction::Release;
-    if (check_baby_info(env.console, context, LANGUAGE, FILTERS, action)){
+    if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action)){
         found_shiny = true;
         env.console.log("Shiny found!");
         env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
