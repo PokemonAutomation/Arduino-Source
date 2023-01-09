@@ -188,6 +188,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+
 #if 0
     ImageRGB32 image("testB-1.png");
     for (size_t r = 0; r < image.height(); r++){
@@ -206,7 +208,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 1
+#if 0
     {
         ImageRGB32 image("TeraCodeTest-50.png");
         TeraLobbyReader reader;
@@ -235,53 +237,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     SandwichHandLocator detector(SandwichHandType::FREE, {0, 0, 1, 1});
     auto ret = detector.detect(image);
     cout << ret.first << " " << ret.second << endl;
-#endif
-
-
-
-
-#if 0
-    PartialTeraCardTracker tracker(
-        SCREEN_WATCHER.overlay(), COLOR_RED, {0, 0, 1, 1},
-        [](const ImageViewRGB32& card){
-//            card.save("test.png");
-            return false;
-        }
-    );
-#if 1
-    while (true){
-        scope.throw_if_cancelled();
-
-        tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
-
-        scope.wait_for(std::chrono::milliseconds(20));
-    }
-#endif
-    tracker.process_frame(SCREEN_WATCHER.screenshot(), current_time());
-#endif
-
-
-
-
-#if 0
-    SCREEN_WATCHER.screenshot().frame->save("test.png");
-#endif
-
-
-#if 0
-    auto screens = QGuiApplication::screens();
-    cout << screens.size() << endl;
-
-    for (QScreen* screen : screens){
-        cout << screen->name().toStdString() << endl;
-    }
-#endif
-
-#if 0
-    QScreen* screen = QGuiApplication::primaryScreen();
-    QPixmap px = screen->grabWindow(0);
-
-    px.save("text.png");
 #endif
 
 

@@ -28,8 +28,8 @@ char read_5S(const ImageViewRGB32& image, char OCR_result){
     //  5 and S are commonly misread as each other. Here we try an extra step to
     //  distinguish them.
 
-//    static int c = 0;
-//    image.save("testB-" + std::to_string(c++) + ".png");
+//    static int count = 0;
+//    image.save("testB-" + std::to_string(count++) + ".png");
 
     if (image.height() < 2){
         return OCR_result;
@@ -48,10 +48,12 @@ char read_5S(const ImageViewRGB32& image, char OCR_result){
         }
     }
     double ratio = (double)top_black_pixels / width;
-    if (ratio > 0.60){
+//    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
+    if (ratio > 0.70){
         return '5';
     }
 
+#if 0
     top_black_pixels = 0;
     for (size_t c = 0; c < width; c++){
         uint32_t pixel = image.pixel(c, 1);
@@ -63,10 +65,11 @@ char read_5S(const ImageViewRGB32& image, char OCR_result){
         }
     }
     ratio = (double)top_black_pixels / width;
+//    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
     if (ratio > 0.70){
         return '5';
     }
-//    cout << "top_black_pixels = " << top_black_pixels << ", " << (double)top_black_pixels / width << endl;
+#endif
 
     return 'S';
 }
