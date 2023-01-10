@@ -1,0 +1,11 @@
+
+---- General ----
+MassRelease
+MassPurchase
+RoamingGimmighoulFarmer
+
+---- Glitches ----
+ItemDupe
+
+---- Eggs ----
+EggFetcher

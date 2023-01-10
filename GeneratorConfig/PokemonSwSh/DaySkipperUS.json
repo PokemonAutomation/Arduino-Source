@@ -18,8 +18,8 @@
             "02-Declaration": "const uint16_t REAL_LIFE_YEAR",
             "03-MinValue": 2000,
             "04-MaxValue": 2060,
-            "98-Default": 2022,
-            "99-Current": 2022
+            "98-Default": 2023,
+            "99-Current": 2023
         },
         {
             "00-Type": "Divider",

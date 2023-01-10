@@ -13,6 +13,11 @@
         "Name": "PokemonBDSP",
         "Display": "BDSP",
         "Settings": [ "PokemonBDSP_Settings" ]
+    },
+    {
+        "Name": "PokemonSV",
+        "Display": "SV",
+        "Settings": [ "PokemonSV_Settings" ]
     }
 ]
 
