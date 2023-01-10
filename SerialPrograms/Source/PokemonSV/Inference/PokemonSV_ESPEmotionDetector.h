@@ -8,9 +8,10 @@
 #define PokemonAutomation_PokemonSV_ESPEmotionDetector_H
 
 #include <chrono>
-#include "CommonFramework/Logging/Logger.h"
+#include <atomic>
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Common/Cpp/Color.h"
+//#include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
