@@ -55,13 +55,13 @@ void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
 
 void FileWindowLogger::log(const std::string& msg, Color color){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [=]{ return m_queue.size() < m_max_queue_size; });
+    m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(msg, color);
     m_cv.notify_all();
 }
 void FileWindowLogger::log(std::string&& msg, Color color){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [=]{ return m_queue.size() < m_max_queue_size; });
+    m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(std::move(msg), color);
     m_cv.notify_all();
 }
