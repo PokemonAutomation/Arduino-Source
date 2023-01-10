@@ -147,6 +147,7 @@ void WidgetStackFixedAspectRatio::update_size(QSize size){
     }
 }
 void WidgetStackFixedAspectRatio::resizeEvent(QResizeEvent* event){
+//    cout << "WidgetStackFixedAspectRatio::resizeEvent(): " << this->width() << " x " << this->height() << endl;
 //    cout << "WidgetStackFixedAspectRatio::resizeEvent(): " << event->size().width() << " x " << event->size().height() << endl;
     update_size(event->size());
 }

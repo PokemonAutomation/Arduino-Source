@@ -68,6 +68,14 @@ AsyncDispatcher::~AsyncDispatcher(){
         task->signal();
     }
 }
+
+void AsyncDispatcher::ensure_threads(size_t threads){
+    std::lock_guard<std::mutex> lg(m_lock);
+    while (m_threads.size() < threads){
+        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
+    }
+}
+
 void AsyncDispatcher::dispatch_task(AsyncTask& task){
 //    cout << "dispatch_task() - enter" << endl;
     std::lock_guard<std::mutex> lg(m_lock);

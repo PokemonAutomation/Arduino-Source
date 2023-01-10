@@ -63,6 +63,9 @@ public:
     AsyncDispatcher(std::function<void()>&& new_thread_callback, size_t starting_threads);
     ~AsyncDispatcher();
 
+    //  Ensure a certain # of threads so they don't need to be lazily created.
+    void ensure_threads(size_t threads);
+
     //  Dispatch the specified task and return a handle to it.
     //  Call "handle->wait()" to wait for the task to finish.
     std::unique_ptr<AsyncTask> dispatch(std::function<void()>&& func);
