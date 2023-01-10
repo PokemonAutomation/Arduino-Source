@@ -47,10 +47,10 @@ struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker {
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back(Stat("Chests farmed"));
-        m_display_order.emplace_back(Stat("Wild interrupts"));
-        m_display_order.emplace_back(Stat("Resets"));
-        m_display_order.emplace_back(Stat("Errors"));
+        m_display_order.emplace_back("Chests farmed");
+        m_display_order.emplace_back("Wild interrupts");
+        m_display_order.emplace_back("Resets");
+        m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& pokemon_fainted;
     std::atomic<uint64_t>& wild_interrupts;

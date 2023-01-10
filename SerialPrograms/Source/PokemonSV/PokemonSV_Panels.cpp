@@ -15,6 +15,7 @@
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_GimmighoulChestFarmer.h"
 #include "Programs/General/PokemonSV_GimmighoulRoamingFarmer.h"
+#include "Programs/General/PokemonSV_ESPTraining.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
@@ -64,6 +65,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE) {
         ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
+        ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
     }
 
     ret.emplace_back("---- Eggs ----");
