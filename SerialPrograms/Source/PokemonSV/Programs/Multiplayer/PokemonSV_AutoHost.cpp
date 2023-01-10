@@ -214,7 +214,7 @@ WallClock AutoHost::wait_for_lobby_open(
     }
 
     VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), snapshot);
+    lobby_code = lobby.raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
     if (SHOW_RAID_CODE && !lobby_code.empty()){
         messages.emplace_back("Raid Code:", lobby_code);
     }

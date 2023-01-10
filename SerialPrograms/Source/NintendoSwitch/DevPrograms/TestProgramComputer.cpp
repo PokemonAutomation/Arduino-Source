@@ -94,6 +94,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 
 #ifdef PA_ARCH_x86
 // #include "Kernels/Kernels_x64_SSE41.h"
@@ -107,6 +108,7 @@
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
+//#include "Common/Cpp/CpuId/CpuId_x86.h"
 #endif
 
 //#include <opencv2/core.hpp>
@@ -188,6 +190,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    StatAccumulatorI32 stats;
+
+    for (size_t c = 0; c < 1000; c++){
+        scope.throw_if_cancelled();
+
+        auto start = current_time();
+        env.log(std::to_string(c));
+        auto end = current_time();
+        stats += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
+    cout << stats.dump("us", 1) << endl;
 
 
 #if 0

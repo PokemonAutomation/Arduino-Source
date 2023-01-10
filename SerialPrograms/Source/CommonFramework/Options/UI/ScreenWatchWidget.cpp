@@ -7,6 +7,10 @@
 #include <QPainter>
 #include "ScreenWatchWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -31,15 +35,17 @@ ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
     m_updater.join();
 }
 void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
-//        cout << "asdf" << endl;
+//    cout << "ScreenWatchDisplayWidget::paintEvent: " << m_holder.width() << " x " << m_holder.height() << endl;
     QWidget::paintEvent(event);
     VideoSnapshot snapshot = m_last_frame;
 
     double aspect_ratio = (double)snapshot.frame->width() / snapshot.frame->height();
     if (aspect_ratio < 2.0){
-        m_holder.setFixedHeight(m_holder.width() / 2);
+//        cout << "ScreenWatchDisplayWidget::paintEvent: box " << m_holder.width() << " x " << m_holder.height() << endl;
         m_holder.set_all(WidgetStackFixedAspectRatio::EXPAND_TO_BOX, aspect_ratio);
+        m_holder.setFixedHeight(m_holder.width() / 2);
     }else{
+//        cout << "ScreenWatchDisplayWidget::paintEvent: adjust " << m_holder.width() << " x " << m_holder.height() << endl;
         m_holder.set_all(WidgetStackFixedAspectRatio::ADJUST_HEIGHT_TO_WIDTH, aspect_ratio);
     }
 

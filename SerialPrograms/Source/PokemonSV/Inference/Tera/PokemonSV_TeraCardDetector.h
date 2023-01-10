@@ -17,6 +17,7 @@
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 
 namespace PokemonAutomation{
+    class AsyncDispatcher;
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -79,8 +80,8 @@ public:
     uint8_t total_players(const ImageViewRGB32& screen) const;
     uint8_t ready_players(const ImageViewRGB32& screen) const;
 
-    int16_t seconds_left(Logger& logger, const ImageViewRGB32& screen);
-    std::string raid_code(Logger& logger, const ImageViewRGB32& screen);
+    int16_t seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen);
+    std::string raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen);
 
     //  OCR the player names in all the specified languages.
     //  The returned strings are raw OCR output and are unprocessed.

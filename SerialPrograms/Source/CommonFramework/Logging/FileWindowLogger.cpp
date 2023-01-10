@@ -10,6 +10,10 @@
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -19,8 +23,19 @@ Logger& global_logger_raw(){
 }
 
 
+FileWindowLogger::~FileWindowLogger(){
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_stopping = true;
+        m_cv.notify_all();
+    }
+    m_thread.join();
+}
 FileWindowLogger::FileWindowLogger(const std::string& path)
     : m_file(QString::fromStdString(path))
+    , m_max_queue_size(10000)
+    , m_stopping(false)
+    , m_thread(&FileWindowLogger::thread_loop, this)
 {
     bool exists = m_file.exists();
     m_file.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -38,24 +53,17 @@ void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
     m_windows.erase(&widget);
 }
 
-void FileWindowLogger::log(const char* msg, Color color){
-    log(std::string(msg), color);
-}
 void FileWindowLogger::log(const std::string& msg, Color color){
-    std::string line = normalize_newlines(msg);
-    std::lock_guard<std::mutex> lg(m_lock);
-    {
-        if (!m_windows.empty()){
-            QString str = to_window_str(line, color);
-            for (FileWindowLoggerWindow* window : m_windows){
-                window->log(str);
-            }
-        }
-    }
-    {
-        m_file.write(to_file_str(msg).c_str());
-        m_file.flush();
-    }
+    std::unique_lock<std::mutex> lg(m_lock);
+    m_cv.wait(lg, [=]{ return m_queue.size() < m_max_queue_size; });
+    m_queue.emplace_back(msg, color);
+    m_cv.notify_all();
+}
+void FileWindowLogger::log(std::string&& msg, Color color){
+    std::unique_lock<std::mutex> lg(m_lock);
+    m_cv.wait(lg, [=]{ return m_queue.size() < m_max_queue_size; });
+    m_queue.emplace_back(std::move(msg), color);
+    m_cv.notify_all();
 }
 
 
@@ -126,6 +134,48 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
 
     return QString::fromStdString(str);
 }
+void FileWindowLogger::internal_log(const std::string& msg, Color color){
+    std::string line = normalize_newlines(msg);
+    {
+        if (!m_windows.empty()){
+            QString str = to_window_str(line, color);
+            for (FileWindowLoggerWindow* window : m_windows){
+                window->log(str);
+            }
+        }
+    }
+    {
+        m_file.write(to_file_str(msg).c_str());
+        m_file.flush();
+    }
+}
+void FileWindowLogger::thread_loop(){
+    std::unique_lock<std::mutex> lg(m_lock);
+    while (true){
+        m_cv.wait(lg, [&]{
+            return m_stopping || !m_queue.empty();
+        });
+        if (m_stopping){
+            break;
+        }
+        auto& item = m_queue.front();
+        std::string msg = std::move(item.first);
+        Color color = item.second;
+        m_queue.pop_front();
+
+        lg.unlock();
+        internal_log(msg, color);
+        lg.lock();
+
+        if (m_queue.size() <= m_max_queue_size / 2){
+            m_cv.notify_all();
+        }
+    }
+}
+
+
+
+
 
 
 FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent)
@@ -153,7 +203,10 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
 
     connect(
         this, &FileWindowLoggerWindow::signal_log,
-        m_text, &QTextEdit::append
+        m_text, [=](QString msg){
+//            cout << "signal_log(): " << msg.toStdString() << endl;
+            m_text->append(msg);
+        }
     );
 
     m_logger += *this;
@@ -166,7 +219,8 @@ FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     m_logger -= *this;
 }
 
-void FileWindowLoggerWindow::log(const QString& msg){
+void FileWindowLoggerWindow::log(QString msg){
+//    cout << "FileWindowLoggerWindow::log(): " << msg.toStdString() << endl;
     emit signal_log(msg);
 }
 

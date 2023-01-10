@@ -48,7 +48,7 @@ public:
 
     std::string run(const ImageViewRGB32& image){
         TesseractAPI* instance;
-        do{
+        while (true){
             {
                 SpinLockGuard lg(m_lock, "TesseractPool::run()");
                 if (!m_idle.empty()){
@@ -57,50 +57,8 @@ public:
                     break;
                 }
             }
-
-#if 0
-            //  Make sure training data exists.
-            std::string path = m_training_data_path + m_language_code + ".traineddata";
-            QFile file(QString::fromStdString(path));
-            if (!file.exists()){
-                return QString();
-            }
-#endif
-
-//            cout << m_training_data_path << endl;
-
-            //  Check for non-ascii characters in path.
-            for (char ch : m_training_data_path){
-                if (ch < 0){
-                    throw InternalSystemError(
-                        nullptr, PA_CURRENT_FUNCTION,
-                        "Detected non-ASCII character in Tesseract path. Please move the program to a path with only ASCII characters."
-                    );
-                }
-            }
-
-            global_logger_tagged().log(
-                "Initializing TesseractAPI (" + m_language_code + "): " + m_training_data_path
-            );
-            std::unique_ptr<TesseractAPI> api(
-                new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
-            );
-            if (!api->valid()){
-                throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
-            }
-
-            SpinLockGuard lg(m_lock, "TesseractPool::run()");
-
-            m_instances.emplace_back(std::move(api));
-            try{
-                m_idle.emplace_back(m_instances.back().get());
-            }catch (...){
-                m_instances.pop_back();
-                throw;
-            }
-            instance = m_idle.back();
-            m_idle.pop_back();
-        }while (false);
+            add_instance();
+        }
 
 //        auto start = current_time();
         TesseractString str = instance->read32(
@@ -120,6 +78,52 @@ public:
         return str.c_str() == nullptr
             ? std::string()
             : str.c_str();
+    }
+
+    void add_instance(){
+        //  Check for non-ascii characters in path.
+        for (char ch : m_training_data_path){
+            if (ch < 0){
+                throw InternalSystemError(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    "Detected non-ASCII character in Tesseract path. Please move the program to a path with only ASCII characters."
+                );
+            }
+        }
+
+        global_logger_tagged().log(
+            "Initializing TesseractAPI (" + m_language_code + "): " + m_training_data_path
+        );
+        std::unique_ptr<TesseractAPI> api(
+            new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
+        );
+        if (!api->valid()){
+            throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
+        }
+
+        SpinLockGuard lg(m_lock, "TesseractPool::run()");
+
+        m_instances.emplace_back(std::move(api));
+        try{
+            m_idle.emplace_back(m_instances.back().get());
+        }catch (...){
+            m_instances.pop_back();
+            throw;
+        }
+    }
+
+    void ensure_instances(size_t instances){
+        size_t current_instances;
+        while (true){
+            {
+                SpinLockGuard lg(m_lock, "TesseractPool::run()");
+                current_instances = m_instances.size();
+            }
+            if (current_instances >= instances){
+                break;
+            }
+            add_instance();
+        }
     }
 
 #ifdef __APPLE__
@@ -168,6 +172,17 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
         }
     }
     return iter->second.run(image);
+}
+void ensure_instances(Language language, size_t instances){
+    std::map<Language, TesseractPool>::iterator iter;
+    {
+        SpinLockGuard lg(ocr_pool_lock, "ocr_read()");
+        iter = ocr_pool.find(language);
+        if (iter == ocr_pool.end()){
+            iter = ocr_pool.emplace(language, language).first;
+        }
+    }
+    iter->second.ensure_instances(instances);
 }
 
 

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h"
@@ -40,13 +41,16 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(SCREEN_WATCHER);
     PA_ADD_OPTION(SKIP_CONNECT_TO_CONTROLLER);
     PA_ADD_OPTION(SETTINGS);
+
+    //  Preload the OCR data.
+    OCR::ensure_instances(Language::English, 6);
 }
 
 
 void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     FastCodeEntrySettings settings(SETTINGS);
 
-    std::string code = read_raid_code(env.logger(), SCREEN_WATCHER.screenshot());
+    std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
     const char* error = enter_code(env, scope, settings, code, !SKIP_CONNECT_TO_CONTROLLER);
     if (error){
         env.log("No valid code found: " + std::string(error), COLOR_RED);

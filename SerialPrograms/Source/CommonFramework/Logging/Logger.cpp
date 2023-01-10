@@ -24,15 +24,12 @@ TaggedLogger::TaggedLogger(Logger& logger, std::string tag)
     , m_tag(std::move(tag))
 {}
 
-void TaggedLogger::log(const char* msg, Color color){
-    log(std::string(msg), color);
-}
 void TaggedLogger::log(const std::string& msg, Color color){
     std::string str =
         current_time_to_str() +
         " - [" + m_tag + "]: " +
         msg;
-    m_logger.log(str, color);
+    m_logger.log(std::move(str), color);
 }
 
 
@@ -42,12 +39,17 @@ public:
     CommandLineLogger(Logger& logger)
     : m_logger(logger) {}
 
-    virtual void log(const char* msg, Color color = Color()) override{
-        m_logger.log(msg, color);
-        std::cout << msg << std::endl;
-    }
     virtual void log(const std::string& msg, Color color = Color()) override{
-        log(msg.c_str(), color);
+        std::cout << msg << std::endl;
+        m_logger.log(msg, color);
+    }
+    virtual void log(std::string&& msg, Color color = Color()) override{
+        std::cout << msg << std::endl;
+        m_logger.log(std::move(msg), color);
+    }
+    virtual void log(const char* msg, Color color = Color()) override{
+        std::cout << msg << std::endl;
+        m_logger.log(msg, color);
     }
 
 private:

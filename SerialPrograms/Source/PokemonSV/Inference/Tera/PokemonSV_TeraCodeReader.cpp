@@ -6,6 +6,7 @@
 
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -76,12 +77,12 @@ char read_5S(const ImageViewRGB32& image, char OCR_result){
 
 
 struct WaterfillOCRResult{
-    ImageViewRGB32 cropped_image;
+    ImagePixelBox box;
     std::string ocr;
 };
 
 
-std::map<size_t, WaterfillOCRResult> waterfill_OCR(const ImageViewRGB32& image){
+std::vector<WaterfillOCRResult> waterfill_OCR(AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
     using namespace Kernels::Waterfill;
 
     //  Direct OCR is unreliable. Instead, we will waterfill each character
@@ -92,34 +93,44 @@ std::map<size_t, WaterfillOCRResult> waterfill_OCR(const ImageViewRGB32& image){
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, THRESHOLD, true);
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, THRESHOLD);
 
-    std::map<size_t, WaterfillOCRResult> map;
+    std::map<size_t, ImagePixelBox> boxes;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(20);
         WaterfillObject object;
-        while (iter->find_next(object, true)){
-//            cout << object.packed_matrix()->dump() << endl;
-            ImageViewRGB32 cropped = extract_box_reference(filtered, object);
-
-//            static int c = 0;
-//            cropped.save("testA-" + std::to_string(c++) + ".png");
-
-            ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
-
-            std::string raw = OCR::ocr_read(Language::English, padded);
-            map.emplace(
-                object.min_x,
-                WaterfillOCRResult{extract_box_reference(image, object), std::move(raw)}
-            );
+        while (iter->find_next(object, false)){
+            boxes.emplace(object.min_x, object);
         }
     }
 
-    return map;
+    std::vector<WaterfillOCRResult> ret;
+    for (auto& item : boxes){
+        ret.emplace_back(WaterfillOCRResult{item.second, std::string()});
+    }
+
+#if 0
+    for (WaterfillOCRResult& item : ret){
+        ImageViewRGB32 cropped = extract_box_reference(filtered, item.box);
+        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+        item.ocr = OCR::ocr_read(Language::English, padded);
+    }
+#else
+    dispatcher.run_in_parallel(
+        0, ret.size(),
+        [&](size_t index){
+            ImageViewRGB32 cropped = extract_box_reference(filtered, ret[index].box);
+            ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+            ret[index].ocr = OCR::ocr_read(Language::English, padded);
+        }
+    );
+#endif
+
+    return ret;
 }
 
 
-int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
-    std::map<size_t, WaterfillOCRResult> map = waterfill_OCR(image);
+int16_t read_raid_timer(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
+    std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image);
 
 //    cout << "map.size() = " << map.size() << endl;
 //    for (auto& item : map){
@@ -139,8 +150,8 @@ int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
 
     std::string raw;
     std::string normalized;
-    for (const auto& item : map){
-        const std::string& ocr = item.second.ocr;
+    for (const auto& item : characters){
+        const std::string& ocr = item.ocr;
         if (ocr.empty()){
             continue;
         }
@@ -179,8 +190,8 @@ int16_t read_raid_timer(Logger& logger, const ImageViewRGB32& image){
 }
 
 
-std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
-    std::map<size_t, WaterfillOCRResult> map = waterfill_OCR(image);
+std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
+    std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image);
 
     static const std::map<char, char> SUBSTITUTIONS{
         {'I', '1'},
@@ -196,8 +207,8 @@ std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
 
     std::string raw;
     std::string normalized;
-    for (const auto& item : map){
-        const std::string& ocr = item.second.ocr;
+    for (const auto& item : characters){
+        const std::string& ocr = item.ocr;
         if (ocr.empty()){
             continue;
         }
@@ -224,7 +235,7 @@ std::string read_raid_code(Logger& logger, const ImageViewRGB32& image){
         switch (ch){
         case '5':
         case 'S':
-            ch = read_5S(item.second.cropped_image, ch);
+            ch = read_5S(extract_box_reference(image, item.box), ch);
         }
 
         normalized += ch;
