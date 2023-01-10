@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace HexGenerator{
 
 
-const std::string VERSION = "v0.5.19";
+const std::string VERSION = "v0.5.20";
 const std::string DISCORD = "https://discord.gg/cQ4gWxN";
 const std::string GITHUB_REPO = "https://github.com/PokemonAutomation/";
 
