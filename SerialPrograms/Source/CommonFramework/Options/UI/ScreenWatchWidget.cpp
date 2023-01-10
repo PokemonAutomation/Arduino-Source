@@ -34,7 +34,15 @@ void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 //        cout << "asdf" << endl;
     QWidget::paintEvent(event);
     VideoSnapshot snapshot = m_last_frame;
-    m_holder.set_aspect_ratio((double)snapshot.frame->width() / snapshot.frame->height());
+
+    double aspect_ratio = (double)snapshot.frame->width() / snapshot.frame->height();
+    if (aspect_ratio < 2.0){
+        m_holder.setFixedHeight(m_holder.width() / 2);
+        m_holder.set_all(WidgetStackFixedAspectRatio::EXPAND_TO_BOX, aspect_ratio);
+    }else{
+        m_holder.set_all(WidgetStackFixedAspectRatio::ADJUST_HEIGHT_TO_WIDTH, aspect_ratio);
+    }
+
     QRect rect(0, 0, this->width(), this->height());
     QPainter painter(this);
     painter.drawImage(rect, snapshot.frame->to_QImage_ref());
@@ -53,7 +61,7 @@ void ScreenWatchDisplayWidget::thread_loop(){
 }
 
 ScreenWatchWidget::ScreenWatchWidget(ScreenWatchDisplay& option, QWidget& parent)
-    : WidgetStackFixedAspectRatio(parent, ADJUST_HEIGHT_TO_WIDTH, option.m_option.aspect_ratio())
+    : WidgetStackFixedAspectRatio(parent, ADJUST_HEIGHT_TO_WIDTH)
     , ConfigWidget(option, *this)
 {
     m_widget = new ScreenWatchDisplayWidget(option.m_option, *this);

@@ -22,12 +22,18 @@ public:
     };
 
 public:
-    WidgetStackFixedAspectRatio(QWidget& parent, SizePolicy size_policy, double aspect_ratio = 16 / 9.);
+    WidgetStackFixedAspectRatio(
+        QWidget& parent,
+        SizePolicy size_policy,
+        double aspect_ratio = 16/9.
+    );
 
-    static double sanitize_aspect_ratio(double aspect_ratio);
+    double sanitize_aspect_ratio(double aspect_ratio) const;
 
     void set_size_policy(SizePolicy size_policy);
     void set_aspect_ratio(double aspect_ratio);
+    void set_all(SizePolicy size_policy, double aspect_ratio);
+
     void add_widget(QWidget& widget);
 
     virtual void resizeEvent(QResizeEvent* event) override;

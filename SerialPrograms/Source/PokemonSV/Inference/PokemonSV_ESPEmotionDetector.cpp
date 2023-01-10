@@ -5,10 +5,7 @@
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/ColorClustering.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSV_ESPEmotionDetector.h"
 
 namespace PokemonAutomation{
