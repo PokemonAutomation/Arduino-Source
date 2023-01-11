@@ -164,8 +164,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             logger(), m_option.instance().NOTIFICATION_PROGRAM_FINISH,
             program_info,
             "",
-            current_stats(),
-            historical_stats()
+            current_stats_tracker(),
+            historical_stats_tracker()
         );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
@@ -179,8 +179,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             logger(), m_option.instance().NOTIFICATION_ERROR_FATAL,
             program_info,
             std::move(message),
-            current_stats(),
-            historical_stats()
+            current_stats_tracker(),
+            historical_stats_tracker()
         );
     }catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
@@ -193,8 +193,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             logger(), m_option.instance().NOTIFICATION_ERROR_FATAL,
             program_info,
             std::move(message),
-            current_stats(),
-            historical_stats()
+            current_stats_tracker(),
+            historical_stats_tracker()
         );
     }catch (...){
         logger().log("Program stopped with an exception!", COLOR_RED);
@@ -203,8 +203,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             logger(), m_option.instance().NOTIFICATION_ERROR_FATAL,
             program_info,
             "Unknown error.",
-            current_stats(),
-            historical_stats()
+            current_stats_tracker(),
+            historical_stats_tracker()
         );
     }
 }

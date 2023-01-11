@@ -88,16 +88,16 @@ void send_program_finished_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
 void send_program_fatal_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     const ImageViewRGB32& image = ImageViewRGB32(), bool keep_file = false
 );
 

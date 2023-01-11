@@ -28,6 +28,7 @@
 namespace PokemonAutomation{
 
 
+#if 0
 JsonObject make_header_field(const ProgramInfo& info){
     JsonObject field;
     field["name"] = info.program_name;
@@ -51,6 +52,7 @@ JsonObject make_header_field(const ProgramInfo& info){
     field["value"] = std::move(text);
     return field;
 }
+#endif
 void append_body_fields(JsonArray& fields, const std::vector<std::pair<std::string, std::string>>& messages){
     for (const auto& item : messages){
         JsonObject field;
@@ -61,7 +63,36 @@ void append_body_fields(JsonArray& fields, const std::vector<std::pair<std::stri
         }
     }
 }
-JsonObject make_credits_field(){
+JsonObject make_credits_field(const ProgramInfo& info){
+#if 0
+    JsonObject field;
+    const std::string& instance_name = GlobalSettings::instance().DISCORD.message.instance_name;
+    field["name"] = instance_name.empty()
+        ? "Session:"
+        : "Session: (" + instance_name + ")";
+    std::string text = info.program_name;
+    if (info.start_time != WallClock::min()){
+        text += "\nUp Time: ";
+        text += duration_to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                current_time() - info.start_time
+            )
+        );
+    }
+
+    text += "\nPowered By: ";
+    text += PreloadSettings::instance().DEVELOPER_MODE
+        ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
+        : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
+    if (GlobalSettings::instance().HIDE_NOTIF_DISCORD_LINK){
+        text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/))";
+    }else{
+        text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/)/[Discord](" + DISCORD_LINK_URL + "))";
+    }
+
+    field["value"] = std::move(text);
+    return field;
+#else
     JsonObject field;
     field["name"] = "Powered By:";
     std::string text = PreloadSettings::instance().DEVELOPER_MODE
@@ -74,6 +105,36 @@ JsonObject make_credits_field(){
     }
     field["value"] = std::move(text);
     return field;
+#endif
+}
+std::pair<std::string, std::string> make_session_field(
+    const ProgramInfo& info,
+    const StatsTracker* current_stats, const std::string& current_stats_addendum
+){
+    const std::string& instance_name = GlobalSettings::instance().DISCORD.message.instance_name;
+    std::string name = instance_name.empty()
+        ? "Current Session:"
+        : "Current Session: (" + instance_name + ")";
+
+    std::string text = info.program_name;
+    if (info.start_time != WallClock::min()){
+        text += "\nUp Time: ";
+        text += duration_to_string(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                current_time() - info.start_time
+            )
+        );
+    }
+    if (current_stats){
+        text += "\n";
+        text += current_stats->to_str();
+        if (!current_stats_addendum.empty()){
+            text += "\n";
+            text += current_stats_addendum;
+        }
+    }
+
+    return {std::move(name), std::move(text)};
 }
 
 
@@ -99,9 +160,9 @@ void send_raw_notification(
         }
 
         JsonArray fields;
-        fields.push_back(make_header_field(info));
+//        fields.push_back(make_header_field(info));
         append_body_fields(fields, messages);
-        fields.push_back(make_credits_field());
+        fields.push_back(make_credits_field(info));
         embed["fields"] = std::move(fields);
 
         if (hasFile){
@@ -147,9 +208,9 @@ void send_raw_notification(
         }
 
         JsonArray fields;
-        fields.push_back(make_header_field(info));
+//        fields.push_back(make_header_field(info));
         append_body_fields(fields, messages);
-        fields.push_back(make_credits_field());
+        fields.push_back(make_credits_field(info));
         embed["fields"] = std::move(fields);
 
         embeds.push_back(embed.clone());
@@ -225,8 +286,16 @@ void send_program_notification_with_file(
     if (!settings.ok_to_send_now(env.logger())){
         return;
     }
+#if 1
+    messages.emplace_back(
+        make_session_field(
+            env.program_info(),
+            env.current_stats(),
+            current_stats_addendum
+        )
+    );
+#else
     const StatsTracker* current_stats = env.current_stats();
-    const StatsTracker* historical_stats = env.historical_stats();
     if (current_stats){
         std::string str = env.current_stats()->to_str();
         if (!current_stats_addendum.empty()){
@@ -235,6 +304,8 @@ void send_program_notification_with_file(
         }
         messages.emplace_back("Session Stats:", std::move(str));
     }
+#endif
+    const StatsTracker* historical_stats = env.historical_stats();
     if (GlobalSettings::instance().ALL_STATS && historical_stats){
         messages.emplace_back("Historical Stats:", env.historical_stats()->to_str());
     }
@@ -259,8 +330,16 @@ void send_program_notification(
     if (!settings.ok_to_send_now(env.logger())){
         return;
     }
+#if 1
+    messages.emplace_back(
+        make_session_field(
+            env.program_info(),
+            env.current_stats(),
+            current_stats_addendum
+        )
+    );
+#else
     const StatsTracker* current_stats = env.current_stats();
-    const StatsTracker* historical_stats = env.historical_stats();
     if (current_stats){
         std::string str = env.current_stats()->to_str();
         if (!current_stats_addendum.empty()){
@@ -269,6 +348,8 @@ void send_program_notification(
         }
         messages.emplace_back("Session Stats:", std::move(str));
     }
+#endif
+    const StatsTracker* historical_stats = env.historical_stats();
     if (GlobalSettings::instance().ALL_STATS && historical_stats){
         messages.emplace_back("Historical Stats:", env.historical_stats()->to_str());
     }
@@ -336,18 +417,24 @@ void send_program_finished_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message:", message},
     };
+#if 1
+    messages.emplace_back(
+        make_session_field(info, current_stats, "")
+    );
+#else
     if (!current_stats.empty()){
         messages.emplace_back("Session Stats:", std::move(current_stats));
     }
-    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats:", std::move(historical_stats));
+#endif
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats:", historical_stats->to_str());
     }
     send_raw_program_notification(
         logger, settings,
@@ -361,18 +448,24 @@ void send_program_fatal_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const std::string& message,
-    std::string current_stats,
-    std::string historical_stats,
+    const StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
     const ImageViewRGB32& image, bool keep_file
 ){
     std::vector<std::pair<std::string, std::string>> messages{
         {"Message:", message},
     };
+#if 1
+    messages.emplace_back(
+        make_session_field(info, current_stats, "")
+    );
+#else
     if (!current_stats.empty()){
         messages.emplace_back("Session Stats:", std::move(current_stats));
     }
-    if (GlobalSettings::instance().ALL_STATS && !historical_stats.empty()){
-        messages.emplace_back("Historical Stats:", std::move(historical_stats));
+#endif
+    if (GlobalSettings::instance().ALL_STATS && historical_stats){
+        messages.emplace_back("Historical Stats:", historical_stats->to_str());
     }
     send_raw_program_notification(
         logger, settings,
