@@ -63,10 +63,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE) {
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
         ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
-    }
+//    }
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
@@ -84,7 +84,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
 #ifdef PA_OFFICIAL
-    if (PreloadSettings::instance().DEVELOPER_MODE) {
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Research ----");
         add_panels(ret);
     }
