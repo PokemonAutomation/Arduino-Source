@@ -65,8 +65,8 @@ void change_stats_view_to_judge(
 
 
 void hold_one_column(BotBaseContext& context){
-     // Minus to draw selection box
-    pbf_press_button(context, BUTTON_MINUS, 30, 50);
+    // Minus to draw selection box
+    pbf_press_button(context, BUTTON_MINUS, 50, 40);
     // Select rest of the pary
     // Press down multiple times to make sure we select full party in case the game drops some presses
     for(int i = 0; i < 20; i++){
@@ -74,7 +74,7 @@ void hold_one_column(BotBaseContext& context){
     }
     // Hold rest of the party
     pbf_wait(context, 60);
-    pbf_press_button(context, BUTTON_A, 30, 50);
+    pbf_press_button(context, BUTTON_A, 50, 40);
 }
 
 // Moving to left/right box is blind sequence. To prevent game dropping button inputs,

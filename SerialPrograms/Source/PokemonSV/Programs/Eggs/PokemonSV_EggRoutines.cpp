@@ -329,12 +329,13 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
         context.wait_for_all_requests();
 
         const size_t remaining_eggs = max_eggs - num_eggs_collected;
+        const float average_eggs_per_check = eggs_collected_cur_session / (float)num_checks;
+
         size_t wait_seconds = default_collection_interval_seconds;
-        if (remaining_eggs <= 4){
+        if (remaining_eggs < average_eggs_per_check){
             // If we have few remaining eggs to hatch, adjust wait time accordingly.
-            const float average_eggs_per_check = eggs_collected_cur_session / (float)num_checks;
             wait_seconds = size_t(remaining_eggs * default_collection_interval_seconds / average_eggs_per_check);
-            console.log("Last remaining eggs " + std::to_string(remaining_eggs) + ", avg eggs per check " + 
+            console.log("Last remaining eggs: " + std::to_string(remaining_eggs) + ", avg eggs per check: " + 
                 std::to_string(average_eggs_per_check) + ", wait secs: " + std::to_string(wait_seconds) + ".");
             if (wait_seconds < 30){
                 // Minimum wait period is 30 sec.
@@ -343,7 +344,8 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
             }
         }
         
-        console.log("Collected " + std::to_string(num_eggs_collected) + " eggs, wait " + std::to_string(wait_seconds) + " seconds.");
+        console.log("Collected " + std::to_string(num_eggs_collected) + " eggs, avg eggs per check: " + std::to_string(average_eggs_per_check)
+            + ", wait " + std::to_string(wait_seconds) + " seconds.");
         console.overlay().add_log("Wait " + std::to_string(wait_seconds) + " secs", COLOR_WHITE);
         
         context.wait_for(std::chrono::seconds(wait_seconds));
