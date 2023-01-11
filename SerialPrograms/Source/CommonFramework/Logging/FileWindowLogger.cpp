@@ -203,7 +203,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
 
     connect(
         this, &FileWindowLoggerWindow::signal_log,
-        m_text, [=](QString msg){
+        m_text, [this](QString msg){
 //            cout << "signal_log(): " << msg.toStdString() << endl;
             m_text->append(msg);
         }
