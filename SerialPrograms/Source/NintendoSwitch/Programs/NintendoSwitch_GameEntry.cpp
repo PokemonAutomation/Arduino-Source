@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
@@ -118,11 +119,12 @@ void start_game_from_home_with_inference(
         HomeWatcher home(std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select;
         UpdateMenuWatcher update_menu(false);
+        BlackScreenWatcher black_screen;
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(10),
-            { home, user_select, update_menu }
+            { home, user_select, update_menu, black_screen }
         );
 
         //  Wait for screen to stabilize.
@@ -140,7 +142,9 @@ void start_game_from_home_with_inference(
             console.log("Detected update menu.", COLOR_RED);
             pbf_press_dpad(context, DPAD_UP, 5, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
-            continue;
+        case 3:
+            console.log("Detected black screen. Game started...");
+            break;
         default:
             console.log("No recognizable state after 10 seconds.", COLOR_RED);
             throw OperationFailedException(console, "No recognizable state after 10 seconds.");
