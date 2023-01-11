@@ -25,14 +25,17 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
+    //  Returns -1 if not found.
+    int8_t detect_slot(const ImageViewRGB32& screen) const;
+
 private:
-    WhiteButtonDetector m_status_button;
+    WhiteButtonDetector m_callouts_button;
     GradientArrowDetector m_arrow;
 };
 class BattleMenuWatcher : public DetectorToFinder<BattleMenuDetector>{
 public:
     BattleMenuWatcher(Color color)
-         : DetectorToFinder("BattleMenuFinder", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("BattleMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -45,14 +48,17 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
+    //  Returns -1 if not found.
+    int8_t detect_slot(const ImageViewRGB32& screen) const;
+
 private:
-    WhiteButtonDetector m_status_button;
+    WhiteButtonDetector m_info_button;
     GradientArrowDetector m_arrow;
 };
 class MoveSelectWatcher : public DetectorToFinder<MoveSelectDetector>{
 public:
     MoveSelectWatcher(Color color)
-         : DetectorToFinder("MoveSelectFinder", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("MoveSelectWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -72,6 +78,35 @@ private:
 
 
 
+class TargetSelectDetector : public StaticScreenDetector{
+public:
+    TargetSelectDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+    //  Returns -1 if not found.
+    //  Returns 0 if opponent.
+    //  Returns 1 if left-most player.
+    //  Returns 4 if right-most player.
+    int8_t detect_slot(const ImageViewRGB32& screen) const;
+
+private:
+    GradientArrowDetector m_opponent;
+    GradientArrowDetector m_player0;
+    GradientArrowDetector m_player1;
+    GradientArrowDetector m_player2;
+    GradientArrowDetector m_player3;
+};
+class TargetSelectWatcher : public DetectorToFinder<TargetSelectDetector>{
+public:
+    TargetSelectWatcher(Color color)
+         : DetectorToFinder("TargetSelectWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+
 class TeraCatchDetector : public StaticScreenDetector{
 public:
     TeraCatchDetector(Color color);
@@ -81,6 +116,7 @@ public:
 
 private:
     Color m_color;
+    WhiteButtonDetector m_callouts_button;
     ImageFloatBox m_button;
     ImageFloatBox m_box_right;
     GradientArrowDetector m_arrow;
@@ -88,7 +124,7 @@ private:
 class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
 public:
     TeraCatchWatcher(Color color)
-         : DetectorToFinder("TeraCatchFinder", std::chrono::milliseconds(1000), color)
+         : DetectorToFinder("TeraCatchWatcher", std::chrono::milliseconds(1000), color)
     {}
 };
 

@@ -58,11 +58,7 @@ bool run_tera_battle(
 
         BattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
-        GradientArrowWatcher target_select_menu(
-            COLOR_CYAN,
-            GradientArrowType::DOWN,
-            {0.45, 0.07, 0.10, 0.10}
-        );
+        TargetSelectWatcher target_select_menu(COLOR_CYAN);
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_GREEN);
         context.wait_for_all_requests();

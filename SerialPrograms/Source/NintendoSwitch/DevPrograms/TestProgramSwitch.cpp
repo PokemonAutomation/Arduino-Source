@@ -175,7 +175,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-    change_stats_view_to_judge(env.program_info(), console, context);
+    BattleMenuDetector battle_menu(COLOR_RED);
+    MoveSelectDetector move_select(COLOR_GREEN);
+    TargetSelectDetector target_select(COLOR_CYAN);
+    TeraCatchDetector tera_catch(COLOR_BLUE);
+    battle_menu.make_overlays(overlays);
+    move_select.make_overlays(overlays);
+    target_select.make_overlays(overlays);
+    tera_catch.make_overlays(overlays);
+    cout << (int)target_select.detect_slot(feed.snapshot()) << endl;
+
+
+
+//    change_stats_view_to_judge(env.program_info(), console, context);
 
 
 #if 0
