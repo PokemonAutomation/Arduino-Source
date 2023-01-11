@@ -298,8 +298,11 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
 
     context.wait_for_all_requests();
     
-    const auto egg_collection_interval = std::chrono::seconds(180);
+    const size_t default_collection_interval_seconds = 180;
     const auto max_egg_wait_time = std::chrono::minutes(30);
+
+    size_t num_checks = 0;
+    size_t eggs_collected_cur_session = 0;
 
     WallClock start = current_time();
     while(true){
@@ -308,7 +311,10 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
         clear_mons_in_front(info, console, context);
         check_basket_to_collect_eggs(info, console, context, max_eggs, num_eggs_collected);
 
-        basket_check_callback(num_eggs_collected - last_num_eggs_collected);
+        const size_t new_eggs_added = num_eggs_collected - last_num_eggs_collected;
+        basket_check_callback(new_eggs_added);
+        eggs_collected_cur_session += new_eggs_added;
+        num_checks++;
 
         if (num_eggs_collected == max_eggs){
             console.log("Collected enough eggs: " + std::to_string(max_eggs));
@@ -320,11 +326,27 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
             console.overlay().add_log("Picnic time up", COLOR_YELLOW);
             break;
         }
-        
         context.wait_for_all_requests();
-        console.log("Collected " + std::to_string(num_eggs_collected) + ", wait 3 minutes.");
-        console.overlay().add_log("Wait 3 min", COLOR_WHITE);
-        context.wait_for(egg_collection_interval);
+
+        const size_t remaining_eggs = max_eggs - num_eggs_collected;
+        size_t wait_seconds = default_collection_interval_seconds;
+        if (remaining_eggs <= 4){
+            // If we have few remaining eggs to hatch, adjust wait time accordingly.
+            const float average_eggs_per_check = eggs_collected_cur_session / (float)num_checks;
+            wait_seconds = size_t(remaining_eggs * default_collection_interval_seconds / average_eggs_per_check);
+            console.log("Last remaining eggs " + std::to_string(remaining_eggs) + ", avg eggs per check " + 
+                std::to_string(average_eggs_per_check) + ", wait secs: " + std::to_string(wait_seconds) + ".");
+            if (wait_seconds < 30){
+                // Minimum wait period is 30 sec.
+                console.log("Clamp wait time to 30 secs.");
+                wait_seconds = 30;
+            }
+        }
+        
+        console.log("Collected " + std::to_string(num_eggs_collected) + " eggs, wait " + std::to_string(wait_seconds) + " seconds.");
+        console.overlay().add_log("Wait " + std::to_string(wait_seconds) + " secs", COLOR_WHITE);
+        
+        context.wait_for(std::chrono::seconds(wait_seconds));
     }
 }
 
