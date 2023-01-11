@@ -322,7 +322,7 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
         }
         
         context.wait_for_all_requests();
-        console.log("Wait 3 minutes.");
+        console.log("Collected " + std::to_string(num_eggs_collected) + ", wait 3 minutes.");
         console.overlay().add_log("Wait 3 min", COLOR_WHITE);
         context.wait_for(egg_collection_interval);
     }
