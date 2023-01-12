@@ -36,6 +36,9 @@ void move_to_left_box(BotBaseContext& context);
 //  Press button R to move to the box on the right
 void move_to_right_box(BotBaseContext& context);
 
+//  Hold one column of at most five pokemon
+void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 //  Release current selected pokemon in the box system.
 //  Throws OperationFailedException, if it got stuck or timed out.
 //  The # of errors are stored into "errors". These are usually dropped button

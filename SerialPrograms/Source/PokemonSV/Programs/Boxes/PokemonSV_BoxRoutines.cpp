@@ -86,6 +86,55 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
+void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    // Minus to draw selection box
+    pbf_press_button(context, BUTTON_MINUS, 50, 40);
+
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "StartHoldingColumn",
+                "Failed to enter box selection mode after 1 minute of Button Minus pressing."
+            );
+        }
+
+        BoxSelectionBoxModeWatcher watcher;
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10), {watcher}
+        );
+
+        if (ret == 0){
+            if (watcher.in_box_selection_mode()){
+                break;
+            }
+            // else: not in selection mode, game drop the button minus press, try again
+            pbf_press_button(context, BUTTON_MINUS, 50, 40);
+            continue;
+        }
+
+        // Cannot detect box selection mode after 10 secs
+        dump_image_and_throw_recoverable_exception(
+            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while holding a column after 10 seconds."
+        );
+    }
+
+    // Select rest of the pary
+    // Press down multiple times to make sure we select full party in case the game drops some presses
+    for(int i = 0; i < 15; i++){
+        pbf_press_dpad(context, DPAD_DOWN, 5, 3);
+    }
+    // Hold rest of the party
+    pbf_wait(context, 60);
+    // We cannot detect whether this Button A will be dropped or not.
+    // So we have to go blind here.
+    pbf_press_button(context, BUTTON_A, 50, 40);
+    context.wait_for_all_requests();
+}
+
 void release_one_pokemon(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t& errors
@@ -192,7 +241,7 @@ void release_one_pokemon(
             continue;
         default:
             dump_image_and_throw_recoverable_exception(
-                info, console, "NoState", "No recognized state after 10 seconds."
+                info, console, "NoStateReleasingPokemon", "No recognized state while releasing a pokemon after 10 seconds."
             );
         }
     }
@@ -226,7 +275,7 @@ void load_one_column_to_party(
     // Move cursor to the current column
     move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
 
-    hold_one_column(context);
+    hold_one_column(info, console, context);
     // Move the held column to party
     move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
 
@@ -247,7 +296,7 @@ void unload_one_column_from_party(
     // Move cursor to party column
     move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
 
-    hold_one_column(context);
+    hold_one_column(info, console, context);
 
     // Move the held column to target
     move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
