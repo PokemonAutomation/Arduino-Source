@@ -450,7 +450,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
                     catch (OperationFailedException& e) {
                         stats.m_errors++;
-
+                        npc_tries++;
                         // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs
                         // at this point it is more likely to be non-recoverable
                         size_t max_npc_tries = ONE_NPC ? 1 : 3;
