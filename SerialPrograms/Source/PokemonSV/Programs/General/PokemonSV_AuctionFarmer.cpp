@@ -355,6 +355,8 @@ uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool hig
 void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer) {
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
+    VideoSnapshot offer_screen = env.console.video().snapshot();
+
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher high_detector(COLOR_RED, { 0.50, 0.40, 0.40, 0.082 });
     PromptDialogWatcher mid_detector(COLOR_PURPLE, { 0.50, 0.475, 0.40, 0.082 });
@@ -406,7 +408,7 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
                 { "Item:", get_auction_item_name(offer.item).display_name() },
                 { "Final Bid:", std::to_string(current_bid) },
             }
-            , "");
+            , "", offer_screen);
     }
 
     return;
