@@ -7,6 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -63,7 +64,7 @@ void change_stats_view_to_judge(
 #endif
 }
 
-
+// Use box selection mode to hold one column of pokemon
 void hold_one_column(BotBaseContext& context){
     // Minus to draw selection box
     pbf_press_button(context, BUTTON_MINUS, 50, 40);
@@ -86,28 +87,22 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
+// Use box selection mode to hold one column of pokemon.
+// Use visual feedback to ensure button Minus is pressed to turn on box selection mode/
+// But no feedback on the button A press to make sure the selection is complete.
 void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     // Minus to draw selection box
     pbf_press_button(context, BUTTON_MINUS, 50, 40);
-
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "StartHoldingColumn",
-                "Failed to enter box selection mode after 1 minute of Button Minus pressing."
+                info, console, "StartHoldingColumn", "Failed to enter box selection mode after 1 minute of Button Minus pressing."
             );
         }
-
         BoxSelectionBoxModeWatcher watcher;
-
         context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(10), {watcher}
-        );
-
-        if (ret == 0){
+        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
             if (watcher.in_box_selection_mode()){
                 break;
             }
@@ -115,7 +110,6 @@ void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             pbf_press_button(context, BUTTON_MINUS, 50, 40);
             continue;
         }
-
         // Cannot detect box selection mode after 10 secs
         dump_image_and_throw_recoverable_exception(
             info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while holding a column after 10 seconds."
@@ -133,6 +127,62 @@ void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     // So we have to go blind here.
     pbf_press_button(context, BUTTON_A, 50, 40);
     context.wait_for_all_requests();
+}
+
+// Assuming already holding one or more pokemon, press A to drop them.
+void drop_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_A, 60, 60);
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "DropColumn", "Failed to drop a column after 1 minute of Button A pressing."
+            );
+        }
+        BoxSelectionBoxModeWatcher watcher;
+        context.wait_for_all_requests();
+        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
+            if (!watcher.in_box_selection_mode()){
+                break;
+            }
+            // else: still in selection mode, game drop the button A press, try again
+            pbf_press_button(context, BUTTON_A, 60, 60);
+            continue;
+        }
+        // Cannot detect box selection mode after 10 secs
+        dump_image_and_throw_recoverable_exception(
+            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while dropping a column after 10 seconds."
+        );
+    }
+}
+
+// Assuming already holding one or more pokemon, press B to cancel the holding.
+void cancel_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Cancel pokemon holding.");
+
+    pbf_press_button(context, BUTTON_B, 60, 60);
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "CancelBoxSelection", "Failed to cancel box selection after 1 minute of Button B pressing."
+            );
+        }
+        BoxSelectionBoxModeWatcher watcher;
+        context.wait_for_all_requests();
+        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
+            if (!watcher.in_box_selection_mode()){
+                break;
+            }
+            // else: still in selection mode, game drop the button B press, try again
+            pbf_press_button(context, BUTTON_B, 60, 60);
+            continue;
+        }
+        // Cannot detect box selection mode after 10 secs
+        dump_image_and_throw_recoverable_exception(
+            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while cancelling box selection after 10 seconds."
+        );
+    }
 }
 
 void release_one_pokemon(
@@ -272,15 +322,33 @@ void load_one_column_to_party(
     console.log("Load column " + std::to_string(column_index) + " to party.");
     console.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
 
-    // Move cursor to the current column
-    move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-
-    hold_one_column(info, console, context);
-    // Move the held column to party
-    move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+    size_t fail_count = 0;
+    while(true){
+        // Move cursor to the target column
+        move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+        hold_one_column(info, console, context);
+        try{
+            // Move the held column to party
+            move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+        } catch(OperationFailedException& e){
+            if (++fail_count == 10){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "ConsecutiveColumnMoveFailure",
+                    "load_one_column_to_party(): consecutive failure of moving column around."
+                );
+            }
+            console.log("Failed to move column around. Cancelling box selection and try again.");
+            // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
+            // the column selection.
+            // We can press B to back out and try again.
+            cancel_held_pokemon(info, console, context);
+            continue;
+        }
+        break;
+    }
 
     // Drop the column to party
-    pbf_press_button(context, BUTTON_A, 60, 60);
+    drop_held_pokemon(info, console, context);
 
     context.wait_for_all_requests();
     console.log("Loaded column " + std::to_string(column_index) + " to party.");
@@ -293,16 +361,34 @@ void unload_one_column_from_party(
     context.wait_for_all_requests();
     console.log("Unload party to column " + std::to_string(column_index) + ".");
     console.overlay().add_log("Unload to column " + std::to_string(column_index+1), COLOR_WHITE);
-    // Move cursor to party column
-    move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
 
-    hold_one_column(info, console, context);
+    size_t fail_count = 0;
+    while(true){
+        // Move cursor to party column
+        move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+        hold_one_column(info, console, context);
 
-    // Move the held column to target
-    move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-
+        try{
+            // Move the held column to target
+            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+        } catch(OperationFailedException& e){
+            if (++fail_count == 10){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "ConsecutiveColumnMoveFailure",
+                    "unload_one_column_from_party(): consecutive failure of moving column around."
+                );
+            }
+            console.log("Failed to move column around. Cancelling box selection and try again.");
+            // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
+            // the column selection.
+            // We can press B to back out and try again.
+            cancel_held_pokemon(info, console, context);
+            continue;
+        }
+        break;
+    }
     // Drop the column
-    pbf_press_button(context, BUTTON_A, 60, 60);
+    drop_held_pokemon(info, console, context);
 
     context.wait_for_all_requests();
     console.log("Unloaded party to column " + std::to_string(column_index) + ".");
