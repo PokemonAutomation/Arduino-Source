@@ -264,6 +264,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
         if (ret == 0) {
             return;
         }
+        tries++;
     }
     throw OperationFailedException(env.console, "Too many attempts to talk to the NPC.");
     return;
@@ -433,6 +434,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         
         bool good_offer = false;
         while (!good_offer) {
+            size_t npc_tries = 0;
             if (!ONE_NPC) {
                 pbf_move_right_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
             }
@@ -445,7 +447,18 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         move_to_auctioneer(env, context, offer);
                     }
                     catch (OperationFailedException& e) {
-                        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message());
+                        stats.m_errors++;
+
+                        // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs
+                        // at this point it is more likely to be non-recoverable
+                        size_t max_npc_tries = ONE_NPC ? 1 : 3;
+
+                        if (npc_tries < max_npc_tries) {
+                            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message());
+                        }
+                        else {
+                            throw OperationFailedException(env.console, "Failed to talk to the NPC!");
+                        }
                         break;
                     }
 
