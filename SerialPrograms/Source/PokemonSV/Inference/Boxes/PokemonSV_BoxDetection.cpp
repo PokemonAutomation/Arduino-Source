@@ -397,7 +397,35 @@ uint8_t BoxEmptyPartyWatcher::num_empty_slots_found() const{
     return num_empty;
 }
 
+namespace{
+    ImageFloatBox BOTTOM_BUTTON_Y_BOX{0.391, 0.939, 0.440, 0.047};
+} // anonymous namespace
 
+BoxBottomButtonYDetector::BoxBottomButtonYDetector(Color color)
+    : WhiteButtonDetector(color, WhiteButton::ButtonY, BOTTOM_BUTTON_Y_BOX)
+{}
+BoxBottomButtonBDetector::BoxBottomButtonBDetector(Color color)
+    : WhiteButtonDetector(color, WhiteButton::ButtonB, {0.842, 0.939, 0.139, 0.047})
+{}
+
+
+BoxSelectionBoxModeWatcher::BoxSelectionBoxModeWatcher(Color color)
+    : VisualInferenceCallback("BoxSelectionBoxModeWatcher")
+    , button_y_watcher(color, WhiteButton::ButtonY, BOTTOM_BUTTON_Y_BOX, WhiteButtonWatcher::FinderType::CONSISTENT)
+{}
+
+void BoxSelectionBoxModeWatcher::make_overlays(VideoOverlaySet& items) const{
+    button_y_watcher.make_overlays(items);
+}
+
+bool BoxSelectionBoxModeWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    return button_y_watcher.process_frame(frame, timestamp);
+}
+
+bool BoxSelectionBoxModeWatcher::in_box_selection_mode() const{
+    // If we have button Y detected, then we are NOT in box selection mode
+    return !button_y_watcher.consistent_result();
+}
 
 
 

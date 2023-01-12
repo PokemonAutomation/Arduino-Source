@@ -268,6 +268,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonSV_BoxEggDetector", std::bind(image_bool_detector_helper, test_pokemonSV_BoxEggDetector, _1)},
     {"PokemonSV_BoxPartyEggDetector", std::bind(image_int_detector_helper, test_pokemonSV_BoxPartyEggDetector, _1)},
     {"PokemonSV_OverworldDetector", std::bind(image_bool_detector_helper, test_pokemonSV_OverworldDetector, _1)},
+    {"PokemonSV_BoxBottomButtonDetector", std::bind(image_words_detector_helper, test_pokemonSV_BoxBottomButtonDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

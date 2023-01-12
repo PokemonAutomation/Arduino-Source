@@ -10,6 +10,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{
     class ConsoleHandle;
@@ -165,6 +166,34 @@ private:
 };
 
 
+// Detect whether there is a button Y in the bottom row of the box system view
+class BoxBottomButtonYDetector : public WhiteButtonDetector{
+public:
+    BoxBottomButtonYDetector(Color color = COLOR_RED);
+};
+
+// Detect whether there is a button B in the bottom row of the box system view
+class BoxBottomButtonBDetector : public WhiteButtonDetector{
+public:
+    BoxBottomButtonBDetector(Color color = COLOR_RED);
+};
+
+// Detect whether we are in box selection mode or not
+class BoxSelectionBoxModeWatcher : public VisualInferenceCallback{
+public:
+    BoxSelectionBoxModeWatcher(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    
+    // Return true when the watcher is sure that we are either in box selection mode or not
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+    // Return whether in box selection mode
+    bool in_box_selection_mode() const;
+
+private:
+    WhiteButtonWatcher button_y_watcher;
+};
 
 
 

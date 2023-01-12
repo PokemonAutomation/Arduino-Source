@@ -55,9 +55,9 @@ public:
 
 // Detect eggs in a party column (five slots after the party lead). Used for egg hatching.
 // It also detects empty spaces and non-empty spaces, so that we know whether we have non-egg pokemon in the party.
-class EggPartyColumnWatcher : public VisualInferenceCallback{
+class BoxEggPartyColumnWatcher : public VisualInferenceCallback{
 public:
-    EggPartyColumnWatcher(Color color = COLOR_YELLOW);
+    BoxEggPartyColumnWatcher(Color color = COLOR_YELLOW);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     

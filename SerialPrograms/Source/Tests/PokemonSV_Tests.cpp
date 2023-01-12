@@ -296,5 +296,32 @@ int test_pokemonSV_OverworldDetector(const ImageViewRGB32& image, bool target){
     return 0;
 }
 
+int test_pokemonSV_BoxBottomButtonDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // two words: <button Y exists, true or false> <button B exists, true or false)
+    if (words.size() < 2){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    bool target_y = false, target_b = false;
+    if (parse_bool(words[words.size()-2], target_y) == false){
+        cerr << "Error: word " << words[words.size()-2] << " is wrong. Must be True or False." << endl;
+        return 1;
+    }
+    if (parse_bool(words[words.size()-1], target_b) == false){
+        cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be True or False." << endl;
+        return 1;
+    }
+
+    BoxBottomButtonYDetector y_detector;
+    bool result_y = y_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(result_y, target_y, "button Y");
+
+    // BoxBottomButtonBDetector b_detector;
+    // bool result_b = b_detector.detect(image);
+    // TEST_RESULT_COMPONENT_EQUAL(result_b, target_b, "button B");
+
+    return 0;
+}
 
 }

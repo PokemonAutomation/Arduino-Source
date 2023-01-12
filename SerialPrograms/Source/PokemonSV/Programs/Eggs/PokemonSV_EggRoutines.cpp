@@ -464,7 +464,7 @@ void check_basket_to_collect_eggs(
 
 std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
-    EggPartyColumnWatcher egg_column_watcher;
+    BoxEggPartyColumnWatcher egg_column_watcher;
     int ret = wait_until(
         console, context,
         std::chrono::seconds(10),

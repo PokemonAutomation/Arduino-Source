@@ -14,11 +14,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-
-
 #include "PokemonSV_BoxEggDetector.h"
-
-
 
 #include <iostream>
 using std::cout;
@@ -102,7 +98,10 @@ bool BoxEggDetector::detect(const ImageViewRGB32& frame) const{
     );
 }
 
-EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallback("EggPartyColumnWatcher"), m_egg_watchers(5), m_empty_watchers(5) {
+BoxEggPartyColumnWatcher::BoxEggPartyColumnWatcher(Color color)
+    : VisualInferenceCallback("BoxEggPartyColumnWatcher"),
+    m_egg_watchers(5), m_empty_watchers(5)
+{
     for(uint8_t i = 0; i < 5; i++){
         m_egg_watchers.emplace_back(
             BoxCursorLocation::PARTY,
@@ -119,14 +118,14 @@ EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallb
     }
 }
 
-void EggPartyColumnWatcher::make_overlays(VideoOverlaySet& items) const{
+void BoxEggPartyColumnWatcher::make_overlays(VideoOverlaySet& items) const{
     for(int i = 0; i < 5; i++){
         m_egg_watchers[i].make_overlays(items);
         m_empty_watchers[i].make_overlays(items);
     }
 }
 
-bool EggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool BoxEggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool all_certain = true;
     for(int i = 0; i < 5; i++){
         // Return true if an egg is detected
@@ -141,7 +140,7 @@ bool EggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallClock
     return all_certain;
 }
 
-uint8_t EggPartyColumnWatcher::num_eggs_found() const{
+uint8_t BoxEggPartyColumnWatcher::num_eggs_found() const{
     uint8_t num_eggs = 0;
     for(int i = 0; i < 5; i++){
         if (m_egg_watchers[i].consistent_result()){
@@ -151,7 +150,7 @@ uint8_t EggPartyColumnWatcher::num_eggs_found() const{
     return num_eggs;
 }
 
-uint8_t EggPartyColumnWatcher::num_non_egg_pokemon_found() const{
+uint8_t BoxEggPartyColumnWatcher::num_non_egg_pokemon_found() const{
     uint8_t num_pokemon = 0;
     for(int i = 0; i < 5; i++){
         if (m_empty_watchers[i].consistent_result() == false && m_egg_watchers[i].consistent_result() == false){
