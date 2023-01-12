@@ -365,7 +365,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // If yes, move them to the right box.
         // Otherwise, release them or move them into box in case we will reset game later.
         for(int i = 0; i < num_eggs_in_party; i++){
-            process_one_baby(env, context, HAS_CLONE_RIDE_POKEMON ? i - 1 : i, num_eggs_in_party);
+            process_one_baby(env, context, i, num_eggs_in_party);
         }
 
         // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
@@ -452,7 +452,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     // Check each pokemon from bottom to top. In this way we can reliably detect end of releasing the pokemon.
-    const int party_row = num_eggs_in_party - egg_index;
+    const int party_row = num_eggs_in_party - egg_index + (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
     context.wait_for_all_requests();
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 
