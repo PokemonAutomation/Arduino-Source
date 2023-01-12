@@ -53,16 +53,15 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "7",
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "7"
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "6",
+        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "6"
     )
     , WRAP_DELAY(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "7",
-        PreloadSettings::instance().DEVELOPER_MODE ? "6" : "7"
+        "6", "6"
     )
 {
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
