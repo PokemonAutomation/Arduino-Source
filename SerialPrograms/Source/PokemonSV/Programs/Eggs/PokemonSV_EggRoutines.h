@@ -85,7 +85,8 @@ uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& co
 // When hatching at Zero Gate, use this function to reset player character position back to Zero Gate flying spot
 void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-// Check hatched pokemon info to determine what to do with it.
+// Assuming the current selected slot in box system is a hatched pokemon, not empty space or egg,
+// check the hatched pokemon's info to determine what to do with it.
 // Return if the pokemon is shiny. The action to handle the pokemon is returned in `action`.
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,

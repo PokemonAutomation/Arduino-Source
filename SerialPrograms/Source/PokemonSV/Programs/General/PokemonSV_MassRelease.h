@@ -45,6 +45,9 @@ private:
     SimpleIntegerOption<uint8_t> BOXES_TO_RELEASE;
     BooleanCheckBoxOption SKIP_SHINIES;
     EventNotificationsOption NOTIFICATIONS;
+
+    // Whether the box system view is judege or stats.
+    bool m_in_judge_view = false;
 };
 
 

@@ -114,6 +114,11 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         return;
     }
 
+    if (m_in_judge_view == false){
+        change_stats_view_to_judge(env.program_info(), env.console, context);
+        m_in_judge_view = true;
+    }
+
     if (egg_detector.detect(screen)){
         stats.m_eggs++;
         return;
@@ -158,7 +163,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
-    change_stats_view_to_judge(env.program_info(), env.console, context);
+    m_in_judge_view = false;
 
     BoxDetector box_detector;
     VideoOverlaySet overlays(env.console.overlay());
