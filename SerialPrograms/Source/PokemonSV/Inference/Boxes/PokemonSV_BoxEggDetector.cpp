@@ -26,7 +26,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-template class FixedLimitVector<NintendoSwitch::PokemonSV::EggWatcher>;
+template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEggWatcher>;
 
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -68,22 +68,22 @@ bool BoxCurrentEggDetector::detect(const ImageViewRGB32& frame) const{
 }
 
 
-EggDetector::EggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color)
+BoxEggDetector::BoxEggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color)
 : m_color(color) {
     if (side == BoxCursorLocation::PARTY){
         m_box = ImageFloatBox(0.149, 0.1165 * row + 0.235, 0.033, 0.066);
     } else if (side == BoxCursorLocation::SLOTS){
         m_box = ImageFloatBox(0.0656 * col + 0.249, 0.1165 * row + 0.235, 0.033, 0.066);
     } else {
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for EggDetector");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for BoxEggDetector");
     }
 }
 
-void EggDetector::make_overlays(VideoOverlaySet& items) const{
+void BoxEggDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool EggDetector::detect(const ImageViewRGB32& frame) const{
+bool BoxEggDetector::detect(const ImageViewRGB32& frame) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)}
     };
@@ -107,7 +107,7 @@ EggPartyColumnWatcher::EggPartyColumnWatcher(Color color) : VisualInferenceCallb
         m_egg_watchers.emplace_back(
             BoxCursorLocation::PARTY,
             (uint8_t)(i + 1), (uint8_t)0,
-            EggWatcher::FinderType::CONSISTENT,
+            BoxEggWatcher::FinderType::CONSISTENT,
             color
         );
         m_empty_watchers.emplace_back(

@@ -34,9 +34,9 @@ private:
 
 
 // Detect if a slot in the box system is an egg.
-class EggDetector : public StaticScreenDetector{
+class BoxEggDetector : public StaticScreenDetector{
 public:
-    EggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_YELLOW);
+    BoxEggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_YELLOW);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -46,10 +46,10 @@ private:
     ImageFloatBox m_box;
 };
 
-class EggWatcher : public DetectorToFinder<EggDetector>{
+class BoxEggWatcher : public DetectorToFinder<BoxEggDetector>{
 public:
-    EggWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_YELLOW)
-         : DetectorToFinder("EggWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
+    BoxEggWatcher(BoxCursorLocation side, uint8_t row, uint8_t col, FinderType finder_type = FinderType::PRESENT, Color color = COLOR_YELLOW)
+         : DetectorToFinder("BoxEggWatcher", finder_type, std::chrono::milliseconds(100), side, row, col, color)
     {}
 };
 
@@ -69,7 +69,7 @@ public:
     uint8_t num_non_egg_pokemon_found() const;
 
 private:
-    FixedLimitVector<EggWatcher> m_egg_watchers;
+    FixedLimitVector<BoxEggWatcher> m_egg_watchers;
     FixedLimitVector<BoxEmptySlotWatcher> m_empty_watchers;
 };
 

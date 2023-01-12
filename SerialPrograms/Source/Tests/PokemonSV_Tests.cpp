@@ -279,7 +279,7 @@ int test_pokemonSV_BoxEggDetector(const ImageViewRGB32& image, bool target){
 int test_pokemonSV_BoxPartyEggDetector(const ImageViewRGB32& image, int target){
     uint8_t num_eggs = 0;
     for(uint8_t i = 0; i < 5; i++){
-        EggDetector detector(BoxCursorLocation::PARTY, i+1, 0);
+        BoxEggDetector detector(BoxCursorLocation::PARTY, i+1, 0);
         if (detector.detect(image)){
             num_eggs++;
         }
