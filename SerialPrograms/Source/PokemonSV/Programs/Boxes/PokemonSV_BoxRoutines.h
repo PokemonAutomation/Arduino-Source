@@ -42,6 +42,12 @@ void release_one_pokemon(
     size_t& errors
 );
 
+// Release a box
+void release_box(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    size_t& errors
+);
+
 //  In box system, check how many slots in the party are empty
 uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 

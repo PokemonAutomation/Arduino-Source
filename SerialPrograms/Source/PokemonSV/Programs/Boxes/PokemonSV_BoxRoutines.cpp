@@ -297,6 +297,20 @@ void release_one_pokemon(
     }
 }
 
+void release_box(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    size_t& errors
+) {
+    for (uint8_t row = 0; row < 5; row++){
+        for (uint8_t j_col = 0; j_col < 6; j_col++){
+            // Go through slots in a Z-shape pattern
+            uint8_t col = (row % 2 == 0 ? j_col : 5 - j_col);
+            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
+            release_one_pokemon(info, console, context, errors);
+        }
+    }
+}
+
 uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     BoxEmptyPartyWatcher watcher;

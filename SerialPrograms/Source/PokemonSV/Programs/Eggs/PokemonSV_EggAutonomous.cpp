@@ -324,7 +324,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     // The loop to hatch batches of eggs.
     // Each batch consists of at most five eggs.
     // There are at most six batches of eggs in a box.
-    uint8_t next_egg_column = 0; // next egg column in box
+    uint8_t next_egg_column = 1; // next egg column in box
+    // starting at 1 because picnic_party_to_hatch_party already loaded and hatched the first batch.
     while(true){
         save_game_if_needed();
 
@@ -341,16 +342,20 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             process_one_baby(env, context, HAS_CLONE_RIDE_POKEMON ? i - 1 : i, num_eggs_in_party);
         } // end for each hatched pokemon in party
 
+        // move party back into the box
+        env.log("Unload party");
+        env.console.overlay().add_log("Unload party", COLOR_WHITE);
+        unload_one_column_from_party(env.program_info(), env.console, context, next_egg_column-1, HAS_CLONE_RIDE_POKEMON);
+
         // Get the next egg column
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-        for (; next_egg_column < 6; next_egg_column++){
+        if (next_egg_column < 6) {
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
             // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
                 env.log("Found next column of eggs at col " + std::to_string(next_egg_column));
                 env.console.overlay().add_log("Add next column", COLOR_WHITE);
-                break;
             }
         }
         context.wait_for_all_requests();
@@ -363,7 +368,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
         } else {
             // no more eggs to hatch in box
-            
+
             // Check if we will reset game:
             // We reset game if the auto save mode is AfterStartAndKeep and we have no pokemon kept during hatching this box
             // m_in_critical_to_save_stage: whether we need to save the game for the current batch of eggs
@@ -374,12 +379,22 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                 env.log("Early exit of egg hatching routine to reset game.");
                 return;
             }
-            
+
+            // release the hatched pokemon
+            env.log("Releasing box");
+            env.console.overlay().add_log("Releasing box", COLOR_WHITE);
+            BoxDetector box_detector;
+            VideoOverlaySet overlays(env.console.overlay());
+            box_detector.make_overlays(overlays);
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, 0);
+            size_t local_errors = 0;
+            release_box(env.program_info(), env.console, context, local_errors);
+
             // otherwise, change to fetching mode:
             env.log("Replace party with picnic team");
             env.console.overlay().add_log("Change to picnic pokemon", COLOR_WHITE);
 
-            // Move to right box
+            // Move to left box
             move_to_left_box(context);
 
             // Swap the party lead, the flame body pokemon with the stored first fetching pokemon
@@ -478,8 +493,6 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
         case EggHatchAction::Release:
         default:
-            size_t local_errors = 0;
-            release_one_pokemon(env.program_info(), env.console, context, local_errors);
             break;
     } // end switch EggHatchAction
 }
