@@ -4,8 +4,13 @@
  *
  */
 
+//#include "Common/Cpp/Exceptions.h"
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
 #include <iostream>
@@ -50,6 +55,36 @@ int8_t BattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)((y - 0.761111) / 0.0814815 + 0.5);
 }
+bool BattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 2){
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 2){
+            console.log("BattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 10){
+            console.log("BattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t diff = (3 + slot - (uint8_t)current_slot) % 3;
+        switch (diff){
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            continue;
+        }
+    }
+}
 
 
 
@@ -90,6 +125,43 @@ int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)((y - 0.602778) / 0.103549 + 0.5);
 }
+bool MoveSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 3){
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 3){
+            console.log("MoveSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 10){
+            console.log("MoveSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
+        switch (diff){
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 3:
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            continue;
+        }
+    }
+}
+
+
+
 
 
 
@@ -155,6 +227,49 @@ int8_t TargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
         return 4;
     }
     return -1;
+}
+bool TargetSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 4){
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 4){
+            console.log("TargetSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 10){
+            console.log("TargetSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
+        if (current_slot == 0 && slot != 0){
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        }
+        if (current_slot != 0 && slot == 0){
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            continue;
+        }
+
+        uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
+        switch (diff){
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            continue;
+        case 3:
+            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            continue;
+        }
+    }
 }
 
 

@@ -183,7 +183,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     move_select.make_overlays(overlays);
     target_select.make_overlays(overlays);
     tera_catch.make_overlays(overlays);
-    cout << (int)target_select.detect_slot(feed.snapshot()) << endl;
+//    cout << (int)target_select.detect_slot(feed.snapshot()) << endl;
+
+//    battle_menu.move_to_slot(console, context, 0);
+//    move_select.move_to_slot(console, context, 1);
+    target_select.move_to_slot(console, context, 2);
 
 
 
