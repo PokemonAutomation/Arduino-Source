@@ -90,7 +90,7 @@ EggAutonomous::EggAutonomous()
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
-        "This number plus the number of " + STRING_POKEMON + " in the box left to your current box must not exceed 30. "
+        "This number plus the number of " + STRING_POKEMON + " in the box right of your current box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
         LockWhileRunning::UNLOCKED,
         10, 1, 30
