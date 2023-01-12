@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
+#include "PokemonSV_TeraMoveTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,7 +26,7 @@ public:
 public:
     StaticTextOption description;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
-
+    TeraMoveTable MOVE_TABLE;
 
 };
 

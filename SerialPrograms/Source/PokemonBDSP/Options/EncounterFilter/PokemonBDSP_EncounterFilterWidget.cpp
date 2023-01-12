@@ -78,10 +78,10 @@ void EncounterFilterWidget::update_value(){
         }
     }
 }
-void EncounterFilterWidget::update_visibility(bool program_is_running){
-    ConfigWidget::update_visibility(program_is_running);
+void EncounterFilterWidget::update_visibility(){
+    ConfigWidget::update_visibility();
     if (m_table){
-        m_table->update_visibility(program_is_running);
+        m_table->update_visibility();
     }
 }
 

@@ -19,7 +19,7 @@ namespace PokemonSV{
 class AuctionItemSelectorRow : public EditableTableRow{
 public:
     AuctionItemSelectorRow();
-    virtual std::unique_ptr<EditableTableRow> clone() const;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     AuctionItemSelectCell item;
@@ -37,7 +37,7 @@ public:
     // Return the auction item slugs that the user has selected via the auction item table UI.
     std::vector<std::string> selected_items() const;
 
-    virtual std::vector<std::string> make_header() const;
+    virtual std::vector<std::string> make_header() const override;
 
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };

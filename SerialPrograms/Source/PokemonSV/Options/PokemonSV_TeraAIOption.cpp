@@ -28,6 +28,7 @@ TeraAIOption::TeraAIOption()
 {
     PA_ADD_STATIC(description);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
+//    PA_ADD_OPTION(MOVE_TABLE);
 }
 
 

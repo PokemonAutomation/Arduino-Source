@@ -10,9 +10,9 @@
 #include "ConfigWidget.h"
 #include "SimpleIntegerWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

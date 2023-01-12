@@ -25,7 +25,8 @@ public:
 
     //  Needs to be called on the UI thread.
     virtual void update_value(){}
-    virtual void update_visibility(bool program_is_running);
+    virtual void update_visibility();
+    void update_visibility(bool program_is_running);
     void update_all(bool program_is_running);
 
 protected:

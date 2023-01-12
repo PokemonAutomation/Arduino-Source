@@ -23,7 +23,7 @@ public:
     EncounterFilterWidget(QWidget& parent, EncounterFilterOption& value);
 
     virtual void update_value() override;
-    virtual void update_visibility(bool program_is_running) override;
+    virtual void update_visibility() override;
 
 private:
     EncounterFilterOption& m_value;

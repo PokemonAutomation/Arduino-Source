@@ -135,6 +135,10 @@ void EditableTableWidget::update_value(){
     std::vector<std::shared_ptr<EditableTableRow>> latest = m_value.current_refs();
 //    cout << "latest.size() = " << latest.size() << endl;
 
+//    //  Adding cells to a table overwrites their visibility. Store all the cells
+//    //  here so we can correct their visibility later.
+//    std::vector<ConfigWidget*> cell_widgets;
+
     //  Iterate the old and new rows and resolve only the differences.
     size_t index_old = 0;
     size_t index_new = 0;
@@ -181,7 +185,17 @@ void EditableTableWidget::update_value(){
             int c = 0;
             int stop = (int)cells.size();
             for (; c < stop; c++){
-                m_table->setCellWidget((int)index_new, c, &cells[c]->make_QtWidget(*m_table)->widget());
+                //  Wrap the widget so that it preserves its visibility.
+                //  QTableWidget for some reason forces the visibility of its
+                //  cells to visible.
+//                cout << "make cell widget" << endl;
+                QWidget* widget = &cells[c]->make_QtWidget(*m_table)->widget();
+                QWidget* cell_widget = new QWidget(this);
+                QVBoxLayout* layout = new QVBoxLayout(cell_widget);
+                layout->setContentsMargins(0, 0, 0, 0);
+                layout->addWidget(widget);
+//                cell_widgets.emplace_back(widget);
+                m_table->setCellWidget((int)index_new, c, cell_widget);
             }
             m_table->setCellWidget((int)index_new, c++, make_clone_button(row));
             m_table->setCellWidget((int)index_new, c++, make_insert_button(row));
@@ -203,6 +217,14 @@ void EditableTableWidget::update_value(){
 //    cout << "latest.size() = " << latest.size() << endl;
     m_current = std::move(latest);
     EditableTableWidget::update_sizes();
+
+#if 0
+    for (ConfigWidget* cell : cell_widgets){
+        cout << "Before: " << cell->widget().isVisible() << endl;
+        cell->update_visibility();
+        cout << "After: " << cell->widget().isVisible() << endl;
+    }
+#endif
 }
 void EditableTableWidget::value_changed(){
     QMetaObject::invokeMethod(m_table, [this]{

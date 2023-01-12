@@ -623,6 +623,7 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
@@ -1508,6 +1509,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
+    Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \
