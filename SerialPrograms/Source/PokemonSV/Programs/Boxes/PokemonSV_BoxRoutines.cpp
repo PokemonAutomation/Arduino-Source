@@ -323,14 +323,14 @@ void load_one_column_to_party(
     console.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
 
     size_t fail_count = 0;
-    while(true){
+    while (true){
         // Move cursor to the target column
         move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
         hold_one_column(info, console, context);
         try{
             // Move the held column to party
             move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
-        } catch(OperationFailedException& e){
+        }catch (OperationFailedException&){
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
                     info, console, "ConsecutiveColumnMoveFailure",
@@ -363,7 +363,7 @@ void unload_one_column_from_party(
     console.overlay().add_log("Unload to column " + std::to_string(column_index+1), COLOR_WHITE);
 
     size_t fail_count = 0;
-    while(true){
+    while (true){
         // Move cursor to party column
         move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
         hold_one_column(info, console, context);
@@ -371,7 +371,7 @@ void unload_one_column_from_party(
         try{
             // Move the held column to target
             move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-        } catch(OperationFailedException& e){
+        }catch (OperationFailedException&){
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
                     info, console, "ConsecutiveColumnMoveFailure",
