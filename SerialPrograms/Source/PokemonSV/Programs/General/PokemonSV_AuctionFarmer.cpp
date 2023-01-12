@@ -264,6 +264,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
         if (ret == 0) {
             return;
         }
+        tries++;
     }
     throw OperationFailedException(env.console, "Too many attempts to talk to the NPC.");
     return;
@@ -354,6 +355,8 @@ uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool hig
 void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer) {
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
+    VideoSnapshot offer_screen = env.console.video().snapshot();
+
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher high_detector(COLOR_RED, { 0.50, 0.40, 0.40, 0.082 });
     PromptDialogWatcher mid_detector(COLOR_PURPLE, { 0.50, 0.475, 0.40, 0.082 });
@@ -405,7 +408,7 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
                 { "Item:", get_auction_item_name(offer.item).display_name() },
                 { "Final Bid:", std::to_string(current_bid) },
             }
-            , "");
+            , "", offer_screen);
     }
 
     return;
@@ -433,6 +436,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         
         bool good_offer = false;
         while (!good_offer) {
+            size_t npc_tries = 0;
             if (!ONE_NPC) {
                 pbf_move_right_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
             }
@@ -445,7 +449,19 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         move_to_auctioneer(env, context, offer);
                     }
                     catch (OperationFailedException& e) {
-                        send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message());
+                        stats.m_errors++;
+                        npc_tries++;
+                        // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs
+                        // at this point it is more likely to be non-recoverable
+                        size_t max_npc_tries = ONE_NPC ? 1 : 3;
+
+                        if (npc_tries < max_npc_tries) {
+                            VideoSnapshot screen = env.console.video().snapshot();
+                            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
+                        }
+                        else {
+                            throw OperationFailedException(env.console, "Failed to talk to the NPC!");
+                        }
                         break;
                     }
 
