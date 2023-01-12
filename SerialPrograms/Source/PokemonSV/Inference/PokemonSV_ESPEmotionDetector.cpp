@@ -23,19 +23,19 @@ Detection ESPEmotionReader::detect(const ImageViewRGB32& screen) const {
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
 
     //Color ratio: R/(R+G+B), G/(R+G+B), B/(R+G+B)
-    if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.1, 10)) {
+    if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.2, 40)) {
         return Detection::RED;
     }
-    if (is_solid(symbol, { 0.529, 0.447, 0.0258 }, 0.1, 10)) {
+    if (is_solid(symbol, { 0.529, 0.447, 0.0258 }, 0.2, 40)) {
         return Detection::YELLOW;
     }
-    if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.1, 10)) {
+    if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.2, 40)) {
         return Detection::BLUE; //Sometimes picks up the grey as well but that works
     }
-    if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.1, 10)) {
+    if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.2, 40)) {
         return Detection::GREEN;
     }
-    if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.1, 10)) {
+    if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.2, 40)) {
         return Detection::GREY;
     }
     return Detection::NO_DETECTION;
