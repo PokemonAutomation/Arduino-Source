@@ -1233,8 +1233,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
-    Source/PokemonSV/Inference/PokemonSV_EggDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_EggDetector.h
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp

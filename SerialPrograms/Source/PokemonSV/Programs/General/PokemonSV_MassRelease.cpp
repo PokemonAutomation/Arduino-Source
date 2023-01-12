@@ -99,7 +99,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
     env.log("Selecting " + STRING_POKEMON + "...");
 
     SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-    BoxEggDetector egg_detector;
+    BoxCurrentEggDetector egg_detector;
     BoxShinyDetector shiny_detector;
     VideoOverlaySet overlays(env.console.overlay());
     sth_in_box_detector.make_overlays(overlays);

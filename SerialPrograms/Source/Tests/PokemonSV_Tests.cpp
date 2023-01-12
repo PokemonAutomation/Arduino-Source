@@ -21,7 +21,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
-#include "PokemonSV/Inference/PokemonSV_EggDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 
 
@@ -270,7 +269,7 @@ int test_pokemonSV_SomethingInBoxSlotDetector(const ImageViewRGB32& image, bool 
 }
 
 int test_pokemonSV_BoxEggDetector(const ImageViewRGB32& image, bool target){
-    BoxEggDetector box_egg_detector(COLOR_RED);
+    BoxCurrentEggDetector box_egg_detector(COLOR_RED);
     bool egg = box_egg_detector.detect(image);
     TEST_RESULT_EQUAL(egg, target);
 
