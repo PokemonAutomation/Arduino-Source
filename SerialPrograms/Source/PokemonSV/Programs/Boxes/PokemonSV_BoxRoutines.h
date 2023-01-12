@@ -42,7 +42,10 @@ void release_one_pokemon(
     size_t& errors
 );
 
-// Release a box
+//  Release a box of pokemon. Can have empty spots or eggs. Eggs are not released.
+//  Throws OperationFailedException, if it got stuck or timed out.
+//  The # of errors are stored into "errors". These are usually dropped button
+//  presses that the function recovered from.
 void release_box(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t& errors

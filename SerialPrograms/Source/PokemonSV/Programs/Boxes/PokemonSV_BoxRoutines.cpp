@@ -301,6 +301,9 @@ void release_box(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t& errors
 ) {
+    context.wait_for_all_requests();
+    console.log("Release one box.");
+    console.overlay().add_log("Release box", COLOR_WHITE);
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern

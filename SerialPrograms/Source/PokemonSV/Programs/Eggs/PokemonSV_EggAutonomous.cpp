@@ -296,18 +296,43 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     return picnic_party_to_hatch_party(env, context);
 }
 
+// The routine to hatch a box of eggs after fetching.
+// When there is an error during hatching, it will throw an OperationFailedException.
+// The outmost program loop should catch this exception and recall this function to achieve error recovery, if needed.
+// When immediately called after fetching routine finishes, assumes the party is already loaded with the first column of
+// eggs and the number of eggs is provided by `num_eggs_in_party`.
+// When called after an error recovery, assumes the party is loaded with some unknown number of eggs, and `num_eggs_in_party` is -1.
 void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
+
+    // index of the egg column in box to be loaded next, 0-indexed
+    // starting at 1 because when hatch_eggs_full_routine() is called, the first column is already loaded to the party
+    uint8_t next_egg_column = 1;
+
     if (num_eggs_in_party < 0){
         // detect how many eggs in party
         enter_box_system_from_overworld(env.program_info(), env.console, context);
 
-        context.wait_for(std::chrono::milliseconds(400)); // wait until box UI fully loaded
+        context.wait_for(std::chrono::milliseconds(400)); // wait until box UI is loaded
 
         const uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
         num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
         env.log("Read " + std::to_string(num_eggs_in_party) + " eggs.");
         env.console.overlay().add_log("Party eggs: " + std::to_string(num_eggs_in_party), COLOR_WHITE);
+
+        // Also detect what's the next egg column
+        context.wait_for(std::chrono::seconds(2)); // wait until box UI is definitely loaded
+        env.log("Checking next egg column.");
+        SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
+        for (; next_egg_column < 6; next_egg_column++){
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
+            context.wait_for_all_requests();
+            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
+            if (sth_in_box_detector.detect(env.console.video().snapshot())){
+                env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
+                break;
+            }
+        }
 
         leave_box_system_to_overworld(env.program_info(), env.console, context);
     }
@@ -324,8 +349,6 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     // The loop to hatch batches of eggs.
     // Each batch consists of at most five eggs.
     // There are at most six batches of eggs in a box.
-    uint8_t next_egg_column = 1; // next egg column in box
-    // starting at 1 because picnic_party_to_hatch_party already loaded and hatched the first batch.
     while(true){
         save_game_if_needed();
 
@@ -337,28 +360,35 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         reset_position_to_flying_spot(env, context);
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
-
+        
+        // Check each hatched baby whether they will be kept.
+        // If yes, move them to the right box.
+        // Otherwise, release them or move them into box in case we will reset game later.
         for(int i = 0; i < num_eggs_in_party; i++){
             process_one_baby(env, context, HAS_CLONE_RIDE_POKEMON ? i - 1 : i, num_eggs_in_party);
-        } // end for each hatched pokemon in party
+        }
 
-        // move party back into the box
-        env.log("Unload party");
-        env.console.overlay().add_log("Unload party", COLOR_WHITE);
-        unload_one_column_from_party(env.program_info(), env.console, context, next_egg_column-1, HAS_CLONE_RIDE_POKEMON);
+        // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
+        // then we can save the time of releasing hatched pokemon in case we will reset the game later.
+        // So here we place the hatched pokemon back to the box
+        if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
+            // move party back into the box
+            env.log("Unload party in case we will reset game later to save releasing time.");
+            unload_one_column_from_party(env.program_info(), env.console, context, next_egg_column-1, HAS_CLONE_RIDE_POKEMON);
+        }
 
         // Get the next egg column
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-        if (next_egg_column < 6) {
+        for (; next_egg_column < 6; next_egg_column++){
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
             // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
             if (sth_in_box_detector.detect(env.console.video().snapshot())){
-                env.log("Found next column of eggs at col " + std::to_string(next_egg_column));
-                env.console.overlay().add_log("Add next column", COLOR_WHITE);
+                env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
+                break;
             }
         }
-        context.wait_for_all_requests();
+
         if (next_egg_column < 6){
             load_one_column_to_party(env.program_info(), env.console, context, next_egg_column, HAS_CLONE_RIDE_POKEMON);
             // Move cursor to party lead so that we can examine rest of party to detect eggs.
@@ -369,28 +399,24 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         } else {
             // no more eggs to hatch in box
 
-            // Check if we will reset game:
-            // We reset game if the auto save mode is AfterStartAndKeep and we have no pokemon kept during hatching this box
-            // m_in_critical_to_save_stage: whether we need to save the game for the current batch of eggs
-            // m_saved_after_fetched_eggs: whether we have saved the game already for a past batch of eggs in this box
-            if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage == false && m_saved_after_fetched_eggs == false){
-                // Yes, we will reset game
-                // So exit this loop early here
-                env.log("Early exit of egg hatching routine to reset game.");
-                return;
+            if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
+                // Check if we will reset game:
+                // We reset game if the auto save mode is AfterStartAndKeep and we have no pokemon kept during hatching this box
+                // m_in_critical_to_save_stage: whether we need to save the game for the current batch of eggs
+                // m_saved_after_fetched_eggs: whether we have saved the game already for a past batch of eggs in this box
+                if (m_in_critical_to_save_stage == false && m_saved_after_fetched_eggs == false){
+                    // Yes, we will reset game
+                    // So exit this loop early here
+                    env.log("Early exit of egg hatching routine to reset game.");
+                    return;
+                }
+
+                // release the hatched pokemon in box
+                size_t local_errors = 0;
+                release_box(env.program_info(), env.console, context, local_errors);
             }
 
-            // release the hatched pokemon
-            env.log("Releasing box");
-            env.console.overlay().add_log("Releasing box", COLOR_WHITE);
-            BoxDetector box_detector;
-            VideoOverlaySet overlays(env.console.overlay());
-            box_detector.make_overlays(overlays);
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, 0, 0);
-            size_t local_errors = 0;
-            release_box(env.program_info(), env.console, context, local_errors);
-
-            // otherwise, change to fetching mode:
+            // change to fetching mode:
             env.log("Replace party with picnic team");
             env.console.overlay().add_log("Change to picnic pokemon", COLOR_WHITE);
 
@@ -493,6 +519,13 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
         case EggHatchAction::Release:
         default:
+            // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
+            // then we can save the time of releasing hatched pokemon in case we will reset the game later.
+            // Otherwise, release the pokemon now.
+            if (AUTO_SAVING != AutoSave::AfterStartAndKeep){
+                size_t local_errors = 0;
+                release_one_pokemon(env.program_info(), env.console, context, local_errors);
+            }
             break;
     } // end switch EggHatchAction
 }
