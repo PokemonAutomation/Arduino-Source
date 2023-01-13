@@ -174,7 +174,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    OverworldWatcher overworld;
+    int ret = wait_until(
+        console, context, std::chrono::seconds(5),
+        {overworld}
+    );
+    cout << ret << endl;
 
+
+#if 0
     BattleMenuDetector battle_menu(COLOR_RED);
     MoveSelectDetector move_select(COLOR_GREEN);
     TargetSelectDetector target_select(COLOR_CYAN);
@@ -188,7 +196,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    battle_menu.move_to_slot(console, context, 0);
 //    move_select.move_to_slot(console, context, 1);
     target_select.move_to_slot(console, context, 2);
-
+#endif
 
 
 //    change_stats_view_to_judge(env.program_info(), console, context);

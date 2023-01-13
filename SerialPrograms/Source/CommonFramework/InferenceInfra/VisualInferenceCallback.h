@@ -34,7 +34,7 @@ public:
 
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
-    virtual bool process_frame(const VideoSnapshot& snapshot);
+    virtual bool process_frame(const VideoSnapshot& frame);
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp);

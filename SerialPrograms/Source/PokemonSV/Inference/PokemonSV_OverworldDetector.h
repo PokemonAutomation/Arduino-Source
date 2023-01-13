@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
@@ -27,18 +28,33 @@ public:
 
     bool detect_ball(const ImageViewRGB32& screen) const;
 
-private:
-    Color m_color;
-    ImageFloatBox m_ball;
-    ImageFloatBox m_radar;
+protected:
+    const Color m_color;
+    const ImageFloatBox m_ball;
+    const ImageFloatBox m_radar;
+    const ImageFloatBox m_radar_inside;
 };
+#if 0
 class OverworldWatcher : public DetectorToFinder<OverworldDetector>{
 public:
     OverworldWatcher(Color color = COLOR_RED)
          : DetectorToFinder("OverworldWatcher", std::chrono::milliseconds(1000), color)
     {}
 };
+#else
+class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
+public:
+    OverworldWatcher(Color color = COLOR_RED);
 
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
+
+
+private:
+    std::chrono::milliseconds m_hold_duration;
+    VideoSnapshot m_start_of_detection;
+};
+#endif
 
 
 }

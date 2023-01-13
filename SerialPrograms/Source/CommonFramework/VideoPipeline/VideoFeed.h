@@ -38,6 +38,11 @@ struct VideoSnapshot{
 
 //    operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame); }
     operator ImageViewRGB32() const{ return *frame; }
+
+    void clear(){
+        frame.reset();
+        timestamp = WallClock::min();
+    }
 };
 
 
