@@ -88,6 +88,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 // Assuming the current selected slot in box system is a hatched pokemon, not empty space or egg,
 // check the hatched pokemon's info to determine what to do with it.
 // Return if the pokemon is shiny. The action to handle the pokemon is returned in `action`.
+// The function will try to switch to judge view if possible so that it can read IVs.
+// If judge view is not unlocked, it will settle onto stats view, and the pokemon's IVs will be regarded as unknown.
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
