@@ -170,6 +170,12 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // reset_position_to_flying_spot(env, context);
         // picnic_party_to_hatch_party(env, context);
         // hatch_eggs_full_routine(env, context, -1);
+
+        // enter_box_system_from_overworld(env.program_info(), env.console, context);
+        // for(int i = 0; i < 5; i++){
+        //     process_one_baby(env, context, i, 5);
+        // }
+
         // return;
     }
 
@@ -309,6 +315,19 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     // starting at 1 because when hatch_eggs_full_routine() is called, the first column is already loaded to the party
     uint8_t next_egg_column = 1;
 
+    auto go_to_next_egg_column = [&](){
+        SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
+        for (; next_egg_column < 6; next_egg_column++){
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
+            context.wait_for_all_requests();
+            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
+            if (sth_in_box_detector.detect(env.console.video().snapshot())){
+                env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
+                break;
+            }
+        }
+    };
+
     if (num_eggs_in_party < 0){
         // detect how many eggs in party
         enter_box_system_from_overworld(env.program_info(), env.console, context);
@@ -323,16 +342,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Also detect what's the next egg column
         context.wait_for(std::chrono::seconds(2)); // wait until box UI is definitely loaded
         env.log("Checking next egg column.");
-        SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-        for (; next_egg_column < 6; next_egg_column++){
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
-            context.wait_for_all_requests();
-            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
-            if (sth_in_box_detector.detect(env.console.video().snapshot())){
-                env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
-                break;
-            }
-        }
+        go_to_next_egg_column();
 
         leave_box_system_to_overworld(env.program_info(), env.console, context);
     }
@@ -378,16 +388,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         }
 
         // Get the next egg column
-        SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-        for (; next_egg_column < 6; next_egg_column++){
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
-            context.wait_for_all_requests();
-            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
-            if (sth_in_box_detector.detect(env.console.video().snapshot())){
-                env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
-                break;
-            }
-        }
+        go_to_next_egg_column();
 
         if (next_egg_column < 6){
             load_one_column_to_party(env.program_info(), env.console, context, next_egg_column, HAS_CLONE_RIDE_POKEMON);
@@ -457,6 +458,11 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 
     env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
+
+    if (egg_index == 0){
+        // fix judge view if needed
+        change_stats_view_to_judge(env.program_info(), env.console, context);
+    }
 
     bool found_shiny = false;
     EggHatchAction action = EggHatchAction::Release;
