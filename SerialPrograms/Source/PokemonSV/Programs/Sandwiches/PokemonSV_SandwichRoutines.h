@@ -41,6 +41,18 @@ void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher&
 // Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
 void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+// Assuming starting at the custom sandwich mode,
+// select the first entry in the filling list (usually cabbage), then select two sweet herbs in the end of the paste list.
+// The location of sweet herb is set by `sweet_herb_index_last`:
+// if sweet herb is the last entry, set `sweet_herb_index_last` to 0;
+// if sweet herb is second to last, set `sweet_herb_index_last` to 1; ...
+// It will use the first sandwich pick in the sandwich pick selection list.
+// After entering sandiwich mini game, it will drop the filling to quickly make a two-sweet-herb only sandwich to gain egg power lv 3.
+void make_two_sweet_herbs_sandwich(
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    size_t sweet_herb_index_last
+);
+
 }
 }
 }

@@ -176,7 +176,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //     process_one_baby(env, context, i, 5);
         // }
 
-        return;
+        // return;
     }
 
     if (AUTO_SAVING != AutoSave::NoAutoSave){
