@@ -44,6 +44,8 @@ int test_pokemonSV_OverworldDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonSV_BoxBottomButtonDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
+int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
 }
 
 #endif

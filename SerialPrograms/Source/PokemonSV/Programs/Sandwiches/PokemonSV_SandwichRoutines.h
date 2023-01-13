@@ -36,13 +36,16 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
 
 // Starting at the sandwich minigame of dropping ingredients, assume the selected recipe is Great Peanut Butter Sandwich,
 // make the sandwich.
-void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context);
+void build_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context);
 
 // Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
 void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+// Assuming at sanwich recipe list, press X to enter custom sandwich mode
+void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 // Assuming starting at the custom sandwich mode,
-// select the first entry in the filling list (usually cabbage), then select two sweet herbs in the end of the paste list.
+// select the first entry in the filling list (usually cabbage), then select two sweet herbs in the end of the condiments list.
 // The location of sweet herb is set by `sweet_herb_index_last`:
 // if sweet herb is the last entry, set `sweet_herb_index_last` to 0;
 // if sweet herb is second to last, set `sweet_herb_index_last` to 1; ...

@@ -37,15 +37,24 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
 // Start at Zero Gate flying spot, go off ramp to start a picnic.
 void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-// Starting at the initial position of a picnic, go to picnic table to make a
-// Great Peanut Butter Sandwich to gain egg power Lv 2.
+enum class EggSandwichType{
+    GREAT_PEANUT_BUTTER,
+    TWO_SWEET_HERBS,
+};
+// Starting at the initial position of a picnic, go to picnic table to make a sandwich that gives egg power.
+// Can choose:
+// - Great Peanut Butter Sandwich to gain egg power Lv 2, must have unlocked its recipe and have enough ingredients to make all
+//   the sandwiches for all the unlocked recipes.
+// - Two-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and provide the location of the Sweet Herb
+//   as the last `sweet_herb_index_last`-th (0-indexed) condiment on the list.
 // Return false if no needed sandwich ingredients or recipe.
-bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context);
+bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console,
+    BotBaseContext& context, EggSandwichType sandwich_type = EggSandwichType::GREAT_PEANUT_BUTTER, size_t sweet_herb_index_last = 5);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
 // `num_eggs_collected` will be updated to add newly collected eggs.
 void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t max_eggs, size_t& num_eggs_collected,
+    size_t basket_wait_seconds, size_t max_eggs, size_t& num_eggs_collected,
     std::function<void(size_t new_eggs)> basket_check_callback);
 
 // Start at Zero Gate flying spot, go in circles in front of the lab to hatch eggs.

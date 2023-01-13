@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_EggAutonomous_H
 #define PokemonAutomation_PokemonSV_EggAutonomous_H
 
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -14,6 +15,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 
 // #include <functional>
 
@@ -81,6 +83,10 @@ private:
         EveryBatch,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
+
+    EnumDropdownOption<EggSandwichType> EGG_SANDWICH_TYPE;
+    IntegerEnumDropdownOption SWEET_HERB_INDEX_BACKWARDS;
+
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     Pokemon::EggHatchFilterTable FILTERS;

@@ -4,25 +4,23 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-//#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-//#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV_SandwichRoutines.h"
-
 
 #include <cmath>
 #include <algorithm>
@@ -31,6 +29,21 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+namespace {
+    const ImageFloatBox HAND_INITIAL_BOX{0.440, 0.455, 0.112, 0.179};
+    const ImageFloatBox INGREDIENT_BOX{0.455, 0.130, 0.090, 0.030};
+
+void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+     SandwichHandWatcher free_hand(SandwichHandType::FREE, HAND_INITIAL_BOX);
+    int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
+    if (ret < 0){
+        dump_image_and_throw_recoverable_exception(info, console, "FreeHandNotDetected",
+            "Cannot detect hand at start of making a sandwich.");
+    }
+}
+
+} // anonymous namespace
 
 bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
@@ -189,7 +202,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
         pbf_press_button(context, BUTTON_A, 30, 100);
         context.wait_for_all_requests();
 
-        GradientArrowWatcher pick_selection(COLOR_YELLOW, GradientArrowType::RIGHT, {0.004, 0.162, 0.100, 0.092});
+        SandwichIngredientArrowWatcher pick_selection(0, COLOR_YELLOW);
         while(true){
             int ret = wait_until(console, context, std::chrono::seconds(3),
                 {selection_watcher, pick_selection});
@@ -364,28 +377,19 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
-
-    const ImageFloatBox initial_box{0.440, 0.455, 0.112, 0.179};
-    const ImageFloatBox ingredient_box{0.455, 0.130, 0.090, 0.030};
-
+void build_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
     const ImageFloatBox sandwich_target_box_left  {0.386, 0.507, 0.060, 0.055};
     const ImageFloatBox sandwich_target_box_middle{0.470, 0.507, 0.060, 0.055};
     const ImageFloatBox sandwich_target_box_right {0.554, 0.507, 0.060, 0.055};
-
     const ImageFloatBox upper_bread_drop_box{0.482, 0.400, 0.036, 0.030};
 
-    SandwichHandWatcher free_hand(SandwichHandType::FREE, initial_box);
-    int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
-    if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "FreeHandNotDetected",
-            "make_great_peanut_butter_sandwich(): Cannot detect starting hand.");
-    }
+    wait_for_initial_hand(info, console, context);
+    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
 
-    console.overlay().add_log("Pick first banana", COLOR_WHITE);
-    auto end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, initial_box, ingredient_box);
+    // console.overlay().add_log("Pick first banana", COLOR_WHITE);
+    auto end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
 
-    console.overlay().add_log("Drop first banana", COLOR_WHITE);
+    // console.overlay().add_log("Drop first banana", COLOR_WHITE);
     // visual feedback grabbing is not reliable. Switch to blind grabbing:
     end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
     
@@ -393,28 +397,28 @@ void make_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher&
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
-    console.overlay().add_log("Pick second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    // console.overlay().add_log("Pick second banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, INGREDIENT_BOX);
 
-    console.overlay().add_log("Drop second banana", COLOR_WHITE);
+    // console.overlay().add_log("Drop second banana", COLOR_WHITE);
     end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
-    console.overlay().add_log("Pick third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, ingredient_box);
+    // console.overlay().add_log("Pick third banana", COLOR_WHITE);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, INGREDIENT_BOX);
     
-    console.overlay().add_log("Drop third banana", COLOR_WHITE);
+    // console.overlay().add_log("Drop third banana", COLOR_WHITE);
     end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
     // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 156, 200, 128, 128, 120);
     // context.wait_for(std::chrono::milliseconds(100));
     // context.wait_for_all_requests();
 
     // Drop upper bread and pick
-    console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
+    // console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
-    ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
+    int ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(info, console, "GrabbingHandNotDetected",
             "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.");
@@ -450,6 +454,158 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Bot
     console.overlay().add_log("Finish eating", COLOR_WHITE);
     context.wait_for(std::chrono::seconds(1));
 }
+
+namespace{
+
+void repeat_press_until(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    std::function<void()> button_press,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::string &error_name, const std::string &error_message,
+    std::chrono::milliseconds detection_timeout = std::chrono::seconds(5),
+    size_t max_presses = 10,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
+){
+    button_press();
+    for(size_t i_try = 0; i_try < max_presses; i_try++){
+        context.wait_for_all_requests();
+        const int ret = wait_until(console, context, detection_timeout, callbacks);
+        if (ret >= 0){
+            return;
+        }
+        button_press();
+    }
+
+    dump_image_and_throw_recoverable_exception(info, console, "IngredientListNotDetected",
+        "enter_custom_sandwich_mode(): cannot detect ingredient list after 50 seconds.");
+}
+
+void repeat_button_press_until(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint16_t button, uint16_t hold_ticks, uint16_t release_ticks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::string &error_name, const std::string &error_message,
+    std::chrono::milliseconds iteration_length = std::chrono::seconds(5),
+    size_t max_presses = 10,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
+){
+    const std::chrono::milliseconds button_time = std::chrono::milliseconds((hold_ticks + release_ticks) * (1000 / TICKS_PER_SECOND));
+    repeat_press_until(info, console, context,
+        [&](){ pbf_press_button(context, button, hold_ticks, release_ticks); },
+        callbacks, error_name, error_message, iteration_length - button_time, max_presses,
+        default_video_period, default_audio_period
+    );
+}
+
+void repeat_dpad_press_until(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint8_t dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::string &error_name, const std::string &error_message,
+    std::chrono::milliseconds iteration_length = std::chrono::seconds(5),
+    size_t max_presses = 10,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
+){
+    const std::chrono::milliseconds button_time = std::chrono::milliseconds((hold_ticks + release_ticks) * (1000 / TICKS_PER_SECOND));
+    repeat_press_until(info, console, context,
+        [&](){ pbf_press_dpad(context, dpad_position, hold_ticks, release_ticks); },
+        callbacks, error_name, error_message, iteration_length - button_time, max_presses, 
+        default_video_period, default_audio_period
+    );
+}
+
+
+} // anonymous namespace
+
+
+void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    console.log("Entering custom sandwich mode.");
+    console.overlay().add_log("Custom sandwich", COLOR_WHITE);
+
+    SandwichIngredientArrowWatcher ingredient_selection_arrow(0, COLOR_YELLOW);
+    repeat_button_press_until(
+        info, console, context, BUTTON_X, 40, 80, {ingredient_selection_arrow},
+        "IngredientListNotDetected", "enter_custom_sandwich_mode(): cannot detect ingredient list after 50 seconds."
+    );
+}
+
+void make_two_sweet_herbs_sandwich(
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    size_t sweet_herb_index_last
+){
+    if (sweet_herb_index_last >= 9){
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Inavlid sweet herb index: " + std::to_string(sweet_herb_index_last));
+    }
+
+    {
+        // Press button A to add first filling
+        DeterminedSandwichIngredientWatcher filling_watcher(SandwichIngredientType::FILLING, 0);
+        repeat_button_press_until(
+            info, console, context, BUTTON_A, 40, 50, {filling_watcher},
+            "DeterminedIngredientNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect determined ingredient after 50 seconds."
+        );
+    }
+
+    {
+        // Press button + to go to condiments page
+        SandwichCondimentsPageWatcher condiments_page_watcher;
+        repeat_button_press_until(
+            info, console, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
+            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect condiments page after 50 seconds."
+        );
+    }
+
+    // Press DPAD_UP multiple times to move to the sweet herb row
+    for(size_t i = 0; i < sweet_herb_index_last+1; i++){
+        console.log("DPAD UP, i = " + std::to_string(i));
+        SandwichIngredientArrowWatcher arrow(9 - i);
+        repeat_dpad_press_until(info, console, context, DPAD_UP, 10, 30, {arrow},
+            "IngredientArrowNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect ingredient selection arrow after 50 seconds."
+        );
+    }
+
+    // Press button A two times to add two sweet herbs
+    for(size_t i = 0; i < 2; i++ ){
+        DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, i);
+        repeat_button_press_until(
+            info, console, context, BUTTON_A, 40, 60, {herb_watcher},
+            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect detemined sweet herb after 50 seconds."
+        );
+    }
+
+    {
+        // Press button + to go to picks page
+        SandwichPicksPageWatcher picks_page_watcher;
+        repeat_button_press_until(
+            info, console, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
+            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect picks page after 50 seconds."
+        );
+    }
+
+    // Mesh button A to select the first pick
+    pbf_mash_button(context, BUTTON_A, 80);
+    context.wait_for_all_requests();
+
+    console.log("Finish determining ingredients for two-sweet-herb sandwich.");
+    console.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
+
+    wait_for_initial_hand(info, console, context);
+
+    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
+    move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
+    // Mash button A to pick and drop ingredients, upper bread and pick.
+    // Egg Power 3 is applied with only two sweet herb condiments!
+    pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
+    console.overlay().add_log("Built sandwich", COLOR_WHITE);
+}
+
+
 
 
 }

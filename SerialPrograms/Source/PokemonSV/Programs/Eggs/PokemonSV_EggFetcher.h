@@ -12,6 +12,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,6 +42,9 @@ private:
 
     SimpleIntegerOption<uint16_t> EGGS_TO_FETCH;
     SimpleIntegerOption<uint16_t> MAX_NUM_SANDWICHES;
+
+    EnumDropdownOption<EggSandwichType> EGG_SANDWICH_TYPE;
+    IntegerEnumDropdownOption SWEET_HERB_INDEX_BACKWARDS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

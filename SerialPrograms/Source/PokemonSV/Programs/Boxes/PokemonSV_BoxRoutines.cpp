@@ -171,7 +171,7 @@ void cancel_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBas
 
 // Assuming the current slot is not empy, press button Y to hold the current pokemon
 void press_y_to_hold_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-context.wait_for_all_requests();
+    context.wait_for_all_requests();
     console.log("Press button Y to hold pokemon for swapping.");
     const bool to_enter_selection = true;
     change_held_mode(

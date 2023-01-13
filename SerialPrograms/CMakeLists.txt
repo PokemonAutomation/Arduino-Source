@@ -1229,6 +1229,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.cpp
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp

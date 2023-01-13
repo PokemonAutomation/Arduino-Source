@@ -108,6 +108,29 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
+    , EGG_SANDWICH_TYPE(
+        "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
+        "Great Peanut Butter Sandwich: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
+        "Two Sweet Herbs: use the first filling and two sweet herbs. Must provide Sweet Herb location on the condiments list.",
+        {
+            {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
+            {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs"},
+        },
+        LockWhileRunning::LOCKED,
+        EggSandwichType::GREAT_PEANUT_BUTTER
+    )
+    , SWEET_HERB_INDEX_BACKWARDS(
+        "<b>Sweet Herb Location:</b><br>If chosen the Two Sweet Herbs as the sandwich, where the Sweet Herb is on the condiments list.",
+        {
+            {0, "0", "Last on list"},
+            {1, "1", "2nd last on list"},
+            {2, "2", "3rd last on list"},
+            {3, "3", "4th last on list"},
+            {4, "4", "5th last on list (the location if you have all types of herbs)"},
+        },
+        LockWhileRunning::LOCKED,
+        4
+    )
     , HAS_CLONE_RIDE_POKEMON(
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
@@ -150,6 +173,8 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(AUTO_SAVING);
+    PA_ADD_OPTION(EGG_SANDWICH_TYPE);
+    PA_ADD_OPTION(SWEET_HERB_INDEX_BACKWARDS);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
     PA_ADD_OPTION(FILTERS);
 
@@ -164,9 +189,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
     {
-        // make_great_peanut_butter_sandwich(env, env.console, context);
-        // reset_game(env, context, "reset");
-        // fetch_eggs_full_routine(env, context);
         // reset_position_to_flying_spot(env, context);
         // picnic_party_to_hatch_party(env, context);
         // hatch_eggs_full_routine(env, context, -1);
@@ -176,6 +198,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //     process_one_baby(env, context, i, 5);
         // }
 
+        // eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
+        //     EGG_SANDWICH_TYPE, SWEET_HERB_INDEX_BACKWARDS.current_value());
         // return;
     }
 
@@ -276,7 +300,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     picnic_at_zero_gate(env.program_info(), env.console, context);
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
 
-    bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context);
+    bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
+        EGG_SANDWICH_TYPE, SWEET_HERB_INDEX_BACKWARDS.current_value());
     if (can_make_sandwich == false){
         throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
     }
@@ -292,7 +317,9 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
-    collect_eggs_after_sandwich(env.program_info(), env.console, context, max_eggs, num_eggs_collected, basket_check_callback);
+    const size_t basket_wait_seconds = (EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+    collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds, max_eggs,
+        num_eggs_collected, basket_check_callback);
 
     leave_picnic(env.program_info(), env.console, context);
 

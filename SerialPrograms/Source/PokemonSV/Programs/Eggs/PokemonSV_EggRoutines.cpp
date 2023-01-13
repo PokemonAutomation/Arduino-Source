@@ -250,29 +250,42 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     picnic_from_overworld(info, console, context);
 }
 
-bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
+bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    EggSandwichType sandwich_type, size_t sweet_herb_index_last)
+{
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
 
     clear_mons_in_front(info, console, context);
-    
-    bool can_make_sandwich = (
-        enter_sandwich_recipe_list(info, console, context) && select_sandwich_recipe(info, console, context, 17)
-    );
-
-    if (can_make_sandwich == false){
+    if (enter_sandwich_recipe_list(info, console, context) == false){
         return false;
     }
-
-    make_great_peanut_butter_sandwich(info, dispatcher, console, context);
+    switch (sandwich_type){
+    case EggSandwichType::GREAT_PEANUT_BUTTER:
+    {
+        if (select_sandwich_recipe(info, console, context, 17) == false){
+            // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
+            return false;
+        }
+        build_great_peanut_butter_sandwich(info, dispatcher, console, context);
+        break;
+    }
+    case EggSandwichType::TWO_SWEET_HERBS:
+        enter_custom_sandwich_mode(info, console, context);
+        make_two_sweet_herbs_sandwich(info, dispatcher, console, context, sweet_herb_index_last);
+        break;
+    default:
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Unknown EggSandwichType");
+    }
+    
     finish_sandwich_eating(info, console, context);
 
     return true;
 }
 
 void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t max_eggs, size_t& num_eggs_collected,
+    size_t basket_wait_seconds, size_t max_eggs, size_t& num_eggs_collected,
     std::function<void(size_t new_eggs)> basket_check_callback
 ){
     context.wait_for_all_requests();
@@ -298,7 +311,7 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
 
     context.wait_for_all_requests();
     
-    const size_t default_collection_interval_seconds = 180;
+    const size_t default_collection_interval_seconds = basket_wait_seconds;
     const auto max_egg_wait_time = std::chrono::minutes(30);
 
     size_t num_checks = 0;
@@ -331,7 +344,7 @@ void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console
         const size_t remaining_eggs = max_eggs - num_eggs_collected;
         const float average_eggs_per_check = eggs_collected_cur_session / (float)num_checks;
 
-        size_t wait_seconds = default_collection_interval_seconds;
+        size_t wait_seconds = basket_wait_seconds;
         if (remaining_eggs < average_eggs_per_check){
             // If we have few remaining eggs to hatch, adjust wait time accordingly.
             wait_seconds = size_t(remaining_eggs * default_collection_interval_seconds / average_eggs_per_check);

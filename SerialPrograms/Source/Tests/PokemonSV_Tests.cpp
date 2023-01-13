@@ -22,7 +22,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
-
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -320,6 +320,52 @@ int test_pokemonSV_BoxBottomButtonDetector(const ImageViewRGB32& image, const st
     // BoxBottomButtonBDetector b_detector;
     // bool result_b = b_detector.detect(image);
     // TEST_RESULT_COMPONENT_EQUAL(result_b, target_b, "button B");
+
+    return 0;
+}
+
+int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // three words: <current ingredient page "Fillings", "Condiments" or "Picks"> <how many fillings determined> <how many condiments determined>
+    if (words.size() < 3){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    std::string target_type = words[words.size() - 3];
+    bool is_condiments = target_type == "Condiments";
+    bool is_picks = target_type == "Picks";
+    if (!is_condiments && !is_picks && target_type != "Fillings"){
+        cerr << "Error: word " << words[words.size()-3] << " is wrong. Must be \"Fillings\", \"Condiments\" or \"Picks\"." << endl;
+        return 1;
+    }
+    int num_fillings = 0, num_condiments = 0;
+    if (parse_int(words[words.size()-2], num_fillings) == false){
+        cerr << "Error: word " << words[words.size()-2] << " is wrong. Must be int of range [0, 6]. " << endl;
+        return 1;
+    }
+    if (parse_int(words[words.size()-1], num_condiments) == false){
+        cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be int of range [0, 4]. " << endl;
+        return 1;
+    }
+    
+    SandwichCondimentsPageDetector condiments_detector;
+    SandwichPicksPageDetector picks_detector;
+
+    bool condi_result = condiments_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(condi_result, is_condiments, "condiments Page");
+
+    bool picks_result = picks_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(picks_result, is_picks, "picks Page");
+
+    for(int i = 0; i < 10; i++){
+        auto type = (i < 6 ? SandwichIngredientType::FILLING : SandwichIngredientType::CONDIMENT);
+        size_t index = (i < 6 ? i : i - 6);
+        DeterminedSandwichIngredientDetector determined_detector(type, index);
+        bool target = (i < 6 ? i < num_fillings : i - 6 < num_condiments);
+        bool result = determined_detector.detect(image);
+
+        TEST_RESULT_COMPONENT_EQUAL(result, target, "ingredient slot " + std::to_string(i));
+    }
 
     return 0;
 }
