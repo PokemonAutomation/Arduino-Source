@@ -64,20 +64,6 @@ void change_stats_view_to_judge(
 #endif
 }
 
-// Use box selection mode to hold one column of pokemon
-void hold_one_column(BotBaseContext& context){
-    // Minus to draw selection box
-    pbf_press_button(context, BUTTON_MINUS, 50, 40);
-    // Select rest of the pary
-    // Press down multiple times to make sure we select full party in case the game drops some presses
-    for(int i = 0; i < 20; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 5, 3);
-    }
-    // Hold rest of the party
-    pbf_wait(context, 60);
-    pbf_press_button(context, BUTTON_A, 50, 40);
-}
-
 // Moving to left/right box is blind sequence. To prevent game dropping button inputs,
 // press the button longer.
 void move_to_left_box(BotBaseContext& context){
@@ -87,34 +73,62 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
-// Use box selection mode to hold one column of pokemon.
-// Use visual feedback to ensure button Minus is pressed to turn on box selection mode/
-// But no feedback on the button A press to make sure the selection is complete.
-void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    // Minus to draw selection box
-    pbf_press_button(context, BUTTON_MINUS, 50, 40);
+namespace {
+    
+// In box system, when using button Minus or button Y, it will enter a mode for box selection and holding pokemon.
+// The function detects the existence of button symbol in the bottom row of the screen to make
+// sure the mode is entered or left.
+// If `enter_mode` is true, the program will assume it is not in the mode, and enter the mode by calling
+// `button_operation()` repeatedly until the mode is observed.
+// If `enter_mode` is false, the program will assume it is in the mode, and leave the mode by calling
+// `button_operation()` repeatedly until it confirms to have left the mode.
+void change_held_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    std::function<void()> button_operation, bool enter_mode,
+    const char* time_out_error_name, const char* time_out_error_message)
+{
+    // First attempt to change mode
+    button_operation();
+
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "StartHoldingColumn", "Failed to enter box selection mode after 1 minute of Button Minus pressing."
+                info, console, time_out_error_name, time_out_error_message
             );
         }
         BoxSelectionBoxModeWatcher watcher;
         context.wait_for_all_requests();
         if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
-            if (watcher.in_box_selection_mode()){
+            if (watcher.in_box_selection_mode() == enter_mode){
                 break;
             }
-            // else: not in selection mode, game drop the button minus press, try again
-            pbf_press_button(context, BUTTON_MINUS, 50, 40);
+            // else: not in the desired mode
+            button_operation();
             continue;
         }
         // Cannot detect box selection mode after 10 secs
         dump_image_and_throw_recoverable_exception(
-            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while holding a column after 10 seconds."
+            info, console, "NoStateBoxSelectionMode", "Cannot determine box selection mode for 10 seconds."
         );
     }
+}
+
+} // anonymous namesapce
+
+// Use box selection mode to hold one column of pokemon.
+// Use visual feedback to ensure button Minus is pressed to turn on box selection mode/
+// But no feedback on the button A press to make sure the selection is complete.
+void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    console.log("Holding one column.");
+    // Press Minus to draw selection box
+    const bool to_enter_selection = true;
+    change_held_mode(
+        info, console, context,
+        [&context](){ pbf_press_button(context, BUTTON_MINUS, 50, 40); },
+        to_enter_selection,
+        "TimeoutHoldingColumn", "Failed to enter box selection mode after 1 minute of Button Minus pressing."
+    );
 
     // Select rest of the pary
     // Press down multiple times to make sure we select full party in case the game drops some presses
@@ -131,59 +145,43 @@ void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
 // Assuming already holding one or more pokemon, press A to drop them.
 void drop_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_A, 60, 60);
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::seconds(60)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "DropColumn", "Failed to drop a column after 1 minute of Button A pressing."
-            );
-        }
-        BoxSelectionBoxModeWatcher watcher;
-        context.wait_for_all_requests();
-        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
-            if (!watcher.in_box_selection_mode()){
-                break;
-            }
-            // else: still in selection mode, game drop the button A press, try again
-            pbf_press_button(context, BUTTON_A, 60, 60);
-            continue;
-        }
-        // Cannot detect box selection mode after 10 secs
-        dump_image_and_throw_recoverable_exception(
-            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while dropping a column after 10 seconds."
-        );
-    }
+    context.wait_for_all_requests();
+    console.log("Drop held pokemon.");
+    const bool to_enter_selection = false;
+    change_held_mode(
+        info, console, context,
+        [&context](){ pbf_press_button(context, BUTTON_A, 60, 60); },
+        to_enter_selection,
+        "TimeoutDroppingPokemon", "Failed to drop pokemon after 1 minute of Button A pressing."
+    );
 }
 
 // Assuming already holding one or more pokemon, press B to cancel the holding.
 void cancel_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
     console.log("Cancel pokemon holding.");
-
-    pbf_press_button(context, BUTTON_B, 60, 60);
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::seconds(60)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "CancelBoxSelection", "Failed to cancel box selection after 1 minute of Button B pressing."
-            );
-        }
-        BoxSelectionBoxModeWatcher watcher;
-        context.wait_for_all_requests();
-        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
-            if (!watcher.in_box_selection_mode()){
-                break;
-            }
-            // else: still in selection mode, game drop the button B press, try again
-            pbf_press_button(context, BUTTON_B, 60, 60);
-            continue;
-        }
-        // Cannot detect box selection mode after 10 secs
-        dump_image_and_throw_recoverable_exception(
-            info, console, "CannotDetermineBoxSelectionMode", "Cannot determine box selection mode while cancelling box selection after 10 seconds."
-        );
-    }
+    const bool to_enter_selection = false;
+    change_held_mode(
+        info, console, context,
+        [&context](){ pbf_press_button(context, BUTTON_B, 60, 60); },
+        to_enter_selection,
+        "TimeoutCancellingHolding", "Failed to cancel holding pokemon after 1 minute of Button B pressing."
+    );
 }
+
+// Assuming the current slot is not empy, press button Y to hold the current pokemon
+void press_y_to_hold_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+context.wait_for_all_requests();
+    console.log("Press button Y to hold pokemon for swapping.");
+    const bool to_enter_selection = true;
+    change_held_mode(
+        info, console, context,
+        [&context](){ pbf_press_button(context, BUTTON_Y, 60, 60); },
+        to_enter_selection,
+        "TimeoutHoldingPokemonByButtonY", "Failed to hold a pokemon by button Y after 1 minute of trying."
+    );
+}
+
 
 void release_one_pokemon(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
@@ -439,14 +437,17 @@ void swap_two_box_slots(
     detector.make_overlays(overlay_set);
 
     detector.move_cursor(info, console, context, source_side, source_row, source_col);
+    SomethingInBoxSlotDetector exists(COLOR_BLUE);
+    if (exists.detect(console.video().snapshot()) == false){
+        dump_image_and_throw_recoverable_exception(info, console, "EmptySourceSwap", "Swapping an empty slot.");
+    }
 
-    pbf_press_button(context, BUTTON_Y, 60, 60);
+    press_y_to_hold_pokemon(info, console, context);
 
     detector.move_cursor(info, console, context, target_side, target_row, target_col);
 
-    pbf_press_button(context, BUTTON_A, 60, 60);
+    drop_held_pokemon(info, console, context);
 
-    context.wait_for_all_requests();
     console.log("Swapped slots.");
 }
 

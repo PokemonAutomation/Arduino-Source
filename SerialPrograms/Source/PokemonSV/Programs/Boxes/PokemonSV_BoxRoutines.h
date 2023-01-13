@@ -71,7 +71,8 @@ void unload_one_column_from_party(const ProgramInfo& info, ConsoleHandle& consol
 void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& side, uint8_t row, uint8_t col);
 
-//  In box system, use button Y to swap two slots
+//  In box system, use button Y to swap two slots.
+//  The source slot must not be empty, while the target slot can be empty.
 void swap_two_box_slots(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,

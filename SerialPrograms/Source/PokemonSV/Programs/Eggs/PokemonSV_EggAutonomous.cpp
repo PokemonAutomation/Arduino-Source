@@ -176,7 +176,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //     process_one_baby(env, context, i, 5);
         // }
 
-        // return;
+        return;
     }
 
     if (AUTO_SAVING != AutoSave::NoAutoSave){
@@ -581,7 +581,7 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
 
     enter_box_system_from_overworld(env.program_info(), env.console, context);
 
-    // Move to right box
+    // Move to left box
     move_to_left_box(context);
 
     // Swap the stored the flame body pokemon with the stored first fetching pokemon
