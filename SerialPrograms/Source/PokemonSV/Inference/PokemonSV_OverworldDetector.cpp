@@ -123,10 +123,13 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
 
 
 
-OverworldWatcher::OverworldWatcher(Color color)
+OverworldWatcher::OverworldWatcher(
+    Color color,
+    std::chrono::milliseconds hold_duration
+)
      : OverworldDetector(color)
      , VisualInferenceCallback("OverworldWatcher")
-     , m_hold_duration(1000)
+     , m_hold_duration(hold_duration)
 {}
 
 void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{

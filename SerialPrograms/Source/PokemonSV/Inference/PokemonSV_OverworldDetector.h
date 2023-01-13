@@ -34,17 +34,13 @@ protected:
     const ImageFloatBox m_radar;
     const ImageFloatBox m_radar_inside;
 };
-#if 0
-class OverworldWatcher : public DetectorToFinder<OverworldDetector>{
-public:
-    OverworldWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("OverworldWatcher", std::chrono::milliseconds(1000), color)
-    {}
-};
-#else
+
 class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
 public:
-    OverworldWatcher(Color color = COLOR_RED);
+    OverworldWatcher(
+        Color color = COLOR_RED,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(1000)
+    );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
@@ -54,7 +50,6 @@ private:
     std::chrono::milliseconds m_hold_duration;
     VideoSnapshot m_start_of_detection;
 };
-#endif
 
 
 }
