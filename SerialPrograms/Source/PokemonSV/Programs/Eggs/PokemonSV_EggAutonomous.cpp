@@ -459,11 +459,6 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
     env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
 
-    if (egg_index == 0){
-        // fix judge view if needed
-        change_stats_view_to_judge(env.program_info(), env.console, context);
-    }
-
     bool found_shiny = false;
     EggHatchAction action = EggHatchAction::Release;
     if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action)){
