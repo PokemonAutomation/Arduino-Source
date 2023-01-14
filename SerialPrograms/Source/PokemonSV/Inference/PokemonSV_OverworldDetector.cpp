@@ -123,32 +123,44 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
 
 
 
-OverworldWatcher::OverworldWatcher(
-    Color color,
-    std::chrono::milliseconds hold_duration
-)
+OverworldWatcher::OverworldWatcher(Color color)
      : OverworldDetector(color)
      , VisualInferenceCallback("OverworldWatcher")
-     , m_hold_duration(hold_duration)
+     , m_ball_hold_duration(std::chrono::milliseconds(5000))
+     , m_map_hold_duration(std::chrono::milliseconds(1000))
+     , m_last_ball(WallClock::min())
 {}
 
 void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{
     OverworldDetector::make_overlays(items);
 }
 bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
-    //  Return true only if the detection is held for the entire duration and
-    //  the radar map has not changed for the duration.
+    //  Return true if either of the following is true:
+    //    - Ball is held and radar map stays still for 1 second.
+    //    - Ball is held for 5 seconds.
+
+    //  The map is not static when there is an event raid in it as it will
+    //  sparkle. So instead, we revert to the ball being held for 5 seconds.
 
     //  No detection.
     if (!detect(frame)){
+        m_last_ball = WallClock::min();
         m_start_of_detection.clear();
         return false;
     }
 
     //  First detection.
+    if (m_last_ball == WallClock::min()){
+        m_last_ball = frame.timestamp;
+    }
     if (!m_start_of_detection){
         m_start_of_detection = frame;
         return false;
+    }
+
+    //  Ball held for long enough.
+    if (frame.timestamp - m_last_ball >= m_ball_hold_duration){
+        return true;
     }
 
     //  Mismatching image sizes.
@@ -168,7 +180,7 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
     }
 
     //  Make sure it's held for long enough.
-    return frame.timestamp - m_start_of_detection.timestamp >= m_hold_duration;
+    return frame.timestamp - m_start_of_detection.timestamp >= m_map_hold_duration;
 }
 
 

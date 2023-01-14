@@ -37,17 +37,16 @@ protected:
 
 class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
 public:
-    OverworldWatcher(
-        Color color = COLOR_RED,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(1000)
-    );
+    OverworldWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
 
 
 private:
-    std::chrono::milliseconds m_hold_duration;
+    std::chrono::milliseconds m_ball_hold_duration;
+    std::chrono::milliseconds m_map_hold_duration;
+    WallClock m_last_ball;
     VideoSnapshot m_start_of_detection;
 };
 
