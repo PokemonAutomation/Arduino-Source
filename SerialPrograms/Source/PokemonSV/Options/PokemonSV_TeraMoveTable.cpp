@@ -104,7 +104,8 @@ TeraMoveTable::TeraMoveTable()
     : EditableTableOption_t<TeraMoveTableRow>(
         "<b>Move Table:</b><br>"
         "Run this sequence of moves. When the end of the table is reached, "
-        "the last entry will be repeated until the battle is won or lost.",
+        "the last entry will be repeated until the battle is won or lost. "
+        "Changes to this table take place on the next battle.",
         LockWhileRunning::UNLOCKED,
         make_defaults()
     )

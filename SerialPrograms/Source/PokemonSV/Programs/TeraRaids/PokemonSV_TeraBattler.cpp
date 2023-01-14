@@ -144,6 +144,7 @@ bool run_tera_battle(
                 if (index >= 4){
                     index = 0;
                 }
+                current_move.type = (TeraMoveType)((uint8_t)TeraMoveType::Move1 + index);
             }
             if (terastallizing.detect(console.video().snapshot())){
                 env.log("Terastallization: Available");
