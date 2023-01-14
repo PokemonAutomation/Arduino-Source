@@ -25,30 +25,17 @@ bool run_tera_battle(
     EventNotificationOption& error_notification,
     TeraAIOption& battle_AI
 ){
-#if 0
-    if (from_start){
-        //  Wait for first battle menu.
-        {
-            BattleMenuWatcher battle_menu(COLOR_RED);
-            int ret = wait_until(
-                console, context,
-                std::chrono::seconds(120),
-                {battle_menu}
-            );
-            if (ret < 0){
-                dump_image_and_throw_recoverable_exception(
-                    env, console, error_notification,
-                    "BattleMenuNotFound",
-                    "Unable to detect Tera raid battle menu after 120 seconds."
-                );
-            }
-            env.log("First battle menu found.");
-        }
+
+    size_t turn = 0;
+    std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
+    TeraMoveEntry current_move{TeraMoveType::Move1, 0, TeraTarget::Opponent};
+    if (!move_table.empty()){
+        current_move = move_table[0];
     }
-#endif
 
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
+    bool next_turn_on_battle_menu = false;
     while (true){
         // warning, this terastallizing detector isn't used in the wait_until below
         TerastallizingDetector terastallizing(COLOR_ORANGE);
@@ -74,30 +61,119 @@ bool run_tera_battle(
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
-        case 0:
+        case 0:{
             env.log("Detected battle menu.");
-            pbf_press_button(context, BUTTON_A, 20, 10);
-            break;
-        case 1:
-            env.log("Detected move select.");
+            if (next_turn_on_battle_menu){
+                env.log("Detected battle menu. Turn: " + std::to_string(turn));
+                turn++;
+                if (turn < move_table.size()){
+                    current_move = move_table[turn];
+                }
+                next_turn_on_battle_menu = false;
+            }
+            switch (current_move.type){
+            case TeraMoveType::Wait:
+                context.wait_for(std::chrono::seconds(current_move.seconds));
+                continue;
+            case TeraMoveType::Move1:
+            case TeraMoveType::Move2:
+            case TeraMoveType::Move3:
+            case TeraMoveType::Move4:
+                if (battle_menu.move_to_slot(console, context, 0)){
+                    pbf_press_button(context, BUTTON_A, 20, 10);
+                }
+                continue;
+            case TeraMoveType::Cheer_AllOut:
+                if (!battle_menu.move_to_slot(console, context, 1)){
+                    continue;
+                }
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                next_turn_on_battle_menu = true;
+                continue;
+            case TeraMoveType::Cheer_HangTough:
+                if (!battle_menu.move_to_slot(console, context, 1)){
+                    continue;
+                }
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                next_turn_on_battle_menu = true;
+                continue;
+            case TeraMoveType::Cheer_HealUp:
+                if (!battle_menu.move_to_slot(console, context, 1)){
+                    continue;
+                }
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_dpad(context, DPAD_UP, 20, 30);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                next_turn_on_battle_menu = true;
+                continue;
+            }
+            continue;
+        }
+        case 1:{
+            env.log("Detected move select. Turn: " + std::to_string(turn));
             consecutive_move_select++;
+
+            uint8_t index = 0;
+            switch (current_move.type){
+            case TeraMoveType::Move1:
+                index = 0;
+                break;
+            case TeraMoveType::Move2:
+                index = 1;
+                break;
+            case TeraMoveType::Move3:
+                index = 2;
+                break;
+            case TeraMoveType::Move4:
+                index = 3;
+                break;
+            default:
+                pbf_press_button(context, BUTTON_B, 20, 10);
+                continue;
+            }
+
             //  If we end up here consecutively too many times, the move is
             //  probably disabled. Select a different move.
             if (consecutive_move_select > 3){
                 env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+                index++;
+                if (index >= 4){
+                    index = 0;
+                }
             }
-            if (battle_AI.TRY_TO_TERASTILLIZE && terastallizing.detect(console.video().snapshot())){
-                env.log("Detected available terastallization.");
-                pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+            if (terastallizing.detect(console.video().snapshot())){
+                env.log("Terastallization: Available");
+                if (battle_AI.TRY_TO_TERASTILLIZE){
+                    pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+                }
+            }else{
+                env.log("Terastallization: Not Available");
             }
-            pbf_press_button(context, BUTTON_A, 20, 10);
-            break;
+            if (move_select_menu.move_to_slot(console, context, index)){
+                pbf_press_button(context, BUTTON_A, 20, 10);
+            }
+            continue;
+        }
         case 2:
-            env.log("Detected target select.");
+            env.log("Detected target select. Turn: " + std::to_string(turn));
             consecutive_move_select = 0;
-            pbf_press_button(context, BUTTON_A, 20, 10);
-            break;
+            switch (current_move.type){
+            case TeraMoveType::Move1:
+            case TeraMoveType::Move2:
+            case TeraMoveType::Move3:
+            case TeraMoveType::Move4:
+                target_select_menu.move_to_slot(console, context, (uint8_t)current_move.target);
+                pbf_press_button(context, BUTTON_A, 20, 10);
+                next_turn_on_battle_menu = true;
+                continue;
+            default:
+                pbf_press_button(context, BUTTON_B, 20, 10);
+                continue;
+            }
         case 3:
             env.log("Detected a win!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);

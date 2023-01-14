@@ -56,7 +56,7 @@ TeraMoveTableRow::TeraMoveTableRow()
     PA_ADD_OPTION(target);
     PA_ADD_OPTION(notes);
 
-//    TeraMoveTableRow::value_changed();
+    TeraMoveTableRow::value_changed();
     type.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> TeraMoveTableRow::clone() const{

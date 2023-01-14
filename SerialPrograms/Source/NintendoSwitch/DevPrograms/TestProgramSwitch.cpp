@@ -173,29 +173,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
     OverworldWatcher overworld;
     int ret = wait_until(
         console, context, std::chrono::seconds(5),
         {overworld}
     );
     cout << ret << endl;
+#endif
 
+#if 1
+    ImageRGB32 image("BadArrow.png");
 
-#if 0
     BattleMenuDetector battle_menu(COLOR_RED);
     MoveSelectDetector move_select(COLOR_GREEN);
     TargetSelectDetector target_select(COLOR_CYAN);
     TeraCatchDetector tera_catch(COLOR_BLUE);
-    battle_menu.make_overlays(overlays);
-    move_select.make_overlays(overlays);
-    target_select.make_overlays(overlays);
-    tera_catch.make_overlays(overlays);
-//    cout << (int)target_select.detect_slot(feed.snapshot()) << endl;
+//    battle_menu.make_overlays(overlays);
+//    move_select.make_overlays(overlays);
+//    target_select.make_overlays(overlays);
+//    tera_catch.make_overlays(overlays);
+    cout << (int)battle_menu.detect_slot(image) << endl;
 
 //    battle_menu.move_to_slot(console, context, 0);
 //    move_select.move_to_slot(console, context, 1);
-    target_select.move_to_slot(console, context, 2);
+//    target_select.move_to_slot(console, context, 2);
 #endif
 
 

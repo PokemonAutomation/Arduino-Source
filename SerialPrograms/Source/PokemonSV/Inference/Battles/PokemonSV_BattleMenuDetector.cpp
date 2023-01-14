@@ -48,6 +48,8 @@ int8_t BattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
+//        cout << "arrow" << endl;
+//        screen.save("test.png");
         return -1;
     }
 

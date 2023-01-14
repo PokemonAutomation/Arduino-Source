@@ -162,6 +162,10 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
                 {0xff00c0c0, 0xff5fffff},
                 {0xff00c0c0, 0xff3fffff},
                 {0xff00c0c0, 0xff0fffff},
+                {0xff00c0e0, 0xff7fffff},
+                {0xff00c0e0, 0xff5fffff},
+                {0xff00c0e0, 0xff3fffff},
+                {0xff00c0e0, 0xff0fffff},
             }
         );
 //        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff0fffff);

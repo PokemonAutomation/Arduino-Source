@@ -26,9 +26,9 @@ TeraAIOption::TeraAIOption()
         LockWhileRunning::UNLOCKED, true
     )
 {
-    PA_ADD_STATIC(description);
+//    PA_ADD_STATIC(description);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
-//    PA_ADD_OPTION(MOVE_TABLE);
+    PA_ADD_OPTION(MOVE_TABLE);
 }
 
 
