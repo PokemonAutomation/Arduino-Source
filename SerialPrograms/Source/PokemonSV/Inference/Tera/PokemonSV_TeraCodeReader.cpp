@@ -16,35 +16,31 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSV_TeraCodeReader.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-char read_5S(const ImageViewRGB32& image, char OCR_result){
+char read_5S(const PackedBinaryMatrix& matrix, char OCR_result){
     //  5 and S are commonly misread as each other. Here we try an extra step to
     //  distinguish them.
 
 //    static int count = 0;
 //    image.save("testB-" + std::to_string(count++) + ".png");
 
-    if (image.height() < 2){
+    if (matrix.height() < 2){
         return OCR_result;
     }
 
-    size_t width = image.width();
+    size_t width = matrix.width();
 
     size_t top_black_pixels = 0;
     for (size_t c = 0; c < width; c++){
-        uint32_t pixel = image.pixel(c, 0);
-        uint32_t sum = pixel & 0xff;
-        sum += (pixel >> 16) & 0xff;
-        sum += (pixel >> 8) & 0xff;
-        if (sum < 400){
+        if (matrix.get(c, 0)){
             top_black_pixels++;
         }
     }
@@ -54,30 +50,12 @@ char read_5S(const ImageViewRGB32& image, char OCR_result){
         return '5';
     }
 
-#if 0
-    top_black_pixels = 0;
-    for (size_t c = 0; c < width; c++){
-        uint32_t pixel = image.pixel(c, 1);
-        uint32_t sum = pixel & 0xff;
-        sum += (pixel >> 16) & 0xff;
-        sum += (pixel >> 8) & 0xff;
-        if (sum < 400){
-            top_black_pixels++;
-        }
-    }
-    ratio = (double)top_black_pixels / width;
-//    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
-    if (ratio > 0.70){
-        return '5';
-    }
-#endif
-
     return 'S';
 }
 
 
 struct WaterfillOCRResult{
-    ImagePixelBox box;
+    PackedBinaryMatrix matrix;
     std::string ocr;
 };
 
@@ -92,43 +70,32 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
 
-//    uint32_t THRESHOLD = 0xff5f5f5f;
-//    uint32_t THRESHOLD = 0xff7f7f7f;
-
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, threshold, true);
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, threshold);
 
-    std::map<size_t, ImagePixelBox> boxes;
+    std::vector<WaterfillObject> objects;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(20);
         WaterfillObject object;
-        while (iter->find_next(object, false)){
-            boxes.emplace(object.min_x, object);
+        while (objects.size() < 16 && iter->find_next(object, true)){
+            objects.emplace_back(std::move(object));
         }
     }
 
-    std::vector<WaterfillOCRResult> ret;
-    for (auto& item : boxes){
-        ret.emplace_back(WaterfillOCRResult{item.second, std::string()});
-    }
-
-#if 0
-    for (WaterfillOCRResult& item : ret){
-        ImageViewRGB32 cropped = extract_box_reference(filtered, item.box);
-        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
-        item.ocr = OCR::ocr_read(Language::English, padded);
-    }
-#else
+    std::vector<WaterfillOCRResult> ret(objects.size());
     dispatcher.run_in_parallel(
-        0, ret.size(),
+        0, objects.size(),
         [&](size_t index){
-            ImageViewRGB32 cropped = extract_box_reference(filtered, ret[index].box);
+            WaterfillObject& object = objects[index];
+            ImageRGB32 cropped = extract_box_reference(filtered, object).copy();
+            PackedBinaryMatrix tmp(object.packed_matrix());
+            filter_by_mask(tmp, cropped, Color(0xffffffff), true);
             ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+            ret[index].matrix = std::move(tmp);
             ret[index].ocr = OCR::ocr_read(Language::English, padded);
         }
     );
-#endif
 
 #if 0
     size_t c = 0;
@@ -260,7 +227,7 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
             switch (ch){
             case '5':
             case 'S':
-                ch = read_5S(extract_box_reference(image, item.box), ch);
+                ch = read_5S(item.matrix, ch);
             }
 
             normalized += ch;
