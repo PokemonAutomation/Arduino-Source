@@ -82,16 +82,21 @@ struct WaterfillOCRResult{
 };
 
 
-std::vector<WaterfillOCRResult> waterfill_OCR(AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
+std::vector<WaterfillOCRResult> waterfill_OCR(
+    AsyncDispatcher& dispatcher,
+    const ImageViewRGB32& image,
+    uint32_t threshold
+){
     using namespace Kernels::Waterfill;
 
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
 
-    uint32_t THRESHOLD = 0xff5f5f5f;
+//    uint32_t THRESHOLD = 0xff5f5f5f;
+//    uint32_t THRESHOLD = 0xff7f7f7f;
 
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, THRESHOLD, true);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, THRESHOLD);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, threshold, true);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, threshold);
 
     std::map<size_t, ImagePixelBox> boxes;
     {
@@ -125,12 +130,22 @@ std::vector<WaterfillOCRResult> waterfill_OCR(AsyncDispatcher& dispatcher, const
     );
 #endif
 
+#if 0
+    size_t c = 0;
+    for (auto& item : ret){
+        cout << item.ocr << endl;
+        ImageViewRGB32 cropped = extract_box_reference(filtered, ret[c].box);
+        cropped.save("letter-" + std::to_string(c) + ".png");
+        c++;
+    }
+#endif
+
     return ret;
 }
 
 
 int16_t read_raid_timer(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
-    std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image);
+    std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image, 0xff7f7f7f);
 
 //    cout << "map.size() = " << map.size() << endl;
 //    for (auto& item : map){
@@ -191,64 +206,78 @@ int16_t read_raid_timer(Logger& logger, AsyncDispatcher& dispatcher, const Image
 
 
 std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& image){
-    std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image);
-
-    static const std::map<char, char> SUBSTITUTIONS{
-        {'I', '1'},
-        {'i', '1'},
-        {'l', '1'},
-        {'O', '0'},
-        {'Z', 'S'},
-        {'\\', 'V'},
-        {'/', '7'},
-        {']', '1'},
-        {'(', 'K'},
+    std::vector<uint32_t> filters{
+        0xff5f5f5f,
+        0xff7f7f7f,
     };
 
-    std::string raw;
-    std::string normalized;
-    for (const auto& item : characters){
-        const std::string& ocr = item.ocr;
-        if (ocr.empty()){
-            continue;
+    for (uint32_t filter : filters){
+        std::vector<WaterfillOCRResult> characters = waterfill_OCR(dispatcher, image, filter);
+
+        static const std::map<char, char> SUBSTITUTIONS{
+            {'I', '1'},
+            {'i', '1'},
+            {'l', '1'},
+            {'O', '0'},
+            {'Z', 'S'},
+            {'\\', 'V'},
+            {'/', '7'},
+            {']', '1'},
+            {'(', 'K'},
+        };
+
+        bool contains_letters = false;
+
+        std::string raw;
+        std::string normalized;
+        for (const auto& item : characters){
+            const std::string& ocr = item.ocr;
+            if (ocr.empty()){
+                continue;
+            }
+            if ((uint8_t)ocr.back() < (uint8_t)32){
+                raw += ocr.substr(0, ocr.size() - 1);
+            }else{
+                raw += ocr;
+            }
+
+            char ch = ocr[0];
+
+            //  Upper case.
+            if ('a' <= ch && ch <= 'z'){
+                ch -= 'a' - 'A';
+            }
+
+            //  Character substitution.
+            auto iter = SUBSTITUTIONS.find(ch);
+            if (iter != SUBSTITUTIONS.end()){
+                ch = iter->second;
+            }
+
+            contains_letters |= 'A' <= ch && ch <= 'Z';
+
+            //  Distinguish 5 and S.
+            switch (ch){
+            case '5':
+            case 'S':
+                ch = read_5S(extract_box_reference(image, item.box), ch);
+            }
+
+            normalized += ch;
         }
-        if ((uint8_t)ocr.back() < (uint8_t)32){
-            raw += ocr.substr(0, ocr.size() - 1);
-        }else{
-            raw += ocr;
+
+        std::string log = "Code OCR: \"" + raw + "\" -> \"" + normalized + "\"";
+        size_t length = normalized.size();
+        if ((contains_letters && length == 6) ||
+            (!contains_letters && (length == 4 || length == 8))
+        ){
+            logger.log(log, COLOR_BLUE);
+            return normalized;
         }
-
-        char ch = ocr[0];
-
-        //  Upper case.
-        if ('a' <= ch && ch <= 'z'){
-            ch -= 'a' - 'A';
-        }
-
-        //  Character substitution.
-        auto iter = SUBSTITUTIONS.find(ch);
-        if (iter != SUBSTITUTIONS.end()){
-            ch = iter->second;
-        }
-
-        //  Distinguish 5 and S.
-        switch (ch){
-        case '5':
-        case 'S':
-            ch = read_5S(extract_box_reference(image, item.box), ch);
-        }
-
-        normalized += ch;
-    }
-
-    std::string log = "Code OCR: \"" + raw + "\" -> \"" + normalized + "\"";
-    if (normalized.size() != 4 && normalized.size() != 6){
         logger.log(log, COLOR_RED);
-        return "";
     }
 
-    logger.log(log, COLOR_BLUE);
-    return normalized;
+    return "";
 }
 
 
