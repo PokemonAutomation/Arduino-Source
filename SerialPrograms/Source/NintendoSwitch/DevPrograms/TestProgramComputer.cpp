@@ -190,6 +190,11 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+
+
+
+#if 0
     StatAccumulatorI32 stats;
 
     for (size_t c = 0; c < 1000; c++){
@@ -201,6 +206,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         stats += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
     cout << stats.dump("us", 1) << endl;
+#endif
 
 
 #if 0

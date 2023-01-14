@@ -10,9 +10,9 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "BinaryImage_FilterRgb32.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
