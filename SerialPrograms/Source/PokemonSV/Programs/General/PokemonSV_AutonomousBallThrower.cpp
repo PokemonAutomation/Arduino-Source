@@ -100,7 +100,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
 
     while (true)
     {
-        BattleMenuWatcher battle_menu(COLOR_RED);
+        NormalBattleMenuWatcher battle_menu(COLOR_RED);
         int ret = wait_until(
             env.console, context,
             std::chrono::seconds(120),

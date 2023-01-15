@@ -254,7 +254,7 @@ bool AutoHost::start_raid(
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
-        BattleMenuWatcher battle_menu(COLOR_CYAN);
+        TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
         int ret = run_until(
             env.console, context,
