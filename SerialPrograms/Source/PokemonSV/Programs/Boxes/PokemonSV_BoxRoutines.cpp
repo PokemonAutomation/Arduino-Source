@@ -29,18 +29,22 @@ namespace PokemonSV{
 
 
 
-void change_stats_view_to_judge(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+bool change_stats_view_to_judge(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool throw_exception
 ){
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
     OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
 #if 1
     for (size_t attempts = 0;; attempts++){
         if (attempts == 10){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "ChangePokemonView",
-                "check_baby_info: Unable to change Pokemon view after 10 tries."
-            );
+            if (throw_exception){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "ChangePokemonView",
+                    "check_baby_info: Unable to change Pokemon view after 10 tries."
+                );
+            }
+            return false;
         }
 
         context.wait_for_all_requests();
@@ -61,6 +65,7 @@ void change_stats_view_to_judge(
             pbf_press_button(context, BUTTON_PLUS, 20, 230);
         }
     }
+    return true;
 #endif
 }
 

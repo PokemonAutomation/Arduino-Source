@@ -116,7 +116,7 @@ EggAutonomous::EggAutonomous()
             {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
             {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs and Lettuce"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         EggSandwichType::GREAT_PEANUT_BUTTER
     )
     , SWEET_HERB_INDEX_BACKWARDS(
@@ -128,7 +128,7 @@ EggAutonomous::EggAutonomous()
             {3, "3", "4th last on list"},
             {4, "4", "5th last on list (the location if you have all types of herbs)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         4
     )
     , HAS_CLONE_RIDE_POKEMON(
