@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 // Detect if the currently selected pokemon is an egg or not, assuming the current
-// selected slot is not empty
+// selected slot is not empty and the box view is stats or judege mode.
 class BoxCurrentEggDetector : public StaticScreenDetector{
 public:
     BoxCurrentEggDetector(Color color = COLOR_BLUE);

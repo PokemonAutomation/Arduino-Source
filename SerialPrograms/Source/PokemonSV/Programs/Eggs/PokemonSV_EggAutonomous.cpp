@@ -342,15 +342,29 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     // starting at 1 because when hatch_eggs_full_routine() is called, the first column is already loaded to the party
     uint8_t next_egg_column = 1;
 
-    auto go_to_next_egg_column = [&](){
+    // Find the next egg column in the current box.
+    // Note: the box columns can be:
+    // - empty. This is due to the column loaded to party, or released in the case of AutoSaving != AfterStartAndKeep.
+    // - egg column.
+    // - hatched pokemon. This only happens in the case of AutoSaving == AfterStartAndKeep.
+    // To handle all AutoSaving cases, we cannot only use `SomethingInBoxSlotDetector` to find the column, but also need
+    // `BoxCurrentEggDetector`. 
+    // This function is called in two cases:
+    // 1. When we recover from error and don't know which column is the next egg column.
+    //    In this case, `change_stats_view_to_judge()` is called as part of the error recovery code before this function,
+    //    so that `BoxCurrentEggDetector` in this function can function correctly to find that the egg column.
+    // 2. When we finish processing one hatched party and want to load the next egg column.
+    //    In this case, `next_egg_column` already point to the next possible column, that cannot be hatched pokemon.
+    //    So we don't need to call egg detector and don't need to worry about setting box views.
+    auto go_to_next_egg_column = [&](bool check_eggs = false){
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
         BoxCurrentEggDetector egg_detector;
         for (; next_egg_column < 6; next_egg_column++){
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
             auto snapshot = env.console.video().snapshot();
-            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
-            if (sth_in_box_detector.detect(snapshot) && egg_detector.detect(snapshot)){
+            // If there is an egg in slot row 0 (or 1 if using clone ride pokemon), col `col`,
+            if (sth_in_box_detector.detect(snapshot) && (!check_eggs || egg_detector.detect(snapshot))){
                 env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
                 break;
             }
@@ -376,7 +390,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Also detect what's the next egg column
         context.wait_for(std::chrono::seconds(2)); // wait until box UI is definitely loaded
         env.log("Checking next egg column.");
-        go_to_next_egg_column();
+        go_to_next_egg_column(true);
 
         leave_box_system_to_overworld(env.program_info(), env.console, context);
     }
