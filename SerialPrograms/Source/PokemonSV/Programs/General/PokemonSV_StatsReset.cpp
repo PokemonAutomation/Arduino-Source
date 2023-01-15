@@ -5,33 +5,28 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/PokemonSV_Settings.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "PokemonSV_StatsReset.h"
-#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV_StatsReset.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 using namespace Pokemon;
  
