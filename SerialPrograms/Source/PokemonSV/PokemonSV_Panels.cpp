@@ -10,12 +10,13 @@
 
 #include "PokemonSV_Settings.h"
 
-#include "Programs/General/PokemonSV_AuctionFarmer.h"
 #include "Programs/General/PokemonSV_MassPurchase.h"
 #include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
+
 #include "Programs/General/PokemonSV_GimmighoulChestFarmer.h"
 #include "Programs/General/PokemonSV_GimmighoulRoamingFarmer.h"
+#include "Programs/General/PokemonSV_AuctionFarmer.h"
 #include "Programs/General/PokemonSV_ESPTraining.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 
@@ -54,7 +55,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
+    }
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
 
@@ -65,10 +68,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
-        ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
-//    }
+    ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
+    ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());

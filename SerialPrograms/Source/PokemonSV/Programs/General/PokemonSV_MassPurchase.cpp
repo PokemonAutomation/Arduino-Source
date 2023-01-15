@@ -3,32 +3,17 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+
 #include "Common/Cpp/Exceptions.h"
-
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
-
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
-
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Pokemon_Notification.h"
-
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
-
 #include "PokemonSV_MassPurchase.h"
 
 namespace PokemonAutomation{
@@ -66,68 +51,68 @@ std::unique_ptr<StatsTracker> MassPurchase_Descriptor::make_stats() const {
 }
 
 MassPurchase::MassPurchase()
-: ITEMS(
-    "<b>Items to Buy:</b><br>The amount of Items to buy from the postion of the cursor.",
-    LockWhileRunning::LOCKED,
-    50
-)
-, QUANTITY(
+    : ITEMS(
+        "<b>Items to Buy:</b><br>The amount of Items to buy from the postion of the cursor.",
+        LockWhileRunning::LOCKED,
+        50
+    )
+    , QUANTITY(
         "<b>Quantity to Buy:</b><br>The amount of each item to buy (Set to 0 for 999).",
         LockWhileRunning::LOCKED,
         0
     )
-, GO_HOME_WHEN_DONE(false)
-, PAY_LP(
-    "<b>Pay with LP:</b>",
-    LockWhileRunning::UNLOCKED, false
-)
-, NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-, NOTIFICATIONS({
-    &NOTIFICATION_STATUS_UPDATE,
-    &NOTIFICATION_PROGRAM_FINISH,
-    &NOTIFICATION_ERROR_RECOVERABLE,
-    &NOTIFICATION_ERROR_FATAL,
+    , GO_HOME_WHEN_DONE(false)
+    , PAY_LP(
+        "<b>Pay with LP:</b>",
+        LockWhileRunning::UNLOCKED, false
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
-PA_ADD_OPTION(ITEMS);
-PA_ADD_OPTION(QUANTITY);
-PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-PA_ADD_OPTION(PAY_LP);
-PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_OPTION(ITEMS);
+    PA_ADD_OPTION(QUANTITY);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(PAY_LP);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
-        
-        OverworldWatcher overworld(COLOR_RED);
-        AdvanceDialogWatcher dialog(COLOR_CYAN);
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {
-                overworld,
-                dialog,
-            }
-        );
-        context.wait_for(std::chrono::milliseconds(50));
 
-        switch (ret){
-        case 0:
-            env.log("Error - Stuck in Overworld");
-            stats.errors++;
-            throw FatalProgramException(env.logger(), "Stuck in Overworld");
-            return true;
+    OverworldWatcher overworld(COLOR_RED);
+    AdvanceDialogWatcher dialog(COLOR_CYAN);
+    context.wait_for_all_requests();
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(10),
+        {
+            overworld,
+            dialog,
+        }
+    );
+    context.wait_for(std::chrono::milliseconds(50));
 
-        case 1:
-            env.log("Detected full bag. Skipped Item");
-            stats.skip++;
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            return true;
-        default:
-            return false;
-        };
-    };
+    switch (ret){
+    case 0:
+        env.log("Error - Stuck in Overworld");
+        stats.errors++;
+        throw FatalProgramException(env.logger(), "Stuck in Overworld");
+
+    case 1:
+        env.log("Detected full bag. Skipped Item");
+        stats.skip++;
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        return true;
+
+    default:
+        return false;
+    }
+};
 
 void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -137,42 +122,42 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
     
     int item_val = ITEMS;
     bool skip_item = false;
-    while (item_val != 0) {
+    while (item_val != 0){
         int qt_val = QUANTITY;
         pbf_press_button(context, BUTTON_A, 5, 105);
         
-        skip_item=mass_purchase(env, env.console, context);
+        skip_item = mass_purchase(env, env.console, context);
         
-        if (skip_item) {
+        if (skip_item){
             pbf_press_button(context, BUTTON_B, 5, 105);
-        };
+        }
         
-        if (!skip_item) {
-        while (qt_val != 0) {
-            pbf_press_dpad(context, DPAD_UP, 5, 105);
-            qt_val--;
-        };
+        if (!skip_item){
+            while (qt_val != 0){
+                pbf_press_dpad(context, DPAD_UP, 5, 105);
+                qt_val--;
+            }
 
-        pbf_press_dpad(context, DPAD_DOWN, 5, 105);
-        pbf_press_button(context, BUTTON_A, 5, 125);
-        
-        if (PAY_LP) {
             pbf_press_dpad(context, DPAD_DOWN, 5, 105);
-        };
-        
-        pbf_press_button(context, BUTTON_A, 5, 250);
-        pbf_press_button(context, BUTTON_A, 5, 125);
-        
-        env.log("Item Purchased");
-        stats.total_items++;
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        };
+            pbf_press_button(context, BUTTON_A, 5, 125);
+
+            if (PAY_LP){
+                pbf_press_dpad(context, DPAD_DOWN, 5, 105);
+            }
+
+            pbf_press_button(context, BUTTON_A, 5, 250);
+            pbf_press_button(context, BUTTON_A, 5, 125);
+
+            env.log("Item Purchased");
+            stats.total_items++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        }
         
         pbf_press_dpad(context, DPAD_DOWN, 5, 105);
         
         item_val--;
-    };
+    }
         
     pbf_press_button(context, BUTTON_B, 5, 105);
     pbf_press_button(context, BUTTON_B, 5, 105);
@@ -182,10 +167,16 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
     pbf_press_button(context, BUTTON_A, 5, 105);
     pbf_press_button(context, BUTTON_B, 5, 105);
     pbf_press_button(context, BUTTON_A, 5, 105);
-    
+
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
+
+
+
+
+
+
 }
 }
 }

@@ -1,4 +1,5 @@
 /*  Mass Purchase
+ *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
@@ -8,9 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
