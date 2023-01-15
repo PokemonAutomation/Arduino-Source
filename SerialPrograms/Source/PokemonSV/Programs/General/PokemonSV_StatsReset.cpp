@@ -127,7 +127,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         switch (TARGET) {
         case Target::TreasuresOfRuin:
             //~30 seconds to start battle?
-            pbf_mash_button(context, BUTTON_A, 3750);
+            pbf_mash_button(context, BUTTON_A, 3250);
             context.wait_for_all_requests();
             break;
         case Target::Generic:
@@ -138,7 +138,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         default:
             throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Unknown Target");
         }
-        BattleMenuWatcher battle_menu(COLOR_YELLOW);
+        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         int ret = wait_until(
             env.console, context,
             std::chrono::seconds(15),
