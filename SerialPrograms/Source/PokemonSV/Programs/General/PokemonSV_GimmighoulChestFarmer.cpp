@@ -110,7 +110,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_mash_button(context, BUTTON_A, 90);
 
         //Wait for the battle to load then check for battle menu, if there isn't a battle menu then no chest
-        BattleMenuWatcher battle_menu(COLOR_YELLOW);
+        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         int ret = wait_until(
             env.console, context,
             std::chrono::seconds(10),

@@ -185,7 +185,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 1
     ImageRGB32 image("BadArrow.png");
 
-    BattleMenuDetector battle_menu(COLOR_RED);
+    TeraBattleMenuDetector battle_menu(COLOR_RED);
     MoveSelectDetector move_select(COLOR_GREEN);
     TargetSelectDetector target_select(COLOR_CYAN);
     TeraCatchDetector tera_catch(COLOR_BLUE);

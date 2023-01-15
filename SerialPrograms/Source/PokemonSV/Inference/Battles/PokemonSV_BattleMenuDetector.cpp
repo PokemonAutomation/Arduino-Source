@@ -13,24 +13,47 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BattleMenuDetector::BattleMenuDetector(Color color)
+NormalBattleMenuDetector::NormalBattleMenuDetector(Color color)
+    : m_status_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
+    , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.62, 0.05, 0.35})
+{}
+void NormalBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
+    m_status_button.make_overlays(items);
+    m_arrow.make_overlays(items);
+}
+bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+    if (!m_status_button.detect(screen)){
+//        cout << "status button" << endl;
+        return false;
+    }
+    if (!m_arrow.detect(screen)){
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
+TeraBattleMenuDetector::TeraBattleMenuDetector(Color color)
     : m_callouts_button(color, WhiteButton::ButtonMinus, {0.35, 0.87, 0.30, 0.05})
     , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.62, 0.05, 0.35})
 {}
-void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
+void TeraBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_callouts_button.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_callouts_button.detect(screen)){
 //        cout << "status button" << endl;
         return false;
@@ -40,7 +63,7 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-int8_t BattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
     if (!m_callouts_button.detect(screen)){
 //        cout << "status button" << endl;
         return -1;
@@ -57,7 +80,7 @@ int8_t BattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)((y - 0.761111) / 0.0814815 + 0.5);
 }
-bool BattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
     if (slot > 2){
         return false;
     }

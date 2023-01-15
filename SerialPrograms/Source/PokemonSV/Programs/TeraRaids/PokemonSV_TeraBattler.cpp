@@ -42,7 +42,7 @@ bool run_tera_battle(
         VideoOverlaySet overlay_set(console);
         terastallizing.make_overlays(overlay_set);
 
-        BattleMenuWatcher battle_menu(COLOR_RED);
+        TeraBattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         TargetSelectWatcher target_select_menu(COLOR_CYAN);
         TeraCatchWatcher catch_menu(COLOR_BLUE);

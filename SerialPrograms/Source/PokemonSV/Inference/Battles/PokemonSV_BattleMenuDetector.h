@@ -20,9 +20,33 @@ namespace PokemonSV{
 
 
 
-class BattleMenuDetector : public StaticScreenDetector{
+class NormalBattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector(Color color);
+    NormalBattleMenuDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+//    //  Returns -1 if not found.
+//    int8_t detect_slot(const ImageViewRGB32& screen) const;
+//    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+
+private:
+    WhiteButtonDetector m_status_button;
+    GradientArrowDetector m_arrow;
+};
+class NormalBattleMenuWatcher : public DetectorToFinder<NormalBattleMenuDetector>{
+public:
+    NormalBattleMenuWatcher(Color color)
+        : DetectorToFinder("NormalBattleMenuWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+
+
+class TeraBattleMenuDetector : public StaticScreenDetector{
+public:
+    TeraBattleMenuDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -35,10 +59,10 @@ private:
     WhiteButtonDetector m_callouts_button;
     GradientArrowDetector m_arrow;
 };
-class BattleMenuWatcher : public DetectorToFinder<BattleMenuDetector>{
+class TeraBattleMenuWatcher : public DetectorToFinder<TeraBattleMenuDetector>{
 public:
-    BattleMenuWatcher(Color color)
-         : DetectorToFinder("BattleMenuWatcher", std::chrono::milliseconds(250), color)
+    TeraBattleMenuWatcher(Color color)
+        : DetectorToFinder("TeraBattleMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -62,7 +86,7 @@ private:
 class MoveSelectWatcher : public DetectorToFinder<MoveSelectDetector>{
 public:
     MoveSelectWatcher(Color color)
-         : DetectorToFinder("MoveSelectWatcher", std::chrono::milliseconds(250), color)
+        : DetectorToFinder("MoveSelectWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -106,7 +130,7 @@ private:
 class TargetSelectWatcher : public DetectorToFinder<TargetSelectDetector>{
 public:
     TargetSelectWatcher(Color color)
-         : DetectorToFinder("TargetSelectWatcher", std::chrono::milliseconds(250), color)
+        : DetectorToFinder("TargetSelectWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
@@ -129,7 +153,7 @@ private:
 class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
 public:
     TeraCatchWatcher(Color color)
-         : DetectorToFinder("TeraCatchWatcher", std::chrono::milliseconds(1000), color)
+        : DetectorToFinder("TeraCatchWatcher", std::chrono::milliseconds(1000), color)
     {}
 };
 
