@@ -57,8 +57,8 @@ bool ESPEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock ti
 
 ESPStartDetector::ESPStartDetector()
     : VisualInferenceCallback("ESPStartDetector")
-    , m_left_box(0.340, 0.140, 0.007, 0.068)
-    , m_right_box(0.712, 0.141, 0.011, 0.066)
+    , m_left_box(0.337, 0.144, 0.007, 0.064)
+    , m_right_box(0.716, 0.140, 0.008, 0.069)
 {}
 void ESPStartDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(COLOR_RED, m_left_box);
@@ -78,8 +78,8 @@ bool ESPStartDetector::process_frame(const ImageViewRGB32& frame, WallClock time
 
 ESPShowNewEmotionDetector::ESPShowNewEmotionDetector()
     : VisualInferenceCallback("ESPShowNewEmotionDetector")
-    , m_left_box(0.340, 0.140, 0.007, 0.068)
-    , m_right_box(0.712, 0.141, 0.011, 0.066)
+    , m_left_box(0.337, 0.144, 0.007, 0.064)
+    , m_right_box(0.716, 0.140, 0.008, 0.069)
 {}
 void ESPShowNewEmotionDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(COLOR_RED, m_left_box);
