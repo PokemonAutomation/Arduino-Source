@@ -640,6 +640,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.cpp \
@@ -1530,6 +1531,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h \
