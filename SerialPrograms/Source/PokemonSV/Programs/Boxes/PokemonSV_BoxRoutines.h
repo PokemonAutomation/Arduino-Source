@@ -23,9 +23,11 @@ enum class BoxCursorLocation;
 
 //  Assuming the current slot in box system is a pokemon, not egg or empty space,
 //  try to change the view to the judge. However, it may land on the stats instead.
-//  If it can't land on either stats or judge, it will throw an exception.
-void change_stats_view_to_judge(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+//  If it can't land on either stats or judge and `throw_exception` is true, it will throw an exception.
+//  Return true if it successfully changed view to judge (or stats if judege is not found)
+bool change_stats_view_to_judge(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool throw_exception = true
 );
 
 //  Press button L to move to the box on the left

@@ -114,9 +114,16 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         return;
     }
 
+    // Try to change to stats or judge view
     if (m_in_judge_view == false){
-        change_stats_view_to_judge(env.program_info(), env.console, context);
-        m_in_judge_view = true;
+        const bool throw_exception = false;
+        if (change_stats_view_to_judge(env.program_info(), env.console, context, throw_exception)){
+            m_in_judge_view = true;
+        } else{
+            // it is an egg
+            stats.m_eggs++;
+            return;
+        }
     }
 
     if (egg_detector.detect(screen)){
