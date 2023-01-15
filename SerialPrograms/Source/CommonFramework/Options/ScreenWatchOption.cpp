@@ -10,8 +10,6 @@
 #include <QWidget>
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Common/Qt/WidgetStackFixedAspectRatio.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ScreenWatchOption.h"
 
@@ -60,15 +58,17 @@ ScreenWatchOption::ScreenWatchOption(
         LockWhileRunning::UNLOCKED,
         default_height, 0.0, 1.0
     )
-    , m_display(CONSTRUCT_TOKEN, *this)
+    , m_display(*this)
+    , m_buttons(*this)
     , m_overlay(m_overlay_option)
 {
-    PA_ADD_OPTION(*m_display);
+    PA_ADD_OPTION(m_display);
     PA_ADD_OPTION(MONITOR_INDEX);
     PA_ADD_OPTION(X);
     PA_ADD_OPTION(Y);
     PA_ADD_OPTION(WIDTH);
     PA_ADD_OPTION(HEIGHT);
+    PA_ADD_OPTION(m_buttons);
 }
 
 

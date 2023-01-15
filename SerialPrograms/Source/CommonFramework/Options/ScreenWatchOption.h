@@ -28,6 +28,17 @@ public:
 
     ScreenWatchOption& m_option;
 };
+class ScreenWatchButtons : public ConfigOption{
+public:
+    ScreenWatchButtons(ScreenWatchOption& option)
+        : m_option(option)
+    {}
+
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+    ScreenWatchOption& m_option;
+};
+
 
 
 class ScreenWatchOption : public GroupOption{
@@ -51,14 +62,16 @@ public:
 
     VideoOverlaySession& overlay();
 
-private:
+public:
     SimpleIntegerOption<uint64_t> MONITOR_INDEX;
     FloatingPointOption X;
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
 
-    Pimpl<ScreenWatchDisplay> m_display;
+private:
+    ScreenWatchDisplay m_display;
+    ScreenWatchButtons m_buttons;
 
     VideoOverlayOption m_overlay_option;
     VideoOverlaySession m_overlay;

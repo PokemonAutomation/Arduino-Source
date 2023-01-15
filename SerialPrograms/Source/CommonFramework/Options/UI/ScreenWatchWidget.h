@@ -50,6 +50,13 @@ private:
     VideoOverlayWidget* m_overlay;
 };
 
+class ScreenWatchButtonWidget : public QWidget, public ConfigWidget{
+public:
+    ScreenWatchButtonWidget(ScreenWatchOption& option, QWidget& parent);
+
+private:
+//    QWidget* m_widget;
+};
 
 
 }

@@ -53,8 +53,8 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "6",
-        PreloadSettings::instance().DEVELOPER_MODE ? "4" : "6"
+        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6",
+        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6"
     )
     , WRAP_DELAY(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",

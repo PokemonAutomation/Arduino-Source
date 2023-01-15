@@ -550,7 +550,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             stats.m_kept++;
             env.update_stats();
             m_num_kept++;
-            env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_kept+1) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
+            env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
             send_keep_notification();
 
             if (move_pokemon_to_keep(env, context, party_row) == false) {
