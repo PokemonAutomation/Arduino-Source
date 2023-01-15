@@ -317,11 +317,13 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
     auto go_to_next_egg_column = [&](){
         SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
+        BoxCurrentEggDetector egg_detector;
         for (; next_egg_column < 6; next_egg_column++){
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, HAS_CLONE_RIDE_POKEMON ? 1 : 0, next_egg_column);
             context.wait_for_all_requests();
-            // If there is pokemon in slot row 0 (or 1 if using clone ride pokemon), col `col`,
-            if (sth_in_box_detector.detect(env.console.video().snapshot())){
+            // If there is an egg in slot row 0 (or 1 if using clone ride pokemon), col `col`,
+            auto snapshot = env.console.video().snapshot();
+            if (sth_in_box_detector.detect(snapshot) && egg_detector.detect(snapshot)){
                 env.log("Found next column of eggs at col " + std::to_string(next_egg_column) + ".");
                 break;
             }
@@ -333,6 +335,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         enter_box_system_from_overworld(env.program_info(), env.console, context);
 
         context.wait_for(std::chrono::milliseconds(400)); // wait until box UI is loaded
+
+        move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
+        change_stats_view_to_judge(env.program_info(), env.console, context);
 
         const uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
         num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
