@@ -69,10 +69,10 @@ EggFetcher::EggFetcher()
     , EGG_SANDWICH_TYPE(
         "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
         "Great Peanut Butter Sandwich: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
-        "Two Sweet Herbs: use the first filling and two sweet herbs. Must provide Sweet Herb location on the condiments list.",
+        "Two Sweet Herbs and Lettuce: use the Lettuce and two sweet herbs. Must provide Sweet Herb location on the condiments list.",
         {
             {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
-            {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs"},
+            {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs and Lettuce"},
         },
         LockWhileRunning::LOCKED,
         EggSandwichType::GREAT_PEANUT_BUTTER

@@ -9,6 +9,8 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichRoutines_H
 #define PokemonAutomation_PokemonSV_SandwichRoutines_H
 
+#include <cstddef>
+
 namespace PokemonAutomation{
     
     struct ProgramInfo;
@@ -45,7 +47,7 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Bot
 void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 // Assuming starting at the custom sandwich mode,
-// select the first entry in the filling list (usually cabbage), then select two sweet herbs in the end of the condiments list.
+// select lettuce (assuming the first entry in the filling list), then select two sweet herbs in the end of the condiments list.
 // The location of sweet herb is set by `sweet_herb_index_last`:
 // if sweet herb is the last entry, set `sweet_herb_index_last` to 0;
 // if sweet herb is second to last, set `sweet_herb_index_last` to 1; ...

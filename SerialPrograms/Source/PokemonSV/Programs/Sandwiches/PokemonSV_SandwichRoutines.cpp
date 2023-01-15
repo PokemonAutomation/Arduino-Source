@@ -543,11 +543,11 @@ void make_two_sweet_herbs_sandwich(
     }
 
     {
-        // Press button A to add first filling
+        // Press button A to add first filling, assumed to be lettuce
         DeterminedSandwichIngredientWatcher filling_watcher(SandwichIngredientType::FILLING, 0);
         repeat_button_press_until(
             info, console, context, BUTTON_A, 40, 50, {filling_watcher},
-            "DeterminedIngredientNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect determined ingredient after 50 seconds."
+            "DeterminedIngredientNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect determined lettuce after 50 seconds."
         );
     }
 
