@@ -46,8 +46,8 @@ public:
     ~ScreenWatchOption();
     ScreenWatchOption(
         std::string label,
-        double default_x, double default_y,
-        double default_width, double default_height
+        double default_x = 0, double default_y = 0,
+        double default_width = 1, double default_height = 1
     );
 
 //    virtual void load_json(const JsonValue& json) override;

@@ -38,7 +38,7 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
 {}
 
 VideoFastCodeEntry::VideoFastCodeEntry()
-    : SCREEN_WATCHER("Capture Box:", 0.480, 0.510, 0.050, 0.030)
+    : SCREEN_WATCHER("Capture Box:")
     , MODE(
         "<b>Mode:</b>",
         {
