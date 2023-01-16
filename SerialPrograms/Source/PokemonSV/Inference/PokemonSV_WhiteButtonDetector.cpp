@@ -101,7 +101,7 @@ WhiteButtonDetector::WhiteButtonDetector(
     , m_box(box)
 {}
 void WhiteButtonDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_box);
+    items.add(m_color, m_box);
 }
 bool WhiteButtonDetector::detect(const ImageViewRGB32& screen) const{
     std::vector<ImageFloatBox> hits = detect_all(screen);

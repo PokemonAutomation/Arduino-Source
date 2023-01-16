@@ -176,6 +176,7 @@ TeraResult exit_tera_win_by_catching(
         );
         AdvanceDialogWatcher advance(COLOR_YELLOW);
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+        PromptDialogWatcher view_summary(COLOR_PURPLE, {0.500, 0.470, 0.400, 0.100});
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
@@ -189,6 +190,7 @@ TeraResult exit_tera_win_by_catching(
                 next_button,
                 advance,
                 add_to_party,
+                view_summary,
                 nickname,
                 summary,
                 main_menu,
@@ -230,6 +232,10 @@ TeraResult exit_tera_win_by_catching(
             }
             continue;
         case 4:
+            console.log("Detected cursor over add-to-party. (unexpected), COLOR_RED");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 5:
             console.log("Detected nickname prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
@@ -243,7 +249,7 @@ TeraResult exit_tera_win_by_catching(
                 break;
             }
             console.log("Detected false positive (A) Next button.", COLOR_RED);
-        case 5:
+        case 6:
             console.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){
                 context.wait_for(std::chrono::milliseconds(500));
@@ -257,11 +263,11 @@ TeraResult exit_tera_win_by_catching(
             }
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
-        case 6:
+        case 7:
             console.log("Detected unexpected main menu.", COLOR_RED);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
-        case 7:
+        case 8:
             console.log("Detected overworld.");
             return result;
         default:

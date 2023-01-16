@@ -173,6 +173,38 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+
+
+//    TeraCatchWatcher catch_menu(COLOR_BLUE);
+#if 0
+    WhiteButtonWatcher next_button(
+        COLOR_CYAN,
+        WhiteButton::ButtonA,
+        {0.8, 0.93, 0.2, 0.07},
+        WhiteButtonWatcher::FinderType::PRESENT,
+        std::chrono::seconds(1)
+    );
+#endif
+//    AdvanceDialogWatcher advance(COLOR_YELLOW);
+    PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+    PromptDialogWatcher view_summary(COLOR_PURPLE, {0.500, 0.470, 0.400, 0.100});
+    PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
+//    PokemonSummaryWatcher summary(COLOR_MAGENTA);
+    MainMenuWatcher main_menu(COLOR_BLUE);
+//    OverworldWatcher overworld(COLOR_RED);
+
+//    catch_menu.make_overlays(overlays);
+//    next_button.make_overlays(overlays);
+//    advance.make_overlays(overlays);
+    add_to_party.make_overlays(overlays);
+    view_summary.make_overlays(overlays);
+    nickname.make_overlays(overlays);
+//    summary.make_overlays(overlays);
+    main_menu.make_overlays(overlays);
+//    overworld.make_overlays(overlays);
+
+
+
 #if 0
     OverworldWatcher overworld;
     int ret = wait_until(
@@ -182,7 +214,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << ret << endl;
 #endif
 
-#if 1
+#if 0
     ImageRGB32 image("BadArrow.png");
 
     TeraBattleMenuDetector battle_menu(COLOR_RED);
