@@ -32,25 +32,27 @@ char read_5S(const PackedBinaryMatrix& matrix, char OCR_result){
 //    static int count = 0;
 //    image.save("testB-" + std::to_string(count++) + ".png");
 
-    if (matrix.height() < 2){
-        return OCR_result;
-    }
-
     size_t width = matrix.width();
+    size_t height = matrix.height();
 
-    size_t top_black_pixels = 0;
-    for (size_t c = 0; c < width; c++){
-        if (matrix.get(c, 0)){
-            top_black_pixels++;
+    for (size_t row = 0; row < height; row++){
+        size_t top_black_pixels = 0;
+        for (size_t c = 0; c < width; c++){
+            if (matrix.get(c, 0)){
+                top_black_pixels++;
+            }
+        }
+        double ratio = (double)top_black_pixels / width;
+    //    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
+        if (ratio > 0.70){
+            return '5';
+        }
+        if (ratio > 0.10){
+            return 'S';
         }
     }
-    double ratio = (double)top_black_pixels / width;
-//    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
-    if (ratio > 0.70){
-        return '5';
-    }
 
-    return 'S';
+    return OCR_result;
 }
 
 
