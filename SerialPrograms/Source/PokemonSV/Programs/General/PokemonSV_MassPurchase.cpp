@@ -113,6 +113,37 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
         return false;
     }
 };
+    
+bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
+
+    OverworldWatcher overworld(COLOR_RED);
+    AdvanceDialogWatcher dialog(COLOR_CYAN);
+    context.wait_for_all_requests();
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(10),
+        {
+            overworld,
+            dialog,
+        }
+    );
+    context.wait_for(std::chrono::milliseconds(50));
+
+    switch (ret){
+    case 0:
+        env.log("Error - Stuck in Overworld");
+        stats.errors++;
+        throw FatalProgramException(env.logger(), "Stuck in Overworld");
+
+    case 1:
+        env.log("Detected Extra Item/Reward");
+        return true;
+
+    default:
+        return false;
+    }
+};
 
 void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -122,6 +153,7 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
     
     int item_val = ITEMS;
     bool skip_item = false;
+    bool extra = false;
     while (item_val != 0){
         int qt_val = QUANTITY;
         pbf_press_button(context, BUTTON_A, 5, 105);
@@ -147,6 +179,10 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
 
             pbf_press_button(context, BUTTON_A, 5, 250);
             pbf_press_button(context, BUTTON_A, 5, 125);
+            extra = extra_items(env, env.console, context);
+            if (extra) {
+                pbf_press_button(context, BUTTON_A, 5, 125);
+            };
 
             env.log("Item Purchased");
             stats.total_items++;
