@@ -123,10 +123,10 @@ EggAutonomous::EggAutonomous()
         "<b>Sweet Herb Location:</b><br>If chosen the Two Sweet Herbs as the sandwich, where the Sweet Herb is on the condiments list.",
         {
             {0, "0", "Last on list"},
-            {1, "1", "2nd last on list"},
-            {2, "2", "3rd last on list"},
-            {3, "3", "4th last on list"},
-            {4, "4", "5th last on list (the location if you have all types of herbs)"},
+            {1, "1", "2nd from last of the list"},
+            {2, "2", "3rd from last of the list"},
+            {3, "3", "4th from last of the list"},
+            {4, "4", "5th from last of the list (the location if you have all types of herbs)"},
         },
         LockWhileRunning::UNLOCKED,
         4
