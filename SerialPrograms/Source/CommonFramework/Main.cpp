@@ -1,5 +1,7 @@
 
 #include <QApplication>
+//#include <QTextStream>
+#include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -8,13 +10,13 @@
 #include "Environment/HardwareValidation.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
-#include "Tools/StatsDatabase.h"
+//#include "Tools/StatsDatabase.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "GlobalSettingsPanel.h"
-#include "Windows/DpiScaler.h"
+//#include "Windows/DpiScaler.h"
+#include "NewVersionCheck.h"
 #include "Windows/MainWindow.h"
 
-//#include <QTextStream>
 
 #include <iostream>
 using std::cout;
@@ -60,6 +62,8 @@ int main(int argc, char *argv[]){
     if (!check_hardware()){
         return 1;
     }
+
+    check_new_version(global_logger_tagged());
 
 #if 0
     application.connect(

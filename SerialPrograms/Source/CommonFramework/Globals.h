@@ -12,7 +12,13 @@
 
 namespace PokemonAutomation{
 
+extern const bool IS_BETA_VERSION;
+
+extern const int PROGRAM_VERSION_MAJOR;
+extern const int PROGRAM_VERSION_MINOR;
+extern const int PROGRAM_VERSION_PATCH;
 extern const std::string PROGRAM_VERSION;
+
 extern const std::string PROGRAM_NAME;
 
 extern const std::string DISCORD_LINK;

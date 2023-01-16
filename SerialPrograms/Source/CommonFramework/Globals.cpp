@@ -10,12 +10,22 @@
 
 namespace PokemonAutomation{
 
-const std::string PROGRAM_VERSION_BASE = "v0.28.3";
+const bool IS_BETA_VERSION = true;
+const int PROGRAM_VERSION_MAJOR = 0;
+const int PROGRAM_VERSION_MINOR = 28;
+const int PROGRAM_VERSION_PATCH = 4;
+
+const std::string PROGRAM_VERSION_BASE =
+    "v" + std::to_string(PROGRAM_VERSION_MAJOR) +
+    "." + std::to_string(PROGRAM_VERSION_MINOR) +
+    "." + std::to_string(PROGRAM_VERSION_PATCH);
 
 #ifdef PA_OFFICIAL
-const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE;
+const std::string PROGRAM_VERSION = IS_BETA_VERSION
+    ? PROGRAM_VERSION_BASE + "-beta"
+    : PROGRAM_VERSION_BASE;
 #else
-const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "u";
+const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "-user";
 #endif
 
 const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";

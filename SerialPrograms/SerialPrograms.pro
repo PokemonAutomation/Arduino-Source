@@ -213,6 +213,7 @@ SOURCES += \
     Source/CommonFramework/Logging/OutputRedirector.cpp \
     Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
+    Source/CommonFramework/NewVersionCheck.cpp \
     Source/CommonFramework/Notifications/EventNotificationOption.cpp \
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp \
     Source/CommonFramework/Notifications/MessageAttachment.cpp \
@@ -1073,6 +1074,7 @@ HEADERS += \
     Source/CommonFramework/Logging/Logger.h \
     Source/CommonFramework/Logging/OutputRedirector.h \
     Source/CommonFramework/Logging/QueuedLogger.h \
+    Source/CommonFramework/NewVersionCheck.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \
     Source/CommonFramework/Notifications/EventNotificationsTable.h \
     Source/CommonFramework/Notifications/MessageAttachment.h \

@@ -476,6 +476,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/UI/PanelWidget.h
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h
+    Source/CommonFramework/NewVersionCheck.cpp
+    Source/CommonFramework/NewVersionCheck.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
