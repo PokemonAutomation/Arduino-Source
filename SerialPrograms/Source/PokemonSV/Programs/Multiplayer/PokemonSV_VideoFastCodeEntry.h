@@ -34,14 +34,24 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
+    ScreenWatchOption SCREEN_WATCHER;
+
     enum class Mode{
         MANUAL,
         AUTOMATIC,
     };
-
-    ScreenWatchOption SCREEN_WATCHER;
     EnumDropdownOption<Mode> MODE;
+
     BooleanCheckBoxOption SKIP_CONNECT_TO_CONTROLLER;
+
+    enum OcrMethod{
+        RAW_OCR,
+        BLACK_TEXT,
+        WHITE_TEXT,
+        TERA_CARD,
+    };
+    EnumDropdownOption<OcrMethod> OCR_METHOD;
+
     FastCodeEntrySettingsOption SETTINGS;
     EventNotificationsOption NOTIFICATIONS;
 };

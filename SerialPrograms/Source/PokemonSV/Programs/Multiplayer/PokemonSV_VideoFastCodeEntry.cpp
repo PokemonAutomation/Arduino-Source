@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -53,6 +54,18 @@ VideoFastCodeEntry::VideoFastCodeEntry()
         LockWhileRunning::LOCKED,
         false
     )
+    , OCR_METHOD(
+        "<b>Text Recognition Method:</b><br>"
+        "Each text recognition method has its own strengths and weaknesses. This option lets you choose which method to use.",
+        {
+            {OcrMethod::RAW_OCR,     "raw-ocr",          "Raw OCR. No image pre-processing."},
+            {OcrMethod::BLACK_TEXT,  "black-on-white",   "Filter: Black Text on White Background"},
+            {OcrMethod::WHITE_TEXT,  "white-on-black",   "Filter: White Text on Black Background"},
+            {OcrMethod::TERA_CARD,   "tera-card",        "Tera Card"},
+        },
+        LockWhileRunning::LOCKED,
+        OcrMethod::TERA_CARD
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })
@@ -60,6 +73,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(SCREEN_WATCHER);
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(SKIP_CONNECT_TO_CONTROLLER);
+    PA_ADD_OPTION(OCR_METHOD);
     PA_ADD_OPTION(SETTINGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -110,10 +124,32 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
         snapshot = std::move(current);
 //        env.log("done new frame check");
 
-        std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
+        std::string code;
+        switch (OCR_METHOD){
+        case OcrMethod::RAW_OCR:
+            code = OCR::ocr_read(Language::English, snapshot);
+            env.log("OCR: " + code);
+            break;
+        case OcrMethod::BLACK_TEXT:{
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xff000000, 0xff7f7f7f, true);
+            code = OCR::ocr_read(Language::English, filtered);
+            env.log("OCR: " + code);
+            break;
+        }
+        case OcrMethod::WHITE_TEXT:{
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xffc0c0c0, 0xffffffff, true);
+            code = OCR::ocr_read(Language::English, filtered);
+            env.log("OCR: " + code);
+            break;
+        }
+        case OcrMethod::TERA_CARD:
+            code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
+        }
         const char* error = enter_code(env, scope, settings, code, false);
         if (error == nullptr){
             break;
+        }else{
+            env.log(std::string("Invalid Code: ") + error, COLOR_RED);
         }
     }
 
