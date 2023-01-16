@@ -34,6 +34,7 @@ public:
 
 private:
     bool mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    bool extra_items(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     
 private:
     SimpleIntegerOption<uint32_t> ITEMS;
