@@ -15,6 +15,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
+#include "CommonFramework/NewVersionCheck.h"
 #include "PanelLists.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
@@ -245,6 +246,7 @@ void MainWindow::load_panel(
     std::unique_ptr<PanelInstance> panel
 ){
     close_panel();
+    check_new_version();
 
     //  Make new widget.
     m_current_panel_widget = panel->make_widget(*this, *this);

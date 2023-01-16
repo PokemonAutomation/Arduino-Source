@@ -104,7 +104,12 @@ GlobalSettings::GlobalSettings()
     )
     , ALL_STATS(
         "<b>All Stats:</b><br>Include all-time stats for notifications.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
+        true
+    )
+    , CHECK_FOR_UPDATES(
+        "<b>Check for Updates:</b><br>Automatically check for updates.",
+        LockWhileRunning::UNLOCKED,
         true
     )
     , WINDOW_SIZE(
@@ -125,7 +130,7 @@ GlobalSettings::GlobalSettings()
     )
     , LOG_EVERYTHING(
         "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         false
     )
     , SAVE_DEBUG_IMAGES(
@@ -139,7 +144,7 @@ GlobalSettings::GlobalSettings()
         "<b>Hide Discord Link in Notifications:</b><br>"
         "Many Discord servers have rules forbidding links to other Discord servers. "
         "Checking this box will hide the support link that appears in the footer of every Discord notification.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         false
     )
     , REALTIME_THREAD_PRIORITY0(
@@ -199,6 +204,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(ALL_STATS);
+    PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
 

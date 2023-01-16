@@ -5,10 +5,12 @@
  */
 
 #include <QMessageBox>
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Options/Environment/ThemeSelectorOption.h"
 #include "Tools/FileDownloader.h"
 #include "Globals.h"
+#include "GlobalSettingsPanel.h"
 #include "NewVersionCheck.h"
 
 //#include <iostream>
@@ -16,6 +18,9 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+
+static auto CHECK_FOR_UPDATES_PERIOD = std::chrono::days(1);
 
 
 bool compare_version(Logger& logger, const JsonObject* json){
@@ -60,6 +65,19 @@ bool compare_version(Logger& logger, const JsonObject* json){
     return false;
 }
 void check_new_version(Logger& logger){
+    if (!GlobalSettings::instance().CHECK_FOR_UPDATES){
+        return;
+    }
+
+    static WallClock last_version_check = WallClock::min();
+//    static size_t check_count = 0;
+    WallClock now = current_time();
+    if (last_version_check != WallClock::min() && now - last_version_check < CHECK_FOR_UPDATES_PERIOD){
+        return;
+    }
+    last_version_check = now;
+//    check_count++;
+
     logger.log("Checking for new version...");
     JsonValue json;
     try{

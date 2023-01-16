@@ -11,9 +11,9 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/BatchWidget.h"
+#include "CommonFramework/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
@@ -134,6 +134,7 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             m_holder.on_idle();
+            check_new_version();
         }else{
             m_holder.on_busy();
         }

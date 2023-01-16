@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "CommonFramework/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -124,6 +125,7 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
         m_actions_bar->set_state(state);
         if (state == ProgramState::STOPPED){
             m_holder.on_idle();
+            check_new_version();
         }else{
             m_holder.on_busy();
         }

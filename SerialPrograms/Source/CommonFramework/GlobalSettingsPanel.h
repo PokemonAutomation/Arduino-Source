@@ -80,6 +80,7 @@ public:
 
     StringOption STATS_FILE;
     BooleanCheckBoxOption ALL_STATS;
+    BooleanCheckBoxOption CHECK_FOR_UPDATES;
 
     ResolutionOption WINDOW_SIZE;
     ThemeSelectorOption THEME;

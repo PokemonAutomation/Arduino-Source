@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_NewVersionCheck_H
 #define PokemonAutomation_NewVersionCheck_H
 
+#include "CommonFramework/Logging/Logger.h"
+
 namespace PokemonAutomation{
 
-class Logger;
-
-void check_new_version(Logger& logger);
+void check_new_version(Logger& logger = global_logger_tagged());
 
 
 
