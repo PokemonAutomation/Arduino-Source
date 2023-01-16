@@ -73,14 +73,19 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, 0xff000000, threshold, true);
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, threshold);
 
-    std::vector<WaterfillObject> objects;
+    std::map<size_t, WaterfillObject> map;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(20);
         WaterfillObject object;
-        while (objects.size() < 16 && iter->find_next(object, true)){
-            objects.emplace_back(std::move(object));
+        while (map.size() < 16 && iter->find_next(object, true)){
+            map.emplace(object.min_x, std::move(object));
         }
+    }
+
+    std::vector<WaterfillObject> objects;
+    for (auto& item : map){
+        objects.emplace_back(std::move(item.second));
     }
 
     std::vector<WaterfillOCRResult> ret(objects.size());
