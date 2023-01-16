@@ -48,6 +48,7 @@ ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
 void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 //    cout << "ScreenWatchDisplayWidget::paintEvent: " << m_holder.width() << " x " << m_holder.height() << endl;
     QWidget::paintEvent(event);
+
     VideoSnapshot snapshot = m_last_frame;
 
     double aspect_ratio = (double)snapshot.frame->width() / snapshot.frame->height();
@@ -69,7 +70,7 @@ void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 void ScreenWatchDisplayWidget::thread_loop(){
     std::unique_lock lg(m_lock);
     while (!m_stop){
-        m_last_frame = m_option.screenshot();;
+        m_last_frame = m_option.screenshot();
         QMetaObject::invokeMethod(this, [&]{
             this->update();
         }, Qt::QueuedConnection);
@@ -172,7 +173,8 @@ private:
 
 
 ScreenWatchButtonWidget::ScreenWatchButtonWidget(ScreenWatchOption& option, QWidget& parent)
-    : ConfigWidget(option, *this)
+    : QWidget(&parent)
+    , ConfigWidget(option, *this)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 

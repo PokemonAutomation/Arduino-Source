@@ -135,10 +135,10 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 {}
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
-//    , SCREEN_WATCHER("Capture Box", 0.40, 0.34, 0.1, 0.04)
+    , SCREEN_WATCHER("Capture Box", 0, 0, 1, 1)
 {
     PA_ADD_OPTION(STATIC_TEXT);
-//    PA_ADD_OPTION(SCREEN_WATCHER);
+    PA_ADD_OPTION(SCREEN_WATCHER);
 }
 
 WallClock REFERENCE = current_time();
