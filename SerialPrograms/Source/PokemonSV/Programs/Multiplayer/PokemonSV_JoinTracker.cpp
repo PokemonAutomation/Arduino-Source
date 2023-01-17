@@ -14,6 +14,10 @@
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "PokemonSV_JoinTracker.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -23,7 +27,8 @@ namespace PokemonSV{
 bool check_ban_for_name(
     Logger& logger,
     std::vector<TeraLobbyNameMatchResult>& matches,
-    const PlayerListRowSnapshot& entry, const std::string& ocr_name,
+    const PlayerListRowSnapshot& entry, const std::string& banlist_source,
+    const std::string& ocr_name,
     bool ignore_whitelist
 ){
     std::u32string normalized_ocr_name = OCR::normalize_utf32(ocr_name);
@@ -88,7 +93,7 @@ bool check_ban_for_name(
     }
 
     matches.emplace_back(TeraLobbyNameMatchResult{
-        entry,
+        entry, banlist_source,
         ocr_name,
         to_utf8(normalized_ocr_name),
         log10p, distance == 0,
@@ -97,17 +102,45 @@ bool check_ban_for_name(
 
     return true;
 }
+
+bool check_name_against_banlist(
+    Logger& logger,
+    std::vector<TeraLobbyNameMatchResult>& match_list,
+    const std::vector<PlayerListRowSnapshot>& banlist, const std::string& banlist_source,
+    const std::map<Language, std::string>& name,
+    bool ignore_whitelist
+){
+    bool banned = false;
+    for (const PlayerListRowSnapshot& entry : banlist){
+        if (!entry.enabled){
+            continue;
+        }
+        auto iter = name.find(entry.language);
+        if (iter == name.end()){
+            throw InternalProgramError(
+                &logger,
+                PA_CURRENT_FUNCTION,
+                "Name was not OCR'ed in the required language."
+            );
+        }
+        banned |= check_ban_for_name(
+            logger,
+            match_list,
+            entry, banlist_source,
+            iter->second,
+            ignore_whitelist
+        );
+    }
+    return banned;
+}
 uint8_t check_ban_list(
     Logger& logger,
     std::vector<TeraLobbyNameMatchResult>& match_list,
-    const std::vector<PlayerListRowSnapshot>& ban_list,
+    const std::vector<PlayerListRowSnapshot>& banlist_local,
+    const std::vector<PlayerListRowSnapshot>& banlist_global,
     const std::array<std::map<Language, std::string>, 4>& player_names,
     bool ignore_whitelist
 ){
-    if (ban_list.empty()){
-        return {};
-    }
-
     //  Check each name against ban list.
     uint8_t banned_count = 0;
     for (size_t c = 1; c < 4; c++){
@@ -116,25 +149,18 @@ uint8_t check_ban_list(
             continue;
         }
         bool banned = false;
-        for (const PlayerListRowSnapshot& entry : ban_list){
-            if (!entry.enabled){
-                continue;
-            }
-            auto iter = name.find(entry.language);
-            if (iter == name.end()){
-                throw InternalProgramError(
-                    &logger,
-                    PA_CURRENT_FUNCTION,
-                    "Name was not OCR'ed in the required language."
-                );
-            }
-            banned |= check_ban_for_name(
-                logger,
-                match_list,
-                entry, iter->second,
-                ignore_whitelist
-            );
-        }
+
+        banned |= check_name_against_banlist(
+            logger, match_list,
+            banlist_local, "Banned by Host: ",
+            name, ignore_whitelist
+        );
+        banned |= check_name_against_banlist(
+            logger, match_list,
+            banlist_global, "Banned Globally: ",
+            name, ignore_whitelist
+        );
+
         if (banned){
             banned_count++;
         }
@@ -345,9 +371,15 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
             }
         }
     }
-    std::vector<PlayerListRowSnapshot> banslist = m_ban_settings.current_banlist();
+
+    std::vector<PlayerListRowSnapshot> banlist_local = m_ban_settings.banlist_local();
+    std::vector<PlayerListRowSnapshot> banlist_global = m_ban_settings.banlist_global();
+//    std::vector<PlayerListRowSnapshot> banslist = m_ban_settings.banlist_combined();
     if (bans_enabled){
-        for (const auto& item : banslist){
+        for (const auto& item : banlist_local){
+            languages.insert(item.language);
+        }
+        for (const auto& item : banlist_global){
             languages.insert(item.language);
         }
     }
@@ -363,7 +395,8 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
         check_ban_list(
             m_logger,
             match_list,
-            m_ban_settings.current_banlist(),
+            banlist_local,
+            banlist_global,
             names,
             m_ban_settings.ignore_whitelist
         );

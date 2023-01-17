@@ -299,20 +299,10 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
             std::string raw = OCR::ocr_read(language, filtered);
             while (!raw.empty()){
                 char ch = raw.back();
-                if (ch <= 32 || ch == '/' || ch == '.'){
+                if (ch <= 32){
                     raw.pop_back();
+                    continue;
                 }
-
-#if 0
-                //  Special case with 6-star raids where the dark blue background
-                //  causes misreads.
-                size_t length = raw.size();
-                if (length > 2 && raw[length - 2] == ' ' && raw[length - 2] == '7'){
-                    raw.pop_back();
-                    raw.pop_back();
-                }
-#endif
-
                 break;
             }
             if (!first){

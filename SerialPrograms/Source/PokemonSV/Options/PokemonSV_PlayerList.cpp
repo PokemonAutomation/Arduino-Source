@@ -125,13 +125,21 @@ RaidPlayerBanList::RaidPlayerBanList()
     }
 }
 
-std::vector<PlayerListRowSnapshot> RaidPlayerBanList::current_banlist() const{
+#if 0
+std::vector<PlayerListRowSnapshot> RaidPlayerBanList::banlist_combined() const{
     std::vector<PlayerListRowSnapshot> table0 = local_table.snapshot();
     std::vector<PlayerListRowSnapshot> table1 = online_table.snapshot();
     for (PlayerListRowSnapshot& entry : table1){
         table0.emplace_back(std::move(entry));
     }
     return table0;
+}
+#endif
+std::vector<PlayerListRowSnapshot> RaidPlayerBanList::banlist_local() const{
+    return local_table.snapshot();
+}
+std::vector<PlayerListRowSnapshot> RaidPlayerBanList::banlist_global() const{
+    return online_table.snapshot();
 }
 
 void RaidPlayerBanList::refresh_online_table(Logger& logger){

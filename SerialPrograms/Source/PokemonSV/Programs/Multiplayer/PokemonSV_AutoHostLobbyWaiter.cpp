@@ -167,7 +167,7 @@ bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot){
         message += user.to_str();
         message += "\n";
         if (!user.notes.empty()){
-            message += "Reason: " + user.notes;
+            message += user.banlist_source + (user.notes.empty() ? "(no reason provided)" : user.notes);
             message += "\n";
         }
     }

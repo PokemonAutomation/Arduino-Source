@@ -57,6 +57,8 @@ public:
 
 struct TeraLobbyNameMatchResult{
     PlayerListRowSnapshot entry;
+    std::string banlist_source;
+
     std::string raw_ocr;
     std::string normalized_ocr;
     double log10p;

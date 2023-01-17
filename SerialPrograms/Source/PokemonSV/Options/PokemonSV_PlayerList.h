@@ -72,7 +72,9 @@ public:
 
     void refresh_online_table(Logger& logger);
 
-    std::vector<PlayerListRowSnapshot> current_banlist() const;
+//    std::vector<PlayerListRowSnapshot> banlist_combined() const;
+    std::vector<PlayerListRowSnapshot> banlist_local() const;
+    std::vector<PlayerListRowSnapshot> banlist_global() const;
 
 public:
     StaticTextOption text;
