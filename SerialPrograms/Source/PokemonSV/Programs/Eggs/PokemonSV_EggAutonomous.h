@@ -8,14 +8,13 @@
 #define PokemonAutomation_PokemonSV_EggAutonomous_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
-#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h"
 
 // #include <functional>
 
@@ -72,8 +71,6 @@ private:
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    SimpleIntegerOption<uint64_t> MAX_NUM_SANDWICHES;
-
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
 
@@ -84,8 +81,7 @@ private:
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
 
-    EnumDropdownOption<EggSandwichType> EGG_SANDWICH_TYPE;
-    IntegerEnumDropdownOption SWEET_HERB_INDEX_BACKWARDS;
+    EggPowerSandwichOption EGG_SANDWICH;
 
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 

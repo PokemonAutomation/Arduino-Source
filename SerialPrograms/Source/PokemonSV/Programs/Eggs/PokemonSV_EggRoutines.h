@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonSV_EggRoutines_H
 #define PokemonAutomation_PokemonSV_EggRoutines_H
 
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include <functional>
 
 namespace PokemonAutomation{
@@ -37,19 +38,16 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
 // Start at Zero Gate flying spot, go off ramp to start a picnic.
 void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-enum class EggSandwichType{
-    GREAT_PEANUT_BUTTER,
-    TWO_SWEET_HERBS,
-};
 // Starting at the initial position of a picnic, go to picnic table to make a sandwich that gives egg power.
 // Can choose:
 // - Great Peanut Butter Sandwich to gain egg power Lv 2, must have unlocked its recipe and have enough ingredients to make all
 //   the sandwiches for all the unlocked recipes.
-// - Two-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and provide the location of the Sweet Herb
-//   as the last `sweet_herb_index_last`-th (0-indexed) condiment on the list.
+// - Two-sweet-herbs, bitter-sweet-herbs or salty-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and
+//   provide the locations of the herbs as the last `xxx_herb_index_last`-th (0-indexed) condiment on the list.
 // Return false if no needed sandwich ingredients or recipe.
 bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console,
-    BotBaseContext& context, EggSandwichType sandwich_type = EggSandwichType::GREAT_PEANUT_BUTTER, size_t sweet_herb_index_last = 5);
+    BotBaseContext& context, EggSandwichType sandwich_type = EggSandwichType::GREAT_PEANUT_BUTTER,
+    size_t sweet_herb_index_last = 4, size_t salty_herb_index_last = 3, size_t bitter_herb_index_last = 1);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
 // `num_eggs_collected` will be updated to add newly collected eggs.

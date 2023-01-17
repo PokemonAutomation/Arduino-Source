@@ -400,6 +400,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
     Source/CommonFramework/Main.cpp
+    Source/CommonFramework/NewVersionCheck.cpp
+    Source/CommonFramework/NewVersionCheck.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
@@ -476,8 +478,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/UI/PanelWidget.h
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h
-    Source/CommonFramework/NewVersionCheck.cpp
-    Source/CommonFramework/NewVersionCheck.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
@@ -1261,6 +1261,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h
+    Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
+    Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp

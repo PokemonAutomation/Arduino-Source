@@ -533,13 +533,22 @@ void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console,
     );
 }
 
-void make_two_sweet_herbs_sandwich(
+void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
-    size_t sweet_herb_index_last
+    EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 ){
-    if (sweet_herb_index_last >= 9){
+    // The game has at most 5 herbs, in the order of sweet, salty, sour, bitter, spicy:
+    if (sweet_herb_index_last >= 5){ // sweet index can only be: 0, 1, 2, 3, 4
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Inavlid sweet herb index: " + std::to_string(sweet_herb_index_last));
+            "Invalid sweet herb index: " + std::to_string(sweet_herb_index_last));
+    }
+    if (salty_herb_index_last >= 4 || salty_herb_index_last >= sweet_herb_index_last){ // 0, 1, 2, 3
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid salty herb index: " + std::to_string(salty_herb_index_last));
+    }
+    if (bitter_herb_index_last >= 2 || bitter_herb_index_last >= sweet_herb_index_last){ // 0, 1
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid bitter herb index: " + std::to_string(bitter_herb_index_last));
     }
 
     {
@@ -547,7 +556,7 @@ void make_two_sweet_herbs_sandwich(
         DeterminedSandwichIngredientWatcher filling_watcher(SandwichIngredientType::FILLING, 0);
         repeat_button_press_until(
             info, console, context, BUTTON_A, 40, 50, {filling_watcher},
-            "DeterminedIngredientNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect determined lettuce after 50 seconds."
+            "DeterminedIngredientNotDetected", "make_two_herbs_sandwich(): cannot detect determined lettuce after 50 seconds."
         );
     }
 
@@ -556,34 +565,59 @@ void make_two_sweet_herbs_sandwich(
         SandwichCondimentsPageWatcher condiments_page_watcher;
         repeat_button_press_until(
             info, console, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
-            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect condiments page after 50 seconds."
+            "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect condiments page after 50 seconds."
         );
     }
 
-    // Press DPAD_UP multiple times to move to the sweet herb row
-    for(size_t i = 0; i < sweet_herb_index_last+1; i++){
-        console.log("DPAD UP, i = " + std::to_string(i));
-        SandwichIngredientArrowWatcher arrow(9 - i);
-        repeat_dpad_press_until(info, console, context, DPAD_UP, 10, 30, {arrow},
-            "IngredientArrowNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect ingredient selection arrow after 50 seconds."
-        );
+    size_t first_herb_index_last = 0;
+    switch(sandwich_type){
+    case EggSandwichType::TWO_SWEET_HERBS:
+        first_herb_index_last = sweet_herb_index_last;
+        break;
+    case EggSandwichType::SALTY_SWEET_HERBS:
+        first_herb_index_last = salty_herb_index_last;
+        break;
+    case EggSandwichType::BITTER_SWEET_HERBS:
+        first_herb_index_last = bitter_herb_index_last;
+        break;
+    default:
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid EggSandwichType for make_two_herbs_sandwich()");
     }
 
-    // Press button A two times to add two sweet herbs
-    for(size_t i = 0; i < 2; i++ ){
-        DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, i);
+    auto move_one_up_to_row = [&](size_t row){
+        console.log("Move arrow to row " + std::to_string(row));
+        SandwichIngredientArrowWatcher arrow(row);
+        repeat_dpad_press_until(info, console, context, DPAD_UP, 10, 30, {arrow}, "IngredientArrowNotDetected",
+            "make_two_herbs_sandwich(): cannot detect ingredient selection arrow at row " + std::to_string(row) + " after 50 seconds."
+        );
+    };
+
+    auto press_a_to_determine_herb = [&](size_t herb_index){
+        DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, herb_index);
         repeat_button_press_until(
-            info, console, context, BUTTON_A, 40, 60, {herb_watcher},
-            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect detemined sweet herb after 50 seconds."
+            info, console, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
+            "make_two_herbs_sandwich(): cannot detect detemined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
         );
+    };
+
+    // Press DPAD_UP multiple times to move to the first herb row
+    for(size_t i = 0; i < first_herb_index_last+1; i++){
+        move_one_up_to_row(9 - i);
     }
+    press_a_to_determine_herb(0); // Press A to detemine one herb
+    // Press DPAD_UP againt to move to the second herb row
+    for(size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
+        move_one_up_to_row(9 - i);
+    }
+    press_a_to_determine_herb(1); // Press A to detemine the second herb
 
     {
         // Press button + to go to picks page
         SandwichPicksPageWatcher picks_page_watcher;
         repeat_button_press_until(
             info, console, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
-            "CondimentsPageNotDetected", "make_two_sweet_herbs_sandwich(): cannot detect picks page after 50 seconds."
+            "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect picks page after 50 seconds."
         );
     }
 

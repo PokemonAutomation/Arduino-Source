@@ -77,11 +77,6 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 
 EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
-    , MAX_NUM_SANDWICHES(
-        "<b>Num Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
-        LockWhileRunning::UNLOCKED,
-        100, 0
-    )
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
@@ -107,29 +102,6 @@ EggAutonomous::EggAutonomous()
         },
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
-    )
-    , EGG_SANDWICH_TYPE(
-        "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
-        "<b>Great Peanut Butter Sandwich</b>: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
-        "<b>Two Sweet Herbs and Lettuce</b>: use the Lettuce and two Sweet Herbs. Must provide Sweet Herb location on the condiments list.",
-        {
-            {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
-            {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs and Lettuce"},
-        },
-        LockWhileRunning::UNLOCKED,
-        EggSandwichType::GREAT_PEANUT_BUTTER
-    )
-    , SWEET_HERB_INDEX_BACKWARDS(
-        "<b>Sweet Herb Location:</b><br>If choosing Sweet Herb as sandwich ingredient, where the Sweet Herb is on the condiments list.",
-        {
-            {0, "0", "Last on list"},
-            {1, "1", "2nd from last of the list"},
-            {2, "2", "3rd from last of the list"},
-            {3, "3", "4th from last of the list"},
-            {4, "4", "5th from last of the list (the location if you have all types of herbs)"},
-        },
-        LockWhileRunning::UNLOCKED,
-        4
     )
     , HAS_CLONE_RIDE_POKEMON(
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
@@ -179,12 +151,10 @@ EggAutonomous::EggAutonomous()
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    PA_ADD_OPTION(MAX_NUM_SANDWICHES);
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(EGG_SANDWICH);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(AUTO_SAVING);
-    PA_ADD_OPTION(EGG_SANDWICH_TYPE);
-    PA_ADD_OPTION(SWEET_HERB_INDEX_BACKWARDS);
     PA_ADD_OPTION(KEEP_BOX_LOCATION);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
@@ -218,6 +188,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         save_game(env, context, true);
     }
 
+    const size_t max_num_sandwiches = EGG_SANDWICH.MAX_NUM_SANDWICHES;
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
     size_t consecutive_failures = 0;
@@ -291,9 +262,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             env.log("Game resetted back to egg fetching routine.");
         }
 
-        if (m_num_sandwich_spent >= MAX_NUM_SANDWICHES){
-            env.console.overlay().add_log("Max sandwich count: " + std::to_string(MAX_NUM_SANDWICHES), COLOR_PURPLE);
-            env.log("Max num sandwiches reached: " + std::to_string(MAX_NUM_SANDWICHES), COLOR_PURPLE);
+        if (m_num_sandwich_spent >= max_num_sandwiches){
+            env.console.overlay().add_log("Max sandwich count: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
+            env.log("Max num sandwiches reached: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
             break;
         }
         // end of one full picnic->hatch iteration
@@ -311,8 +282,19 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     picnic_at_zero_gate(env.program_info(), env.console, context);
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
 
+    // Check user herb index input validity:
+    const size_t sweet_index_last = EGG_SANDWICH.SWEET_HERB_INDEX_BACKWARDS.current_value();
+    const size_t salty_index_last = EGG_SANDWICH.SALTY_HERB_INDEX_BACKWARDS.current_value();
+    const size_t bitter_index_last = EGG_SANDWICH.BITTER_HERB_INDEX_BACKWARDS.current_value();
+    if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::SALTY_SWEET_HERBS && salty_index_last >= sweet_index_last){
+        throw UserSetupError(env.console, "Salty Herb index cannot be the same or before Sweet Herb.");
+    }
+    else if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::BITTER_SWEET_HERBS && bitter_index_last >= sweet_index_last){
+        throw UserSetupError(env.console, "Bitter Herb index cannot be the same or before Sweet Herb.");
+    }
+
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
-        EGG_SANDWICH_TYPE, SWEET_HERB_INDEX_BACKWARDS.current_value());
+        EGG_SANDWICH.EGG_SANDWICH_TYPE, sweet_index_last, salty_index_last, bitter_index_last);
     if (can_make_sandwich == false){
         throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
     }
@@ -328,7 +310,7 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
-    const size_t basket_wait_seconds = (EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+    const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
     collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds, max_eggs,
         num_eggs_collected, basket_check_callback);
 

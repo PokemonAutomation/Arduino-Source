@@ -61,34 +61,6 @@ EggFetcher::EggFetcher()
         LockWhileRunning::LOCKED,
         900
     )
-    , MAX_NUM_SANDWICHES(
-        "<b>Max number of sandwiches to make:</b>",
-        LockWhileRunning::UNLOCKED,
-        10, 1
-    )
-    , EGG_SANDWICH_TYPE(
-        "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
-        "Great Peanut Butter Sandwich: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
-        "Two Sweet Herbs and Lettuce: use the Lettuce and two sweet herbs. Must provide Sweet Herb location on the condiments list.",
-        {
-            {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
-            {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs and Lettuce"},
-        },
-        LockWhileRunning::UNLOCKED,
-        EggSandwichType::GREAT_PEANUT_BUTTER
-    )
-    , SWEET_HERB_INDEX_BACKWARDS(
-        "<b>Sweet Herb Location:</b><br>If chosen the Two Sweet Herbs as the sandwich, where the Sweet Herb is on the condiments list.",
-        {
-            {0, "0", "Last on list"},
-            {1, "1", "2nd last on list"},
-            {2, "2", "3rd last on list"},
-            {3, "3", "4th last on list"},
-            {4, "4", "5th last on list (the location if you have all types of herbs)"},
-        },
-        LockWhileRunning::UNLOCKED,
-        4
-    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -98,9 +70,7 @@ EggFetcher::EggFetcher()
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(EGGS_TO_FETCH);
-    PA_ADD_OPTION(MAX_NUM_SANDWICHES);
-    PA_ADD_OPTION(EGG_SANDWICH_TYPE);
-    PA_ADD_OPTION(SWEET_HERB_INDEX_BACKWARDS);
+    PA_ADD_OPTION(EGG_SANDWICH);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -116,17 +86,29 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     size_t num_eggs_collected = 0;
 
     try{
-        for(uint16_t i = 0; i < MAX_NUM_SANDWICHES; i++){
+        for(uint16_t i = 0; i < EGG_SANDWICH.MAX_NUM_SANDWICHES; i++){
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
             picnic_at_zero_gate(env.program_info(), env.console, context);
             // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     
+            // Check user herb index input validity:
+            const size_t sweet_index_last = EGG_SANDWICH.SWEET_HERB_INDEX_BACKWARDS.current_value();
+            const size_t salty_index_last = EGG_SANDWICH.SALTY_HERB_INDEX_BACKWARDS.current_value();
+            const size_t bitter_index_last = EGG_SANDWICH.BITTER_HERB_INDEX_BACKWARDS.current_value();
+            if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::SALTY_SWEET_HERBS && salty_index_last >= sweet_index_last){
+                throw UserSetupError(env.console, "Salty Herb index cannot be the same or before Sweet Herb.");
+            }
+            else if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::BITTER_SWEET_HERBS && bitter_index_last >= sweet_index_last){
+                throw UserSetupError(env.console, "Bitter Herb index cannot be the same or before Sweet Herb.");
+            }
+
             bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
-                EGG_SANDWICH_TYPE, SWEET_HERB_INDEX_BACKWARDS.current_value());
+                EGG_SANDWICH.EGG_SANDWICH_TYPE, sweet_index_last, salty_index_last, bitter_index_last);
             if (can_make_sandwich == false){
                 throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
             }
+
             stats.m_sandwiches++;
             env.update_stats();
 
@@ -137,7 +119,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.update_stats();
             };
 
-            const size_t basket_wait_seconds = (EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+            const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
             collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds,
                 EGGS_TO_FETCH, num_eggs_collected, basket_check_callback);
 

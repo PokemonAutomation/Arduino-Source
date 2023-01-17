@@ -251,7 +251,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
 }
 
 bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
-    EggSandwichType sandwich_type, size_t sweet_herb_index_last)
+    EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last)
 {
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
@@ -272,8 +272,10 @@ bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispat
         break;
     }
     case EggSandwichType::TWO_SWEET_HERBS:
+    case EggSandwichType::SALTY_SWEET_HERBS:
+    case EggSandwichType::BITTER_SWEET_HERBS:
         enter_custom_sandwich_mode(info, console, context);
-        make_two_sweet_herbs_sandwich(info, dispatcher, console, context, sweet_herb_index_last);
+        make_two_herbs_sandwich(info, dispatcher, console, context, sandwich_type, sweet_herb_index_last, salty_herb_index_last, bitter_herb_index_last);
         break;
     default:
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Unknown EggSandwichType");

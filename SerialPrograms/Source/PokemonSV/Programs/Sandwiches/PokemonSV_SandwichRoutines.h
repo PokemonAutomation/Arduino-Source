@@ -46,16 +46,23 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Bot
 // Assuming at sanwich recipe list, press X to enter custom sandwich mode
 void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+enum class EggSandwichType{
+    GREAT_PEANUT_BUTTER,
+    TWO_SWEET_HERBS,
+    BITTER_SWEET_HERBS,
+    SALTY_SWEET_HERBS
+};
+
 // Assuming starting at the custom sandwich mode,
-// select lettuce (assuming the first entry in the filling list), then select two sweet herbs in the end of the condiments list.
-// The location of sweet herb is set by `sweet_herb_index_last`:
-// if sweet herb is the last entry, set `sweet_herb_index_last` to 0;
-// if sweet herb is second to last, set `sweet_herb_index_last` to 1; ...
+// select lettuce (assuming the first entry in the filling list), then select two herbs (two sweets, bitter sweet or salty sweet) in the end
+// of the condiments list. The location of herbs are set by `xxx_herb_index_last`:
+// if a herb is the last entry, set `xxx_herb_index_last` to 0;
+// if a herb is second to last, set `xxx_herb_index_last` to 1; ...
 // It will use the first sandwich pick in the sandwich pick selection list.
-// After entering sandiwich mini game, it will drop the filling to quickly make a two-sweet-herb only sandwich to gain egg power lv 3.
-void make_two_sweet_herbs_sandwich(
+// After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
+void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
-    size_t sweet_herb_index_last
+    EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 );
 
 }
