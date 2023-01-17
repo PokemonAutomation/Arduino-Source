@@ -105,12 +105,14 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
     );
 
 #if 0
-    size_t c = 0;
-    for (auto& item : ret){
-        cout << item.ocr << endl;
-        ImageViewRGB32 cropped = extract_box_reference(filtered, ret[c].box);
-        cropped.save("letter-" + std::to_string(c) + ".png");
-        c++;
+    static size_t count = 0;
+    for (size_t c = 0; c < objects.size(); c++){
+//        cout << item.ocr << endl;
+        ImageRGB32 cropped = extract_box_reference(filtered, objects[c]).copy();
+        filter_by_mask(ret[c].matrix, cropped, Color(0xffffffff), true);
+        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+        padded.save("letter-" + std::to_string(count) + ".png");
+        count++;
     }
 #endif
 
@@ -197,6 +199,7 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
             {'\\', 'V'},
             {'/', '7'},
             {']', '1'},
+            {')', 'J'},
             {'(', 'K'},
         };
 

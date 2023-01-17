@@ -190,7 +190,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-
+    ImageRGB32 image("GinCode2.png");
+    read_raid_code(env.logger(), env.inference_dispatcher(), image);
 
 
 
