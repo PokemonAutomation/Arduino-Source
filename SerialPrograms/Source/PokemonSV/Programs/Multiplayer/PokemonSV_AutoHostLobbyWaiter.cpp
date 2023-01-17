@@ -166,10 +166,12 @@ bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot){
         m_env.log("Banned User: " + user.to_str(), COLOR_RED);
         message += user.to_str();
         message += "\n";
-        if (!user.notes.empty()){
-            message += user.banlist_source + (user.notes.empty() ? "(no reason provided)" : user.notes);
-            message += "\n";
+        if (user.notes.empty()){
+            message += user.banlist_source + "(no reason provided)";
+        }else{
+            message += user.banlist_source + user.notes;
         }
+        message += "\n";
     }
     send_program_notification(
         m_env, m_notification_raid_start,
