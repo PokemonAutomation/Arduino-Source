@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
     , MAX_NUM_SANDWICHES(
-        "<b>Num Sandwiches:</b><br>How many Great Peanut Butter Sandwiches you can make before running out of ingredients.",
+        "<b>Num Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
         LockWhileRunning::UNLOCKED,
         100, 0
     )
@@ -91,15 +91,16 @@ EggAutonomous::EggAutonomous()
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in the box right of your current box must not exceed 30. "
-        "Otherwise, the program will break when that box is full.",
+        "Otherwise, the program will stop when that box is full.",
         LockWhileRunning::UNLOCKED,
         10, 1, 30
     )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
-        "No auto-saving: No error/crash recovery. No sandwich ingredients permanently spent.<br>"
-        "Save before picnic and after keeping a baby: Allows for error/crash recovery. Reset game if no baby to keep. Low sandwich ingredients usage.<br>"
-        "Save before every batch: Allows you to unhatch eggs. High sandwich ingredients usage.<br><br>",
+        "Must <b>turn off</b> in-game Autosave feature so that this program can properly reset the game.<br>"
+        "<b>No auto-saving</b>: No game resets. No error/crash recovery.<br>"
+        "<b>Save before picnic and after keeping a baby</b>: Allows for error/crash recovery. Reset game if no baby to keep. Low sandwich ingredients usage.<br>"
+        "<b>Save before every batch</b>: Allows you to unhatch eggs. High sandwich ingredients usage.<br><br>",
         {
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
@@ -110,8 +111,8 @@ EggAutonomous::EggAutonomous()
     )
     , EGG_SANDWICH_TYPE(
         "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
-        "Great Peanut Butter Sandwich: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
-        "Two Sweet Herbs and Lettuce: use the Lettuce and two sweet herbs. Must provide Sweet Herb location on the condiments list.",
+        "<b>Great Peanut Butter Sandwich</b>: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
+        "<b>Two Sweet Herbs and Lettuce</b>: use the Lettuce and two Sweet Herbs. Must provide Sweet Herb location on the condiments list.",
         {
             {EggSandwichType::GREAT_PEANUT_BUTTER, "great-peanut-butter", "Great Peanut Butter Sandwich"},
             {EggSandwichType::TWO_SWEET_HERBS, "two-sweet-herbs", "Two Sweet Herbs and Lettuce"},
@@ -120,7 +121,7 @@ EggAutonomous::EggAutonomous()
         EggSandwichType::GREAT_PEANUT_BUTTER
     )
     , SWEET_HERB_INDEX_BACKWARDS(
-        "<b>Sweet Herb Location:</b><br>If chosen the Two Sweet Herbs as the sandwich, where the Sweet Herb is on the condiments list.",
+        "<b>Sweet Herb Location:</b><br>If choosing Sweet Herb as sandwich ingredient, where the Sweet Herb is on the condiments list.",
         {
             {0, "0", "Last on list"},
             {1, "1", "2nd from last of the list"},
@@ -135,7 +136,8 @@ EggAutonomous::EggAutonomous()
         "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
         "place it as second in party before starting the program.</b>"
-        "The program will skip the first row of eggs in the box as a result, so you will need to this row full.",
+        "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
+        "to fill the first row with " + STRING_POKEMON + " before running this program.",
         LockWhileRunning::LOCKED,
         false)
     , SAVE_DEBUG_VIDEO(
