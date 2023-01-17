@@ -1,6 +1,6 @@
 {
     "0-ProgramName": "MassRelease",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/PokemonSV/MassRelease.md",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/MassRelease.md",
     "2-Description": "Automatically Release Boxes of Pokemon",
     "3-Parameters": [
         {

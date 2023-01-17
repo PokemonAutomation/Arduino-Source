@@ -1,6 +1,6 @@
 {
     "0-ProgramName": "EggFetcher",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/PokemonSV/EggFetcher.md",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/EggFetcher.md",
     "2-Description": "Fetches eggs using egg power sandwiches!",
     "3-Parameters": [
         {

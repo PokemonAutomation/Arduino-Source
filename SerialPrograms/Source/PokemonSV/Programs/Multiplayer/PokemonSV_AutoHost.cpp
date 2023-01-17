@@ -426,7 +426,10 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                     "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
                     "Pausing program for " + std::to_string(minutes) + " minute(s)."
                 );
-                context.wait_for(std::chrono::minutes(minutes));
+                WallClock start_time = current_time();
+                while (current_time() < start_time + std::chrono::minutes(minutes)){
+                    context.wait_for(std::chrono::seconds(1));
+                }
                 consecutive_failures = 0;
             }
         }

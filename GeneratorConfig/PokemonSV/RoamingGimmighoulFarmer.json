@@ -1,6 +1,6 @@
 {
     "0-ProgramName": "RoamingGimmighoulFarmer",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/PokemonSV/RoamingGimmighoulFarmer.md",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/RoamingGimmighoulFarmer.md",
     "2-Description": "Farm Gimmighoul Coins for evolution.",
     "3-Parameters": [
         {

@@ -174,7 +174,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    size_t errors;
+    release_box(env.program_info(), console, context, errors, 1);
 
+
+
+#if 0
 //    TeraCatchWatcher catch_menu(COLOR_BLUE);
 #if 0
     WhiteButtonWatcher next_button(
@@ -202,7 +207,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    summary.make_overlays(overlays);
     main_menu.make_overlays(overlays);
 //    overworld.make_overlays(overlays);
-
+#endif
 
 
 #if 0

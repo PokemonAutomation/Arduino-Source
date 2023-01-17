@@ -1,6 +1,6 @@
 {
     "0-ProgramName": "MassPurchase",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/PokemonSV/MassPurchase.md",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/MassPurchase.md",
     "2-Description": "Purchase a Specified Amount of Items",
     "3-Parameters": [
         {
