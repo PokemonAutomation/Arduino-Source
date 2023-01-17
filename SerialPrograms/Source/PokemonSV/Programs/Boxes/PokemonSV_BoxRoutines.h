@@ -53,7 +53,8 @@ void release_one_pokemon(
 //  presses that the function recovered from.
 void release_box(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t& errors
+    size_t& errors,
+    uint8_t start_row = 0   //  Start from this row. (skip te first "start_row" rows)
 );
 
 //  In box system, check how many slots in the party are empty

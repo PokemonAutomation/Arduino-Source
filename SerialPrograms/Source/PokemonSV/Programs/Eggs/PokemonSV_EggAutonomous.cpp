@@ -419,7 +419,10 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
                 // release the hatched pokemon in box
                 size_t local_errors = 0;
-                release_box(env.program_info(), env.console, context, local_errors);
+                release_box(
+                    env.program_info(), env.console, context, local_errors,
+                    HAS_CLONE_RIDE_POKEMON ? 1 : 0
+                );
             }
 
             // change to fetching mode:
