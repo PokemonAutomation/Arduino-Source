@@ -605,13 +605,15 @@ bool check_baby_info(
     BoxShinyWatcher shiny_detector;
     // BoxShinyDetector shiny_detector;
     shiny_detector.make_overlays(overlay_set);
-    const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(300), {shiny_detector});
-    const bool shiny = (shiny_ret == 0);
-    VideoSnapshot screen = console.video().snapshot();
 
     IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
     BoxGenderDetector gender_detector;
     gender_detector.make_overlays(overlay_set);
+
+    const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(200), {shiny_detector});
+    const bool shiny = (shiny_ret == 0);
+    VideoSnapshot screen = console.video().snapshot();
+
     IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
     EggHatchGenderFilter gender = gender_detector.detect(screen);
 
