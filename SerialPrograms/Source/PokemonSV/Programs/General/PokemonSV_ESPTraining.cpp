@@ -143,6 +143,8 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 );
                 if (ret < 0) {
                     env.log("Timeout waiting for dialog.");
+                    endflag = false;
+                    break;
                 }
                 int ret2 = wait_until(
                     env.console, context,
