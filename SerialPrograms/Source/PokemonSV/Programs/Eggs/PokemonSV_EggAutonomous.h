@@ -89,6 +89,8 @@ private:
 
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
+    IntegerEnumDropdownOption KEEP_BOX_LOCATION;
+
     Pokemon::EggHatchFilterTable FILTERS;
 
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;

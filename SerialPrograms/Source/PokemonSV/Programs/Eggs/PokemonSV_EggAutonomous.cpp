@@ -90,8 +90,7 @@ EggAutonomous::EggAutonomous()
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
-        "This number plus the number of " + STRING_POKEMON + " in the box right of your current box must not exceed 30. "
-        "Otherwise, the program will stop when that box is full.",
+        "The program will put them into a box neighboring the current box.",
         LockWhileRunning::UNLOCKED,
         10, 1, 30
     )
@@ -140,6 +139,15 @@ EggAutonomous::EggAutonomous()
         "to fill the first row with " + STRING_POKEMON + " before running this program.",
         LockWhileRunning::LOCKED,
         false)
+    , KEEP_BOX_LOCATION(
+        "<b>Location of the Keep Box:</b><br>Which box to keep the shiny " + STRING_POKEMON + " and others that match the filters.",
+        {
+            {0, "left", "Left Box"},
+            {1, "right", "Right Box"},
+        },
+        LockWhileRunning::UNLOCKED,
+        1
+    )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
@@ -177,8 +185,9 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(EGG_SANDWICH_TYPE);
     PA_ADD_OPTION(SWEET_HERB_INDEX_BACKWARDS);
-    PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
+    PA_ADD_OPTION(KEEP_BOX_LOCATION);
     PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
 
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -422,7 +431,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         enter_box_system_from_overworld(env.program_info(), env.console, context);
         
         // Check each hatched baby whether they will be kept.
-        // If yes, move them to the right box.
+        // If yes, move them to the keep box.
         // Otherwise, release them or move them into box in case we will reset game later.
         for(int i = 0; i < num_eggs_in_party; i++){
             process_one_baby(env, context, i, num_eggs_in_party);
@@ -581,15 +590,22 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     } // end switch EggHatchAction
 }
 
-// From the egg box, move left to the kept box, drop the pokemon to an empty spot in the box, move back to the egg box.
+// From the egg box, move to the kept box, drop the pokemon to an empty spot in the box, move back to the egg box.
 // Return false if it does not find an empty spot.
 bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party){
     SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-    move_to_right_box(context);
+    const size_t keep_box_location = KEEP_BOX_LOCATION.current_value();
+    if (keep_box_location == 0){
+        move_to_left_box(context);
+    } else {
+        move_to_right_box(context);
+    }
+    
     context.wait_for_all_requests();
 
+    const uint8_t col_start = (keep_box_location == 0 ? 2 : 0);
     for (uint8_t row = 0; row < 5; row++){
-        for (uint8_t col = 0; col < 6; col++){
+        for (uint8_t col = col_start; col < 6; col++){
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
             context.wait_for_all_requests();
             // If no pokemon in the slot:
@@ -601,7 +617,11 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
                     BoxCursorLocation::SLOTS, row, col);
 
                 // Move back to middle box
-                move_to_left_box(context);
+                if (keep_box_location == 0){
+                    move_to_right_box(context);
+                } else {
+                    move_to_left_box(context);
+                }
                 context.wait_for_all_requests();
                 return true;
             }
