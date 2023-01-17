@@ -79,6 +79,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
 
     //  Preload the OCR data.
     OCR::ensure_instances(Language::English, 6);
+    preload_code_templates();
 }
 
 

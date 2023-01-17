@@ -8,11 +8,13 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSV_TeraCodeReader.h"
 
@@ -25,12 +27,88 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-char read_5S(const PackedBinaryMatrix& matrix, char OCR_result){
+class CharacterTemplates{
+    CharacterTemplates()
+        : ENG_5(RESOURCE_PATH() + "PokemonSV/TeraCode/TeraCode-5-eng.png")
+        , ENG_S(RESOURCE_PATH() + "PokemonSV/TeraCode/TeraCode-S-eng.png")
+        , CHI_5(RESOURCE_PATH() + "PokemonSV/TeraCode/TeraCode-5-chi.png")
+        , CHI_S(RESOURCE_PATH() + "PokemonSV/TeraCode/TeraCode-S-chi.png")
+    {}
+
+public:
+    static const CharacterTemplates& instance(){
+        static CharacterTemplates templates;
+        return templates;
+    }
+
+    ImageMatch::ExactImageMatcher ENG_5;
+    ImageMatch::ExactImageMatcher ENG_S;
+    ImageMatch::ExactImageMatcher CHI_5;
+    ImageMatch::ExactImageMatcher CHI_S;
+};
+
+void preload_code_templates(){
+    CharacterTemplates::instance();
+}
+
+
+
+
+
+char read_5S(
+    const ImageViewRGB32& image,
+    const Kernels::Waterfill::WaterfillObject& object, char OCR_result
+){
     //  5 and S are commonly misread as each other. Here we try an extra step to
     //  distinguish them.
 
+//    cout << matrix.dump() << endl;
+
+//    cout << (object.center_of_gravity_x() - object.min_x) / object.width() << ", " << (object.center_of_gravity_y() - object.min_y) / object.height() << endl;
+
+    const CharacterTemplates& templates = CharacterTemplates::instance();
+
+    ImageViewRGB32 cropped = extract_box_reference(image, object);
 //    static int count = 0;
-//    image.save("testB-" + std::to_string(count++) + ".png");
+//    cropped.save("testC-" + std::to_string(count++) + ".png");
+
+    double best_rmsd = 1000;
+    char best_result = OCR_result;
+
+    double rmsd;
+
+    rmsd = templates.ENG_5.rmsd(cropped);
+//    cout << "eng-5 = " << rmsd << endl;
+    if (best_rmsd > rmsd){
+        best_rmsd = rmsd;
+        best_result = '5';
+    }
+
+    rmsd = templates.ENG_S.rmsd(cropped);
+//    cout << "eng-S = " << rmsd << endl;
+    if (best_rmsd > rmsd){
+        best_rmsd = rmsd;
+        best_result = 'S';
+    }
+
+    rmsd = templates.CHI_5.rmsd(cropped);
+//    cout << "chi-5 = " << rmsd << endl;
+    if (best_rmsd > rmsd){
+        best_rmsd = rmsd;
+        best_result = '5';
+    }
+
+    rmsd = templates.CHI_S.rmsd(cropped);
+//    cout << "chi-S = " << rmsd << endl;
+    if (best_rmsd > rmsd){
+//        best_rmsd = rmsd;
+        best_result = 'S';
+    }
+
+    return best_result;
+
+#if 0
+    PackedBinaryMatrix matrix = object.packed_matrix();
 
     size_t width = matrix.width();
     size_t height = matrix.height();
@@ -43,7 +121,7 @@ char read_5S(const PackedBinaryMatrix& matrix, char OCR_result){
             }
         }
         double ratio = (double)top_black_pixels / width;
-    //    cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
+        cout << "top_black_pixels = " << top_black_pixels << ", " << ratio << endl;
         if (ratio > 0.70){
             return '5';
         }
@@ -53,11 +131,12 @@ char read_5S(const PackedBinaryMatrix& matrix, char OCR_result){
     }
 
     return OCR_result;
+#endif
 }
 
 
 struct WaterfillOCRResult{
-    PackedBinaryMatrix matrix;
+    Kernels::Waterfill::WaterfillObject object;
     std::string ocr;
 };
 
@@ -85,21 +164,19 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
         }
     }
 
-    std::vector<WaterfillObject> objects;
+    std::vector<WaterfillOCRResult> ret;
     for (auto& item : map){
-        objects.emplace_back(std::move(item.second));
+        ret.emplace_back(WaterfillOCRResult{std::move(item.second), ""});
     }
 
-    std::vector<WaterfillOCRResult> ret(objects.size());
     dispatcher.run_in_parallel(
-        0, objects.size(),
+        0, ret.size(),
         [&](size_t index){
-            WaterfillObject& object = objects[index];
+            WaterfillObject& object = ret[index].object;
             ImageRGB32 cropped = extract_box_reference(filtered, object).copy();
             PackedBinaryMatrix tmp(object.packed_matrix());
             filter_by_mask(tmp, cropped, Color(0xffffffff), true);
             ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
-            ret[index].matrix = std::move(tmp);
             ret[index].ocr = OCR::ocr_read(Language::English, padded);
         }
     );
@@ -237,7 +314,7 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
             switch (ch){
             case '5':
             case 'S':
-                ch = read_5S(item.matrix, ch);
+                ch = read_5S(image, item.object, ch);
             }
 
             normalized += ch;

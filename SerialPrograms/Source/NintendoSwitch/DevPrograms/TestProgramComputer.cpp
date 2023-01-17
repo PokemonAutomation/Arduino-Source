@@ -190,8 +190,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    ImageRGB32 image("GinCode2.png");
-    read_raid_code(env.logger(), env.inference_dispatcher(), image);
+//    ImageRGB32 image("GinCode2.png");
+//    read_raid_code(env.logger(), env.inference_dispatcher(), image);
 
 
 
@@ -210,8 +210,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 0
-    ImageRGB32 image("testB-1.png");
+#if 1
+    ImageRGB32 image("TeraCode-S-chi-original.png");
     for (size_t r = 0; r < image.height(); r++){
         for (size_t c = 0; c < image.width(); c++){
             uint32_t pixel = image.pixel(c, r);
@@ -223,7 +223,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             }
         }
     }
-    image.save("test.png");
+    image.save("TeraCode-S-chi.png");
 #endif
 
 
