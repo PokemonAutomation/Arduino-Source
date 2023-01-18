@@ -143,6 +143,8 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 );
                 if (ret < 0) {
                     env.log("Timeout waiting for dialog.");
+                    endflag = false;
+                    break;
                 }
                 int ret2 = wait_until(
                     env.console, context,
@@ -205,8 +207,19 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             context.wait_for_all_requests();
         }
 
-        //Program done, mash B to clear out
-        pbf_mash_button(context, BUTTON_B, 480);
+        //Program done, mash B until overworld detected
+        OverworldWatcher overworld(COLOR_CYAN);
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context) {
+                pbf_mash_button(context, BUTTON_B, 700);
+            },
+            {overworld}
+        );
+        if (ret != 0) {
+            env.console.log("Failed to detect overworld after ending.", COLOR_RED);
+        }
+        context.wait_for_all_requests();
 
         //Save the game if option checked, then loop again
         if(SAVE) {
