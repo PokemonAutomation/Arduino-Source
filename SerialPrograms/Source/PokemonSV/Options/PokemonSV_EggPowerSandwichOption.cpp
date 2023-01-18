@@ -19,12 +19,12 @@ EggPowerSandwichOption::EggPowerSandwichOption()
         false, true
     )
     , MAX_NUM_SANDWICHES(
-        "<b>Num Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
+        "<b>Max Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
         LockWhileRunning::UNLOCKED,
         100, 0, 999
     )
     , EGG_SANDWICH_TYPE(
-        "<b>Sandwich:</b><br>Which sandwich to get egg power.<br>"
+        "<b>Sandwich Recipe:</b><br>Which sandwich to get egg power.<br>"
         "<b>Great Peanut Butter Sandwich</b>: Use recipe No. 17. Must have enough ingredients to make it and ALL the other unlocked sandwich recipes for reliable recipe detection.<br>"
         "<b>Two Sweet/Sweet and Salty/Sweet and Bitter Herbs and Lettuce</b>: use the Lettuce and two Herbs. Must provide to program Herb locations on the condiments list.",
         {
