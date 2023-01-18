@@ -296,14 +296,12 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
             ImageRGB32 filtered = filter_name_image(box);
 //            filtered.save("name" + std::to_string(c) + ".png");
 
-            std::string raw = OCR::ocr_read(language, filtered);
-            while (!raw.empty()){
-                char ch = raw.back();
-                if (ch <= 32){
-                    raw.pop_back();
+            std::string raw;
+            for (char ch : OCR::ocr_read(language, filtered)){
+                if (ch < 32){
                     continue;
                 }
-                break;
+                raw += ch;
             }
             if (!first){
                 str += ", ";
