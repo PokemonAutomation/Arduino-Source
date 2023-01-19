@@ -5,6 +5,7 @@
  */
 
 #include <set>
+#include <atomic>
 #include <iostream>
 #include "Concurrency/SpinLock.h"
 #include "LifetimeSanitizer.h"
@@ -20,7 +21,28 @@ SpinLock sanitizer_lock;
 std::set<const LifetimeSanitizer*> sanitizer_map;
 
 
+std::atomic<bool> LifetimeSanitizer_enabled(true);
+bool LifetimeSanitizer_has_been_disabled = false;
+
+void LifetimeSanitizer::set_enabled(bool enabled){
+    if (enabled){
+        LifetimeSanitizer_enabled.store(true, std::memory_order_relaxed);
+        return;
+    }
+    SpinLockGuard lg(sanitizer_lock);
+    LifetimeSanitizer_has_been_disabled = true;
+    LifetimeSanitizer_enabled.store(false, std::memory_order_relaxed);
+}
+
+
+
+
+
 LifetimeSanitizer::LifetimeSanitizer(){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating: " << this << std::endl;
@@ -34,6 +56,10 @@ LifetimeSanitizer::LifetimeSanitizer(){
     std::terminate();
 }
 LifetimeSanitizer::~LifetimeSanitizer(){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Freeing: " << this << std::endl;
@@ -43,6 +69,13 @@ LifetimeSanitizer::~LifetimeSanitizer(){
         sanitizer_map.erase(this);
         return;
     }
+
+    //  Skip this check if we've been disabled before in case there's stuff we
+    //  haven't tracked.
+    if (LifetimeSanitizer_has_been_disabled){
+        return;
+    }
+
     std::cerr << "LifetimeSanitizer - Free non-existant: " << this << std::endl;
     std::terminate();
 }
@@ -50,6 +83,10 @@ LifetimeSanitizer::~LifetimeSanitizer(){
 
 
 LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     x.check_usage();
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
@@ -64,6 +101,10 @@ LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x){
     std::terminate();
 }
 void LifetimeSanitizer::operator=(LifetimeSanitizer&& x){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     check_usage();
     x.check_usage();
 }
@@ -71,6 +112,10 @@ void LifetimeSanitizer::operator=(LifetimeSanitizer&& x){
 
 
 LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     x.check_usage();
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
@@ -85,6 +130,10 @@ LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
     std::terminate();
 }
 void LifetimeSanitizer::operator=(const LifetimeSanitizer& x){
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     check_usage();
     x.check_usage();
 }
@@ -92,6 +141,10 @@ void LifetimeSanitizer::operator=(const LifetimeSanitizer& x){
 
 
 void LifetimeSanitizer::check_usage() const{
+    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Using: " << this << std::endl;

@@ -71,6 +71,7 @@ bool run_tera_battle(
                 }
                 next_turn_on_battle_menu = false;
             }
+            env.log("Current Move Selection: " + current_move.to_str());
             switch (current_move.type){
             case TeraMoveType::Wait:
                 context.wait_for(std::chrono::seconds(current_move.seconds));

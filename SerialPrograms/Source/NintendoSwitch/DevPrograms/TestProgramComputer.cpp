@@ -146,6 +146,19 @@ WallClock REFERENCE = current_time();
 
 using namespace Kernels;
 
+template <typename Type>
+void print(const Type* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        cout << ptr[c];
+    }
+    cout << "}" << endl;
+}
 
 
 #if 0
@@ -177,8 +190,164 @@ private:
 
 
 
+struct PixelBuffer{
+    float blue;
+    float green;
+    float red;
+    float alpha;
+
+    PixelBuffer()
+        : blue(0)
+        , green(0)
+        , red(0)
+        , alpha(0)
+    {}
+    PixelBuffer(uint32_t argb)
+        : blue((float)(argb & 0xff))
+        , green((float)((argb >> 8) & 0xff))
+        , red((float)((argb >> 16) & 0xff))
+        , alpha((float)((argb >> 24) & 0xff))
+    {}
+    PixelBuffer(float p_blue, float p_green, float p_red, float p_alpha)
+        : blue(p_blue)
+        , green(p_green)
+        , red(p_red)
+        , alpha(p_alpha)
+    {}
+
+    void operator+=(const PixelBuffer& pixel){
+        blue += pixel.blue;
+        green += pixel.green;
+        alpha += pixel.alpha;
+        alpha += pixel.alpha;
+    }
+    PixelBuffer operator*(float multiplier) const{
+        return {blue * multiplier, green * multiplier, red * multiplier, alpha * multiplier};
+    }
+};
+
+void accumulate_collapse(
+    PixelBuffer& dst, float dst_inv_width, size_t dst_index,
+    const PixelBuffer& src, float src_inv_width, size_t src_index
+){
+
+//    float start = index *
+
+//    size_t dst_width = 0;
+//    size_t src_width = 0;
+
+    float dst_start = dst_index * dst_inv_width;
+    float dst_end = dst_start + dst_inv_width;
+
+    float src_start = src_index * src_inv_width;
+    float src_end = src_start + src_inv_width;
+
+    src_start = std::max(src_start, dst_start);
+    src_end = std::min(src_end, dst_end);
+
+    dst += src * (src_end - src_start);
+}
 
 
+
+void process_pixel(
+    PixelBuffer& dst,
+    float dst_row_start, float dst_row_end,
+    float dst_col_start, float dst_col_end,
+    const PixelBuffer& src,
+    float src_inv_width, float src_inv_height,
+    size_t src_row, size_t src_col
+){
+    float src_row_start = src_row * src_inv_height;
+    float src_row_end = src_row_start + src_inv_height;
+    float src_col_start = src_col * src_inv_width;
+    float src_col_end = src_col_start + src_inv_width;
+
+    src_row_start = std::max(src_row_start, dst_row_start);
+    src_row_end = std::min(src_row_end, dst_row_end);
+    src_col_start = std::max(src_col_start, dst_col_start);
+    src_col_end = std::min(src_col_end, dst_col_end);
+
+    dst += src * (src_row_end - src_row_start) * (src_col_end - src_col_start);
+
+}
+
+
+void scale_image(
+    uint32_t* dst, size_t dst_bytes_per_row, size_t dst_width, size_t dst_height,
+    uint32_t* src, size_t src_bytes_per_row, size_t src_width, size_t src_height
+){
+    if (dst_width == 0 || dst_height == 0){
+        return;
+    }
+    if (src_width == 0 || src_height == 0){
+        for (size_t r = 0; r < dst_height; r++){
+            dst = (uint32_t*)((char*)dst + dst_bytes_per_row);
+            for (size_t c = 0; c < dst_width; c++){
+                dst[c] = 0xff000000;
+            }
+        }
+        return;
+    }
+
+    float dst_inv_width = 1.f / dst_width;
+    float src_inv_width = 1.f / src_width;
+
+//    size_t src_row = 0;
+    for (size_t dst_row = 0; dst_row < dst_height; dst_row++){
+        size_t src_col = 0;
+        for (size_t dst_col = 0; dst_col < dst_width; dst_col++){
+            PixelBuffer pixel;
+            float dst_col_start = dst_col * dst_inv_width;
+            float dst_col_end = dst_col_start + dst_inv_width;
+
+            float src_col_start = src_col * src_inv_width;
+            float src_col_end = src_col_start + src_inv_width;
+
+            src_col_start = std::max(src_col_start, dst_col_start);
+            src_col_end = std::min(src_col_end, dst_col_end);
+            if (src_col_end < dst_col_end){
+                src_col++;
+            }
+//            pixel += ;
+
+
+
+        }
+    }
+}
+
+
+
+void scale_row(
+    float* dst, size_t dst_length,
+    float* src, size_t src_length
+){
+    float dst_inv_length = 1.f / dst_length;
+    float src_inv_length = 1.f / src_length;
+
+    size_t dst_index = 0;
+    size_t src_index = 0;
+
+    float value = 0;
+    while (dst_index < dst_length){
+        float dst_s = dst_index * dst_inv_length;
+        float dst_e = dst_s + dst_inv_length;
+        float src_s = src_index * src_inv_length;
+        float src_e = src_s + src_inv_length;
+
+        float ratio = std::min(dst_e, src_e) - std::max(dst_s, src_s);
+        value += ratio * src[src_index];
+
+        if (dst_e <= src_e){
+            dst[dst_index] = value * dst_length;
+            value = 0;
+            dst_index++;
+        }else{
+            src_index++;
+        }
+    }
+}
 
 
 
@@ -193,6 +362,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    ImageRGB32 image("GinCode2.png");
 //    read_raid_code(env.logger(), env.inference_dispatcher(), image);
 
+
+    float dst[10];
+    float src[6] = {1, 0, 0, 0, 0};
+
+
+    scale_row(dst, 8, src, 5);
+    print(dst, 8);
+
+//    env.log("crash coming...", COLOR_RED);
+//    cout << *(char*)nullptr << endl;
 
 
 #if 0
@@ -210,7 +389,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 1
+#if 0
     ImageRGB32 image("TeraCode-S-chi-original.png");
     for (size_t r = 0; r < image.height(); r++){
         for (size_t c = 0; c < image.width(); c++){

@@ -49,6 +49,8 @@ struct TeraMoveEntry{
     TeraMoveType type;
     uint8_t seconds;
     TeraTarget target;
+
+    std::string to_str() const;
 };
 
 

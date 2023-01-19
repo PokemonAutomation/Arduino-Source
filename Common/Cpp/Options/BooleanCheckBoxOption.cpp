@@ -59,7 +59,6 @@ void BooleanCheckBoxCell::load_json(const JsonValue& json){
     bool value;
     if (json.read_boolean(value)){
         *this = value;
-        report_value_changed();
     }
 }
 JsonValue BooleanCheckBoxCell::to_json() const{

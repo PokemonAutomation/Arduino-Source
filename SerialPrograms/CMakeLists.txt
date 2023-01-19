@@ -41,6 +41,7 @@ file(GLOB MAIN_SOURCES
     ../3rdParty/TesseractPA/TesseractPA.h
     ../3rdParty/nlohmann/json.hpp
     ../3rdParty/qdarkstyle/dark/darkstyle.qrc
+    ../ClientSource/Connection/BotBase.cpp
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp

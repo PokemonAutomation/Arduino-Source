@@ -67,13 +67,17 @@ public:
 
 
 
-class GlobalSettings : public BatchOption{
+class GlobalSettings : public BatchOption, private ConfigOption::Listener{
+    ~GlobalSettings();
     GlobalSettings();
 public:
     static GlobalSettings& instance();
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+
+private:
+    virtual void value_changed() override;
 
 public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;
@@ -107,6 +111,7 @@ public:
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     VideoBackendOption VIDEO_BACKEND;
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
+    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
 
     ProcessorLevelOption PROCESSOR_LEVEL0;
 

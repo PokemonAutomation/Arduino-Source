@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_LifetimeSanitizer_H
 #define PokemonAutomation_LifetimeSanitizer_H
 
-//#define PA_SANITIZER_ENABLE
+#define PA_SANITIZER_ENABLE
 
 namespace PokemonAutomation{
 
@@ -26,10 +26,13 @@ public:
     void operator=(const LifetimeSanitizer& x);
 
     void check_usage() const;
+    static void set_enabled(bool enabled);
 
 #else
     void check_usage() const{}
+    static void set_enabled(bool enabled){}
 #endif
+
 };
 
 

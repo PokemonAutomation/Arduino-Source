@@ -8,6 +8,7 @@
 #define PokemonAutomation_AbstractBotBase_H
 
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
 
@@ -71,31 +72,18 @@ public:
 //  A wrapper for BotBase that allows for asynchronous cancelling.
 class BotBaseContext final : public CancellableScope{
 public:
-    BotBaseContext(BotBase& botbase)
-        : m_botbase(botbase)
-    {}
-    BotBaseContext(CancellableScope& parent, BotBase& botbase)
-        : m_botbase(botbase)
-    {
-        attach(parent);
-    }
-    virtual ~BotBaseContext(){
-        detach();
-    }
+    BotBaseContext(BotBase& botbase);
+    BotBaseContext(CancellableScope& parent, BotBase& botbase);
+    virtual ~BotBaseContext();
 
 
-    void wait_for_all_requests() const{
-        m_botbase.wait_for_all_requests(this);
-    }
+    void wait_for_all_requests() const;
 
     //  Don't use this unless you really need to.
     BotBase& botbase() const{ return m_botbase; }
 
     //  Stop all commands in this context now.
-    void cancel_now(){
-        CancellableScope::cancel(nullptr);
-        m_botbase.stop_all_commands();
-    }
+    void cancel_now();
 
     //  Stop the commands in this context, but do it lazily.
     //  Still will stop new commands from being issued to the device,
@@ -103,35 +91,21 @@ public:
     //  should replace the command queue.
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
-    void cancel_lazy(){
-        CancellableScope::cancel(nullptr);
-        m_botbase.next_command_interrupt();
-    }
+    void cancel_lazy();
 
 
-    virtual bool cancel(std::exception_ptr exception) noexcept override{
-        if (CancellableScope::cancel(std::move(exception))){
-            return true;
-        }
-        try{
-            m_botbase.stop_all_commands();
-        }catch (...){}
-        return false;
-    }
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 
 public:
-    bool try_issue_request(const BotBaseRequest& request) const{
-        return m_botbase.try_issue_request(request, this);
-    }
-    void issue_request(const BotBaseRequest& request) const{
-        m_botbase.issue_request(request, this);
-    }
+    bool try_issue_request(const BotBaseRequest& request) const;
+    void issue_request(const BotBaseRequest& request) const;
     BotBaseMessage issue_request_and_wait(const BotBaseRequest& request) const;
 
 
 private:
     BotBase& m_botbase;
+    LifetimeSanitizer m_lifetime_sanitizer;
 };
 
 

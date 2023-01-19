@@ -7,13 +7,18 @@
 #include <iostream>
 #include <set>
 #include <QCryptographicHash>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Environment/Environment.h"
+//#include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "GlobalSettingsPanel.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -86,6 +91,9 @@ void PreloadSettings::load(const JsonValue& json){
 GlobalSettings& GlobalSettings::instance(){
     static GlobalSettings settings;
     return settings;
+}
+GlobalSettings::~GlobalSettings(){
+    ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockWhileRunning::LOCKED)
@@ -166,33 +174,39 @@ GlobalSettings::GlobalSettings()
     , AUDIO_FILE_VOLUME_SCALE(
         "<b>Audio File Input Volume Scale:</b><br>"
         "Multiply audio file playback by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         0.31622776601683793320, //  -10dB
         -10000, 10000
     )
     , AUDIO_DEVICE_VOLUME_SCALE(
         "<b>Audio Device Input Volume Scale:</b><br>"
         "Multiply audio device input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         1.0, -10000, 10000
     )
     , SHOW_ALL_AUDIO_DEVICES(
         "<b>Show all Audio Devices:</b><br>"
         "Show all audio devices - including duplicates.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         false
     )
     , SHOW_RECORD_FREQUENCIES(
         "<b>Show Record Frequencies:</b><br>"
         "Show option to record audio frequencies.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         false
     )
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         true
+    )
+    , ENABLE_LIFETIME_SANITIZER(
+        "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
+        "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
+        LockWhileRunning::UNLOCKED,
+        IS_BETA_VERSION
     )
     , DEVELOPER_TOKEN(
         true,
@@ -231,10 +245,14 @@ GlobalSettings::GlobalSettings()
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
 #endif
+    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
 
     PA_ADD_OPTION(PROCESSOR_LEVEL0);
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
+
+    GlobalSettings::value_changed();
+    ENABLE_LIFETIME_SANITIZER.add_listener(*this);
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
@@ -344,6 +362,19 @@ JsonValue GlobalSettings::to_json() const{
 
     return obj;
 }
+
+void GlobalSettings::value_changed(){
+    bool enabled = ENABLE_LIFETIME_SANITIZER;
+    LifetimeSanitizer::set_enabled(enabled);
+    if (enabled){
+        global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);
+    }else{
+        global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
+    }
+}
+
+
+
 
 
 

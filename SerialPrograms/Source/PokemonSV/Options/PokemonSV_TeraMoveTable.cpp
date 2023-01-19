@@ -15,7 +15,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-
 const EnumDatabase<TeraMoveType>& tera_move_enum_database(){
     static EnumDatabase<TeraMoveType> database{
         {TeraMoveType::Wait,            "wait",             "Wait for X seconds."},
@@ -39,6 +38,35 @@ const EnumDatabase<TeraTarget>& tera_target_enum_database(){
     };
     return database;
 }
+
+
+std::string TeraMoveEntry::to_str() const{
+    switch (type){
+    case TeraMoveType::Wait:
+        return "Wait for " + std::to_string(seconds) + " second(s).";
+    case TeraMoveType::Move1:
+    case TeraMoveType::Move2:
+    case TeraMoveType::Move3:
+    case TeraMoveType::Move4:{
+        int slot = (int)type - (int)TeraMoveType::Move1;
+        std::string str = "Move " + std::to_string(slot + 1) + " on ";
+        if (target == TeraTarget::Opponent){
+            return str + "opponent.";
+        }else{
+            slot = (int)target - (int)TeraTarget::Player0;
+            return "player " + std::to_string(slot) + ".";
+        }
+    }
+    case TeraMoveType::Cheer_AllOut:
+        return "Cheer - All Out";
+    case TeraMoveType::Cheer_HangTough:
+        return "Cheer - Hang Tough";
+    case TeraMoveType::Cheer_HealUp:
+        return "Cheer - Heal Up";
+    }
+    return "(Invalid Move)";
+}
+
 
 
 
