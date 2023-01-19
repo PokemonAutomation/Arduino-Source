@@ -39,7 +39,7 @@ public:
         count %= 16;
         if (count){
             uint64_t mask = ((uint64_t)1 << count) - 1;
-            __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
+            __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, pixels);
             pixel = filter16(bits, pixel);
             _mm512_mask_storeu_epi32(pixels, (__mmask16)mask, pixel);
         }
@@ -86,7 +86,7 @@ public:
         count %= 16;
         if (count){
             uint64_t mask = ((uint64_t)1 << count) - 1;
-            __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
+            __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, pixels);
             bits |= (convert16(pixel) & mask) << c;
         }
 //        cout << "bits = " << bits << endl;
@@ -145,7 +145,7 @@ public:
         count %= 16;
         if (count){
             uint64_t mask = ((uint64_t)1 << count) - 1;
-            __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
+            __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, pixels);
             bits |= (convert16(pixel) & mask) << c;
         }
 //        cout << "bits = " << bits << endl;

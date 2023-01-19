@@ -40,7 +40,7 @@ public:
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, in);
+        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
         pixel = process_word(pixel);
         _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
     }
@@ -119,7 +119,7 @@ public:
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, in);
+        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
         pixel = process_word(pixel);
         _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
     }
@@ -197,7 +197,7 @@ public:
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, in);
+        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
         pixel = process_word(pixel);
         _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
     }

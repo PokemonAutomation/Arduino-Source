@@ -109,8 +109,8 @@ PA_FORCE_INLINE void sum_sqr_deviation_x64_AVX512(
 
     if (width % 16){
         __mmask16 mask = (((uint32_t)1 << (width % 16))) - 1;
-        __m512i r = _mm512_maskz_load_epi32(mask, ptrR);
-        __m512i i = _mm512_maskz_load_epi32(mask, ptrI);
+        __m512i r = _mm512_maskz_loadu_epi32(mask, ptrR);
+        __m512i i = _mm512_maskz_loadu_epi32(mask, ptrI);
         background = _mm512_maskz_mov_epi32(mask, background);
         sum_sqr_deviation_x64_AVX512<mode>(total, sum, r, i, background);
     }

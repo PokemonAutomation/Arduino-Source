@@ -89,8 +89,8 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX512(
 
     if (width % 16){
         __mmask16 mask = (__mmask16)(((uint32_t)1 << (width % 16)) - 1);
-        __m512i p = _mm512_maskz_load_epi32(mask, ptrI);
-        __m512i m = _mm512_maskz_load_epi32(mask, ptrA);
+        __m512i p = _mm512_maskz_loadu_epi32(mask, ptrI);
+        __m512i m = _mm512_maskz_loadu_epi32(mask, ptrA);
 
         m = _mm512_srai_epi32(m, 31);
         p = _mm512_and_si512(p, m);

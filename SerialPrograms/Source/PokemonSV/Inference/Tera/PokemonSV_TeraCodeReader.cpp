@@ -183,10 +183,10 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
 
 #if 0
     static size_t count = 0;
-    for (size_t c = 0; c < objects.size(); c++){
-//        cout << item.ocr << endl;
-        ImageRGB32 cropped = extract_box_reference(filtered, objects[c]).copy();
-        filter_by_mask(ret[c].matrix, cropped, Color(0xffffffff), true);
+    for (size_t c = 0; c < ret.size(); c++){
+        cout << ret[c].ocr << endl;
+        ImageRGB32 cropped = extract_box_reference(filtered, ret[c].object).copy();
+        filter_by_mask(ret[c].object.packed_matrix(), cropped, Color(0xffffffff), true);
         ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
         padded.save("letter-" + std::to_string(count) + ".png");
         count++;
