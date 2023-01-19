@@ -87,6 +87,8 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
         log << "Minidump created!" << endl;
     }
 
+    Sleep(1000);
+
     return EXCEPTION_CONTINUE_SEARCH;
 }
 

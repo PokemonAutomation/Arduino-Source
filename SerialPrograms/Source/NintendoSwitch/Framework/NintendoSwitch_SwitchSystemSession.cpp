@@ -21,6 +21,9 @@ namespace NintendoSwitch{
 
 
 SwitchSystemSession::~SwitchSystemSession(){
+    try{
+        m_logger.log("Shutting down session...");
+    }catch (...){}
     ProgramTracker::instance().remove_console(m_console_id);
     m_overlay.remove_stat(*m_main_thread_utilization);
     m_option.m_camera.info = m_camera->current_device();

@@ -51,7 +51,11 @@ BotBaseHandle::~BotBaseHandle(){
 }
 
 BotBase* BotBaseHandle::botbase(){
-    return m_botbase.get();
+    BotBase* ret = m_botbase.get();
+    if (ret == nullptr){
+        m_logger.log("BotBaseHandle::botbase() called with null botbase...", COLOR_RED);
+    }
+    return ret;
 }
 
 BotBaseHandle::State BotBaseHandle::state() const{

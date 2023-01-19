@@ -44,11 +44,6 @@ public:
     );
 
 public:
-    Logger& logger();
-    BotBase* botbase();
-    VideoFeed& camera();
-    VideoOverlay& overlay();
-    AudioFeed& audio();
     void update_ui(ProgramState state);
 
     //  The public versions of the private QWidget key and focus event handling functions.

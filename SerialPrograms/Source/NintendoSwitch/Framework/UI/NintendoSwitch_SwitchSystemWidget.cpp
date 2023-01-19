@@ -148,21 +148,6 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
 }
 
-Logger& SwitchSystemWidget::logger(){
-    return m_session.logger();
-}
-BotBase* SwitchSystemWidget::botbase(){
-    return m_session.serial_session().botbase().botbase();
-}
-VideoFeed& SwitchSystemWidget::camera(){
-    return m_session.camera_session();
-}
-VideoOverlay& SwitchSystemWidget::overlay(){
-    return m_session.overlay_session();
-}
-AudioFeed& SwitchSystemWidget::audio(){
-    return m_session.audio_session();
-}
 
 void SwitchSystemWidget::update_ui(ProgramState state){
     if (!m_session.allow_commands_while_running()){
