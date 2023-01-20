@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include <opencv2/core/mat.hpp>
 #include "Common/Cpp/Exceptions.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"
@@ -56,6 +57,7 @@ QImage ImageViewRGB32::scaled_to_QImage(size_t width, size_t height) const{
         return tmp.copy();
     }
     return tmp.scaled((int)width, (int)height);
+//    return tmp.scaled((int)width, (int)height, Qt::IgnoreAspectRatio, Qt::TransformationMode::SmoothTransformation);
 }
 cv::Mat ImageViewRGB32::to_opencv_Mat() const{
     return cv::Mat{ static_cast<int>(m_height), static_cast<int>(m_width), CV_8UC4, (cv::Scalar*)m_ptr, m_bytes_per_row };

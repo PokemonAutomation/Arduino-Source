@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_JoinTracker_H
 
 #include <string>
+#include <array>
 #include <set>
 #include <map>
 #include "CommonFramework/Language.h"

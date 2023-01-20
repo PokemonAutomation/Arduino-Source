@@ -7,11 +7,13 @@
 #ifndef PokemonAutomation_CommonFramework_ImageViewRGB32_H
 #define PokemonAutomation_CommonFramework_ImageViewRGB32_H
 
-#include <opencv2/core/mat.hpp>
 #include <string>
 #include "ImageViewPlanar32.h"
 
 class QImage;
+namespace cv{
+    class Mat;
+}
 
 namespace PokemonAutomation{
 

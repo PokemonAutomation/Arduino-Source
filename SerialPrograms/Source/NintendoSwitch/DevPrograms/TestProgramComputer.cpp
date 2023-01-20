@@ -97,7 +97,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 
 #ifdef PA_ARCH_x86
-// #include "Kernels/Kernels_x64_SSE41.h"
+//#include "Kernels/Kernels_x64_SSE41.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 // #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 // #include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
@@ -109,6 +109,8 @@
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 //#include "Common/Cpp/CpuId/CpuId_x86.h"
+//#include "Kernels/ImageScaling/Kernels_ImageScaling_Default.h"
+//#include "Kernels/ImageScaling/Kernels_ImageScaling_x64_SSE41.h"
 #endif
 
 //#include <opencv2/core.hpp>
@@ -155,199 +157,21 @@ void print(const Type* ptr, size_t len){
             cout << ", ";
         }
         first = false;
-        cout << ptr[c];
+        if (sizeof(Type) == 1){
+            cout << (uint32_t)ptr[c];
+        }else{
+            cout << ptr[c];
+        }
     }
     cout << "}" << endl;
 }
 
 
-#if 0
-using Box = Rectangle<size_t>;
-
-struct MergableBox{
-    Rectangle<size_t> box;
-    size_t active_pixels;
-
-    bool merge(const MergableBox& x){
-//        if (box.min_x){
-//
-//        }
-    }
-};
-
-
-class LinearBoxSet{
-public:
-
-
-private:
-    std::vector<Box> m_boxes;
-};
-#endif
 
 
 
 
 
-
-struct PixelBuffer{
-    float blue;
-    float green;
-    float red;
-    float alpha;
-
-    PixelBuffer()
-        : blue(0)
-        , green(0)
-        , red(0)
-        , alpha(0)
-    {}
-    PixelBuffer(uint32_t argb)
-        : blue((float)(argb & 0xff))
-        , green((float)((argb >> 8) & 0xff))
-        , red((float)((argb >> 16) & 0xff))
-        , alpha((float)((argb >> 24) & 0xff))
-    {}
-    PixelBuffer(float p_blue, float p_green, float p_red, float p_alpha)
-        : blue(p_blue)
-        , green(p_green)
-        , red(p_red)
-        , alpha(p_alpha)
-    {}
-
-    void operator+=(const PixelBuffer& pixel){
-        blue += pixel.blue;
-        green += pixel.green;
-        alpha += pixel.alpha;
-        alpha += pixel.alpha;
-    }
-    PixelBuffer operator*(float multiplier) const{
-        return {blue * multiplier, green * multiplier, red * multiplier, alpha * multiplier};
-    }
-};
-
-void accumulate_collapse(
-    PixelBuffer& dst, float dst_inv_width, size_t dst_index,
-    const PixelBuffer& src, float src_inv_width, size_t src_index
-){
-
-//    float start = index *
-
-//    size_t dst_width = 0;
-//    size_t src_width = 0;
-
-    float dst_start = dst_index * dst_inv_width;
-    float dst_end = dst_start + dst_inv_width;
-
-    float src_start = src_index * src_inv_width;
-    float src_end = src_start + src_inv_width;
-
-    src_start = std::max(src_start, dst_start);
-    src_end = std::min(src_end, dst_end);
-
-    dst += src * (src_end - src_start);
-}
-
-
-
-void process_pixel(
-    PixelBuffer& dst,
-    float dst_row_start, float dst_row_end,
-    float dst_col_start, float dst_col_end,
-    const PixelBuffer& src,
-    float src_inv_width, float src_inv_height,
-    size_t src_row, size_t src_col
-){
-    float src_row_start = src_row * src_inv_height;
-    float src_row_end = src_row_start + src_inv_height;
-    float src_col_start = src_col * src_inv_width;
-    float src_col_end = src_col_start + src_inv_width;
-
-    src_row_start = std::max(src_row_start, dst_row_start);
-    src_row_end = std::min(src_row_end, dst_row_end);
-    src_col_start = std::max(src_col_start, dst_col_start);
-    src_col_end = std::min(src_col_end, dst_col_end);
-
-    dst += src * (src_row_end - src_row_start) * (src_col_end - src_col_start);
-
-}
-
-
-void scale_image(
-    uint32_t* dst, size_t dst_bytes_per_row, size_t dst_width, size_t dst_height,
-    uint32_t* src, size_t src_bytes_per_row, size_t src_width, size_t src_height
-){
-    if (dst_width == 0 || dst_height == 0){
-        return;
-    }
-    if (src_width == 0 || src_height == 0){
-        for (size_t r = 0; r < dst_height; r++){
-            dst = (uint32_t*)((char*)dst + dst_bytes_per_row);
-            for (size_t c = 0; c < dst_width; c++){
-                dst[c] = 0xff000000;
-            }
-        }
-        return;
-    }
-
-    float dst_inv_width = 1.f / dst_width;
-    float src_inv_width = 1.f / src_width;
-
-//    size_t src_row = 0;
-    for (size_t dst_row = 0; dst_row < dst_height; dst_row++){
-        size_t src_col = 0;
-        for (size_t dst_col = 0; dst_col < dst_width; dst_col++){
-            PixelBuffer pixel;
-            float dst_col_start = dst_col * dst_inv_width;
-            float dst_col_end = dst_col_start + dst_inv_width;
-
-            float src_col_start = src_col * src_inv_width;
-            float src_col_end = src_col_start + src_inv_width;
-
-            src_col_start = std::max(src_col_start, dst_col_start);
-            src_col_end = std::min(src_col_end, dst_col_end);
-            if (src_col_end < dst_col_end){
-                src_col++;
-            }
-//            pixel += ;
-
-
-
-        }
-    }
-}
-
-
-
-void scale_row(
-    float* dst, size_t dst_length,
-    float* src, size_t src_length
-){
-    float dst_inv_length = 1.f / dst_length;
-    float src_inv_length = 1.f / src_length;
-
-    size_t dst_index = 0;
-    size_t src_index = 0;
-
-    float value = 0;
-    while (dst_index < dst_length){
-        float dst_s = dst_index * dst_inv_length;
-        float dst_e = dst_s + dst_inv_length;
-        float src_s = src_index * src_inv_length;
-        float src_e = src_s + src_inv_length;
-
-        float ratio = std::min(dst_e, src_e) - std::max(dst_s, src_s);
-        value += ratio * src[src_index];
-
-        if (dst_e <= src_e){
-            dst[dst_index] = value * dst_length;
-            value = 0;
-            dst_index++;
-        }else{
-            src_index++;
-        }
-    }
-}
 
 
 
@@ -359,16 +183,66 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-//    ImageRGB32 image("GinCode2.png");
-//    read_raid_code(env.logger(), env.inference_dispatcher(), image);
 
 
+
+#if 0
+    uint32_t src[4 * 4] = {
+        0xff0a0a0a, 0xff141414, 0xff1e1e1e, 0xff282828,
+        0xff646464, 0xff646464, 0xff646464, 0xff646464,
+        0xff646464, 0xff646464, 0xff646464, 0xff646464,
+        0xff646464, 0xff646464, 0xff646464, 0xff646464,
+    };
+    uint32_t dst[4 * 4] = {};
+
+    print((uint8_t*)src + 0*16, 16);
+    print((uint8_t*)src + 1*16, 16);
+    print((uint8_t*)src + 2*16, 16);
+    print((uint8_t*)src + 3*16, 16);
+
+#if 0
+    TileBuilder builder(
+        dst, 3 * sizeof(uint32_t), 3, 3,
+        src, 4 * sizeof(uint32_t), 4, 4
+    );
+
+    FloatPixelTile tile;
+    size_t dst_col = 0;
+    size_t src_col = 0;
+    builder.build_tile(tile, dst_col, 0, src_col);
+    cout << tile << endl;
+
+    FloatPixelWord accumulator;
+    size_t row = 0;
+    builder.write_tile(accumulator, row, 0, tile, 0);
+#endif
+
+    scale_image_Default(
+        dst, 4 * sizeof(uint32_t), 4, 4,
+        src, 4 * sizeof(uint32_t), 4, 4
+    );
+
+
+    print((uint8_t*)dst + 0*16, 16);
+    print((uint8_t*)dst + 1*16, 16);
+    print((uint8_t*)dst + 2*16, 16);
+    print((uint8_t*)dst + 3*16, 16);
+
+//    print((uint8_t*)dst + 0*12, 12);
+//    print((uint8_t*)dst + 1*12, 12);
+//    print((uint8_t*)dst + 2*12, 12);
+
+
+#if 0
     float dst[10];
-    float src[6] = {1, 0, 0, 0, 0};
+    float src[6] = {1, 2, 3, 4, 5};
 
 
     scale_row(dst, 8, src, 5);
     print(dst, 8);
+#endif
+#endif
+
 
 //    env.log("crash coming...", COLOR_RED);
 //    cout << *(char*)nullptr << endl;
@@ -994,331 +868,6 @@ void print(const uint64_t* ptr, size_t len){
     }
     cout << "}" << endl;
 }
-
-
-
-
-
-
-
-#if 0
-struct Uint8Scaler_x1_Default{
-    static constexpr size_t VECTOR_LENGTH = 1;
-    using vtype = uint8_t;
-
-    uint16_t vscale;
-
-    Uint8Scaler_x1_Default(double scale)
-        : vscale(scale * 256 + 0.5)
-    {}
-    PA_FORCE_INLINE uint8_t apply(uint8_t x) const{
-        return (uint8_t)(x * vscale >> 8);
-    }
-
-    PA_FORCE_INLINE void mulset(uint8_t* dst, const uint8_t* src) const{
-        dst[0] = apply(src[0]);
-    }
-    PA_FORCE_INLINE void muladd(uint8_t* dst, const uint8_t* src) const{
-        dst[0] = std::min<uint16_t>(dst[0] + apply(src[0]), 255);
-    }
-    static PA_FORCE_INLINE void mulset2(
-        const uint8_t* src,
-        uint8_t* dst0, const Uint8Scaler_x1_Default& lower,
-        uint8_t* dst1, const Uint8Scaler_x1_Default& upper
-    ){
-        uint8_t x = src[0];
-        dst0[0] = std::min<uint16_t>(dst0[0] + lower.apply(x), 255);
-        dst1[0] = upper.apply(x);
-    }
-};
-struct Uint8Scaler_x16_SSE41{
-    static constexpr size_t VECTOR_LENGTH = 16;
-    using vtype = __m128i;
-
-    vtype vscale;
-
-    Uint8Scaler_x16_SSE41(double scale)
-        : vscale(_mm_set1_epi16((uint16_t)(scale * 256)))
-    {}
-    PA_FORCE_INLINE vtype apply(vtype x) const{
-        vtype L = _mm_slli_epi16(x, 8);
-        vtype H = _mm_and_si128(x, _mm_set1_epi16(0xff00));
-        L = _mm_mulhi_epu16(L, vscale);
-        H = _mm_mulhi_epu16(H, vscale);
-        H = _mm_slli_epi16(H, 8);
-        return _mm_or_si128(L, H);
-    }
-
-    PA_FORCE_INLINE void mulset(uint8_t* ptr, const uint8_t* src) const{
-        vtype x = _mm_loadu_si128((const vtype*)src);
-        x = apply(x);
-        _mm_storeu_si128((vtype*)ptr, x);
-    }
-    PA_FORCE_INLINE void mulset(uint8_t* ptr, const uint8_t* src, size_t length) const{
-        PartialWordAccess_x64_SSE41 partial_access(length);
-        vtype x = partial_access.load(src);
-        x = apply(x);
-        partial_access.store_no_past_end(ptr, x);
-    }
-    PA_FORCE_INLINE void muladd(uint8_t* ptr, const uint8_t* src) const{
-        vtype x = _mm_loadu_si128((const vtype*)src);
-        x = apply(x);
-        x = _mm_adds_epu8(_mm_loadu_si128((const vtype*)ptr), x);
-        _mm_storeu_si128((vtype*)ptr, x);
-    }
-    PA_FORCE_INLINE void muladd(uint8_t* ptr, const uint8_t* src, size_t length) const{
-        PartialWordAccess_x64_SSE41 partial_access(length);
-        vtype x = partial_access.load(src);
-        x = apply(x);
-        x = _mm_adds_epu8(_mm_loadu_si128((const vtype*)ptr), x);
-        partial_access.store_no_past_end(ptr, x);
-    }
-    static PA_FORCE_INLINE void mulset2(
-        const uint8_t* src,
-        uint8_t* dst0, const Uint8Scaler_x16_SSE41& lower,
-        uint8_t* dst1, const Uint8Scaler_x16_SSE41& upper
-    ){
-        vtype x = _mm_loadu_si128((const __m128i*)src);
-        vtype L = lower.apply(x);
-        vtype H = upper.apply(x);
-        L = _mm_adds_epu8(_mm_loadu_si128((const vtype*)dst0), L);
-        _mm_storeu_si128((vtype*)dst0, L);
-        _mm_storeu_si128((vtype*)dst1, H);
-    }
-    static PA_FORCE_INLINE void mulset2(
-        const uint8_t* src, size_t length,
-        uint8_t* dst0, const Uint8Scaler_x16_SSE41& lower,
-        uint8_t* dst1, const Uint8Scaler_x16_SSE41& upper
-    ){
-        PartialWordAccess_x64_SSE41 partial_access(length);
-        vtype x = partial_access.load(src);
-        vtype L = lower.apply(x);
-        vtype H = upper.apply(x);
-        L = _mm_adds_epu8(_mm_loadu_si128((const vtype*)dst0), L);
-        partial_access.store_no_past_end(dst0, L);
-        partial_access.store_no_past_end(dst1, H);
-    }
-};
-struct Uint8Scaler_x32_AVX2{
-    static constexpr size_t VECTOR_LENGTH = 32;
-    using vtype = __m256i;
-
-    vtype vscale;
-
-    Uint8Scaler_x32_AVX2(double scale)
-        : vscale(_mm256_set1_epi16((uint16_t)(scale * 256)))
-    {}
-    PA_FORCE_INLINE vtype apply(vtype x) const{
-        vtype L = _mm256_slli_epi16(x, 8);
-        vtype H = _mm256_and_si256(x, _mm256_set1_epi16(0xff00));
-        L = _mm256_mulhi_epu16(L, vscale);
-        H = _mm256_mulhi_epu16(H, vscale);
-        H = _mm256_slli_epi16(H, 8);
-        return _mm256_or_si256(L, H);
-    }
-
-    PA_FORCE_INLINE void mulset(uint8_t* ptr, const uint8_t* src) const{
-        vtype x = _mm256_loadu_si256((const vtype*)src);
-        x = apply(x);
-        _mm256_storeu_si256((vtype*)ptr, x);
-    }
-    PA_FORCE_INLINE void mulset(uint8_t* ptr, const uint8_t* src, size_t length) const{
-        PartialWordAccess32_x64_AVX2 partial_access(length / 4);
-        vtype x = partial_access.load(src);
-        x = apply(x);
-        partial_access.store(ptr, x);
-    }
-    PA_FORCE_INLINE void muladd(uint8_t* ptr, const uint8_t* src) const{
-        vtype x = _mm256_loadu_si256((const vtype*)src);
-        x = apply(x);
-        x = _mm256_adds_epu8(_mm256_loadu_si256((const vtype*)ptr), x);
-        _mm256_storeu_si256((vtype*)ptr, x);
-    }
-    PA_FORCE_INLINE void muladd(uint8_t* ptr, const uint8_t* src, size_t length) const{
-        PartialWordAccess32_x64_AVX2 partial_access(length / 4);
-        vtype x = partial_access.load(src);
-        x = apply(x);
-        x = _mm256_adds_epu8(_mm256_loadu_si256((const vtype*)ptr), x);
-        partial_access.store(ptr, x);
-    }
-    static PA_FORCE_INLINE void mulset2(
-        const uint8_t* src,
-        uint8_t* dst0, const Uint8Scaler_x32_AVX2& lower,
-        uint8_t* dst1, const Uint8Scaler_x32_AVX2& upper
-    ){
-        vtype x = _mm256_loadu_si256((const vtype*)src);
-        vtype L = lower.apply(x);
-        vtype H = upper.apply(x);
-        L = _mm256_adds_epu8(_mm256_loadu_si256((const vtype*)dst0), L);
-        _mm256_storeu_si256((vtype*)dst0, L);
-        _mm256_storeu_si256((vtype*)dst1, H);
-    }
-    static PA_FORCE_INLINE void mulset2(
-        const uint8_t* src, size_t length,
-        uint8_t* dst0, const Uint8Scaler_x32_AVX2& lower,
-        uint8_t* dst1, const Uint8Scaler_x32_AVX2& upper
-    ){
-        PartialWordAccess32_x64_AVX2 partial_access(length / 4);
-        vtype x = partial_access.load(src);
-        vtype L = lower.apply(x);
-        vtype H = upper.apply(x);
-        L = _mm256_adds_epu8(_mm256_loadu_si256((const vtype*)dst0), L);
-        partial_access.store(dst0, L);
-        partial_access.store(dst1, H);
-    }
-};
-
-
-
-
-void scale_vertical_shrink_Default(
-    size_t width,
-    const uint32_t* src, size_t src_bytes_per_row, size_t src_height,
-    uint32_t* dst, size_t dst_bytes_per_row, size_t dst_height
-){
-    width *= 4;
-    double ratio = (double)dst_height / src_height;
-    Uint8Scaler_x1_Default scaler(ratio);
-
-    const uint8_t* src_ptr = (uint8_t*)src;
-    uint8_t* dst_ptr = (uint8_t*)dst;
-
-    size_t uninitialized = 0;
-    for (size_t src_index = 0; src_index < src_height; src_index++){
-        double src_s = ratio * (double)src_index;
-        double src_e = ratio * (double)(src_index + 1);
-
-        size_t index0 = (size_t)src_s;
-        size_t index1 = index0 + 1;
-
-        if (index0 >= dst_height){
-            break;
-        }
-
-        const uint8_t* src0 = src_ptr + src_index * src_bytes_per_row;
-        uint8_t* dst0 = dst_ptr + index0 * dst_bytes_per_row;
-
-        if (src_e <= (double)index1 || index1 >= dst_height){
-            //  Source fits entirely in the current row.
-            if (uninitialized <= index0){
-                for (size_t c = 0; c < width; c++){
-                    scaler.mulset(dst0 + c, src0 + c);
-                }
-                uninitialized = index1;
-            }else{
-                for (size_t c = 0; c < width; c++){
-                    scaler.muladd(dst0 + c, src0 + c);
-                }
-            }
-            continue;
-        }else{
-            //  Source is split across the current row and the next.
-            uint8_t* dst1 = dst0 + dst_bytes_per_row;
-            Uint8Scaler_x1_Default lower(index1 - src_s);
-            Uint8Scaler_x1_Default upper(src_e - index1);
-            for (size_t c = 0; c < width; c++){
-                Uint8Scaler_x1_Default::mulset2(
-                    src0 + c,
-                    dst0 + c, lower,
-                    dst1 + c, upper
-                );
-            }
-            uninitialized = index1 + 1;
-        }
-    }
-}
-
-template <typename Uint8Scalar>
-void scale_vertical_shrink(
-    size_t width,
-    const uint32_t* src, size_t src_bytes_per_row, size_t src_height,
-    uint32_t* dst, size_t dst_bytes_per_row, size_t dst_height
-){
-    width *= 4;
-    if (width < Uint8Scalar::VECTOR_LENGTH){
-        scale_vertical_shrink_Default(
-            width,
-            src, src_bytes_per_row, src_height,
-            dst, dst_bytes_per_row, dst_height
-        );
-        return;
-    }
-    double ratio = (double)dst_height / src_height;
-    Uint8Scalar scaler(ratio);
-
-    const uint8_t* src_ptr = (uint8_t*)src;
-    uint8_t* dst_ptr = (uint8_t*)dst;
-
-    size_t uninitialized = 0;
-    for (size_t src_index = 0; src_index < src_height; src_index++){
-        double src_s = ratio * (double)src_index;
-        double src_e = ratio * (double)(src_index + 1);
-
-        size_t index0 = (size_t)src_s;
-        size_t index1 = index0 + 1;
-
-        if (index0 >= dst_height){
-            break;
-        }
-
-        const uint8_t* src0 = src_ptr + src_index * src_bytes_per_row;
-        uint8_t* dst0 = dst_ptr + index0 * dst_bytes_per_row;
-
-        size_t lc = width / Uint8Scalar::VECTOR_LENGTH;
-        if (src_e <= (double)index1 || index1 >= dst_height){
-            //  Source fits entirely in the current row.
-            if (uninitialized <= index0){
-                do{
-                    scaler.mulset(dst0, src0);
-                    src0 += Uint8Scalar::VECTOR_LENGTH;
-                    dst0 += Uint8Scalar::VECTOR_LENGTH;
-                }while (--lc);
-                lc = width % Uint8Scalar::VECTOR_LENGTH;
-                if (lc){
-                    scaler.mulset(dst0, src0, lc);
-                }
-                uninitialized = index1;
-            }else{
-                do{
-                    scaler.muladd(dst0, src0);
-                    src0 += Uint8Scalar::VECTOR_LENGTH;
-                    dst0 += Uint8Scalar::VECTOR_LENGTH;
-                }while (--lc);
-                lc = width % Uint8Scalar::VECTOR_LENGTH;
-                if (lc){
-                    scaler.muladd(dst0, src0, lc);
-                }
-            }
-            continue;
-        }else{
-            //  Source is split across the current row and the next.
-            uint8_t* dst1 = dst0 + dst_bytes_per_row;
-            Uint8Scalar lower(index1 - src_s);
-            Uint8Scalar upper(src_e - index1);
-            do{
-                Uint8Scalar::mulset2(
-                    src0,
-                    dst0, lower,
-                    dst1, upper
-                );
-                src0 += Uint8Scalar::VECTOR_LENGTH;
-                dst0 += Uint8Scalar::VECTOR_LENGTH;
-                dst1 += Uint8Scalar::VECTOR_LENGTH;
-            }while (--lc);
-            lc = width % Uint8Scalar::VECTOR_LENGTH;
-            if (lc){
-                Uint8Scalar::mulset2(
-                    src0, lc,
-                    dst0, lower,
-                    dst1, upper
-                );
-            }
-            uninitialized = index1 + 1;
-        }
-
-    }
-}
-#endif
 
 
 

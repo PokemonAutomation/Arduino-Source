@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <array>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/StringToolsQt.h"
