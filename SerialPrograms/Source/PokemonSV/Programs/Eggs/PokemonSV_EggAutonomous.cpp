@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
