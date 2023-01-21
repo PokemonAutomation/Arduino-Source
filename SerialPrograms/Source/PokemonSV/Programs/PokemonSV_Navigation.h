@@ -3,6 +3,7 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *  Move between different game elements: overworld, save, internet, map, etc.
+ *
  */
 
 #ifndef PokemonAutomation_PokemonSV_Navigation_H
@@ -20,13 +21,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
-//  Save game from menu.
-void save_game_from_menu(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
-//  Save game from overworld.
-void save_game_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
-
-void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
@@ -50,6 +44,13 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  From overworld or main menu => Code entry for tera raid.
+void enter_tera_search(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool connect_to_internet
+);
+
 
 }
 }

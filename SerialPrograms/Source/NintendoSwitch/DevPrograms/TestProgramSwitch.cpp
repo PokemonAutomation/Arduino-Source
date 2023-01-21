@@ -72,6 +72,9 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 
 
 #include <QPixmap>
@@ -146,7 +149,9 @@ TestProgram::TestProgram()
 //using namespace Kernels;
 using namespace Kernels::Waterfill;
 
-//using namespace PokemonLA;
+using namespace PokemonSV;
+
+
 
 
 
@@ -173,9 +178,60 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+#if 0
+    auto image = feed.snapshot();
+    CodeEntryDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+#endif
 
-    size_t errors;
-    release_box(env.program_info(), console, context, errors, 1);
+
+    enter_tera_search(env.program_info(), console, context, false);
+
+
+
+
+#if 0
+    TeraRaidSearchDetector detector(COLOR_YELLOW);
+
+    auto image = feed.snapshot();
+    cout << detector.detect(image) << endl;
+    detector.move_cursor_to_search(env.program_info(), console, context);
+#endif
+
+#if 0
+    auto image = feed.snapshot();
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, 0xff808080);
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(100);
+    WaterfillObject object;
+
+    size_t c = 0;
+    while (iter->find_next(object, false)){
+//        cout << "yellow = " << object.area << endl;
+        extract_box_reference(image, object).save("object-" + std::to_string(c++) + ".png");
+//        yellows.emplace_back(std::move(object));
+    }
+#endif
+
+
+
+
+
+
+
+#if 0
+    PokePortalDetector detector(COLOR_YELLOW);
+
+    auto image = feed.snapshot();
+    cout << detector.detect_location(image) << endl;
+
+    detector.move_cursor(env.program_info(), console, context, 2);
+#endif
+
+
+//    size_t errors;
+//    release_box(env.program_info(), console, context, errors, 1);
 
 
 

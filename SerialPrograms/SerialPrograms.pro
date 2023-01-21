@@ -617,10 +617,12 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
@@ -653,8 +655,10 @@ SOURCES += \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
+    Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
@@ -1510,10 +1514,12 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
@@ -1546,8 +1552,10 @@ HEADERS += \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
+    Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
+    Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \

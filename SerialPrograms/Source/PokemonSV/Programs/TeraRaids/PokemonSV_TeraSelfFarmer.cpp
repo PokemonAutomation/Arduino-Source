@@ -27,6 +27,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
 //#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"

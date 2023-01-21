@@ -14,12 +14,12 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV_GimmighoulRoamingFarmer.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 using namespace Pokemon;
 

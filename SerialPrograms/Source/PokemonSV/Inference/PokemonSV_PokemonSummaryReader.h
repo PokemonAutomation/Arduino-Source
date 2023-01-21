@@ -38,7 +38,7 @@ protected:
 class PokemonSummaryWatcher : public DetectorToFinder<PokemonSummaryDetector>{
 public:
     PokemonSummaryWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("PokemonSummaryFinder", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("PokemonSummaryWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 

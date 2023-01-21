@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -22,24 +23,42 @@ namespace PokemonSV{
 
 MainMenuDetector::MainMenuDetector(Color color)
     : m_color(color)
+    , m_bottom(0.10, 0.94, 0.40, 0.05)
     , m_arrow_left(color, GradientArrowType::RIGHT, {0.02, 0.10, 0.05, 0.90})
     , m_arrow_right(color, GradientArrowType::RIGHT, {0.67, 0.20, 0.05, 0.50})
 {}
 void MainMenuDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_bottom);
     m_arrow_left.make_overlays(items);
     m_arrow_right.make_overlays(items);
 }
 bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
+    //  Disambiguate against the Poke Portal.
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
+//    cout << bottom.average << bottom.stddev << endl;
+    if (is_solid(bottom, {0.582218, 0.417782, 0.})){
+        return false;
+    }
+
+    //  Check the arrows.
     if (m_arrow_left.detect(screen)){
         return true;
     }
     if (m_arrow_right.detect(screen)){
         return true;
     }
+
     return false;
 }
 
 std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32& screen) const{
+    //  Disambiguate against the Poke Portal.
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
+    if (is_solid(bottom, {0.582218, 0.417782, 0.})){
+        return {MenuSide::NONE, 0};
+    }
+
+    //  Check the arrows.
     ImageFloatBox box;
     if (m_arrow_left.detect(box, screen)){
         if (box.y > 0.85){

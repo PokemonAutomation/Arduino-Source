@@ -17,173 +17,18 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
+#include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-namespace {
-
-void save_game_from_menu_impl(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Saving game from menu...");
-    WallClock start = current_time();
-    bool saved = false;
-    while (true){
-        context.wait_for_all_requests();
-        if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(info, console, "SaveGameFailed",
-                "save_game_from_menu(): Failed to save game after 5 minutes.");
-        }
-
-        MainMenuWatcher menu(COLOR_RED);
-        GradientArrowWatcher confirmation(COLOR_YELLOW, GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
-        AdvanceDialogWatcher finished(COLOR_GREEN);
-
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(60),
-            {menu, confirmation, finished}
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            if (saved){
-                console.log("Detected main menu. Finished!");
-                return;
-            }else{
-                console.log("Detected main menu. Saving game...");
-                pbf_press_button(context, BUTTON_R, 20, 105);
-                continue;
-            }
-        case 1:
-            console.log("Detected save confirmation prompt.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            continue;
-        case 2:
-            console.log("Detected save finished dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
-            saved = true;
-            continue;
-        default:
-            dump_image_and_throw_recoverable_exception(info, console, "SaveGameFailed",
-                "save_game_from_menu(): No recognized state after 60 seconds.");
-        }
-    }
-}
-
-} // anonymous namespace
-
-void save_game_from_menu(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    context.wait_for_all_requests();
-    console.overlay().add_log("Save game", COLOR_YELLOW);
-    save_game_from_menu_impl(info, console, context);
-}
-
-void save_game_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    context.wait_for_all_requests();
-    console.overlay().add_log("Save game", COLOR_YELLOW);
-    console.log("Saving game from overworld...");
-    WallClock start = current_time();
-    bool saved = false;
-    while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(info, console, "SaveGameFailed",
-                "save_game_from_overworld(): Failed to save game after 5 minutes.");
-        }
-
-        int ret;
-        {
-            OverworldWatcher overworld(COLOR_CYAN);
-            MainMenuWatcher main_menu(COLOR_RED);
-            context.wait_for_all_requests();
-            ret = wait_until(
-                console, context,
-                std::chrono::seconds(60),
-                {overworld, main_menu}
-            );
-        }
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            console.log("Detected overworld.");
-            if (saved){
-                return;
-            }else{
-                pbf_press_button(context, BUTTON_X, 20, 105);
-                continue;
-            }
-        case 1:
-            console.log("Detected main menu.");
-            if (!saved){
-                save_game_from_menu_impl(info, console, context);
-                saved = true;
-            }
-            pbf_press_button(context, BUTTON_B, 20, 105);
-            continue;
-        default:
-            dump_image_and_throw_recoverable_exception(info, console, "SaveGameFailed",
-                "save_game_from_overworld(): No recognized state after 60 seconds.");
-        }
-    }
-}
 
 
-
-void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    WallClock start = current_time();
-    bool connected = false;
-    while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(info, console, "ConnectInternetFailed",
-                "connect_to_internet_from_overworld(): Failed to connect to internet after 5 minutes.");
-        }
-
-        OverworldWatcher overworld(COLOR_RED);
-        MainMenuWatcher main_menu(COLOR_YELLOW);
-        AdvanceDialogWatcher dialog(COLOR_GREEN);
-        PromptDialogWatcher prompt(COLOR_CYAN);
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(60),
-            {overworld, main_menu, dialog, prompt}
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            console.log("Detected overworld.");
-            if (connected){
-                return;
-            }else{
-                pbf_press_button(context, BUTTON_X, 20, 105);
-                continue;
-            }
-        case 1:
-            console.log("Detected main menu.");
-            if (connected){
-                pbf_press_button(context, BUTTON_B, 20, 105);
-            }else{
-                pbf_press_button(context, BUTTON_L, 20, 105);
-            }
-            continue;
-        case 2:
-            console.log("Detected dialog.");
-            connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
-            continue;
-        case 3:
-            console.log("Already connected to internet.");
-            connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
-            continue;
-        default:
-            dump_image_and_throw_recoverable_exception(info, console, "ConnectInternetFailed",
-                "connect_to_internet_from_overworld(): No recognized state after 60 seconds.");
-        }
-    }
-}
 
 void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     DateReader reader;
@@ -231,16 +76,20 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
         }
         else{
-            dump_image_and_throw_recoverable_exception(info, console, "FailToOpenMap",
-                "open_map_from_overworld(): No overworld state found after 10 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToOpenMap",
+                "open_map_from_overworld(): No overworld state found after 10 seconds."
+            );
         }
     }
 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            dump_image_and_throw_recoverable_exception(info, console, "FailToOpenMap",
-                "open_map_from_overworld(): Failed to open map after 1 minute.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToOpenMap",
+                "open_map_from_overworld(): Failed to open map after 1 minute."
+            );
         }
 
         OverworldWatcher overworld(COLOR_CYAN);
@@ -271,8 +120,10 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
                 continue;
             }
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "FailToOpenMap",
-                "open_map_from_overworld(): No recognized state after 30 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToOpenMap",
+                "open_map_from_overworld(): No recognized state after 30 seconds."
+            );
         }
     }
 }
@@ -285,8 +136,10 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            dump_image_and_throw_recoverable_exception(info, console, "FailToFly",
-                "fly_to_overworld_from_map(): Failed to open map after 1 minute.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToFly",
+                "fly_to_overworld_from_map(): Failed to open map after 1 minute."
+            );
         }
 
         int ret = 0;
@@ -324,8 +177,10 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             continue;
             
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "FailToFly",
-                "fly_to_overworld_from_map(): No recognized state after 30 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToFly",
+                "fly_to_overworld_from_map(): No recognized state after 30 seconds."
+            );
         }
     }
 }
@@ -364,8 +219,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             console.log("Detected main menu.");
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
-                dump_image_and_throw_recoverable_exception(info, console, "FailToPicnic",
-                    "picnic_from_overworld(): Cannot move menu cursor to picnic.");
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "FailToPicnic",
+                    "picnic_from_overworld(): Cannot move menu cursor to picnic."
+                );
             }
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
             continue;
@@ -378,8 +235,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             context.wait_for_all_requests();
             return;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "FailToPicnic",
-                "picnic_from_overworld(): No recognized state after 30 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToPicnic",
+                "picnic_from_overworld(): No recognized state after 30 seconds."
+            );
         }
     }
 }
@@ -405,8 +264,10 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         }
 
         if (i == 4){
-            dump_image_and_throw_recoverable_exception(info, console, "FailToLeavePicnic",
-                "leave_picnic(): Failed to leave picnic after 5 tries.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToLeavePicnic",
+                "leave_picnic(): Failed to leave picnic after 5 tries."
+            );
         }
 
         // prompt not found, maybe button Y dropped?
@@ -426,8 +287,10 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         {overworld}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "FailToLeavePicnic",
-            "leave_picnic(): Failed to detecxt overworld after 20 seconds.");
+        dump_image_and_throw_recoverable_exception(
+            info, console, "FailToLeavePicnic",
+            "leave_picnic(): Failed to detecxt overworld after 20 seconds."
+        );
     }
     // Wait three more seconds to make sure the player character is free to operate:
     context.wait_for(std::chrono::seconds(3));
@@ -441,8 +304,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            dump_image_and_throw_recoverable_exception(info, console, "FailToEnterBoxes",
-                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToEnterBoxes",
+                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes."
+            );
         }
 
         OverworldWatcher overworld(COLOR_CYAN);
@@ -466,8 +331,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             console.overlay().add_log("Enter box", COLOR_WHITE);
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
-                dump_image_and_throw_recoverable_exception(info, console, "FailToEnterBoxes",
-                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.");
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "FailToEnterBoxes",
+                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes."
+                );
             }
             pbf_press_button(context, BUTTON_A, 20, 50);
             continue;
@@ -476,8 +343,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             context.wait_for(std::chrono::milliseconds(200));
             return;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "FailToEnterBoxes",
-                "enter_box_system_from_overworld(): No recognized state after 30 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "FailToEnterBoxes",
+                "enter_box_system_from_overworld(): No recognized state after 30 seconds."
+            );
         }
     }
 }
@@ -498,10 +367,103 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
         {overworld}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "FailToLeaveBoxes",
-            "leave_box_system_to_overworld(): Unknown state after 10 button B presses.");
+        dump_image_and_throw_recoverable_exception(
+            info, console, "FailToLeaveBoxes",
+            "leave_box_system_to_overworld(): Unknown state after 10 button B presses."
+        );
     }
 }
+
+
+
+
+
+void enter_tera_search(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool connect_to_internet
+){
+    WallClock start = current_time();
+    bool connected = false;
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "EnterTeraSearchFailed",
+                "enter_tera_search(): Failed to enter Tera search."
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_RED);
+        MainMenuWatcher main_menu(COLOR_YELLOW);
+        PokePortalWatcher poke_portal(COLOR_GREEN);
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
+        CodeEntryWatcher code_entry(COLOR_PURPLE);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(60),
+            {
+                overworld,
+                main_menu,
+                poke_portal,
+                raid_search,
+                code_entry,
+            }
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_X, 20, 105);
+            continue;
+        case 1:
+            console.log("Detected main menu.");
+            if (connect_to_internet && !connected){
+                connect_to_internet_from_menu(info, console, context);
+                connected = true;
+                continue;
+            }
+            if (main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 3)){
+                pbf_press_button(context, BUTTON_A, 20, 230);
+            }
+            continue;
+        case 2:
+            console.log("Detected Poke Portal.");
+            if (poke_portal.move_cursor(info, console, context, 1)){
+                pbf_press_button(context, BUTTON_A, 20, 230);
+            }
+            continue;
+        case 3:
+            console.log("Detected Tera Raid Search.");
+            if (raid_search.move_cursor_to_search(info, console, context)){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+            }
+            continue;
+        case 4:
+            console.log("Detected Code Entry.");
+            return;
+        default:
+            dump_image_and_throw_recoverable_exception(
+                info, console, "EnterTeraSearchFailed",
+                "enter_tera_search(): No recognized state after 60 seconds."
+            );
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 }

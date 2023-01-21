@@ -54,6 +54,7 @@ public:
 
 protected:
     Color m_color;
+    ImageFloatBox m_bottom;
     GradientArrowDetector m_arrow_left;
     GradientArrowDetector m_arrow_right;
 };

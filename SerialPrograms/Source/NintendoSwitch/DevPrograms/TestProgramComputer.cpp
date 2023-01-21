@@ -95,6 +95,8 @@
 #include "Common/Qt/TimeQt.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "ClientSource/Connection/BotBase.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -165,8 +167,6 @@ void print(const Type* ptr, size_t len){
     }
     cout << "}" << endl;
 }
-
-
 
 
 

@@ -23,7 +23,7 @@
 #include "PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Resources/PokemonSV_AuctionItemNames.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

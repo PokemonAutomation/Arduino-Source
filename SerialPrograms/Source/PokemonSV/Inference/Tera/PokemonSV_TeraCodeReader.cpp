@@ -308,8 +308,6 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
                 ch = iter->second;
             }
 
-            contains_letters |= 'A' <= ch && ch <= 'Z';
-
             //  Distinguish 5 and S.
             switch (ch){
             case '5':
@@ -317,13 +315,15 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
                 ch = read_5S(image, item.object, ch);
             }
 
+            contains_letters |= 'A' <= ch && ch <= 'Z';
+
             normalized += ch;
         }
 
         std::string log = "Code OCR: \"" + raw + "\" -> \"" + normalized + "\"";
         size_t length = normalized.size();
         if ((contains_letters && length == 6) ||
-            (!contains_letters && (length == 4 || length == 8))
+            (!contains_letters && (length == 4 || length == 6 || length == 8))
         ){
             logger.log(log, COLOR_BLUE);
             return normalized;
