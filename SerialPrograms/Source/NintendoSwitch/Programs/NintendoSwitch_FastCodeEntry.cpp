@@ -45,7 +45,6 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
     , DIGIT_REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
         LockWhileRunning::LOCKED,
-        PreloadSettings::instance().DEVELOPER_MODE,
         PreloadSettings::instance().DEVELOPER_MODE
     )
     , SCROLL_DELAY(
@@ -53,7 +52,6 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6",
         PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6"
     )
     , WRAP_DELAY(
@@ -61,7 +59,7 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
         3, 15,
-        "6", "6"
+        "6"
     )
 {
     PA_ADD_OPTION(KEYBOARD_LAYOUT);

@@ -21,12 +21,12 @@ template <typename Type>
 class TimeExpressionCell : public ConfigOption{
 public:
     ~TimeExpressionCell();
-    TimeExpressionCell(const TimeExpressionCell& x);
+    TimeExpressionCell(const TimeExpressionCell& x) = delete;
     TimeExpressionCell(
         LockWhileRunning lock_while_running,
         double ticks_per_second,
         Type min_value, Type max_value,
-        std::string default_value, std::string current_value
+        std::string default_value
     );
 
 public:
@@ -38,15 +38,8 @@ public:
     TimeExpressionCell(
         LockWhileRunning lock_while_running,
         double ticks_per_second,
-        std::string default_value,
-        Type min_value
-    );
-    TimeExpressionCell(
-        LockWhileRunning lock_while_running,
-        double ticks_per_second,
-        std::string default_value,
         Type min_value,
-        Type max_value
+        std::string default_value
     );
 
     double ticks_per_second() const;
@@ -83,8 +76,9 @@ public:
     TimeExpressionOption(
         std::string label,
         LockWhileRunning lock_while_running,
-        double ticks_per_second, Type min_value, Type max_value,
-        std::string default_value, std::string current_value
+        double ticks_per_second,
+        Type min_value, Type max_value,
+        std::string default_value
     );
 
 public:
@@ -98,16 +92,8 @@ public:
         std::string label,
         LockWhileRunning lock_while_running,
         double ticks_per_second,
-        std::string default_value,
-        Type min_value
-    );
-    TimeExpressionOption(
-        std::string label,
-        LockWhileRunning lock_while_running,
-        double ticks_per_second,
-        std::string default_value,
         Type min_value,
-        Type max_value
+        std::string default_value
     );
 
     const std::string& label() const{ return m_label; }

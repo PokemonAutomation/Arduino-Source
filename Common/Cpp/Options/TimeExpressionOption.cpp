@@ -77,13 +77,13 @@ struct TimeExpressionCell<Type>::Data{
 
     Data(
         double ticks_per_second, Type min_value, Type max_value,
-        std::string default_value, std::string current_value
+        std::string default_value
     )
         : m_ticks_per_second(ticks_per_second)
         , m_min_value(min_value)
         , m_max_value(max_value)
         , m_default(std::move(default_value))
-        , m_current(std::move(current_value))
+        , m_current(m_default)
         , m_value(0)
     {
         m_error = process(m_current, m_value);
@@ -116,24 +116,18 @@ struct TimeExpressionCell<Type>::Data{
 template <typename Type>
 TimeExpressionCell<Type>::~TimeExpressionCell() = default;
 template <typename Type>
-TimeExpressionCell<Type>::TimeExpressionCell(const TimeExpressionCell& x)
-    : ConfigOption(x)
-    , m_data(
-        CONSTRUCT_TOKEN, x.ticks_per_second(), x.min_value(), x.max_value(),
-        x.default_value(), x.current_text()
-    )
-{}
-template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
     LockWhileRunning lock_while_running,
     double ticks_per_second,
     Type min_value, Type max_value,
-    std::string default_value, std::string current_value
+    std::string default_value
 )
     : ConfigOption(lock_while_running)
     , m_data(
-        CONSTRUCT_TOKEN, ticks_per_second, min_value, max_value,
-        std::move(default_value), std::move(current_value)
+        CONSTRUCT_TOKEN,
+        ticks_per_second,
+        min_value, max_value,
+        std::move(default_value)
     )
 {}
 
@@ -145,38 +139,25 @@ TimeExpressionCell<Type>::TimeExpressionCell(
 )
     : ConfigOption(lock_while_running)
     , m_data(
-        CONSTRUCT_TOKEN, ticks_per_second,
-        std::numeric_limits<Type>::min(),
-        std::numeric_limits<Type>::max(),
-        default_value, default_value
+        CONSTRUCT_TOKEN,
+        ticks_per_second,
+        std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max(),
+        std::move(default_value)
     )
 {}
 template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
     LockWhileRunning lock_while_running,
     double ticks_per_second,
-    std::string default_value,
-    Type min_value
-)
-    : ConfigOption(lock_while_running)
-    , m_data(
-        CONSTRUCT_TOKEN, ticks_per_second, min_value,
-        std::numeric_limits<Type>::max(),
-        default_value, default_value
-    )
-{}
-template <typename Type>
-TimeExpressionCell<Type>::TimeExpressionCell(
-    LockWhileRunning lock_while_running,
-    double ticks_per_second,
-    std::string default_value,
     Type min_value,
-    Type max_value
+    std::string default_value
 )
     : ConfigOption(lock_while_running)
     , m_data(
-        CONSTRUCT_TOKEN, ticks_per_second, min_value, max_value,
-        default_value, default_value
+        CONSTRUCT_TOKEN,
+        ticks_per_second,
+        min_value, std::numeric_limits<Type>::max(),
+        std::move(default_value)
     )
 {}
 
@@ -287,14 +268,15 @@ template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
     LockWhileRunning lock_while_running,
-    double ticks_per_second, Type min_value, Type max_value,
-    std::string default_value, std::string current_value
+    double ticks_per_second,
+    Type min_value, Type max_value,
+    std::string default_value
 )
     : TimeExpressionCell<Type>(
         lock_while_running,
         ticks_per_second,
         min_value, max_value,
-        std::move(default_value), std::move(current_value)
+        std::move(default_value)
     )
     , m_label(std::move(label))
 {}
@@ -308,8 +290,7 @@ TimeExpressionOption<Type>::TimeExpressionOption(
     : TimeExpressionCell<Type>(
         lock_while_running,
         ticks_per_second,
-        default_value,
-        std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max()
+        std::move(default_value)
     )
     , m_label(std::move(label))
 {}
@@ -318,31 +299,14 @@ TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
     LockWhileRunning lock_while_running,
     double ticks_per_second,
-    std::string default_value,
-    Type min_value
-)
-    : TimeExpressionCell<Type>(
-        lock_while_running,
-        ticks_per_second,
-        default_value,
-        min_value, std::numeric_limits<Type>::max()
-    )
-    , m_label(std::move(label))
-{}
-template <typename Type>
-TimeExpressionOption<Type>::TimeExpressionOption(
-    std::string label,
-    LockWhileRunning lock_while_running,
-    double ticks_per_second,
-    std::string default_value,
     Type min_value,
-    Type max_value
+    std::string default_value
 )
     : TimeExpressionCell<Type>(
         lock_while_running,
         ticks_per_second,
-        default_value,
-        min_value, max_value
+        min_value,
+        std::move(default_value)
     )
     , m_label(std::move(label))
 {}

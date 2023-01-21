@@ -37,7 +37,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
         "(German players may need to increase this to 90.)",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
-        "50", 20
+        20, "50"
     )
 {
     PA_ADD_OPTION(FLY_A_TO_X_DELAY);

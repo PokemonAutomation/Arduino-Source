@@ -42,9 +42,9 @@ TimeExpression::TimeExpression(const JsonObject& obj)
         SingleStatementOption::m_label,
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
-        obj.get_string_throw(JSON_DEFAULT),
         obj.get_integer_throw(JSON_MIN_VALUE),
-        obj.get_integer_throw(JSON_MAX_VALUE)
+        obj.get_integer_throw(JSON_MAX_VALUE),
+        obj.get_string_throw(JSON_DEFAULT)
     )
 {
     m_option.set(obj.get_string_throw(JSON_CURRENT));

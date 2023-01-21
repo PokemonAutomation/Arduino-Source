@@ -74,9 +74,9 @@ void move_codeboard(BotBaseContext& context, const DigitPath& path);
 struct FastCodeEntrySettings{
     KeyboardLayout keyboard_layout = KeyboardLayout::QWERTY;
     bool include_plus = true;
-    uint8_t scroll_delay = 4;
+    uint8_t scroll_delay = 6;
     uint8_t wrap_delay = 6;
-    bool digit_reordering = true;
+    bool digit_reordering = false;
 
     FastCodeEntrySettings(FastCodeEntrySettingsOption& option);
 };
