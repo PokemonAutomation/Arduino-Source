@@ -72,7 +72,7 @@ struct TeraLobbyNameMatchResult{
 
 class TeraLobbyReader : public StaticScreenDetector{
 public:
-    TeraLobbyReader(Color color = COLOR_RED);
+    TeraLobbyReader(Logger& logger, AsyncDispatcher& dispatcher, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -82,8 +82,8 @@ public:
     uint8_t total_players(const ImageViewRGB32& screen) const;
     uint8_t ready_players(const ImageViewRGB32& screen) const;
 
-    int16_t seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen);
-    std::string raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen);
+    int16_t seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
+    std::string raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
 
     //  OCR the player names in all the specified languages.
     //  The returned strings are raw OCR output and are unprocessed.
@@ -95,6 +95,8 @@ public:
 
 
 private:
+    Logger& m_logger;
+    AsyncDispatcher& m_dispatcher;
     Color m_color;
     ImageFloatBox m_bottom_right;
     ImageFloatBox m_label;
@@ -111,13 +113,19 @@ private:
 };
 class TeraLobbyWatcher : public DetectorToFinder<TeraLobbyReader>{
 public:
-    TeraLobbyWatcher(Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
-         : DetectorToFinder("TeraLobbyFinder", duration, color)
+    TeraLobbyWatcher(
+        Logger& logger, AsyncDispatcher& dispatcher,
+        Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("TeraLobbyFinder", duration, logger, dispatcher, color)
     {}
 };
 class TeraLobbyReadyWaiter : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyReadyWaiter(Color color, uint8_t desired_players);
+    TeraLobbyReadyWaiter(
+        Logger& logger, AsyncDispatcher& dispatcher,
+        Color color, uint8_t desired_players
+    );
 
     int8_t last_known_total_players() const{
         return m_last_known_total_players.load(std::memory_order_relaxed);

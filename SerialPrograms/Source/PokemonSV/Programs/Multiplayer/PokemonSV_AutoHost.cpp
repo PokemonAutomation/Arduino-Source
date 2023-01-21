@@ -189,7 +189,7 @@ WallClock AutoHost::wait_for_lobby_open(
 ){
     VideoOverlaySet overlays(env.console.overlay());
 
-    TeraLobbyWatcher lobby(COLOR_RED);
+    TeraLobbyWatcher lobby(env.logger(), env.realtime_dispatcher(), COLOR_RED);
     lobby.make_overlays(overlays);
 
     int ret = wait_until(
@@ -479,7 +479,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
 #if 1
         try{
-            open_hosting_lobby(env.program_info(), env.console, context, mode);
+            open_hosting_lobby(env, env.console, context, mode);
         }catch (OperationFailedException&){
             consecutive_failures++;
             stats.m_errors++;

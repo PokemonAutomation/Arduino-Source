@@ -149,8 +149,10 @@ std::string TeraLobbyNameMatchResult::to_str() const{
 
 
 
-TeraLobbyReader::TeraLobbyReader(Color color)
-    : m_color(color)
+TeraLobbyReader::TeraLobbyReader(Logger& logger, AsyncDispatcher& dispatcher, Color color)
+    : m_logger(logger)
+    , m_dispatcher(dispatcher)
+    , m_color(color)
     , m_bottom_right(0.73, 0.85, 0.12, 0.02)
     , m_label(0.75, 0.67, 0.10, 0.05)
     , m_cursor(0.135, 0.25, 0.05, 0.25)
@@ -196,6 +198,10 @@ bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
+    if (seconds_left(m_logger, m_dispatcher, screen) < 0){
+        return false;
+    }
+
     return true;
 }
 
@@ -221,11 +227,11 @@ uint8_t TeraLobbyReader::ready_players(const ImageViewRGB32& screen) const{
     return total;
 }
 
-int16_t TeraLobbyReader::seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen){
+int16_t TeraLobbyReader::seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_timer);
     return read_raid_timer(logger, dispatcher, image);
 }
-std::string TeraLobbyReader::raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen){
+std::string TeraLobbyReader::raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_code);
     return read_raid_code(logger, dispatcher, image);
 }
@@ -320,8 +326,11 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
 
 
-TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(Color color, uint8_t desired_players)
-    : TeraLobbyReader(color)
+TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(
+    Logger& logger, AsyncDispatcher& dispatcher,
+    Color color, uint8_t desired_players
+)
+    : TeraLobbyReader(logger, dispatcher, color)
     , VisualInferenceCallback("TeraLobbyReadyWaiter")
     , m_desired_players(desired_players)
     , m_last_known_total_players(-1)

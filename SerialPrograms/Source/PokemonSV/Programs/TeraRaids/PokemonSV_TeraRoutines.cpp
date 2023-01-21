@@ -90,7 +90,7 @@ void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
 
 
 void open_hosting_lobby(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     HostingMode mode
 ){
     bool recovery_mode = false;
@@ -99,7 +99,7 @@ void open_hosting_lobby(
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "OpenLobbyFailed",
+                env.program_info(), console, "OpenLobbyFailed",
                 "Unable to open Tera lobby after 5 minutes."
             );
         }
@@ -122,7 +122,7 @@ void open_hosting_lobby(
         }
 
         TeraCardWatcher card_detector(COLOR_YELLOW);
-        TeraLobbyWatcher lobby(COLOR_BLUE);
+        TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,

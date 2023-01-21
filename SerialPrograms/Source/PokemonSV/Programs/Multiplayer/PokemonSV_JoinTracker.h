@@ -95,7 +95,7 @@ private:
 
 class TeraLobbyJoinWatcher2 : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyJoinWatcher2(Color color);
+    TeraLobbyJoinWatcher2(Logger& logger, AsyncDispatcher& dispatcher, Color color);
 
     uint8_t last_known_total_players() const{ return m_last_known_total_players.load(std::memory_order_relaxed); }
     uint8_t last_known_ready_players() const{ return m_last_known_ready_players.load(std::memory_order_relaxed); }
@@ -112,7 +112,7 @@ private:
 class TeraLobbyNameWatcher : public TeraLobbyReader, public VisualInferenceCallback{
 public:
     TeraLobbyNameWatcher(
-        Logger& logger, Color color,
+        Logger& logger, AsyncDispatcher& dispatcher, Color color,
         RaidJoinReportOption& report_settings,
         RaidPlayerBanList& ban_settings
     );

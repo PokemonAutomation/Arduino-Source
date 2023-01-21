@@ -191,6 +191,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    enter_tera_search(env.program_info(), console, context, false);
 //    open_hosting_lobby(env.program_info(), console, context, HostingMode::ONLINE_CODED);
 
+    auto image = feed.snapshot();
+    TeraLobbyReader detector(console.logger(), env.realtime_dispatcher());
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+
+
+#if 0
     size_t host_index = 1;
     ConsoleHandle& host = env.consoles[host_index];
     BotBaseContext host_context(scope, host.botbase());
@@ -220,7 +227,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         }
         enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
     });
-
+#endif
 
 
 

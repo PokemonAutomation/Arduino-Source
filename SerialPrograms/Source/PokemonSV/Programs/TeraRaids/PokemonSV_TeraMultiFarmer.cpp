@@ -257,9 +257,9 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
     BotBaseContext host_context(scope, host_console.botbase());
 
     //  Open lobby and read code.
-    TeraLobbyReader lobby_reader;
+    TeraLobbyReader lobby_reader(host_console.logger(), env.realtime_dispatcher());
     open_hosting_lobby(
-        env.program_info(), host_console, host_context,
+        env, host_console, host_context,
         MODE == Mode::HOST_ONLINE
             ? HostingMode::ONLINE_CODED
             : HostingMode::LOCAL
@@ -281,7 +281,7 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
 
         enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
 
-        TeraLobbyWatcher lobby;
+        TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher());
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context, std::chrono::seconds(60),

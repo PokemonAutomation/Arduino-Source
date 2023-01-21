@@ -38,8 +38,8 @@ TeraLobbyWaiter::TeraLobbyWaiter(
     , m_notification_raid_start(NOTIFICATION_RAID_START)
     , m_dialog(COLOR_YELLOW)
     , m_start_raid(COLOR_BLUE)
-    , m_join_watcher(COLOR_RED)
-    , m_name_watcher(console.logger(), COLOR_RED, JOIN_REPORT, BAN_LIST)
+    , m_join_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED)
+    , m_name_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST)
 {}
 
 VideoSnapshot TeraLobbyWaiter::synchronize_state(){

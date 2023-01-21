@@ -41,7 +41,7 @@ enum class HostingMode{
     ONLINE_EVERYONE,
 };
 void open_hosting_lobby(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     HostingMode mode
 );
 
