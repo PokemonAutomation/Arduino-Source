@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "Pokemon/Pokemon_IVChecker.h"
+//#include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 

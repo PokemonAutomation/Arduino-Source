@@ -69,7 +69,7 @@ private:
     void reset_host(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
     void reset_joiner(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-    void run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
     bool run_raid(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
@@ -80,18 +80,24 @@ private:
         HOST_LOCALLY,
         HOST_ONLINE,
     };
-    EnumDropdownOption<Mode> MODE;
+    EnumDropdownOption<Mode> HOSTING_MODE;
 
     IntegerEnumDropdownOption HOSTING_SWITCH;
     SimpleIntegerOption<uint16_t> MAX_WINS;
     std::unique_ptr<PerConsoleTeraFarmerOptions> PLAYERS[4];
 
+    enum class RecoveryMode{
+        STOP_ON_ERROR,
+        SAVE_AND_RESET,
+    };
+    EnumDropdownOption<RecoveryMode> RECOVERY_MODE;
     BooleanCheckBoxOption ROLLOVER_PREVENTION;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
     WallClock m_last_time_fix;
+    bool m_errored[4];
 };
 
 

@@ -61,8 +61,10 @@ void save_game_from_menu_impl(const ProgramInfo& info, ConsoleHandle& console, B
             saved = true;
             continue;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "SaveGameFailed",
-                "save_game_from_menu(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                info, console, "SaveGameFailed",
+                "save_game_from_menu(): No recognized state after 60 seconds."
+            );
         }
     }
 }
