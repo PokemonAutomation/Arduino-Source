@@ -285,7 +285,7 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context, std::chrono::seconds(60),
-            {lobby}
+            {{lobby, std::chrono::milliseconds(500)}}
         );
         if (ret < 0){
             throw OperationFailedException(console.logger(), "Unable to join lobby.");

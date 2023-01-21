@@ -195,7 +195,7 @@ WallClock AutoHost::wait_for_lobby_open(
     int ret = wait_until(
         env.console, context,
         std::chrono::seconds(60),
-        {lobby}
+        {{lobby, std::chrono::milliseconds(500)}}
     );
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(

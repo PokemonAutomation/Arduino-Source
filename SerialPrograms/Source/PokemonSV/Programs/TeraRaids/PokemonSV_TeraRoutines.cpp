@@ -127,7 +127,11 @@ void open_hosting_lobby(
         int ret = wait_until(
             console, context,
             std::chrono::seconds(30),
-            {overworld, card_detector, lobby}
+            {
+                overworld,
+                card_detector,
+                {lobby, std::chrono::milliseconds(500)}
+            }
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
