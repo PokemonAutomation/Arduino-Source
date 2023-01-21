@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <fstream>
 #include <QFile>
 #include "Common/Cpp/Exceptions.h"
