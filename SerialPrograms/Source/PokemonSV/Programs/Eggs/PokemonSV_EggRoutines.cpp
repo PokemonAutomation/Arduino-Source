@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -627,7 +628,39 @@ bool check_baby_info(
     return shiny;
 }
 
+bool check_stats_reset_info(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
+    Pokemon::EggHatchAction& action
+) {
+    context.wait_for_all_requests();
 
+    change_stats_view_to_judge(info, console, context);
+
+    VideoOverlaySet overlay_set(console.overlay());
+
+    BoxShinyWatcher shiny_detector;
+    // BoxShinyDetector shiny_detector;
+    shiny_detector.make_overlays(overlay_set);
+
+    IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
+    BoxGenderDetector gender_detector;
+    gender_detector.make_overlays(overlay_set);
+
+    const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(200), { shiny_detector });
+    const bool shiny = (shiny_ret == 0);
+    VideoSnapshot screen = console.video().snapshot();
+
+    IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    EggHatchGenderFilter gender = gender_detector.detect(screen);
+
+    console.log(IVs.to_string(), COLOR_GREEN);
+    console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+
+    action = FILTERS.get_action(shiny, IVs, gender);
+
+    return shiny;
+}
 
 
 

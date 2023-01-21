@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonSV_EggRoutines_H
 #define PokemonAutomation_PokemonSV_EggRoutines_H
 
+#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include <functional>
 
@@ -100,6 +101,13 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
+    Pokemon::EggHatchAction& action
+);
+
+//This is a similar to check_baby_info, except for Stats Reset
+bool check_stats_reset_info(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
     Pokemon::EggHatchAction& action
 );
 

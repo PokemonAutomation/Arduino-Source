@@ -199,7 +199,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             //Check the IVs of the newly caught Pokemon - *must be on IV panel*
             EggHatchAction action = EggHatchAction::Keep;
-            check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action);
+            //This is an edited version of check_baby_info
+            check_stats_reset_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action);
 
             switch (action) {
             case EggHatchAction::StopProgram:
