@@ -76,7 +76,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
         //  Reset game
-        reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
+        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
 
     if (FIX_TIME_WHEN_DONE) {

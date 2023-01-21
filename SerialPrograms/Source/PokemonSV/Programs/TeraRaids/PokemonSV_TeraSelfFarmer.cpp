@@ -45,7 +45,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         "PokemonSV:TeraSelfFarmer",
         STRING_POKEMON + " SV", "Tera Self Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraSelfFarmer.md",
-        "Farm items from Tera raids.",
+        "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny raids.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -110,7 +110,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         "<b>Mode:</b>",
         database(),
         LockWhileRunning::LOCKED,
-        Mode::CATCH_ALL
+        Mode::SHINY_HUNT
     )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",

@@ -62,19 +62,20 @@ bool run_tera_battle(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            env.log("Detected battle menu.");
+            console.log("Detected battle menu.");
             if (next_turn_on_battle_menu){
-                env.log("Detected battle menu. Turn: " + std::to_string(turn));
+                console.log("Detected battle menu. Turn: " + std::to_string(turn));
                 turn++;
                 if (turn < move_table.size()){
                     current_move = move_table[turn];
                 }
                 next_turn_on_battle_menu = false;
             }
-            env.log("Current Move Selection: " + current_move.to_str());
+            console.log("Current Move Selection: " + current_move.to_str());
             switch (current_move.type){
             case TeraMoveType::Wait:
                 context.wait_for(std::chrono::seconds(current_move.seconds));
+                next_turn_on_battle_menu = true;
                 continue;
             case TeraMoveType::Move1:
             case TeraMoveType::Move2:
@@ -114,7 +115,7 @@ bool run_tera_battle(
             continue;
         }
         case 1:{
-            env.log("Detected move select. Turn: " + std::to_string(turn));
+            console.log("Detected move select. Turn: " + std::to_string(turn));
             consecutive_move_select++;
 
             uint8_t index = 0;
@@ -139,7 +140,7 @@ bool run_tera_battle(
             //  If we end up here consecutively too many times, the move is
             //  probably disabled. Select a different move.
             if (consecutive_move_select > 3){
-                env.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+                console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
 //                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
                 index++;
                 if (index >= 4){
@@ -148,12 +149,12 @@ bool run_tera_battle(
                 current_move.type = (TeraMoveType)((uint8_t)TeraMoveType::Move1 + index);
             }
             if (terastallizing.detect(console.video().snapshot())){
-                env.log("Terastallization: Available");
+                console.log("Terastallization: Available");
                 if (battle_AI.TRY_TO_TERASTILLIZE){
                     pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
                 }
             }else{
-                env.log("Terastallization: Not Available");
+                console.log("Terastallization: Not Available");
             }
             if (move_select_menu.move_to_slot(console, context, index)){
                 pbf_press_button(context, BUTTON_A, 20, 10);
@@ -161,7 +162,7 @@ bool run_tera_battle(
             continue;
         }
         case 2:
-            env.log("Detected target select. Turn: " + std::to_string(turn));
+            console.log("Detected target select. Turn: " + std::to_string(turn));
             consecutive_move_select = 0;
             switch (current_move.type){
             case TeraMoveType::Move1:
@@ -177,11 +178,11 @@ bool run_tera_battle(
                 continue;
             }
         case 3:
-            env.log("Detected a win!", COLOR_BLUE);
+            console.log("Detected a win!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 4:
-            env.log("Detected a loss!", COLOR_ORANGE);
+            console.log("Detected a loss!", COLOR_ORANGE);
             return false;
         default:
             consecutive_timeouts++;
@@ -192,7 +193,7 @@ bool run_tera_battle(
                     "No state detected after 6 minutes."
                 );
             }
-            env.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
+            console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 250);
         }
     }

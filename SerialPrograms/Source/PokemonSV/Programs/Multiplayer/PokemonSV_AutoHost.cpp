@@ -10,7 +10,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/TimeQt.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -97,12 +97,12 @@ AutoHost::AutoHost()
     , MODE(
         "<b>Hosting Mode:</b>",
         {
-            {Mode::LOCAL,           "local",            "Host Locally"},
-            {Mode::ONLINE_CODED,    "online-coded",     "Host Online (link code)"},
-            {Mode::ONLINE_EVERYONE, "online-everyone",  "Host Online (everyone)"},
+            {HostingMode::LOCAL,            "local",            "Host Locally"},
+            {HostingMode::ONLINE_CODED,     "online-coded",     "Host Online (link code)"},
+            {HostingMode::ONLINE_EVERYONE,  "online-everyone",  "Host Online (everyone)"},
         },
         LockWhileRunning::UNLOCKED,
-        Mode::ONLINE_CODED
+        HostingMode::ONLINE_CODED
     )
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay (in seconds):</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
@@ -328,7 +328,7 @@ bool AutoHost::run_lobby(
 }
 void AutoHost::check_kill_switch(ProgramEnvironment& env){
     std::string kill_switch_url = REMOTE_KILL_SWITCH0;
-    if (MODE == Mode::LOCAL || kill_switch_url.empty()){
+    if (MODE == HostingMode::LOCAL || kill_switch_url.empty()){
         return;
     }
 
@@ -444,7 +444,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                     last_time_fix = now;
                 }
             }
-            reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
+            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
         }
         skip_reset = false;
 
@@ -453,11 +453,10 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         //  Store the mode locally in case the user changes in the middle of
         //  this iteration.
-        Mode mode = MODE;
+        HostingMode mode = MODE;
 
-        if (mode != Mode::LOCAL){
+        if (mode != HostingMode::LOCAL){
             //  Connect to internet.
-//            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Online mode has not been implemented yet.");
             try{
                 connect_to_internet_from_overworld(env.program_info(), env.console, context);
             }catch (OperationFailedException&){
@@ -478,15 +477,25 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         BAN_LIST.refresh_online_table(env.logger());
 
+#if 1
+        try{
+            open_hosting_lobby(env.program_info(), env.console, context, mode);
+        }catch (OperationFailedException&){
+            consecutive_failures++;
+            stats.m_errors++;
+            continue;
+        }
+#else
         pbf_press_button(context, BUTTON_A, 20, 230);
-        if (mode != Mode::LOCAL){
-            if (mode == Mode::ONLINE_EVERYONE){
+        if (mode != HostingMode::LOCAL){
+            if (mode == HostingMode::ONLINE_EVERYONE){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             }
             pbf_press_button(context, BUTTON_A, 20, 230);
         }
-
         context.wait_for_all_requests();
+#endif
+
         try{
             std::string lobby_code;
             std::array<std::map<Language, std::string>, 4> player_names;

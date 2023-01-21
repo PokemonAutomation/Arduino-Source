@@ -12,7 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV_FastCodeEntry.h"
+#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
 #include "PokemonSV_ClipboardFastCodeEntry.h"
 
 namespace PokemonAutomation{

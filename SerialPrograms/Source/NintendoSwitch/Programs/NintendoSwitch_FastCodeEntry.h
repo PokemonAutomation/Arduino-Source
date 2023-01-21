@@ -74,10 +74,11 @@ void move_codeboard(BotBaseContext& context, const DigitPath& path);
 struct FastCodeEntrySettings{
     KeyboardLayout keyboard_layout = KeyboardLayout::QWERTY;
     bool include_plus = true;
-    uint8_t scroll_delay = 6;
-    uint8_t wrap_delay = 6;
+    uint8_t scroll_delay = 8;
+    uint8_t wrap_delay = 8;
     bool digit_reordering = false;
 
+    FastCodeEntrySettings() = default;
     FastCodeEntrySettings(FastCodeEntrySettingsOption& option);
 };
 void enter_alphanumeric_code(

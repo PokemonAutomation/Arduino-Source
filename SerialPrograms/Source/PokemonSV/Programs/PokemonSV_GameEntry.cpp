@@ -125,7 +125,7 @@ bool gamemenu_to_ingame(ConsoleHandle& console, BotBaseContext& context){
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint16_t post_wait_time
 ){
     console.overlay().add_log("Reset game", COLOR_WHITE);
@@ -133,7 +133,7 @@ bool reset_game_from_home(
     ok &= reset_game_to_gamemenu(console, context);
     ok &= gamemenu_to_ingame(console, context);
     if (!ok){
-        dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
+        dump_image(console.logger(), info, "StartGame", console.video().snapshot());
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);

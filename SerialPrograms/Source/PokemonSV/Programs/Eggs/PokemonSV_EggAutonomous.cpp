@@ -679,7 +679,7 @@ void EggAutonomous::reset_game(SingleSwitchProgramEnvironment& env, BotBaseConte
     try{
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
-        reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
+        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     } catch(OperationFailedException &e){
         // To be safe: avoid doing anything outside of game on Switch,
         // make game resetting non error recoverable

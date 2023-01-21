@@ -129,7 +129,7 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
                 || object.max_x + 1 >= width || object.max_y + 1 >= height // touching right or bottom edge
                 || (object.max_x > width * 0.82 && object.max_y > height * 0.68) // touches mini map area
                 || object.width() < width * 0.0926 || object.height() < height * 0.0926 // object is too small
-                ) {
+            ){
                 continue;
             }
 
@@ -175,7 +175,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseC
 
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
-        reset_game_from_home(env, env.console, context, TICKS_PER_SECOND);
+        reset_game_from_home(env.program_info(), env.console, context, TICKS_PER_SECOND);
     }
     catch (OperationFailedException& e) {
         AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();

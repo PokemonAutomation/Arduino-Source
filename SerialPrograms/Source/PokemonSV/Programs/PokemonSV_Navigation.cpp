@@ -17,9 +17,7 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
@@ -373,85 +371,6 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
         );
     }
 }
-
-
-
-
-
-void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    bool connect_to_internet
-){
-    WallClock start = current_time();
-    bool connected = false;
-    while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "EnterTeraSearchFailed",
-                "enter_tera_search(): Failed to enter Tera search."
-            );
-        }
-
-        OverworldWatcher overworld(COLOR_RED);
-        MainMenuWatcher main_menu(COLOR_YELLOW);
-        PokePortalWatcher poke_portal(COLOR_GREEN);
-        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
-        CodeEntryWatcher code_entry(COLOR_PURPLE);
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(60),
-            {
-                overworld,
-                main_menu,
-                poke_portal,
-                raid_search,
-                code_entry,
-            }
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105);
-            continue;
-        case 1:
-            console.log("Detected main menu.");
-            if (connect_to_internet && !connected){
-                connect_to_internet_from_menu(info, console, context);
-                connected = true;
-                continue;
-            }
-            if (main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 3)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
-            }
-            continue;
-        case 2:
-            console.log("Detected Poke Portal.");
-            if (poke_portal.move_cursor(info, console, context, 1)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
-            }
-            continue;
-        case 3:
-            console.log("Detected Tera Raid Search.");
-            if (raid_search.move_cursor_to_search(info, console, context)){
-                pbf_press_button(context, BUTTON_A, 20, 105);
-            }
-            continue;
-        case 4:
-            console.log("Detected Code Entry.");
-            return;
-        default:
-            dump_image_and_throw_recoverable_exception(
-                info, console, "EnterTeraSearchFailed",
-                "enter_tera_search(): No recognized state after 60 seconds."
-            );
-        }
-    }
-}
-
-
-
 
 
 

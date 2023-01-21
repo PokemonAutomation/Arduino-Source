@@ -22,6 +22,7 @@
 #include "Programs/General/PokemonSV_StatsReset.h"
 
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
+#include "Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h"
 
 #include "Programs/Multiplayer/PokemonSV_FastCodeEntry.h"
 #include "Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h"
@@ -70,6 +71,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_multi_switch_program<TeraMultiFarmer_Descriptor, TeraMultiFarmer>());
+    }
     ret.emplace_back(make_single_switch_program<GimmighoulRoamingFarmer_Descriptor, GimmighoulRoamingFarmer>());
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
     ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());

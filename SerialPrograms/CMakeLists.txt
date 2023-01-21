@@ -1322,6 +1322,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
+    Source/PokemonSV/Programs/PokemonSV_CodeEntry.cpp
+    Source/PokemonSV/Programs/PokemonSV_CodeEntry.h
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
@@ -1334,6 +1336,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp

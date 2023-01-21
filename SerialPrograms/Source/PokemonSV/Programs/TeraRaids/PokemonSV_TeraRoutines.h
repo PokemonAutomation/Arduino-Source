@@ -9,8 +9,9 @@
 
 //#include <stdint.h>
 #include <string>
+#include <atomic>
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+//#include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{
     class ConsoleHandle;
@@ -25,11 +26,32 @@ namespace PokemonSV{
 
 
 
+
+
 //  While in the overworld, attempt to enter a raid in front of you.
 bool open_raid(ConsoleHandle& console, BotBaseContext& context);
 
 //  While viewing a raid card, close and return to the overworld.
 void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+
+enum class HostingMode{
+    LOCAL,
+    ONLINE_CODED,
+    ONLINE_EVERYONE,
+};
+void open_hosting_lobby(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    HostingMode mode
+);
+
+
+//  From overworld or main menu => Code entry for tera raid.
+void enter_tera_search(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool connect_to_internet
+);
+
 
 
 
@@ -41,6 +63,18 @@ void exit_tera_win_without_catching(
     const ProgramInfo& info,
     ConsoleHandle& console,
     BotBaseContext& context
+);
+
+
+//  Exit a Tera raid after winning by catching.
+//  The entry point is with the catch/no-catch option up.
+//  Does not check for shininess.
+void exit_tera_win_by_catching(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    Language language,
+    const std::string& ball_slug
 );
 
 

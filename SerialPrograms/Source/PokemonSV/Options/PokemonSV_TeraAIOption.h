@@ -22,7 +22,6 @@ class TeraAIOption : public GroupOption{
 public:
     TeraAIOption();
 
-
 public:
     StaticTextOption description;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;

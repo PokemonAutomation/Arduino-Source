@@ -75,6 +75,8 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
+#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
 
 
 #include <QPixmap>
@@ -186,7 +188,38 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-    enter_tera_search(env.program_info(), console, context, false);
+//    enter_tera_search(env.program_info(), console, context, false);
+//    open_hosting_lobby(env.program_info(), console, context, HostingMode::ONLINE_CODED);
+
+    size_t host_index = 1;
+    ConsoleHandle& host = env.consoles[host_index];
+    BotBaseContext host_context(scope, host.botbase());
+
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        if (console.index() == host_index){
+            open_raid(console, context);
+        }else{
+            enter_tera_search(env.program_info(), console, context, true);
+        }
+    });
+    open_hosting_lobby(env.program_info(), host, host_context, HostingMode::ONLINE_CODED);
+
+    TeraLobbyReader lobby_reader;
+    std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host.video().snapshot());
+    std::string normalized_code;
+    const char* error = normalize_code(normalized_code, code);
+    if (error){
+//        pbf_press_button(host_context, BUTTON_B, 20, 230);
+//        pbf_press_button(host_context, BUTTON_A, 20, 230);
+        throw OperationFailedException(env.logger(), "Unable to read raid code.");
+    }
+
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        if (console.index() == host_index){
+            return;
+        }
+        enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+    });
 
 
 

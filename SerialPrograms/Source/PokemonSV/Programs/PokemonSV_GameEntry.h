@@ -12,6 +12,7 @@
 namespace PokemonAutomation{
     class ConsoleHandle;
     class BotBaseContext;
+    struct ProgramInfo;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -30,7 +31,7 @@ bool gamemenu_to_ingame(ConsoleHandle& console, BotBaseContext& context);
 // post_wait_time: how many ticks to wait after the black screen (shown when loading the map) is over.
 // Return whether it successfully enters the game
 bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint16_t post_wait_time = 125
 );
 

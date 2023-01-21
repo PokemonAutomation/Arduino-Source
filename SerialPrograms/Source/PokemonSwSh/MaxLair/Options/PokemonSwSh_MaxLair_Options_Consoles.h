@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Language.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+//#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh_MaxLair_Options.h"
 
 namespace PokemonAutomation{

@@ -45,12 +45,6 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-//  From overworld or main menu => Code entry for tera raid.
-void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    bool connect_to_internet
-);
-
 
 }
 }

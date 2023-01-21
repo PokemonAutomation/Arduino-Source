@@ -244,7 +244,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             stats.resets++;
             env.update_stats();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, context, 5 * TICKS_PER_SECOND);
+            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
         }
     }
     env.update_stats();

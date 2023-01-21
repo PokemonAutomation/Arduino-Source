@@ -16,12 +16,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const char* enter_code(
-    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-    const FastCodeEntrySettings& settings, const std::string& code,
-    bool connect_controller_press
-);
-
 
 class FastCodeEntry_Descriptor : public MultiSwitchProgramDescriptor{
 public:

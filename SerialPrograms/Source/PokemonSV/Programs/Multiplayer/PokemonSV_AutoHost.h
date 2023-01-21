@@ -15,6 +15,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
@@ -61,13 +62,7 @@ private:
 private:
 //    OCR::LanguageOCR LANGUAGE;
 
-    enum class Mode{
-        LOCAL,
-        ONLINE_CODED,
-        ONLINE_EVERYONE,
-    };
-
-    EnumDropdownOption<Mode> MODE;
+    EnumDropdownOption<HostingMode> MODE;
 
     SimpleIntegerOption<uint16_t> LOBBY_WAIT_DELAY;
     IntegerEnumDropdownOption START_RAID_PLAYERS;
