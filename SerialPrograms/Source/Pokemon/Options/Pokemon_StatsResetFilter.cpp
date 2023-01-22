@@ -5,13 +5,8 @@
  */
 
 #include "Common/Compiler.h"
-// #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "Pokemon_StatsResetFilter.h"
 #include "Pokemon_EggHatchFilter.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -23,27 +18,9 @@ const EnumDatabase<EggHatchAction>& StatsResetAction_Database() {
         });
     return database;
 }
-const EnumDatabase<EggHatchShinyFilter>& StatsResetShinyFilter_Database() {
-    static const EnumDatabase<EggHatchShinyFilter> database({
-        {EggHatchShinyFilter::Anything, "anything",     "Anything"},
-        {EggHatchShinyFilter::NotShiny, "not-shiny",    "Not Shiny"},
-        {EggHatchShinyFilter::Shiny,    "shiny",        "Shiny"},
-        });
-    return database;
-}
-const EnumDatabase<EggHatchGenderFilter>& StatsResetGenderFilter_Database() {
-    static const EnumDatabase<EggHatchGenderFilter> database({
-        {EggHatchGenderFilter::Any,         "any",          "Any"},
-        {EggHatchGenderFilter::Male,        "male",         "Male"},
-        {EggHatchGenderFilter::Female,      "female",       "Female"},
-        });
-    return database;
-}
 
 StatsResetFilterRow::StatsResetFilterRow()
     : action(StatsResetAction_Database(), LockWhileRunning::LOCKED, EggHatchAction::Keep)
-    , shiny(StatsResetShinyFilter_Database(), LockWhileRunning::LOCKED, EggHatchShinyFilter::Anything)
-    , gender(StatsResetGenderFilter_Database(), LockWhileRunning::LOCKED, EggHatchGenderFilter::Any)
     , iv_hp(IVCheckerFilter::Anything)
     , iv_atk(IVCheckerFilter::Anything)
     , iv_def(IVCheckerFilter::Anything)
@@ -51,9 +28,6 @@ StatsResetFilterRow::StatsResetFilterRow()
     , iv_spdef(IVCheckerFilter::Anything)
     , iv_speed(IVCheckerFilter::Anything)
 {
-    //PA_ADD_OPTION(action);
-    //PA_ADD_OPTION(shiny);
-    //PA_ADD_OPTION(gender);
     PA_ADD_OPTION(iv_hp);
     PA_ADD_OPTION(iv_atk);
     PA_ADD_OPTION(iv_def);
@@ -61,16 +35,10 @@ StatsResetFilterRow::StatsResetFilterRow()
     PA_ADD_OPTION(iv_spdef);
     PA_ADD_OPTION(iv_speed);
 }
-StatsResetFilterRow::StatsResetFilterRow(EggHatchShinyFilter p_shiny)
-    : StatsResetFilterRow()
-{
-    shiny.set(p_shiny);
-}
+
 std::unique_ptr<EditableTableRow> StatsResetFilterRow::clone() const{
     std::unique_ptr<StatsResetFilterRow> ret(new StatsResetFilterRow());
     ret->action.set(action);
-    ret->shiny.set(shiny);
-    ret->gender.set(gender);
     ret->iv_hp.set(iv_hp);
     ret->iv_atk.set(iv_atk);
     ret->iv_def.set(iv_def);
@@ -91,9 +59,6 @@ StatsResetFilterTable::StatsResetFilterTable()
 {}
 std::vector<std::string> StatsResetFilterTable::make_header() const{
     return std::vector<std::string>{
-        //"Action",
-        //"Shininess",
-        //"Gender",
         "HP",
         "Attack",
         "Defense",
@@ -104,12 +69,11 @@ std::vector<std::string> StatsResetFilterTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> StatsResetFilterTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new StatsResetFilterRow(EggHatchShinyFilter::Shiny));
+    ret.emplace_back(new StatsResetFilterRow());
     return ret;
 }
 
-
-EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const{
+EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs) const{
     EggHatchAction action = EggHatchAction::Release;
     std::vector<std::unique_ptr<StatsResetFilterRow>> list = copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){

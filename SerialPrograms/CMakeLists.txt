@@ -1224,6 +1224,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp

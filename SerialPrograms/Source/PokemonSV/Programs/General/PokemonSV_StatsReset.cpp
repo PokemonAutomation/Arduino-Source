@@ -15,13 +15,13 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
-#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV_StatsReset.h"
 
 namespace PokemonAutomation{
@@ -204,14 +204,6 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             switch (action) {
             case EggHatchAction::StopProgram:
-                //Correct stats found, end program
-                stats_matched = true;
-                env.console.log("Program stop requested...");
-                send_program_status_notification(
-                    env, NOTIFICATION_PROGRAM_FINISH,
-                    "Match found!"
-                );
-                break;
             case EggHatchAction::Keep:
                 //Correct stats found, end program
                 stats_matched = true;

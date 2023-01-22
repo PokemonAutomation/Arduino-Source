@@ -20,13 +20,10 @@ namespace Pokemon{
 class StatsResetFilterRow : public EditableTableRow{
 public:
     StatsResetFilterRow();
-    StatsResetFilterRow(EggHatchShinyFilter p_shiny);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
     EnumDropdownCell<EggHatchAction> action;
-    EnumDropdownCell<EggHatchShinyFilter> shiny;
-    EnumDropdownCell<EggHatchGenderFilter> gender;
     IVCheckerFilterCell iv_hp;
     IVCheckerFilterCell iv_atk;
     IVCheckerFilterCell iv_def;
@@ -41,8 +38,9 @@ public:
     virtual std::vector<std::string> make_header() const override;
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
-    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const;
+    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs) const;
 };
+
 }
 }
 #endif
