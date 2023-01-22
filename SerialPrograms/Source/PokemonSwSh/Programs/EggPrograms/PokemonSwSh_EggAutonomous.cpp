@@ -234,6 +234,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             stats.m_errors++;
             env.update_stats();
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
@@ -243,7 +244,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             // If there is no auto save, then we shouldn't reset to game to lose previous progress.
             if (AUTO_SAVING == AutoSave::NoAutoSave){
-                throw e;
+                throw;
             }
 
             consecutive_failures++;

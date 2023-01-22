@@ -145,6 +145,7 @@ RideCloner101::RideCloner101()
         &NOTIFICATION_NONSHINY,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -375,14 +376,18 @@ bool RideCloner101::run_post_win(
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
-            }catch (OperationFailedException&){}
+            }catch (OperationFailedException& e){
+                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            }
             continue;
         case 7:
             console.log("Detected overworld.");
             break;
         default:
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "FailedPostRaidWin",
-                "run_post_win(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), console, "FailedPostRaidWin",
+                "run_post_win(): No recognized state after 60 seconds."
+            );
         }
         break;
     }

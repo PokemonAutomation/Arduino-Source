@@ -407,74 +407,24 @@ void send_program_recoverable_error_notification(
         image, keep_file
     );
 }
-
-
-
-
-
-
-void send_program_finished_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
-    const std::string& message,
-    const StatsTracker* current_stats,
-    const StatsTracker* historical_stats,
-    const ImageViewRGB32& image, bool keep_file
-){
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message:", message},
-    };
-#if 1
-    messages.emplace_back(
-        make_session_field(info, current_stats, "")
-    );
-#else
-    if (!current_stats.empty()){
-        messages.emplace_back("Session Stats:", std::move(current_stats));
-    }
-#endif
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats:", historical_stats->to_str());
-    }
-    send_raw_program_notification(
-        logger, settings,
-        COLOR_GREEN, info,
-        "Program Finished",
-        messages,
-        image, keep_file
-    );
-}
 void send_program_fatal_error_notification(
-    Logger& logger, EventNotificationOption& settings,
-    const ProgramInfo& info,
+    ProgramEnvironment& env, EventNotificationOption& settings,
     const std::string& message,
-    const StatsTracker* current_stats,
-    const StatsTracker* historical_stats,
     const ImageViewRGB32& image, bool keep_file
 ){
-    std::vector<std::pair<std::string, std::string>> messages{
-        {"Message:", message},
-    };
-#if 1
-    messages.emplace_back(
-        make_session_field(info, current_stats, "")
-    );
-#else
-    if (!current_stats.empty()){
-        messages.emplace_back("Session Stats:", std::move(current_stats));
-    }
-#endif
-    if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats:", historical_stats->to_str());
-    }
-    send_raw_program_notification(
-        logger, settings,
-        COLOR_RED, info,
+    send_program_notification(
+        env, settings,
+        COLOR_RED,
         "Program Stopped (Fatal Error)",
-        messages,
+        {{"Message:", message}}, "",
         image, keep_file
     );
 }
+
+
+
+
+
 
 
 

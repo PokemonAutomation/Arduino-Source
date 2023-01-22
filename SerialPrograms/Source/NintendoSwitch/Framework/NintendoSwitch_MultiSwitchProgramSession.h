@@ -53,14 +53,13 @@ private:
     virtual void startup(size_t switch_count) override;
 
 private:
-    void run_program_instance(const ProgramInfo& info);
+    void run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
 
 private:
     MultiSwitchProgramOption& m_option;
     MultiSwitchSystemSession m_system;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    SpinLock m_lock;
     CancellableScope* m_scope = nullptr;
 
     std::set<Listener*> m_listeners;

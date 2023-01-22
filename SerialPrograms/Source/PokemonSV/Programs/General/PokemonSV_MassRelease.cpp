@@ -138,14 +138,14 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         }
     }
 
-    try {
+    try{
         size_t errors = 0;
         release_one_pokemon(env.program_info(), env.console, context, errors);
         stats.m_released++;
         stats.m_errors += errors;
-    } catch(OperationFailedException& e){
+    }catch (OperationFailedException&){
         stats.m_errors++;
-        throw e;
+        throw;
     }
 }
 void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){

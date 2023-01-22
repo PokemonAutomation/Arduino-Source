@@ -105,6 +105,7 @@ BurmyFinder::BurmyFinder()
         &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
         &MATCH_DETECTED_OPTIONS.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
     , SAVE_DEBUG_VIDEO(
@@ -780,8 +781,10 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             run_iteration(env, context, counters);
-        }catch (OperationFailedException&){
+        }catch (OperationFailedException& e){
             stats.errors++;
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }

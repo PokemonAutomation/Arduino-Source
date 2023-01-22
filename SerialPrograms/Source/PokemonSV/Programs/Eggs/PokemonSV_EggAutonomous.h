@@ -61,7 +61,12 @@ private:
 
     void reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg);
 
-    void handle_recoverable_error(SingleSwitchProgramEnvironment& env, BotBaseContext& context, OperationFailedException& e, size_t& consecutive_failures);
+    void handle_recoverable_error(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        EventNotificationOption& notification,
+        OperationFailedException& e,
+        size_t& consecutive_failures
+    );
 
     // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::function<void())
 

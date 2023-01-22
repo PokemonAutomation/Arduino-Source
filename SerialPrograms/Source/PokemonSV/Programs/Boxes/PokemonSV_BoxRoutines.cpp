@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -335,9 +336,10 @@ uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& conso
 }
 
 void load_one_column_to_party(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    uint8_t column_index, bool has_clone_ride_pokemon)
-{
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    EventNotificationOption& notification,
+    uint8_t column_index, bool has_clone_ride_pokemon
+){
     context.wait_for_all_requests();
     console.log("Load column " + std::to_string(column_index) + " to party.");
     console.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
@@ -345,15 +347,17 @@ void load_one_column_to_party(
     size_t fail_count = 0;
     while (true){
         // Move cursor to the target column
-        move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-        hold_one_column(info, console, context);
+        move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+        hold_one_column(env.program_info(), console, context);
         try{
             // Move the held column to party
-            move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
-        }catch (OperationFailedException&){
+            move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+        }catch (OperationFailedException& e){
+            e.send_notification(env, notification);
+
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
-                    info, console, "ConsecutiveColumnMoveFailure",
+                    env.program_info(), console, "ConsecutiveColumnMoveFailure",
                     "load_one_column_to_party(): consecutive failure of moving column around."
                 );
             }
@@ -361,21 +365,22 @@ void load_one_column_to_party(
             // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
             // the column selection.
             // We can press B to back out and try again.
-            cancel_held_pokemon(info, console, context);
+            cancel_held_pokemon(env.program_info(), console, context);
             continue;
         }
         break;
     }
 
     // Drop the column to party
-    drop_held_pokemon(info, console, context);
+    drop_held_pokemon(env.program_info(), console, context);
 
     context.wait_for_all_requests();
     console.log("Loaded column " + std::to_string(column_index) + " to party.");
 }
 
 void unload_one_column_from_party(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
     context.wait_for_all_requests();
@@ -385,16 +390,18 @@ void unload_one_column_from_party(
     size_t fail_count = 0;
     while (true){
         // Move cursor to party column
-        move_box_cursor(info, console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
-        hold_one_column(info, console, context);
+        move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+        hold_one_column(env.program_info(), console, context);
 
         try{
             // Move the held column to target
-            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-        }catch (OperationFailedException&){
+            move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+        }catch (OperationFailedException& e){
+            e.send_notification(env, notification);
+
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
-                    info, console, "ConsecutiveColumnMoveFailure",
+                    env.program_info(), console, "ConsecutiveColumnMoveFailure",
                     "unload_one_column_from_party(): consecutive failure of moving column around."
                 );
             }
@@ -402,13 +409,13 @@ void unload_one_column_from_party(
             // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
             // the column selection.
             // We can press B to back out and try again.
-            cancel_held_pokemon(info, console, context);
+            cancel_held_pokemon(env.program_info(), console, context);
             continue;
         }
         break;
     }
     // Drop the column
-    drop_held_pokemon(info, console, context);
+    drop_held_pokemon(env.program_info(), console, context);
 
     context.wait_for_all_requests();
     console.log("Unloaded party to column " + std::to_string(column_index) + ".");

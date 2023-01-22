@@ -44,7 +44,7 @@ private:
 
 
 private:
-    void run_program_instance(const ProgramInfo& info);
+    void run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
 
 private:
     SingleSwitchProgramOption& m_option;

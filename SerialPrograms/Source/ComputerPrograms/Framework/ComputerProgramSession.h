@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 
 struct ProgramInfo;
 class ComputerProgramOption;
+class ProgramEnvironment;
 
 
 class ComputerProgramSession final : public ProgramSession{
@@ -40,7 +41,7 @@ private:
 
 
 private:
-    void run_program_instance(const ProgramInfo& info);
+    void run_program_instance(ProgramEnvironment& env, CancellableScope& scope);
 
 private:
     ComputerProgramOption& m_option;

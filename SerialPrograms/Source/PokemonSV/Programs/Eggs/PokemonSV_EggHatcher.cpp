@@ -83,6 +83,7 @@ EggHatcher::EggHatcher()
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -106,7 +107,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             }
         }
 
-        load_one_column_to_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+        load_one_column_to_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);
         // Move cursor to party lead so that we can examine rest of party to detect eggs.
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
 
@@ -123,7 +124,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             // Move them back
             env.log("Only non-egg pokemon in column, move them back.");
             env.console.overlay().add_log("No egg in column", COLOR_WHITE);
-            unload_one_column_from_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+            unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);
             continue;
         }
         
@@ -160,7 +161,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             throw FatalProgramException(env.logger(), "detected egg in party after hatching.");
         }
 
-        unload_one_column_from_party(env.program_info(), env.console, context, column_index, HAS_CLONE_RIDE_POKEMON);
+        unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);
     }
 
     context.wait_for_all_requests();
@@ -196,10 +197,10 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             hatch_one_box(env, context);
         }
-    } catch(OperationFailedException& e){
+    } catch(OperationFailedException&){
         stats.m_errors++;
         env.update_stats();
-        throw e;
+        throw;
     }
 
     env.update_stats();

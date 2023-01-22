@@ -29,6 +29,7 @@ MultiSwitchSystemSession::MultiSwitchSystemSession(
 )
     : m_option(option)
     , m_program_id(program_id)
+    , m_switch_count_locked(false)
     , m_consoles(option.count())
 {
     size_t count = option.count();
@@ -37,8 +38,20 @@ MultiSwitchSystemSession::MultiSwitchSystemSession(
     }
 }
 
-void MultiSwitchSystemSession::set_switch_count(size_t count){
+void MultiSwitchSystemSession::lock(){
     std::lock_guard<std::mutex> lg(m_lock);
+    m_switch_count_locked = true;
+}
+void MultiSwitchSystemSession::unlock(){
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_switch_count_locked = false;
+}
+bool MultiSwitchSystemSession::set_switch_count(size_t count){
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_switch_count_locked){
+        return false;
+    }
+
     for (Listener* listener : m_listeners){
         listener->shutdown();
     }
@@ -50,7 +63,10 @@ void MultiSwitchSystemSession::set_switch_count(size_t count){
     for (Listener* listener : m_listeners){
         listener->startup(count);
     }
+
+    return true;
 }
+
 
 
 

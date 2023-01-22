@@ -16,8 +16,7 @@
 #define PokemonAutomationn_NintendoSwitch_MultiSwitchSystemSession_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "NintendoSwitch_SingleSwitchProgramSession.h"
+#include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch_MultiSwitchSystemOption.h"
 
 namespace PokemonAutomation{
@@ -45,7 +44,12 @@ public:
         uint64_t program_id
     );
 
-    void set_switch_count(size_t count);
+    //  Lock/unlock the Switch count.
+    void lock();
+    void unlock();
+
+    //  Returns true only on success.
+    bool set_switch_count(size_t count);
 
     size_t min_switches() const{ return m_option.min_switches(); }
     size_t max_switches() const{ return m_option.max_switches(); }
@@ -61,6 +65,7 @@ private:
     const uint64_t m_program_id;
 
     std::mutex m_lock;
+    bool m_switch_count_locked;
     FixedLimitVector<SwitchSystemSession> m_consoles;
     std::set<Listener*> m_listeners;
 };

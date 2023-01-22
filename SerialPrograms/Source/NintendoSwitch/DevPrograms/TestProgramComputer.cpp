@@ -20,6 +20,7 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -182,7 +183,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-
+//    throw OperationFailedException(env.logger(), "asdf");
+//    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
+//    throw ProgramFinishedException();
+    throw FatalProgramException(env.logger(), "test");
 
 
 

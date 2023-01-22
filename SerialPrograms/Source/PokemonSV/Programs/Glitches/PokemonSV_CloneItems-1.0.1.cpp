@@ -243,8 +243,10 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         default:
             stats.m_errors++;
 
-            dump_image_and_throw_recoverable_exception(env, console, NOTIFICATION_ERROR_RECOVERABLE,
-                "CloneItemNoState", "No recognized state after 10 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                env, console, NOTIFICATION_ERROR_RECOVERABLE,
+                "CloneItemNoState", "No recognized state after 10 seconds."
+            );
         }
 
     }
@@ -264,7 +266,9 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             cloned++;
             stats.m_cloned++;
             continue;
-        }catch (OperationFailedException&){}
+        }catch (OperationFailedException& e){
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+        }
 
         env.console.log("Attempting to recover by backing out to a known state.", COLOR_RED);
 

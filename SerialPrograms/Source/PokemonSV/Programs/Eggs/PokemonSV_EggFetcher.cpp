@@ -132,10 +132,10 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 break;
             }
         }
-    } catch(OperationFailedException& e){
+    } catch(OperationFailedException&){
         stats.m_errors++;
         env.update_stats();
-        throw e;
+        throw;
     }
 
     env.update_stats();

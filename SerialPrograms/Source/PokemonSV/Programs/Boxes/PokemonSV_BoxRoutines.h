@@ -13,6 +13,8 @@
 namespace PokemonAutomation{
     
     struct ProgramInfo;
+    class ProgramEnvironment;
+    class EventNotificationOption;
     class ConsoleHandle;
     class BotBaseContext;
 
@@ -62,13 +64,19 @@ uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& conso
 
 //  In box system, assuming the party is empty, load one column in the current box onto party.
 //  if has_clone_ride_pokemon is true, skip loading the first row of the box.
-void load_one_column_to_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    uint8_t column_index, bool has_clone_ride_pokemon);
+void load_one_column_to_party(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    EventNotificationOption& notification,
+    uint8_t column_index, bool has_clone_ride_pokemon
+);
 
 //  In box system, assuming the target column is empty, unload party (after the lead) to the target column.
 //  if has_clone_ride_pokemon is true, skip unloading the second row of the party.
-void unload_one_column_from_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    uint8_t column_index, bool has_clone_ride_pokemon);
+void unload_one_column_from_party(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    EventNotificationOption& notification,
+    uint8_t column_index, bool has_clone_ride_pokemon
+);
 
 //  In box system, move the cursor to the desired slot.
 void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,

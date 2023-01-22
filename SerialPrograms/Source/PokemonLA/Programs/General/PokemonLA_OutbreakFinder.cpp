@@ -649,10 +649,9 @@ bool OutbreakFinder::run_iteration(
     //  Enter map.
     try{
         open_travel_map_from_jubilife(env, env.console, context);
-    } catch(OperationFailedException& e)
-    {
+    }catch (OperationFailedException&){
         stats.errors++;
-        throw e;
+        throw;
     }
     context.wait_for(std::chrono::milliseconds(500));
 

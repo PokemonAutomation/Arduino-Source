@@ -488,9 +488,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         try {
             choose_apricorn(env, context, sport);
         }
-        catch (OperationFailedException&) {
+        catch (OperationFailedException& e) {
             stats.errors++;
             env.update_stats();
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3) {

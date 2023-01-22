@@ -29,7 +29,7 @@ ConsoleHandle::ConsoleHandle(
     size_t index,
     Logger& logger,
 //    ThreadHandle& handle,
-    BotBase& botbase,
+    BotBase* botbase,
     VideoFeed& video,
     VideoOverlay& overlay,
     AudioFeed& audio

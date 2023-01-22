@@ -429,7 +429,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             if (run_raid(env, scope)){
                 wins++;
             }
-        }catch (OperationFailedException&){
+        }catch (OperationFailedException& e){
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.

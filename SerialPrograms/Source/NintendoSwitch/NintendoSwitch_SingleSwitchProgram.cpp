@@ -54,6 +54,7 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
     , NOTIFICATION_ERROR_FATAL(
         "Program Error (Fatal)",
         true, true,
+        ImageAttachmentMode::PNG,
         error_notification_tags
     )
 {}

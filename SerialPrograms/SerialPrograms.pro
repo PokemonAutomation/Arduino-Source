@@ -164,6 +164,7 @@ SOURCES += \
     Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
+    Source/CommonFramework/Exceptions/OperationFailedException.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.cpp \
@@ -1026,6 +1027,7 @@ HEADERS += \
     Source/CommonFramework/Environment/HardwareValidation.h \
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
+    Source/CommonFramework/Exceptions/OperationFailedException.h \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h \

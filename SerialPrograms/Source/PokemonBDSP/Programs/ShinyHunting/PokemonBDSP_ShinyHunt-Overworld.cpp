@@ -146,10 +146,11 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
             }
             lead_tracker.report_result(result_own.shiny_type);
 
-        } catch(OperationFailedException& e){
+        }catch (OperationFailedException& e){
             if (!RESET_GAME_WHEN_ERROR){
-                throw e;
+                throw;
             }
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             stats.add_error();
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);

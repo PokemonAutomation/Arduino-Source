@@ -37,7 +37,7 @@ public:
         size_t index,
         Logger& logger,
 //        ThreadHandle& handle,
-        BotBase& botbase,
+        BotBase* botbase,
         VideoFeed& video,
         VideoOverlay& overlay,
         AudioFeed& audio
@@ -53,7 +53,7 @@ public:
     size_t index() const{ return m_index; }
 
     Logger& logger(){ return m_logger; }
-    BotBase& botbase(){ return m_botbase; }
+    BotBase& botbase(){ return *m_botbase; }
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
@@ -73,7 +73,7 @@ public:
 private:
     size_t m_index;
     Logger& m_logger;
-    BotBase& m_botbase;
+    BotBase* m_botbase;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
     AudioFeed& m_audio;

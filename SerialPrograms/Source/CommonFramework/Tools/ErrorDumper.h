@@ -19,6 +19,11 @@ class Logger;
 class ProgramEnvironment;
 struct ProgramInfo;
 
+std::string dump_image_alone(
+    Logger& logger,
+    const ProgramInfo& program_info, const std::string& label,
+    const ImageViewRGB32& image
+);
 // Dump error image to ./ErrorDumps/ folder. Also send image as telemetry if user allows.
 // Return image path.
 std::string dump_image(

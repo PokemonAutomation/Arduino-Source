@@ -459,9 +459,10 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             //  Connect to internet.
             try{
                 connect_to_internet_from_overworld(env.program_info(), env.console, context);
-            }catch (OperationFailedException&){
+            }catch (OperationFailedException& e){
                 consecutive_failures++;
                 stats.m_errors++;
+                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
                 continue;
             }
         }
@@ -480,9 +481,10 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 #if 1
         try{
             open_hosting_lobby(env, env.console, context, mode);
-        }catch (OperationFailedException&){
+        }catch (OperationFailedException& e){
             consecutive_failures++;
             stats.m_errors++;
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             continue;
         }
 #else
@@ -534,9 +536,10 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             }
             completed_one = true;
             consecutive_failures = 0;
-        }catch (OperationFailedException&){
+        }catch (OperationFailedException& e){
             consecutive_failures++;
             stats.m_errors++;
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             continue;
         }
     }

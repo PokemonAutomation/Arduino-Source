@@ -212,8 +212,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             // If there is no auto save, then we shouldn't reset to game to lose previous progress.
             if (AUTO_SAVING == AutoSave::NoAutoSave){
-                throw e;
+                throw;
             }
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             consecutive_failures++;
             if (consecutive_failures >= 3){

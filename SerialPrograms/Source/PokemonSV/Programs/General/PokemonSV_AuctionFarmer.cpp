@@ -159,10 +159,10 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
 }
 
 
-void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool do_full_reset, uint8_t& year) {
-    try {
-        if (do_full_reset) {
-            if (year == MAX_YEAR) {
+void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool do_full_reset, uint8_t& year){
+    try{
+        if (do_full_reset){
+            if (year == MAX_YEAR){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
                 home_roll_date_enter_game_autorollback(env.console, context, year);
             }
@@ -176,8 +176,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseC
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
         reset_game_from_home(env.program_info(), env.console, context, TICKS_PER_SECOND);
-    }
-    catch (OperationFailedException& e) {
+    }catch (OperationFailedException& e){
         AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
         stats.m_errors++;
         env.update_stats();
@@ -202,7 +201,7 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     }
 
     // read dialog bubble
-    for (ImageFloatBox dialog_box : dialog_boxes) {
+    for (ImageFloatBox dialog_box : dialog_boxes){
         OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
 
         ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
@@ -442,14 +441,16 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);
-            for (std::pair<AuctionOffer, ImageFloatBox> offer_pair : offers) {
+            for (std::pair<AuctionOffer, ImageFloatBox> offer_pair : offers){
                 AuctionOffer offer = offer_pair.first;
                 if (is_good_offer(offer)) {
                     try {
                         move_to_auctioneer(env, context, offer);
                     }
-                    catch (OperationFailedException& e) {
+                    catch (OperationFailedException& e){
                         stats.m_errors++;
+                        e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+
                         npc_tries++;
                         // if ONE_NPC the program already tries multiple times without change to compensate for dropped inputs
                         // at this point it is more likely to be non-recoverable
@@ -471,7 +472,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     good_offer = true;
                 }
             }
-            if (!good_offer) {
+            if (!good_offer){
                 reset_auctions(env, context, false, year);
                 stats.m_resets++;
             }
