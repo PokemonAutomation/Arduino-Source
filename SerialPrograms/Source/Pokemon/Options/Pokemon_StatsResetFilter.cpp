@@ -11,16 +11,8 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-const EnumDatabase<EggHatchAction>& StatsResetAction_Database() {
-    static const EnumDatabase<EggHatchAction> database({
-        {EggHatchAction::StopProgram,   "stop",     "Stop Program"},
-        {EggHatchAction::Keep,          "keep",     "Keep"},
-        });
-    return database;
-}
-
 StatsResetFilterRow::StatsResetFilterRow()
-    : action(StatsResetAction_Database(), LockWhileRunning::LOCKED, EggHatchAction::Keep)
+    : action(EggHatchAction::StopProgram)
     , iv_hp(IVCheckerFilter::Anything)
     , iv_atk(IVCheckerFilter::Anything)
     , iv_def(IVCheckerFilter::Anything)
@@ -38,7 +30,6 @@ StatsResetFilterRow::StatsResetFilterRow()
 
 std::unique_ptr<EditableTableRow> StatsResetFilterRow::clone() const{
     std::unique_ptr<StatsResetFilterRow> ret(new StatsResetFilterRow());
-    ret->action.set(action);
     ret->iv_hp.set(iv_hp);
     ret->iv_atk.set(iv_atk);
     ret->iv_def.set(iv_def);

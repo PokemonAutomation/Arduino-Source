@@ -204,7 +204,6 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             switch (action) {
             case EggHatchAction::StopProgram:
-            case EggHatchAction::Keep:
                 //Correct stats found, end program
                 stats_matched = true;
                 env.console.log("Match found!");

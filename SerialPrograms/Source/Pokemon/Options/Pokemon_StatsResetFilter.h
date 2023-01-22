@@ -23,7 +23,7 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
-    EnumDropdownCell<EggHatchAction> action;
+    EggHatchAction action;
     IVCheckerFilterCell iv_hp;
     IVCheckerFilterCell iv_atk;
     IVCheckerFilterCell iv_def;
