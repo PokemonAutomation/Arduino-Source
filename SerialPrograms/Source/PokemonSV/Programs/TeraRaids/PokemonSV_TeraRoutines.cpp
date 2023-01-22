@@ -318,8 +318,10 @@ void exit_tera_win_by_catching(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "ExitTeraWinFailed",
-                "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), console, "ExitTeraWinFailed",
+                "Failed to return to overworld after 5 minutes."
+            );
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -423,8 +425,10 @@ TeraResult exit_tera_win_by_catching(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "ExitTeraWinFailed",
-                "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), console, "ExitTeraWinFailed",
+                "Failed to return to overworld after 5 minutes."
+            );
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -532,8 +536,10 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected overworld.");
             return result;
         default:
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "ExitTeraWinFailed",
-                "exit_tera_win_by_catching(): No recognized state after 60 seconds.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), console, "ExitTeraWinFailed",
+                "exit_tera_win_by_catching(): No recognized state after 60 seconds."
+            );
         }
     }
 }

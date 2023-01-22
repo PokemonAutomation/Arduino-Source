@@ -409,6 +409,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
 
     m_last_time_fix = WallClock::min();
     for (uint16_t wins = 0; wins < MAX_WINS;){
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
         //  Reset all errored Switches.
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             size_t index = console.index();
