@@ -103,7 +103,6 @@ bool check_baby_info(
     Pokemon::EggHatchAction& action
 );
 
-
 }
 }
 }

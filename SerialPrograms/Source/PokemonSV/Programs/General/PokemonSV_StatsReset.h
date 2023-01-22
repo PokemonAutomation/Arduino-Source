@@ -12,7 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -41,7 +41,7 @@ private:
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    Pokemon::EggHatchFilterTable FILTERS;
+    Pokemon::StatsResetFilterTable FILTERS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

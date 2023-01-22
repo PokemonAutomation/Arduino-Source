@@ -627,10 +627,6 @@ bool check_baby_info(
     return shiny;
 }
 
-
-
-
-
 }
 }
 }
