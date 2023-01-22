@@ -6,8 +6,8 @@
 
 #include <sstream>
 #include <map>
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"

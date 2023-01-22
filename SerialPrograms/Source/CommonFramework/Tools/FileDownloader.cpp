@@ -14,8 +14,8 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <QTimer>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "FileDownloader.h"
 
 //#include <iostream>

@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_PlayerList.h"

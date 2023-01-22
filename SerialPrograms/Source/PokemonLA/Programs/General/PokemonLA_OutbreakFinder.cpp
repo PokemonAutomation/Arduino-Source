@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"

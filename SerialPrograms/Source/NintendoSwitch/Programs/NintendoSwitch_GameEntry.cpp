@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

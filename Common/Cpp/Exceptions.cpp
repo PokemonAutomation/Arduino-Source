@@ -26,13 +26,6 @@ std::string Exception::to_str() const{
 
 
 
-OperationFailedException::OperationFailedException(Logger& logger, std::string message)
-    : m_message(message)
-{
-    logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
-}
-
-
 FatalProgramException::FatalProgramException(Logger& logger, std::string message)
     : m_message(message)
 {

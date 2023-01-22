@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -132,7 +132,10 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             if (ret2 != 0) {
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(env.console, "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?");
+                throw OperationFailedException(
+                    env.console,
+                    "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?"
+                );
             }
             stats.pokemon_fainted++;
             env.update_stats();

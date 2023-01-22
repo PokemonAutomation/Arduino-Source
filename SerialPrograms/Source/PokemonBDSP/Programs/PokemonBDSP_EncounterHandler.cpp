@@ -5,10 +5,9 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Types.h"
 #include "PokemonBDSP_BasicCatcher.h"
 #include "PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_GameNavigation.h"

@@ -4,9 +4,7 @@
  *
  */
 
-#include "PokemonLA_IngoMoveGrinder.h"
-
-#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -21,6 +19,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
+#include "PokemonLA_IngoMoveGrinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

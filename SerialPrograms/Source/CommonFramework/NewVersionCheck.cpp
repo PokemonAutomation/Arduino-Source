@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Exceptions/OperationFailedException.h"
 #include "Options/Environment/ThemeSelectorOption.h"
 #include "Tools/FileDownloader.h"
 #include "Globals.h"
