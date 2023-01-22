@@ -87,7 +87,7 @@ void CaughtPokemonScreen::leave_summary(){
         break;
     default:
         dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
-        throw OperationFailedException(m_console, "Failed to detect caught menu.");
+        throw OperationFailedException(m_console, "Failed to detect caught menu.", true);
     }
 
     m_in_summary = false;
@@ -114,16 +114,14 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        dump_image(m_console, m_env.program_info(), "SummaryScreen", m_console.video().snapshot());
-        throw OperationFailedException(m_console, "Failed to detect summary screen.");
+        throw OperationFailedException(m_console, "Failed to detect summary screen.", true);
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
             m_console.log("Not shiny.", COLOR_BLUE);
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
-        throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a non-shiny.");
+            throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a non-shiny.", true);
         }
         break;
     case SummaryShinySymbolDetector::Detection::SHINY:
@@ -132,8 +130,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
-            throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a shiny.");
+            throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a shiny.", true);
         }
         break;
     }

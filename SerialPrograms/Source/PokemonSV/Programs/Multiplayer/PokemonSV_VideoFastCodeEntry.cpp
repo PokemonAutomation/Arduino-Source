@@ -91,7 +91,6 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
         const char* error = enter_code(env, scope, settings, code, !SKIP_CONNECT_TO_CONTROLLER);
         if (error){
             env.log("No valid code found: " + std::string(error), COLOR_RED);
-    //        throw OperationFailedException(env.logger(), error);
         }
         return;
     }

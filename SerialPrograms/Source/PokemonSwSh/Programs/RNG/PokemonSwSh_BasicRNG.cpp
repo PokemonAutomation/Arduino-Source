@@ -32,7 +32,7 @@ Xoroshiro128PlusState find_rng_state(
         uint64_t last_bit = 0;
         switch (detection) {
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            throw OperationFailedException(console, "Attack animation could not be detected.");
+            throw OperationFailedException(console, "Attack animation could not be detected.", true);
             break;
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
@@ -91,7 +91,7 @@ Xoroshiro128PlusState refind_rng_state(
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         switch (detection) {
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            throw OperationFailedException(console, "Attack animation could not be detected.");
+            throw OperationFailedException(console, "Attack animation could not be detected.", true);
             break;
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";

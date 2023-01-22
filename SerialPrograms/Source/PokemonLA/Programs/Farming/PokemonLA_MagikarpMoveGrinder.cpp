@@ -106,7 +106,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
-            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
+            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.", true);
         }
 
         if (ret == 0){
@@ -176,7 +176,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
-            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
+            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.", true);
         }
 
         if (ret == 0){
@@ -233,7 +233,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
-        throw OperationFailedException(env.console, "No Pokemon sepecified to grind.");
+        throw UserSetupError(env.console, "No Pokemon sepecified to grind.");
     }
 
     //  Connect the controller.

@@ -142,7 +142,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         if(ret != 0) {
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(env.console, "Failed to enter battle. Are you facing the Pokemon or in a menu?");
+            throw OperationFailedException(env.console, "Failed to enter battle. Are you facing the Pokemon or in a menu?", true);
         }
         bool battle_ended = false;
         while (!battle_ended) {
@@ -227,8 +227,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.console.log("Invalid state.");
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(env.console, "Invalid state.");
-                break;
+                throw OperationFailedException(env.console, "Invalid state.", true);
             }
         }
         if (!battle_ended) {

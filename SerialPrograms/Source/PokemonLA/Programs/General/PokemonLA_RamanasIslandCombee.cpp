@@ -254,7 +254,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.", true);
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_X, 20, 230);
@@ -289,7 +289,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
-    } else if (ret == 1){
+    }else if (ret == 1){
         env.log("Character blacks out");
         // black out.
         stats.blackouts++;
@@ -299,7 +299,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
-        throw OperationFailedException(env.console, "Black out.");
+        throw OperationFailedException(env.console, "Black out.", true);
     }
 
     from_professor_return_to_jubilife(env, env.console, context);

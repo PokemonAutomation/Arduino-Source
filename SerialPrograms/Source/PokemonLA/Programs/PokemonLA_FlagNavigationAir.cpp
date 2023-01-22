@@ -287,16 +287,16 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
 
 bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
-        throw OperationFailedException(m_console, "No state change detected after 60 seconds.");
+        throw OperationFailedException(m_console, "No state change detected after 60 seconds.", true);
     }
     if (start_time() + m_navigate_timeout < timestamp){
-        throw OperationFailedException(m_console, "Unable to reach flag after timeout period.");
+        throw OperationFailedException(m_console, "Unable to reach flag after timeout period.", true);
     }
     if (m_dialog_detector.detected()){
-        throw OperationFailedException(m_console, "Potential ambush by Miss Fortune sister.");
+        throw OperationFailedException(m_console, "Potential ambush by Miss Fortune sister.", true);
     }
     if (m_find_flag_failed.load(std::memory_order_acquire)){
-        throw OperationFailedException(m_console, "Unable to find flag.");
+        throw OperationFailedException(m_console, "Unable to find flag.", true);
     }
 
     //  Read flag.
@@ -415,7 +415,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 #endif
 
 //    if (m_last_flag_detection + std::chrono::seconds(20) < timestamp){
-//        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.");
+//        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.", true);
 //    }
 //    double flag_age = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_last_flag_detection).count() / 1000.;
 //    if (flag_age > 0){

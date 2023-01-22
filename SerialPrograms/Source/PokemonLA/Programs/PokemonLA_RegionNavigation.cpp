@@ -116,8 +116,7 @@ void from_professor_return_to_jubilife(
             pbf_mash_button(context, BUTTON_B, 20);
             break;
         default:
-            dump_image(env.logger(), env.program_info(), "ReturnToJubilife", console.video().snapshot());
-            throw OperationFailedException(console, "Did not detect option to return to Jubilife.");
+            throw OperationFailedException(console, "Did not detect option to return to Jubilife.", true);
         }
     }
 }
@@ -136,7 +135,7 @@ void mash_A_to_enter_sub_area(
     );
     if (ret < 0){
         dump_image(env.logger(), env.program_info(), "LoadSubArea", console.video().snapshot());
-        throw OperationFailedException(console, "Failed to load into sub area after 7 seconds.");
+        throw OperationFailedException(console, "Failed to load into sub area after 7 seconds.", true);
     }
 
     console.log("Loaded into sub area...");
@@ -156,7 +155,7 @@ void mash_A_to_change_region(
         {{black_screen0}}
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to load into region after timeout.");
+        throw OperationFailedException(console, "Failed to load into region after timeout.", true);
     }
     context.wait_for(std::chrono::milliseconds(1000));
 
@@ -172,7 +171,7 @@ void mash_A_to_change_region(
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
-        throw OperationFailedException(console, "Failed to load into region after timeout.");
+        throw OperationFailedException(console, "Failed to load into region after timeout.", true);
     }
     console.log("Loaded into map...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
@@ -195,7 +194,7 @@ void open_travel_map_from_jubilife(
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
-        throw OperationFailedException(console, "Map not detected after 10 x A presses.");
+        throw OperationFailedException(console, "Map not detected after 10 x A presses.", true);
     }
     console.log("Found map!");
 }
@@ -224,7 +223,7 @@ void goto_camp_from_jubilife(
     }
     if (current_region != location.region){
         dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot());
-        throw OperationFailedException(console, std::string("Unable to find: ") + location.display);
+        throw OperationFailedException(console, std::string("Unable to find: ") + location.display, true);
     }
 
     if (location.warp_slot != 0){
@@ -257,7 +256,7 @@ void goto_camp_from_jubilife(
         );
         if (ret < 0){
             dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
-            throw OperationFailedException(console, "Map not detected after 5 seconds.");
+            throw OperationFailedException(console, "Map not detected after 5 seconds.", true);
         }
         console.log("Found map!");
         context.wait_for(std::chrono::milliseconds(500));
@@ -278,7 +277,7 @@ void goto_camp_from_jubilife(
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "Unable to fly. Are you under attack?");
+            throw OperationFailedException(console, "Unable to fly. Are you under attack?", true);
         }
     }
     pbf_wait(context, 50);
@@ -296,7 +295,7 @@ void goto_camp_from_jubilife(
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
-        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.", true);
     }
     console.log("Arrived at sub-camp...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
@@ -328,7 +327,7 @@ void goto_camp_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
-            throw OperationFailedException(console, "Unable to escape from being attacked.");
+            throw OperationFailedException(console, "Unable to escape from being attacked.", true);
         }
 
         //  Open the map.
@@ -386,7 +385,7 @@ void goto_camp_from_overworld(
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
-        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.", true);
     }
     console.log("Arrived at camp...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
@@ -410,7 +409,7 @@ void goto_any_camp_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
-            throw OperationFailedException(console, "Unable to escape from being attacked.");
+            throw OperationFailedException(console, "Unable to escape from being attacked.", true);
         }
 
         //  Open the map.
@@ -424,7 +423,7 @@ void goto_any_camp_from_overworld(
             );
             if (ret < 0){
 //                dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
-                throw OperationFailedException(console, "Map not detected after 5 seconds.");
+                throw OperationFailedException(console, "Map not detected after 5 seconds.", true);
             }
             console.log("Found map!");
             context.wait_for(std::chrono::milliseconds(500));
@@ -472,7 +471,7 @@ void goto_any_camp_from_overworld(
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
-        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.", true);
     }
     console.log("Arrived at camp...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));

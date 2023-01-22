@@ -174,7 +174,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for(std::chrono::milliseconds(500));
         if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
-            throw OperationFailedException(env.console, "Failed to return to starting position. Something is wrong.");
+            throw OperationFailedException(env.console, "Failed to return to starting position. Something is wrong.", true);
         }
 
         stats.m_boxes++;

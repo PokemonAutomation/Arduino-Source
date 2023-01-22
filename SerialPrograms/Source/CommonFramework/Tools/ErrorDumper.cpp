@@ -79,8 +79,7 @@ void dump_image_and_throw_recoverable_exception(
     );
     throw OperationFailedException(console, message);
 #else
-    VideoSnapshot screen = console.video().snapshot();
-    throw OperationFailedException(console, message, std::move(screen.frame));
+    throw OperationFailedException(console, message);
 #endif
 }
 
@@ -109,8 +108,7 @@ void dump_image_and_throw_recoverable_exception(
     }
     throw OperationFailedException(console, error_message);
 #else
-    VideoSnapshot screen = console.video().snapshot();
-    throw OperationFailedException(console, error_message, std::move(screen.frame));
+    throw OperationFailedException(console, error_message);
 #endif
 }
 

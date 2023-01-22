@@ -8,8 +8,10 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "OperationFailedException.h"
 
 namespace PokemonAutomation{
@@ -30,6 +32,14 @@ OperationFailedException::OperationFailedException(Logger& logger, std::string m
     , m_screenshot(std::move(screenshot))
 {
     logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
+}
+OperationFailedException::OperationFailedException(ConsoleHandle& console, std::string message, bool take_screenshot)
+    : m_message(std::move(message))
+{
+    if (take_screenshot){
+        m_screenshot = console.video().snapshot().frame;
+    }
+    console.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
 ImageViewRGB32 OperationFailedException::screenshot() const{
     if (m_screenshot){

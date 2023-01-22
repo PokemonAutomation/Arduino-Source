@@ -154,7 +154,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }
             }
             if (slot == 4){
-                throw OperationFailedException(env.console, "Ran out of PP in a battle.");
+                throw OperationFailedException(env.console, "Ran out of PP in a battle.", true);
             }
 
             for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -187,11 +187,11 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 
         default:
             stats.m_errors++;
-            throw OperationFailedException(env.console, "Timed out after 30 seconds.");
+            throw OperationFailedException(env.console, "Timed out after 30 seconds.", true);
         }
     }
 
-    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
+    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?", true);
 }
 
 

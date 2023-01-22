@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -381,7 +382,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
     }
     if (is_wild_land(current_region) == false){
         dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
-        throw OperationFailedException(env.console, std::string("Unable to find a wild land"));
+        throw OperationFailedException(env.console, "Unable to find a wild land", true);
     }
 
     mash_A_to_change_region(env, env.console, context);
@@ -480,7 +481,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         }
     }
     if (region == MapRegion::NONE){
-        throw OperationFailedException(env.console, "Program internal error. No MMO region name found.");
+        throw InternalProgramError(&env.console.logger(), PA_CURRENT_FUNCTION, "No MMO region name found.");
     }
 
     env.log("Go to " + std::string(MAP_REGION_NAMES[int(region)]) + " to check MMO.");
@@ -496,7 +497,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     // Fix zoom level:
     const int zoom_level = read_map_zoom_level(question_mark_image);
     if (zoom_level < 0){
-        throw OperationFailedException(env.console, "Canot read map zoom level.");
+        throw OperationFailedException(env.console, "Canot read map zoom level.", true);
     }
 
     if (zoom_level == 0){
@@ -556,8 +557,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
     int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "DialogBoxNotDetected", env.console.video().snapshot());
-        throw OperationFailedException(env.console, "Dialog box not detected when waiting for MMO map.");
+        throw OperationFailedException(env.console, "Dialog box not detected when waiting for MMO map.", true);
     }
 
     pbf_press_button(context, BUTTON_B, 50, 50);
@@ -565,8 +565,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        dump_image(env.console.logger(), env.program_info(), "MapNotDetected", env.console.video().snapshot());
-        throw OperationFailedException(env.console, "Map not detected after talking to Mai.");
+        throw OperationFailedException(env.console, "Map not detected after talking to Mai.", true);
     }
     env.console.log("Found revealed map thanks to Munchlax!");
 

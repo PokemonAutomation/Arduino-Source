@@ -34,7 +34,7 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
         {{detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
+        throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.", true);
     }
     console.log("Returned to overworld.");
 }
@@ -43,7 +43,7 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
 
 size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
     if (pokemon_to_switch_to >= max_num_pokemon){
-        throw OperationFailedException(console, "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon));
+        throw OperationFailedException(console, "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon), true);
     }
     // Move past leading fainted pokemon
     for(size_t i = 0; i < pokemon_to_switch_to; i++){
@@ -69,7 +69,7 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         // and therefore cannot be used. Try the next pokemon:
         pokemon_to_switch_to++;
         if (pokemon_to_switch_to >= max_num_pokemon){
-            throw OperationFailedException(console, "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon));
+            throw OperationFailedException(console, "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon), true);
         }
 
         // Fist hit B to clear the "cannot send pokemon" dialogue
@@ -148,7 +148,7 @@ void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size
             // Pokemon has zero PP on all moves. This should not happen as it will just use
             // Struggle.
             console.log("No PP on all moves. Abort program.", COLOR_RED);
-            throw OperationFailedException(console, "No PP on all moves.");
+            throw OperationFailedException(console, "No PP on all moves.", true);
         }
         
         // Go to the next move.

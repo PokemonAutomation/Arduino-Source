@@ -119,7 +119,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for_all_requests();
     }
     if (error){
-        throw OperationFailedException(env.console, "Unable to find Wyrdeer after 10 attempts.");
+        throw OperationFailedException(env.console, "Unable to find Wyrdeer after 10 attempts.", true);
     }
 
     env.console.log("Beginning Shiny Detection...");

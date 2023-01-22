@@ -121,7 +121,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.");
+            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.", true);
         }
         return false;
     }
@@ -173,7 +173,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.");
+            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.", true);
         }
         return false;
     }
@@ -232,22 +232,26 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(
                 m_console,
-                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls."
+                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls.",
+                true
             );
         case CatchResult::OUT_OF_BALLS:
             throw OperationFailedException(
                 m_console,
-                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?"
+                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?",
+                true
             );
         case CatchResult::CANNOT_THROW_BALL:
             throw OperationFailedException(
                 m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?"
+                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
+                true
             );
         case CatchResult::TIMEOUT:
             throw OperationFailedException(
                 m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?"
+                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?",
+                true
             );
         }
         send_catch_notification(
@@ -276,22 +280,26 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(
                 m_console,
-                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls."
+                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls.",
+                true
             );
         case CatchResult::OUT_OF_BALLS:
             throw OperationFailedException(
                 m_console,
-                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?"
+                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?",
+                true
             );
         case CatchResult::CANNOT_THROW_BALL:
             throw OperationFailedException(
                 m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?"
+                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
+                true
             );
         case CatchResult::TIMEOUT:
             throw OperationFailedException(
                 m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?"
+                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?",
+                true
             );
         }
         send_catch_notification(

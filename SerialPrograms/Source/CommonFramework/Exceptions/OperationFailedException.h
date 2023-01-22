@@ -18,6 +18,7 @@ class ImageRGB32;
 class EventNotificationOption;
 struct ProgramInfo;
 class ProgramEnvironment;
+class ConsoleHandle;
 
 
 //  Thrown by subroutines if they fail for an in-game reason.
@@ -31,8 +32,9 @@ public:
     OperationFailedException& operator=(OperationFailedException&&);
 
 public:
-    OperationFailedException(Logger& logger, std::string message);
-    OperationFailedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
+    explicit OperationFailedException(Logger& logger, std::string message);
+    explicit OperationFailedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
+    explicit OperationFailedException(ConsoleHandle& console, std::string message, bool take_screenshot);
 
     virtual const char* name() const override{ return "OperationFailedException"; }
     virtual std::string message() const override{ return m_message; }

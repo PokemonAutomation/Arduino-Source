@@ -139,7 +139,7 @@ void open_hosting_lobby(
             console.log("Detected overworld.");
             recovery_mode = false;
             if (!open_raid(console, context)){
-                throw OperationFailedException(console, "No Tera raid found.");
+                throw OperationFailedException(console, "No Tera raid found.", true);
             }
             continue;
         case 1:

@@ -36,7 +36,7 @@ struct VideoSnapshot{
 
     const ImageRGB32* operator->() const{ return frame.get(); }
 
-//    operator std::shared_ptr<const ImageRGB32>() &&{ return std::move(frame); }
+    operator std::shared_ptr<const ImageRGB32>() const{ return frame; }
     operator ImageViewRGB32() const{ return *frame; }
 
     void clear(){

@@ -247,12 +247,20 @@ std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, cons
         }
 
         if (raw_path[pos] != 'A'){
-            throw OperationFailedException(env.console, "Wrong Path string. Should have 'A' at pos " + std::to_string(pos));
+            throw InternalProgramError(
+                &env.console.logger(),
+                PA_CURRENT_FUNCTION,
+                "Wrong Path string. Should have 'A' at pos " + std::to_string(pos)
+            );
         }
         raw_path[next_pos] = '\0';
         int despawn_count = strtol(raw_path.data() + pos+1, nullptr, 10);
         if (despawn_count <= 0 || despawn_count > max_num_despawn){
-            throw OperationFailedException(env.console, "Wrong Path string. Invalid number " + std::to_string(despawn_count) + " at pos " + std::to_string(pos+1));
+            throw InternalProgramError(
+                &env.console.logger(),
+                PA_CURRENT_FUNCTION,
+                "Wrong Path string. Invalid number " + std::to_string(despawn_count) + " at pos " + std::to_string(pos+1)
+            );
         }
         path_despawns.push_back(despawn_count);
     }
@@ -328,7 +336,7 @@ void AutoMultiSpawn::advance_one_path_step(
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.", true);
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_X, 20, 230);
@@ -344,11 +352,16 @@ void AutoMultiSpawn::advance_one_path_step(
         // Go to spawn point to start a battle, remove some pokemon, then return to camp.
         size_t num_pokemon_removed = try_one_battle_to_remove_pokemon(env, context, pokemon_left, remained_to_remove);
         already_removed_pokemon += num_pokemon_removed;
-        env.log("Removed " + std::to_string(num_pokemon_removed) + " via battle, total "
-             + std::to_string(already_removed_pokemon) + " pokemon removed, target total pokemon to remove: " + std::to_string(num_to_despawn));
+        env.log(
+            "Removed " + std::to_string(num_pokemon_removed) + " via battle, total "
+             + std::to_string(already_removed_pokemon) + " pokemon removed, target total pokemon to remove: " + std::to_string(num_to_despawn)
+         );
         if (already_removed_pokemon > num_to_despawn){
-            throw OperationFailedException(env.console, "Removed more pokemon than required. Removed "
-                 + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn));
+            throw OperationFailedException(
+                env.console, "Removed more pokemon than required. Removed "
+                + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn),
+                true
+            );
         }
 
         remained_to_remove -= num_pokemon_removed;
@@ -363,7 +376,7 @@ void AutoMultiSpawn::advance_one_path_step(
         }
     }
     if (remained_to_remove > 0){
-        throw OperationFailedException(env.console, "After trying to start three battles, cannot remove enough pokemon.");
+        throw OperationFailedException(env.console, "After trying to start three battles, cannot remove enough pokemon.", true);
     }
 
     // All pokemon removed. Now go to tent to change time of day.
@@ -398,7 +411,11 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
     }
 
     if (focused_pokemon.name_candidates.size() == 0){
-        throw OperationFailedException(env.console, "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times");
+        throw OperationFailedException(
+            env.console,
+            "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times",
+            true
+        );
     }
     
     // We have found a target pokemon and initiated a pokemon battle
@@ -436,7 +453,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         );
 
         if (ret < 0){
-            throw OperationFailedException(env.console, "Cannot detect a battle after 30 seconds");
+            throw OperationFailedException(env.console, "Cannot detect a battle after 30 seconds", true);
         }
 
         if (battle_starting){
@@ -487,7 +504,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
             // Oh no, we removed more than needed.
             // XXX can try to reset the game to fix this. But for now let user handles this.
             env.log("Removed more than needed!");
-            throw OperationFailedException(env.console, "Removed more pokemon than needed!");
+            throw OperationFailedException(env.console, "Removed more pokemon than needed!", true);
         } else if (num_removed_pokemon < num_to_despawn){
 
             // Press A to select moves
@@ -509,7 +526,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
             env.console, context, std::chrono::seconds(30), {{escape_detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(env.console, "Cannot detect end of battle when escaping");
+            throw OperationFailedException(env.console, "Cannot detect end of battle when escaping.", true);
         }
     }
 

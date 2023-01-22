@@ -100,7 +100,7 @@ void start_game_from_home_with_inference(
             console.log("Detected Home screen.");
         }else{
             console.log("Failed to detect Home screen after 10 seconds.", COLOR_RED);
-            throw OperationFailedException(console, "Failed to detect Home screen after 10 seconds.");
+            throw OperationFailedException(console, "Failed to detect Home screen after 10 seconds.", true);
         }
         context.wait_for(std::chrono::milliseconds(100));
     }
@@ -147,7 +147,7 @@ void start_game_from_home_with_inference(
             break;
         default:
             console.log("No recognizable state after 10 seconds.", COLOR_RED);
-            throw OperationFailedException(console, "No recognizable state after 10 seconds.");
+            throw OperationFailedException(console, "No recognizable state after 10 seconds.", true);
         }
         break;
     }

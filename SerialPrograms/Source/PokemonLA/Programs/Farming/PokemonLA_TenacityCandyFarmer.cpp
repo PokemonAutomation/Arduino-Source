@@ -126,7 +126,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             }
         );
         if (ret != 0){
-            throw OperationFailedException(env.console, "Unable to detect Tenacity path menu after 10 A presses.");
+            throw OperationFailedException(env.console, "Unable to detect Tenacity path menu after 10 A presses.", true);
         }
     }
     // Move down the menu box to select Pearl Clan
@@ -201,7 +201,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                 {{arc_phone_detector}}
             );
             if (ret < 0){
-                throw OperationFailedException(env.console, "Failed to find Arc phone after 20 seconds when the last battle ends.");
+                throw OperationFailedException(env.console, "Failed to find Arc phone after 20 seconds when the last battle ends.", true);
             }
             env.log("Found Arc Phone. End of one path.");
 
@@ -231,7 +231,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            return true;
-            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
+            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.", true);
         }
 
         if (ret == 0){

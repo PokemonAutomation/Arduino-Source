@@ -336,7 +336,7 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
                 {{lobby, std::chrono::milliseconds(500)}}
             );
             if (ret < 0){
-                throw OperationFailedException(console.logger(), "Unable to join lobby.");
+                throw OperationFailedException(console, "Unable to join lobby.", true);
             }
 
             pbf_mash_button(context, BUTTON_A, 125);

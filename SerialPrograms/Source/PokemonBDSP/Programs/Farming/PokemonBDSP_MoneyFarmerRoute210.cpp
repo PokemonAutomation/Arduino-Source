@@ -173,7 +173,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(env.console, "Ran out of PP in a battle.");
+                    throw OperationFailedException(env.console, "Ran out of PP in a battle.", true);
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -193,7 +193,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(env.console, "Ran out of PP in a battle.");
+                    throw OperationFailedException(env.console, "Ran out of PP in a battle.", true);
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -219,11 +219,11 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             return true;
         default:
             stats.m_errors++;
-            throw OperationFailedException(env.console, "Timed out after 2 minutes.");
+            throw OperationFailedException(env.console, "Timed out after 2 minutes.", true);
         }
     }
 
-    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
+    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?", true);
 }
 
 void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){

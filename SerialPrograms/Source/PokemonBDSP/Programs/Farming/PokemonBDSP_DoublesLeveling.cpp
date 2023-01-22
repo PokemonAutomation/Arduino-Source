@@ -133,11 +133,11 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         default:
             env.log("Timed out.", COLOR_RED);
             stats.add_error();
-            throw OperationFailedException(env.console, "Timed out after 2 minutes.");
+            throw OperationFailedException(env.console, "Timed out after 2 minutes.", true);
         }
     }
 
-    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
+    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?", true);
 }
 
 
