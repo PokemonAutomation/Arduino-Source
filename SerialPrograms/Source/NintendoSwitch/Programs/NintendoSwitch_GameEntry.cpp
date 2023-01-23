@@ -99,7 +99,11 @@ void start_game_from_home_with_inference(
         if (ret == 0){
             console.log("Detected Home screen.");
         }else{
-            throw OperationFailedException(console, "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.", true);
+            throw OperationFailedException(
+                console,
+                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
+                true
+            );
         }
         context.wait_for(std::chrono::milliseconds(100));
     }

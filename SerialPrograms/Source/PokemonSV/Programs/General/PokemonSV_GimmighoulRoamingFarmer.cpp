@@ -60,6 +60,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
+    uint8_t year = MAX_YEAR;
     for (uint32_t c = 0; c < SKIPS; c++) {
         //  Grab coin assuming there is one
         env.log("Fetch Attempts: " + tostr_u_commas(c));
@@ -71,8 +72,13 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
 
         //  Date skip
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        home_to_date_time(context, true, false);
-        roll_date_forward_1(context, false);
+        home_to_date_time(context, true, true);
+        if (year >= MAX_YEAR){
+            roll_date_backward_N(context, MAX_YEAR, true);
+            year = 0;
+        }
+        roll_date_forward_1(context, true);
+        year++;
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
         //  Reset game

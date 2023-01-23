@@ -128,6 +128,7 @@ bool reset_game_from_home(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint16_t post_wait_time
 ){
+    console.log("Resetting game from home...");
     console.overlay().add_log("Reset game", COLOR_WHITE);
     bool ok = true;
     ok &= reset_game_to_gamemenu(console, context);

@@ -121,6 +121,7 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
     m_sanitizer.check_usage();
 
     std::unique_lock<std::mutex> lg(m_sleep_lock);
+    m_logger.log("Waiting for all requests to finish...", COLOR_DARKGREEN);
     while (true){
         if (cancelled != nullptr && cancelled->cancelled()){
             throw OperationCancelledException();
