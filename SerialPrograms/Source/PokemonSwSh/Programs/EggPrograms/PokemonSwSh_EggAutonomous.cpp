@@ -601,8 +601,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             EggHatchGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+            NatureReader::Results nature;
 
-            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender);
+            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender, nature);
 
             auto send_keep_notification = [&](){
                 if (!shiny){

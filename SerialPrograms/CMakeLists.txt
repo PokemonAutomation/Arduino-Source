@@ -827,6 +827,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h
     Source/Pokemon/Inference/Pokemon_NameReader.cpp
     Source/Pokemon/Inference/Pokemon_NameReader.h
+    Source/Pokemon/Inference/Pokemon_NatureReader.cpp
+    Source/Pokemon/Inference/Pokemon_NatureReader.h
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp
@@ -849,6 +851,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_EncounterStats.h
     Source/Pokemon/Pokemon_IVChecker.cpp
     Source/Pokemon/Pokemon_IVChecker.h
+    Source/Pokemon/Pokemon_NatureChecker.cpp
+    Source/Pokemon/Pokemon_NatureChecker.h
     Source/Pokemon/Pokemon_Notification.cpp
     Source/Pokemon/Pokemon_Notification.h
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp
@@ -1229,6 +1233,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp

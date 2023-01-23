@@ -224,8 +224,9 @@ bool EggAutonomousState::process_party(){
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
         EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
+        NatureReader::Results nature;
 
-        EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
+        EggHatchAction action = m_filters.get_action(shiny, IVs, gender, nature);
 
         switch (action){
         case EggHatchAction::StopProgram:
