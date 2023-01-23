@@ -131,12 +131,22 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
         }
         {
             SpinLockGuard lg1(m_state_lock, "PABotBase::wait_for_all_requests()");
+#if 0
+            m_logger.log(
+                "Waiting for all requests to finish... (Requests: " +
+                std::to_string(m_pending_requests.size()) +
+                ", Commands: " + std::to_string(m_pending_commands.size()) + ")",
+                COLOR_DARKGREEN
+            );
+#endif
             if (m_pending_requests.empty() && m_pending_commands.empty()){
-                return;
+                break;
             }
         }
         m_cv.wait(lg);
     }
+
+//    m_logger.log("Waiting for all requests to finish... Completed.", COLOR_DARKGREEN);
 }
 
 bool PABotBase::try_stop_all_commands(){
@@ -211,6 +221,11 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
     //  Remove all commands at or before the specified seqnum.
     std::lock_guard<std::mutex> lg0(m_sleep_lock);
     SpinLockGuard lg1(m_state_lock, "PABotBase::next_command_interrupt()");
+    m_logger.log("Clearing all active commands... (Commands: " + std::to_string(m_pending_commands.size()) + ")", COLOR_DARKGREEN);
+
+//    if (m_pending_commands.size() > 2){
+//        cout << "asdf" << endl;
+//    }
 
     if (!m_pending_commands.empty()){
         //  Remove all active commands up to the seqnum.

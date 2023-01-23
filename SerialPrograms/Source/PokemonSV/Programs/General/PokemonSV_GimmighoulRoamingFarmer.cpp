@@ -29,7 +29,7 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
         STRING_POKEMON + " SV", "Gimmighoul Roaming Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulRoamingFarmer.md",
         "Farm roaming Gimmighoul for coins.",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
