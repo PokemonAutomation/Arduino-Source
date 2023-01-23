@@ -134,27 +134,25 @@ void start_game_from_home_with_inference(
         case 0:
             console.log("Detected home screen (again).", COLOR_RED);
             pbf_press_button(context, BUTTON_A, 20, 105);
-            continue;
+            break;
         case 1:
             console.log("Detected user-select screen.");
-            break;
+            move_to_user(context, user_slot);
+            pbf_press_button(context, BUTTON_A, 10, start_game_wait);
+            return;
         case 2:
             console.log("Detected update menu.", COLOR_RED);
             pbf_press_dpad(context, DPAD_UP, 5, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
         case 3:
             console.log("Detected black screen. Game started...");
-            break;
+            return;
         default:
             console.log("No recognizable state after 10 seconds.", COLOR_RED);
             throw OperationFailedException(console, "No recognizable state after 10 seconds.", true);
         }
-        break;
     }
-
-    //  Move to user and enter game.
-    move_to_user(context, user_slot);
-    pbf_press_button(context, BUTTON_A, 10, start_game_wait);
 }
 
 
