@@ -31,7 +31,8 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggAutonomous.md",
         "Automatically fetch+hatch eggs and keep all shinies.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

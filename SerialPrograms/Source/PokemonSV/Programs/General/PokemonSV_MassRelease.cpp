@@ -30,7 +30,8 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " SV", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassRelease.md",
         "Mass release boxes of Pokémon.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

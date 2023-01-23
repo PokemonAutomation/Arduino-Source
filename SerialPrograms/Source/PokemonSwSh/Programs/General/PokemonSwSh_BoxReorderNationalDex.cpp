@@ -130,7 +130,8 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
         STRING_POKEMON + " SwSh", "Box Reorder National Dex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BoxReorderNationalDex.md",
         "Order boxes of " + STRING_POKEMON + ".",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -23,7 +23,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
         STRING_POKEMON + " SwSh", "Surprise Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
         "Surprise trade away boxes of " + STRING_POKEMON,
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

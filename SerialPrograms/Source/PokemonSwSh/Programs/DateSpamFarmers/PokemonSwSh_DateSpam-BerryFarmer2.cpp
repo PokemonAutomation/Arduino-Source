@@ -31,7 +31,8 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer2.md",
         "Farm berries using Feedback.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -22,7 +22,7 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         STRING_POKEMON + " SwSh", "Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BallThrower.md",
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

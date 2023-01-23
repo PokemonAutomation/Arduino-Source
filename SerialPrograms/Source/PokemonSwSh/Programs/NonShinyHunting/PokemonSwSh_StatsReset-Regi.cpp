@@ -28,7 +28,8 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Regi.md",
         "Repeatedly catch regi until you get the stats you want.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

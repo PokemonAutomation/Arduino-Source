@@ -24,7 +24,8 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " SV", "Self Box Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SelfBoxTrade.md",
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 2, 2
     )

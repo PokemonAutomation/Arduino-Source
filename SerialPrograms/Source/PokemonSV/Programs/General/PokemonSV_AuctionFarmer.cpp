@@ -46,7 +46,8 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
         STRING_POKEMON + " SV", "Auction Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AuctionFarmer.md",
         "Check auctions and bid on items.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

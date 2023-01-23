@@ -29,7 +29,8 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         STRING_POKEMON + " BDSP", "Legendary Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/LegendaryReset.md",
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

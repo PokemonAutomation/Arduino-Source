@@ -13,6 +13,12 @@
 namespace PokemonAutomation{
 
 
+enum class AllowCommandsWhenRunning{
+    DISABLE_COMMANDS,
+    ENABLE_COMMANDS,
+};
+
+
 enum class PABotBaseLevel{
     NOT_PABOTBASE = 0,
     PABOTBASE_12KB = 1,

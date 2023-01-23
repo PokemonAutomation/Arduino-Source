@@ -31,7 +31,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         STRING_POKEMON + " SV", "Fast Code Entry (FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FastCodeEntry.md",
         "Quickly enter a 4, 6, or 8 digit link code.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

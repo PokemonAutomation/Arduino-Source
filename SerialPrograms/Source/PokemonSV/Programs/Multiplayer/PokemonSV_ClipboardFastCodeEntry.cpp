@@ -28,7 +28,7 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         STRING_POKEMON + " SV", "Clipboard Fast Code Entry (C-FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ClipboardFastCodeEntry.md",
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

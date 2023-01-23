@@ -28,7 +28,8 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " LA", "Self Box Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SelfBoxTrade.md",
         "Trade boxes across two Switches.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 2, 2
     )

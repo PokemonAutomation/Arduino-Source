@@ -20,7 +20,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " LA", "Clothing Buyer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ClothingBuyer.md",
         "Buy out all the clothing in the store.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

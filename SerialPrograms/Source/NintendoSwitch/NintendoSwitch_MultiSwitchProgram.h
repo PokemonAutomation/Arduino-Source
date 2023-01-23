@@ -64,7 +64,7 @@ public:
         std::string doc_link,
         std::string description,
         FeedbackType feedback,
-        bool allow_commands_while_running,
+        AllowCommandsWhenRunning allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level,
         size_t min_switches,
         size_t max_switches,

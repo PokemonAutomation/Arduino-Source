@@ -26,7 +26,8 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Seed Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SeedFinder.md",
         "Finds the current state to be used for manual RNG manipulation.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

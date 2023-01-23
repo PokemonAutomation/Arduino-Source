@@ -36,7 +36,8 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " SV", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsReset.md",
         "Repeatedly catch the Treasures of Ruin until you get the stats you want.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

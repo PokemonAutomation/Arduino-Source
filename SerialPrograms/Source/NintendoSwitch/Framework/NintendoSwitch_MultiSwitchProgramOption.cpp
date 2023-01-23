@@ -20,7 +20,9 @@ MultiSwitchProgramOption::MultiSwitchProgramOption(const MultiSwitchProgramDescr
     , m_system(
         descriptor.min_pabotbase_level(),
         descriptor.feedback(),
-        descriptor.allow_commands_while_running(),
+        descriptor.allow_commands_while_running()
+            ? AllowCommandsWhenRunning::ENABLE_COMMANDS
+            : AllowCommandsWhenRunning::DISABLE_COMMANDS,
         descriptor.min_switches(),
         descriptor.max_switches(),
         descriptor.default_switches()

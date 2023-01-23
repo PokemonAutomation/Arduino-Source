@@ -30,7 +30,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
-        FeedbackType::OPTIONAL_, false,
+        FeedbackType::OPTIONAL_, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

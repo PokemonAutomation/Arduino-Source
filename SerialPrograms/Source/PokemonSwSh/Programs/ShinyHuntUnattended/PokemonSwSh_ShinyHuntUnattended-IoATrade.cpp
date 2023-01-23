@@ -26,7 +26,7 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.md",
         "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

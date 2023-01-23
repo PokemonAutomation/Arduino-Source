@@ -27,7 +27,8 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Fetcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggFetcher.md",
         "Automatically fetch eggs from a picnic.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

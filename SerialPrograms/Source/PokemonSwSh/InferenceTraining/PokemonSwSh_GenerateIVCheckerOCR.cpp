@@ -33,7 +33,8 @@ GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
         STRING_POKEMON + " SwSh", "Generate IV Checker OCR Data",
         "",
         "Generate IV Checker OCR Data",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

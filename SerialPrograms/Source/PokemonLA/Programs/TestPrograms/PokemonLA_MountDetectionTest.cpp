@@ -22,7 +22,7 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         STRING_POKEMON + " LA", "Mount Detection Test",
         "",
         "Test the mount detection in the bottom right corner.",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

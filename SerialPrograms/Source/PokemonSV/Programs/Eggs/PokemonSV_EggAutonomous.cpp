@@ -38,7 +38,8 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SV", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md",
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

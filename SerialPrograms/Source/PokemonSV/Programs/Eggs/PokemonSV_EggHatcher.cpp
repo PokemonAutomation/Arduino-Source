@@ -31,7 +31,8 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggHatcher.md",
         "Automatically hatch eggs from boxes.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

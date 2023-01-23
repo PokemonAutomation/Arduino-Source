@@ -19,7 +19,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string doc_link,
     std::string description,
     FeedbackType feedback,
-    bool allow_commands_while_running,
+    AllowCommandsWhenRunning allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level
 )
     : ProgramDescriptor(
@@ -31,7 +31,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
     return std::unique_ptr<PanelInstance>(new SingleSwitchProgramOption(*this));

@@ -43,7 +43,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " LA", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

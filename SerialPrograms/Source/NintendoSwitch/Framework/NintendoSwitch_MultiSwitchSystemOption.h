@@ -30,14 +30,16 @@ public:
 public:
     MultiSwitchSystemOption(
         PABotBaseLevel min_pabotbase,
-        FeedbackType feedback, bool allow_commands_while_running,
+        FeedbackType feedback,
+        AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t switches
     );
     MultiSwitchSystemOption(
         PABotBaseLevel min_pabotbase,
-        FeedbackType feedback, bool allow_commands_while_running,
+        FeedbackType feedback,
+        AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         const JsonValue& json

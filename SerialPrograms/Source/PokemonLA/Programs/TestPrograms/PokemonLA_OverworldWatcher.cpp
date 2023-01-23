@@ -27,7 +27,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
         "",
         "This is a test program that simply observes the game and labels things of interest. "
         "This program doesn't really do anything.",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

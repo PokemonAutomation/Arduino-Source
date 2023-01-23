@@ -30,7 +30,8 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy2.md",
         "With the menu glitch active, clone entire boxes of items at a time. "
         "<font color=\"red\">(The menu glitch can only be activated on version 1.1.0 - 1.1.3.)</font>",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

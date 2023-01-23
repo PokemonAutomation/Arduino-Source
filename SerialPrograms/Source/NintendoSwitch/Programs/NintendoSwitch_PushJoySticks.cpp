@@ -18,7 +18,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Nintendo Switch", "Push Joy Sticks",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PushJoySticks.md",
         "Push Joy Sticks continously.",
-        FeedbackType::NONE, false,
+        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -53,7 +53,8 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         STRING_POKEMON + " SV", "Auto-Host",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoHost.md",
         "Auto-host a Tera raid.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

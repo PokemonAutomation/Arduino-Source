@@ -15,13 +15,14 @@ namespace NintendoSwitch{
 
 MultiSwitchSystemOption::MultiSwitchSystemOption(
     PABotBaseLevel min_pabotbase,
-    FeedbackType feedback, bool allow_commands_while_running,
+    FeedbackType feedback,
+    AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     size_t switches
 )
     : m_min_pabotbase(min_pabotbase)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
@@ -32,13 +33,14 @@ MultiSwitchSystemOption::MultiSwitchSystemOption(
 }
 MultiSwitchSystemOption::MultiSwitchSystemOption(
     PABotBaseLevel min_pabotbase,
-    FeedbackType feedback, bool allow_commands_while_running,
+    FeedbackType feedback,
+    AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     const JsonValue& json
 )
     : m_min_pabotbase(min_pabotbase)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)

@@ -116,7 +116,8 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Nintendo Switch", "Test Program (Switch)",
         "",
         "Test Program (Switch)",
-        FeedbackType::OPTIONAL_, true,
+        FeedbackType::OPTIONAL_,
+        AllowCommandsWhenRunning::ENABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

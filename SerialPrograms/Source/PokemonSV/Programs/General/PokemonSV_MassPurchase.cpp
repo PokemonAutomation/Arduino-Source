@@ -27,7 +27,8 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         STRING_POKEMON + " SV", "Mass Purchase",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassPurchase.md",
         "Purchase a specified amount of items from a shop.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

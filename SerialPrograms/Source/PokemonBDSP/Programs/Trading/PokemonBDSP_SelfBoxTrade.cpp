@@ -23,7 +23,8 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Box Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/SelfBoxTrade.md",
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 2, 2
     )

@@ -30,7 +30,9 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switches(
-        PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE, false,
+        PABotBaseLevel::NOT_PABOTBASE,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         1, 4, 1
     )
 {}

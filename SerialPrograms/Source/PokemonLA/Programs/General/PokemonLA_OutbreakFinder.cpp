@@ -158,7 +158,8 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         STRING_POKEMON + " LA", "Outbreak Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/OutbreakFinder.md",
         "Search for an outbreak for a specific " + STRING_POKEMON,
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

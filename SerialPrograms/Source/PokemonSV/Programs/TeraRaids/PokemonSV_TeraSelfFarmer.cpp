@@ -46,7 +46,8 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         STRING_POKEMON + " SV", "Tera Self Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraSelfFarmer.md",
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny raids.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

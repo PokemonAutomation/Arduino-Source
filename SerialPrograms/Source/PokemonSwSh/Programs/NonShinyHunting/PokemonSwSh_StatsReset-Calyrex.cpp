@@ -28,7 +28,8 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Calyrex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Calyrex.md",
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

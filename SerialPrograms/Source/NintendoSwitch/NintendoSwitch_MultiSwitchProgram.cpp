@@ -71,7 +71,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string doc_link,
     std::string description,
     FeedbackType feedback,
-    bool allow_commands_while_running,
+    AllowCommandsWhenRunning allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level,
     size_t min_switches,
     size_t max_switches,
@@ -86,7 +86,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)

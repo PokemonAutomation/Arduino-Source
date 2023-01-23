@@ -20,7 +20,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "Nintendo Switch", "Box Draw",
         "",
         "Test box coordinates for development.",
-        FeedbackType::NONE, true,
+        FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

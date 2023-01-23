@@ -85,7 +85,8 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         STRING_POKEMON + " SV", "Tera Multi-Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraMultiFarmer.md",
         "Farm items and " + STRING_POKEMON + " from a Tera raid using multiple Switches.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         2, 4, 2
     )
