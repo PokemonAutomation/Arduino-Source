@@ -75,13 +75,13 @@ StatsReset::StatsReset()
         LockWhileRunning::LOCKED,
         Target::TreasuresOfRuin
     )
-    ,LANGUAGE(
+    , LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
         LockWhileRunning::LOCKED,
-        false
+        true
     )
-    ,BALL_SELECT(
+    , BALL_SELECT(
         "<b>Ball Select:</b>",
         LockWhileRunning::UNLOCKED,
         "poke-ball"

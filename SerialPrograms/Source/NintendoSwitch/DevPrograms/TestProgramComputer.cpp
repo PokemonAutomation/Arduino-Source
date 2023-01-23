@@ -186,8 +186,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw OperationFailedException(env.logger(), "asdf");
 //    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
 //    throw ProgramFinishedException();
-    throw FatalProgramException(env.logger(), "test");
+//    throw FatalProgramException(env.logger(), "test");
 
+
+    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
 
 
 #if 0

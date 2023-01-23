@@ -120,7 +120,7 @@ CloneItems101::CloneItems101()
 
 
 
-void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
 
     bool item_held = false;
@@ -218,7 +218,7 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
             if (!item_held){
                 pbf_press_button(context, BUTTON_B, 20, 105);
 //                continue;
-                return;
+                return true;
             }
 
             VideoSnapshot snapshot = console.video().snapshot();
@@ -242,11 +242,12 @@ void CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
         }
         default:
             stats.m_errors++;
-
-            dump_image_and_throw_recoverable_exception(
-                env, console, NOTIFICATION_ERROR_RECOVERABLE,
-                "CloneItemNoState", "No recognized state after 10 seconds."
-            );
+            console.log("No recognized state after 10 seconds.", COLOR_RED);
+            return false;
+//            dump_image_and_throw_recoverable_exception(
+//                env, console, NOTIFICATION_ERROR_RECOVERABLE,
+//                "CloneItemNoState", "No recognized state after 10 seconds."
+//            );
         }
 
     }
@@ -261,6 +262,12 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
+        if (clone_item(env, env.console, context)){
+            cloned++;
+            stats.m_cloned++;
+            continue;
+        }
+#if 0
         try{
             clone_item(env, env.console, context);
             cloned++;
@@ -269,6 +276,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
         }
+#endif
 
         env.console.log("Attempting to recover by backing out to a known state.", COLOR_RED);
 
