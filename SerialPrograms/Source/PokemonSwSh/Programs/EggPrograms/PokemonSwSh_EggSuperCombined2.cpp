@@ -23,7 +23,8 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Super-Combined 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

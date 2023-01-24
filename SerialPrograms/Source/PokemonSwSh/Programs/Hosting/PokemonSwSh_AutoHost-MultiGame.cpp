@@ -31,7 +31,8 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         STRING_POKEMON + " SwSh", "Auto-Host Multi-Game",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
-        FeedbackType::OPTIONAL_, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::OPTIONAL_,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

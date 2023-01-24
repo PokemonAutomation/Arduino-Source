@@ -18,7 +18,8 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Nintendo Switch", "Prevent Sleep",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PreventSleep.md",
         "Press B every 15 seconds to keep the Switch from sleeping.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

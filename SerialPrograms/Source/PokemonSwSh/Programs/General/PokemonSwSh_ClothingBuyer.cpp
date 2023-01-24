@@ -22,7 +22,8 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " SwSh", "Clothing Buyer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
         "Buy out all the clothing in a store.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -19,7 +19,8 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
         "PokemonSwSh:SynchronizedSpinning",
         STRING_POKEMON + " SwSh", "Synchronized Spinning", "",
         "Don't ask... seriously, don't ask...",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

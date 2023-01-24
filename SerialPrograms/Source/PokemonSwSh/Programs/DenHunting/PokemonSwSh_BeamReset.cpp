@@ -23,7 +23,8 @@ BeamReset_Descriptor::BeamReset_Descriptor()
         STRING_POKEMON + " SwSh", "Beam Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
         "Reset a beam until you see a purple beam.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

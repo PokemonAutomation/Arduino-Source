@@ -24,7 +24,8 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         STRING_POKEMON + " SwSh", "Trade Bot",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
         "Surprise trade with a code for hosting giveaways.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -18,7 +18,8 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Nintendo Switch", "Turbo Button",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboButton.md",
         "Mash a controller button. (similar to turbo controller)",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

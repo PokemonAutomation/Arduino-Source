@@ -18,7 +18,8 @@ TestPathMaker_Descriptor::TestPathMaker_Descriptor()
         "Nintendo Switch", "Path Maker",
         "",
         "Create paths to test routes",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -31,7 +31,8 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
         STRING_POKEMON + " SV", "Video Fast Code Entry (V-FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/VideoFastCodeEntry.md",
         "Read a 4, 6, or 8 digit link code from someone on your screen and enter it as quickly as possible.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )

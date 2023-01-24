@@ -24,7 +24,8 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Daily Highlight Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-DailyHighlightFarmer.md",
         "Farm the daily highlight watt trader in Crown Tundra.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
