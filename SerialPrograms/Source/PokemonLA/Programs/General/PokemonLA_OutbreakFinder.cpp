@@ -107,34 +107,13 @@ namespace {
 
 
 std::vector<std::string> load_mmo_names(){
-    std::vector<std::string> names;
-
-    const std::string slugs[5] = {
+    return {
         "fieldlands-mmo",
         "mirelands-mmo",
         "coastlands-mmo",
         "highlands-mmo",
         "icelands-mmo"
     };
-
-    const std::string display_names[5] = {
-        "Fieldlands MMO",
-        "Mirelands MMO",
-        "Coastlands MMO",
-        "Highlands MMO",
-        "Icelands MMO"
-    };
-
-    std::string mmo_symbol_path = RESOURCE_PATH() + "PokemonLA/MMOQuestionMark-Template.png";
-    ImageRGB32 mmo_sprite(mmo_symbol_path);
-    QPixmap mmo_pixmap = QPixmap::fromImage(ImageMatch::trim_image_alpha(mmo_sprite).to_QImage_ref());
-
-
-    for(size_t i = 0; i < 5; i++){
-        names.emplace_back(slugs[i]);
-    }
-
-    return names;
 }
 
 // The name of each MMO event happening at each region. Their slugs are:
