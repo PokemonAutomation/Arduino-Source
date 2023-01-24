@@ -10,7 +10,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
 #include "CommonFramework/Environment/Environment.h"
-#include "VideoOverlayTypes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 
 namespace PokemonAutomation{
 

@@ -4,16 +4,16 @@
  *
  */
 
+#ifdef _WIN32
+
 #include <map>
 #include <iostream>
 #include <thread>
+#include <Windows.h>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
 #include "Environment_Windows.h"
-
-#ifdef _WIN32
-#include <Windows.h>
 
 #if __GNUC__
 #ifndef cpuid_H
@@ -138,6 +138,54 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle){
     nanos *= 100;
     return std::chrono::duration_cast<WallClock::duration>(std::chrono::nanoseconds(nanos));
 }
+
+
+
+
+
+
+
+
+SystemCpuTime SystemCpuTime::now(){
+    SystemCpuTime ret;
+    ret.set_to_now();
+    return ret;
+}
+size_t SystemCpuTime::vcores(){
+    static size_t cores = read_cores();
+    return cores;
+}
+void SystemCpuTime::set_to_now(){
+    FILETIME idle_time, kernel_time, user_time;
+    if (GetSystemTimes(&idle_time, &kernel_time, &user_time)){
+        m_idle = idle_time.dwLowDateTime + ((uint64_t)idle_time.dwHighDateTime << 32);
+        m_kernel = kernel_time.dwLowDateTime + ((uint64_t)kernel_time.dwHighDateTime << 32);
+        m_user = user_time.dwLowDateTime + ((uint64_t)user_time.dwHighDateTime << 32);
+    }else{
+        m_idle = 0;
+        m_kernel = 0;
+        m_user = 0;
+    }
+}
+size_t SystemCpuTime::read_cores(){
+    size_t cores = 0;
+    WORD total_groups = GetActiveProcessorGroupCount();
+    for (WORD group = 0; group < total_groups; group++){
+        DWORD processors_within_group = GetActiveProcessorCount(group);
+        cores += processors_within_group;
+    }
+    return cores;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

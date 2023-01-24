@@ -26,7 +26,7 @@ OverlayStatSnapshot ThreadUtilizationStat::get_current(){
     WallClock now = current_time();
     WallClock::duration clock = thread_cpu_time(m_handle);
     if (clock == WallClock::duration::min()){
-        return OverlayStatSnapshot{m_label + " ---", };
+        return OverlayStatSnapshot{m_label + " ---"};
     }
 
     if (m_last_clock != WallClock::duration::min()){

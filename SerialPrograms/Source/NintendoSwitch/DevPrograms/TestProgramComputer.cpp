@@ -4,6 +4,10 @@
  *
  */
 
+#ifdef _WIN64
+#include <Windows.h>
+#endif
+
 #include <set>
 #include <mutex>
 #include <fstream>
@@ -99,6 +103,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Environment/Environment.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -175,8 +180,6 @@ void print(const Type* ptr, size_t len){
 
 
 
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -192,8 +195,35 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
 
-    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
+//    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
+
+#if 0
+    FILETIME idle_time, kernel_time, user_time;
+    GetSystemTimes(&idle_time, &kernel_time, &user_time);
+//    cout <<  << endl;
+//    cout <<  << endl;
+//    cout <<  << endl;
+
+    uint64_t start_idle = idle_time.dwLowDateTime + ((uint64_t)idle_time.dwHighDateTime << 32);
+    uint64_t start_kernel = kernel_time.dwLowDateTime + ((uint64_t)kernel_time.dwHighDateTime << 32);
+    uint64_t start_user = user_time.dwLowDateTime + ((uint64_t)user_time.dwHighDateTime << 32);
+
+    scope.wait_for(std::chrono::seconds(4));
+
+    GetSystemTimes(&idle_time, &kernel_time, &user_time);
+//    cout <<  << endl;
+//    cout <<  << endl;
+//    cout <<  << endl;
+
+    uint64_t end_idle = idle_time.dwLowDateTime + ((uint64_t)idle_time.dwHighDateTime << 32);
+    uint64_t end_kernel = kernel_time.dwLowDateTime + ((uint64_t)kernel_time.dwHighDateTime << 32);
+    uint64_t end_user = user_time.dwLowDateTime + ((uint64_t)user_time.dwHighDateTime << 32);
+
+    cout << (end_idle - start_idle) * 100 / 1000000000. << endl;
+    cout << (end_kernel - start_kernel) * 100 / 1000000000. << endl;
+    cout << (end_user - start_user) * 100 / 1000000000. << endl;
+#endif
 
 #if 0
     uint32_t src[4 * 4] = {

@@ -531,8 +531,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraOption.cpp
     Source/CommonFramework/VideoPipeline/CameraOption.h
     Source/CommonFramework/VideoPipeline/CameraSession.h
-    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.cpp
-    Source/CommonFramework/VideoPipeline/ThreadUtilizationStats.h
+    Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
+    Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.cpp
+    Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp

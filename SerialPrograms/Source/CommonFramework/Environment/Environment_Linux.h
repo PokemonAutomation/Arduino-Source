@@ -36,5 +36,27 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle);
 
 
 
+class SystemCpuTime{
+public:
+    static SystemCpuTime now();
+    static size_t vcores();
+
+    bool is_valid() const{
+        return false;
+    }
+
+    std::chrono::microseconds operator-(const SystemCpuTime& x) const;
+
+private:
+    void set_to_now();
+    static size_t read_cores();
+
+private:
+//    uint64_t m_time = 0;
+};
+
+
+
+
 }
 #endif

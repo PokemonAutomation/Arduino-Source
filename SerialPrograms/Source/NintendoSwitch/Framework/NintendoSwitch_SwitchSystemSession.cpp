@@ -4,7 +4,8 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/ThreadUtilizationStats.h"
+#include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
+#include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -26,6 +27,7 @@ SwitchSystemSession::~SwitchSystemSession(){
     }catch (...){}
     ProgramTracker::instance().remove_console(m_console_id);
     m_overlay.remove_stat(*m_main_thread_utilization);
+    m_overlay.remove_stat(*m_cpu_utilization);
     m_option.m_camera.info = m_camera->current_device();
     m_option.m_camera.current_resolution = m_camera->current_resolution();
 }
@@ -41,11 +43,13 @@ SwitchSystemSession::SwitchSystemSession(
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)
     , m_overlay(option.m_overlay)
+    , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
     m_camera->set_resolution(option.m_camera.current_resolution);
     m_camera->set_source(option.m_camera.info);
     m_console_id = ProgramTracker::instance().add_console(program_id, *this);
+    m_overlay.add_stat(*m_cpu_utilization);
     m_overlay.add_stat(*m_main_thread_utilization);
 }
 
