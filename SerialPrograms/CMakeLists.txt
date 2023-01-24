@@ -1413,6 +1413,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp

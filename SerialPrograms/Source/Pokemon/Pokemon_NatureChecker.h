@@ -45,6 +45,8 @@ enum class NatureCheckerValue{
 };
 const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database();
 NatureCheckerValue NatureCheckerValue_string_to_enum(const std::string& token);
+NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token);
+
 
 enum class NatureCheckerFilter {
     Any,
