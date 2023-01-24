@@ -885,6 +885,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.cpp
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp
