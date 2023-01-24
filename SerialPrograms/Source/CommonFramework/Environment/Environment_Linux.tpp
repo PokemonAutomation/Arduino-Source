@@ -110,7 +110,7 @@ std::chrono::microseconds SystemCpuTime::operator-(const SystemCpuTime& x) const
     return std::chrono::microseconds(0);
 }
 SystemCpuTime SystemCpuTime::now(){
-    SystemCpuUtilizationTracker ret;
+    SystemCpuTime ret;
     ret.set_to_now();
     return ret;
 }
