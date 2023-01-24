@@ -106,22 +106,22 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle){
 
 
 
-std::chrono::microseconds SystemCpuUtilizationTracker::operator-(const SystemCpuUtilizationTracker& x) const{
+std::chrono::microseconds SystemCpuTime::operator-(const SystemCpuTime& x) const{
     return std::chrono::microseconds(0);
 }
-SystemCpuUtilizationTracker SystemCpuUtilizationTracker::now(){
+SystemCpuTime SystemCpuTime::now(){
     SystemCpuUtilizationTracker ret;
     ret.set_to_now();
     return ret;
 }
-size_t SystemCpuUtilizationTracker::vcores(){
+size_t SystemCpuTime::vcores(){
     static size_t cores = read_cores();
     return cores;
 }
-void SystemCpuUtilizationTracker::set_to_now(){
+void SystemCpuTime::set_to_now(){
     //  TODO
 }
-size_t SystemCpuUtilizationTracker::read_cores(){
+size_t SystemCpuTime::read_cores(){
     //  TODO
     return 0;
 }
