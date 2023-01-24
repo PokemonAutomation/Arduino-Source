@@ -56,17 +56,6 @@ public:
 };
 
 
-//  A generic exception that should not be caught.
-class FatalProgramException : public Exception{
-public:
-    FatalProgramException(Logger& logger, std::string message);
-    virtual const char* name() const override{ return "FatalProgramException"; }
-    virtual std::string message() const override{ return m_message; }
-private:
-    std::string m_message;
-};
-
-
 
 
 

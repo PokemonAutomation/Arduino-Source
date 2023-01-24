@@ -12,12 +12,7 @@
 
 namespace PokemonAutomation{
 
-class ImageViewRGB32;
-class ImageRGB32;
-class EventNotificationOption;
-struct ProgramInfo;
-class ProgramEnvironment;
-class ConsoleHandle;
+class FatalProgramException;
 
 
 //  Thrown by subroutines if they fail for an in-game reason.

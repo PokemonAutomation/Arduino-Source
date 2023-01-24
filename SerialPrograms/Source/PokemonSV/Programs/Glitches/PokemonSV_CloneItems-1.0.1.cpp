@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -295,8 +296,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         );
         context.wait_for(std::chrono::milliseconds(50));
         if (ret < 0){
-            dump_image(env.logger(), env.program_info(), "CannotRecoverFromError", env.console.video().snapshot());
-            throw FatalProgramException(env.console.logger(), "Unable to recover from error state.");
+            throw FatalProgramException(env.console, "Unable to recover from error state.", true);
         }
     }
 

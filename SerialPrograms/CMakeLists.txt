@@ -281,6 +281,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h
     Source/CommonFramework/CrashDump.cpp
     Source/CommonFramework/CrashDump.h
+    Source/CommonFramework/Exceptions/FatalProgramException.cpp
+    Source/CommonFramework/Exceptions/FatalProgramException.h
     Source/CommonFramework/Exceptions/OperationFailedException.cpp
     Source/CommonFramework/Exceptions/OperationFailedException.h
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp

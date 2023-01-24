@@ -1,4 +1,4 @@
-/*  Operation Failed Exception
+/*  Fatal Program Exception
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -10,29 +10,31 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "FatalProgramException.h"
-#include "OperationFailedException.h"
 
 namespace PokemonAutomation{
 
 
-OperationFailedException::OperationFailedException(Logger& logger, std::string message)
+FatalProgramException::FatalProgramException(ScreenshotException&& e)
+    : ScreenshotException(std::move(e.m_message), std::move(e.m_screenshot))
+{}
+FatalProgramException::FatalProgramException(Logger& logger, std::string message)
     : ScreenshotException(std::move(message))
 {
-    logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
+    logger.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
-OperationFailedException::OperationFailedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
+FatalProgramException::FatalProgramException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
     : ScreenshotException(std::move(message), std::move(screenshot))
 {
-    logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
+    logger.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
-OperationFailedException::OperationFailedException(ConsoleHandle& console, std::string message, bool take_screenshot)
+FatalProgramException::FatalProgramException(ConsoleHandle& console, std::string message, bool take_screenshot)
     : ScreenshotException(console, std::move(message), take_screenshot)
 {
-    console.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
+    console.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
 
 
-void OperationFailedException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const{
+void FatalProgramException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const{
     std::vector<std::pair<std::string, std::string>> embeds;
     if (!m_message.empty()){
         embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));

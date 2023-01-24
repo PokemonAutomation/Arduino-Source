@@ -5,10 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -82,7 +81,7 @@ void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& c
     BattleBallReader reader(console, LANGUAGE);
     int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
     if (quantity == 0) {
-        throw FatalProgramException(console.logger(), "Unable to find appropriate ball. Did you run out?");
+        throw FatalProgramException(console, "Unable to find appropriate ball. Did you run out?", true);
     }
     if (quantity < 0) {
         console.log("Unable to read ball quantity.", COLOR_RED);
@@ -118,8 +117,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             env.update_stats();
             break;
         default:
-            dump_image(env.logger(), env.program_info(), "BattleMenuNotDetected", env.console.video().snapshot());
-            throw FatalProgramException(env.console.logger(), "Failed to detect battle menu after 60 seconds, did you catch or fail?");
+            throw FatalProgramException(env.console, "Failed to detect battle menu after 60 seconds, did you catch or fail?", true);
         }
 
     }

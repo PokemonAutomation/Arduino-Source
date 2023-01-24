@@ -26,14 +26,6 @@ std::string Exception::to_str() const{
 
 
 
-FatalProgramException::FatalProgramException(Logger& logger, std::string message)
-    : m_message(message)
-{
-    logger.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
-}
-
-
-
 
 FileException::FileException(Logger* logger, const char* location, std::string message, std::string file)
     : m_location(location)

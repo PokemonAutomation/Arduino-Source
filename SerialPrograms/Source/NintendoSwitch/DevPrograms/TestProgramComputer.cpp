@@ -192,7 +192,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
 
-    throw ProgramFinishedException();
+    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
 #if 0

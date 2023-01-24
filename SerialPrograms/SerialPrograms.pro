@@ -164,6 +164,7 @@ SOURCES += \
     Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
+    Source/CommonFramework/Exceptions/FatalProgramException.cpp \
     Source/CommonFramework/Exceptions/OperationFailedException.cpp \
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp \
     Source/CommonFramework/Exceptions/ScreenshotException.cpp \
@@ -1031,6 +1032,7 @@ HEADERS += \
     Source/CommonFramework/Environment/HardwareValidation.h \
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
+    Source/CommonFramework/Exceptions/FatalProgramException.h \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
     Source/CommonFramework/Exceptions/ProgramFinishedException.h \
     Source/CommonFramework/Exceptions/ScreenshotException.h \

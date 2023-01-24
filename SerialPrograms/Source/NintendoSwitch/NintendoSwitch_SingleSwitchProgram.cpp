@@ -43,7 +43,12 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
     const std::vector<std::string>& error_notification_tags
 )
     : m_options(LockWhileRunning::UNLOCKED)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATION_PROGRAM_FINISH(
+        "Program Finished",
+        true, true,
+        ImageAttachmentMode::PNG,
+        {"Notifs"}
+    )
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
         true, false,

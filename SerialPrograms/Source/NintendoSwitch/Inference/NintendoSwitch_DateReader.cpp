@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -142,8 +143,7 @@ void DateReader::set_hours(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            dump_image(console.logger(), info, "DateChangeMenuNotDetected", snapshot);
-            throw FatalProgramException(console.logger(), "Expected date change menu.");
+            throw FatalProgramException(console, "Expected date change menu.", true);
         }
     }
 
@@ -159,8 +159,7 @@ void DateReader::set_hours(
         VideoSnapshot snapshot = console.video().snapshot();
         int8_t current_hour = read_hours(console.logger(), snapshot);
         if (current_hour < 0){
-            dump_image(console.logger(), info, "CannotReadHour", snapshot);
-            throw FatalProgramException(console.logger(), "Unable to read the hour.");
+            throw FatalProgramException(console, "Unable to read the hour.", true);
         }
 
         //  We're done.
@@ -211,8 +210,7 @@ void DateReader::set_hours(
     }
 
     auto snapshot = console.video().snapshot();
-    dump_image(console.logger(), info, "FailToSetHour", snapshot);
-    throw FatalProgramException(console.logger(), "Failed to set the hour after 10 attempts.");
+    throw FatalProgramException(console, "Failed to set the hour after 10 attempts.", true);
 }
 
 

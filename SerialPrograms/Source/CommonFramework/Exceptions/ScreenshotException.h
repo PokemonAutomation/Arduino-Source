@@ -37,7 +37,7 @@ public:
 
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const = 0;
 
-protected:
+public:
     std::string m_message;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };

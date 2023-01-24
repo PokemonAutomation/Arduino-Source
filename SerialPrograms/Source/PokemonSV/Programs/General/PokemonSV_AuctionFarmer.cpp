@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
@@ -181,8 +182,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseC
         AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
         stats.m_errors++;
         env.update_stats();
-
-        throw FatalProgramException(env.logger(), e.message());
+        throw FatalProgramException(std::move(e));
     }
 }
 

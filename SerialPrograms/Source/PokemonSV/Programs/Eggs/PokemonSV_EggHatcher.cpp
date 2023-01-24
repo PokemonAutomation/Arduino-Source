@@ -4,10 +4,9 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -103,8 +102,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         {
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
-                dump_image(env.logger(), env.program_info(), "PartyNotEmpty", env.console.video().snapshot());
-                throw FatalProgramException(env.logger(), "party not empty when loading one column for hatching.");
+                throw FatalProgramException(env.console, "Party not empty when loading one column for hatching.", true);
             }
         }
 
@@ -158,8 +156,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
-            dump_image(env.logger(), env.program_info(), "EggInPartyAfterHatching", env.console.video().snapshot());
-            throw FatalProgramException(env.logger(), "detected egg in party after hatching.");
+            throw FatalProgramException(env.console, "Detected egg in party after hatching.", true);
         }
 
         unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);

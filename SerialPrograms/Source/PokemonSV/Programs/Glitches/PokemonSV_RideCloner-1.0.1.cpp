@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -317,7 +318,7 @@ bool RideCloner101::run_post_win(
             BattleBallReader reader(console, LANGUAGE);
             int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
             if (quantity == 0){
-                throw FatalProgramException(console.logger(), "Unable to find appropriate ball. Did you run out?");
+                throw FatalProgramException(console, "Unable to find appropriate ball. Did you run out?", true);
             }
             if (quantity < 0){
                 console.log("Unable to read ball quantity.", COLOR_RED);
