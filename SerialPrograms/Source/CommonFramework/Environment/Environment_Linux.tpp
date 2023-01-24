@@ -9,6 +9,7 @@
 #include <time.h>
 #include <set>
 #include <iostream>
+#include <thread>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sched.h>
@@ -122,8 +123,7 @@ void SystemCpuTime::set_to_now(){
     //  TODO
 }
 size_t SystemCpuTime::read_cores(){
-    //  TODO
-    return 0;
+    return std::thread::hardware_concurrency();
 }
 
 
