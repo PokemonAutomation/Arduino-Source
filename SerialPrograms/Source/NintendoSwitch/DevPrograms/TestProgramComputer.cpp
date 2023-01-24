@@ -20,6 +20,7 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -189,7 +190,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw FatalProgramException(env.logger(), "test");
 
 
-    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
+//    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
+
+    throw ProgramFinishedException();
 
 
 #if 0

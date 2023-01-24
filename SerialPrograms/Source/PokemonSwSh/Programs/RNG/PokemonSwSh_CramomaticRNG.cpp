@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <set>
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -522,7 +523,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         //  Out of apricorns.
         if (!result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
-            throw ProgramFinishedException();
+            throw ProgramFinishedException(env.console, "Out of apricorns.");
         }
 
 

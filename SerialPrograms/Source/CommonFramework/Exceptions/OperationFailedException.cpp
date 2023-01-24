@@ -4,11 +4,8 @@
  *
  */
 
-#include <memory>
-#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -17,45 +14,33 @@
 namespace PokemonAutomation{
 
 
-
-OperationFailedException::~OperationFailedException() = default;
-OperationFailedException::OperationFailedException(OperationFailedException&&) = default;
-OperationFailedException& OperationFailedException::operator=(OperationFailedException&&) = default;
-
 OperationFailedException::OperationFailedException(Logger& logger, std::string message)
-    : m_message(std::move(message))
+    : ScreenshotException(std::move(message))
 {
     logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
 OperationFailedException::OperationFailedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
-    : m_message(std::move(message))
-    , m_screenshot(std::move(screenshot))
+    : ScreenshotException(std::move(message), std::move(screenshot))
 {
     logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
 OperationFailedException::OperationFailedException(ConsoleHandle& console, std::string message, bool take_screenshot)
-    : m_message(std::move(message))
+    : ScreenshotException(console, std::move(message), take_screenshot)
 {
-    if (take_screenshot){
-        m_screenshot = console.video().snapshot().frame;
-    }
     console.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
-}
-ImageViewRGB32 OperationFailedException::screenshot() const{
-    if (m_screenshot){
-        return *m_screenshot;
-    }else{
-        return ImageViewRGB32();
-    }
 }
 
 
 void OperationFailedException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const{
+    std::vector<std::pair<std::string, std::string>> embeds;
+    if (!m_message.empty()){
+        embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
+    }
     send_program_notification(
         env, notification,
         COLOR_RED,
         "Program Error",
-        {{"Message:", m_message}}, "",
+        std::move(embeds), "",
         screenshot()
     );
     if (m_screenshot){
@@ -65,7 +50,7 @@ void OperationFailedException::send_notification(ProgramEnvironment& env, EventN
             env.logger(), true, COLOR_RED,
             env.program_info(),
             label,
-            {{"Message", m_message}},
+            std::move(embeds),
             filename
         );
     }

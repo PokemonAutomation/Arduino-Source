@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -102,12 +103,9 @@ void ComputerProgramSession::internal_run_program(){
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){
-    }catch (ProgramFinishedException&){
+    }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
-        send_program_finished_notification(
-            env, m_option.instance().NOTIFICATION_PROGRAM_FINISH,
-            ""
-        );
+        e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
     }catch (InvalidConnectionStateException&){
     }catch (OperationFailedException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);

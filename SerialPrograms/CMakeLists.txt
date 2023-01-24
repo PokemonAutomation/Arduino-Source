@@ -283,6 +283,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/Exceptions/OperationFailedException.cpp
     Source/CommonFramework/Exceptions/OperationFailedException.h
+    Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
+    Source/CommonFramework/Exceptions/ProgramFinishedException.h
+    Source/CommonFramework/Exceptions/ScreenshotException.cpp
+    Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
     Source/CommonFramework/Environment/Environment_Linux.h

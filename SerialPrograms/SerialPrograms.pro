@@ -165,6 +165,8 @@ SOURCES += \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
     Source/CommonFramework/Exceptions/OperationFailedException.cpp \
+    Source/CommonFramework/Exceptions/ProgramFinishedException.cpp \
+    Source/CommonFramework/Exceptions/ScreenshotException.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.cpp \
@@ -607,6 +609,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
@@ -1029,6 +1032,8 @@ HEADERS += \
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
+    Source/CommonFramework/Exceptions/ProgramFinishedException.h \
+    Source/CommonFramework/Exceptions/ScreenshotException.h \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h \
@@ -1508,6 +1513,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
