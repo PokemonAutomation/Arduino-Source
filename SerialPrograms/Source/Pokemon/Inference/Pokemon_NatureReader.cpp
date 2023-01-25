@@ -41,6 +41,7 @@ std::string nature_checker_value_to_string(NatureCheckerValue value) {
         "Sassy",
         "Serious",
         "Timid",
+        "Last"
     };
 
     return names[int(value)];
@@ -66,7 +67,7 @@ OCR::StringMatchResult NatureReader::read_substring(
 }
 
 std::string NatureReader::Results::to_string() const {
-    return  "HP: " + nature_checker_value_to_string(nature);
+    return  "Nature: " + nature_checker_value_to_string(nature);
 }
 
 

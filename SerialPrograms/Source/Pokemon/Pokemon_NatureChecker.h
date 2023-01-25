@@ -16,6 +16,7 @@ namespace Pokemon{
 
 enum class NatureCheckerValue{
     UnableToDetect,
+    Neutral,
     Any,
     Adamant,
     Bashful,

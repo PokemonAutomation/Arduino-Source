@@ -40,6 +40,7 @@ const std::map<std::string, NatureCheckerValue> NatureCheckerValue_TOKEN_TO_ENUM
 };
 const std::map<NatureCheckerValue, std::string> NatureCheckerValue_ENUM_TO_TOKEN{
     {NatureCheckerValue::UnableToDetect,    "Unable to Detect"},
+    {NatureCheckerValue::Neutral,           "Neutral"},
     {NatureCheckerValue::Adamant,           "Adamant"},
     {NatureCheckerValue::Bashful,           "Bashful"},
     {NatureCheckerValue::Bold,              "Bold"},
@@ -68,7 +69,7 @@ const std::map<NatureCheckerValue, std::string> NatureCheckerValue_ENUM_TO_TOKEN
 
 const std::map<std::pair<int, int>, NatureCheckerValue> NatureCheckerValue_HELPHINDER_TO_ENUM{
     {{ 0, 2 },      NatureCheckerValue::Adamant},
-    {{ -1, -1 },    NatureCheckerValue::Bashful}, //Bashful, Docile, Hardy, Quirky, Serious
+    {{ -1, -1 },    NatureCheckerValue::Neutral}, //Bashful, Docile, Hardy, Quirky, Serious
     {{ 1, 0 },      NatureCheckerValue::Bold},
     {{ 0, 4 },      NatureCheckerValue::Brave},
     {{ 3, 0 },      NatureCheckerValue::Calm},
@@ -178,6 +179,9 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Adamant:
         return value == NatureCheckerValue::Adamant;
     case NatureCheckerFilter::Bashful:
+        if (value == NatureCheckerValue::Neutral) {
+            return true;
+        }
         return value == NatureCheckerValue::Bashful;
     case NatureCheckerFilter::Bold:
         return value == NatureCheckerValue::Bold;
@@ -188,10 +192,16 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Careful:
         return value == NatureCheckerValue::Careful;
     case NatureCheckerFilter::Docile:
+        if (value == NatureCheckerValue::Neutral) {
+            return true;
+        }
         return value == NatureCheckerValue::Docile;
     case NatureCheckerFilter::Gentle:
         return value == NatureCheckerValue::Gentle;
     case NatureCheckerFilter::Hardy:
+        if (value == NatureCheckerValue::Neutral) {
+            return true;
+        }
         return value == NatureCheckerValue::Hardy;
     case NatureCheckerFilter::Hasty:
         return value == NatureCheckerValue::Hasty;
@@ -214,6 +224,9 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Quiet:
         return value == NatureCheckerValue::Quiet;
     case NatureCheckerFilter::Quirky:
+        if (value == NatureCheckerValue::Neutral) {
+            return true;
+        }
         return value == NatureCheckerValue::Quirky;
     case NatureCheckerFilter::Rash:
         return value == NatureCheckerValue::Rash;
@@ -222,6 +235,9 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Sassy:
         return value == NatureCheckerValue::Sassy;
     case NatureCheckerFilter::Serious:
+        if (value == NatureCheckerValue::Neutral) {
+            return true;
+        }
         return value == NatureCheckerValue::Serious;
     case NatureCheckerFilter::Timid:
         return value == NatureCheckerValue::Timid;
