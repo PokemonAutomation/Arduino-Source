@@ -12,7 +12,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 const NatureReader& NATURE_READER(){
-    const static Pokemon::NatureReader reader("PokemonSV/NatureCheckerOCR.json");
+    const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
     return reader;
 }
 
