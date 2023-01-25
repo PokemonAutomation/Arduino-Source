@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const bool IS_BETA_VERSION = true;
+const bool IS_BETA_VERSION = false;
 const int PROGRAM_VERSION_MAJOR = 0;
 const int PROGRAM_VERSION_MINOR = 28;
 const int PROGRAM_VERSION_PATCH = 17;

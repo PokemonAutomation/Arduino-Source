@@ -59,9 +59,9 @@ MassPurchase::MassPurchase()
         50
     )
     , QUANTITY(
-        "<b>Quantity to Buy:</b><br>The amount of each item to buy (Set to 0 for 999).",
+        "<b>Quantity to Buy:</b><br>The amount of each item to buy. If a clothing store, set to 1.",
         LockWhileRunning::LOCKED,
-        0
+        1, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , PAY_LP(
@@ -150,40 +150,57 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, 
 void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
-    
+
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-    
-    int item_val = ITEMS;
+
+    uint16_t item_val = ITEMS;
     bool skip_item = false;
     bool extra = false;
     while (item_val != 0){
-        int qt_val = QUANTITY;
-        pbf_press_button(context, BUTTON_A, 5, 105);
-        
+        uint16_t qt_val = QUANTITY;
+        pbf_press_button(context, BUTTON_A, 20, 105);
+
         skip_item = mass_purchase(env, env.console, context);
-        
+
         if (skip_item){
-            pbf_press_button(context, BUTTON_B, 5, 105);
+            pbf_press_button(context, BUTTON_B, 20, 105);
         }
-        
+
         if (!skip_item){
-            while (qt_val != 0){
-                pbf_press_dpad(context, DPAD_UP, 5, 105);
-                qt_val--;
+            if (qt_val <= 500){
+                uint16_t current = 1;
+                while (current + 10 <= qt_val){
+                    pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+                    current += 10;
+                }
+                while (current < qt_val){
+                    pbf_press_dpad(context, DPAD_UP, 20, 10);
+                    current++;
+                }
+            }else{
+                uint16_t current = 999;
+                pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+                while (current >= qt_val + 10){
+                    pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+                    current -= 10;
+                }
+                while (current > qt_val){
+                    pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+                    current--;
+                }
             }
 
-            pbf_press_dpad(context, DPAD_DOWN, 5, 105);
-            pbf_press_button(context, BUTTON_A, 5, 125);
+            pbf_press_button(context, BUTTON_A, 20, 125);
 
             if (PAY_LP){
                 pbf_press_dpad(context, DPAD_DOWN, 5, 105);
             }
 
-            pbf_press_button(context, BUTTON_A, 5, 250);
-            pbf_press_button(context, BUTTON_A, 5, 125);
+            pbf_press_button(context, BUTTON_A, 20, 230);
+            pbf_press_button(context, BUTTON_A, 20, 105);
             extra = extra_items(env, env.console, context);
             if (extra) {
-                pbf_press_button(context, BUTTON_A, 5, 125);
+                pbf_press_button(context, BUTTON_A, 20, 105);
             };
 
             env.log("Item Purchased");
@@ -192,19 +209,19 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
         
-        pbf_press_dpad(context, DPAD_DOWN, 5, 105);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 105);
         
         item_val--;
     }
         
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_A, 5, 105);
-    pbf_press_button(context, BUTTON_B, 5, 105);
-    pbf_press_button(context, BUTTON_A, 5, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 105);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

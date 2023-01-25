@@ -18,9 +18,13 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSV_TeraCodeReader.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//#define PA_ENABLE_CODE_DEBUG
+
+#ifdef PA_ENABLE_CODE_DEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -181,7 +185,7 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
         }
     );
 
-#if 0
+#ifdef PA_ENABLE_CODE_DEBUG
     static size_t count = 0;
     for (size_t c = 0; c < ret.size(); c++){
         cout << ret[c].ocr << endl;

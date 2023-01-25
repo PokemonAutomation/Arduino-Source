@@ -37,8 +37,8 @@ private:
     bool extra_items(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     
 private:
-    SimpleIntegerOption<uint32_t> ITEMS;
-    SimpleIntegerOption<uint32_t> QUANTITY;
+    SimpleIntegerOption<uint16_t> ITEMS;
+    SimpleIntegerOption<uint16_t> QUANTITY;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption PAY_LP;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
