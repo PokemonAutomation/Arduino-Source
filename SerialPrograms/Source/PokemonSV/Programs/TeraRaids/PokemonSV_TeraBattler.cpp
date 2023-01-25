@@ -66,8 +66,12 @@ bool run_tera_battle(
             if (next_turn_on_battle_menu){
                 console.log("Detected battle menu. Turn: " + std::to_string(turn));
                 turn++;
-                if (turn < move_table.size()){
-                    current_move = move_table[turn];
+                //  Reset the move to the table entry in case we were forced to
+                //  change moves due to move being unselectable.
+                if (move_table.empty()){
+                    current_move = TeraMoveEntry{TeraMoveType::Move1, 0, TeraTarget::Opponent};
+                }else if (turn < move_table.size()){
+                    current_move = move_table.back();
                 }
                 next_turn_on_battle_menu = false;
             }

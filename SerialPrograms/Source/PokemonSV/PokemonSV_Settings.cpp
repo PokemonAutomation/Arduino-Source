@@ -40,7 +40,7 @@ GameSettings::GameSettings()
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
-        "40 * TICKS_PER_SECOND"
+        "60 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
@@ -52,7 +52,7 @@ GameSettings::GameSettings()
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockWhileRunning::LOCKED,
         TICKS_PER_SECOND,
-        "40 * TICKS_PER_SECOND"
+        "60 * TICKS_PER_SECOND"
     )
     , m_tera_raids(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"

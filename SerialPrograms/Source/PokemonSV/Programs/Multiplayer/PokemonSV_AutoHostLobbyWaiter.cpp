@@ -177,8 +177,8 @@ bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot){
         m_env, m_notification_raid_start,
         COLOR_RED,
         m_lobby_code.empty()
-            ? "Raid Canceled Due to Banned User"
-            : "Raid (" + m_lobby_code + ") Canceled Due to Banned User",
+            ? "Raid Cancelled Due to Banned User"
+            : "Raid (" + m_lobby_code + ") Cancelled Due to Banned User",
         {{"Banned User(s):", std::move(message)}}, "",
         snapshot
     );

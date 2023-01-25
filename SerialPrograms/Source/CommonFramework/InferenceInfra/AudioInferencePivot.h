@@ -27,7 +27,7 @@ public:
     //  If this callback returns true:
     //      1.  Cancel "scope".
     //      2.  Set "set_when_triggered" to the callback.
-    //  If the callback throws an exception, "scope" will be canceled with that exception.
+    //  If the callback throws an exception, "scope" will be cancelled with that exception.
     void add_callback(
         Cancellable& scope,
         std::atomic<InferenceCallback*>* set_when_triggered,
