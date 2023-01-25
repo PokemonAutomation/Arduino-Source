@@ -73,6 +73,12 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
             throw UserSetupError(logger(), std::move(error));
         }
     }
+    size_t consoles = m_system.count();
+    for (size_t c = 0; c < consoles; c++){
+        if (!m_system[c].serial_session().is_ready()){
+            throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
+        }
+    }
 
     {
         SpinLockGuard lg(m_lock);
@@ -117,12 +123,6 @@ void MultiSwitchProgramSession::internal_run_program(){
     );
 
     size_t consoles = m_system.count();
-    for (size_t c = 0; c < consoles; c++){
-        if (!m_system[c].serial_session().is_ready()){
-            throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
-        }
-    }
-
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];
