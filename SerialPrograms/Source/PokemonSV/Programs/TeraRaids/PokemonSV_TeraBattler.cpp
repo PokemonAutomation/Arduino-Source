@@ -4,6 +4,7 @@
  *
  */
 
+#include <mutex>
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -15,6 +16,12 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+//  If two Switches send commands at exactly the same time, it may cause the
+//  Switches to desync and fork the battle state. So we use this lock prevent
+//  any two Switches from sending commands too close to each other.
+std::mutex tera_battle_throttle_lock;
 
 
 enum class BattleMenuResult{
@@ -86,7 +93,9 @@ bool run_cheer_select(
         return false;
     }
     if (cheer_select_menu.move_to_slot(console, context, index)){
+        std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
         pbf_press_button(context, BUTTON_A, 20, 10);
+        context.wait_for_all_requests();
     }
     return true;
 }
@@ -151,10 +160,13 @@ bool run_target_select(
     case TeraMoveType::Move1:
     case TeraMoveType::Move2:
     case TeraMoveType::Move3:
-    case TeraMoveType::Move4:
+    case TeraMoveType::Move4:{
         target_select_menu.move_to_slot(console, context, (uint8_t)move.target);
+        std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
         pbf_press_button(context, BUTTON_A, 20, 10);
+        context.wait_for_all_requests();
         return true;
+    }
     default:
         pbf_press_button(context, BUTTON_B, 20, 10);
         return false;
