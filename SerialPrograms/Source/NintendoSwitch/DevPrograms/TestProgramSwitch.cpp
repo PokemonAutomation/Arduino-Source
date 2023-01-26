@@ -36,6 +36,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
@@ -160,8 +161,6 @@ using namespace PokemonSV;
 
 
 
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -182,6 +181,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    ImageRGB32 filtered = filter_rgb32_range(image, 0xff808000, 0xffffffff, Color(0xff000000), false);
+    filtered.save("test.png");
+#endif
+
+#if 0
     TeraBattleMenuDetector battle_menu(COLOR_RED);
     MoveSelectDetector move_select(COLOR_YELLOW);
     CheerSelectDetector cheer_select(COLOR_GREEN);
@@ -191,7 +201,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto image = feed.snapshot();
     cheer_select.detect_slot(image);
-
+#endif
 
 
 #if 0

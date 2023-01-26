@@ -534,7 +534,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
                 );
             }
             if (win){
-                exit_tera_win_without_catching(env.program_info(), env.console, context);
+                exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
             }
             completed_one = true;
             consecutive_failures = 0;

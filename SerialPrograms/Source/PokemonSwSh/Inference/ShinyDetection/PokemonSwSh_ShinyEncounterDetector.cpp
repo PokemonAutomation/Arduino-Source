@@ -129,13 +129,13 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ConsoleHandle& console, CancellableScope& context,
+    ConsoleHandle& console, CancellableScope& scope,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout
 ){
     ShinyEncounterTracker tracker(console, console, battle_settings);
     int result = wait_until(
-        console, context, timeout,
+        console, scope, timeout,
         {{tracker}}
     );
     if (result < 0){

@@ -61,8 +61,8 @@ void enter_tera_search(
 //  Upon returning, you will be in the overworld.
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console,
-    BotBaseContext& context
+    ConsoleHandle& console, BotBaseContext& context,
+    size_t stop_on_sparkly_items
 );
 
 
@@ -71,10 +71,10 @@ void exit_tera_win_without_catching(
 //  Does not check for shininess.
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug
+    const std::string& ball_slug,
+    size_t stop_on_sparkly_items
 );
 
 
@@ -92,13 +92,12 @@ enum class TeraResult{
 //  "stop_on_shiny == true', then you will be in the summary of the shiny.
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
-    bool stop_on_shiny,
+    bool stop_on_shiny, size_t stop_on_sparkly_items,
     std::atomic<uint64_t>* stat_shinies
 );
 

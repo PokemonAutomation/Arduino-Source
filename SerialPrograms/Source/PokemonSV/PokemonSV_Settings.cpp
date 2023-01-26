@@ -12,7 +12,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 

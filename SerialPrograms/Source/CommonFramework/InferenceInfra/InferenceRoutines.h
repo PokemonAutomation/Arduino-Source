@@ -29,21 +29,21 @@ class ProgramEnvironment;
 //  Exceptions thrown in either the commands or the callbacks will stop
 //  everything and will be propagated out of this function.
 int wait_until(
-    ConsoleHandle& console, CancellableScope& context,
+    ConsoleHandle& console, CancellableScope& scope,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
 inline int wait_until(
-    ConsoleHandle& console, CancellableScope& context,
+    ConsoleHandle& console, CancellableScope& scope,
     std::chrono::milliseconds timeout,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 ){
     return wait_until(
-        console, context,
+        console, scope,
         current_time() + timeout,
         callbacks,
         default_video_period, default_audio_period
