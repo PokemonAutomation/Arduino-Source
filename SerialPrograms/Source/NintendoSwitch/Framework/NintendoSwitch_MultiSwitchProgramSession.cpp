@@ -73,6 +73,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
             throw UserSetupError(logger(), std::move(error));
         }
     }
+
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
         if (!m_system[c].serial_session().is_ready()){

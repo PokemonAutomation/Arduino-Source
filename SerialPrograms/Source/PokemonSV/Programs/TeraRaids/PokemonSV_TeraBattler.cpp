@@ -70,7 +70,7 @@ bool run_tera_battle(
                 //  change moves due to move being unselectable.
                 if (move_table.empty()){
                     current_move = TeraMoveEntry{TeraMoveType::Move1, 0, TeraTarget::Opponent};
-                }else if (turn < move_table.size()){
+                }else if (turn >= move_table.size()){
                     current_move = move_table.back();
                 }
                 next_turn_on_battle_menu = false;
