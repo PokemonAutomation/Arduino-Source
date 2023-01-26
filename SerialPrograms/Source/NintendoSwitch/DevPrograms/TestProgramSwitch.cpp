@@ -181,6 +181,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+
+    TeraBattleMenuDetector battle_menu(COLOR_RED);
+    MoveSelectDetector move_select(COLOR_YELLOW);
+    CheerSelectDetector cheer_select(COLOR_GREEN);
+    battle_menu.make_overlays(overlays);
+    move_select.make_overlays(overlays);
+    cheer_select.make_overlays(overlays);
+
+    auto image = feed.snapshot();
+    cheer_select.detect_slot(image);
+
+
+
 #if 0
     auto image = feed.snapshot();
     CodeEntryDetector detector;
@@ -192,11 +205,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    enter_tera_search(env.program_info(), console, context, false);
 //    open_hosting_lobby(env.program_info(), console, context, HostingMode::ONLINE_CODED);
 
+#if 0
     auto image = feed.snapshot();
     TeraLobbyReader detector(console.logger(), env.realtime_dispatcher());
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     size_t host_index = 1;

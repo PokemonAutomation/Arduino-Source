@@ -43,6 +43,7 @@ bool run_tera_battle(
         terastallizing.make_overlays(overlay_set);
 
         TeraBattleMenuWatcher battle_menu(COLOR_RED);
+        CheerSelectWatcher cheer_select_menu(COLOR_YELLOW);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         TargetSelectWatcher target_select_menu(COLOR_CYAN);
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -53,6 +54,7 @@ bool run_tera_battle(
             std::chrono::seconds(120),
             {
                 battle_menu,
+                cheer_select_menu,
                 move_select_menu,
                 target_select_menu,
                 catch_menu,
@@ -92,35 +94,39 @@ bool run_tera_battle(
                 }
                 continue;
             case TeraMoveType::Cheer_AllOut:
-                if (!battle_menu.move_to_slot(console, context, 1)){
-                    continue;
-                }
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                next_turn_on_battle_menu = true;
-                continue;
             case TeraMoveType::Cheer_HangTough:
-                if (!battle_menu.move_to_slot(console, context, 1)){
-                    continue;
-                }
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                next_turn_on_battle_menu = true;
-                continue;
             case TeraMoveType::Cheer_HealUp:
-                if (!battle_menu.move_to_slot(console, context, 1)){
-                    continue;
+                if (battle_menu.move_to_slot(console, context, 1)){
+                    pbf_press_button(context, BUTTON_A, 20, 10);
                 }
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_dpad(context, DPAD_UP, 20, 30);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                next_turn_on_battle_menu = true;
                 continue;
             }
             continue;
         }
         case 1:{
+            console.log("Detected cheer select. Turn: " + std::to_string(turn));
+            uint8_t index = 0;
+            switch (current_move.type){
+            case TeraMoveType::Cheer_AllOut:
+                index = 0;
+                break;
+            case TeraMoveType::Cheer_HangTough:
+                index = 1;
+                break;
+            case TeraMoveType::Cheer_HealUp:
+                index = 2;
+                break;
+            default:
+                pbf_press_button(context, BUTTON_B, 20, 10);
+                continue;
+            }
+            if (cheer_select_menu.move_to_slot(console, context, index)){
+                pbf_press_button(context, BUTTON_A, 20, 10);
+            }
+            next_turn_on_battle_menu = true;
+            continue;
+        }
+        case 2:{
             console.log("Detected move select. Turn: " + std::to_string(turn));
             consecutive_move_select++;
 
@@ -167,7 +173,7 @@ bool run_tera_battle(
             }
             continue;
         }
-        case 2:
+        case 3:
             console.log("Detected target select. Turn: " + std::to_string(turn));
             consecutive_move_select = 0;
             switch (current_move.type){
@@ -183,11 +189,11 @@ bool run_tera_battle(
                 pbf_press_button(context, BUTTON_B, 20, 10);
                 continue;
             }
-        case 3:
+        case 4:
             console.log("Detected a win!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
-        case 4:
+        case 5:
             console.log("Detected a loss!", COLOR_ORANGE);
             return false;
         default:
