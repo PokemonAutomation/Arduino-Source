@@ -182,6 +182,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+//    change_view_to_stats_or_judge(console, context);
+    change_view_to_judge(console, context, Language::English);
+
+
 
 
 #if 0

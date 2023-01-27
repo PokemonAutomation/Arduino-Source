@@ -377,8 +377,14 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
         // Move box cursor to party lead
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
+
         // Change box view to judge or stats
-        change_stats_view_to_judge(env.program_info(), env.console, context);
+        Language language = LANGUAGE;
+        if (language == Language::None){
+            change_view_to_stats_or_judge(env.console, context);
+        }else{
+            change_view_to_judge(env.console, context, language);
+        }
 
         const uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
         num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);

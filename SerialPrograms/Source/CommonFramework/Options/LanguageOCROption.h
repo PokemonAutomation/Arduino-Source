@@ -8,6 +8,7 @@
 #define PokemonAutomation_Options_LanguageOCROption_H
 
 #include <atomic>
+#include <vector>
 #include <map>
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Language.h"

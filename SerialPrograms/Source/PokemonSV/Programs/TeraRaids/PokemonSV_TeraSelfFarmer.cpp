@@ -119,7 +119,7 @@ TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
-        "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
+        "<b>Fix Clock:</b><br>Fix the time when catching so the caught date will be correct.",
         LockWhileRunning::UNLOCKED, false
     )
 {
