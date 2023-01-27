@@ -69,6 +69,15 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
         LockWhileRunning::LOCKED,
         15
     )
+    , START_LOCATION(
+        "<b>Start Location:</b><br>The start location of your character.",
+        {
+            {StartLocation::FlyPoint, "fly-point", "Fly Point - East Province (Area One) Watchtower"},
+            {StartLocation::InFrontOfChest, "in-front-of-chest", "In front of chest"},
+        },
+        LockWhileRunning::LOCKED,
+        StartLocation::FlyPoint
+    )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
@@ -82,6 +91,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
         })
 {
     PA_ADD_OPTION(PP);
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -90,18 +100,21 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
 void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
-    //Set starting position by flying - must fly to East Province (Area One) Watchtower, do not move from fly point
-    open_map_from_overworld(env.program_info(), env.console, context);
-    fly_to_overworld_from_map(env.program_info(), env.console, context);
-    pbf_move_left_joystick(context, 0, 0, 158, 0);
-    pbf_press_button(context, BUTTON_L, 50, 40);
-    pbf_move_left_joystick(context, 128, 0, 100, 0);
-    //snake eater
-    pbf_press_button(context, BUTTON_L, 50, 40);
-    pbf_move_left_joystick(context, 128, 0, 2350, 0);
-    pbf_press_button(context, BUTTON_L, 50, 40);
-    pbf_move_left_joystick(context, 128, 0, 160, 0);
-    context.wait_for_all_requests();
+    if (START_LOCATION == StartLocation::FlyPoint) {
+        //Set starting position by flying - must fly to East Province (Area One) Watchtower, do not move from fly point
+        open_map_from_overworld(env.program_info(), env.console, context);
+        fly_to_overworld_from_map(env.program_info(), env.console, context);
+        pbf_move_left_joystick(context, 0, 0, 158, 0);
+        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_move_left_joystick(context, 128, 0, 100, 0);
+        //snake eater
+        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_move_left_joystick(context, 128, 0, 2350, 0);
+        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_move_left_joystick(context, 128, 0, 140, 0);
+        context.wait_for_all_requests();
+    }
+    //else assuming player is positioned correctly in front of the chest
 
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
     uint32_t c = 0;
@@ -154,7 +167,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             pbf_press_button(context, BUTTON_L, 50, 40);
             pbf_move_left_joystick(context, 128, 0, 2350, 0);
             pbf_press_button(context, BUTTON_L, 50, 40);
-            pbf_move_left_joystick(context, 128, 0, 150, 0);
+            pbf_move_left_joystick(context, 128, 0, 140, 0);
             context.wait_for_all_requests();
 
             //Check for tauros interrupt before pressing A - reset position if there was one
@@ -186,7 +199,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 pbf_press_button(context, BUTTON_L, 50, 40);
                 pbf_move_left_joystick(context, 128, 0, 2350, 0);
                 pbf_press_button(context, BUTTON_L, 50, 40);
-                pbf_move_left_joystick(context, 128, 0, 145, 0);
+                pbf_move_left_joystick(context, 128, 0, 140, 0);
                 context.wait_for_all_requests();
 
                 stats.wild_interrupts++;
