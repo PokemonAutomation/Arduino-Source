@@ -146,6 +146,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             throw OperationFailedException(env.console, "Failed to enter battle. Are you facing the Pokemon or in a menu?", true);
         }
         bool battle_ended = false;
+        bool goldfish_loop = false;
         while (!battle_ended){
             //Navigate to correct ball and repeatedly throw it until caught
             pbf_press_button(context, BUTTON_X, 20, 100);
@@ -166,27 +167,46 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.update_stats();
                 env.console.log("Unable to read ball quantity.", COLOR_RED);
             }
-            //Throw ball/Wild pokemon's turn/wait for catch animation
+            //Throw ball
             pbf_mash_button(context, BUTTON_A, 150);
-            stats.balls++;
-            env.update_stats();
-            //pbf_wait(context, 4000);
-            pbf_mash_button(context, BUTTON_B, 1000);
-            context.wait_for_all_requests();
 
-            AdvanceDialogWatcher summary(COLOR_MAGENTA);
-            int ret2 = wait_until(
+            //Check for battle menu - if found after a second then assume caught in a goldfish bounce loop
+            ret = wait_until(
                 env.console, context,
-                std::chrono::seconds(25),
-                { summary, battle_menu }
+                std::chrono::seconds(4),
+                { battle_menu }
             );
-            if (ret2 == 0){
-                env.log("Dialog detected, assuming caught.");
-                stats.catches++;
-                env.update_stats();
-                battle_ended = true;
+            if (ret == 0) {
+                env.console.log("Battle menu detected, assuming caught in a loop. Resetting.", COLOR_RED);
+                battle_ended = true; //Leave the loop
+                goldfish_loop = true;
             }
-            //ret2 == 1 battle menu, continue
+            else {
+                //Wild pokemon's turn/wait for catch animation
+                //pbf_mash_button(context, BUTTON_A, 150);
+                stats.balls++;
+                env.update_stats();
+                //pbf_wait(context, 4000);
+                pbf_mash_button(context, BUTTON_B, 900);
+                context.wait_for_all_requests();
+
+                AdvanceDialogWatcher summary(COLOR_MAGENTA);
+                int ret2 = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(25),
+                    { summary, battle_menu }
+                );
+                if (ret2 == 0) {
+                    env.log("Dialog detected, assuming caught.");
+                    stats.catches++;
+                    env.update_stats();
+                    battle_ended = true;
+                }
+                //ret2 == 1 battle menu, continue
+            }
+        }
+        if (goldfish_loop) {
+            battle_ended = false; //Set this back and use the reset below
         }
         if (battle_ended){
             //Close all the dex entry and caught menus
