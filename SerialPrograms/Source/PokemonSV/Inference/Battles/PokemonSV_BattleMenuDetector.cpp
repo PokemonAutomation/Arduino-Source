@@ -114,6 +114,77 @@ bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext
 
 
 
+CheerSelectDetector::CheerSelectDetector(Color color)
+    : m_info_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
+    , m_arrow(color, GradientArrowType::RIGHT, {0.705, 0.710, 0.050, 0.260})
+{}
+void CheerSelectDetector::make_overlays(VideoOverlaySet& items) const{
+    m_info_button.make_overlays(items);
+    m_arrow.make_overlays(items);
+}
+bool CheerSelectDetector::detect(const ImageViewRGB32& screen) const{
+    if (m_info_button.detect(screen)){
+//        cout << "status" << endl;
+        return false;
+    }
+    if (!m_arrow.detect(screen)){
+//        cout << "arrow" << endl;
+        return false;
+    }
+    return true;
+}
+int8_t CheerSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
+    if (m_info_button.detect(screen)){
+//        cout << "status" << endl;
+        return false;
+    }
+
+    ImageFloatBox box;
+    if (!m_arrow.detect(box, screen)){
+//        cout << "arrow" << endl;
+        return false;
+    }
+
+    double y = box.y + box.height * 0.5;
+    y = (y - 0.758333) / 0.082639;
+//    cout << "y = " << y << endl;
+
+    return (int8_t)(y + 0.5);
+}
+bool CheerSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 2){
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 2){
+            console.log("CheerSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 10){
+            console.log("CheerSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t diff = (3 + slot - (uint8_t)current_slot) % 3;
+        switch (diff){
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            continue;
+        }
+    }
+}
+
+
+
+
 MoveSelectDetector::MoveSelectDetector(Color color)
     : m_info_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
     , m_arrow(color, GradientArrowType::RIGHT, {0.705, 0.550, 0.050, 0.410})
@@ -146,9 +217,10 @@ int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
     }
 
     double y = box.y + box.height * 0.5;
+    y = (y - 0.602778) / 0.103549;
 //    cout << "y = " << y << endl;
 
-    return (int8_t)((y - 0.602778) / 0.103549 + 0.5);
+    return (int8_t)(y + 0.5);
 }
 bool MoveSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
     if (slot > 3){

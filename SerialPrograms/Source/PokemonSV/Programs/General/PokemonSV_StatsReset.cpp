@@ -113,14 +113,14 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     //Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;
-    while (!stats_matched) {
+    while (!stats_matched){
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-        if (retD < 0) {
+        if (retD < 0){
             env.log("Dialog detected.");
         }
-        switch (TARGET) {
+        switch (TARGET){
         case Target::TreasuresOfRuin:
             //~30 seconds to start battle?
             pbf_mash_button(context, BUTTON_A, 3250);
@@ -146,7 +146,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             throw OperationFailedException(env.console, "Failed to enter battle. Are you facing the Pokemon or in a menu?", true);
         }
         bool battle_ended = false;
-        while (!battle_ended) {
+        while (!battle_ended){
             //Navigate to correct ball and repeatedly throw it until caught
             pbf_press_button(context, BUTTON_X, 20, 100);
             context.wait_for_all_requests();
@@ -161,7 +161,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 );
                 break;
             }
-            if (quantity < 0) {
+            if (quantity < 0){
                 stats.errors++;
                 env.update_stats();
                 env.console.log("Unable to read ball quantity.", COLOR_RED);
@@ -180,7 +180,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 std::chrono::seconds(25),
                 { summary, battle_menu }
             );
-            if (ret2 == 0) {
+            if (ret2 == 0){
                 env.log("Dialog detected, assuming caught.");
                 stats.catches++;
                 env.update_stats();
@@ -188,7 +188,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
             //ret2 == 1 battle menu, continue
         }
-        if (battle_ended) {
+        if (battle_ended){
             //Close all the dex entry and caught menus
             pbf_mash_button(context, BUTTON_B, 100);
             context.wait_for_all_requests();
@@ -201,9 +201,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Check the IVs of the newly caught Pokemon - *must be on IV panel*
             EggHatchAction action = EggHatchAction::Keep;
             //This is an edited version of check_baby_info
-            check_stats_reset_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action);
+            check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
 
-            switch (action) {
+            switch (action){
             case EggHatchAction::StopProgram:
                 //Correct stats found, end program
                 stats_matched = true;
@@ -231,7 +231,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 throw OperationFailedException(env.console, "Invalid state.", true);
             }
         }
-        if (!battle_ended) {
+        if (!battle_ended){
             //Reset game
             stats.resets++;
             env.update_stats();

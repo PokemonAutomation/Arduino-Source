@@ -47,11 +47,19 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
         this, &QLineEdit::editingFinished,
         this, [this](){
             bool ok;
-            Type current = (Type)this->text().toLong(&ok);
-            current = std::max(current, m_value.min_value());
-            current = std::min(current, m_value.max_value());
-            this->setText(QString::number(current));
-            m_value.set(current);
+            if (std::is_unsigned_v<Type>){
+                uint64_t current = this->text().toULongLong(&ok);
+                current = std::max<uint64_t>(current, m_value.min_value());
+                current = std::min<uint64_t>(current, m_value.max_value());
+                this->setText(QString::number(current));
+                m_value.set((Type)current);
+            }else{
+                int64_t current = this->text().toLongLong(&ok);
+                current = std::max<int64_t>(current, m_value.min_value());
+                current = std::min<int64_t>(current, m_value.max_value());
+                this->setText(QString::number(current));
+                m_value.set((Type)current);
+            }
         }
     );
     value.add_listener(*this);

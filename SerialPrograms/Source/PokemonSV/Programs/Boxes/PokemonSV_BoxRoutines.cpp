@@ -18,6 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV_BoxRoutines.h"
 
 //#include <iostream>
@@ -29,46 +30,98 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-
-bool change_stats_view_to_judge(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+bool change_view_to_stats_or_judge(
+    ConsoleHandle& console, BotBaseContext& context,
     bool throw_exception
 ){
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
     OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
-#if 1
     for (size_t attempts = 0;; attempts++){
-        if (attempts == 10){
-            if (throw_exception){
-                dump_image_and_throw_recoverable_exception(
-                    info, console, "ChangePokemonView",
-                    "check_baby_info: Unable to change Pokemon view after 10 tries."
-                );
+        if (throw_exception){
+            if (attempts == 10){
+                throw OperationFailedException(console, "Unable to change Pokemon view after 10 tries.", true);
             }
-            return false;
+        }else{
+            if (attempts == 3){
+                return false;
+            }
         }
 
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
         ImageStats stats = image_stats(extract_box_reference(screen, name_bar));
-        if (stats.stddev.sum() > 100){
+//        cout << stats.stddev << endl;
+        if (stats.stddev.sum() > 50){
             break;
         }
 
         console.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
 
-        //  Alternate one and two + presses. If IV checker is enabled, we should
-        //  land on the IV checker. Otherwise, it will land us back to nothing.
-        //  Then the next press will be a single which will put us on the stats
-        //  with no IV checker.
-        pbf_press_button(context, BUTTON_PLUS, 20, 230);
-        if (attempts % 2 == 0){
-            pbf_press_button(context, BUTTON_PLUS, 20, 230);
-        }
+//        //  Alternate one and two + presses. If IV checker is enabled, we should
+//        //  land on the IV checker. Otherwise, it will land us back to nothing.
+//        //  Then the next press will be a single which will put us on the stats
+//        //  with no IV checker.
+        pbf_press_button(context, BUTTON_PLUS, 20, 105);
+//        if (attempts % 2 == 0){
+//            pbf_press_button(context, BUTTON_PLUS, 20, 230);
+//        }
     }
     return true;
-#endif
 }
+
+
+void change_view_to_judge(
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language
+){
+    if (language == Language::None){
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "change_view_to_judge() called with no language."
+        );
+    }
+
+    ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
+    IVCheckerReaderScope iv_checker(console, language);
+    OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
+    for (size_t attempts = 0;; attempts++){
+        if (attempts == 5){
+            throw OperationFailedException(console, "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?", true);
+        }
+
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        ImageStats stats = image_stats(extract_box_reference(screen, name_bar));
+//        cout << stats.stddev << endl;
+
+        //  Check if we're even on a stats screen.
+        if (stats.stddev.sum() < 50){
+            console.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            continue;
+        }
+
+        //  See if we're on the judge screen.
+        IVCheckerReader::Results ivs = iv_checker.read(console, screen);
+
+        size_t detected = 0;
+        if (ivs.hp      != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.attack  != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.defense != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.spatk   != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.spdef   != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.speed   != IVCheckerValue::UnableToDetect) detected++;
+
+        //  If less than 4 of the IVs are read, assume we're not on the judge screen.
+        if (detected < 4){
+            pbf_press_button(context, BUTTON_PLUS, 20, 230);
+        }
+
+        break;
+    }
+}
+
+
 
 // Moving to left/right box is blind sequence. To prevent game dropping button inputs,
 // press the button longer.

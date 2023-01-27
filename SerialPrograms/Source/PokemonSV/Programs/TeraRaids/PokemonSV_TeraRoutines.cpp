@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -18,11 +19,12 @@
 //#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraRewardsReader.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
@@ -245,10 +247,25 @@ void enter_tera_search(
 
 
 
+void stop_if_enough_rare_items(
+    ConsoleHandle& console, BotBaseContext& context,
+    size_t stop_on_sparkly_items
+){
+    if (stop_on_sparkly_items == 0){
+        return;
+    }
+    size_t sparkly_items = SparklyItemDetector::count_sparkly_items(console, context);
+    console.log("Sparkly Items Detected: " + std::to_string(sparkly_items), COLOR_BLUE);
+    if (sparkly_items >= stop_on_sparkly_items){
+        throw ProgramFinishedException(console, "Found a raid with " + std::to_string(sparkly_items) + " rare items!", true);
+    }
+}
+
+
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console,
-    BotBaseContext& context
+    ConsoleHandle& console, BotBaseContext& context,
+    size_t stop_on_sparkly_items
 ){
     console.log("Exiting raid without catching...");
 
@@ -287,6 +304,7 @@ void exit_tera_win_without_catching(
             continue;
         case 1:
             console.log("Detected possible (A) Next button.");
+            stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2:
@@ -308,10 +326,10 @@ void exit_tera_win_without_catching(
 
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug
+    const std::string& ball_slug,
+    size_t stop_on_sparkly_items
 ){
     console.log("Exiting raid with catching...");
 
@@ -376,6 +394,7 @@ void exit_tera_win_by_catching(
         }
         case 1:
             console.log("Detected (A) Next button.");
+            stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
@@ -410,13 +429,12 @@ void exit_tera_win_by_catching(
 
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
-    bool stop_on_shiny,
+    bool stop_on_shiny, size_t stop_on_sparkly_items,
     std::atomic<uint64_t>* stat_shinies
 ){
     console.log("Exiting raid with catching...");
@@ -511,6 +529,7 @@ TeraResult exit_tera_win_by_catching(
             //  open. If so, fall-through to that.
             if (!summary.detect(console.video().snapshot())){
                 console.log("Detected possible (A) Next button.");
+                stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 break;
@@ -536,6 +555,13 @@ TeraResult exit_tera_win_by_catching(
             continue;
         case 8:
             console.log("Detected overworld.");
+            if (stop_on_shiny && result == TeraResult::NO_DETECTION){
+                throw UserSetupError(
+                    console,
+                    "Unable to find " + STRING_POKEMON + " summary to check for shininess.<br>"
+                    "Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
+                );
+            }
             return result;
         default:
             dump_image_and_throw_recoverable_exception(

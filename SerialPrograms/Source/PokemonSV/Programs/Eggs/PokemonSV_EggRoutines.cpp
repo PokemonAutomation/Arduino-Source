@@ -601,7 +601,12 @@ bool check_baby_info(
 ){
     context.wait_for_all_requests();
 
-    change_stats_view_to_judge(info, console, context);
+    Language language = LANGUAGE;
+    if (language == Language::None){
+        change_view_to_stats_or_judge(console, context);
+    }else{
+        change_view_to_judge(console, context, language);
+    }
 
     VideoOverlaySet overlay_set(console.overlay());
 

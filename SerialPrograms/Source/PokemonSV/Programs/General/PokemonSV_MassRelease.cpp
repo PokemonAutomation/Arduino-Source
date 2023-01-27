@@ -118,7 +118,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
     // Try to change to stats or judge view
     if (m_in_judge_view == false){
         const bool throw_exception = false;
-        if (change_stats_view_to_judge(env.program_info(), env.console, context, throw_exception)){
+        if (change_view_to_stats_or_judge(env.console, context, throw_exception)){
             m_in_judge_view = true;
         } else{
             // it is an egg

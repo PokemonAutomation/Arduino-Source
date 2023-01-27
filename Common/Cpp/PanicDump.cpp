@@ -38,8 +38,8 @@ void run_with_catch(const char* location, std::function<void()>&& lambda){
 #else
     try{
         lambda();
-    }catch (Exception&){
-        panic_dump(location, "ProgramCancelledException");
+    }catch (Exception& e){
+        panic_dump(location, e.message().c_str());
         throw;
     }catch (const char* e){
         panic_dump(location, e);

@@ -21,8 +21,7 @@ namespace PokemonSV{
 //  Run a tera battle until you either win or lose.
 bool run_tera_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     EventNotificationOption& error_notification,
     TeraAIOption& battle_AI
 );

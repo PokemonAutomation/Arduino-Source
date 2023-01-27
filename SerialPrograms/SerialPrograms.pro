@@ -629,6 +629,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.cpp \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraRewardsReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
@@ -649,6 +650,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
@@ -1535,6 +1537,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h \
+    Source/PokemonSV/Inference/Tera/PokemonSV_TeraRewardsReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
@@ -1555,6 +1558,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
+    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \

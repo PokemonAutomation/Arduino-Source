@@ -21,6 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class TeraSelfFarmer;
 
 
 class TeraSelfFarmer_Descriptor : public SingleSwitchProgramDescriptor{
@@ -35,6 +36,39 @@ public:
 
 
 
+class TeraFarmerOpponentFilter : public GroupOption{
+public:
+    TeraFarmerOpponentFilter();
+
+    bool should_battle(size_t stars) const;
+
+    SimpleIntegerOption<uint8_t> MIN_STARS;
+    SimpleIntegerOption<uint8_t> MAX_STARS;
+
+};
+class TeraFarmerCatchOnWin : public GroupOption{
+public:
+    TeraFarmerCatchOnWin(TeraSelfFarmer& program);
+    virtual void on_set_enabled(bool enabled) override;
+
+private:
+    TeraSelfFarmer& m_program;
+
+public:
+    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
+    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
+};
+class TeraFarmerStopConditions : public GroupOption{
+public:
+    TeraFarmerStopConditions();
+
+    SimpleIntegerOption<uint16_t> MAX_CATCHES;
+    BooleanCheckBoxOption STOP_ON_SHINY;
+    SimpleIntegerOption<uint8_t> STOP_ON_RARE_ITEMS;
+};
+
+
+
 class TeraSelfFarmer : public SingleSwitchProgramInstance{
 public:
     TeraSelfFarmer();
@@ -44,25 +78,16 @@ private:
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
+    friend class TeraFarmerCatchOnWin;
+
     OCR::LanguageOCROption LANGUAGE;
 
-    enum class Mode{
-        FARM_LP_ONLY,
-        FARM_ITEMS_ONLY,
-        CATCH_ALL,
-        SHINY_HUNT,
-    };
-    static const EnumDatabase<Mode>& database();
-    EnumDropdownOption<Mode> MODE;
-
-    SimpleIntegerOption<uint8_t> MIN_STARS;
-    SimpleIntegerOption<uint8_t> MAX_STARS;
+    TeraFarmerOpponentFilter FILTER;
     TeraAIOption BATTLE_AI;
+    TeraFarmerCatchOnWin CATCH_ON_WIN;
+    TeraFarmerStopConditions STOP_CONDITIONS;
 
-    SimpleIntegerOption<uint16_t> MAX_CATCHES;
-    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
-
+    //  Notifications
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;
     EventNotificationOption NOTIFICATION_SHINY;

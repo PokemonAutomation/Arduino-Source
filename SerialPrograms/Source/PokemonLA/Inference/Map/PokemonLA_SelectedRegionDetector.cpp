@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonLA_SelectedRegionDetector.h"
@@ -89,10 +89,10 @@ private:
 };
 
 
-MapRegion detect_selected_region(ConsoleHandle& console, CancellableScope& context){
+MapRegion detect_selected_region(ConsoleHandle& console, CancellableScope& scope){
     MapLocationDetector detector;
     int ret = wait_until(
-        console, context,
+        console, scope,
         std::chrono::seconds(2),
         {{detector}}
     );

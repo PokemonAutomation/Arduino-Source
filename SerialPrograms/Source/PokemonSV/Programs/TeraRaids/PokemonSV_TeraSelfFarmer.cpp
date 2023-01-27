@@ -21,8 +21,8 @@
 #include "Pokemon/Pokemon_Strings.h"
 //#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
@@ -32,6 +32,10 @@
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV_TeraSelfFarmer.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,7 +49,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         "PokemonSV:TeraSelfFarmer",
         STRING_POKEMON + " SV", "Tera Self Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraSelfFarmer.md",
-        "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny raids.",
+        "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -85,34 +89,9 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 }
 
 
-const EnumDatabase<TeraSelfFarmer::Mode>& TeraSelfFarmer::database(){
-//    static EnumDatabase<TeraSelfFarmer::Mode> database0{
-//        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-//        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
-//    };
-    static EnumDatabase<TeraSelfFarmer::Mode> database1{
-        {Mode::FARM_LP_ONLY,    "lp-only",      "LP only. Open the raid menu to get LP, but don't enter it."},
-        {Mode::FARM_ITEMS_ONLY, "items-only",   "Items only. Don't catch anything."},
-        {Mode::CATCH_ALL,       "catch-all",    "Catch everything using the specified ball."},
-        {Mode::SHINY_HUNT,      "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
-    };
-//    return PreloadSettings::instance().DEVELOPER_MODE ? database1 : database0;
-    return database1;
-}
 
-
-TeraSelfFarmer::TeraSelfFarmer()
-    : LANGUAGE(
-        "<b>Game Language:</b>",
-        PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
-    )
-    , MODE(
-        "<b>Mode:</b>",
-        database(),
-        LockWhileRunning::LOCKED,
-        Mode::SHINY_HUNT
-    )
+TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
+    : GroupOption("Opponent Filter", LockWhileRunning::UNLOCKED)
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
         LockWhileRunning::UNLOCKED,
@@ -123,20 +102,70 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::UNLOCKED,
         4, 1, 7
     )
-    , MAX_CATCHES(
-        "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
-        LockWhileRunning::UNLOCKED,
-        50, 1, 999
-    )
+{
+    PA_ADD_OPTION(MIN_STARS);
+    PA_ADD_OPTION(MAX_STARS);
+}
+bool TeraFarmerOpponentFilter::should_battle(size_t stars) const{
+    return MIN_STARS <= stars && stars <= MAX_STARS;
+}
+
+TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
+    : GroupOption("Catch on Win - Required for shiny checking.", LockWhileRunning::UNLOCKED, true)
+    , m_program(program)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
         LockWhileRunning::UNLOCKED,
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
-        "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
+        "<b>Fix Clock:</b><br>Fix the time when catching so the caught date will be correct.",
         LockWhileRunning::UNLOCKED, false
     )
+{
+    PA_ADD_OPTION(BALL_SELECT);
+    PA_ADD_OPTION(FIX_TIME_ON_CATCH);
+}
+void TeraFarmerCatchOnWin::on_set_enabled(bool enabled){
+    m_program.STOP_CONDITIONS.STOP_ON_SHINY.set_visibility(
+        enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    );
+}
+
+TeraFarmerStopConditions::TeraFarmerStopConditions()
+    : GroupOption("Stop Conditions", LockWhileRunning::UNLOCKED)
+    , MAX_CATCHES(
+        "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
+        LockWhileRunning::UNLOCKED,
+        50, 1, 999
+    )
+    , STOP_ON_SHINY(
+        "<b>Stop on Shiny:</b> (requires catching the " + STRING_POKEMON + ")<br>"
+        "Stop the program if a shiny is found. Resetting the game will return you to the front of this (shiny) raid so it can be hosted again.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
+    , STOP_ON_RARE_ITEMS(
+        "<b>Stop on Rare Items:</b><br>"
+        "Stop the program if the rewards contain at least this many rare (sparkly) items. Set to zero to disable this feature and never stop for item rewards.<br>"
+        "Note that the program can only see the first 8 item rewards. It will not scroll down.",
+        LockWhileRunning::UNLOCKED,
+        0, 0, 8
+    )
+{
+    PA_ADD_OPTION(MAX_CATCHES);
+    PA_ADD_OPTION(STOP_ON_SHINY);
+    PA_ADD_OPTION(STOP_ON_RARE_ITEMS);
+}
+
+
+TeraSelfFarmer::TeraSelfFarmer()
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonNameReader::instance().languages(),
+        LockWhileRunning::UNLOCKED
+    )
+    , CATCH_ON_WIN(*this)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
         "Non-Shiny Encounter",
@@ -159,13 +188,10 @@ TeraSelfFarmer::TeraSelfFarmer()
     })
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(MODE);
-    PA_ADD_OPTION(MIN_STARS);
-    PA_ADD_OPTION(MAX_STARS);
+    PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(BATTLE_AI);
-    PA_ADD_OPTION(MAX_CATCHES);
-    PA_ADD_OPTION(BALL_SELECT);
-    PA_ADD_OPTION(FIX_TIME_ON_CATCH);
+    PA_ADD_OPTION(CATCH_ON_WIN);
+    PA_ADD_OPTION(STOP_CONDITIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -190,15 +216,16 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         return false;
     }
 
-    if (MODE == Mode::FARM_ITEMS_ONLY){
-        exit_tera_win_without_catching(env.program_info(), env.console, context);
+//    if (MODE == Mode::FARM_ITEMS_ONLY){
+    if (!CATCH_ON_WIN.enabled()){
+        exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
         return true;
     }
 
     VideoSnapshot battle_snapshot = env.console.video().snapshot();
 
 
-    if (FIX_TIME_ON_CATCH){
+    if (CATCH_ON_WIN.FIX_TIME_ON_CATCH){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -213,10 +240,11 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     exit_tera_win_by_catching(
         env, env.console, context,
         LANGUAGE,
-        BALL_SELECT.slug(),
+        CATCH_ON_WIN.BALL_SELECT.slug(),
         NOTIFICATION_NONSHINY,
         NOTIFICATION_SHINY,
-        MODE == Mode::SHINY_HUNT,
+        STOP_CONDITIONS.STOP_ON_SHINY,
+        STOP_CONDITIONS.STOP_ON_RARE_ITEMS,
         &stats.m_shinies
     );
     return true;
@@ -228,7 +256,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
-    if (MIN_STARS > MAX_STARS){
+    if (FILTER.MIN_STARS > FILTER.MAX_STARS){
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
 
@@ -240,7 +268,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     bool first = true;
 
     while (true){
-        if (m_number_caught >= MAX_CATCHES){
+        if (m_number_caught >= STOP_CONDITIONS.MAX_CATCHES){
             break;
         }
 
@@ -310,24 +338,15 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.log(log);
         }
 
-        bool skip = false;
-
-        if (MODE == Mode::FARM_LP_ONLY) {
-            skip = true;
-        }
-
-        if (stars < MIN_STARS || stars > MAX_STARS){
-            skip = true;
-        }
-
-        if (skip) {
+        if (!FILTER.should_battle(stars)) {
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
             close_raid(env.program_info(), env.console, context);
             continue;
         }
 
-        if (MODE == Mode::SHINY_HUNT){
+//        if (MODE == Mode::SHINY_HUNT){
+        if (true){
             close_raid(env.program_info(), env.console, context);
             save_game_from_overworld(env.program_info(), env.console, context);
             context.wait_for_all_requests();

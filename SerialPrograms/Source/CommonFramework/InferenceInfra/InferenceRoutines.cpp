@@ -18,24 +18,24 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ConsoleHandle& console, CancellableScope& context,
+    ConsoleHandle& console, CancellableScope& scope,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 ){
-    CancellableHolder<CancellableScope> subcontext(context);
+    CancellableHolder<CancellableScope> subscope(scope);
     InferenceSession session(
-        subcontext, console,
+        subscope, console,
         callbacks,
         default_video_period, default_audio_period
     );
 
     try{
-        subcontext.wait_until(deadline);
+        subscope.wait_until(deadline);
     }catch (OperationCancelledException&){}
 
-    context.throw_if_cancelled();
+    scope.throw_if_cancelled();
 
     return session.triggered_index();
 }

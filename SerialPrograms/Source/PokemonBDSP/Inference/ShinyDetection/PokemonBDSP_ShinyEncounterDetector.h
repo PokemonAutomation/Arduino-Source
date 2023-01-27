@@ -121,7 +121,7 @@ private:
 // When a shiny sound is detected, it adds 5.0 to the heighest overall alpha value.
 void detect_shiny_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, CancellableScope& context,
+    ConsoleHandle& console, CancellableScope& scope,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     EventNotificationOption& settings,

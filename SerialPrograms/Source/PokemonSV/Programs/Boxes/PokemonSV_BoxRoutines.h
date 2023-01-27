@@ -9,6 +9,7 @@
 #define PokemonAutomation_PokemonSV_BoxRoutines_H
 
 #include <stdint.h>
+#include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
     
@@ -27,10 +28,19 @@ enum class BoxCursorLocation;
 //  try to change the view to the judge. However, it may land on the stats instead.
 //  If it can't land on either stats or judge and `throw_exception` is true, it will throw an exception.
 //  Return true if it successfully changed view to judge (or stats if judege is not found)
-bool change_stats_view_to_judge(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+bool change_view_to_stats_or_judge(
+    ConsoleHandle& console, BotBaseContext& context,
     bool throw_exception = true
 );
+
+
+//  Assuming the current slot in box system is a pokemon, not egg or empty space,
+//  change the view to the judge. If it fails, it will throw OperationFailedException.
+void change_view_to_judge(
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language
+);
+
 
 //  Press button L to move to the box on the left
 void move_to_left_box(BotBaseContext& context);

@@ -9,29 +9,36 @@
 
 #include <functional>
 
-namespace PokemonAutomation {
-struct ProgramInfo;
-class ConsoleHandle;
-class BotBaseContext;
-class ImageViewRGB32;
+namespace PokemonAutomation{
+    struct ProgramInfo;
+    class ConsoleHandle;
+    class BotBaseContext;
+    class ImageViewRGB32;
 
-namespace OCR {
+namespace OCR{
     class LanguageOCROption;
 }
-namespace Pokemon {
+namespace Pokemon{
     enum class EggHatchAction;
     class EggHatchFilterTable;
     class StatsResetFilterTable;
 }
 
-namespace NintendoSwitch {
-namespace PokemonSV {
-    //This is a similar to check_baby_info, except for Stats Reset
-    bool check_stats_reset_info(
-        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-        OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
-        Pokemon::EggHatchAction& action
-    );
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+
+//This is a similar to check_baby_info, except for Stats Reset
+bool check_stats_reset_info(
+    ConsoleHandle& console, BotBaseContext& context,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
+    Pokemon::EggHatchAction& action
+);
+
+
+
+
 }
 }
 }

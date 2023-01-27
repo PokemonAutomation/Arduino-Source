@@ -232,7 +232,7 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
         stats.m_wins++;
         env.update_stats();
         if (HOSTING_MODE == Mode::HOST_ONLINE){
-            exit_tera_win_without_catching(env.program_info(), console, context);
+            exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }
         reset_host(env.program_info(), console, context);
         if (HOSTING_MODE == Mode::HOST_ONLINE){
@@ -258,9 +258,9 @@ void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& co
 
     if (win){
         if (option.catch_on_win){
-            exit_tera_win_by_catching(env, console, context, option.language, option.ball_select.slug());
+            exit_tera_win_by_catching(env, console, context, option.language, option.ball_select.slug(), 0);
         }else{
-            exit_tera_win_without_catching(env.program_info(), console, context);
+            exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }
     }
 

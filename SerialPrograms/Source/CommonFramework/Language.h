@@ -8,7 +8,6 @@
 #define PokemonAutomation_Language_H
 
 #include <string>
-#include <vector>
 #include <set>
 
 namespace PokemonAutomation{
