@@ -1,4 +1,4 @@
-/*  IV Checker Reader
+/*  Box Nature Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

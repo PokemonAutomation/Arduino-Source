@@ -1,11 +1,10 @@
-/*  IV Checker Reader
+/*  Box Nature Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "PokemonBDSP_BoxNatureDetector.h"
 
 namespace PokemonAutomation{
