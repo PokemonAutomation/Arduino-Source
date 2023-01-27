@@ -79,6 +79,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         if (!m_system[c].serial_session().is_ready()){
             throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
         }
+        start_program_video_check(env.consoles[c], m_option.descriptor().feedback());
     }
 
     {
@@ -135,7 +136,6 @@ void MultiSwitchProgramSession::internal_run_program(){
             session.overlay(),
             session.audio()
         );
-        start_program_video_check(handles.back(), m_option.descriptor().feedback());
     }
 
 

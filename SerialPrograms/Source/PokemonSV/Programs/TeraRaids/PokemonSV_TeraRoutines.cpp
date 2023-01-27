@@ -39,22 +39,32 @@ using namespace Pokemon;
 
 bool open_raid(ConsoleHandle& console, BotBaseContext& context){
     console.log("Opening raid...");
-
-    TeraCardWatcher card_detector(COLOR_RED);
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
-            pbf_press_button(context, BUTTON_A, 20, 355);
-        },
-        {card_detector}
-    );
-    if (ret < 0){
-        console.log("No Tera raid found.", COLOR_ORANGE);
-        return false;
+    while (true){
+        TeraCardWatcher card_detector(COLOR_RED);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_A, 20, 355);
+            },
+            {
+                card_detector,
+                dialog,
+            }
+        );
+        switch (ret){
+        case 0:
+            console.log("Tera raid found!", COLOR_BLUE);
+            return true;
+        case 1:
+            console.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        default:
+            console.log("No Tera raid found.", COLOR_ORANGE);
+            return false;
+        }
     }
-
-    console.log("Tera raid found!", COLOR_BLUE);
-    return true;
 }
 void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Closing raid...");
@@ -190,6 +200,7 @@ void enter_tera_search(
         PokePortalWatcher poke_portal(COLOR_GREEN);
         TeraRaidSearchWatcher raid_search(COLOR_CYAN);
         CodeEntryWatcher code_entry(COLOR_PURPLE);
+        AdvanceDialogWatcher dialog(COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
@@ -200,6 +211,7 @@ void enter_tera_search(
                 poke_portal,
                 raid_search,
                 code_entry,
+                dialog,
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
@@ -234,6 +246,10 @@ void enter_tera_search(
         case 4:
             console.log("Detected Code Entry.");
             return;
+        case 5:
+            console.log("Detected Dialog.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
         default:
             dump_image_and_throw_recoverable_exception(
                 info, console, "EnterTeraSearchFailed",

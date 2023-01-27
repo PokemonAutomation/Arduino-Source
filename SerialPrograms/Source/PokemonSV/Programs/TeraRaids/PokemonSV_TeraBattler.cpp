@@ -203,6 +203,13 @@ bool run_tera_battle(
         CheerSelectWatcher cheer_select_menu(COLOR_YELLOW);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         TargetSelectWatcher target_select_menu(COLOR_CYAN);
+        WhiteButtonWatcher next_button(
+            COLOR_CYAN,
+            WhiteButton::ButtonA,
+            {0.8, 0.93, 0.2, 0.07},
+            WhiteButtonWatcher::FinderType::PRESENT,
+            std::chrono::seconds(5)
+        );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_GREEN);
         context.wait_for_all_requests();
@@ -219,6 +226,7 @@ bool run_tera_battle(
                 cheer_select_menu,
                 move_select_menu,
                 target_select_menu,
+                next_button,
                 catch_menu,
                 overworld,
             }
@@ -296,10 +304,11 @@ bool run_tera_battle(
             }
             continue;
         case 4:
+        case 5:
             console.log("Detected a win!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
-        case 5:
+        case 6:
             console.log("Detected a loss!", COLOR_ORANGE);
             return false;
         default:

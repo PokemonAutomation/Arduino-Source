@@ -15,7 +15,9 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
+#include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
@@ -321,6 +323,8 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
         throw;
     }
 
+//    normalized_code[0] = '0';
+
     //  Join the lobby. If anything throws, we need to reset everyone.
     try{
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
@@ -328,19 +332,48 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
                 return;
             }
 
-            enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+            for (size_t attempts = 0;; attempts++){
+                if (attempts >= 3){
+                    throw OperationFailedException(console, "Failed to join lobby 3 times.", true);
+                }
 
-            TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher());
-            context.wait_for_all_requests();
-            int ret = wait_until(
-                console, context, std::chrono::seconds(60),
-                {{lobby, std::chrono::milliseconds(500)}}
-            );
-            if (ret < 0){
-                throw OperationFailedException(console, "Unable to join lobby.", true);
+                enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+
+                TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_RED);
+                AdvanceDialogWatcher wrong_code(COLOR_YELLOW);
+                CodeEntryWatcher incomplete_code(COLOR_GREEN);
+                context.wait_for_all_requests();
+                context.wait_for(std::chrono::seconds(3));
+                int ret = wait_until(
+                    console, context, std::chrono::seconds(60),
+                    {
+                        {lobby, std::chrono::milliseconds(500)},
+                        wrong_code,
+                        incomplete_code,
+                    }
+                );
+                switch (ret){
+                case 0:
+                    console.log("Entered raid lobby!");
+                    pbf_mash_button(context, BUTTON_A, 125);
+                    break;
+                case 1:
+                    console.log("Wrong code! Backing out and trying again...", COLOR_RED);
+                    stats.m_errors++;
+                    pbf_press_button(context, BUTTON_B, 20, 230);
+                    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+                    continue;
+                case 2:
+                    console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
+                    stats.m_errors++;
+                    pbf_press_button(context, BUTTON_X, 20, 230);
+                    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+                    continue;
+                default:
+                    throw OperationFailedException(console, "Unable to join lobby.", true);
+                }
+                break;
             }
-
-            pbf_mash_button(context, BUTTON_A, 125);
         });
     }catch (OperationFailedException&){
         stats.m_errors++;
