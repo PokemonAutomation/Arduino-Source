@@ -307,9 +307,13 @@ void MultiLanguageJoinTracker::dump(const std::string& filename) const{
 
 
 
-TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(Logger& logger, AsyncDispatcher& dispatcher, Color color)
+TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(
+    Logger& logger, AsyncDispatcher& dispatcher, Color color,
+    uint8_t host_players
+)
     : TeraLobbyReader(logger, dispatcher, color)
     , VisualInferenceCallback("TeraLobbyJoinWatcher2")
+    , m_host_players(host_players)
 {}
 void TeraLobbyJoinWatcher2::make_overlays(VideoOverlaySet& items) const{
     TeraLobbyReader::make_overlays(items);
@@ -321,9 +325,11 @@ bool TeraLobbyJoinWatcher2::process_frame(const ImageViewRGB32& frame, WallClock
     }
 
     uint8_t total_players = this->total_players(frame);
-    uint8_t ready_players = this->ready_players(frame);
+//    uint8_t ready_players = this->ready_players(frame);
+    uint8_t ready_joiners = this->ready_joiners(frame, m_host_players);
     m_last_known_total_players.store(total_players, std::memory_order_relaxed);
-    m_last_known_ready_players.store(ready_players, std::memory_order_relaxed);
+//    m_last_known_ready_players.store(ready_players, std::memory_order_relaxed);
+    m_last_known_ready_joiners.store(ready_joiners, std::memory_order_relaxed);
     return false;
 }
 
@@ -388,7 +394,7 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
 
     //  Read names.
     std::array<std::map<Language, std::string>, 4> names = read_names(
-        m_logger, languages, true, frame
+        m_logger, languages, frame
     );
 
     //  Process bans.

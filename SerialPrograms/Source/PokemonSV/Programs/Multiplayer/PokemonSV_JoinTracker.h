@@ -95,17 +95,23 @@ private:
 
 class TeraLobbyJoinWatcher2 : public TeraLobbyReader, public VisualInferenceCallback{
 public:
-    TeraLobbyJoinWatcher2(Logger& logger, AsyncDispatcher& dispatcher, Color color);
+    TeraLobbyJoinWatcher2(
+        Logger& logger, AsyncDispatcher& dispatcher, Color color,
+        uint8_t host_players
+    );
 
     uint8_t last_known_total_players() const{ return m_last_known_total_players.load(std::memory_order_relaxed); }
-    uint8_t last_known_ready_players() const{ return m_last_known_ready_players.load(std::memory_order_relaxed); }
+//    uint8_t last_known_ready_players() const{ return m_last_known_ready_players.load(std::memory_order_relaxed); }
+    uint8_t last_known_ready_joiners() const{ return m_last_known_ready_joiners.load(std::memory_order_relaxed); }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
+    uint8_t m_host_players;
     std::atomic<uint8_t> m_last_known_total_players = 0;
-    std::atomic<uint8_t> m_last_known_ready_players = 0;
+//    std::atomic<uint8_t> m_last_known_ready_players = 0;
+    std::atomic<uint8_t> m_last_known_ready_joiners = 0;
 };
 
 

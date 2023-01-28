@@ -308,6 +308,7 @@ bool AutoHost::run_lobby(
 
     TeraLobbyWaiter waiter(
         env, env.console, context,
+        1,
         lobby_code, start_time,
         LOBBY_WAIT_DELAY,
         START_RAID_PLAYERS,

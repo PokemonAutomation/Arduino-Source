@@ -215,9 +215,22 @@ uint8_t TeraLobbyReader::total_players(const ImageViewRGB32& screen) const{
     }
     return std::max(total, (uint8_t)1);
 }
+#if 0
 uint8_t TeraLobbyReader::ready_players(const ImageViewRGB32& screen) const{
     uint8_t total = 0;
     for (size_t c = 0; c < 4; c++){
+        ImageStats player = image_stats(extract_box_reference(screen, m_player_ready[c]));
+//        cout << "Player " << c << ": " << player.average << player.stddev << endl;
+        if (player.stddev.sum() > 80){
+            total++;
+        }
+    }
+    return total;
+}
+#endif
+uint8_t TeraLobbyReader::ready_joiners(const ImageViewRGB32& screen, uint8_t host_players){
+    uint8_t total = 0;
+    for (size_t c = host_players; c < 4; c++){
         ImageStats player = image_stats(extract_box_reference(screen, m_player_ready[c]));
 //        cout << "Player " << c << ": " << player.average << player.stddev << endl;
         if (player.stddev.sum() > 80){
@@ -285,12 +298,11 @@ ImageRGB32 filter_name_image(const ImageViewRGB32& image){
 
 std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
     Logger& logger,
-    const std::set<Language>& languages, bool include_host,
+    const std::set<Language>& languages,
     const ImageViewRGB32& screen
 ) const{
     std::array<std::map<Language, std::string>, 4> ret;
-    size_t start = include_host ? 0 : 1;
-    for (size_t c = start; c < 4; c++){
+    for (size_t c = 0; c < 4; c++){
         ImageStats sprite = image_stats(extract_box_reference(screen, m_player_mon[c]));
         if (sprite.stddev.sum() <= 80){
             continue;
@@ -326,6 +338,7 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
 
 
+#if 0
 TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(
     Logger& logger, AsyncDispatcher& dispatcher,
     Color color, uint8_t desired_players
@@ -348,7 +361,7 @@ bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock 
     m_last_known_total_players.store(total_players);
     return ready_players + 1 >= m_desired_players;
 }
-
+#endif
 
 
 

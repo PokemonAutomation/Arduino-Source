@@ -80,7 +80,8 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
     uint8_t total_players(const ImageViewRGB32& screen) const;
-    uint8_t ready_players(const ImageViewRGB32& screen) const;
+//    uint8_t ready_players(const ImageViewRGB32& screen) const;
+    uint8_t ready_joiners(const ImageViewRGB32& screen, uint8_t host_players);
 
     int16_t seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
     std::string raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
@@ -89,7 +90,7 @@ public:
     //  The returned strings are raw OCR output and are unprocessed.
     std::array<std::map<Language, std::string>, 4> read_names(
         Logger& logger,
-        const std::set<Language>& languages, bool include_host,
+        const std::set<Language>& languages,
         const ImageViewRGB32& screen
     ) const;
 
@@ -120,6 +121,8 @@ public:
          : DetectorToFinder("TeraLobbyFinder", duration, logger, dispatcher, color)
     {}
 };
+
+#if 0
 class TeraLobbyReadyWaiter : public TeraLobbyReader, public VisualInferenceCallback{
 public:
     TeraLobbyReadyWaiter(
@@ -142,6 +145,7 @@ private:
     std::atomic<int8_t> m_last_known_total_players;
     std::atomic<int8_t> m_last_known_ready_players;
 };
+#endif
 
 
 

@@ -23,6 +23,7 @@ namespace PokemonSV{
 TeraLobbyWaiter::TeraLobbyWaiter(
     ProgramEnvironment& env,
     ConsoleHandle& console, BotBaseContext& context,
+    uint8_t host_players,
     const std::string& lobby_code, WallClock start_time,
     SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
     IntegerEnumDropdownOption& START_RAID_PLAYERS,
@@ -32,13 +33,14 @@ TeraLobbyWaiter::TeraLobbyWaiter(
 )
     : m_env(env)
     , m_console(console), m_context(context)
+    , m_host_players(host_players)
     , m_lobby_code(lobby_code), m_start_time(start_time)
     , m_lobby_wait_delay(LOBBY_WAIT_DELAY)
     , m_start_raid_players(START_RAID_PLAYERS)
     , m_notification_raid_start(NOTIFICATION_RAID_START)
     , m_dialog(COLOR_YELLOW)
     , m_start_raid(COLOR_BLUE)
-    , m_join_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED)
+    , m_join_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, host_players)
     , m_name_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST)
 {}
 
@@ -47,16 +49,21 @@ VideoSnapshot TeraLobbyWaiter::synchronize_state(){
     m_join_watcher.process_frame(snapshot, snapshot.timestamp);
     m_name_watcher.process_frame(snapshot, snapshot.timestamp);
     m_total_players = m_join_watcher.last_known_total_players();
-    m_ready_players = m_join_watcher.last_known_ready_players();
+//    m_ready_players = m_join_watcher.last_known_ready_players();
+    m_ready_joiners = m_join_watcher.last_known_ready_joiners();
     m_name_watcher.get_last_known_state(m_names, m_bans);
     return snapshot;
 }
 
 
 std::string TeraLobbyWaiter::check_hat_trick(){
-    if (m_total_players != 4){
+    //  Hat trick requires only one host and a fully lobby.
+    if (m_host_players != 1 || m_total_players != 4){
         return "";
     }
+
+    //  All 3 joiners must OCR to the same name in English and be at least
+    //  4 characters long. (to filter out false positives in other languages)
     auto iter1 = m_names[1].find(Language::English);
     if (iter1 == m_names[1].end()) return "";
     auto iter2 = m_names[2].find(Language::English);
@@ -87,7 +94,7 @@ bool TeraLobbyWaiter::check_bans(){
 
     //  Names are different.
     std::set<std::u32string> normalized_names;
-    for (size_t c = 1; c < 4; c++){
+    for (size_t c = m_host_players; c < 4; c++){
         auto iter = m_names[c].find(Language::English);
         if (iter == m_names[c].end()){
             continue;
@@ -101,7 +108,7 @@ bool TeraLobbyWaiter::check_bans(){
     //  First detected banned user.
     if (m_ban_timer == WallClock::max()){
         m_ban_timer = current_time();
-//            cout << "Start ban timer." << endl;
+//        cout << "Start ban timer." << endl;
         return false;
     }
 
@@ -121,7 +128,7 @@ bool TeraLobbyWaiter::check_start_timeout(){
     if (current_time() < m_start_time + std::chrono::seconds(start_delay)){
         return false;
     }
-    if (m_ready_players < m_total_players - 1){
+    if (m_host_players + m_ready_joiners < m_total_players){
         return false;
     }
     return true;
@@ -130,7 +137,7 @@ bool TeraLobbyWaiter::check_enough_players(){
     if (m_total_players < (uint8_t)m_start_raid_players.current_value()){
         return false;
     }
-    if (m_ready_players < m_total_players - 1){
+    if (m_host_players + m_ready_joiners < m_total_players){
         return false;
     }
     return true;
@@ -192,7 +199,7 @@ bool TeraLobbyWaiter::process_start_timeout(const ImageViewRGB32& snapshot){
     if (current_time() < m_start_time + std::chrono::seconds(start_delay)){
         return false;
     }
-    if (m_ready_players < m_total_players - 1){
+    if (m_host_players + m_ready_joiners < m_total_players){
         return false;
     }
 
@@ -215,7 +222,7 @@ bool TeraLobbyWaiter::process_enough_players(const ImageViewRGB32& snapshot){
     if (m_total_players < start_raid_players){
         return false;
     }
-    if (m_ready_players < m_total_players - 1){
+    if (m_host_players + m_ready_joiners < m_total_players){
         return false;
     }
 
@@ -260,7 +267,8 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
 
         //  Read sensors.
         m_total_players = m_join_watcher.last_known_total_players();
-        m_ready_players = m_join_watcher.last_known_ready_players();
+//        m_ready_players = m_join_watcher.last_known_ready_players();
+        m_ready_joiners = m_join_watcher.last_known_ready_joiners();
         m_name_watcher.get_last_known_state(m_names, m_bans);
 
 //        cout << "total = " << (int)m_total_players << ", ready = " << (int)m_ready_players << endl;

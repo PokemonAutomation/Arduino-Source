@@ -30,6 +30,7 @@ public:
     TeraLobbyWaiter(
         ProgramEnvironment& env,
         ConsoleHandle& console, BotBaseContext& context,
+        uint8_t host_players,
         const std::string& lobby_code, WallClock start_time,
         SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
         IntegerEnumDropdownOption& START_RAID_PLAYERS,
@@ -73,6 +74,7 @@ private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
     BotBaseContext& m_context;
+    uint8_t m_host_players;
 
     const std::string& m_lobby_code;
     WallClock m_start_time;
@@ -89,7 +91,8 @@ private:
 
     //  Last known state
     uint8_t m_total_players = 1;
-    uint8_t m_ready_players = 0;
+//    uint8_t m_ready_players = 0;
+    uint8_t m_ready_joiners = 0;
     std::array<std::map<Language, std::string>, 4> m_names;
     std::vector<TeraLobbyNameMatchResult> m_bans;
     WallClock m_ban_timer = WallClock::max();
