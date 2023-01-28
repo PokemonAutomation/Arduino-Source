@@ -22,6 +22,7 @@ public:
     DiscordIntegrationSettingsOption();
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
+    BooleanCheckBoxOption run_on_start;
     BooleanCheckBoxOption use_dpp;
     StringOption token;
     StringOption command_prefix;

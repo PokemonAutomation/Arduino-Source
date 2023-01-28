@@ -83,9 +83,9 @@ namespace PokemonAutomation {
                     std::vector<std::string> channel_vector;
                     std::vector<std::string> message_vector;
 
-                    std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = channels.copy_snapshot();
-                    for (size_t i = 0; i < table.size(); i++) {
-                        const Integration::DiscordIntegrationChannel& channel = *table[i];
+                    auto table = channels.copy_snapshot();
+                    for (auto& ch : table) {
+                        const Integration::DiscordIntegrationChannel& channel = *ch;
                         if (((std::string)channel.tags_text).empty() || !channel.enabled) {
                             continue;
                         }
@@ -113,17 +113,14 @@ namespace PokemonAutomation {
                             msg += "<@" + (std::string)settings.message.user_id + ">";
                         }
 
-                        const std::string& discord_message = settings.message.message;
+                        std::string discord_message = settings.message.message;
                         if (!discord_message.empty()) {
                             if (!msg.empty()) {
                                 msg += " ";
                             }
 
-                            for (char ch : discord_message) {
-                                if (ch != '@') {
-                                    msg += ch;
-                                }
-                            }
+                            discord_message.erase(std::remove(discord_message.begin(), discord_message.end(), '@'), discord_message.end());
+                            msg += discord_message;
                         }
 
                         if (!message.empty()) {
@@ -143,7 +140,7 @@ namespace PokemonAutomation {
 			void Client::run(const std::string& token) {
 				try {
 					uint32_t intents = intents::i_default_intents | intents::i_guild_members;
-					m_bot = std::unique_ptr<cluster>(new cluster(token, intents));
+                    m_bot = std::make_unique<cluster>(token, intents);
 					Handler::initialize(*m_bot.get());
 					m_bot->start(false);
 				}

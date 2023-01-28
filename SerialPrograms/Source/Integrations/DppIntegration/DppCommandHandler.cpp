@@ -24,6 +24,9 @@ namespace PokemonAutomation {
 					this->log_dpp(log.message, "Internal Log", log.severity);
 				});
 
+				const presence& p = presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status);
+				bot.set_presence(p);
+
 				owner = bot.current_application_get_sync().owner;
 				Handler::create_commands(bot);
 
@@ -105,6 +108,28 @@ namespace PokemonAutomation {
 				m.channel_id = channel;
 				m.add_embed(embed);
 				bot.message_create(m);
+			}
+
+			void Handler::update_response(const dpp::slashcommand_t& event, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
+				message m;
+				if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
+					std::string data;
+					try {
+						data = utility::read_file(file->filepath());
+						m.add_file(file->filename(), data);
+						embed.set_image("attachment://" + file->filename());
+					}
+					catch (dpp::exception e) {
+						log_dpp(std::format("Exception thrown while reading screenshot data: {}", e.what()), "send_message()", ll_error);
+					}
+				}
+
+				if (!msg.empty() && msg != "") {
+					m.content = msg;
+				}
+
+				m.add_embed(embed);
+				event.edit_response(m);
 			}
 
 			void Handler::log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll) {
@@ -337,8 +362,8 @@ namespace PokemonAutomation {
 					.add_option(command_option(command_option_type::co_integer, "format", "Image format.", true)
 						.add_choice(command_option_choice("PNG", 0))
 						.add_choice(command_option_choice("JPG", 1))),
-					[&bot, this](const slashcommand_t& event) {
-						// Serves as an ack because we only have to reply within 3 seconds.
+					[this](const slashcommand_t& event) {
+						// Serves as an ack because we have to reply within 3 seconds.
 						event.thinking();
 						uint64_t id = Utility::sanitize_console_id_input(event);
 						uint8_t format = std::get<int64_t>(event.get_parameter("format"));
@@ -353,21 +378,17 @@ namespace PokemonAutomation {
 
 						std::string response = Integration::screenshot(id, path.c_str());
 						if (!response.empty()) {
-							event.reply(response);
+							event.edit_response(response);
 							return;
 						}
 						else {
 							std::shared_ptr<PendingFileSend> file(new PendingFileSend(path, true));
-							event.delete_original_response();
-
 							embed_footer footer;
 							footer.set_text(std::format("Console ID: {}", id));
 
 							embed emb;
 							emb.set_title("Program Screenshot").set_color((uint32_t)color).set_footer(footer);
-
-							uint64_t chid = event.command.get_channel().id;
-							Handler::send_message(bot, emb, std::to_string(chid), std::chrono::seconds(0), "", std::move(file));
+							Handler::update_response(event, emb, "", std::move(file));
 						}
 					}
 				});

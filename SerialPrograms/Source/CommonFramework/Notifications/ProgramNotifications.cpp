@@ -150,10 +150,9 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(logger, image));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_integration;
+    JsonObject embed;
     JsonArray embeds;
     {
-        JsonObject embed;
         embed["title"] = title;
 
         if (color){
@@ -172,7 +171,6 @@ void send_raw_notification(
             embed["image"] = std::move(field);
         }
         embeds.push_back(embed.clone());
-        embed_integration = embed.clone();
     }
 
     Integration::DiscordWebhook::send_message(
@@ -182,14 +180,14 @@ void send_raw_notification(
     );
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", std::move(embed_integration),
+        should_ping, tags, "", std::move(embed),
         hasFile ? file : nullptr
     );
 #endif
 
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().send_message_dpp(
-        should_ping, color, tags, std::move(embed_integration), "",
+        should_ping, color, tags, std::move(embed), "",
         hasFile ? file : nullptr
     );
 #endif
@@ -205,10 +203,9 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_integration;
+    JsonObject embed;
     JsonArray embeds;
     {
-        JsonObject embed;
         embed["title"] = title;
 
         if (color){
@@ -222,7 +219,6 @@ void send_raw_notification(
         embed["fields"] = std::move(fields);
 
         embeds.push_back(embed.clone());
-        embed_integration = embed.clone();
     }
 
     Integration::DiscordWebhook::send_message(
@@ -232,14 +228,14 @@ void send_raw_notification(
     );
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", std::move(embed_integration),
+        should_ping, tags, "", std::move(embed),
         hasFile ? file : nullptr
     );
 #endif
 
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().send_message_dpp(
-        should_ping, color, tags, std::move(embed_integration), "",
+        should_ping, color, tags, std::move(embed), "",
         hasFile ? file : nullptr
     );
 #endif

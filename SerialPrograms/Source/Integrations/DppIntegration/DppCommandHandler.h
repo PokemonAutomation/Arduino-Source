@@ -40,7 +40,13 @@ namespace PokemonAutomation {
 					const std::string& channel,
 					std::chrono::milliseconds delay,
 					const std::string& msg,
-					std::shared_ptr<PendingFileSend> fil
+					std::shared_ptr<PendingFileSend> file
+				);
+				void update_response(
+					const dpp::slashcommand_t& event,
+					dpp::embed& embed,
+					const std::string& msg,
+					std::shared_ptr<PendingFileSend> file
 				);
 
 			private:
