@@ -35,6 +35,70 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
+    ../3rdParty/dpp/appcommand.h
+    ../3rdParty/dpp/application.h
+    ../3rdParty/dpp/auditlog.h
+    ../3rdParty/dpp/automod.h
+    ../3rdParty/dpp/ban.h
+    ../3rdParty/dpp/cache.h
+    ../3rdParty/dpp/channel.h
+    ../3rdParty/dpp/cluster.h
+    ../3rdParty/dpp/cluster_coro_calls.h
+    ../3rdParty/dpp/cluster_sync_calls.h
+    ../3rdParty/dpp/collector.h
+    ../3rdParty/dpp/colors.h
+    ../3rdParty/dpp/commandhandler.h
+    ../3rdParty/dpp/coro.h
+    ../3rdParty/dpp/discordclient.h
+    ../3rdParty/dpp/discordevents.h
+    ../3rdParty/dpp/discordvoiceclient.h
+    ../3rdParty/dpp/dispatcher.h
+    ../3rdParty/dpp/dns.h
+    ../3rdParty/dpp/dpp.h
+    ../3rdParty/dpp/dtemplate.h
+    ../3rdParty/dpp/emoji.h
+    ../3rdParty/dpp/etf.h
+    ../3rdParty/dpp/event.h
+    ../3rdParty/dpp/event_router.h
+    ../3rdParty/dpp/exception.h
+    ../3rdParty/dpp/export.h
+    ../3rdParty/dpp/guild.h
+    ../3rdParty/dpp/httpsclient.h
+    ../3rdParty/dpp/integration.h
+    ../3rdParty/dpp/intents.h
+    ../3rdParty/dpp/invite.h
+    ../3rdParty/dpp/json_interface.h
+    ../3rdParty/dpp/managed.h
+    ../3rdParty/dpp/message.h
+    ../3rdParty/dpp/misc-enum.h
+    ../3rdParty/dpp/once.h
+    ../3rdParty/dpp/permissions.h
+    ../3rdParty/dpp/presence.h
+    ../3rdParty/dpp/prune.h
+    ../3rdParty/dpp/queues.h
+    ../3rdParty/dpp/restrequest.h
+    ../3rdParty/dpp/restresults.h
+    ../3rdParty/dpp/role.h
+    ../3rdParty/dpp/scheduled_event.h
+    ../3rdParty/dpp/snowflake.h
+    ../3rdParty/dpp/socket.h
+    ../3rdParty/dpp/sslclient.h
+    ../3rdParty/dpp/stage_instance.h
+    ../3rdParty/dpp/stringops.h
+    ../3rdParty/dpp/sync.h
+    ../3rdParty/dpp/sysdep.h
+    ../3rdParty/dpp/timed_listener.h
+    ../3rdParty/dpp/timer.h
+    ../3rdParty/dpp/user.h
+    ../3rdParty/dpp/utility.h
+    ../3rdParty/dpp/version.h
+    ../3rdParty/dpp/voiceregion.h
+    ../3rdParty/dpp/voicestate.h
+    ../3rdParty/dpp/webhook.h
+    ../3rdParty/dpp/win32_safe_warnings.h
+    ../3rdParty/dpp/wsclient.h
+    ../3rdParty/dpp/nlohmann/json.hpp
+    ../3rdParty/dpp/nlohmann/json_fwd.hpp
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
@@ -584,6 +648,12 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
+    Source/Integrations/DppIntegration/DppClient.cpp
+    Source/Integrations/DppIntegration/DppClient.h
+    Source/Integrations/DppIntegration/DppUtility.cpp
+    Source/Integrations/DppIntegration/DppUtility.h
+    Source/Integrations/DppIntegration/DppCommandHandler.cpp
+    Source/Integrations/DppIntegration/DppCommandHandler.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -1806,8 +1876,20 @@ if (MSVC)
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
-    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib OpenCV_lib)
-    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
+
+    add_library(dpp_lib IMPORTED UNKNOWN)
+    set_target_properties(dpp_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE ../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG ../3rdPartyBinaries/dppd.lib)
+    set_target_properties(dpp_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+
+    target_link_libraries(SerialPrograms tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
+    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY PA_DPP _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic

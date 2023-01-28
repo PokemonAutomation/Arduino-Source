@@ -7,8 +7,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include "Common/Compiler.h"
+#include <Integrations/DppIntegration/DppClient.h>
 #include "SleepyDiscordRunner.h"
+#include "Common/Compiler.h"
 #include "DiscordIntegrationSettings.h"
 
 namespace PokemonAutomation{
@@ -18,6 +19,11 @@ namespace Integration{
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
 //    , m_integration_enabled(integration_enabled)
+    , use_dpp(
+        "<b>Discord integration to use:</b><br>If enabled, use D++ Discord library. If disabled, use Sleepy Discord library.",
+        LockWhileRunning::LOCKED,
+        false
+    )
     , token(
         true,
         "<b>Discord token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
@@ -60,6 +66,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         "", "123456789012345678"
     )
 {
+    PA_ADD_OPTION(use_dpp);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
@@ -92,25 +99,50 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_start->setFont(font);
     button_stop->setFont(font);
 
-#ifdef PA_SLEEPY
-//    this->setVisible(value.m_integration_enabled);
-    set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+    bool dpp = GlobalSettings::instance().DISCORD.integration.use_dpp;
 
-    connect(
-        button_start, &QPushButton::clicked,
-        this, [=, &value](bool){
-            set_options_enabled(false);
-            SleepyDiscordRunner::sleepy_connect();
-            set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-        }
-    );
-    connect(
-        button_stop, &QPushButton::clicked,
-        this, [=, &value](bool){
-            SleepyDiscordRunner::sleepy_terminate();
-            set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-        }
-    );
+#ifdef PA_SLEEPY
+    if (!dpp) {
+        set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+
+        connect(
+            button_start, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                set_options_enabled(false);
+                SleepyDiscordRunner::sleepy_connect();
+                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+            }
+        );
+        connect(
+            button_stop, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                SleepyDiscordRunner::sleepy_terminate();
+                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+            }
+        );
+    }
+#endif
+
+#ifdef PA_DPP
+    if (dpp) {
+        set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+
+        connect(
+            button_start, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                set_options_enabled(false);
+        DppClient::Client::instance().connect();
+        set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+            }
+        );
+        connect(
+            button_stop, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                DppClient::Client::instance().disconnect();
+        set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+            }
+        );
+    }
 #endif
 }
 

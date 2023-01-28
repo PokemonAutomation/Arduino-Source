@@ -2,6 +2,7 @@
 #include <QApplication>
 //#include <QTextStream>
 #include <QMessageBox>
+#include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -89,6 +90,10 @@ int main(int argc, char *argv[]){
 
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::sleepy_terminate();
+#endif
+
+#ifdef PA_DPP
+    Integration::DppClient::Client::instance().disconnect();
 #endif
 
     return ret;

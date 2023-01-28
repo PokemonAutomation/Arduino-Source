@@ -5,6 +5,7 @@
  */
 
 #include <QFile>
+#include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -149,7 +150,7 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(logger, image));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_sleepy;
+    JsonObject embed_integration;
     JsonArray embeds;
     {
         JsonObject embed;
@@ -171,7 +172,7 @@ void send_raw_notification(
             embed["image"] = std::move(field);
         }
         embeds.push_back(embed.clone());
-        embed_sleepy = std::move(embed);
+        embed_integration = embed.clone();
     }
 
     Integration::DiscordWebhook::send_message(
@@ -181,7 +182,14 @@ void send_raw_notification(
     );
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", embed_sleepy,
+        should_ping, tags, "", std::move(embed_integration),
+        hasFile ? file : nullptr
+    );
+#endif
+
+#ifdef PA_DPP
+    Integration::DppClient::Client::instance().send_message_dpp(
+        should_ping, color, tags, std::move(embed_integration), "",
         hasFile ? file : nullptr
     );
 #endif
@@ -197,7 +205,7 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_sleepy;
+    JsonObject embed_integration;
     JsonArray embeds;
     {
         JsonObject embed;
@@ -214,7 +222,7 @@ void send_raw_notification(
         embed["fields"] = std::move(fields);
 
         embeds.push_back(embed.clone());
-        embed_sleepy = std::move(embed);
+        embed_integration = embed.clone();
     }
 
     Integration::DiscordWebhook::send_message(
@@ -224,7 +232,14 @@ void send_raw_notification(
     );
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", embed_sleepy,
+        should_ping, tags, "", std::move(embed_integration),
+        hasFile ? file : nullptr
+    );
+#endif
+
+#ifdef PA_DPP
+    Integration::DppClient::Client::instance().send_message_dpp(
+        should_ping, color, tags, std::move(embed_integration), "",
         hasFile ? file : nullptr
     );
 #endif
