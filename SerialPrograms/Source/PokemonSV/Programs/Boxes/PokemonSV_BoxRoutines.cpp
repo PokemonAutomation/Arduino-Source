@@ -502,9 +502,13 @@ void swap_two_box_slots(
     detector.make_overlays(overlay_set);
 
     detector.move_cursor(info, console, context, source_side, source_row, source_col);
-    SomethingInBoxSlotDetector exists(COLOR_BLUE);
-    if (exists.detect(console.video().snapshot()) == false){
-        dump_image_and_throw_recoverable_exception(info, console, "EmptySourceSwap", "Swapping an empty slot.");
+
+    {
+        const bool stop_on_exists = true;
+        SomethingInBoxSlotWatcher exists(COLOR_BLUE, stop_on_exists);
+        if (wait_until(console, context, std::chrono::seconds(3), {exists}) < 0){
+            dump_image_and_throw_recoverable_exception(info, console, "EmptySourceSwap", "Swapping an empty slot.");
+        }
     }
 
     press_y_to_hold_pokemon(info, console, context);
