@@ -182,7 +182,6 @@ bool run_tera_battle(
     EventNotificationOption& error_notification,
     TeraAIOption& battle_AI
 ){
-
     size_t turn = 0;
     std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
     TeraMoveEntry current_move{TeraMoveType::Move1, 0, TeraTarget::Opponent};
@@ -192,6 +191,7 @@ bool run_tera_battle(
 
     size_t consecutive_timeouts = 0;
     size_t consecutive_move_select = 0;
+    bool battle_menu_seen = false;
     bool next_turn_on_battle_menu = false;
     while (true){
         // Warning, this terastallizing detector isn't used in the wait_until() below.
@@ -208,7 +208,12 @@ bool run_tera_battle(
             WhiteButton::ButtonA,
             {0.8, 0.93, 0.2, 0.07},
             WhiteButtonWatcher::FinderType::PRESENT,
-            std::chrono::seconds(5)
+            //  This can false positive against the back (B) button while in the
+            //  lobby. So don't trigger this unless we see the battle menu first.
+            //  At the same time, there's a possibility that we miss the battle
+            //  menu if the raid is won before it even loads. And this can only
+            //  happen if the raid was uncatchable to begin with.
+            std::chrono::seconds(battle_menu_seen ? 5 : 60)
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_GREEN);
@@ -235,6 +240,7 @@ bool run_tera_battle(
         switch (ret){
         case 0:{
             console.log("Detected battle menu.");
+            battle_menu_seen = true;
 
             //  If we enter here, we advance to the next turn.
             if (next_turn_on_battle_menu){

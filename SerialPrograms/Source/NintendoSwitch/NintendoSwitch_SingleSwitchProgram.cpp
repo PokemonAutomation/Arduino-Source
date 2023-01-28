@@ -46,7 +46,7 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
     , NOTIFICATION_PROGRAM_FINISH(
         "Program Finished",
         true, true,
-        ImageAttachmentMode::PNG,
+        ImageAttachmentMode::JPG,
         {"Notifs"}
     )
     , NOTIFICATION_ERROR_RECOVERABLE(
