@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -32,6 +33,21 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+
+GeneralHostingOptions::GeneralHostingOptions()
+    : GroupOption("Hosting Options", LockWhileRunning::LOCKED)
+{
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(START_RAID_PLAYERS);
+    PA_ADD_OPTION(SHOW_RAID_CODE);
+    PA_ADD_OPTION(DESCRIPTION);
+    PA_ADD_OPTION(REMOTE_KILL_SWITCH);
+    PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
+    PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
+}
+
 
 
 
@@ -116,20 +132,11 @@ std::unique_ptr<StatsTracker> TeraMultiFarmer_Descriptor::make_stats() const{
 
 
 TeraMultiFarmer::~TeraMultiFarmer(){
+    HOSTING_MODE.remove_listener(*this);
     HOSTING_SWITCH.remove_listener(*this);
 }
 TeraMultiFarmer::TeraMultiFarmer()
-    : HOSTING_MODE(
-        "<b>Mode:</b>",
-        {
-            {Mode::FARM_ALONE,      "farm-alone",   "Farm by yourself."},
-            {Mode::HOST_LOCALLY,    "host-locally", "Host empty slots locally."},
-            {Mode::HOST_ONLINE,     "host-online",  "Host empty slots online."},
-        },
-        LockWhileRunning::LOCKED,
-        Mode::FARM_ALONE
-    )
-    , HOSTING_SWITCH(
+    : HOSTING_SWITCH(
         "<b>Host Switch:</b><br>This is the Switch that hosts the raid.",
         {
             {0, "switch0", "Switch 0 (Top Left)"},
@@ -145,6 +152,16 @@ TeraMultiFarmer::TeraMultiFarmer()
         LockWhileRunning::UNLOCKED,
         999, 1, 999
     )
+    , HOSTING_MODE(
+        "<b>Mode:</b>",
+        {
+            {Mode::FARM_ALONE,      "farm-alone",   "Farm by yourself."},
+            {Mode::HOST_LOCALLY,    "host-locally", "Host empty slots locally."},
+            {Mode::HOST_ONLINE,     "host-online",  "Host empty slots online."},
+        },
+        LockWhileRunning::LOCKED,
+        Mode::FARM_ALONE
+    )
     , RECOVERY_MODE(
         "<b>Recovery Mode:</b>",
         {
@@ -154,18 +171,24 @@ TeraMultiFarmer::TeraMultiFarmer()
         LockWhileRunning::LOCKED,
         RecoveryMode::SAVE_AND_RESET
     )
-    , ROLLOVER_PREVENTION(
-        "<b>Rollover Prevention:</b><br>Periodically set the time back to 12AM to prevent the date from rolling over and losing the raid.",
-        LockWhileRunning::UNLOCKED,
-        true
-    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS({
-        &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_ERROR_RECOVERABLE,
-        &NOTIFICATION_ERROR_FATAL,
-    })
+    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE && false
+        ? std::vector<EventNotificationOption*>{
+                &NOTIFICATION_STATUS_UPDATE,
+                &NOTIFICATION_RAID_POST,
+                &NOTIFICATION_RAID_START,
+                &NOTIFICATION_JOIN_REPORT,
+                &NOTIFICATION_PROGRAM_FINISH,
+                &NOTIFICATION_ERROR_RECOVERABLE,
+                &NOTIFICATION_ERROR_FATAL,
+        }
+        : std::vector<EventNotificationOption*>{
+                &NOTIFICATION_STATUS_UPDATE,
+                &NOTIFICATION_PROGRAM_FINISH,
+                &NOTIFICATION_ERROR_RECOVERABLE,
+                &NOTIFICATION_ERROR_FATAL,
+        }
+    )
 {
     const LanguageSet& languages = PokemonNameReader::instance().languages();
     size_t host = HOSTING_SWITCH.current_value();
@@ -174,9 +197,15 @@ TeraMultiFarmer::TeraMultiFarmer()
     PLAYERS[2].reset(new PerConsoleTeraFarmerOptions("Switch 2 (Bottom Left)", languages, host == 2));
     PLAYERS[3].reset(new PerConsoleTeraFarmerOptions("Switch 3 (Bottom Right)", languages, host == 3));
 
-//    PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(HOSTING_SWITCH);
     PA_ADD_OPTION(MAX_WINS);
+
+    //  General Auto-Hosting Options
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+//        PA_ADD_OPTION(HOSTING_MODE);
+        PA_ADD_OPTION(HOSTING_OPTIONS);
+    }
+
     PA_ADD_OPTION(*PLAYERS[0]);
     PA_ADD_OPTION(*PLAYERS[1]);
     PA_ADD_OPTION(*PLAYERS[2]);
@@ -184,11 +213,19 @@ TeraMultiFarmer::TeraMultiFarmer()
 
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(RECOVERY_MODE);
+
+    //  Extended Auto-Hosting Options
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(BAN_LIST);
+        PA_ADD_OPTION(JOIN_REPORT);
+    }
+
     PA_ADD_OPTION(NOTIFICATIONS);
 
     TeraMultiFarmer::value_changed();
 
     HOSTING_SWITCH.add_listener(*this);
+    HOSTING_MODE.add_listener(*this);
 }
 void TeraMultiFarmer::update_active_consoles(size_t switch_count){
     for (size_t c = 0; c < 4; c ++){
@@ -200,6 +237,13 @@ void TeraMultiFarmer::value_changed(){
     for (size_t c = 0; c < 4; c++){
         PLAYERS[c]->set_host(host == c);
     }
+
+    ConfigOptionState hosting = HOSTING_MODE == Mode::FARM_ALONE
+        ? ConfigOptionState::HIDDEN
+        : ConfigOptionState::ENABLED;
+    HOSTING_OPTIONS.set_visibility(hosting);
+    BAN_LIST.set_visibility(hosting);
+    JOIN_REPORT.set_visibility(hosting);
 }
 
 
@@ -273,6 +317,59 @@ void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& co
 
     enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
 }
+void TeraMultiFarmer::join_lobby(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    size_t host_index, const std::string& normalized_code
+){
+    if (console.index() == host_index){
+        return;
+    }
+
+    TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
+
+    for (size_t attempts = 0;; attempts++){
+        if (attempts >= 3){
+            throw OperationFailedException(console, "Failed to join lobby 3 times.", true);
+        }
+
+        enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+
+        TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_RED);
+        AdvanceDialogWatcher wrong_code(COLOR_YELLOW);
+        CodeEntryWatcher incomplete_code(COLOR_GREEN);
+        context.wait_for_all_requests();
+        context.wait_for(std::chrono::seconds(3));
+        int ret = wait_until(
+            console, context, std::chrono::seconds(60),
+            {
+                {lobby, std::chrono::milliseconds(500)},
+                wrong_code,
+                incomplete_code,
+            }
+        );
+        switch (ret){
+        case 0:
+            console.log("Entered raid lobby!");
+            pbf_mash_button(context, BUTTON_A, 125);
+            break;
+        case 1:
+            console.log("Wrong code! Backing out and trying again...", COLOR_RED);
+            stats.m_errors++;
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+            continue;
+        case 2:
+            console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
+            stats.m_errors++;
+            pbf_press_button(context, BUTTON_X, 20, 230);
+            enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+            continue;
+        default:
+            throw OperationFailedException(console, "Unable to join lobby.", true);
+        }
+        break;
+    }
+}
 bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
     size_t host_index = HOSTING_SWITCH.current_value();
@@ -328,52 +425,7 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
     //  Join the lobby. If anything throws, we need to reset everyone.
     try{
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-            if (console.index() == host_index){
-                return;
-            }
-
-            for (size_t attempts = 0;; attempts++){
-                if (attempts >= 3){
-                    throw OperationFailedException(console, "Failed to join lobby 3 times.", true);
-                }
-
-                enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
-
-                TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_RED);
-                AdvanceDialogWatcher wrong_code(COLOR_YELLOW);
-                CodeEntryWatcher incomplete_code(COLOR_GREEN);
-                context.wait_for_all_requests();
-                context.wait_for(std::chrono::seconds(3));
-                int ret = wait_until(
-                    console, context, std::chrono::seconds(60),
-                    {
-                        {lobby, std::chrono::milliseconds(500)},
-                        wrong_code,
-                        incomplete_code,
-                    }
-                );
-                switch (ret){
-                case 0:
-                    console.log("Entered raid lobby!");
-                    pbf_mash_button(context, BUTTON_A, 125);
-                    break;
-                case 1:
-                    console.log("Wrong code! Backing out and trying again...", COLOR_RED);
-                    stats.m_errors++;
-                    pbf_press_button(context, BUTTON_B, 20, 230);
-                    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-                    continue;
-                case 2:
-                    console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
-                    stats.m_errors++;
-                    pbf_press_button(context, BUTTON_X, 20, 230);
-                    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-                    continue;
-                default:
-                    throw OperationFailedException(console, "Unable to join lobby.", true);
-                }
-                break;
-            }
+            join_lobby(env, console, context, host_index, normalized_code);
         });
     }catch (OperationFailedException&){
         stats.m_errors++;

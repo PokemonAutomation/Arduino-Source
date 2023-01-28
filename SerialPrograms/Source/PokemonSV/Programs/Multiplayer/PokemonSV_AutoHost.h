@@ -7,14 +7,12 @@
 #ifndef PokemonAutomation_PokemonSV_AutoHost_H
 #define PokemonAutomation_PokemonSV_AutoHost_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
+#include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 
@@ -64,25 +62,23 @@ private:
 
     EnumDropdownOption<HostingMode> MODE;
 
-    SimpleIntegerOption<uint16_t> LOBBY_WAIT_DELAY;
-    IntegerEnumDropdownOption START_RAID_PLAYERS;
-    BooleanCheckBoxOption SHOW_RAID_CODE;
-    BooleanCheckBoxOption ROLLOVER_PREVENTION;
+    LobbyWaitDelay LOBBY_WAIT_DELAY;
+    StartRaidPlayers START_RAID_PLAYERS;
+    ShowRaidCode SHOW_RAID_CODE;
+    AutoHostDescription DESCRIPTION;
+    RemoteKillSwitch REMOTE_KILL_SWITCH0;
+    ConsecutiveFailurePause CONSECUTIVE_FAILURE_PAUSE;
+    FailurePauseMinutes FAILURE_PAUSE_MINUTES;
 
-    TextEditOption DESCRIPTION;
-
-    StringOption REMOTE_KILL_SWITCH0;
-
-    SimpleIntegerOption<uint8_t> CONSECUTIVE_FAILURE_PAUSE;
-    SimpleIntegerOption<uint16_t> FAILURE_PAUSE_MINUTES;
+    RolloverPrevention ROLLOVER_PREVENTION;
     TeraAIOption BATTLE_AI;
 
     RaidPlayerBanList BAN_LIST;
     RaidJoinReportOption JOIN_REPORT;
 
-    EventNotificationOption NOTIFICATION_RAID_POST;
-    EventNotificationOption NOTIFICATION_RAID_START;
-    EventNotificationOption NOTIFICATION_JOIN_REPORT;
+    RaidPostNotification NOTIFICATION_RAID_POST;
+    RaidStartNotification NOTIFICATION_RAID_START;
+    JoinReportNotification NOTIFICATION_JOIN_REPORT;
     EventNotificationsOption NOTIFICATIONS0;
 
     WallClock m_ban_timer;

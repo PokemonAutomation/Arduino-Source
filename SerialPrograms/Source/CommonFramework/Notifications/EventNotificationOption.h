@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_EventNotificationOption_H
 #define PokemonAutomation_EventNotificationOption_H
 
+#include <chrono>
 #include <vector>
 #include "Common/Cpp/AbstractLogger.h"
-#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_TeraMultiFarmer_H
 #define PokemonAutomation_PokemonSV_TeraMultiFarmer_H
 
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -17,10 +18,29 @@
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
+#include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
+#include "PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+
+class GeneralHostingOptions : public GroupOption{
+public:
+    GeneralHostingOptions();
+
+    LobbyWaitDelay LOBBY_WAIT_DELAY;
+    StartRaidPlayers START_RAID_PLAYERS;
+    ShowRaidCode SHOW_RAID_CODE;
+    AutoHostDescription DESCRIPTION;
+    RemoteKillSwitch REMOTE_KILL_SWITCH;
+    ConsecutiveFailurePause CONSECUTIVE_FAILURE_PAUSE;
+    FailurePauseMinutes FAILURE_PAUSE_MINUTES;
+};
+
 
 
 class PerConsoleTeraFarmerOptions : public GroupOption, public ConfigOption::Listener{
@@ -41,9 +61,6 @@ public:
 
     TeraAIOption battle_ai;
 };
-
-
-
 
 
 
@@ -71,10 +88,17 @@ private:
 
     bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void join_lobby(
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        size_t host_index, const std::string& normalized_code
+    );
 
     bool run_raid(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
 
 private:
+    IntegerEnumDropdownOption HOSTING_SWITCH;
+    SimpleIntegerOption<uint16_t> MAX_WINS;
+
     enum class Mode{
         FARM_ALONE,
         HOST_LOCALLY,
@@ -82,8 +106,9 @@ private:
     };
     EnumDropdownOption<Mode> HOSTING_MODE;
 
-    IntegerEnumDropdownOption HOSTING_SWITCH;
-    SimpleIntegerOption<uint16_t> MAX_WINS;
+    GeneralHostingOptions HOSTING_OPTIONS;
+
+    //  Per-console Options
     std::unique_ptr<PerConsoleTeraFarmerOptions> PLAYERS[4];
 
     enum class RecoveryMode{
@@ -91,9 +116,16 @@ private:
         SAVE_AND_RESET,
     };
     EnumDropdownOption<RecoveryMode> RECOVERY_MODE;
-    BooleanCheckBoxOption ROLLOVER_PREVENTION;
+    RolloverPrevention ROLLOVER_PREVENTION;
+
+    //  Extended Auto-host Options
+    RaidPlayerBanList BAN_LIST;
+    RaidJoinReportOption JOIN_REPORT;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    RaidPostNotification NOTIFICATION_RAID_POST;
+    RaidStartNotification NOTIFICATION_RAID_START;
+    JoinReportNotification NOTIFICATION_JOIN_REPORT;
     EventNotificationsOption NOTIFICATIONS;
 
     WallClock m_last_time_fix;

@@ -1542,6 +1542,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
+    Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \

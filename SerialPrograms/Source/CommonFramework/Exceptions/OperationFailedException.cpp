@@ -9,7 +9,6 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "FatalProgramException.h"
 #include "OperationFailedException.h"
 
 namespace PokemonAutomation{

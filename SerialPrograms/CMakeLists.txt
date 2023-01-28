@@ -1365,6 +1365,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
+    Source/PokemonSV/Resources/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp

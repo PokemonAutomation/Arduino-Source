@@ -106,60 +106,6 @@ AutoHost::AutoHost()
         LockWhileRunning::UNLOCKED,
         HostingMode::ONLINE_CODED
     )
-    , LOBBY_WAIT_DELAY(
-        "<b>Lobby Wait Delay (in seconds):</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
-        LockWhileRunning::UNLOCKED,
-        60, 15, 180
-    )
-    , START_RAID_PLAYERS(
-        "<b>Start Players:</b><br>Start the raid when there are this many players.",
-        {
-            {2, "2", "2 Players (1 Joiner)"},
-            {3, "3", "3 Players (2 Joiners)"},
-            {4, "4", "4 Players (3 Joiners)"},
-        },
-        LockWhileRunning::UNLOCKED,
-        4
-    )
-    , SHOW_RAID_CODE(
-        "<b>Show Raid Code:</b><br>Include the raid code in the post notifications. This allows FCE users to copy-paste the code.",
-        LockWhileRunning::UNLOCKED,
-        true
-    )
-    , ROLLOVER_PREVENTION(
-        "<b>Rollover Prevention:</b><br>Periodically set the time back to 12AM to prevent the date from rolling over and losing the raid.",
-        LockWhileRunning::UNLOCKED,
-        true
-    )
-    , DESCRIPTION(
-        "<b>Description:</b>",
-        LockWhileRunning::UNLOCKED,
-        "",
-        "Auto-Hosting Shiny Eevee"
-    )
-    , REMOTE_KILL_SWITCH0(
-        false,
-        "<b>Remote Kill Switch:</b><br>Stop the auto-host if the session crosses the date/time specified in this URL. "
-        "The default URL is maintained by the PA/SHA staff which updates this with the event change dates.",
-        LockWhileRunning::UNLOCKED,
-        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.json",
-        "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-KillSwitch.json"
-    )
-    , CONSECUTIVE_FAILURE_PAUSE(
-        "<b>Consecutive Failure Stop/Pause:</b><br>Pause or stop the program if this many consecutive raids fail.<br>"
-        "It is not recommended to set this higher than 3 since soft bans start after 3 disconnects.",
-        LockWhileRunning::UNLOCKED,
-        3, 1
-    )
-    , FAILURE_PAUSE_MINUTES(
-        "<b>Failure Pause Time (in minutes):</b><br>If you trigger the above by failing too many times, "
-        "pause for this many minutes before resuming the program. (Zero stops the program.)",
-        LockWhileRunning::UNLOCKED,
-        0, 0
-    )
-    , NOTIFICATION_RAID_POST("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
-    , NOTIFICATION_RAID_START("Raid Start Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
-    , NOTIFICATION_JOIN_REPORT("Player Join Reports", true, false, {"Telemetry"})
     , NOTIFICATIONS0({
         &NOTIFICATION_RAID_POST,
         &NOTIFICATION_RAID_START,
@@ -169,17 +115,23 @@ AutoHost::AutoHost()
     })
 {
     PA_ADD_OPTION(MODE);
+
+    //  General Auto-Hosting Options
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
     PA_ADD_OPTION(SHOW_RAID_CODE);
-    PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(REMOTE_KILL_SWITCH0);
     PA_ADD_OPTION(CONSECUTIVE_FAILURE_PAUSE);
     PA_ADD_OPTION(FAILURE_PAUSE_MINUTES);
+
+    PA_ADD_OPTION(ROLLOVER_PREVENTION);
     PA_ADD_OPTION(BATTLE_AI);
+
+    //  Extended Auto-Hosting Options
     PA_ADD_OPTION(BAN_LIST);
     PA_ADD_OPTION(JOIN_REPORT);
+
     PA_ADD_OPTION(NOTIFICATIONS0);
 }
 
