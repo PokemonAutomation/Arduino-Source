@@ -28,7 +28,7 @@ public:
     NatureReader::Results read(Logger& logger, const ImageViewRGB32& frame);
 
 private:
-    NaturePlusMinus read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box);
+    NaturePlusMinus read(Logger& logger, const ImageViewRGB32& frame, const ImageFloatBox& box);
 
 private:
     OverlayBoxScope m_box_atk;
@@ -36,8 +36,6 @@ private:
     OverlayBoxScope m_box_spatk;
     OverlayBoxScope m_box_spdef;
     OverlayBoxScope m_box_spd;
-    double m_area_ratio_threshold;
-    Color m_color;
 };
 
 

@@ -23,48 +23,25 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 BoxNatureDetector::BoxNatureDetector(VideoOverlay& overlay)
-    : m_box_atk(overlay, { 0.689, 0.198 + 1 * 0.0515, 0.84, 0.047})
-    , m_box_def(overlay, { 0.689, 0.198 + 2 * 0.0515, 0.84, 0.047})
-    , m_box_spatk(overlay, { 0.689, 0.198 + 3 * 0.0515, 0.84, 0.047})
-    , m_box_spdef(overlay, { 0.689, 0.198 + 4 * 0.0515, 0.84, 0.047})
-    , m_box_spd(overlay, { 0.689, 0.198 + 5 * 0.0515, 0.84, 0.047})
+    : m_box_atk(overlay, { 0.689, 0.198 + 1 * 0.0515, 0.084, 0.047})
+    , m_box_def(overlay, { 0.689, 0.198 + 2 * 0.0515, 0.084, 0.047})
+    , m_box_spatk(overlay, { 0.689, 0.198 + 3 * 0.0515, 0.084, 0.047})
+    , m_box_spdef(overlay, { 0.689, 0.198 + 4 * 0.0515, 0.084, 0.047})
+    , m_box_spd(overlay, { 0.689, 0.198 + 5 * 0.0515, 0.084, 0.047})
 {}
 
-NaturePlusMinus BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
+NaturePlusMinus BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& frame, const ImageFloatBox& box){
+    const ImageStats region = image_stats(extract_box_reference(frame, box));
 
-    const auto region = extract_box_reference(frame, box);
-
-    // Retain only red pixels from region
-    const bool replace_color_within_range = false;
-    const ImageRGB32 red_region = filter_rgb32_range(
-        region,
-        combine_rgb(150, 0, 0), combine_rgb(255, 100, 100), Color(0), replace_color_within_range
-    );
-    const size_t num_red_pixels = image_stats(red_region).count;
-
-    // Retain only blue pixels from region
-    const ImageRGB32 blue_region = filter_rgb32_range(
-        region,
-        combine_rgb(0, 0, 180), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
-    );
-    const size_t num_blue_pixels = image_stats(blue_region).count;
-
-    const double threshold = region.width() * region.height() * m_area_ratio_threshold;
-
-    if (PreloadSettings::debug().COLOR_CHECK) {
-        cout << "num_red_pixels: " << num_red_pixels << ", num_blue_pixels: " << num_blue_pixels
-            << ", region " << region.width() << " x " << region.height() << " threshold " << threshold << endl;
-
-        cout << "Save images to ./red_only.png and ./blue_only.png" << endl;
-        red_region.save("./red_only.png");
-        blue_region.save("./blue_only.png");
-    }
-
-    if (num_red_pixels > threshold) {
-        return NaturePlusMinus::PLUS;
-    }
-    else if (num_blue_pixels > threshold) {
+    //cout << region.average.r << endl;
+    //cout << region.average.g << endl;
+    //cout << region.average.b << endl;
+    
+    if (region.average.b > region.average.r + 3) {
         return NaturePlusMinus::MINUS;
+    }
+    else if (region.average.r > region.average.b) {
+        return NaturePlusMinus::PLUS;
     }
     return NaturePlusMinus::NEUTRAL;
 
