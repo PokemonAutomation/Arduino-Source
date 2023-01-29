@@ -63,11 +63,6 @@ DiscordSettingsOption::DiscordSettingsOption()
     PA_ADD_OPTION(integration);
 #endif
 }
-#if 0
-void DiscordSettingsOption::load_json(const JsonValueRef& json){
-    BatchOption::load_json(json);
-}
-#endif
 
 
 
