@@ -531,99 +531,85 @@ void send_message_sleepy(
     const JsonObject& embed,
     std::shared_ptr<PendingFileSend> file
 ){
+    DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
+    if (!settings.integration.enabled()){
+        return;
+    }
+
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_sleepy_client != nullptr) {
+    if (m_sleepy_client == nullptr){
+        return;
+    }
 
-        std::set<std::string> tag_set;
-        for (const std::string& tag : tags){
-            tag_set.insert(to_lower(tag));
+    std::set<std::string> tag_set;
+    for (const std::string& tag : tags){
+        tag_set.insert(to_lower(tag));
+    }
+
+    const DiscordIntegrationTable& channels = settings.integration.channels;
+    std::vector<std::string> channel_vector;
+    std::vector<std::string> message_vector;
+
+    std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = channels.copy_snapshot();
+    for (size_t i = 0; i < table.size(); i++){
+        const Integration::DiscordIntegrationChannel& channel = *table[i];
+        if (((std::string)channel.tags_text).empty() || !channel.enabled){
+            continue;
         }
 
-        DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-        const DiscordIntegrationTable& channels = settings.integration.channels;
-        std::vector<std::string> channel_vector;
-        std::vector<std::string> message_vector;
-
-        std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = channels.copy_snapshot();
-        for (size_t i = 0; i < table.size(); i++){
-            const Integration::DiscordIntegrationChannel& channel = *table[i];
-            if (((std::string)channel.tags_text).empty() || !channel.enabled){
-                continue;
+        bool send = false;
+        for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)){
+            auto iter = tag_set.find(to_lower(tag));
+            if (iter != tag_set.end()){
+                channel_vector.emplace_back(channel.channel_id);
+                send = true;
+                break;
             }
-
-            bool send = false;
-            for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)){
-                auto iter = tag_set.find(to_lower(tag));
-                if (iter != tag_set.end()){
-                    channel_vector.emplace_back(channel.channel_id);
-                    send = true;
-                    break;
-                }
-            }
-
-            if (!send) {
-                continue;
-            }
-
-            if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
-                should_ping = false;
-            }
-
-            std::string str = "";
-            if (should_ping && channel.ping){
-                str += "<@" + (std::string)settings.message.user_id + ">";
-            }
-
-            const std::string& discord_message = settings.message.message;
-            if (!discord_message.empty()){
-                if (!str.empty()){
-                    str += " ";
-                }
-
-                for (char ch : discord_message){
-                    if (ch != '@'){
-                        str += ch;
-                    }
-                }
-            }
-
-            if (!message.empty()){
-                if (!str.empty()){
-                    str += " ";
-                }
-                str += message;
-            }
-            message_vector.emplace_back(str);
-
-            std::string json = embed.dump();
-            sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
-            m_sleepy_client->send(
-                json,
-                channel.channel_id,
-                std::chrono::seconds(channel.delay),
-                str,
-                file == nullptr ? nullptr : file
-            );
         }
 
-#if 0
-        if (channel_vector.empty()){
-            return;
+        if (!send) {
+            continue;
         }
 
-        std::string chanStr;
-        std::string messages;
-        for (size_t i = 0; i < channel_vector.size(); i++){
-            chanStr += channel_vector[i];
-            chanStr += (i + 1 == channel_vector.size() ? "" : ",");
-            messages += message_vector[i];
-            messages += (i + 1 == channel_vector.size() ? "" : "|");
+        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
+            should_ping = false;
         }
+
+        std::string str = "";
+        if (should_ping && channel.ping){
+            str += "<@" + (std::string)settings.message.user_id + ">";
+        }
+
+        const std::string& discord_message = settings.message.message;
+        if (!discord_message.empty()){
+            if (!str.empty()){
+                str += " ";
+            }
+
+            for (char ch : discord_message){
+                if (ch != '@'){
+                    str += ch;
+                }
+            }
+        }
+
+        if (!message.empty()){
+            if (!str.empty()){
+                str += " ";
+            }
+            str += message;
+        }
+        message_vector.emplace_back(str);
 
         std::string json = embed.dump();
         sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
-        m_sleepy_client->send(json, chanStr, std::chrono::seconds(0), messages, file == nullptr ? nullptr : std::move(file));
-#endif
+        m_sleepy_client->send(
+            json,
+            channel.channel_id,
+            std::chrono::seconds(channel.delay),
+            str,
+            file == nullptr ? nullptr : file
+        );
     }
 }
 
