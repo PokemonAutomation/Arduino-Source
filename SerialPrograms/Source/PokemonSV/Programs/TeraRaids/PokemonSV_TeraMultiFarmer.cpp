@@ -39,7 +39,7 @@ using namespace Pokemon;
 
 
 GeneralHostingOptions::GeneralHostingOptions()
-    : GroupOption("Hosting Options", LockWhileRunning::LOCKED)
+    : GroupOption("Hosting Options", LockWhileRunning::UNLOCKED)
 {
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
@@ -186,7 +186,7 @@ TeraMultiFarmer::TeraMultiFarmer()
         RecoveryMode::SAVE_AND_RESET
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE && false
+    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE
         ? std::vector<EventNotificationOption*>{
                 &NOTIFICATION_STATUS_UPDATE,
                 &NOTIFICATION_RAID_POST,
@@ -216,7 +216,7 @@ TeraMultiFarmer::TeraMultiFarmer()
 
     //  General Auto-Hosting Options
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        PA_ADD_OPTION(HOSTING_MODE);
+        PA_ADD_OPTION(HOSTING_MODE);
         PA_ADD_OPTION(HOSTING_OPTIONS);
     }
 
@@ -231,7 +231,7 @@ TeraMultiFarmer::TeraMultiFarmer()
     //  Extended Auto-Hosting Options
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(BAN_LIST);
-        PA_ADD_OPTION(JOIN_REPORT);
+//        PA_ADD_OPTION(JOIN_REPORT);
     }
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -411,6 +411,10 @@ bool TeraMultiFarmer::run_raid(
             throw;
         }
     });
+
+    if (HOSTING_MODE != Mode::FARM_ALONE){
+        BAN_LIST.refresh_online_table(env.logger());
+    }
 
     //  Open lobby and read code.
     WallClock lobby_start_time;
