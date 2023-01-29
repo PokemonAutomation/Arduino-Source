@@ -42,15 +42,15 @@ namespace PokemonAutomation {
                     const std::string& msg,
                     std::shared_ptr<PendingFileSend> file
                 );
+
+            private:
+                void create_commands(dpp::cluster& bot);
                 void update_response(
                     const dpp::slashcommand_t& event,
                     dpp::embed& embed,
                     const std::string& msg,
                     std::shared_ptr<PendingFileSend> file
                 );
-
-            private:
-                void create_commands(dpp::cluster& bot);
             };
         }
     }
