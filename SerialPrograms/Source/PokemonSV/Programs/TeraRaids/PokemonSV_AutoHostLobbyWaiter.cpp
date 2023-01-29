@@ -41,7 +41,7 @@ TeraLobbyWaiter::TeraLobbyWaiter(
     , m_dialog(COLOR_YELLOW)
     , m_start_raid(COLOR_BLUE)
     , m_join_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, host_players)
-    , m_name_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST)
+    , m_name_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST, host_players)
 {}
 
 VideoSnapshot TeraLobbyWaiter::synchronize_state(){
@@ -81,10 +81,13 @@ std::string TeraLobbyWaiter::check_hat_trick(){
     }
     return iter1->second;
 }
-bool TeraLobbyWaiter::check_bans(){
+bool TeraLobbyWaiter::check_bans(bool skip_grace_period){
     if (m_bans.empty()){
         m_ban_timer = WallClock::max();
         return false;
+    }
+    if (skip_grace_period){
+        return true;
     }
 
 //    //  Enough people have joined.
@@ -162,8 +165,8 @@ bool TeraLobbyWaiter::process_hat_trick(const ImageViewRGB32& snapshot){
     );
     return true;
 }
-bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot){
-    if (!check_bans()){
+bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot, bool skip_grace_period){
+    if (!check_bans(skip_grace_period)){
         return false;
     }
 
@@ -275,7 +278,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
 
         //  No events have fired. Keep looping.
         if (check_hat_trick().empty() &&
-            !check_bans() &&
+            !check_bans(false) &&
             !check_start_timeout() &&
             !check_enough_players() &&
             !(end_time < current_time())
@@ -294,7 +297,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         }
 
         //  Check bans.
-        if (process_bans(snapshot)){
+        if (process_bans(snapshot, true)){
             return LobbyResult::BANNED_PLAYER;
         }
 

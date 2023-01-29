@@ -34,8 +34,9 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
-#include "PokemonSV_AutoHost.h"
+#include "PokemonSV_AutoHostTools.h"
 #include "PokemonSV_AutoHostLobbyWaiter.h"
+#include "PokemonSV_AutoHost.h"
 
 //#include <iostream>
 //using std::cout;
@@ -161,25 +162,12 @@ WallClock AutoHost::wait_for_lobby_open(
     WallClock start_time = current_time();
     context.wait_for(std::chrono::seconds(1));
 
-    //  Send notification.
-    std::vector<std::pair<std::string, std::string>> messages;
-    std::string description = DESCRIPTION;
-    if (!description.empty()){
-        messages.emplace_back("Description:", std::move(description));
-    }
-
-    VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
-    if (SHOW_RAID_CODE && !lobby_code.empty()){
-        messages.emplace_back("Raid Code:", lobby_code);
-    }
-
-    send_program_notification(
-        env, NOTIFICATION_RAID_POST,
-        Color(0),
-        "Tera Raid Notification",
-        messages, "",
-        env.console.video().snapshot()
+    send_host_announcement(
+        env, env.console,
+        lobby_code,
+        SHOW_RAID_CODE,
+        DESCRIPTION,
+        NOTIFICATION_RAID_POST
     );
 
     return start_time;

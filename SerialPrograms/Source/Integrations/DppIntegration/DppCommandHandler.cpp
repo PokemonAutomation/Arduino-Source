@@ -112,6 +112,8 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
             m.content = msg;
         }
 
+        m.allowed_mentions.parse_users = true;
+
         m.channel_id = channel;
         m.add_embed(embed);
         bot.message_create(m);

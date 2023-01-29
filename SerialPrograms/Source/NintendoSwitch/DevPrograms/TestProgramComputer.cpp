@@ -93,7 +93,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
 #include "Integrations/DiscordWebhook.h"
-#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "CommonFramework/Environment/Environment.h"

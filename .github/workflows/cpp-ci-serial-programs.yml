@@ -116,7 +116,7 @@ jobs:
       run: |
         robocopy Packages/SerialPrograms/Resources          Output/Resources /s
         robocopy Packages/PABotBase/PABotBase-Switch        Output/PABotBase /s
-        robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries libcrypto-1_1-x64.dll libssl-1_1-x64.dll Sleepy.dll tesseractPA.dll opencv_world460.dll 
+        robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries dpp.dll libcrypto-1_1-x64.dll libsodium.dll libssl-1_1-x64.dll opencv_world460.dll opus.dll Sleepy.dll tesseractPA.dll zlib1.dll
         robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
         exit 0
     - uses: actions/upload-artifact@v3

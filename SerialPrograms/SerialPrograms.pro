@@ -653,6 +653,10 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp \
@@ -664,19 +668,15 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.cpp \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
-    Source/PokemonSV/Programs/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
@@ -1629,6 +1629,10 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h \
     Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h \
@@ -1640,19 +1644,15 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHost.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_AutoHostLobbyWaiter.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_FastCodeEntry.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h \
-    Source/PokemonSV/Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
-    Source/PokemonSV/Programs/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \

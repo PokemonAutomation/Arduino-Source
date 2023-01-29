@@ -77,7 +77,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
-#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
+#include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 
 
 #include <QPixmap>

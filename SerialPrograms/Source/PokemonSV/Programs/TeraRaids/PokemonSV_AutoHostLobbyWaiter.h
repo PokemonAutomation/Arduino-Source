@@ -17,7 +17,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
+#include "PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -58,13 +58,13 @@ private:
     VideoSnapshot synchronize_state();
 
     std::string check_hat_trick();
-    bool check_bans();
+    bool check_bans(bool skip_grace_period);
     bool check_start_timeout();
     bool check_enough_players();
 
 
     bool process_hat_trick(const ImageViewRGB32& snapshot);
-    bool process_bans(const ImageViewRGB32& snapshot);
+    bool process_bans(const ImageViewRGB32& snapshot, bool skip_grace_period);
     bool process_start_timeout(const ImageViewRGB32& snapshot);
     bool process_enough_players(const ImageViewRGB32& snapshot);
 

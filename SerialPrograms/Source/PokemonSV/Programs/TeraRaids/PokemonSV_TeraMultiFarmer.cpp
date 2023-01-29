@@ -22,10 +22,12 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
-#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
-#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
+#include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
+#include "PokemonSV_TeraRoutines.h"
+#include "PokemonSV_TeraBattler.h"
+#include "PokemonSV_AutoHostTools.h"
+#include "PokemonSV_AutoHostLobbyWaiter.h"
 #include "PokemonSV_TeraMultiFarmer.h"
 
 namespace PokemonAutomation{
@@ -37,7 +39,7 @@ using namespace Pokemon;
 
 
 GeneralHostingOptions::GeneralHostingOptions()
-    : GroupOption("Hosting Options", LockWhileRunning::LOCKED)
+    : GroupOption("Hosting Options", LockWhileRunning::UNLOCKED)
 {
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
@@ -112,18 +114,30 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
 struct TeraMultiFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_raids(m_stats["Raids"])
+        , m_empty(m_stats["Empty Raids"])
+        , m_full(m_stats["Full Raids"])
+        , m_joiners(m_stats["Total Joiners"])
         , m_wins(m_stats["Wins"])
         , m_losses(m_stats["Losses"])
+        , m_banned(m_stats["Banned"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Raids");
+        m_display_order.emplace_back("Empty Raids", true);
+        m_display_order.emplace_back("Full Raids", true);
+        m_display_order.emplace_back("Total Joiners", true);
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Banned", true);
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& m_raids;
+    std::atomic<uint64_t>& m_empty;
+    std::atomic<uint64_t>& m_full;
+    std::atomic<uint64_t>& m_joiners;
     std::atomic<uint64_t>& m_wins;
     std::atomic<uint64_t>& m_losses;
+    std::atomic<uint64_t>& m_banned;
     std::atomic<uint64_t>& m_errors;
 };
 std::unique_ptr<StatsTracker> TeraMultiFarmer_Descriptor::make_stats() const{
@@ -156,8 +170,8 @@ TeraMultiFarmer::TeraMultiFarmer()
         "<b>Mode:</b>",
         {
             {Mode::FARM_ALONE,      "farm-alone",   "Farm by yourself."},
-            {Mode::HOST_LOCALLY,    "host-locally", "Host empty slots locally."},
-            {Mode::HOST_ONLINE,     "host-online",  "Host empty slots online."},
+            {Mode::HOST_LOCALLY,    "host-locally", "Host remaining slots locally."},
+            {Mode::HOST_ONLINE,     "host-online",  "Host remaining slots online."},
         },
         LockWhileRunning::LOCKED,
         Mode::FARM_ALONE
@@ -172,7 +186,7 @@ TeraMultiFarmer::TeraMultiFarmer()
         RecoveryMode::SAVE_AND_RESET
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE && false
+    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE
         ? std::vector<EventNotificationOption*>{
                 &NOTIFICATION_STATUS_UPDATE,
                 &NOTIFICATION_RAID_POST,
@@ -202,7 +216,7 @@ TeraMultiFarmer::TeraMultiFarmer()
 
     //  General Auto-Hosting Options
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        PA_ADD_OPTION(HOSTING_MODE);
+        PA_ADD_OPTION(HOSTING_MODE);
         PA_ADD_OPTION(HOSTING_OPTIONS);
     }
 
@@ -212,12 +226,12 @@ TeraMultiFarmer::TeraMultiFarmer()
     PA_ADD_OPTION(*PLAYERS[3]);
 
     PA_ADD_OPTION(ROLLOVER_PREVENTION);
-    PA_ADD_OPTION(RECOVERY_MODE);
+//    PA_ADD_OPTION(RECOVERY_MODE);
 
     //  Extended Auto-Hosting Options
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(BAN_LIST);
-        PA_ADD_OPTION(JOIN_REPORT);
+//        PA_ADD_OPTION(JOIN_REPORT);
     }
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -370,7 +384,11 @@ void TeraMultiFarmer::join_lobby(
         break;
     }
 }
-bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
+bool TeraMultiFarmer::run_raid(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    std::string& lobby_code,
+    std::array<std::map<Language, std::string>, 4>& player_names
+){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
     size_t host_index = HOSTING_SWITCH.current_value();
     ConsoleHandle& host_console = env.consoles[host_index];
@@ -389,13 +407,17 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
             }
         }catch (OperationFailedException&){
             stats.m_errors++;
-            m_errored[console.index()] = true;
+            m_reset_required[console.index()] = true;
             throw;
         }
     });
 
+    if (HOSTING_MODE != Mode::FARM_ALONE){
+        BAN_LIST.refresh_online_table(env.logger());
+    }
+
     //  Open lobby and read code.
-    std::string normalized_code;
+    WallClock lobby_start_time;
     try{
         TeraLobbyReader lobby_reader(host_console.logger(), env.realtime_dispatcher());
         open_hosting_lobby(
@@ -404,8 +426,9 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
                 ? HostingMode::ONLINE_CODED
                 : HostingMode::LOCAL
         );
+        lobby_start_time = current_time();
         std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host_console.video().snapshot());
-        const char* error = normalize_code(normalized_code, code);
+        const char* error = normalize_code(lobby_code, code);
         if (error){
             dump_image_and_throw_recoverable_exception(
                 env, host_console,
@@ -416,29 +439,72 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
         }
     }catch (OperationFailedException&){
         stats.m_errors++;
-        m_errored[host_index] = true;
+        m_reset_required[host_index] = true;
         throw;
     }
 
 //    normalized_code[0] = '0';
 
-    //  Join the lobby. If anything throws, we need to reset everyone.
+    //  Join the lobby with local joiners. If anything throws, we need to reset everyone.
     try{
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-            join_lobby(env, console, context, host_index, normalized_code);
+            join_lobby(env, console, context, host_index, lobby_code);
         });
     }catch (OperationFailedException&){
         stats.m_errors++;
-        m_errored[0] = true;
-        m_errored[1] = true;
-        m_errored[2] = true;
-        m_errored[3] = true;
+        m_reset_required[0] = true;
+        m_reset_required[1] = true;
+        m_reset_required[2] = true;
+        m_reset_required[3] = true;
         throw;
     }
 
+#if 1
+    //  Put it up on auto-host.
     if (HOSTING_MODE != Mode::FARM_ALONE){
+        send_host_announcement(
+            env, host_console,
+            lobby_code,
+            HOSTING_OPTIONS.SHOW_RAID_CODE,
+            HOSTING_OPTIONS.DESCRIPTION,
+            NOTIFICATION_RAID_POST
+        );
 
+        TeraLobbyWaiter waiter(
+            env, host_console, host_context,
+            (uint8_t)env.consoles.size(),
+            lobby_code, lobby_start_time,
+            HOSTING_OPTIONS.LOBBY_WAIT_DELAY,
+            HOSTING_OPTIONS.START_RAID_PLAYERS,
+            NOTIFICATION_RAID_START,
+            BAN_LIST,
+            JOIN_REPORT
+        );
+
+        TeraLobbyWaiter::LobbyResult result = waiter.run_lobby();
+        player_names = waiter.names();
+
+        if (result == TeraLobbyWaiter::LobbyResult::BANNED_PLAYER){
+            stats.m_banned++;
+            m_reset_required[0] = true;
+            m_reset_required[1] = true;
+            m_reset_required[2] = true;
+            m_reset_required[3] = true;
+        }
+        if (result != TeraLobbyWaiter::LobbyResult::RAID_STARTED){
+            return false;
+        }
+
+        uint8_t hosts = (uint8_t)env.consoles.size();
+        uint8_t players = waiter.last_known_players();
+        stats.m_joiners += players - hosts;
+        if (players == 4){
+            stats.m_full++;
+        }else if (players == hosts){
+            stats.m_empty++;
+        }
     }
+#endif
 
     bool win = false;
 
@@ -457,7 +523,7 @@ bool TeraMultiFarmer::run_raid(MultiSwitchProgramEnvironment& env, CancellableSc
             //  Host throws. Reset the host and keep going.
             stats.m_errors++;
             env.update_stats();
-            m_errored[console.index()] = true;
+            m_reset_required[console.index()] = true;
             throw;
         }
     });
@@ -477,10 +543,10 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
 //    ConsoleHandle& host_console = env.consoles[host_index];
 //    BotBaseContext host_context(scope, host_console.botbase());
 
-    m_errored[0] = false;
-    m_errored[1] = false;
-    m_errored[2] = false;
-    m_errored[3] = false;
+    m_reset_required[0] = false;
+    m_reset_required[1] = false;
+    m_reset_required[2] = false;
+    m_reset_required[3] = false;
 
 #if 1
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
@@ -500,7 +566,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         //  Reset all errored Switches.
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             size_t index = console.index();
-            if (!m_errored[index]){
+            if (!m_reset_required[index]){
                 return;
             }
             if (index == host_index){
@@ -508,20 +574,26 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             }else{
                 reset_joiner(env.program_info(), console, context);
             }
-            m_errored[index] = false;
+            m_reset_required[index] = false;
         });
 
         try{
-            if (run_raid(env, scope)){
+            std::string lobby_code;
+            std::array<std::map<Language, std::string>, 4> player_names;
+            bool win = run_raid(env, scope, lobby_code, player_names);
+            if (win){
                 wins++;
             }
+
+            //  Join Report
+
         }catch (OperationFailedException& e){
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.
                 for (size_t c = 0; c < 4; c++){
-                    if (m_errored[c] && c != host_index){
+                    if (m_reset_required[c] && c != host_index){
                         throw;
                     }
                 }

@@ -10,7 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
+#include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_FastCodeEntry.h"
 
 //#include <iostream>

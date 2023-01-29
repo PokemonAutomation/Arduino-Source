@@ -120,7 +120,8 @@ public:
     TeraLobbyNameWatcher(
         Logger& logger, AsyncDispatcher& dispatcher, Color color,
         RaidJoinReportOption& report_settings,
-        RaidPlayerBanList& ban_settings
+        RaidPlayerBanList& ban_settings,
+        uint8_t host_players
     );
 
     void get_last_known_state(
@@ -135,6 +136,7 @@ private:
     Logger& m_logger;
     RaidJoinReportOption& m_report_settings;
     RaidPlayerBanList& m_ban_settings;
+    uint8_t m_host_players;
 
     mutable std::mutex m_lock;
     std::array<std::map<Language, std::string>, 4> m_last_known_names;
