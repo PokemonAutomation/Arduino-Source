@@ -494,6 +494,15 @@ bool TeraMultiFarmer::run_raid(
         if (result != TeraLobbyWaiter::LobbyResult::RAID_STARTED){
             return false;
         }
+
+        uint8_t hosts = (uint8_t)env.consoles.size();
+        uint8_t players = waiter.last_known_players();
+        stats.m_joiners += players - hosts;
+        if (players == 4){
+            stats.m_full++;
+        }else if (players == hosts){
+            stats.m_empty++;
+        }
     }
 #endif
 
