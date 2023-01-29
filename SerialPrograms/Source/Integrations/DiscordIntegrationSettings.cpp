@@ -7,8 +7,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include "Common/Compiler.h"
+#include <Integrations/DppIntegration/DppClient.h>
 #include "SleepyDiscordRunner.h"
+#include "Common/Compiler.h"
 #include "DiscordIntegrationSettings.h"
 
 namespace PokemonAutomation{
@@ -18,6 +19,16 @@ namespace Integration{
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
 //    , m_integration_enabled(integration_enabled)
+    , run_on_start(
+        "<b>Run Discord integration on launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
+        LockWhileRunning::LOCKED,
+        false
+    )
+    , use_dpp(
+        "<b>Discord integration to use:</b><br><b>Enabled:</b> use D++ Discord library. <b>Disabled:</b> use Sleepy Discord library.",
+        LockWhileRunning::LOCKED,
+        false
+    )
     , token(
         true,
         "<b>Discord token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
@@ -26,12 +37,12 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , command_prefix(
         false,
-        "<b>Discord command prefix:</b><br>Enter a command prefix for your bot.",
+        "<b>Discord command prefix (Sleepy):</b><br>Enter a command prefix for your bot.",
         LockWhileRunning::LOCKED,
         "^", "^"
     )
     , use_suffix(
-        "<b>Discord bot use suffix:</b><br>Use a suffix instead of a prefix for commands.",
+        "<b>Discord bot use suffix (Sleepy):</b><br>Use a suffix instead of a prefix for commands.",
         LockWhileRunning::LOCKED,
         false
     )
@@ -49,17 +60,19 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , sudo(
         false,
-        "<b>Discord sudo:</b><br>Enter user ID(s) to grant sudo access to.",
+        "<b>Discord sudo (Sleepy):</b><br>Enter user ID(s) to grant sudo access to.",
         LockWhileRunning::LOCKED,
         "", "123456789012345678"
     )
     , owner(
         false,
-        "<b>Discord owner:</b><br>Enter the bot owner's ID (your own ID).",
+        "<b>Discord owner (Sleepy):</b><br>Enter the bot owner's ID (your own ID).",
         LockWhileRunning::LOCKED,
         "", "123456789012345678"
     )
 {
+    PA_ADD_OPTION(run_on_start);
+    PA_ADD_OPTION(use_dpp);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
@@ -93,24 +106,47 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_stop->setFont(font);
 
 #ifdef PA_SLEEPY
-//    this->setVisible(value.m_integration_enabled);
-    set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
 
-    connect(
-        button_start, &QPushButton::clicked,
-        this, [=, &value](bool){
-            set_options_enabled(false);
-            SleepyDiscordRunner::sleepy_connect();
-            set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-        }
-    );
-    connect(
-        button_stop, &QPushButton::clicked,
-        this, [=, &value](bool){
-            SleepyDiscordRunner::sleepy_terminate();
-            set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-        }
-    );
+        connect(
+            button_start, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                set_options_enabled(false);
+                SleepyDiscordRunner::sleepy_connect();
+                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+            }
+        );
+        connect(
+            button_stop, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                SleepyDiscordRunner::sleepy_terminate();
+                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+            }
+        );
+    }
+#endif
+
+#ifdef PA_DPP
+    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+
+        connect(
+            button_start, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                set_options_enabled(false);
+                DppClient::Client::instance().connect();
+                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+            }
+        );
+        connect(
+            button_stop, &QPushButton::clicked,
+            this, [=, &value](bool) {
+                DppClient::Client::instance().disconnect();
+                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+            }
+        );
+    }
 #endif
 }
 

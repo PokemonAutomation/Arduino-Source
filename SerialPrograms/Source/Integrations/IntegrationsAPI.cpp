@@ -58,7 +58,7 @@ void pai_status(DllSafeString& description){
         if (!item.second.stats.empty()){
             str += "* **Stats:** " + item.second.stats + "\n";
         }
-        str += "* **Consoles:** ";
+        str += "* **Console ID(s):** ";
         bool first = true;
         if (item.second.console_ids.empty()){
             str += "No consoles enabled.";

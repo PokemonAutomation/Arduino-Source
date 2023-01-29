@@ -5,6 +5,7 @@
  */
 
 #include <QFile>
+#include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -149,10 +150,9 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(logger, image));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_sleepy;
+    JsonObject embed;
     JsonArray embeds;
     {
-        JsonObject embed;
         embed["title"] = title;
 
         if (color){
@@ -171,7 +171,6 @@ void send_raw_notification(
             embed["image"] = std::move(field);
         }
         embeds.push_back(embed.clone());
-        embed_sleepy = std::move(embed);
     }
 
     Integration::DiscordWebhook::send_message(
@@ -179,11 +178,23 @@ void send_raw_notification(
         std::move(embeds),
         hasFile ? file : nullptr
     );
+
 #ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", embed_sleepy,
-        hasFile ? file : nullptr
-    );
+    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::SleepyDiscordRunner::send_message_sleepy(
+            should_ping, tags, "", std::move(embed),
+            hasFile ? file : nullptr
+        );
+    }
+#endif
+
+#ifdef PA_DPP
+    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::DppClient::Client::instance().send_message_dpp(
+            should_ping, color, tags, std::move(embed), "",
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 }
 void send_raw_notification(
@@ -197,10 +208,9 @@ void send_raw_notification(
     std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
     bool hasFile = !file->filepath().empty();
 
-    JsonObject embed_sleepy;
+    JsonObject embed;
     JsonArray embeds;
     {
-        JsonObject embed;
         embed["title"] = title;
 
         if (color){
@@ -214,7 +224,6 @@ void send_raw_notification(
         embed["fields"] = std::move(fields);
 
         embeds.push_back(embed.clone());
-        embed_sleepy = std::move(embed);
     }
 
     Integration::DiscordWebhook::send_message(
@@ -222,11 +231,23 @@ void send_raw_notification(
         std::move(embeds),
         hasFile ? file : nullptr
     );
+
 #ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", embed_sleepy,
-        hasFile ? file : nullptr
-    );
+    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::SleepyDiscordRunner::send_message_sleepy(
+            should_ping, tags, "", std::move(embed),
+            hasFile ? file : nullptr
+        );
+    }
+#endif
+
+#ifdef PA_DPP
+    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::DppClient::Client::instance().send_message_dpp(
+            should_ping, color, tags, std::move(embed), "",
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 }
 
