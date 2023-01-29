@@ -70,6 +70,7 @@ macx{
 
 
 SOURCES += \
+    ../3rdParty/QtWavFile/WavFile.cpp \
     ../3rdParty/TesseractPA/TesseractPA.cpp \
     ../ClientSource/Connection/BotBase.cpp \
     ../ClientSource/Connection/MessageLogger.cpp \

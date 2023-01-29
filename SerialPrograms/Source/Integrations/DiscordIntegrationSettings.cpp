@@ -7,9 +7,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+
+#include <dpp/DPP_SilenceWarnings.h>
 #include <Integrations/DppIntegration/DppClient.h>
+
 #include "SleepyDiscordRunner.h"
-#include "Common/Compiler.h"
 #include "DiscordIntegrationSettings.h"
 
 namespace PokemonAutomation{

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16.0)
 project(SerialPrograms)
 
 #enable c++ 20
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #produce clang tidy file
@@ -35,75 +35,10 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
-    ../3rdParty/dpp/appcommand.h
-    ../3rdParty/dpp/application.h
-    ../3rdParty/dpp/auditlog.h
-    ../3rdParty/dpp/automod.h
-    ../3rdParty/dpp/ban.h
-    ../3rdParty/dpp/cache.h
-    ../3rdParty/dpp/channel.h
-    ../3rdParty/dpp/cluster.h
-    ../3rdParty/dpp/cluster_coro_calls.h
-    ../3rdParty/dpp/cluster_sync_calls.h
-    ../3rdParty/dpp/collector.h
-    ../3rdParty/dpp/colors.h
-    ../3rdParty/dpp/commandhandler.h
-    ../3rdParty/dpp/coro.h
-    ../3rdParty/dpp/discordclient.h
-    ../3rdParty/dpp/discordevents.h
-    ../3rdParty/dpp/discordvoiceclient.h
-    ../3rdParty/dpp/dispatcher.h
-    ../3rdParty/dpp/dns.h
-    ../3rdParty/dpp/dpp.h
-    ../3rdParty/dpp/dtemplate.h
-    ../3rdParty/dpp/emoji.h
-    ../3rdParty/dpp/etf.h
-    ../3rdParty/dpp/event.h
-    ../3rdParty/dpp/event_router.h
-    ../3rdParty/dpp/exception.h
-    ../3rdParty/dpp/export.h
-    ../3rdParty/dpp/guild.h
-    ../3rdParty/dpp/httpsclient.h
-    ../3rdParty/dpp/integration.h
-    ../3rdParty/dpp/intents.h
-    ../3rdParty/dpp/invite.h
-    ../3rdParty/dpp/json_interface.h
-    ../3rdParty/dpp/managed.h
-    ../3rdParty/dpp/message.h
-    ../3rdParty/dpp/misc-enum.h
-    ../3rdParty/dpp/once.h
-    ../3rdParty/dpp/permissions.h
-    ../3rdParty/dpp/presence.h
-    ../3rdParty/dpp/prune.h
-    ../3rdParty/dpp/queues.h
-    ../3rdParty/dpp/restrequest.h
-    ../3rdParty/dpp/restresults.h
-    ../3rdParty/dpp/role.h
-    ../3rdParty/dpp/scheduled_event.h
-    ../3rdParty/dpp/snowflake.h
-    ../3rdParty/dpp/socket.h
-    ../3rdParty/dpp/sslclient.h
-    ../3rdParty/dpp/stage_instance.h
-    ../3rdParty/dpp/stringops.h
-    ../3rdParty/dpp/sync.h
-    ../3rdParty/dpp/sysdep.h
-    ../3rdParty/dpp/timed_listener.h
-    ../3rdParty/dpp/timer.h
-    ../3rdParty/dpp/user.h
-    ../3rdParty/dpp/utility.h
-    ../3rdParty/dpp/version.h
-    ../3rdParty/dpp/voiceregion.h
-    ../3rdParty/dpp/voicestate.h
-    ../3rdParty/dpp/webhook.h
-    ../3rdParty/dpp/win32_safe_warnings.h
-    ../3rdParty/dpp/wsclient.h
-    ../3rdParty/dpp/nlohmann/json.hpp
-    ../3rdParty/dpp/nlohmann/json_fwd.hpp
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../3rdParty/nlohmann/json.hpp
     ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../ClientSource/Connection/BotBase.cpp
     ../ClientSource/Connection/BotBase.h

@@ -2,6 +2,7 @@
 #include <QApplication>
 //#include <QTextStream>
 #include <QMessageBox>
+#include <dpp/DPP_SilenceWarnings.h>
 #include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
