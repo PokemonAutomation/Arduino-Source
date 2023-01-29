@@ -12,47 +12,47 @@
 #include "Integrations/DiscordSettingsOption.h"
 
 namespace PokemonAutomation {
-	namespace Integration {
-		namespace DppCommandHandler {
-			class Handler : DppUtility::Utility {
-			public:
-				Handler() {}
+    namespace Integration {
+        namespace DppCommandHandler {
+            class Handler : DppUtility::Utility {
+            public:
+                Handler() {}
 
-			private:
-				struct SlashCommand {
-					dpp::slashcommand command;
-					std::function<void(const dpp::slashcommand_t&)> func;
-				};
+            private:
+                struct SlashCommand {
+                    dpp::slashcommand command;
+                    std::function<void(const dpp::slashcommand_t&)> func;
+                };
 
-				bool m_initialized = false;
-				std::mutex m_count_lock;
-				static std::map<std::string, SlashCommand> command_map;
-				static dpp::user owner;
-				static Color color;
+                bool m_initialized = false;
+                std::mutex m_count_lock;
+                static std::map<std::string, SlashCommand> command_map;
+                static dpp::user owner;
+                static Color color;
 
-			protected:
-				void initialize(dpp::cluster& bot);
-				bool check_if_empty(const DiscordSettingsOption& settings);
-				void log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll);
-				void send_message(
-					dpp::cluster& bot,
-					dpp::embed& embed,
-					const std::string& channel,
-					std::chrono::milliseconds delay,
-					const std::string& msg,
-					std::shared_ptr<PendingFileSend> file
-				);
-				void update_response(
-					const dpp::slashcommand_t& event,
-					dpp::embed& embed,
-					const std::string& msg,
-					std::shared_ptr<PendingFileSend> file
-				);
+            protected:
+                void initialize(dpp::cluster& bot);
+                bool check_if_empty(const DiscordSettingsOption& settings);
+                void log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll);
+                void send_message(
+                    dpp::cluster& bot,
+                    dpp::embed& embed,
+                    const std::string& channel,
+                    std::chrono::milliseconds delay,
+                    const std::string& msg,
+                    std::shared_ptr<PendingFileSend> file
+                );
+                void update_response(
+                    const dpp::slashcommand_t& event,
+                    dpp::embed& embed,
+                    const std::string& msg,
+                    std::shared_ptr<PendingFileSend> file
+                );
 
-			private:
-				void create_commands(dpp::cluster& bot);
-			};
-		}
-	}
+            private:
+                void create_commands(dpp::cluster& bot);
+            };
+        }
+    }
 }
 #endif

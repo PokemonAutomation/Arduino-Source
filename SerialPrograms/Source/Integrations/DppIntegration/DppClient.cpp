@@ -10,56 +10,56 @@
 
 using namespace dpp;
 namespace PokemonAutomation {
-	namespace Integration {
-		namespace DppClient {
-			Client& Client::instance() {
-				static Client client;
-				return client;
-			}
+    namespace Integration {
+        namespace DppClient {
+            Client& Client::instance() {
+                static Client client;
+                return client;
+            }
 
             bool Client::is_running() {
                 return Client::m_is_connected;
             }
 
-			void Client::connect() {
-				std::lock_guard<std::mutex> lg(m_connect_lock);
-				if (m_bot == nullptr && !m_is_connected) {
-					DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-					if (!Handler::check_if_empty(settings))
-						return;
+            void Client::connect() {
+                std::lock_guard<std::mutex> lg(m_connect_lock);
+                if (m_bot == nullptr && !m_is_connected) {
+                    DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
+                    if (!Handler::check_if_empty(settings))
+                        return;
 
-					std::string token = settings.integration.token;
-					try {
-						std::thread(&Client::run, this, token).detach();
+                    std::string token = settings.integration.token;
+                    try {
+                        std::thread(&Client::run, this, token).detach();
                         m_is_connected = true;
-					}
-					catch (std::exception& e) {
+                    }
+                    catch (std::exception& e) {
                         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			void Client::disconnect() {
-				std::lock_guard<std::mutex> lg(m_connect_lock);
-				if (m_bot != nullptr && m_is_connected) {
-					try {
-						m_bot->shutdown();
-						m_bot = nullptr;
+            void Client::disconnect() {
+                std::lock_guard<std::mutex> lg(m_connect_lock);
+                if (m_bot != nullptr && m_is_connected) {
+                    try {
+                        m_bot->shutdown();
+                        m_bot = nullptr;
                         m_is_connected = false;
-					}
-					catch (std::exception& e) {
+                    }
+                    catch (std::exception& e) {
                         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			void Client::send_message_dpp(
-				bool should_ping,
+            void Client::send_message_dpp(
+                bool should_ping,
                 const Color& color,
-				const std::vector<std::string>& tags,
-				const JsonObject& json_obj,
+                const std::vector<std::string>& tags,
+                const JsonObject& json_obj,
                 const std::string& message,
-				std::shared_ptr<PendingFileSend> file) {
+                std::shared_ptr<PendingFileSend> file) {
                 if (m_is_connected) {
                     embed embed;
                     {
@@ -135,21 +135,21 @@ namespace PokemonAutomation {
                         Handler::send_message(*m_bot.get(), embed, channel.channel_id, std::chrono::seconds(channel.delay), msg, file);
                     }
                 }
-			}
+            }
 
-			void Client::run(const std::string& token) {
-				try {
-					uint32_t intents = intents::i_default_intents | intents::i_guild_members;
+            void Client::run(const std::string& token) {
+                try {
+                    uint32_t intents = intents::i_default_intents | intents::i_guild_members;
                     m_bot = std::make_unique<cluster>(token, intents);
-					Handler::initialize(*m_bot.get());
-					m_bot->start(false);
-				}
-				catch (std::exception& e) {
+                    Handler::initialize(*m_bot.get());
+                    m_bot->start(false);
+                }
+                catch (std::exception& e) {
                     Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
                     m_is_connected = false;
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 }
 #endif

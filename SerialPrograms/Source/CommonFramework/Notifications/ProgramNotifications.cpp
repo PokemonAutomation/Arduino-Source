@@ -178,18 +178,23 @@ void send_raw_notification(
         std::move(embeds),
         hasFile ? file : nullptr
     );
+
 #ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", std::move(embed),
-        hasFile ? file : nullptr
-    );
+    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::SleepyDiscordRunner::send_message_sleepy(
+            should_ping, tags, "", std::move(embed),
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 
 #ifdef PA_DPP
-    Integration::DppClient::Client::instance().send_message_dpp(
-        should_ping, color, tags, std::move(embed), "",
-        hasFile ? file : nullptr
-    );
+    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::DppClient::Client::instance().send_message_dpp(
+            should_ping, color, tags, std::move(embed), "",
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 }
 void send_raw_notification(
@@ -226,18 +231,23 @@ void send_raw_notification(
         std::move(embeds),
         hasFile ? file : nullptr
     );
+
 #ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::send_message_sleepy(
-        should_ping, tags, "", std::move(embed),
-        hasFile ? file : nullptr
-    );
+    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::SleepyDiscordRunner::send_message_sleepy(
+            should_ping, tags, "", std::move(embed),
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 
 #ifdef PA_DPP
-    Integration::DppClient::Client::instance().send_message_dpp(
-        should_ping, color, tags, std::move(embed), "",
-        hasFile ? file : nullptr
-    );
+    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
+        Integration::DppClient::Client::instance().send_message_dpp(
+            should_ping, color, tags, std::move(embed), "",
+            hasFile ? file : nullptr
+        );
+    }
 #endif
 }
 
