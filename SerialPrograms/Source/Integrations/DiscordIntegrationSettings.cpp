@@ -118,6 +118,8 @@ void DiscordIntegrationSettingsOption::value_changed(){
 DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value)
     : GroupWidget(parent, value)
 {
+#if (defined PA_SLEEPY || defined PA_DPP)
+
     QWidget* control_buttons = new QWidget(this);
     m_options_layout->insertWidget(0, control_buttons);
 
@@ -149,10 +151,10 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
 
     connect(
         button_start, &QPushButton::clicked,
-        this, [=, &value](bool) {
+        this, [=, this, &value](bool) {
             set_options_enabled(false);
-#ifdef PA_SLEEPY
             switch (value.library){
+#ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_connect();
                 set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
@@ -169,10 +171,10 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     );
     connect(
         button_stop, &QPushButton::clicked,
-        this, [=, &value](bool) {
+        this, [=, this, &value](bool) {
             switch (value.library){
-            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
 #ifdef PA_SLEEPY
+            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_terminate();
                 set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
                 break;
@@ -186,6 +188,8 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
             }
         }
     );
+
+#endif
 }
 
 

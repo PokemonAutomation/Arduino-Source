@@ -43,7 +43,6 @@ inline ConfigWidget* DiscordMessageSettingsOption::make_QtWidget(QWidget& parent
 class DiscordSettingsOption : public BatchOption{
 public:
     DiscordSettingsOption();
-//    virtual void load_json(const JsonValueRef& json) override;
 
     DiscordMessageSettingsOption message;
     DiscordWebhookSettingsOption webhooks;
