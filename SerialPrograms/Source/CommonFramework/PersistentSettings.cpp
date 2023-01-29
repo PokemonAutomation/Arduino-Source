@@ -5,6 +5,7 @@
  */
 
 #include <QCoreApplication>
+#include <QDir>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -42,13 +43,15 @@ void PersistentSettings::write() const{
     root["99-Panels"] = panels.clone();
 
     try{
-        root.dump(QCoreApplication::applicationName().toStdString() + "-Settings.json");
+        QDir().mkpath(QString::fromStdString(GlobalSettings::instance().get_user_folder()));
+
+        root.dump(GlobalSettings::instance().get_user_folder(QCoreApplication::applicationName().toStdString() + "-Settings.json"));
     }catch (FileException&){}
 }
 
 
 void PersistentSettings::read(){
-    std::string filename = QCoreApplication::applicationName().toStdString() + "-Settings.json";
+    std::string filename = GlobalSettings::instance().get_user_folder(QCoreApplication::applicationName().toStdString() + "-Settings.json");
     JsonValue json = load_json_file(filename);
     JsonObject* obj = json.get_object();
     if (obj == nullptr){

@@ -121,7 +121,7 @@ void ProgramSession::load_historical_stats(){
         m_logger.log("Loading historical stats...");
 //        m_current_stats = m_descriptor.make_stats();
         StatSet set;
-        set.open_from_file(GlobalSettings::instance().STATS_FILE);
+        set.open_from_file(GlobalSettings::instance().get_user_folder(GlobalSettings::instance().STATS_FILE));
         const std::string& identifier = m_descriptor.identifier();
         StatList& list = set[identifier];
         if (list.size() != 0){
@@ -134,7 +134,7 @@ void ProgramSession::update_historical_stats_with_current(){
     if (m_current_stats){
         m_logger.log("Saving historical stats...");
         bool ok = StatSet::update_file(
-            GlobalSettings::instance().STATS_FILE,
+            GlobalSettings::instance().get_user_folder(GlobalSettings::instance().STATS_FILE),
             m_descriptor.identifier(),
             *m_current_stats
         );

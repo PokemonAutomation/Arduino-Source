@@ -76,12 +76,15 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    std::string get_user_folder(const std::string& file_name = std::string());
+
 private:
     virtual void value_changed() override;
 
 public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;
 
+    StringOption USER_FOLDER;
     StringOption STATS_FILE;
     BooleanCheckBoxOption ALL_STATS;
     BooleanCheckBoxOption CHECK_FOR_UPDATES;
