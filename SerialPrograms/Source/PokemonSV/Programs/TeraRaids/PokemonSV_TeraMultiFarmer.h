@@ -20,6 +20,7 @@
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "PokemonSV_AutoHostTools.h"
 #include "PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
@@ -133,6 +134,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     WallClock m_last_time_fix;
+//    std::atomic<bool> m_raid_error;
     bool m_reset_required[4];
 };
 

@@ -45,6 +45,9 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
+                //  Do 2 presses in quick succession in case one drops or is
+                //  needed to connect the controller.
+                pbf_press_button(context, BUTTON_A, 5, 5);
                 pbf_press_button(context, BUTTON_A, 20, 355);
             },
             {
@@ -111,10 +114,10 @@ void open_hosting_lobby(
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
-        if (current_time() - start > std::chrono::minutes(5)){
+        if (current_time() - start > std::chrono::minutes(2)){
             dump_image_and_throw_recoverable_exception(
                 env.program_info(), console, "OpenLobbyFailed",
-                "Unable to open Tera lobby after 5 minutes."
+                "Unable to open Tera lobby after 2 minutes."
             );
         }
 

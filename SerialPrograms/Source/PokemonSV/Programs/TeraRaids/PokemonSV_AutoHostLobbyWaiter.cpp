@@ -253,8 +253,8 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         {
             m_dialog,
             m_start_raid,
-            m_join_watcher,
-            {m_name_watcher, std::chrono::seconds(1)}
+            {m_join_watcher, std::chrono::seconds(1)},  //  Both of these involve OCR.
+            {m_name_watcher, std::chrono::seconds(1)}   //  Let's not spam them at the full frame rate.
         }
     );
 

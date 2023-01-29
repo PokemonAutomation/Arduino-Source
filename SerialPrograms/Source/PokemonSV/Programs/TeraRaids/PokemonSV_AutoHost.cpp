@@ -345,38 +345,18 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
     MultiLanguageJoinTracker join_tracker;
 
+    TeraFailTracker fail_tracker(
+        env, context,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        CONSECUTIVE_FAILURE_PAUSE,
+        FAILURE_PAUSE_MINUTES
+    );
     bool skip_reset = true;
-    bool completed_one = false;
-    size_t consecutive_failures = 0;
     WallClock last_time_fix = WallClock::min();
     while (true){
         env.update_stats();
 
-        if (consecutive_failures > 0 && !completed_one){
-            throw FatalProgramException(env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
-        }
-        size_t fail_threshold = CONSECUTIVE_FAILURE_PAUSE;
-        if (consecutive_failures >= fail_threshold){
-            uint16_t minutes = FAILURE_PAUSE_MINUTES;
-            if (minutes == 0){
-                throw FatalProgramException(
-                    env.logger(),
-                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
-                    "Stopping to prevent possible ban."
-                );
-            }else{
-                send_program_recoverable_error_notification(
-                    env, NOTIFICATION_ERROR_RECOVERABLE,
-                    "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
-                    "Pausing program for " + std::to_string(minutes) + " minute(s)."
-                );
-                WallClock start_time = current_time();
-                while (current_time() < start_time + std::chrono::minutes(minutes)){
-                    context.wait_for(std::chrono::seconds(1));
-                }
-                consecutive_failures = 0;
-            }
-        }
+        fail_tracker.on_raid_start();
 
         if (!skip_reset){
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -403,16 +383,16 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             try{
                 connect_to_internet_from_overworld(env.program_info(), env.console, context);
             }catch (OperationFailedException& e){
-                consecutive_failures++;
                 stats.m_errors++;
                 e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+                fail_tracker.report_raid_error();
                 continue;
             }
         }
 
         if (!open_raid(env.console, context)){
             env.log("No Tera raid found.", COLOR_RED);
-            consecutive_failures++;
+            fail_tracker.report_raid_error();
             continue;
         }
         env.log("Tera raid found!", COLOR_BLUE);
@@ -421,25 +401,14 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
 
         BAN_LIST.refresh_online_table(env.logger());
 
-#if 1
         try{
             open_hosting_lobby(env, env.console, context, mode);
         }catch (OperationFailedException& e){
-            consecutive_failures++;
             stats.m_errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            fail_tracker.report_raid_error();
             continue;
         }
-#else
-        pbf_press_button(context, BUTTON_A, 20, 230);
-        if (mode != HostingMode::LOCAL){
-            if (mode == HostingMode::ONLINE_EVERYONE){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-            }
-            pbf_press_button(context, BUTTON_A, 20, 230);
-        }
-        context.wait_for_all_requests();
-#endif
 
         try{
             std::string lobby_code;
@@ -477,12 +446,11 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             if (win){
                 exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
             }
-            completed_one = true;
-            consecutive_failures = 0;
+            fail_tracker.report_successful_raid();
         }catch (OperationFailedException& e){
-            consecutive_failures++;
             stats.m_errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            fail_tracker.report_raid_error();
             continue;
         }
     }

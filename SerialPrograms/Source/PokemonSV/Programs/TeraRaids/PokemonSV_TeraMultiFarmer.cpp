@@ -552,6 +552,9 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             if (console.index() != host_index){
+                //  Do 2 presses in quick succession in case one drops or is
+                //  needed to connect the controller.
+                pbf_press_button(context, BUTTON_X, 5, 5);
                 pbf_press_button(context, BUTTON_X, 20, 105);
                 save_game_from_menu(env.program_info(), console, context);
             }
@@ -559,9 +562,20 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     }
 #endif
 
+    TeraFailTracker fail_tracker(
+        env, scope,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        HOSTING_OPTIONS.CONSECUTIVE_FAILURE_PAUSE,
+        HOSTING_OPTIONS.FAILURE_PAUSE_MINUTES
+    );
     m_last_time_fix = WallClock::min();
     for (uint16_t wins = 0; wins < MAX_WINS;){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+        //  We don't care about fail tracking if we're alone. No chance of ban.
+        if (HOSTING_MODE != Mode::FARM_ALONE){
+            fail_tracker.on_raid_start();
+        }
 
         //  Reset all errored Switches.
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
@@ -587,6 +601,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
 
             //  Join Report
 
+            fail_tracker.report_successful_raid();
         }catch (OperationFailedException& e){
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
@@ -598,6 +613,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
                     }
                 }
             }
+            fail_tracker.report_raid_error();
         }
     }
 
