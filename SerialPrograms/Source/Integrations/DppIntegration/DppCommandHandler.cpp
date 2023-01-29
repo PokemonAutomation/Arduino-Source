@@ -197,7 +197,7 @@ namespace PokemonAutomation {
                     .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
                         .set_min_value(0)),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         std::string response = Integration::reset_serial(id);
 
                         if (!response.empty()) {
@@ -216,7 +216,7 @@ namespace PokemonAutomation {
                     .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
                         .set_min_value(0)),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         std::string response = Integration::reset_camera(id);
 
                         if (!response.empty()) {
@@ -235,7 +235,7 @@ namespace PokemonAutomation {
                     .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
                         .set_min_value(0)),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         std::string response = Integration::start_program(id);
 
                         if (!response.empty()) {
@@ -254,7 +254,7 @@ namespace PokemonAutomation {
                     .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
                         .set_min_value(0)),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         std::string response = Integration::stop_program(id);
 
                         if (!response.empty()) {
@@ -304,7 +304,7 @@ namespace PokemonAutomation {
                         .add_choice(command_option_choice("DLEFT", 16))
                         .add_choice(command_option_choice("DRIGHT", 17))),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         uint16_t bt = std::get<int64_t>(event.get_parameter("button"));
                         uint16_t button = Utility::get_button(bt);
 
@@ -336,7 +336,7 @@ namespace PokemonAutomation {
                     .add_option(command_option(command_option_type::co_integer, "ticks", "How long to hold the stick for, in ticks.", true)
                         .set_min_value(0)),
                     [](const slashcommand_t& event) {
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         std::string stick = std::get<std::string>(event.get_parameter("stick"));
                         uint8_t x = std::get<int64_t>(event.get_parameter("magnitude_x"));
                         uint8_t y = std::get<int64_t>(event.get_parameter("magnitude_y"));
@@ -365,7 +365,7 @@ namespace PokemonAutomation {
                     [this](const slashcommand_t& event) {
                         // Serves as an ack because we have to reply within 3 seconds.
                         event.thinking();
-                        uint64_t id = Utility::sanitize_console_id_input(event);
+                        uint64_t id = std::get<int64_t>(event.get_parameter("id"));
                         uint8_t format = std::get<int64_t>(event.get_parameter("format"));
 
                         std::string path;

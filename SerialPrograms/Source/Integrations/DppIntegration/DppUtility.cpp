@@ -59,14 +59,6 @@ namespace PokemonAutomation {
                 log("User count: " + std::to_string(count) + " (" + event.created->name + ")", "get_user_counts()", ll_info);
             }
 
-            uint64_t Utility::sanitize_console_id_input(const slashcommand_t& event) {
-                int64_t id = std::get<int64_t>(event.get_parameter("id"));
-                if (id > UINT64_MAX) {
-                    id = UINT64_MAX;
-                }
-                return id;
-            }
-
             uint16_t Utility::get_button(const uint16_t& bt) {
                 if (bt > 13) {
                     uint8_t dpad = 0;

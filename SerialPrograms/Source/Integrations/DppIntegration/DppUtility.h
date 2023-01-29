@@ -18,7 +18,6 @@ namespace PokemonAutomation {
             protected:
                 void log(const std::string& message, const std::string& identity, const dpp::loglevel& ll);
                 void get_user_counts(dpp::cluster& bot, const dpp::guild_create_t& event);
-                static uint64_t sanitize_console_id_input(const dpp::slashcommand_t& event);
                 static uint16_t get_button(const uint16_t& bt);
 
             private:
