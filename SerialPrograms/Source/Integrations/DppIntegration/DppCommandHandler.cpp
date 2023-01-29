@@ -1,20 +1,18 @@
 #ifdef PA_DPP
 
 #include <format>
-
 #include <dpp/DPP_SilenceWarnings.h>
 #include <dpp/dpp.h>
-#include <Integrations/DppIntegration/DppCommandHandler.h>
-#include <Integrations/DppIntegration/DppUtility.h>
-
+#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
-#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
+#include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
-#include "../IntegrationsAPI.h"
+#include "DppUtility.h"
+#include "DppCommandHandler.h"
 
 using namespace dpp;
 namespace PokemonAutomation{
@@ -172,7 +170,7 @@ void Handler::create_commands(cluster& bot) {
 
     command_map.emplace("about", SlashCommand {
         slashcommand("about", "Some info about me!", bot.me.id),
-        [&bot](const slashcommand_t& event) {
+        [](const slashcommand_t& event) {
             embed embed;
             embed.set_color((uint32_t)color).set_title("Here's a little bit about me!");
 
