@@ -9,6 +9,7 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
+#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Integrations/DiscordSettingsOption.h"
 
 namespace PokemonAutomation {
@@ -25,6 +26,8 @@ namespace PokemonAutomation {
                 };
 
                 bool m_initialized = false;
+                AsyncDispatcher m_dispatcher = AsyncDispatcher(nullptr, 1);
+                ScheduledTaskRunner m_queue = ScheduledTaskRunner(m_dispatcher);
                 std::mutex m_count_lock;
                 static std::map<std::string, SlashCommand> command_map;
                 static dpp::user owner;

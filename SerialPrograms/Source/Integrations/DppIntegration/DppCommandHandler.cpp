@@ -12,6 +12,7 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
+#include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Integrations/DiscordSettingsOption.h"
 #include "../IntegrationsAPI.h"
 
@@ -94,26 +95,30 @@ void Handler::initialize(cluster& bot) {
 }
 
 void Handler::send_message(cluster& bot, embed& embed, const std::string& channel, std::chrono::milliseconds delay, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
-    message m;
-    if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
-        std::string data;
-        try {
-            data = utility::read_file(file->filepath());
-            m.add_file(file->filename(), data);
-            embed.set_image("attachment://" + file->filename());
+    Handler::m_queue.add_event(delay > std::chrono::milliseconds(10000) ? std::chrono::milliseconds(0) : delay,
+    [&bot, this, embed = std::move(embed), channel = channel, msg = msg, file = std::move(file)]() mutable {
+        message m;
+        if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
+            std::string data;
+            try {
+                data = utility::read_file(file->filepath());
+                m.add_file(file->filename(), data);
+                embed.set_image("attachment://" + file->filename());
+            }
+            catch (dpp::exception e) {
+                log_dpp(std::format("Exception thrown while reading screenshot data: {}", e.what()), "send_message()", ll_error);
+            }
         }
-        catch (dpp::exception e) {
-            log_dpp(std::format("Exception thrown while reading screenshot data: {}", e.what()), "send_message()", ll_error);
+
+        if (!msg.empty() && msg != "") {
+            m.content = msg;
         }
-    }
 
-    if (!msg.empty() && msg != "") {
-        m.content = msg;
-    }
-
-    m.channel_id = channel;
-    m.add_embed(embed);
-    bot.message_create(m);
+        m.channel_id = channel;
+        m.add_embed(embed);
+        bot.message_create(m);
+    });
+    log_dpp("Sending message...", "send_message()", ll_info);
 }
 
 void Handler::update_response(const dpp::slashcommand_t& event, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
