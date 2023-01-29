@@ -139,12 +139,13 @@ uint8_t check_ban_list(
     std::vector<TeraLobbyNameMatchResult>& match_list,
     const std::vector<PlayerListRowSnapshot>& banlist_local,
     const std::vector<PlayerListRowSnapshot>& banlist_global,
+    uint8_t host_players,
     const std::array<std::map<Language, std::string>, 4>& player_names,
     bool ignore_whitelist
 ){
     //  Check each name against ban list.
     uint8_t banned_count = 0;
-    for (size_t c = 1; c < 4; c++){
+    for (size_t c = host_players; c < 4; c++){
         const auto& name = player_names[c];
         if (name.empty()){
             continue;
@@ -339,13 +340,15 @@ TeraLobbyNameWatcher::TeraLobbyNameWatcher(
     Logger& logger, AsyncDispatcher& dispatcher,
     Color color,
     RaidJoinReportOption& report_settings,
-    RaidPlayerBanList& ban_settings
+    RaidPlayerBanList& ban_settings,
+    uint8_t host_players
 )
     : TeraLobbyReader(logger, dispatcher, color)
     , VisualInferenceCallback("TeraLobbyNameWatcher")
     , m_logger(logger)
     , m_report_settings(report_settings)
     , m_ban_settings(ban_settings)
+    , m_host_players(host_players)
 {}
 
 void TeraLobbyNameWatcher::get_last_known_state(
@@ -405,6 +408,7 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
             match_list,
             banlist_local,
             banlist_global,
+            m_host_players,
             names,
             m_ban_settings.ignore_whitelist
         );

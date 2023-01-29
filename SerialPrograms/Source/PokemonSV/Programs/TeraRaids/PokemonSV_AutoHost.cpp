@@ -170,29 +170,6 @@ WallClock AutoHost::wait_for_lobby_open(
         NOTIFICATION_RAID_POST
     );
 
-#if 0
-    //  Send notification.
-    std::vector<std::pair<std::string, std::string>> messages;
-    std::string description = DESCRIPTION;
-    if (!description.empty()){
-        messages.emplace_back("Description:", std::move(description));
-    }
-
-    VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
-    if (SHOW_RAID_CODE && !lobby_code.empty()){
-        messages.emplace_back("Raid Code:", lobby_code);
-    }
-
-    send_program_notification(
-        env, NOTIFICATION_RAID_POST,
-        Color(0),
-        "Tera Raid Notification",
-        messages, "",
-        snapshot
-    );
-#endif
-
     return start_time;
 }
 void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, uint8_t player_count){
