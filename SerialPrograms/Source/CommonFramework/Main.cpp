@@ -2,6 +2,8 @@
 #include <QApplication>
 //#include <QTextStream>
 #include <QMessageBox>
+#include <dpp/DPP_SilenceWarnings.h>
+#include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -76,6 +78,22 @@ int main(int argc, char *argv[]){
     );
 #endif
 
+#ifdef PA_SLEEPY
+    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
+        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord
+    ){
+        Integration::SleepyDiscordRunner::sleepy_connect();
+    }
+#endif
+
+#ifdef PA_DPP
+    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
+        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP
+    ){
+        Integration::DppClient::Client::instance().connect();
+    }
+#endif
+
     int ret;
     {
         MainWindow w;
@@ -89,6 +107,10 @@ int main(int argc, char *argv[]){
 
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::sleepy_terminate();
+#endif
+
+#ifdef PA_DPP
+    Integration::DppClient::Client::instance().disconnect();
 #endif
 
     return ret;

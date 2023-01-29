@@ -35,9 +35,11 @@ win32-g++{
     DEFINES += PA_AutoDispatch_x64_08_Nehalem
     LIBS += ../3rdPartyBinaries/tesseractPA.lib
 
-    DEFINES += WIN32
     DEFINES += PA_SLEEPY
     LIBS += ../3rdPartyBinaries/Sleepy.lib
+
+    DEFINES += PA_DPP
+    LIBS += ../3rdPartyBinaries/dpp.lib
 }
 win32-msvc{
     QMAKE_CXXFLAGS += /std:c++latest /utf-8
@@ -52,6 +54,9 @@ win32-msvc{
 
     DEFINES += PA_SLEEPY
     LIBS += ../3rdPartyBinaries/Sleepy.lib
+
+    DEFINES += PA_DPP
+    LIBS += ../3rdPartyBinaries/dpp.lib
 
     LIBS += ../3rdPartyBinaries/opencv_world460.lib
 }
@@ -299,6 +304,9 @@ SOURCES += \
     Source/Integrations/IntegrationsAPI.cpp \
     Source/Integrations/ProgramTracker.cpp \
     Source/Integrations/SleepyDiscordRunner.cpp \
+    Source/Integrations/DppIntegration/DppClient.cpp \
+    Source/Integrations/DppIntegration/DppUtility.cpp \
+    Source/Integrations/DppIntegration/DppCommandHandler.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
@@ -877,6 +885,70 @@ HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
     ../3rdParty/TesseractPA/TesseractPA.h \
     ../3rdParty/nlohmann/json.hpp \
+    ../3rdParty/dpp/appcommand.h \
+    ../3rdParty/dpp/application.h \
+    ../3rdParty/dpp/auditlog.h \
+    ../3rdParty/dpp/automod.h \
+    ../3rdParty/dpp/ban.h \
+    ../3rdParty/dpp/cache.h \
+    ../3rdParty/dpp/channel.h \
+    ../3rdParty/dpp/cluster.h \
+    ../3rdParty/dpp/cluster_coro_calls.h \
+    ../3rdParty/dpp/cluster_sync_calls.h \
+    ../3rdParty/dpp/collector.h \
+    ../3rdParty/dpp/colors.h \
+    ../3rdParty/dpp/commandhandler.h \
+    ../3rdParty/dpp/coro.h \
+    ../3rdParty/dpp/discordclient.h \
+    ../3rdParty/dpp/discordevents.h \
+    ../3rdParty/dpp/discordvoiceclient.h \
+    ../3rdParty/dpp/dispatcher.h \
+    ../3rdParty/dpp/dns.h \
+    ../3rdParty/dpp/dpp.h \
+    ../3rdParty/dpp/dtemplate.h \
+    ../3rdParty/dpp/emoji.h \
+    ../3rdParty/dpp/etf.h \
+    ../3rdParty/dpp/event.h \
+    ../3rdParty/dpp/event_router.h \
+    ../3rdParty/dpp/exception.h \
+    ../3rdParty/dpp/export.h \
+    ../3rdParty/dpp/guild.h \
+    ../3rdParty/dpp/httpsclient.h \
+    ../3rdParty/dpp/integration.h \
+    ../3rdParty/dpp/intents.h \
+    ../3rdParty/dpp/invite.h \
+    ../3rdParty/dpp/json_interface.h \
+    ../3rdParty/dpp/managed.h \
+    ../3rdParty/dpp/message.h \
+    ../3rdParty/dpp/misc-enum.h \
+    ../3rdParty/dpp/once.h \
+    ../3rdParty/dpp/permissions.h \
+    ../3rdParty/dpp/presence.h \
+    ../3rdParty/dpp/prune.h \
+    ../3rdParty/dpp/queues.h \
+    ../3rdParty/dpp/restrequest.h \
+    ../3rdParty/dpp/restresults.h \
+    ../3rdParty/dpp/role.h \
+    ../3rdParty/dpp/scheduled_event.h \
+    ../3rdParty/dpp/snowflake.h \
+    ../3rdParty/dpp/socket.h \
+    ../3rdParty/dpp/sslclient.h \
+    ../3rdParty/dpp/stage_instance.h \
+    ../3rdParty/dpp/stringops.h \
+    ../3rdParty/dpp/sync.h \
+    ../3rdParty/dpp/sysdep.h \
+    ../3rdParty/dpp/timed_listener.h \
+    ../3rdParty/dpp/timer.h \
+    ../3rdParty/dpp/user.h \
+    ../3rdParty/dpp/utility.h \
+    ../3rdParty/dpp/version.h \
+    ../3rdParty/dpp/voiceregion.h \
+    ../3rdParty/dpp/voicestate.h \
+    ../3rdParty/dpp/webhook.h \
+    ../3rdParty/dpp/win32_safe_warnings.h \
+    ../3rdParty/dpp/wsclient.h \
+    ../3rdParty/dpp/nlohmann/json.hpp \
+    ../3rdParty/dpp/nlohmann/json_fwd.hpp \
     ../ClientSource/Connection/BotBase.h \
     ../ClientSource/Connection/BotBaseMessage.h \
     ../ClientSource/Connection/MessageLogger.h \
@@ -1186,6 +1258,9 @@ HEADERS += \
     Source/Integrations/ProgramTracker.h \
     Source/Integrations/ProgramTrackerInterfaces.h \
     Source/Integrations/SleepyDiscordRunner.h \
+    Source/Integrations/DppIntegration/DppClient.h \
+    Source/Integrations/DppIntegration/DppUtility.h \
+    Source/Integrations/DppIntegration/DppCommandHandler.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h \
@@ -1790,7 +1865,8 @@ HEADERS += \
     Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
-    Source/Tests/TestUtils.h
+    Source/Tests/TestUtils.h \
+
 
 
 

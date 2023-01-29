@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16.0)
 project(SerialPrograms)
 
 #enable c++ 20
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #produce clang tidy file
@@ -39,7 +39,6 @@ file(GLOB MAIN_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../3rdParty/nlohmann/json.hpp
     ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../ClientSource/Connection/BotBase.cpp
     ../ClientSource/Connection/BotBase.h
@@ -584,6 +583,12 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
+    Source/Integrations/DppIntegration/DppClient.cpp
+    Source/Integrations/DppIntegration/DppClient.h
+    Source/Integrations/DppIntegration/DppUtility.cpp
+    Source/Integrations/DppIntegration/DppUtility.h
+    Source/Integrations/DppIntegration/DppCommandHandler.cpp
+    Source/Integrations/DppIntegration/DppCommandHandler.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -1806,8 +1811,20 @@ if (MSVC)
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
-    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib OpenCV_lib)
-    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY _CRT_SECURE_NO_WARNINGS)
+
+    add_library(dpp_lib IMPORTED UNKNOWN)
+    set_target_properties(dpp_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE ../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG ../3rdPartyBinaries/dppd.lib)
+    set_target_properties(dpp_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+
+    target_link_libraries(SerialPrograms tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
+    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY PA_DPP _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
