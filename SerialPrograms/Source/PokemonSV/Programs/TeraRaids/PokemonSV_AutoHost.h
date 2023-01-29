@@ -14,7 +14,7 @@
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
-#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
+#include "PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

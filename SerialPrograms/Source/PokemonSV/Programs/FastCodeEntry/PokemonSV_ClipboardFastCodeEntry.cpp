@@ -8,11 +8,10 @@
 #include <QClipboard>
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
+#include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_ClipboardFastCodeEntry.h"
 
 namespace PokemonAutomation{

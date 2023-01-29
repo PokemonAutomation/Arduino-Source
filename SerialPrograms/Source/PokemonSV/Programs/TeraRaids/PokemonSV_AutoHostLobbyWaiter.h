@@ -17,7 +17,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
+#include "PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

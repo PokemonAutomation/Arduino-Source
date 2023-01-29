@@ -15,7 +15,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
-#include "PokemonSV/Programs/PokemonSV_CodeEntry.h"
+#include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_VideoFastCodeEntry.h"
 
 namespace PokemonAutomation{

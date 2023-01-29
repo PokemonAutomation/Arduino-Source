@@ -20,7 +20,7 @@
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
-#include "PokemonSV/Programs/Multiplayer/PokemonSV_JoinTracker.h"
+#include "PokemonSV_JoinTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -93,7 +93,11 @@ private:
         size_t host_index, const std::string& normalized_code
     );
 
-    bool run_raid(MultiSwitchProgramEnvironment& env, CancellableScope& scope);
+    bool run_raid(
+        MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+        std::string& lobby_code,
+        std::array<std::map<Language, std::string>, 4>& player_names
+    );
 
 private:
     IntegerEnumDropdownOption HOSTING_SWITCH;
@@ -129,7 +133,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     WallClock m_last_time_fix;
-    bool m_errored[4];
+    bool m_reset_required[4];
 };
 
 

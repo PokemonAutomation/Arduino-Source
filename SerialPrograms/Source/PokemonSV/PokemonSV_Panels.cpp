@@ -26,13 +26,13 @@
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
 #include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 
-#include "Programs/Multiplayer/PokemonSV_AutoHost.h"
+#include "Programs/TeraRaids/PokemonSV_AutoHost.h"
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 #include "Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h"
 
-#include "Programs/Multiplayer/PokemonSV_FastCodeEntry.h"
-#include "Programs/Multiplayer/PokemonSV_ClipboardFastCodeEntry.h"
-#include "Programs/Multiplayer/PokemonSV_VideoFastCodeEntry.h"
+#include "Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h"
+#include "Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h"
+#include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
 
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
