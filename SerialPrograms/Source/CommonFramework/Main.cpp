@@ -79,13 +79,17 @@ int main(int argc, char *argv[]){
 #endif
 
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.run_on_start && !GlobalSettings::instance().DISCORD.integration.use_dpp) {
+    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
+        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord
+    ){
         Integration::SleepyDiscordRunner::sleepy_connect();
     }
 #endif
 
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.run_on_start && GlobalSettings::instance().DISCORD.integration.use_dpp) {
+    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
+        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP
+    ){
         Integration::DppClient::Client::instance().connect();
     }
 #endif

@@ -63,80 +63,87 @@ void Client::send_message_dpp(
     const std::vector<std::string>& tags,
     const JsonObject& json_obj,
     const std::string& message,
-    std::shared_ptr<PendingFileSend> file) {
-    if (m_is_connected) {
-        embed embed;
-        {
-            embed.set_title(*json_obj.get_string("title"));
-            embed.set_color((int)((uint32_t)color & 0xffffff));
+    std::shared_ptr<PendingFileSend> file
+){
+    DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
+    if (!settings.integration.enabled()){
+        return;
+    }
+    if (!m_is_connected){
+        return;
+    }
 
-            auto fields = json_obj.get_array("fields");
-            for (auto& field : *fields) {
-                auto obj = field.get_object();
-                embed.add_field(*obj->get_string("name"), *obj->get_string("value"));
+
+    embed embed;
+    {
+        embed.set_title(*json_obj.get_string("title"));
+        embed.set_color((int)((uint32_t)color & 0xffffff));
+
+        auto fields = json_obj.get_array("fields");
+        for (auto& field : *fields) {
+            auto obj = field.get_object();
+            embed.add_field(*obj->get_string("name"), *obj->get_string("value"));
+        }
+    }
+
+    std::set<std::string> tag_set;
+    for (const std::string& tag : tags) {
+        tag_set.insert(to_lower(tag));
+    }
+
+    const DiscordIntegrationTable& channels = settings.integration.channels;
+    std::vector<std::string> channel_vector;
+    std::vector<std::string> message_vector;
+
+    auto table = channels.copy_snapshot();
+    for (auto& ch : table) {
+        const Integration::DiscordIntegrationChannel& channel = *ch;
+        if (((std::string)channel.tags_text).empty() || !channel.enabled) {
+            continue;
+        }
+
+        bool send = false;
+        for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)) {
+            auto iter = tag_set.find(to_lower(tag));
+            if (iter != tag_set.end()) {
+                channel_vector.emplace_back(channel.channel_id);
+                send = true;
+                break;
             }
         }
 
-        std::set<std::string> tag_set;
-        for (const std::string& tag : tags) {
-            tag_set.insert(to_lower(tag));
+        if (!send) {
+            continue;
         }
 
-        DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-        const DiscordIntegrationTable& channels = settings.integration.channels;
-        std::vector<std::string> channel_vector;
-        std::vector<std::string> message_vector;
-
-        auto table = channels.copy_snapshot();
-        for (auto& ch : table) {
-            const Integration::DiscordIntegrationChannel& channel = *ch;
-            if (((std::string)channel.tags_text).empty() || !channel.enabled) {
-                continue;
-            }
-
-            bool send = false;
-            for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)) {
-                auto iter = tag_set.find(to_lower(tag));
-                if (iter != tag_set.end()) {
-                    channel_vector.emplace_back(channel.channel_id);
-                    send = true;
-                    break;
-                }
-            }
-
-            if (!send) {
-                continue;
-            }
-
-            if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0) {
-                should_ping = false;
-            }
-
-            std::string msg = "";
-            if (should_ping && channel.ping) {
-                msg += "<@" + (std::string)settings.message.user_id + ">";
-            }
-
-            std::string discord_message = settings.message.message;
-            if (!discord_message.empty()) {
-                if (!msg.empty()) {
-                    msg += " ";
-                }
-
-                discord_message.erase(std::remove(discord_message.begin(), discord_message.end(), '@'), discord_message.end());
-                msg += discord_message;
-            }
-
-            if (!message.empty()) {
-                if (!msg.empty()) {
-                    msg += " ";
-                }
-                msg += message;
-            }
-
-            message_vector.emplace_back(msg);
-            Handler::send_message(*m_bot.get(), embed, channel.channel_id, std::chrono::seconds(channel.delay), msg, file);
+        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0) {
+            should_ping = false;
         }
+
+        std::string msg = "";
+        if (should_ping && channel.ping) {
+            msg += "<@" + (std::string)settings.message.user_id + ">";
+        }
+
+        std::string discord_message = settings.message.message;
+        if (!discord_message.empty()) {
+            if (!msg.empty()) {
+                msg += " ";
+            }
+
+            discord_message.erase(std::remove(discord_message.begin(), discord_message.end(), '@'), discord_message.end());
+            msg += discord_message;
+        }
+
+        if (!message.empty()) {
+            if (!msg.empty()) {
+                msg += " ";
+            }
+            msg += message;
+        }
+
+        message_vector.emplace_back(msg);
+        Handler::send_message(*m_bot.get(), embed, channel.channel_id, std::chrono::seconds(channel.delay), msg, file);
     }
 }
 

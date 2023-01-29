@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 namespace Integration{
 
 
+DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
+    library.remove_listener(*this);
+}
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
 //    , m_integration_enabled(integration_enabled)
@@ -26,10 +29,14 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockWhileRunning::LOCKED,
         false
     )
-    , use_dpp(
-        "<b>Discord integration to use:</b><br><b>Enabled:</b> use D++ Discord library. <b>Disabled:</b> use Sleepy Discord library.",
+    , library(
+        "<b>Discord Integration Library:</b><br>Restart the program for this to take effect.",
+        {
+            {Library::SleepyDiscord, "sleepy", "Sleepy Discord"},
+            {Library::DPP, "dpp", "DPP"},
+        },
         LockWhileRunning::LOCKED,
-        false
+        Library::SleepyDiscord
     )
     , token(
         true,
@@ -74,7 +81,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    PA_ADD_OPTION(use_dpp);
+    PA_ADD_OPTION(library);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
@@ -83,7 +90,31 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     PA_ADD_OPTION(sudo);
     PA_ADD_OPTION(owner);
     PA_ADD_OPTION(channels);
+
+    DiscordIntegrationSettingsOption::value_changed();
+
+    library.add_listener(*this);
 }
+void DiscordIntegrationSettingsOption::value_changed(){
+    switch (library){
+    case Library::SleepyDiscord:
+        command_prefix.set_visibility(ConfigOptionState::ENABLED);
+        use_suffix.set_visibility(ConfigOptionState::ENABLED);
+        sudo.set_visibility(ConfigOptionState::ENABLED);
+        owner.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    case Library::DPP:
+        command_prefix.set_visibility(ConfigOptionState::HIDDEN);
+        use_suffix.set_visibility(ConfigOptionState::HIDDEN);
+        sudo.set_visibility(ConfigOptionState::HIDDEN);
+        owner.set_visibility(ConfigOptionState::HIDDEN);
+        break;
+    }
+}
+
+
+
+
 DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value)
     : GroupWidget(parent, value)
 {
@@ -107,49 +138,54 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_start->setFont(font);
     button_stop->setFont(font);
 
+    bool options_enabled = value.enabled();
 #ifdef PA_SLEEPY
-    if (!GlobalSettings::instance().DISCORD.integration.use_dpp) {
-        set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+    options_enabled &= !SleepyDiscordRunner::is_running();
+#endif
+#ifdef PA_DPP
+    options_enabled &= !DppClient::Client::instance().is_running();
+#endif
+    set_options_enabled(options_enabled);
 
-        connect(
-            button_start, &QPushButton::clicked,
-            this, [=, &value](bool) {
-                set_options_enabled(false);
+    connect(
+        button_start, &QPushButton::clicked,
+        this, [=, &value](bool) {
+            set_options_enabled(false);
+#ifdef PA_SLEEPY
+            switch (value.library){
+            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_connect();
                 set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-            }
-        );
-        connect(
-            button_stop, &QPushButton::clicked,
-            this, [=, &value](bool) {
-                SleepyDiscordRunner::sleepy_terminate();
-                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
-            }
-        );
-    }
+                break;
 #endif
-
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.use_dpp) {
-        set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
-
-        connect(
-            button_start, &QPushButton::clicked,
-            this, [=, &value](bool) {
-                set_options_enabled(false);
+            case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().connect();
                 set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+                break;
+#endif
             }
-        );
-        connect(
-            button_stop, &QPushButton::clicked,
-            this, [=, &value](bool) {
+        }
+    );
+    connect(
+        button_stop, &QPushButton::clicked,
+        this, [=, &value](bool) {
+            switch (value.library){
+            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
+#ifdef PA_SLEEPY
+                SleepyDiscordRunner::sleepy_terminate();
+                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
+                break;
+#endif
+#ifdef PA_DPP
+            case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().disconnect();
                 set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
-            }
-        );
-    }
+                break;
 #endif
+            }
+        }
+    );
 }
 
 
