@@ -398,7 +398,7 @@ uint8_t BoxEmptyPartyWatcher::num_empty_slots_found() const{
 }
 
 namespace{
-    ImageFloatBox BOTTOM_BUTTON_Y_BOX{0.391, 0.939, 0.440, 0.047};
+    ImageFloatBox BOTTOM_BUTTON_Y_BOX{0.391, 0.939, 0.400, 0.047};
 } // anonymous namespace
 
 BoxBottomButtonYDetector::BoxBottomButtonYDetector(Color color)
