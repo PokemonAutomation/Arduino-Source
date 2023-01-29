@@ -135,7 +135,6 @@ void Client::send_message_dpp(
             }
 
             message_vector.emplace_back(msg);
-            Handler::log_dpp("Sending message...", "send_message_dpp()", ll_info);
             Handler::send_message(*m_bot.get(), embed, channel.channel_id, std::chrono::seconds(channel.delay), msg, file);
         }
     }
