@@ -63,6 +63,9 @@ int main(int argc, char *argv[]){
     //  Make settings directory.
     QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
 
+    // Make screenshots directory.
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));
+
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
         return run_command_line_tests();
     }

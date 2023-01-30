@@ -69,6 +69,7 @@ std::string get_training_path(){
 
 
 const std::string SETTINGS_PATH = "UserSettings/";
+const std::string SCREENSHOTS_PATH = "Screenshots/";
 const std::string& RESOURCE_PATH(){
     static std::string path = get_resource_path();
     return path;
