@@ -31,21 +31,29 @@ BoxNatureDetector::BoxNatureDetector(VideoOverlay& overlay)
 {}
 
 NaturePlusMinus BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& frame, const ImageFloatBox& box){
-    const ImageStats region = image_stats(extract_box_reference(frame, box));
+    const auto region = extract_box_reference(frame, box);
+    const bool replace_color_within_range = true;
 
-    //cout << region.average.r << endl;
-    //cout << region.average.g << endl;
-    //cout << region.average.b << endl;
-    
-    if (region.average.b > region.average.r + 3) {
+    //Filter out background - white/gray
+    ImageRGB32 filtered_region = filter_rgb32_range(
+        extract_box_reference(frame, box),
+        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), Color(0), replace_color_within_range
+    );
+    ImageStats stats = image_stats(filtered_region);
+
+    //filtered_region.save("./filtered_only.png");
+    //cout << stats.average.r << endl;
+    //cout << stats.average.g << endl;
+    //cout << stats.average.b << endl;
+
+    if (stats.average.b > stats.average.r + 50) {
         return NaturePlusMinus::MINUS;
-    }
-    else if (region.average.r > region.average.b) {
+    } else if (stats.average.r > stats.average.b + 50) {
         return NaturePlusMinus::PLUS;
     }
     return NaturePlusMinus::NEUTRAL;
-
 }
+
 NatureReader::Results BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& frame){
     NatureReader::Results results;
     NaturePlusMinus stats[5];
