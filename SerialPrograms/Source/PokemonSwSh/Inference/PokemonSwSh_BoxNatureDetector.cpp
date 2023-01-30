@@ -31,7 +31,6 @@ BoxNatureDetector::BoxNatureDetector(VideoOverlay& overlay)
 {}
 
 NaturePlusMinus BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& frame, const ImageFloatBox& box){
-    const auto region = extract_box_reference(frame, box);
     const bool replace_color_within_range = true;
 
     //Filter out background - white/gray
