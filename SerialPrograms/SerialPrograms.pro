@@ -420,6 +420,7 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
+    Source/Pokemon/Inference/Pokemon_NatureReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
@@ -430,6 +431,7 @@ SOURCES += \
     Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
     Source/Pokemon/Pokemon_IVChecker.cpp \
+    Source/Pokemon/Pokemon_NatureChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
     Source/Pokemon/Pokemon_Strings.cpp \
@@ -446,6 +448,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
@@ -616,6 +619,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp \
@@ -676,6 +680,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
@@ -703,6 +708,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.cpp \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
@@ -1391,6 +1397,7 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
+    Source/Pokemon/Inference/Pokemon_NatureReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
@@ -1403,6 +1410,7 @@ HEADERS += \
     Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
     Source/Pokemon/Pokemon_IVChecker.h \
+    Source/Pokemon/Pokemon_NatureChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_ShinySparkleSet.h \
     Source/Pokemon/Pokemon_Strings.h \
@@ -1419,6 +1427,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
@@ -1591,6 +1600,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h \
@@ -1652,6 +1662,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
@@ -1685,6 +1696,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h \
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
