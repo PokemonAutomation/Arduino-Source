@@ -5,14 +5,12 @@
  */
 
 #include <QCoreApplication>
-#include <QDir>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Json/JsonTools.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
@@ -43,19 +41,18 @@ void PersistentSettings::write() const{
     root["99-Panels"] = panels.clone();
 
     try{
-        QDir().mkpath(QString::fromStdString(GlobalSettings::instance().get_user_folder()));
-
-        root.dump(GlobalSettings::instance().get_user_folder(QCoreApplication::applicationName().toStdString() + "-Settings.json"));
+        std::string settings_path = SETTINGS_PATH + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+        root.dump(settings_path);
     }catch (FileException&){}
 }
 
 
 void PersistentSettings::read(){
-    std::string filename = GlobalSettings::instance().get_user_folder(QCoreApplication::applicationName().toStdString() + "-Settings.json");
-    JsonValue json = load_json_file(filename);
+    std::string settings_path = SETTINGS_PATH + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+    JsonValue json = load_json_file(settings_path);
     JsonObject* obj = json.get_object();
     if (obj == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", filename);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", settings_path);
     }
 
     //  Need to load this subset of settings first because they will affect how

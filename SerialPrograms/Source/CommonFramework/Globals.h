@@ -30,6 +30,7 @@ extern const std::string PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
+extern const std::string SETTINGS_PATH;
 const std::string& RESOURCE_PATH();
 const std::string& TRAINING_PATH();
 
