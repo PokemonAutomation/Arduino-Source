@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 

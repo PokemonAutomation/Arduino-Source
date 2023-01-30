@@ -27,6 +27,7 @@ class MultiSwitchProgramInstance;
 
 class MultiSwitchProgramOption final : public PanelInstance{
 public:
+    ~MultiSwitchProgramOption();
     MultiSwitchProgramOption(const MultiSwitchProgramDescriptor& descriptor);
 
     virtual void from_json(const JsonValue& json) override;

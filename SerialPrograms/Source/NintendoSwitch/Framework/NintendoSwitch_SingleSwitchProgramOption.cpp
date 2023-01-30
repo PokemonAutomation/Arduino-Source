@@ -13,6 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+SingleSwitchProgramOption::~SingleSwitchProgramOption() = default;
 SingleSwitchProgramOption::SingleSwitchProgramOption(const SingleSwitchProgramDescriptor& descriptor)
     : PanelInstance(descriptor)
     , m_descriptor(descriptor)

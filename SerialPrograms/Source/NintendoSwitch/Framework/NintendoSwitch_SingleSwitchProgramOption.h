@@ -27,6 +27,7 @@ class SingleSwitchProgramInstance;
 
 class SingleSwitchProgramOption final : public PanelInstance{
 public:
+    ~SingleSwitchProgramOption();
     SingleSwitchProgramOption(const SingleSwitchProgramDescriptor& descriptor);
 
     virtual void from_json(const JsonValue& json) override;
