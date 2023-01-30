@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -14,9 +13,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_BoxNatureDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

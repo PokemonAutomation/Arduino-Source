@@ -161,12 +161,13 @@ EggHatchAction EggHatchFilterTable::get_action(bool shiny, const IVCheckerReader
         if (!IVChecker_filter_match(filter.iv_speed, IVs.speed)) continue;
 
         EggHatchGenderFilter filter_gender = filter.gender;
-        if(filter_gender != gender && filter_gender != EggHatchGenderFilter::Any){
+        if (filter_gender != gender && filter_gender != EggHatchGenderFilter::Any){
             continue;
         }
 
-        if (!NatureChecker_filter_match(filter.nature, nature.nature)) continue;
-        
+        if (!NatureChecker_filter_match(filter.nature, nature.nature)){
+            continue;
+        }
 
         EggHatchAction filter_action = filter.action;
 

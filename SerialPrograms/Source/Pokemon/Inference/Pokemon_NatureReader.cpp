@@ -49,7 +49,7 @@ std::string nature_checker_value_to_string(NatureCheckerValue value) {
 }
 
 NatureReader::NatureReader(const std::string& json_path)
-: SmallDictionaryMatcher(json_path)
+    : SmallDictionaryMatcher(json_path)
 {}
 
 OCR::StringMatchResult NatureReader::read_substring(
@@ -58,7 +58,7 @@ OCR::StringMatchResult NatureReader::read_substring(
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
-    ) const {
+) const{
     return match_substring_from_image_multifiltered(
         &logger, language, image, text_color_ranges,
         MAX_LOG10P, MAX_LOG10P_SPREAD,
