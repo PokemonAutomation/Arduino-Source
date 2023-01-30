@@ -103,6 +103,13 @@ GlobalSettings::GlobalSettings()
         LockWhileRunning::LOCKED,
         false
     )
+    , USER_FOLDER {
+        false,
+        "<b>User Folder:</b><br>Folder in which the Stats and Settings files are stored.",
+        LockWhileRunning::LOCKED,
+        "ProgramData",
+        "ProgramData"
+    }
     , STATS_FILE(
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
@@ -216,6 +223,7 @@ GlobalSettings::GlobalSettings()
     )
 {
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
+    PA_ADD_OPTION(USER_FOLDER);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
@@ -371,6 +379,17 @@ void GlobalSettings::value_changed(){
     }else{
         global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
     }
+}
+
+std::string GlobalSettings::get_user_folder(const std::string& file_name){
+    std::string path = USER_FOLDER;
+    if (!path.ends_with("/")){
+        path += "/";
+    }
+    if (!file_name.empty()){
+        path += file_name;
+    }
+    return path;
 }
 
 
