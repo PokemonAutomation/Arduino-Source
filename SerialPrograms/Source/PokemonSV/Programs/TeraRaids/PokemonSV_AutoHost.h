@@ -81,7 +81,6 @@ private:
     JoinReportNotification NOTIFICATION_JOIN_REPORT;
     EventNotificationsOption NOTIFICATIONS0;
 
-    WallClock m_ban_timer;
     WallClock m_killswitch_time;
     std::string m_killswitch_reason;
 };

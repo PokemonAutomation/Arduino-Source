@@ -568,6 +568,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         HOSTING_OPTIONS.CONSECUTIVE_FAILURE_PAUSE,
         HOSTING_OPTIONS.FAILURE_PAUSE_MINUTES
     );
+    KillSwitchTracker kill_switch(env);
+
     m_last_time_fix = WallClock::min();
     for (uint16_t wins = 0; wins < MAX_WINS;){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -590,6 +592,11 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             }
             m_reset_required[index] = false;
         });
+
+        //  Check kill-switch now before we go online.
+        if (HOSTING_MODE == Mode::HOST_ONLINE){
+            kill_switch.check_kill_switch(HOSTING_OPTIONS.REMOTE_KILL_SWITCH);
+        }
 
         try{
             std::string lobby_code;

@@ -4,10 +4,15 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
+#include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Qt/TimeQt.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
@@ -103,6 +108,80 @@ void TeraFailTracker::report_raid_error(){
         m_env.log("Consecutive Failure Count: " + std::to_string(m_consecutive_failures), COLOR_RED);
     }
 }
+
+
+
+
+KillSwitchTracker::KillSwitchTracker(ProgramEnvironment& env)
+    : m_env(env)
+{}
+void KillSwitchTracker::check_kill_switch(const std::string& kill_switch_url){
+    if (kill_switch_url.empty()){
+        return;
+    }
+
+    WallClock start_time = m_env.program_info().start_time;
+
+    if (kill_switch_url.ends_with(".txt")){
+        m_env.log("Loading remote kill switch time...");
+        try{
+            std::string kill_time_str = FileDownloader::download_file(m_env.logger(), kill_switch_url);
+            m_killswitch_time = parse_utc_time_str(kill_time_str);
+        }catch (OperationFailedException& e){
+            m_env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
+        }catch (ParseException& e){
+            m_env.log("Unable to load kill switch URL: " + e.message(), COLOR_RED);
+        }
+    }else if (kill_switch_url.ends_with(".json")){
+        m_env.log("Loading remote kill switch time...");
+
+        try{
+            JsonValue json = FileDownloader::download_json_file(m_env.logger(), kill_switch_url);
+            const JsonObject* obj = json.get_object();
+            if (obj == nullptr){
+                throw ParseException("Invalid kill-switch Json.");
+            }
+            const std::string* date = obj->get_string("date");
+            if (date == nullptr){
+                m_env.log("Invalid Kill Switch Json", COLOR_RED);
+            }else{
+                m_killswitch_time = parse_utc_time_str(*date);
+            }
+            const std::string* reason = obj->get_string("reason");
+            if (date == nullptr){
+                m_env.log("Invalid Kill Switch Json", COLOR_RED);
+            }else{
+                m_killswitch_reason = *reason;
+            }
+        }catch (OperationFailedException& e){
+            m_env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
+        }catch (ParseException& e){
+            m_env.log("Invalid kill-switch JSON: " + e.message(), COLOR_RED);
+        }
+    }else{
+        throw UserSetupError(m_env.logger(), "Invalid kill switch URL extension.");
+    }
+
+    WallClock now = current_time();
+    m_env.log(
+        "Start UTC: " + to_utc_time_str(start_time) +
+        ", Current UTC: " + to_utc_time_str(now) +
+        ", Kill UTC: " + to_utc_time_str(m_killswitch_time)
+    );
+    if (start_time < m_killswitch_time && now > m_killswitch_time){
+        if (m_killswitch_reason.empty()){
+            throw FatalProgramException(m_env.logger(), "Stopped by remote kill switch. No reason specified.");
+        }else{
+            throw FatalProgramException(m_env.logger(), "Stopped by remote kill switch. Reason: " + m_killswitch_reason);
+        }
+    }
+}
+
+
+
+
+
+
 
 
 

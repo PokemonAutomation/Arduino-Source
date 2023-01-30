@@ -52,6 +52,19 @@ private:
 };
 
 
+class KillSwitchTracker{
+public:
+    KillSwitchTracker(ProgramEnvironment& env);
+
+    void check_kill_switch(const std::string& kill_switch_url);
+
+private:
+    ProgramEnvironment& m_env;
+    WallClock m_killswitch_time;
+    std::string m_killswitch_reason;
+};
+
+
 
 
 
