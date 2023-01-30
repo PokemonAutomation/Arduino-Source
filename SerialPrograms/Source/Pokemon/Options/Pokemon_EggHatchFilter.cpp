@@ -52,13 +52,11 @@ const EnumDatabase<EggHatchGenderFilter>& EggHatchGenderFilter_Database(){
     return database;
 }
 
-
-
-
 EggHatchFilterRow::EggHatchFilterRow()
     : action(EggHatchAction_Database(), LockWhileRunning::LOCKED, EggHatchAction::Keep)
     , shiny(EggHatchShinyFilter_Database(), LockWhileRunning::LOCKED, EggHatchShinyFilter::Anything)
     , gender(EggHatchGenderFilter_Database(), LockWhileRunning::LOCKED, EggHatchGenderFilter::Any)
+    , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCKED, NatureCheckerFilter::Any)
     , iv_hp(IVCheckerFilter::Anything)
     , iv_atk(IVCheckerFilter::Anything)
     , iv_def(IVCheckerFilter::Anything)
@@ -69,6 +67,7 @@ EggHatchFilterRow::EggHatchFilterRow()
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(shiny);
     PA_ADD_OPTION(gender);
+    PA_ADD_OPTION(nature);
     PA_ADD_OPTION(iv_hp);
     PA_ADD_OPTION(iv_atk);
     PA_ADD_OPTION(iv_def);
@@ -86,6 +85,7 @@ std::unique_ptr<EditableTableRow> EggHatchFilterRow::clone() const{
     ret->action.set(action);
     ret->shiny.set(shiny);
     ret->gender.set(gender);
+    ret->nature.set(nature);
     ret->iv_hp.set(iv_hp);
     ret->iv_atk.set(iv_atk);
     ret->iv_def.set(iv_def);
@@ -115,6 +115,7 @@ std::vector<std::string> EggHatchFilterTable::make_header() const{
         "Action",
         "Shininess",
         "Gender",
+        "Nature",
         "HP",
         "Attack",
         "Defense",
@@ -129,8 +130,7 @@ std::vector<std::unique_ptr<EditableTableRow>> EggHatchFilterTable::make_default
     return ret;
 }
 
-
-EggHatchAction EggHatchFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender) const{
+EggHatchAction EggHatchFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs, EggHatchGenderFilter gender, NatureReader::Results nature) const{
     EggHatchAction action = EggHatchAction::Release;
     std::vector<std::unique_ptr<EggHatchFilterRow>> list = copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
@@ -164,6 +164,9 @@ EggHatchAction EggHatchFilterTable::get_action(bool shiny, const IVCheckerReader
         if(filter_gender != gender && filter_gender != EggHatchGenderFilter::Any){
             continue;
         }
+
+        if (!NatureChecker_filter_match(filter.nature, nature.nature)) continue;
+        
 
         EggHatchAction filter_action = filter.action;
 

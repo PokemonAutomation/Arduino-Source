@@ -832,6 +832,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h
     Source/Pokemon/Inference/Pokemon_NameReader.cpp
     Source/Pokemon/Inference/Pokemon_NameReader.h
+    Source/Pokemon/Inference/Pokemon_NatureReader.cpp
+    Source/Pokemon/Inference/Pokemon_NatureReader.h
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp
@@ -854,6 +856,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_EncounterStats.h
     Source/Pokemon/Pokemon_IVChecker.cpp
     Source/Pokemon/Pokemon_IVChecker.h
+    Source/Pokemon/Pokemon_NatureChecker.cpp
+    Source/Pokemon/Pokemon_NatureChecker.h
     Source/Pokemon/Pokemon_Notification.cpp
     Source/Pokemon/Pokemon_Notification.h
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp
@@ -886,6 +890,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.cpp
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp
@@ -1234,6 +1240,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp
@@ -1417,6 +1425,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp

@@ -19,6 +19,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
@@ -616,6 +617,7 @@ bool check_baby_info(
     IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
     BoxGenderDetector gender_detector;
     gender_detector.make_overlays(overlay_set);
+    BoxNatureDetector nature_detector(console.overlay(), LANGUAGE);
 
     const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(200), {shiny_detector});
     const bool shiny = (shiny_ret == 0);
@@ -623,11 +625,13 @@ bool check_baby_info(
 
     IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
     EggHatchGenderFilter gender = gender_detector.detect(screen);
+    NatureReader::Results nature = nature_detector.read(console.logger(), screen);
 
     console.log(IVs.to_string(), COLOR_GREEN);
     console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+    console.log("Nature: " + nature.to_string(), COLOR_GREEN);
 
-    action = FILTERS.get_action(shiny, IVs, gender);
+    action = FILTERS.get_action(shiny, IVs, gender, nature);
 
     return shiny;
 }

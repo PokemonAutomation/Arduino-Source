@@ -21,6 +21,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -189,6 +190,7 @@ bool EggAutonomousState::process_party(){
 
     BoxShinyDetector shiny_reader;
     IVCheckerReaderScope iv_reader(m_console, m_language);
+    BoxNatureDetector nature_detector(m_console.overlay(), m_language);
 
     VideoOverlaySet set(m_console);
     shiny_reader.make_overlays(set);
@@ -224,8 +226,9 @@ bool EggAutonomousState::process_party(){
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
         EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
+        NatureReader::Results nature = nature_detector.read(m_console.logger(), screen);
 
-        EggHatchAction action = m_filters.get_action(shiny, IVs, gender);
+        EggHatchAction action = m_filters.get_action(shiny, IVs, gender, nature);
 
         switch (action){
         case EggHatchAction::StopProgram:

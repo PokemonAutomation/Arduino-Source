@@ -21,6 +21,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -571,6 +572,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         BoxGenderDetector gender_detector;
         gender_detector.make_overlays(overlay_set);
         IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
+        BoxNatureDetector nature_detector(env.console.overlay());
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
             pbf_wait(context, 50); // wait for a while to make sure the pokemon stats are loaded.
@@ -601,8 +603,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             EggHatchGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+            NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender);
+            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender, nature);
 
             auto send_keep_notification = [&](){
                 if (!shiny){
