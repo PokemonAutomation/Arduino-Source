@@ -7,10 +7,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-
 #include <dpp/DPP_SilenceWarnings.h>
 #include <Integrations/DppIntegration/DppClient.h>
-
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
 
@@ -81,7 +80,9 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    PA_ADD_OPTION(library);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(library);
+    }
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
