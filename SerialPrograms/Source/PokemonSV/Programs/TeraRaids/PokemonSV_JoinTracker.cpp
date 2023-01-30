@@ -272,6 +272,12 @@ std::string JoinTracker::dump(size_t indent) const{
 
 
 
+
+MultiLanguageJoinTracker::MultiLanguageJoinTracker(uint8_t host_players)
+    : m_host_players(host_players)
+{}
+
+
 void MultiLanguageJoinTracker::add(Language language, const std::string& name, std::string lobby_code){
     m_databases[language].add(name, lobby_code);
 }
@@ -279,7 +285,7 @@ void MultiLanguageJoinTracker::append(
     const std::array<std::map<Language, std::string>, 4>& names,
     const std::string& lobby_code
 ){
-    for (size_t c = 1; c < 4; c++){
+    for (size_t c = m_host_players; c < 4; c++){
         for (const auto& item : names[c]){
             add(item.first, item.second, lobby_code);
         }

@@ -76,8 +76,9 @@ private:
 
 class MultiLanguageJoinTracker{
 public:
-    void add(Language language, const std::string& name, std::string lobby_code);
+    MultiLanguageJoinTracker(uint8_t host_players);
 
+    void add(Language language, const std::string& name, std::string lobby_code);
     void append(
         const std::array<std::map<Language, std::string>, 4>& names,
         const std::string& lobby_code
@@ -87,6 +88,7 @@ public:
     void dump(const std::string& filename) const;
 
 private:
+    uint8_t m_host_players;
     std::map<Language, JoinTracker> m_databases;
 };
 

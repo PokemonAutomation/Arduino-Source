@@ -5,11 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/TimeQt.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -279,7 +275,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     m_killswitch_time = WallClock::max();
 
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
-    MultiLanguageJoinTracker join_tracker;
+    MultiLanguageJoinTracker join_tracker(1);
 
     TeraFailTracker fail_tracker(
         env, context,

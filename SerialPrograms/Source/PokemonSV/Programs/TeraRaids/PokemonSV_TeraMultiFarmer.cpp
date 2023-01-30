@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -186,23 +187,12 @@ TeraMultiFarmer::TeraMultiFarmer()
         RecoveryMode::SAVE_AND_RESET
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS(PreloadSettings::instance().DEVELOPER_MODE
-        ? std::vector<EventNotificationOption*>{
-                &NOTIFICATION_STATUS_UPDATE,
-                &NOTIFICATION_RAID_POST,
-                &NOTIFICATION_RAID_START,
-                &NOTIFICATION_JOIN_REPORT,
-                &NOTIFICATION_PROGRAM_FINISH,
-                &NOTIFICATION_ERROR_RECOVERABLE,
-                &NOTIFICATION_ERROR_FATAL,
-        }
-        : std::vector<EventNotificationOption*>{
-                &NOTIFICATION_STATUS_UPDATE,
-                &NOTIFICATION_PROGRAM_FINISH,
-                &NOTIFICATION_ERROR_RECOVERABLE,
-                &NOTIFICATION_ERROR_FATAL,
-        }
-    )
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     const LanguageSet& languages = PokemonNameReader::instance().languages();
     size_t host = HOSTING_SWITCH.current_value();
@@ -215,10 +205,8 @@ TeraMultiFarmer::TeraMultiFarmer()
     PA_ADD_OPTION(MAX_WINS);
 
     //  General Auto-Hosting Options
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(HOSTING_MODE);
-        PA_ADD_OPTION(HOSTING_OPTIONS);
-    }
+    PA_ADD_OPTION(HOSTING_MODE);
+    PA_ADD_OPTION(HOSTING_OPTIONS);
 
     PA_ADD_OPTION(*PLAYERS[0]);
     PA_ADD_OPTION(*PLAYERS[1]);
@@ -229,10 +217,8 @@ TeraMultiFarmer::TeraMultiFarmer()
 //    PA_ADD_OPTION(RECOVERY_MODE);
 
     //  Extended Auto-Hosting Options
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(BAN_LIST);
-//        PA_ADD_OPTION(JOIN_REPORT);
-    }
+    PA_ADD_OPTION(BAN_LIST);
+    PA_ADD_OPTION(JOIN_REPORT);
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -543,6 +529,9 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
 //    ConsoleHandle& host_console = env.consoles[host_index];
 //    BotBaseContext host_context(scope, host_console.botbase());
 
+    std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
+    MultiLanguageJoinTracker join_tracker((uint8_t)env.consoles.size());
+
     m_reset_required[0] = false;
     m_reset_required[1] = false;
     m_reset_required[2] = false;
@@ -605,9 +594,18 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             if (win){
                 wins++;
             }
-
-            //  Join Report
-
+            if (HOSTING_MODE != Mode::FARM_ALONE && JOIN_REPORT.enabled() && (win || !JOIN_REPORT.wins_only)){
+                join_tracker.append(player_names, lobby_code);
+                join_tracker.dump(report_name);
+                send_program_notification_with_file(
+                    env,
+                    NOTIFICATION_JOIN_REPORT,
+                    Color(0),
+                    "Join Report",
+                    {}, "",
+                    report_name
+                );
+            }
             fail_tracker.report_successful_raid();
         }catch (OperationFailedException& e){
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
