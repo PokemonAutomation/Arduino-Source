@@ -118,7 +118,7 @@ private:
 //
 class MultiSwitchProgramInstance{
 public:
-    virtual ~MultiSwitchProgramInstance() = default;
+    virtual ~MultiSwitchProgramInstance();
     MultiSwitchProgramInstance(const MultiSwitchProgramInstance&) = delete;
     void operator=(const MultiSwitchProgramInstance&) = delete;
 

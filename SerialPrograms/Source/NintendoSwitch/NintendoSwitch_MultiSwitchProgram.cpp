@@ -98,7 +98,7 @@ std::unique_ptr<PanelInstance> MultiSwitchProgramDescriptor::make_panel() const{
 
 
 
-
+MultiSwitchProgramInstance::~MultiSwitchProgramInstance() = default;
 MultiSwitchProgramInstance::MultiSwitchProgramInstance(
     const std::vector<std::string>& error_notification_tags
 )

@@ -101,7 +101,7 @@ private:
 //
 class SingleSwitchProgramInstance{
 public:
-    virtual ~SingleSwitchProgramInstance() = default;
+    virtual ~SingleSwitchProgramInstance();
     SingleSwitchProgramInstance(const SingleSwitchProgramInstance&) = delete;
     void operator=(const SingleSwitchProgramInstance&) = delete;
 

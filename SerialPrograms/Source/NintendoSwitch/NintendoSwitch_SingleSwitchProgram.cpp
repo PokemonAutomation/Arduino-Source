@@ -39,6 +39,7 @@ std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const
 
 
 
+SingleSwitchProgramInstance::~SingleSwitchProgramInstance() = default;
 SingleSwitchProgramInstance::SingleSwitchProgramInstance(
     const std::vector<std::string>& error_notification_tags
 )
