@@ -119,16 +119,16 @@ void send_raw_notification(
         embeds.push_back(embed.clone());
     }
 
-    Integration::DiscordWebhook::send_message(
-        logger, should_ping, tags, "",
+    Integration::DiscordWebhook::send_embed(
+        logger, should_ping, tags,
         std::move(embeds),
         hasFile ? file : nullptr
     );
 
 #ifdef PA_SLEEPY
     if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
-        Integration::SleepyDiscordRunner::send_message_sleepy(
-            should_ping, tags, "", std::move(embed),
+        Integration::SleepyDiscordRunner::send_embed_sleepy(
+            should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
         );
     }
@@ -136,8 +136,8 @@ void send_raw_notification(
 
 #ifdef PA_DPP
     if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
-        Integration::DppClient::Client::instance().send_message_dpp(
-            should_ping, color, tags, std::move(embed), "",
+        Integration::DppClient::Client::instance().send_embed_dpp(
+            should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr
         );
     }
@@ -172,16 +172,16 @@ void send_raw_notification(
         embeds.push_back(embed.clone());
     }
 
-    Integration::DiscordWebhook::send_message(
-        logger, should_ping, tags, "",
+    Integration::DiscordWebhook::send_embed(
+        logger, should_ping, tags,
         std::move(embeds),
         hasFile ? file : nullptr
     );
 
 #ifdef PA_SLEEPY
     if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
-        Integration::SleepyDiscordRunner::send_message_sleepy(
-            should_ping, tags, "", std::move(embed),
+        Integration::SleepyDiscordRunner::send_embed_sleepy(
+            should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
         );
     }
@@ -189,8 +189,8 @@ void send_raw_notification(
 
 #ifdef PA_DPP
     if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
-        Integration::DppClient::Client::instance().send_message_dpp(
-            should_ping, color, tags, std::move(embed), "",
+        Integration::DppClient::Client::instance().send_embed_dpp(
+            should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr
         );
     }

@@ -85,10 +85,9 @@ namespace SleepyDiscordRunner{
 
     bool is_running();
     bool is_connected();
-    void send_message_sleepy(
+    void send_embed_sleepy(
         bool should_ping,
         const std::vector<std::string>& tags,
-        const std::string& message,
         const JsonObject& embed,
         std::shared_ptr<PendingFileSend> file
     );

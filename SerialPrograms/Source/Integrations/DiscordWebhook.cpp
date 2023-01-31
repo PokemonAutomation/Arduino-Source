@@ -11,14 +11,15 @@
 #include <QEventLoop>
 #include <QNetworkAccessManager>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/PanicDump.h"
-#include "Common/Cpp/Json/JsonValue.h"
+//#include "Common/Cpp/PanicDump.h"
+//#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "DiscordSettingsOption.h"
 #include "DiscordWebhook.h"
 
 //#include <iostream>
@@ -239,11 +240,13 @@ void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByt
     process_reply(reply.get());
 }
 
-void send_message(
+
+
+
+void send_embed(
     Logger& logger,
     bool should_ping,
     const std::vector<std::string>& tags,
-    const std::string& message,
     const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
 ){
@@ -252,79 +255,34 @@ void send_message(
         return;
     }
 
-    std::set<std::string> tag_set;
-    for (const std::string& tag : tags){
-        tag_set.insert(to_lower(tag));
-    }
+    MessageBuilder builder(tags);
 
     std::vector<std::unique_ptr<DiscordWebhookUrl>> list = settings.webhooks.urls.copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
         const DiscordWebhookUrl& url = *list[c];
-        if (!url.enabled){
+        if (!url.enabled || ((std::string)url.url).empty()){
             continue;
         }
-        if (((std::string)url.url).empty()){
-            continue;
-        }
-//        cout << url.url.toStdString() << " : tags = " << url.tags.size() << endl;
-//        for (const QString& tag : tag_set){
-//            cout << "event tag: " << tag.toStdString() << endl;
-//        }
-
-        //  See if a tag matches.
-        bool send = false;
-        for (const std::string& tag : EventNotificationOption::parse_tags(url.tags_text)){
-//            cout << "find tag: " << tag.toStdString() << endl;
-            auto iter = tag_set.find(to_lower(tag));
-            if (iter != tag_set.end()){
-//                cout << "found" << endl;
-                send = true;
-                break;
-            }
-        }
-        if (!send){
+        if (!builder.should_send(EventNotificationOption::parse_tags(url.tags_text))){
             continue;
         }
 
-        //  Sanitize user ID.
-        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
-            should_ping = false;
+        JsonObject json;
+        json["content"] = builder.build_message(
+            should_ping && url.ping,
+            settings.message.user_id,
+            settings.message.message
+        );
+        if (!embeds.empty()){
+            json["embeds"] = embeds.clone();
         }
-
-        //  Message
-        std::string str;
-        if (should_ping && url.ping){
-            str += "<@" + (std::string)settings.message.user_id + ">";
-        }
-
-        const std::string& discord_message = settings.message.message;
-        if (!discord_message.empty()){
-            if (!str.empty()){
-                str += " ";
-            }
-            for (char ch : discord_message){
-                if (ch != '@'){
-                    str += ch;
-                }
-            }
-//            str += discord_message;
-        }
-        if (!message.empty()){
-            if (!str.empty()){
-                str += " ";
-            }
-            str += message;
-        }
-
-        JsonObject jsonContent;
-        jsonContent["content"] = str;
-        jsonContent["embeds"] = embeds.clone();
 
         DiscordWebhookSender::instance().send_json(
             logger,
             QString::fromStdString(url.url),
             std::chrono::seconds(url.delay),
-            jsonContent, file
+            std::move(json),
+            file
         );
     }
 }

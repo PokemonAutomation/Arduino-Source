@@ -524,10 +524,9 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
     }
 }
 
-void send_message_sleepy(
+void send_embed_sleepy(
     bool should_ping,
     const std::vector<std::string>& tags,
-    const std::string& message,
     const JsonObject& embed,
     std::shared_ptr<PendingFileSend> file
 ){
@@ -541,14 +540,8 @@ void send_message_sleepy(
         return;
     }
 
-    std::set<std::string> tag_set;
-    for (const std::string& tag : tags){
-        tag_set.insert(to_lower(tag));
-    }
-
+    MessageBuilder builder(tags);
     const DiscordIntegrationTable& channels = settings.integration.channels;
-    std::vector<std::string> channel_vector;
-    std::vector<std::string> message_vector;
 
     std::vector<std::unique_ptr<DiscordIntegrationChannel>> table = channels.copy_snapshot();
     for (size_t i = 0; i < table.size(); i++){
@@ -556,58 +549,20 @@ void send_message_sleepy(
         if (((std::string)channel.tags_text).empty() || !channel.enabled){
             continue;
         }
-
-        bool send = false;
-        for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)){
-            auto iter = tag_set.find(to_lower(tag));
-            if (iter != tag_set.end()){
-                channel_vector.emplace_back(channel.channel_id);
-                send = true;
-                break;
-            }
-        }
-
-        if (!send) {
+        if (!builder.should_send(EventNotificationOption::parse_tags(channel.tags_text))){
             continue;
         }
 
-        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0){
-            should_ping = false;
-        }
-
-        std::string str = "";
-        if (should_ping && channel.ping){
-            str += "<@" + (std::string)settings.message.user_id + ">";
-        }
-
-        const std::string& discord_message = settings.message.message;
-        if (!discord_message.empty()){
-            if (!str.empty()){
-                str += " ";
-            }
-
-            for (char ch : discord_message){
-                if (ch != '@'){
-                    str += ch;
-                }
-            }
-        }
-
-        if (!message.empty()){
-            if (!str.empty()){
-                str += " ";
-            }
-            str += message;
-        }
-        message_vector.emplace_back(str);
-
-        std::string json = embed.dump();
         sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
         m_sleepy_client->send(
-            json,
+            embed.dump(),
             channel.channel_id,
             std::chrono::seconds(channel.delay),
-            str,
+            builder.build_message(
+                should_ping && channel.ping,
+                settings.message.user_id,
+                settings.message.message
+            ),
             file == nullptr ? nullptr : file
         );
     }

@@ -23,12 +23,11 @@ public:
     void connect();
     bool is_running();
     void disconnect();
-    void send_message_dpp(
+    void send_embed_dpp(
         bool should_ping,
         const Color& color,
         const std::vector<std::string>& tags,
         const JsonObject& json_obj,
-        const std::string& message,
         std::shared_ptr<PendingFileSend> file
     );
 

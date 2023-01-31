@@ -64,26 +64,27 @@ void SomethingInBoxSlotDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool SomethingInBoxSlotDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
-    // cout << right.average << right.stddev << endl;
-    if (!is_solid(right, {0.533473, 0.466527, 0.0})){
-        // cout << "asdf" << endl;
+//    extract_box_reference(screen, m_right).save("test.png");
+//    cout << right.average << right.stddev << endl;
+    if (!is_solid(right, {0.533473, 0.466527, 0.0}, 0.15, 20)){
+//        cout << "asdf" << endl;
         return !m_true_if_exists;
     }
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
-    // cout << top.average << top.stddev << endl;
+//    cout << top.average << top.stddev << endl;
     if (!is_solid(top, {0.533473, 0.466527, 0.0})){
-        // cout << "qwer" << endl;
+//        cout << "qwer" << endl;
         return !m_true_if_exists;
     }
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-    // cout << bottom.average << bottom.stddev << endl;
-    // extract_box_reference(screen, m_bottom).save("./tmp_bottom.png");
+//     cout << bottom.average << bottom.stddev << endl;
+//    extract_box_reference(screen, m_bottom).save("./tmp_bottom.png");
     if (!is_solid(bottom, {0.533473, 0.466527, 0.0}, 0.15, 15.0)){
-        // cout << "zxcv" << endl;
+//        cout << "zxcv" << endl;
         return !m_true_if_exists;
     }
     ImageStats body = image_stats(extract_box_reference(screen, m_body));
-    // cout << body.average << body.stddev << endl;
+//    cout << body.average << body.stddev << endl;
     if (body.stddev.sum() < 100){
         return !m_true_if_exists;
     }

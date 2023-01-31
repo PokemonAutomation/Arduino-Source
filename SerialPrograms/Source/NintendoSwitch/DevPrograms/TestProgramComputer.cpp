@@ -198,6 +198,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
+    ImageRGB32 image("screenshot-20230130-150721112888.png");
+    SomethingInBoxSlotDetector detector(COLOR_RED);
+
+    cout << detector.detect(image) << endl;
+
+
 #if 0
     FILETIME idle_time, kernel_time, user_time;
     GetSystemTimes(&idle_time, &kernel_time, &user_time);

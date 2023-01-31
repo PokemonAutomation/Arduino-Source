@@ -8,8 +8,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <dpp/DPP_SilenceWarnings.h>
-#include <Integrations/DppIntegration/DppClient.h>
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "DppIntegration/DppClient.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
 
@@ -115,6 +117,13 @@ void DiscordIntegrationSettingsOption::value_changed(){
 
 
 
+class DiscordIntegrationSettingsOptionUI : public GroupWidget{
+public:
+    DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value);
+};
+ConfigWidget* DiscordIntegrationSettingsOption::make_QtWidget(QWidget& parent){
+    return new DiscordIntegrationSettingsOptionUI(parent, *this);
+}
 
 DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value)
     : GroupWidget(parent, value)
@@ -192,6 +201,69 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
 
 #endif
 }
+
+
+
+
+
+
+std::string convert(const std::string& message){
+    std::u32string ret;
+    std::u32string block;
+    for (char32_t ch : to_utf32(message)){
+        switch (ch){
+        case 38:
+            if (block.empty() || block.back() != 64){
+                break;
+            }
+            continue;
+        case 64:
+            block += ch;
+            continue;
+        }
+        ret += ch;
+        block.clear();
+    }
+
+    return to_utf8(ret);
+}
+
+
+MessageBuilder::MessageBuilder(const std::vector<std::string>& message_tags){
+    for (const std::string& tag : message_tags){
+        m_message_tags.insert(to_lower(tag));
+    }
+}
+bool MessageBuilder::should_send(const std::vector<std::string>& channel_tags) const{
+    for (const std::string& tag : channel_tags){
+        auto iter = m_message_tags.find(to_lower(tag));
+        if (iter != m_message_tags.end()){
+            return true;
+        }
+    }
+    return false;
+}
+std::string MessageBuilder::build_message(bool ping, const std::string& user_id, const std::string& message) const{
+    if (std::atoll(user_id.c_str()) == 0){
+        ping = false;
+    }
+
+    std::string str;
+    if (ping){
+        str += "<?" + user_id + ">";
+        str[1]++;
+    }
+
+    if (!message.empty()){
+        if (!str.empty()){
+            str += " ";
+        }
+        str += convert(message);
+    }
+
+    return str;
+}
+
 
 
 

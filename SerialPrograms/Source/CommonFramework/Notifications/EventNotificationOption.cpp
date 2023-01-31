@@ -9,6 +9,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "EventNotificationOption.h"

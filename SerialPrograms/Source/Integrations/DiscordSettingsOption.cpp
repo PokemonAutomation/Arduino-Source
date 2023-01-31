@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "DiscordSettingsOption.h"
 
 //#include <iostream>
@@ -40,7 +41,9 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
 {
     PA_ADD_OPTION(instance_name);
     PA_ADD_OPTION(user_id);
-    PA_ADD_OPTION(message);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(message);
+    }
 }
 DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value)
     : BatchWidget(parent, value)

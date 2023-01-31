@@ -577,7 +577,7 @@ TeraResult exit_tera_win_by_catching(
             if (stop_on_shiny && result == TeraResult::NO_DETECTION){
                 throw UserSetupError(
                     console,
-                    "Unable to find " + STRING_POKEMON + " summary to check for shininess.<br>"
+                    "Unable to find " + STRING_POKEMON + " summary to check for shininess. "
                     "Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
                 );
             }

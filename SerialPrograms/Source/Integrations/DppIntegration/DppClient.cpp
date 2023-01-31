@@ -58,12 +58,11 @@ void Client::disconnect() {
     }
 }
 
-void Client::send_message_dpp(
+void Client::send_embed_dpp(
     bool should_ping,
     const Color& color,
     const std::vector<std::string>& tags,
     const JsonObject& json_obj,
-    const std::string& message,
     std::shared_ptr<PendingFileSend> file
 ){
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
@@ -92,9 +91,8 @@ void Client::send_message_dpp(
         tag_set.insert(to_lower(tag));
     }
 
+    MessageBuilder builder(tags);
     const DiscordIntegrationTable& channels = settings.integration.channels;
-    std::vector<std::string> channel_vector;
-    std::vector<std::string> message_vector;
 
     auto table = channels.copy_snapshot();
     for (auto& ch : table) {
@@ -102,49 +100,20 @@ void Client::send_message_dpp(
         if (((std::string)channel.tags_text).empty() || !channel.enabled) {
             continue;
         }
-
-        bool send = false;
-        for (const std::string& tag : EventNotificationOption::parse_tags(channel.tags_text)) {
-            auto iter = tag_set.find(to_lower(tag));
-            if (iter != tag_set.end()) {
-                channel_vector.emplace_back(channel.channel_id);
-                send = true;
-                break;
-            }
-        }
-
-        if (!send) {
+        if (!builder.should_send(EventNotificationOption::parse_tags(channel.tags_text))){
             continue;
         }
 
-        if (std::atoll(((std::string)settings.message.user_id).c_str()) == 0) {
-            should_ping = false;
-        }
-
-        std::string msg = "";
-        if (should_ping && channel.ping) {
-            msg += "<@" + (std::string)settings.message.user_id + ">";
-        }
-
-        std::string discord_message = settings.message.message;
-        if (!discord_message.empty()) {
-            if (!msg.empty()) {
-                msg += " ";
-            }
-
-            discord_message.erase(std::remove(discord_message.begin(), discord_message.end(), '@'), discord_message.end());
-            msg += discord_message;
-        }
-
-        if (!message.empty()) {
-            if (!msg.empty()) {
-                msg += " ";
-            }
-            msg += message;
-        }
-
-        message_vector.emplace_back(msg);
-        Handler::send_message(*m_bot.get(), embed, channel.channel_id, std::chrono::seconds(channel.delay), msg, file);
+        Handler::send_message(
+            *m_bot.get(), embed,
+            channel.channel_id, std::chrono::seconds(channel.delay),
+            builder.build_message(
+                should_ping && channel.ping,
+                settings.message.user_id,
+                settings.message.message
+            ),
+            file
+        );
     }
 }
 

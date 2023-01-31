@@ -9,14 +9,13 @@
 
 #include <vector>
 #include <string>
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ProgramInfo.h"
-#include "MessageAttachment.h"
 #include "EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
+class Logger;
 class StatsTracker;
 class ProgramEnvironment;
 

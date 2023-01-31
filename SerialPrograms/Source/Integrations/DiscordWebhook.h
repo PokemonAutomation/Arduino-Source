@@ -80,11 +80,10 @@ private:
 
 
 
-void send_message(
+void send_embed(
     Logger& logger,
     bool should_ping,
     const std::vector<std::string>& tags,
-    const std::string& message,
     const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
 );
