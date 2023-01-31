@@ -37,7 +37,7 @@ private:
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;
     bool m_is_connected = false;
-    std::mutex m_connect_lock;
+    std::mutex m_client_lock;
 //    std::thread m_thread;
 };
 

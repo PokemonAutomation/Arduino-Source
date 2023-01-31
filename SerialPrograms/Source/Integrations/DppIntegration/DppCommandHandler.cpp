@@ -26,7 +26,7 @@ Color Handler::color = COLOR_WHITE;
 
 void Handler::initialize(cluster& bot) {
     bot.on_log([this](const log_t& log) {
-        this->log_dpp(log.message, "Internal Log", log.severity);
+        log_dpp(log.message, "Internal Log", log.severity);
     });
 
     const presence& p = presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status);
@@ -36,10 +36,10 @@ void Handler::initialize(cluster& bot) {
     Handler::create_commands(bot);
 
     bot.on_ready([&bot, this](const ready_t&) {
-        this->log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
+        log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
         if (run_once<struct register_bot_commands>() && !m_initialized) {
             // Overwrite because we can both add and remove commands. Takes an hour for removed commands to be updated.
-            this->log_dpp("Registering slash commands.", "Ready", ll_info);
+            log_dpp("Registering slash commands.", "Ready", ll_info);
             std::vector<slashcommand> cmds;
             for (auto& element : command_map) {
                 cmds.emplace_back(element.second.command);
@@ -52,20 +52,19 @@ void Handler::initialize(cluster& bot) {
     bot.on_guild_create([&bot, this](const guild_create_t& event) {
         try {
             std::string id = std::to_string(event.created->id);
-            this->log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
+            log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
             std::lock_guard<std::mutex> lg(m_count_lock);
-            Utility utility;
-            std::thread(&Utility::get_user_counts, std::ref(utility), std::ref(bot), event).detach();
+            Utility::get_user_counts(bot, event);
         }
         catch (std::exception& e) {
-            this->log_dpp("Failed to get user counts: " + (std::string)e.what(), "Guild Create", ll_error);
+            log_dpp("Failed to get user counts: " + (std::string)e.what(), "Guild Create", ll_error);
         }
     });
 
     bot.on_guild_member_add([this](const guild_member_add_t& event) {
         std::string id = std::to_string(event.adding_guild->id);
         if (!user_counts.empty() && user_counts.count(id)) {
-            this->log_dpp("New member joined " + event.adding_guild->name + ". Incrementing member count.", "Guild Member Add", ll_info);
+            log_dpp("New member joined " + event.adding_guild->name + ". Incrementing member count.", "Guild Member Add", ll_info);
             user_counts.at(id)++;
         }
     });
@@ -73,7 +72,7 @@ void Handler::initialize(cluster& bot) {
     bot.on_guild_member_remove([this](const guild_member_remove_t& event) {
         std::string id = std::to_string(event.removing_guild->id);
         if (!user_counts.empty() && user_counts.count(id)) {
-            this->log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
+            log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
             user_counts.at(id)--;
         }
     });
@@ -81,12 +80,12 @@ void Handler::initialize(cluster& bot) {
     bot.on_slashcommand([this](const slashcommand_t& event) {
         auto it = command_map.find(event.command.get_command_name());
         if (it != command_map.end()) {
-            this->log_dpp("Executing slash command: " + event.command.get_command_name() + ".", "Slash Command", ll_info);
+            log_dpp("Executing slash command: " + event.command.get_command_name() + ".", "Slash Command", ll_info);
             try {
                 it->second.func(event);
             }
             catch (std::exception& e) {
-                this->log_dpp("Exception occurred while executing command: " + event.command.get_command_name() + ".\n" + e.what(), "Slash Command", ll_critical);
+                log_dpp("Exception occurred while executing command: " + event.command.get_command_name() + ".\n" + e.what(), "Slash Command", ll_critical);
             }
         }
     });
