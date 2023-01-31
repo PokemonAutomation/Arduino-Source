@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstddef>
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation {
