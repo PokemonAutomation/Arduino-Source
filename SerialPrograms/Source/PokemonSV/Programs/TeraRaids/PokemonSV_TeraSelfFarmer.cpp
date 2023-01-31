@@ -359,6 +359,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             continue;
         }
         
+        bool herba = false;
         std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
         std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
 
