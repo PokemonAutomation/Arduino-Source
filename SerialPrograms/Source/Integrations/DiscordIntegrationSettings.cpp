@@ -9,7 +9,8 @@
 #include <QPushButton>
 #include <dpp/DPP_SilenceWarnings.h>
 #include "Common/Qt/StringToolsQt.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Globals.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "DppIntegration/DppClient.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
@@ -85,7 +86,9 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    PA_ADD_OPTION(library);
+    if (IS_BETA_VERSION){
+        PA_ADD_OPTION(library);
+    }
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
