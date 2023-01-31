@@ -27,16 +27,18 @@ bool Client::is_running() {
 }
 
 void Client::connect() {
-    std::lock_guard<std::mutex> lg(m_connect_lock);
+    std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_bot == nullptr && !m_is_connected) {
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
         if (!Handler::check_if_empty(settings))
             return;
 
         std::string token = settings.integration.token;
+        uint32_t intents = intents::i_default_intents | intents::i_guild_members;
         try {
+            m_bot = std::make_unique<cluster>(token, intents);
+            m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
             std::thread(&Client::run, this, token).detach();
-            m_is_connected = true;
         }
         catch (std::exception& e) {
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
@@ -45,11 +47,11 @@ void Client::connect() {
 }
 
 void Client::disconnect() {
-    std::lock_guard<std::mutex> lg(m_connect_lock);
+    std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_bot != nullptr && m_is_connected) {
         try {
             m_bot->shutdown();
-            m_bot = nullptr;
+            m_bot.reset();
             m_is_connected = false;
         }
         catch (std::exception& e) {
@@ -65,6 +67,7 @@ void Client::send_embed_dpp(
     const JsonObject& json_obj,
     std::shared_ptr<PendingFileSend> file
 ){
+    std::lock_guard<std::mutex> lg(m_client_lock);
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
     if (!settings.integration.enabled()){
         return;
@@ -118,14 +121,15 @@ void Client::send_embed_dpp(
 }
 
 void Client::run(const std::string& token) {
+    std::lock_guard<std::mutex> lg(m_client_lock);
     try {
-        uint32_t intents = intents::i_default_intents | intents::i_guild_members;
-        m_bot = std::make_unique<cluster>(token, intents);
         Handler::initialize(*m_bot.get());
-        m_bot->start(false);
+        m_bot->start(st_return);
+        m_is_connected = true;
     }
     catch (std::exception& e) {
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
+        m_bot.reset();
         m_is_connected = false;
     }
 }
