@@ -576,7 +576,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         return 1;
     }
 
-    // static int count = 0;
+    static int count = 0;
     ImageRGB32 output_sprite = sprite_image.copy();
     ImageRGB32 output_quest = question_mark_image.copy();
     std::vector<ImagePixelBox> new_boxes;
@@ -624,7 +624,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         cout << "FAILURE: " << target_sprites.size() - success_count << "/" << target_sprites.size() << endl;
         return 1;
     }
-    // count++;
+    count++;
     
     return 0;
 }
