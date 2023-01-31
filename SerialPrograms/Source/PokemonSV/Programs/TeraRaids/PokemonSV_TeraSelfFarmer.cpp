@@ -352,11 +352,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             continue;
         }
         
-        const char* sixstar[6]
-               = { "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo" };
-        const char* fivestar[9]
-               = { "gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan" };
-        
         if (FILTER.SKIP_HERBA && stars<5) {
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
@@ -364,22 +359,21 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             continue;
         }
         
-        bool herba=false;
-        if (FILTER.SKIP_HERBA && stars==5) {
-        for (int i = 0; i < 9; ++i) {
-            if (fivestar[i] == best_silhouette) {
-                herba = true;
+        std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
+        std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
+
+        for (const std::string& str : sixstar){
+            if (best_silhouette == str){
+                 herba = true;
             }
-          }
-        };
+        }
         
-        if (FILTER.SKIP_HERBA && stars==6) {
-        for (int i = 0; i < 6; ++i) {
-            if (sixstar[i] == best_silhouette) {
-                herba = true;
+
+        for (const std::string& str : fivestar){
+            if (best_silhouette == str){
+                 herba = true;
             }
-          }
-        };
+        }
         
         if (FILTER.SKIP_HERBA && !herba) {
             env.log("Skipping raid...", COLOR_ORANGE);
