@@ -92,6 +92,12 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 
 TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
     : GroupOption("Opponent Filter", LockWhileRunning::UNLOCKED)
+    , SKIP_HERBA(
+        "<b>Skip Non-Herba Raids:</b><br>"
+        "Skip raids that don't have the possibility to reward all types of Herba Mystica. This won't stop the program when Herba Mystica is found, it will only increase your chances to find it.",
+        LockWhileRunning::UNLOCKED,
+        false
+    )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
         LockWhileRunning::UNLOCKED,
@@ -103,6 +109,7 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
         4, 1, 7
     )
 {
+    PA_ADD_OPTION(SKIP_HERBA);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
 }
@@ -344,6 +351,38 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             close_raid(env.program_info(), env.console, context);
             continue;
         }
+        
+        if (FILTER.SKIP_HERBA && stars<5) {
+            env.log("Skipping raid...", COLOR_ORANGE);
+            stats.m_skipped++;
+            close_raid(env.program_info(), env.console, context);
+            continue;
+        }
+        
+        bool herba = false;
+        std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
+        std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
+
+        for (const std::string& str : sixstar){
+            if (best_silhouette == str){
+                 herba = true;
+            }
+        }
+        
+
+        for (const std::string& str : fivestar){
+            if (best_silhouette == str){
+                 herba = true;
+            }
+        }
+        
+        if (FILTER.SKIP_HERBA && !herba) {
+            env.log("Skipping raid...", COLOR_ORANGE);
+            stats.m_skipped++;
+            close_raid(env.program_info(), env.console, context);
+            continue;
+        }
+        
 
 //        if (MODE == Mode::SHINY_HUNT){
         if (true){
