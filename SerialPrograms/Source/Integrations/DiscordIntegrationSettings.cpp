@@ -14,9 +14,9 @@
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Integration{
@@ -36,8 +36,8 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     , library(
         "<b>Discord Integration Library:</b><br>Restart the program for this to take effect.",
         {
-            {Library::SleepyDiscord, "sleepy", "Sleepy Discord"},
-            {Library::DPP, "dpp", "DPP"},
+            {Library::SleepyDiscord, "sleepy", "Sleepy Discord (normal commands)"},
+            {Library::DPP, "dpp", "DPP (slash commands)"},
         },
         LockWhileRunning::LOCKED,
         Library::SleepyDiscord
@@ -85,9 +85,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(library);
-    }
+    PA_ADD_OPTION(library);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);
