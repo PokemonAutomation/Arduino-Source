@@ -173,7 +173,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
 #ifdef PA_DPP
             case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().connect();
-                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_initialized());
                 break;
 #endif
             }
@@ -192,7 +192,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
 #ifdef PA_DPP
             case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().disconnect();
-                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_running());
+                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_initialized());
                 break;
 #endif
             }

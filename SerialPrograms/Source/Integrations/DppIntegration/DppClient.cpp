@@ -22,6 +22,10 @@ Client& Client::instance() {
     return client;
 }
 
+bool Client::is_initialized(){
+    std::lock_guard<std::mutex> lg(m_client_lock);
+    return m_bot != nullptr;
+}
 bool Client::is_running() {
     return m_is_connected.load(std::memory_order_acquire);
 }

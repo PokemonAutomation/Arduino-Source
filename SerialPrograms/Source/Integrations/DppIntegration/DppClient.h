@@ -20,8 +20,10 @@ public:
     static Client& instance();
 
 public:
-    void connect();
+    bool is_initialized();
     bool is_running();
+
+    void connect();
     void disconnect();
     void send_embed_dpp(
         bool should_ping,
