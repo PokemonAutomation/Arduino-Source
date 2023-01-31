@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Qt/Options/BatchWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "DiscordSettingsOption.h"
 
@@ -13,6 +14,9 @@
 
 namespace PokemonAutomation{
 namespace Integration{
+
+
+
 
 
 DiscordMessageSettingsOption::DiscordMessageSettingsOption()
@@ -45,9 +49,16 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
         PA_ADD_OPTION(message);
     }
 }
+class DiscordMessageSettingsOptionUI : public BatchWidget{
+public:
+    DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value);
+};
 DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value)
     : BatchWidget(parent, value)
 {}
+ConfigWidget* DiscordMessageSettingsOption::make_QtWidget(QWidget& parent){
+    return new DiscordMessageSettingsOptionUI(parent, *this);
+}
 
 
 

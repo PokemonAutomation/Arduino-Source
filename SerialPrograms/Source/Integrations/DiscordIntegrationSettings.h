@@ -16,8 +16,6 @@
 #include "DiscordIntegrationTable.h"
 
 namespace PokemonAutomation{
-    class JsonArray;
-    class JsonObject;
 namespace Integration{
 
 
@@ -25,6 +23,7 @@ class DiscordIntegrationSettingsOption : public GroupOption, private ConfigOptio
 public:
     ~DiscordIntegrationSettingsOption();
     DiscordIntegrationSettingsOption();
+
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
     virtual void value_changed() override;
 

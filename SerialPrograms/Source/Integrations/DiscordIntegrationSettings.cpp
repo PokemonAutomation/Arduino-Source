@@ -8,12 +8,15 @@
 #include <QLabel>
 #include <QPushButton>
 #include <dpp/DPP_SilenceWarnings.h>
-#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "DppIntegration/DppClient.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Integration{
@@ -99,33 +102,57 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     library.add_listener(*this);
 }
 void DiscordIntegrationSettingsOption::value_changed(){
+#if (defined PA_SLEEPY || defined PA_DPP)
+    bool options_enabled = this->enabled();
     switch (library){
-    case Library::SleepyDiscord:
-        command_prefix.set_visibility(ConfigOptionState::ENABLED);
-        use_suffix.set_visibility(ConfigOptionState::ENABLED);
-        sudo.set_visibility(ConfigOptionState::ENABLED);
-        owner.set_visibility(ConfigOptionState::ENABLED);
+#ifdef PA_SLEEPY
+    case Library::SleepyDiscord:{
+        options_enabled &= !SleepyDiscordRunner::is_running();
+        ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
+
+        library.set_visibility(state);
+        token.set_visibility(state);
+        game_status.set_visibility(state);
+        hello_message.set_visibility(state);
+
+        command_prefix.set_visibility(state);
+        use_suffix.set_visibility(state);
+        sudo.set_visibility(state);
+        owner.set_visibility(state);
         break;
-    case Library::DPP:
+    }
+#endif
+#ifdef PA_DPP
+    case Library::DPP:{
+        options_enabled &= !DppClient::Client::instance().is_initialized();
+        ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
+
+        library.set_visibility(state);
+        token.set_visibility(state);
+        game_status.set_visibility(state);
+        hello_message.set_visibility(state);
+
         command_prefix.set_visibility(ConfigOptionState::HIDDEN);
         use_suffix.set_visibility(ConfigOptionState::HIDDEN);
         sudo.set_visibility(ConfigOptionState::HIDDEN);
         owner.set_visibility(ConfigOptionState::HIDDEN);
         break;
     }
+#endif
+    }
+#endif
 }
 
 
-
-class DiscordIntegrationSettingsOptionUI : public GroupWidget{
+class DiscordIntegrationSettingsWidget : public GroupWidget{
 public:
-    DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value);
+    DiscordIntegrationSettingsWidget(QWidget& parent, DiscordIntegrationSettingsOption& value);
 };
 ConfigWidget* DiscordIntegrationSettingsOption::make_QtWidget(QWidget& parent){
-    return new DiscordIntegrationSettingsOptionUI(parent, *this);
+    return new DiscordIntegrationSettingsWidget(parent, *this);
 }
 
-DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value)
+DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& parent, DiscordIntegrationSettingsOption& value)
     : GroupWidget(parent, value)
 {
 #if (defined PA_SLEEPY || defined PA_DPP)
@@ -134,6 +161,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     m_options_layout->insertWidget(0, control_buttons);
 
     QHBoxLayout* layout = new QHBoxLayout(control_buttons);
+    layout->setContentsMargins(5, 5, 5, 5);
 
     QLabel* text = new QLabel("<b>Bot Control:</b>", control_buttons);
     layout->addWidget(text, 2);
@@ -150,52 +178,40 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_start->setFont(font);
     button_stop->setFont(font);
 
-    bool options_enabled = value.enabled();
-#ifdef PA_SLEEPY
-    options_enabled &= !SleepyDiscordRunner::is_running();
-#endif
-#ifdef PA_DPP
-    options_enabled &= !DppClient::Client::instance().is_running();
-#endif
-    set_options_enabled(options_enabled);
-
     connect(
         button_start, &QPushButton::clicked,
-        this, [=, this, &value](bool) {
-            set_options_enabled(false);
+        this, [&value](bool) {
             switch (value.library){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_connect();
-                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
                 break;
 #endif
 #ifdef PA_DPP
             case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().connect();
-                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_initialized());
                 break;
 #endif
             }
+            value.value_changed();
         }
     );
     connect(
         button_stop, &QPushButton::clicked,
-        this, [=, this, &value](bool) {
+        this, [&value](bool) {
             switch (value.library){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_terminate();
-                set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
                 break;
 #endif
 #ifdef PA_DPP
             case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().disconnect();
-                set_options_enabled(value.enabled() && !DppClient::Client::instance().is_initialized());
                 break;
 #endif
             }
+            value.value_changed();
         }
     );
 
