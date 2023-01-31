@@ -23,12 +23,12 @@ Client& Client::instance() {
 }
 
 bool Client::is_running() {
-    return Client::m_is_connected;
+    return m_is_connected.load(std::memory_order_acquire);
 }
 
 void Client::connect() {
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_bot == nullptr && !m_is_connected) {
+    if (m_bot == nullptr && !m_is_connected.load(std::memory_order_relaxed)) {
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
         if (!Handler::check_if_empty(settings))
             return;
@@ -48,11 +48,11 @@ void Client::connect() {
 
 void Client::disconnect() {
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_bot != nullptr && m_is_connected) {
+    if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)) {
         try {
             m_bot->shutdown();
             m_bot.reset();
-            m_is_connected = false;
+            m_is_connected.store(false, std::memory_order_release);
         }
         catch (std::exception& e) {
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
@@ -72,7 +72,7 @@ void Client::send_embed_dpp(
     if (!settings.integration.enabled()){
         return;
     }
-    if (!m_is_connected){
+    if (!m_is_connected.load(std::memory_order_relaxed)){
         return;
     }
 
@@ -122,15 +122,19 @@ void Client::send_embed_dpp(
 
 void Client::run(const std::string& token) {
     std::lock_guard<std::mutex> lg(m_client_lock);
+    if (!m_bot){
+        Handler::log_dpp("DPP has been disconnected.", "run()", ll_warning);
+        return;
+    }
     try {
         Handler::initialize(*m_bot.get());
         m_bot->start(st_return);
-        m_is_connected = true;
+        m_is_connected.store(true, std::memory_order_release);
     }
     catch (std::exception& e) {
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
         m_bot.reset();
-        m_is_connected = false;
+        m_is_connected.store(false, std::memory_order_release);
     }
 }
 

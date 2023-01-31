@@ -2,7 +2,7 @@
 #ifndef DPP_CLIENT_H
 #define DPP_CLIENT_H
 
-//#include <thread>
+#include <atomic>
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
 #include "CommonFramework/Notifications/MessageAttachment.h"
@@ -16,7 +16,7 @@ namespace DppClient{
 
 class Client : protected DppCommandHandler::Handler{
 public:
-    Client(){}
+    Client() : m_is_connected(false) {}
     static Client& instance();
 
 public:
@@ -36,7 +36,7 @@ private:
 
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;
-    bool m_is_connected = false;
+    std::atomic<bool> m_is_connected;
     std::mutex m_client_lock;
 //    std::thread m_thread;
 };
