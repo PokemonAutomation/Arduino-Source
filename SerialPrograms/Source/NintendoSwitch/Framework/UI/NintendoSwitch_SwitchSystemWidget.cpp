@@ -17,6 +17,7 @@
 #include "CommonFramework/ControllerDevices/SerialPortWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
+#include "CommonFramework/Globals.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -140,7 +141,7 @@ SwitchSystemWidget::SwitchSystemWidget(
                 if (!image){
                     return;
                 }
-                std::string filename = "screenshot-" + now_to_filestring() + ".png";
+                std::string filename = SCREENSHOTS_PATH + "screenshot-" + now_to_filestring() + ".png";
                 m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
                 image->save(filename);
             });
