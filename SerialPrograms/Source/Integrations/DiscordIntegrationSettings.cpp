@@ -37,7 +37,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         "<b>Discord Integration Library:</b><br>Restart the program for this to take effect.",
         {
             {Library::SleepyDiscord, "sleepy", "Sleepy Discord (normal commands)"},
-            {Library::DPP, "dpp", "DPP (slash commands)"},
+            {Library::DPP, "dpp", "D++ (slash commands)"},
         },
         LockWhileRunning::LOCKED,
         Library::SleepyDiscord

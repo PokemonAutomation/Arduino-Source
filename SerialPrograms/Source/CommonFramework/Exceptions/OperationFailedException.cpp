@@ -40,7 +40,7 @@ void OperationFailedException::send_notification(ProgramEnvironment& env, EventN
         env, notification,
         COLOR_RED,
         "Program Error",
-        std::move(embeds), "",
+        embeds, "",
         screenshot()
     );
     if (m_screenshot){

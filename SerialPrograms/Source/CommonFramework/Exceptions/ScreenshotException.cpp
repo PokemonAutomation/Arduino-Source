@@ -24,6 +24,9 @@ ScreenshotException::ScreenshotException(ConsoleHandle& console, std::string mes
 {
     if (take_screenshot){
         m_screenshot = console.video().snapshot().frame;
+        if (m_screenshot == nullptr || !*m_screenshot){
+            console.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
+        }
     }
 }
 ImageViewRGB32 ScreenshotException::screenshot() const{
