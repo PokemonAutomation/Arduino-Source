@@ -4,7 +4,6 @@
  *
  */
 
-#include <array>
 #include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
@@ -114,9 +113,32 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
 }
-bool TeraFarmerOpponentFilter::should_battle(size_t stars) const{
-    return MIN_STARS <= stars && stars <= MAX_STARS;
-}
+
+bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) const{
+    if (SKIP_HERBA && stars < 5) {
+        return false;
+    };
+    
+    std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
+    std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
+
+    for (const std::string& str : sixstar){
+        if (SKIP_HERBA && pokemon == str){
+            return true;
+        }
+    };
+
+    for (const std::string& str : fivestar){
+        if (SKIP_HERBA && pokemon == str){
+             return true;
+        }
+    };
+    
+    if (MIN_STARS <= stars && stars <= MAX_STARS) {
+        return true;
+    };
+    return false;
+};
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
     : GroupOption("Catch on Win - Required for shiny checking.", LockWhileRunning::UNLOCKED, true)
@@ -267,6 +289,10 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     if (FILTER.MIN_STARS > FILTER.MAX_STARS){
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
+    
+    if (FILTER.SKIP_HERBA && FILTER.MAX_STARS < 5){
+        throw UserSetupError(env.console, "Error in the settings, Skip Non-Herba Raids is checked but Max Stars is less than 5.");
+    }
 
     m_number_caught = 0;
 
@@ -284,6 +310,12 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
 
+        //  Clear per-iteration flags.
+//        m_battle_finished = false;
+//        m_caught = false;
+//        m_summary_read = false;
+
+
         if (!first){
             day_skip_from_overworld(env.console, context);
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
@@ -293,8 +325,10 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         first = false;
 
         if (open_raid(env.console, context)){
+//            env.log("Tera raid found!", COLOR_BLUE);
             stats.m_raids++;
         }else{
+//            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
         context.wait_for(std::chrono::milliseconds(500));
@@ -338,53 +372,27 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.log(log);
         }
 
-        if (!FILTER.should_battle(stars)) {
+        if (!FILTER.should_battle(stars, best_silhouette)) {
             env.log("Skipping raid...", COLOR_ORANGE);
             stats.m_skipped++;
             close_raid(env.program_info(), env.console, context);
             continue;
         }
         
-        if (FILTER.SKIP_HERBA && stars<5) {
-            env.log("Skipping raid...", COLOR_ORANGE);
-            stats.m_skipped++;
-            close_raid(env.program_info(), env.console, context);
-            continue;
-        }
         
-        bool herba = false;
-        std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
-        std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
+        
 
-        for (const std::string& str : sixstar){
-            if (best_silhouette == str){
-                 herba = true;
+//        if (MODE == Mode::SHINY_HUNT){
+        if (true){
+            close_raid(env.program_info(), env.console, context);
+            save_game_from_overworld(env.program_info(), env.console, context);
+            context.wait_for_all_requests();
+            if (open_raid(env.console, context)){
+                env.log("Tera raid found!", COLOR_BLUE);
+            }else{
+                env.log("No Tera raid found.", COLOR_ORANGE);
+                continue;
             }
-        }
-        
-
-        for (const std::string& str : fivestar){
-            if (best_silhouette == str){
-                 herba = true;
-            }
-        }
-        
-        if (FILTER.SKIP_HERBA && !herba) {
-            env.log("Skipping raid...", COLOR_ORANGE);
-            stats.m_skipped++;
-            close_raid(env.program_info(), env.console, context);
-            continue;
-        }
-        
-
-        close_raid(env.program_info(), env.console, context);
-        save_game_from_overworld(env.program_info(), env.console, context);
-        context.wait_for_all_requests();
-        if (open_raid(env.console, context)){
-            env.log("Tera raid found!", COLOR_BLUE);
-        }else{
-            env.log("No Tera raid found.", COLOR_ORANGE);
-            continue;
         }
 
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
