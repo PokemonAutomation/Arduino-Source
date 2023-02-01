@@ -410,6 +410,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Main.cpp
     Source/CommonFramework/NewVersionCheck.cpp
     Source/CommonFramework/NewVersionCheck.h
+    Source/CommonFramework/SetupSettings.cpp
+    Source/CommonFramework/SetupSettings.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp

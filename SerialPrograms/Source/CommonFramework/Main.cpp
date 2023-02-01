@@ -18,6 +18,7 @@
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 //#include "Windows/DpiScaler.h"
+#include "SetupSettings.h"
 #include "NewVersionCheck.h"
 #include "Windows/MainWindow.h"
 
@@ -53,15 +54,17 @@ int main(int argc, char *argv[]){
 
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{
+        //  Make settings directory.
+        QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
+
+        setup_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json");
+
         PERSISTENT_SETTINGS().read();
     }catch (const FileException& error){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }catch (const ParseException& error){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }
-
-    //  Make settings directory.
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
 
     // Make screenshots directory.
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));

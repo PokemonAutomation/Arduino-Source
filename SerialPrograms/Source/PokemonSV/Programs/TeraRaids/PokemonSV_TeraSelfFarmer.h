@@ -42,6 +42,7 @@ public:
 
     bool should_battle(size_t stars) const;
 
+    BooleanCheckBoxOption SKIP_HERBA;
     SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
 

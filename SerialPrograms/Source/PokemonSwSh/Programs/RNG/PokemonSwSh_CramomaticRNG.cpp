@@ -150,7 +150,6 @@ CramomaticRNG::CramomaticRNG()
         LockWhileRunning::LOCKED,
         false
     )
-
 {
     PA_ADD_OPTION(START_LOCATION);
 
