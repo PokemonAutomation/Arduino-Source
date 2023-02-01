@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/Options/BatchWidget.h"
+#include <QWidget>
+#include "ConfigWidget.h"
 #include "Common/Cpp/Options/GroupOption.h"
 
 #ifndef PokemonAutomation_Options_GroupWidget_H

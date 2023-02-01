@@ -62,6 +62,9 @@ bool StringCell::is_password() const{
 const std::string& StringCell::placeholder_text() const{
     return m_data->m_placeholder_text;
 }
+const std::string StringCell::default_value() const{
+    return m_data->m_default;
+}
 
 StringCell::operator std::string() const{
     SpinLockGuard lg(m_data->m_lock);
