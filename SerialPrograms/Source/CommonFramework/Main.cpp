@@ -48,28 +48,29 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>("std::string");
     qRegisterMetaType<Resolution>("Resolution");
-    
+
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
+    QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));
+
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{
-        //  Make settings directory.
-        QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
-
-        if (!setup_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json")){
+        if (!migrate_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json")){
             return 1;
         }
 
         PERSISTENT_SETTINGS().read();
+
+        if (!migrate_stats(global_logger_tagged())){
+            return 1;
+        }
     }catch (const FileException& error){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }catch (const ParseException& error){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }
-
-    // Make screenshots directory.
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));
 
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
         return run_command_line_tests();

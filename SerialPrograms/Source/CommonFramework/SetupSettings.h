@@ -7,12 +7,15 @@
 #ifndef PokemonAutomation_SetupSettings_H
 #define PokemonAutomation_SetupSettings_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include <string>
 
 namespace PokemonAutomation{
 
-bool setup_settings(Logger& logger = global_logger_tagged(), std::string file_name = std::string());
+class Logger;
 
+
+bool migrate_settings(Logger& logger, std::string file_name);
+bool migrate_stats(Logger& logger);
 
 
 }
