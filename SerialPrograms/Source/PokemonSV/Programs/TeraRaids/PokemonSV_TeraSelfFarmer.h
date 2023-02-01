@@ -43,6 +43,15 @@ public:
     bool should_battle(size_t stars, const std::string& pokemon) const;
 
     BooleanCheckBoxOption SKIP_HERBA;
+    enum class Herba{
+        SOUR_H,
+        SWEET_H,
+        SALTY_H,
+        SPICY_H,
+        BITTER_H,
+        ALL_H,
+    };
+    EnumDropdownOption<Herba> FOCUS_H;
     SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
 
