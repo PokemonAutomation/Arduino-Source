@@ -284,12 +284,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
 
-        //  Clear per-iteration flags.
-//        m_battle_finished = false;
-//        m_caught = false;
-//        m_summary_read = false;
-
-
         if (!first){
             day_skip_from_overworld(env.console, context);
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
@@ -299,10 +293,8 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         first = false;
 
         if (open_raid(env.console, context)){
-//            env.log("Tera raid found!", COLOR_BLUE);
             stats.m_raids++;
         }else{
-//            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
         context.wait_for(std::chrono::milliseconds(500));
@@ -385,17 +377,14 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
         
 
-//        if (MODE == Mode::SHINY_HUNT){
-        if (true){
-            close_raid(env.program_info(), env.console, context);
-            save_game_from_overworld(env.program_info(), env.console, context);
-            context.wait_for_all_requests();
-            if (open_raid(env.console, context)){
-                env.log("Tera raid found!", COLOR_BLUE);
-            }else{
-                env.log("No Tera raid found.", COLOR_ORANGE);
-                continue;
-            }
+        close_raid(env.program_info(), env.console, context);
+        save_game_from_overworld(env.program_info(), env.console, context);
+        context.wait_for_all_requests();
+        if (open_raid(env.console, context)){
+            env.log("Tera raid found!", COLOR_BLUE);
+        }else{
+            env.log("No Tera raid found.", COLOR_ORANGE);
+            continue;
         }
 
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
