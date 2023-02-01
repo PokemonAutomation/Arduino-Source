@@ -44,12 +44,12 @@ public:
 
 
 public:
+    //  Stop the currently running command.
+    void stop_command();
+
     //  Dispath the following lambda. If something is already running, it will be
     //  stopped and replaced with this one.
     void dispatch(std::function<void(BotBaseContext&)>&& lambda);
-
-//    //  Stop the currently running command.
-//    void stop_commands();
 
     //  Wait for currently running command to finish.
     void wait();

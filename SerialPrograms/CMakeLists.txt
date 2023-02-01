@@ -1256,6 +1256,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
@@ -1272,8 +1276,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h
-    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp

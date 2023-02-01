@@ -14,6 +14,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
@@ -66,7 +67,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -78,6 +79,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 
 
 #include <QPixmap>
@@ -156,6 +158,124 @@ using namespace Kernels::Waterfill;
 using namespace PokemonSV;
 
 
+enum class OverworldState{
+    None,
+    FindingSky,
+    TurningLeft,
+    TurningRight,
+};
+
+void find_sky(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    AreaZeroSkyTracker& sky_tracker, double target_x
+){
+    AsyncCommandSession session(context, console, env.realtime_dispatcher(), context.botbase());
+    OverworldState state = OverworldState::None;
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(1)){
+            throw OperationFailedException(console, "Failed to find the sky after 1 minute.", true);
+        }
+
+        context.wait_for(std::chrono::milliseconds(200));
+
+        double sky_x, sky_y;
+        bool sky = sky_tracker.sky_location(sky_x, sky_y);
+
+        if (!sky){
+            if (!session.command_is_running() || state != OverworldState::FindingSky){
+                console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
+                session.dispatch([](BotBaseContext& context){
+                    pbf_move_right_joystick(context, 128, 0, 250, 0);
+                    pbf_move_right_joystick(context, 255, 0, 10 * TICKS_PER_SECOND, 0);
+                });
+                state = OverworldState::FindingSky;
+            }
+            continue;
+        }
+
+        cout << sky_x << " - " << sky_y << endl;
+
+        if (sky_x < target_x - 0.05){
+            if (!session.command_is_running() || state != OverworldState::TurningLeft){
+                console.log("Centering the sky... Moving left.", COLOR_BLUE);
+                uint8_t magnitude = (uint8_t)((target_x - sky_x) * 96 + 31);
+                uint16_t duration = (uint16_t)((target_x - sky_x) * 125 + 20);
+                session.dispatch([=](BotBaseContext& context){
+                    pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
+                });
+                state = OverworldState::TurningLeft;
+            }
+            continue;
+        }
+        if (sky_x > target_x + 0.05){
+            if (!session.command_is_running() || state != OverworldState::TurningRight){
+                console.log("Centering the sky... Moving Right.", COLOR_BLUE);
+                uint8_t magnitude = (uint8_t)((sky_x - target_x) * 96 + 31);
+                uint16_t duration = (uint16_t)((sky_x - target_x) * 125 + 20);
+                session.dispatch([=](BotBaseContext& context){
+                    pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
+                });
+                state = OverworldState::TurningRight;
+            }
+            continue;
+        }
+
+        if (session.command_is_running()){
+            session.stop_command();
+            context.wait_for(std::chrono::seconds(1));
+            continue;
+        }
+        break;
+    }
+
+    session.stop_session_and_rethrow();
+}
+
+
+void run_overworld(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    AreaZeroSkyTracker& sky_tracker, double target_x
+){
+    while (true){
+        context.wait_for_all_requests();
+        context.wait_for(std::chrono::milliseconds(200));
+
+        find_sky(env, console, context, sky_tracker, target_x);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+
+        pbf_move_left_joystick(context, 128, 255, 50, 0);
+        pbf_press_button(context, BUTTON_L, 20, 105);
+        pbf_press_button(context, BUTTON_R, 20, 0);
+        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
+        context.wait_for_all_requests();
+
+        find_sky(env, console, context, sky_tracker, target_x);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+
+        pbf_move_left_joystick(context, 128, 0, 50, 0);
+//        pbf_press_button(context, BUTTON_L, 20, 50);
+        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+
+        for (size_t c = 0; c < 4; c++){
+            context.wait_for_all_requests();
+            console.log("Let's Go Iteration: " + std::to_string(c));
+            double sky_x, sky_y;
+            if (sky_tracker.sky_location(sky_x, sky_y) && std::abs(target_x - sky_x) > 0.1){
+                find_sky(env, console, context, sky_tracker, target_x);
+                pbf_move_right_joystick(context, 128, 255, 80, 0);
+            }
+            pbf_move_left_joystick(context, 128, 0, 125, 0);
+            pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+        }
+
+        pbf_move_left_joystick(context, 0, 128, 30, 0);
+        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+        pbf_move_left_joystick(context, 255, 128, 30, 0);
+        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+    }
+}
+
 
 
 
@@ -181,9 +301,41 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    while (true){
+        NormalBattleMenuWatcher battle_menu(COLOR_RED);
+        AreaZeroSkyTracker sky_tracker(overlay);
+        context.wait_for_all_requests();
+        int ret = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+//                pbf_move_left_joystick(context, 128, 255,);
+//                context.wait_until_cancel();
+                run_overworld(env, console, context, sky_tracker, 0.40);
+            },
+            {battle_menu, sky_tracker}
+        );
+        context.wait_for(std::chrono::milliseconds(200));
+        if (ret == 0){
+            console.log("Detected battle encounter.");
+            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+        }
+    }
+
+
+
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    ImageRGB32 filtered = filter_rgb32_range(image, 0xffe0e000, 0xffffffff, Color(0xff000000), false);
+    filtered.save("test.png");
+#endif
 
 //    change_view_to_stats_or_judge(console, context);
-    change_view_to_judge(console, context, Language::English);
+//    change_view_to_judge(console, context, Language::English);
 
 
 
