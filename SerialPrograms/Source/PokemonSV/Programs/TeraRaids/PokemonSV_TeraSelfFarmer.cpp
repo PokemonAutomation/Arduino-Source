@@ -117,7 +117,7 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
 bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) const{
     if (SKIP_HERBA && stars < 5) {
         return false;
-    };
+    }
     
     std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
     std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
@@ -126,19 +126,19 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
         if (SKIP_HERBA && pokemon == str){
             return true;
         }
-    };
+    }
 
     for (const std::string& str : fivestar){
         if (SKIP_HERBA && pokemon == str){
              return true;
         }
-    };
+    }
     
-    if (MIN_STARS <= stars && stars <= MAX_STARS) {
+    if (MIN_STARS <= stars && stars <= MAX_STARS){
         return true;
-    };
+    }
     return false;
-};
+}
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
     : GroupOption("Catch on Win - Required for shiny checking.", LockWhileRunning::UNLOCKED, true)
@@ -246,7 +246,6 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
         return false;
     }
 
-//    if (MODE == Mode::FARM_ITEMS_ONLY){
     if (!CATCH_ON_WIN.enabled()){
         exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
         return true;
@@ -309,13 +308,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-
-        //  Clear per-iteration flags.
-//        m_battle_finished = false;
-//        m_caught = false;
-//        m_summary_read = false;
-
-
         if (!first){
             day_skip_from_overworld(env.console, context);
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
@@ -325,10 +317,8 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         first = false;
 
         if (open_raid(env.console, context)){
-//            env.log("Tera raid found!", COLOR_BLUE);
             stats.m_raids++;
         }else{
-//            env.log("No Tera raid found.", COLOR_ORANGE);
             continue;
         }
         context.wait_for(std::chrono::milliseconds(500));
@@ -382,17 +372,14 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         
         
 
-//        if (MODE == Mode::SHINY_HUNT){
-        if (true){
-            close_raid(env.program_info(), env.console, context);
-            save_game_from_overworld(env.program_info(), env.console, context);
-            context.wait_for_all_requests();
-            if (open_raid(env.console, context)){
-                env.log("Tera raid found!", COLOR_BLUE);
-            }else{
-                env.log("No Tera raid found.", COLOR_ORANGE);
-                continue;
-            }
+        close_raid(env.program_info(), env.console, context);
+        save_game_from_overworld(env.program_info(), env.console, context);
+        context.wait_for_all_requests();
+        if (open_raid(env.console, context)){
+            env.log("Tera raid found!", COLOR_BLUE);
+        }else{
+            env.log("No Tera raid found.", COLOR_ORANGE);
+            continue;
         }
 
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
