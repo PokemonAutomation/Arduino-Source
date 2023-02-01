@@ -40,7 +40,7 @@ class TeraFarmerOpponentFilter : public GroupOption{
 public:
     TeraFarmerOpponentFilter();
 
-    bool should_battle(size_t stars, std::string pokemon) const;
+    bool should_battle(size_t stars, const std::string& pokemon) const;
 
     BooleanCheckBoxOption SKIP_HERBA;
     SimpleIntegerOption<uint8_t> MIN_STARS;

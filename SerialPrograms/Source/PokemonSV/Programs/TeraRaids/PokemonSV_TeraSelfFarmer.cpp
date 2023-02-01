@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
@@ -114,23 +115,24 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
     PA_ADD_OPTION(MAX_STARS);
 }
 
-bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) const{
+bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& pokemon) const{
     if (stars < MIN_STARS || stars > MAX_STARS){
         return false;
     }
-    
-    std::array<std::string, 6> sixstar{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
-    std::array<std::string, 9> fivestar{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
 
-    for (const std::string& str : sixstar){
-        if (SKIP_HERBA && pokemon == str){
+    static const std::set<std::string> fivestar{
+        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"
+    };
+    static const std::set<std::string> sixstar{
+        "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
+    };
+
+    if (SKIP_HERBA){
+        if (fivestar.find(pokemon) != fivestar.end()){
             return true;
         }
-    }
-
-    for (const std::string& str : fivestar){
-        if (SKIP_HERBA && pokemon == str){
-             return true;
+        if (sixstar.find(pokemon) != sixstar.end()){
+            return true;
         }
     }
 
