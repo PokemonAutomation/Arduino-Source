@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include <sstream>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
@@ -128,10 +129,14 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
     PA_ADD_OPTION(MAX_STARS);
 }
 
-bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) const{
+bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& pokemon) const{
+    if (stars < MIN_STARS || stars > MAX_STARS){
+        return false;
+    }
+    
     if (SKIP_HERBA && stars < 5) {
         return false;
-    };
+    }
     
     std::array<std::string, 6> sixall{"blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"};
     std::array<std::string, 9> fiveall{"gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"};
@@ -174,6 +179,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
                  return true;
             }
         };
+        return false;
     };
     
     if (SKIP_HERBA && FOCUS_H == Herba::SWEET_H){
@@ -187,6 +193,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
                  return true;
             }
         };
+        return false;
     };
 
     if (SKIP_HERBA && FOCUS_H == Herba::SALTY_H){
@@ -200,6 +207,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
                  return true;
             }
         };
+        return false;
     };
     
     if (SKIP_HERBA && FOCUS_H == Herba::SPICY_H){
@@ -213,6 +221,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
                  return true;
             }
         };
+        return false;
     };
     
     if (SKIP_HERBA && FOCUS_H == Herba::BITTER_H){
@@ -226,6 +235,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
                  return true;
             }
         };
+        return false;
     };
     
     if (MIN_STARS <= stars && stars <= MAX_STARS) {
@@ -474,20 +484,15 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
         
         
-        
-
-//        if (MODE == Mode::SHINY_HUNT){
-        if (true){
-            close_raid(env.program_info(), env.console, context);
-            save_game_from_overworld(env.program_info(), env.console, context);
-            context.wait_for_all_requests();
-            if (open_raid(env.console, context)){
-                env.log("Tera raid found!", COLOR_BLUE);
-            }else{
-                env.log("No Tera raid found.", COLOR_ORANGE);
-                continue;
-            }
-        }
+ 
+        close_raid(env.program_info(), env.console, context);
+        save_game_from_overworld(env.program_info(), env.console, context);
+        context.wait_for_all_requests();
+        if (open_raid(env.console, context)){
+            env.log("Tera raid found!", COLOR_BLUE);
+        }else{
+            env.log("No Tera raid found.", COLOR_ORANGE);
+            continue;
 
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
         pbf_mash_button(context, BUTTON_A, 250);
