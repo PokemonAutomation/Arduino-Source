@@ -99,6 +99,19 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
         LockWhileRunning::UNLOCKED,
         false
     )
+    , FOCUS_H(
+    "<b>Focus Herba:</b><br>Only focus on a specific Herba Mystica (Applied if Skip Non-Herba Raids is enabled).",
+    {
+        {Herba::SOUR_H,      "Sour",   "Sour Herba Mystica"},
+        {Herba::SWEET_H,      "Sweet",   "Sweet Herba Mystica"},
+        {Herba::SALTY_H,      "Salty",   "Salty Herba Mystica"},
+        {Herba::SPICY_H,      "Spicy",   "Spicy Herba Mystica"},
+        {Herba::BITTER_H,      "Bitter",   "Bitter Herba Mystica"},
+        {Herba::ALL_H,      "All",   "All Herba Mystica"},
+    },
+    LockWhileRunning::UNLOCKED,
+    Herba::ALL_H
+    )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
         LockWhileRunning::UNLOCKED,
@@ -120,23 +133,112 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         return false;
     }
 
-    static const std::set<std::string> fivestar{
+    static const std::set<std::string> fiveall{
         "gengar", "glalie", "amoonguss", "dondozo", "palafin", "blissey", "eelektross", "driftblim", "cetitan"
     };
-    static const std::set<std::string> sixstar{
+    static const std::set<std::string> sixall{
         "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
+    };
+    
+    static const std::set<std::string> fivesour{
+        "slowking", "gothitelle", "florges", "goodra", "mimikyu", "altaria", "dragalge", "mismagius", "hatterene", "tinkaton"
+    };
+    static const std::set<std::string> sixsour{
+        "umbreon", "slowking", "goodra", "mimikyu", "frosmoth", "tinkaton", "toedscruel", "clodsire"
+    };
+    
+    static const std::set<std::string> fivesweet{
+        "raichu", "ditto", "delibird", "sableye", "weavile", "froslass", "talonflame", "noivern", "dragapult", "pawmot"
+    };
+    static const std::set<std::string> sixsweet{
+        "ditto", "jolteon", "talonflame", "dragapult", "maushold", "cyclizar", "kilowattrel", "grafaiai"
+    };
+    
+    static const std::set<std::string> fivesalty{
+        "slowbro", "cloyster", "bronzong", "hippowdon", "avalugg", "greedent", "corviknight", "coalossal", "copperajah", "orthworm", "garganacl"
+    };
+    static const std::set<std::string> sixsalty{
+        "pelipper", "torkoal", "hippowdon", "avalugg", "toxapex", "corviknight", "orthworm", "klawf", "garganacl", "dachsbun"
+    };
+    
+    static const std::set<std::string> fivespicy{
+        "arcanine", "scyther", "tauros", "gyarados", "dragonite", "scizor", "tyranitar", "breloom", "slaking", "hariyama", "salamence", "staraptor", "luxray", "honchkrow", "garchomp", "abomasnow", "gallade", "krookodile", "haxorus", "braviary", "mudsdale", "tsareena", "passimian", "flapple", "grimmsnarl", "falinks", "indeedee", "revavroom", "baxcalibur", "bombirdier", "mabosstiff", "brambleghast", "ceruledge", "kingambit", "annihilape"
+    };
+    static const std::set<std::string> sixspicy{
+        "tauros", "gyarados", "flareon", "dragonite", "scizor", "heracross", "tyranitar", "breloom", "salamence", "staraptor", "garchomp", "leafeon", "gallade", "haxorus", "lycanroc", "pincurchin", "revavroom", "baxcalibur", "pawmot", "bombirdier", "mabosstiff", "ceruledge", "kingambit", "annihilape"
+    };
+    
+    static const std::set<std::string> fivebitter{
+        "eevee", "houndoom", "gardevoir", "camerupt", "magnezone", "rotom", "zoroark", "hydreigon", "volcarona", "clawitzer", "oranguru", "appletun", "toxtricity", "polteageist", "pincurchin", "arboliva", "tatsugiri", "glimmora", "armarouge"
+    };
+    static const std::set<std::string> sixbitter{
+        "gengar", "espeon", "gardevoir", "magnezone", "glaceon", "hydreigon", "volcarona", "dragalge", "clawitzer", "sylveon", "glimmora", "armarouge"
     };
 
     if (SKIP_HERBA){
-        if (fivestar.find(pokemon) != fivestar.end()){
+        if (fiveall.find(pokemon) != fiveall.end()){
             return true;
         }
-        if (sixstar.find(pokemon) != sixstar.end()){
+        if (sixall.find(pokemon) != sixall.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::SOUR_H){
+        if (fiveall.find(pokemon) != fiveall.end()){
+            return true;
+        }
+        if (sixall.find(pokemon) != sixall.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::SOUR_H){
+        if (fiveall.find(pokemon) != fiveall.end()){
+            return true;
+        }
+        if (sixall.find(pokemon) != sixall.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::SWEET_H){
+        if (fivesweet.find(pokemon) != fivesweet.end()){
+            return true;
+        }
+        if (sixsweet.find(pokemon) != sixsweet.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::SALTY_H){
+        if (fivesalty.find(pokemon) != fivesalty.end()){
+            return true;
+        }
+        if (sixsalty.find(pokemon) != sixsalty.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::SPICY_H){
+        if (fivespicy.find(pokemon) != fivespicy.end()){
+            return true;
+        }
+        if (sixspicy.find(pokemon) != sixspicy.end()){
+            return true;
+        }
+    }
+    
+     if (SKIP_HERBA && FOCUS_H == Herba::BITTER_H){
+        if (fivebitter.find(pokemon) != fivebitter.end()){
+            return true;
+        }
+        if (sixbitter.find(pokemon) != sixbitter.end()){
             return true;
         }
     }
 
-    return false;
+    return true;
 }
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
