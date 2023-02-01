@@ -89,6 +89,8 @@ EnumDropdownOptionWidget::EnumDropdownOptionWidget(QWidget& parent, IntegerEnumD
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
     layout->addWidget(text, 1);
     layout->addWidget(m_cell, 1);
 }

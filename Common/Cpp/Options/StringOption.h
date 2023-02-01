@@ -26,6 +26,7 @@ public:
 
     bool is_password() const;
     const std::string& placeholder_text() const;
+    const std::string default_value() const;
 
     operator std::string() const;
     void set(std::string x);

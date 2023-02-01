@@ -1,5 +1,5 @@
 #set the minimum cmake version required
-cmake_minimum_required(VERSION 3.16.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 #set the name of the project
 project(SerialPrograms)
@@ -410,6 +410,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Main.cpp
     Source/CommonFramework/NewVersionCheck.cpp
     Source/CommonFramework/NewVersionCheck.h
+    Source/CommonFramework/SetupSettings.cpp
+    Source/CommonFramework/SetupSettings.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
@@ -1802,6 +1804,13 @@ if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
+endif()
+
+#extract opencv_world460d.dll from archive on Windows Debug builds
+if (MSVC)
+    if (CMAKE_BUILD_TYPE MATCHES "Debug")
+        file(ARCHIVE_EXTRACT INPUT ../3rdPartyBinaries/opencv_world460d.zip DESTINATION ../3rdPartyBinaries/)
+    endif()
 endif()
 
 #add include directory

@@ -95,15 +95,15 @@ EggAutonomous::EggAutonomous()
         10, 1, 30
     )
     , AUTO_SAVING(
-        "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
-        "Must <b>turn off</b> in-game Autosave feature so that this program can properly reset the game.<br>"
-        "<b>No auto-saving</b>: No game resets. No error/crash recovery.<br>"
-        "<b>Save before picnic and after keeping a baby</b>: Allows for error/crash recovery. Reset game if no baby to keep. Low sandwich ingredients usage.<br>"
-        "<b>Save before every batch</b>: Allows you to unhatch eggs. High sandwich ingredients usage.<br><br>",
+        "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>" +
+        make_text_url(
+            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md#auto-saving-mode",
+            "See the wiki for the full explanations of each mode."
+        ),
         {
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
-            {AutoSave::EveryBatch, "every-batch", "Save before every batch."},
+            {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
         },
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
