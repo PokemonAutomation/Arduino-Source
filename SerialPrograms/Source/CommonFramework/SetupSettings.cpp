@@ -88,7 +88,8 @@ bool migrate_stats(Logger& logger){
     }
 
     if (!root_file.exists() && folder_file.exists()){
-        logger.log("Migrated, nothing to do.");
+        logger.log("File migrated. Stats path in settings not updated. Updating...");
+        GlobalSettings::instance().STATS_FILE.restore_defaults();
         return true;
     }
 

@@ -115,7 +115,7 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
 }
 
 bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) const{
-    if (SKIP_HERBA && stars < 5) {
+    if (stars < MIN_STARS || stars > MAX_STARS){
         return false;
     }
     
@@ -133,10 +133,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, std::string pokemon) 
              return true;
         }
     }
-    
-    if (MIN_STARS <= stars && stars <= MAX_STARS){
-        return true;
-    }
+
     return false;
 }
 
