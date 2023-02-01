@@ -57,7 +57,9 @@ int main(int argc, char *argv[]){
         //  Make settings directory.
         QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
 
-        setup_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json");
+        if (!setup_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json")){
+            return 1;
+        }
 
         PERSISTENT_SETTINGS().read();
     }catch (const FileException& error){

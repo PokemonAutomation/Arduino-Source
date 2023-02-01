@@ -11,7 +11,7 @@
 
 namespace PokemonAutomation{
 
-void setup_settings(Logger& logger = global_logger_tagged(), std::string file_name = std::string());
+bool setup_settings(Logger& logger = global_logger_tagged(), std::string file_name = std::string());
 
 
 
