@@ -530,13 +530,13 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 60);
-                pbf_press_button(context, BUTTON_A, 20, 105);
+//                pbf_press_button(context, BUTTON_A, 20, 105);
             }else{
                 pbf_press_button(context, BUTTON_B, 20, 105);
             }
             continue;
         case 4:
-            console.log("Detected cursor over add-to-party. (unexpected), COLOR_RED");
+            console.log("Detected cursor over view summary.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 5:
