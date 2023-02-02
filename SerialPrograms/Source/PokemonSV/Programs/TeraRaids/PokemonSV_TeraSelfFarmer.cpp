@@ -185,21 +185,13 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
     }
     
      if (SKIP_HERBA && FOCUS_H == Herba::SOUR_H){
-        if (fiveall.find(pokemon) != fiveall.end()){
+        if (fivesour.find(pokemon) != fivesour.end()){
             return true;
         }
-        if (sixall.find(pokemon) != sixall.end()){
+        if (sixsour.find(pokemon) != sixsour.end()){
             return true;
         }
-    }
-    
-     if (SKIP_HERBA && FOCUS_H == Herba::SOUR_H){
-        if (fiveall.find(pokemon) != fiveall.end()){
-            return true;
-        }
-        if (sixall.find(pokemon) != sixall.end()){
-            return true;
-        }
+        return false;
     }
     
      if (SKIP_HERBA && FOCUS_H == Herba::SWEET_H){
@@ -209,6 +201,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixsweet.find(pokemon) != sixsweet.end()){
             return true;
         }
+        return false;
     }
     
      if (SKIP_HERBA && FOCUS_H == Herba::SALTY_H){
@@ -218,6 +211,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixsalty.find(pokemon) != sixsalty.end()){
             return true;
         }
+        return false;
     }
     
      if (SKIP_HERBA && FOCUS_H == Herba::SPICY_H){
@@ -227,6 +221,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixspicy.find(pokemon) != sixspicy.end()){
             return true;
         }
+        return false;
     }
     
      if (SKIP_HERBA && FOCUS_H == Herba::BITTER_H){
@@ -236,6 +231,10 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixbitter.find(pokemon) != sixbitter.end()){
             return true;
         }
+        return false;
+    }
+    
+    if (FOCUS_H == Herba::ALL_H) {
         return false;
     }
 
