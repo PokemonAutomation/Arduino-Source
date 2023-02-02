@@ -32,7 +32,7 @@ using namespace Pokemon;
 
 GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:GimmighoulChestFarerm",
+        "PokemonSV:GimmighoulChestFarmer",
         STRING_POKEMON + " SV", "Gimmighoul Chest Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulChestFarmer.md",
         "Farm Chest Gimmighoul for coins.",

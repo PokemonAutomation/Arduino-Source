@@ -1351,6 +1351,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h
+    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
