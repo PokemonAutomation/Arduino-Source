@@ -320,7 +320,11 @@ void release_one_pokemon(
             }
             pbf_press_dpad(context, DPAD_UP, 10, 10);
             pbf_press_dpad(context, DPAD_UP, 10, 10);
-            pbf_press_button(context, BUTTON_A, 20, 20);
+
+            //  Double up this A press since dropping it currently isn't recoverable.
+            pbf_press_button(context, BUTTON_A, 5, 3);
+            pbf_press_button(context, BUTTON_A, 5, 27);
+
             expected = 2;
             continue;
         case 2:

@@ -233,47 +233,58 @@ void find_sky(
 }
 
 
+void move_and_target(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t duration){
+    pbf_move_left_joystick(context, x, y, duration, 0);
+    pbf_press_button(context, BUTTON_L | BUTTON_R, 20, 105);
+//    pbf_move_left_joystick(context, 128, 255, 250, 0);
+//    pbf_move_left_joystick(context, 128, 0, 50, 0);
+//    pbf_press_button(context, BUTTON_R, 20, 0);
+//    pbf_move_left_joystick(context, 128, 0, 200, 0);
+}
+
+
 void run_overworld(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     AreaZeroSkyTracker& sky_tracker, double target_x
 ){
-    while (true){
-        context.wait_for_all_requests();
-        context.wait_for(std::chrono::milliseconds(200));
+    console.log("Run Iteration. Target = " + std::to_string(target_x));
+    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(200));
 
-        find_sky(env, console, context, sky_tracker, target_x);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
+    pbf_press_button(context, BUTTON_R, 20, 0);
+    find_sky(env, console, context, sky_tracker, target_x);
+    pbf_move_right_joystick(context, 128, 255, 80, 0);
 
-        pbf_move_left_joystick(context, 128, 255, 50, 0);
-        pbf_press_button(context, BUTTON_L, 20, 105);
-        pbf_press_button(context, BUTTON_R, 20, 0);
-        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
-        context.wait_for_all_requests();
+    move_and_target(context, 128, 255, 50);
+    move_and_target(context, 128, 0, 2 * TICKS_PER_SECOND);
+    move_and_target(context, 128, 0, 3 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
-        find_sky(env, console, context, sky_tracker, target_x);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
+    find_sky(env, console, context, sky_tracker, 0.5);
+    pbf_move_right_joystick(context, 128, 255, 80, 0);
 
-        pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 50);
-        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_R, 20, 105);
 
-        for (size_t c = 0; c < 4; c++){
-            context.wait_for_all_requests();
-            console.log("Let's Go Iteration: " + std::to_string(c));
-            double sky_x, sky_y;
-            if (sky_tracker.sky_location(sky_x, sky_y) && std::abs(target_x - sky_x) > 0.1){
-                find_sky(env, console, context, sky_tracker, target_x);
-                pbf_move_right_joystick(context, 128, 255, 80, 0);
-            }
-            pbf_move_left_joystick(context, 128, 0, 125, 0);
-            pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+#if 0
+    for (size_t c = 0; c < 2; c++){
+        context.wait_for_all_requests();
+        console.log("Let's Go Iteration: " + std::to_string(c));
+        double sky_x, sky_y;
+        if (sky_tracker.sky_location(sky_x, sky_y) && std::abs(target_x - sky_x) > 0.1){
+            find_sky(env, console, context, sky_tracker, target_x);
+            pbf_move_right_joystick(context, 128, 255, 80, 0);
         }
-
-        pbf_move_left_joystick(context, 0, 128, 30, 0);
-        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
-        pbf_move_left_joystick(context, 255, 128, 30, 0);
-        pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
     }
+#endif
+
+    pbf_move_left_joystick(context, 128, 0, 350, 0);
+    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 0, 128, 30, 0);
+    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 255, 128, 30, 0);
+    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
 }
 
 
@@ -300,7 +311,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
+    pbf_move_left_joystick(context, 128, 255, 300, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_R, 20, 0);
+    pbf_move_left_joystick(context, 128, 0, 350, 0);
+#endif
+#if 1
+    size_t count = 0;
     while (true){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
@@ -308,9 +326,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         int ret = run_until(
             console, context,
             [&](BotBaseContext& context){
-//                pbf_move_left_joystick(context, 128, 255,);
-//                context.wait_until_cancel();
-                run_overworld(env, console, context, sky_tracker, 0.40);
+                while (true){
+                    switch (count++ % 2){
+                    case 0:
+                        run_overworld(env, console, context, sky_tracker, 0.50);
+                        break;
+                    case 1:
+                        run_overworld(env, console, context, sky_tracker, 0.70);
+                        break;
+                    }
+                }
             },
             {battle_menu, sky_tracker}
         );
@@ -322,6 +347,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
         }
     }
+#endif
+
 
 
 

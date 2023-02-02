@@ -134,9 +134,10 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixstar.find(pokemon) != sixstar.end()){
             return true;
         }
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)

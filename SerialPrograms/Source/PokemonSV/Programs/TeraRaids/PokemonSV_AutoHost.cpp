@@ -156,6 +156,9 @@ WallClock AutoHost::wait_for_lobby_open(
     WallClock start_time = current_time();
     context.wait_for(std::chrono::seconds(1));
 
+    VideoSnapshot snapshot = env.console.video().snapshot();
+    lobby_code = lobby.raid_code(env.logger(), env.inference_dispatcher(), snapshot);
+
     send_host_announcement(
         env, env.console,
         lobby_code,
