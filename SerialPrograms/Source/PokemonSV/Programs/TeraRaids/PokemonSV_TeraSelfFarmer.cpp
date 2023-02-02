@@ -236,6 +236,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
         if (sixbitter.find(pokemon) != sixbitter.end()){
             return true;
         }
+        return false;
     }
 
     return true;

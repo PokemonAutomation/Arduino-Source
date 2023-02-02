@@ -66,6 +66,20 @@ bool AsyncCommandSession::command_is_running(){
     return m_current != nullptr;
 }
 
+void AsyncCommandSession::stop_command(){
+    m_sanitizer.check_usage();
+
+    std::unique_lock<std::mutex> lg(m_lock);
+    if (cancelled()){
+        return;
+    }
+
+    if (m_current){
+        //  Already a task running. Cancel it.
+        m_current->context.cancel_now();
+        m_cv.wait(lg, [this]{ return m_current == nullptr; });
+    }
+}
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
     m_sanitizer.check_usage();
 
@@ -101,7 +115,9 @@ bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
     }else{
-        m_botbase.stop_all_commands();
+        try{
+            m_botbase.stop_all_commands();
+        }catch (...){}
     }
     m_cv.notify_all();
     return false;

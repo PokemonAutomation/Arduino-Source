@@ -10,7 +10,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_TeraBattler.h"
 
 namespace PokemonAutomation{

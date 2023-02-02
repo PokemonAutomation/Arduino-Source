@@ -91,7 +91,7 @@
 #include "Common/Cpp/Containers/BoxSet.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
