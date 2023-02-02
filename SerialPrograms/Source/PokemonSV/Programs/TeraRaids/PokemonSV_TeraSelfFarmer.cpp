@@ -124,6 +124,7 @@ TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
     )
 {
     PA_ADD_OPTION(SKIP_HERBA);
+    PA_ADD_OPTION(FOCUS_H);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
 }
