@@ -26,6 +26,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV_AutoHostTools.h"
@@ -158,6 +159,8 @@ WallClock AutoHost::wait_for_lobby_open(
 
     VideoSnapshot snapshot = env.console.video().snapshot();
     lobby_code = lobby.raid_code(env.logger(), env.inference_dispatcher(), snapshot);
+    std::string code = lobby.raid_code(env.logger(), env.inference_dispatcher(), snapshot);
+    normalize_code(lobby_code, code);
 
     send_host_announcement(
         env, env.console,
