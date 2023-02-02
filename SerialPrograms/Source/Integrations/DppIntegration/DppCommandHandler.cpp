@@ -29,9 +29,6 @@ void Handler::initialize(cluster& bot) {
         log_dpp(log.message, "Internal Log", log.severity);
     });
 
-    const presence& p = presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status);
-    bot.set_presence(p);
-
     owner = bot.current_application_get_sync().owner;
     Handler::create_commands(bot);
 
