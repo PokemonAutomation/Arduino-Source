@@ -16,7 +16,6 @@ namespace PokemonSV{
 
 const SpriteDatabase& AUCTION_ITEM_SPRITES();
 
-
 }
 }
 }

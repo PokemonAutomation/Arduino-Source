@@ -1284,6 +1284,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
+    Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
@@ -1311,6 +1313,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h
     Source/PokemonSV/PokemonSV_Panels.cpp
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
@@ -1397,6 +1403,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
+    Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp
+    Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

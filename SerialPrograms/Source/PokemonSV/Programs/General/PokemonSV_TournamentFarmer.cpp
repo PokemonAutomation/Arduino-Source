@@ -23,6 +23,8 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h"
+#include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
 
 namespace PokemonAutomation {
@@ -80,6 +82,7 @@ TournamentFarmer::TournamentFarmer()
         LockWhileRunning::UNLOCKED,
         0, 0
     )
+    , TARGET_ITEMS("<b>Items:</b>")
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -91,6 +94,7 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
+    PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -110,7 +114,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
-        int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
+        int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret < 0) {
             env.log("Dialog detected.");
         }
@@ -269,7 +273,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             pbf_move_left_joystick(context, 0, 128, 8, 0);
             pbf_press_button(context, BUTTON_L, 50, 40);
             pbf_press_button(context, BUTTON_PLUS, 50, 40);
-            pbf_press_button(context, BUTTON_B, 50, 40); //Trying to glide over npc spawns
+            pbf_press_button(context, BUTTON_B, 50, 40); //Trying to jump/glide over npc spawns
             pbf_press_button(context, BUTTON_B, 50, 40);
             pbf_move_left_joystick(context, 128, 0, 500, 0);
             pbf_press_button(context, BUTTON_B, 50, 40);
