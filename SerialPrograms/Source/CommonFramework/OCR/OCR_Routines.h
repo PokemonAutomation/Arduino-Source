@@ -41,6 +41,7 @@ StringMatchResult multifiltered_OCR(
 const std::vector<TextColorRange>& BLACK_TEXT_FILTERS();
 const std::vector<TextColorRange>& WHITE_TEXT_FILTERS();
 const std::vector<TextColorRange>& BLACK_OR_WHITE_TEXT_FILTERS();
+const std::vector<TextColorRange>& BLUE_TEXT_FILTERS();
 
 
 

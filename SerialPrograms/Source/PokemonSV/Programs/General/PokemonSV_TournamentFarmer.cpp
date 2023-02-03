@@ -6,8 +6,10 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -68,24 +70,32 @@ std::unique_ptr<StatsTracker> TournamentFarmer_Descriptor::make_stats() const {
 
 TournamentFarmer::TournamentFarmer()
     : NUM_ROUNDS(
-        "<b>Number of Tournaments to run:",
-        LockWhileRunning::UNLOCKED,
-        100, 0
-    )
-    , TRY_TO_TERASTILLIZE(
-        "<b>Use Terastillization:</b><br>Will take longer but may be worth the attack boost.",
+          "<b>Number of Tournaments to run:",
           LockWhileRunning::UNLOCKED,
-        false
-    )
+          100, 0
+          )
+    , TRY_TO_TERASTILLIZE(
+          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer but may be worth the attack boost.",
+          LockWhileRunning::UNLOCKED,
+          false
+          )
     , SAVE_NUM_ROUNDS(
-        "<b>Save every this many tournaments:</b><br>(zero disables saving)",
-        LockWhileRunning::UNLOCKED,
-        0, 0
-    )
-    , TARGET_ITEMS("<b>Items:</b>")
+          "<b>Save every this many tournaments:</b><br>(zero disables saving)",
+          LockWhileRunning::UNLOCKED,
+          0, 0
+          )
     , GO_HOME_WHEN_DONE(false)
+    , LANGUAGE(
+          "<b>Game Language:</b><br>The language is needed to read the prizes.",
+          TournamentPrizeNameReader::instance().languages(),
+          LockWhileRunning::LOCKED,
+          true
+          )
+    , TARGET_ITEMS("<b>Items:</b>")
+    , NOTIFICATION_PRIZE_MATCH("Matching Prize", true, false, ImageAttachmentMode::JPG, { "Notifs" })
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_PRIZE_MATCH,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
@@ -94,8 +104,9 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
-    PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -108,6 +119,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Last Pokemon Center visited is Mesagzoa West
     Sylveon only farming build - ideally with fairy tera
     stand in front of tournament entry man
+    Ride legendary is not the solo pokemon (in case of loss)
     */
 
     for(uint32_t c = 0; c < NUM_ROUNDS; c++) {
@@ -134,12 +146,13 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
         context.wait_for_all_requests();
 
-        BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+        BlackScreenWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         bool battle_lost = false;
         for (uint16_t battles = 0; !battle_lost && battles < 4; battles++) {
             //Wait for battle - shorter than tournament start above
             NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW);
             OverworldWatcher overworld(COLOR_CYAN);
+
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
@@ -202,6 +215,8 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 break;
             }
         }
+        pbf_wait(context, 700); //Space out the black screen detection a bit
+        context.wait_for_all_requests();
         BlackScreenOverWatcher black_screen2(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         //Tournament won
         if (!battle_lost) {
@@ -219,19 +234,48 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             context.wait_for_all_requests();
 
             //Wait for congrats dialog - wait an extra bit since the dialog appears while still loading in
-            int ret_dialog = wait_until(env.console, context, Milliseconds(1000), { advance_detector });
-            if (ret_dialog < 0) {
+            AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
+            int ret_dialog = wait_until(env.console, context, Milliseconds(1000), { advance_detector2 });
+            if (ret_dialog == 0) {
                 env.log("Dialog detected.");
             }
             pbf_wait(context, 300);
             context.wait_for_all_requests();
 
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_wait(context, 100);
+            context.wait_for_all_requests();
 
-            //NOW DETECT ITEM HERE
-            //????? OCR ????
+            //Detect prize
+            //bool replace_color_within_range = false;
+            VideoSnapshot screen = env.console.video().snapshot();
+            ImageFloatBox dialog_box(0.259, 0.734, 0.484, 0.158);
+            ImageViewRGB32 dialog_image = extract_box_reference(screen, dialog_box);
 
+            //ImageRGB32 dialog_filtered = filter_rgb32_range(
+            //    extract_box_reference(screen, dialog_box),
+            //    combine_rgb(50, 135, 162), combine_rgb(167, 244, 255), Color(0), replace_color_within_range
+            //);
+            //dialog_filtered.save("./dialog_image.png");
 
+            const double LOG10P_THRESHOLD = -1.5;
+            OCR::StringMatchResult result = PokemonSV::TournamentPrizeNameReader::instance().read_substring(
+                env.console, LANGUAGE, dialog_image,
+                OCR::BLUE_TEXT_FILTERS()
+            );
+            result.clear_beyond_log10p(LOG10P_THRESHOLD);
+            if (result.results.empty()) {
+                env.log("No matching prize name found in dialog box.");
+                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            }
+            for (const auto& r : result.results) {
+                env.console.log("Found prize: " + r.second.token);
+                if (TARGET_ITEMS.find_item(r.second.token)) {
+                    env.log("Prize on list");
+                    send_program_status_notification(env, NOTIFICATION_PRIZE_MATCH);  
+                    break;
+                }
+            }
 
             //Clear remaining dialog and check if we need to save
             OverworldWatcher overworld2(COLOR_CYAN);
@@ -248,11 +292,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             context.wait_for_all_requests();
 
             //Save the game if option checked, then loop again
-            if (SAVE_NUM_ROUNDS != 0) {
-                if (((c + 1) % SAVE_NUM_ROUNDS) == 0) {
-                    env.log("Saving game.");
-                    save_game_from_overworld(env.program_info(), env.console, context);
-                }
+            if (SAVE_NUM_ROUNDS != 0 && ((c + 1) % SAVE_NUM_ROUNDS) == 0) {
+                env.log("Saving game.");
+                save_game_from_overworld(env.program_info(), env.console, context);
             }
 
             stats.tournaments++;

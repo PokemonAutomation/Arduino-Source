@@ -97,6 +97,14 @@ const std::vector<TextColorRange>& BLACK_OR_WHITE_TEXT_FILTERS(){
     };
     return filters;
 }
+const std::vector<TextColorRange>& BLUE_TEXT_FILTERS() {
+    static std::vector<TextColorRange> filters{
+        {0xFF3287A2, 0xFFA7F4FF},
+        {0xFF2283A2, 0xFF8EF1FF},
+        {0xFF428BA2, 0xFFC1F7FF},
+    };
+    return filters;
+}
 
 
 
