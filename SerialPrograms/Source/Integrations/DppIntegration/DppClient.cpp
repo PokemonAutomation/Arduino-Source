@@ -132,7 +132,9 @@ void Client::run(const std::string& token) {
     }
     try {
         Handler::initialize(*m_bot.get());
+        m_bot->set_websocket_protocol(websocket_protocol_t::ws_etf);
         m_bot->start(st_return);
+        m_bot->set_presence(presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status));
         m_is_connected.store(true, std::memory_order_release);
     }
     catch (std::exception& e) {
