@@ -6,15 +6,15 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV_MainMenuDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -123,7 +123,11 @@ bool MainMenuDetector::move_cursor(
         if (current.first == MenuSide::NONE){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                dump_image_and_throw_recoverable_exception(info, console, "UnableToDetectMenu", "Unable to detect menu.");
+                throw OperationFailedException(
+                    console,
+                    "MainMenuDetector::move_cursor(): Unable to detect menu.",
+                    screen
+                );
             }
             context.wait_for(std::chrono::milliseconds(50));
             continue;

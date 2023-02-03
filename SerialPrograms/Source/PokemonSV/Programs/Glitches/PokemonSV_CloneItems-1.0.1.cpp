@@ -170,15 +170,19 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
             continue;
         case 1:
             console.log("Detected main menu.");
-            if (item_held){
-                main_menu.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 1, true);
-                pbf_press_button(context, BUTTON_A, 20, 20);
-            }else{
-                main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 1, true);
-                pbf_press_button(context, BUTTON_A, 20, 50);
-                pbf_press_dpad(context, DPAD_UP, 10, 10);
-                pbf_press_dpad(context, DPAD_UP, 20, 10);
-                pbf_press_button(context, BUTTON_A, 20, 20);
+            try{
+                if (item_held){
+                    main_menu.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 1, true);
+                    pbf_press_button(context, BUTTON_A, 20, 20);
+                }else{
+                    main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 1, true);
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_dpad(context, DPAD_UP, 10, 10);
+                    pbf_press_dpad(context, DPAD_UP, 20, 10);
+                    pbf_press_button(context, BUTTON_A, 20, 20);
+                }
+            }catch (OperationFailedException& e){
+                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             }
             continue;
         case 2:
