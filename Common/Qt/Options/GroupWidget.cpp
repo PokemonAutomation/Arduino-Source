@@ -7,8 +7,12 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QGroupBox>
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "GroupWidget.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -73,30 +77,35 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
         m_group_box, &QGroupBox::toggled,
         this, [this](bool on){
             m_value.set_enabled(on);
-            m_value.on_set_enabled(on);
+//            m_value.on_set_enabled(on);
         }
     );
 
     value.add_listener(*this);
 }
+
+#if 0
 void GroupWidget::set_options_enabled(bool enabled){
     for (ConfigWidget* item : m_options){
         item->widget().setEnabled(enabled);
     }
 }
+#endif
 void GroupWidget::update_value(){
     bool on = m_value.enabled();
+//    cout << "on = " << on << endl;
     m_group_box->setChecked(on);
     for (ConfigWidget* item : m_options){
         item->update_value();
     }
 }
 void GroupWidget::value_changed(){
+//    cout << "GroupWidget::value_changed()" << endl;
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
 }
-void GroupWidget::mouseDoubleClickEvent(QMouseEvent* event){
+void GroupWidget::mouseDoubleClickEvent(QMouseEvent*){
     m_expand_text->setVisible(m_expanded);
     m_expanded = !m_expanded;
     m_options_holder->setVisible(m_expanded);

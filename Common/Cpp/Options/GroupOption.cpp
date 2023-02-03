@@ -11,6 +11,10 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "GroupOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -55,6 +59,7 @@ bool GroupOption::enabled() const{
 }
 void GroupOption::set_enabled(bool enabled){
     m_data->m_enabled.store(enabled, std::memory_order_relaxed);
+    report_value_changed();
     on_set_enabled(enabled);
 }
 void GroupOption::load_json(const JsonValue& json){
@@ -66,7 +71,9 @@ void GroupOption::load_json(const JsonValue& json){
     if (m_data->m_toggleable){
         bool enabled;
         if (obj->read_boolean(enabled, "Enabled")){
-            m_data->m_enabled.store(enabled, std::memory_order_relaxed);
+            if (enabled != m_data->m_enabled.exchange(enabled, std::memory_order_relaxed)){
+                report_value_changed();
+            }
             on_set_enabled(enabled);
         }
     }

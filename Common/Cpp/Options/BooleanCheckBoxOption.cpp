@@ -9,6 +9,10 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "BooleanCheckBoxOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -52,8 +56,9 @@ BooleanCheckBoxCell::operator bool() const{
     return m_data->m_current.load(std::memory_order_relaxed);
 }
 void BooleanCheckBoxCell::operator=(bool x){
-    m_data->m_current.store(x, std::memory_order_relaxed);
-    report_value_changed();
+    if (x != m_data->m_current.exchange(x, std::memory_order_relaxed)){
+        report_value_changed();
+    }
 }
 void BooleanCheckBoxCell::load_json(const JsonValue& json){
     bool value;
@@ -66,7 +71,6 @@ JsonValue BooleanCheckBoxCell::to_json() const{
 }
 void BooleanCheckBoxCell::restore_defaults(){
     *this = m_data->m_default;
-    report_value_changed();
 }
 
 

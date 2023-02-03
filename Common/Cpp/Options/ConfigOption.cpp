@@ -120,6 +120,7 @@ void ConfigOption::report_program_state(bool program_is_running){
 void ConfigOption::report_value_changed(){
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
+//    cout << "listeners = " << data.listeners.size() << endl;
     for (Listener* listener : data.listeners){
         listener->value_changed();
     }

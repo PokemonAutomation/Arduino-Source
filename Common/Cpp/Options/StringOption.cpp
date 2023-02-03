@@ -73,6 +73,9 @@ StringCell::operator std::string() const{
 void StringCell::set(std::string x){
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (m_data->m_current == x){
+            return;
+        }
         m_data->m_current = std::move(x);
     }
     report_value_changed();
@@ -83,11 +86,7 @@ void StringCell::load_json(const JsonValue& json){
     if (str == nullptr) {
         return;
     }
-    {
-        SpinLockGuard lg(m_data->m_lock);
-        m_data->m_current = *str;
-    }
-    report_value_changed();
+    set(*str);
 }
 JsonValue StringCell::to_json() const{
     SpinLockGuard lg(m_data->m_lock);
@@ -95,11 +94,7 @@ JsonValue StringCell::to_json() const{
 }
 
 void StringCell::restore_defaults(){
-    {
-        SpinLockGuard lg(m_data->m_lock);
-        m_data->m_current = m_data->m_default;
-    }
-    report_value_changed();
+    set(m_data->m_default);
 }
 
 

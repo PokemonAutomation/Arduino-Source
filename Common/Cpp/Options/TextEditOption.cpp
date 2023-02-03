@@ -105,22 +105,14 @@ void TextEditOption::load_json(const JsonValue& json){
     if (str == nullptr){
         return;
     }
-    {
-        SpinLockGuard lg(m_data->m_lock);
-        m_data->m_current = *str;
-    }
-    report_value_changed();
+    set(*str);
 }
 JsonValue TextEditOption::to_json() const{
     SpinLockGuard lg(m_data->m_lock);
     return m_data->m_current;
 }
 void TextEditOption::restore_defaults(){
-    {
-        SpinLockGuard lg(m_data->m_lock);
-        m_data->m_current = m_data->m_default;
-    }
-    report_value_changed();
+    set(m_data->m_default);
 }
 
 

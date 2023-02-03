@@ -25,6 +25,7 @@ namespace Integration{
 
 DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
     library.remove_listener(*this);
+    this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
@@ -100,9 +101,11 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
 
     DiscordIntegrationSettingsOption::value_changed();
 
+    this->add_listener(*this);
     library.add_listener(*this);
 }
 void DiscordIntegrationSettingsOption::value_changed(){
+//    cout << this->enabled() << endl;
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
     switch (library){

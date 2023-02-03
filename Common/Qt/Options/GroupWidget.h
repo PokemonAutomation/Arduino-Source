@@ -23,7 +23,7 @@ public:
     ~GroupWidget();
     GroupWidget(QWidget& parent, GroupOption& value);
 
-    void set_options_enabled(bool enabled);
+//    void set_options_enabled(bool enabled);
 
     virtual void update_value() override;
     virtual void value_changed() override;

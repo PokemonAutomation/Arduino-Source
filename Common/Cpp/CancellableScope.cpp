@@ -59,7 +59,7 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     if (data.cancelled.load(std::memory_order_acquire)){
         return true;
     }
-    return data.cancelled.exchange(true);
+    return data.cancelled.exchange(true, std::memory_order_relaxed);
 }
 void Cancellable::throw_if_cancelled() const{
     m_sanitizer.check_usage();
