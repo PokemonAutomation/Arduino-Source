@@ -276,8 +276,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             for (const auto& r : result.results) {
                 env.console.log("Found prize: " + r.second.token);
                 if (TARGET_ITEMS.find_item(r.second.token)) {
-                    env.log("Prize on list");
-                    send_program_status_notification(env, NOTIFICATION_PRIZE_MATCH);  
+                    env.log("Prize matched");
+                    send_program_notification(
+                        env, NOTIFICATION_PRIZE_MATCH,
+                        COLOR_GREEN, "Prize matched",
+                        {
+                            { "Item:", r.second.token },
+                        }
+                    , "", screen);
                     break;
                 }
             }
