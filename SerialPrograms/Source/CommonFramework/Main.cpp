@@ -83,21 +83,21 @@ int main(int argc, char *argv[]){
 
     check_new_version(global_logger_tagged());
 
+    Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD.integration;
+    if (discord_settings.run_on_start){
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
-        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord
-    ){
-        Integration::SleepyDiscordRunner::sleepy_connect();
-    }
+        if (discord_settings.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+            Integration::SleepyDiscordRunner::sleepy_connect();
+        }
 #endif
-
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.run_on_start &&
-        GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP
-    ){
-        Integration::DppClient::Client::instance().connect();
-    }
+        if (discord_settings.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+            Integration::DppClient::Client::instance().connect();
+        }
 #endif
+        discord_settings.value_changed();
+    }
+
 
     int ret;
     {
