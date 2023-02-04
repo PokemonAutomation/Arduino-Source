@@ -40,7 +40,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
         "PokemonSV:TournamentFarmer",
         STRING_POKEMON + " SV", "Tournament Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TournamentFarmer.md",
-        "Farm the Ace Academy Tournament.",
+        "Farm the Ace Academy Tournament for money and prizes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -120,6 +120,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Sylveon only farming build - ideally with fairy tera
     stand in front of tournament entry man
     Ride legendary is not the solo pokemon (in case of loss)
+
+    Possible improvements to make:
+    money tracking? notifs tend to backlog.
+    find prize sprites - some code is there, just disabled
+    find translations for mints and tera shards
     */
 
     for(uint32_t c = 0; c < NUM_ROUNDS; c++) {
