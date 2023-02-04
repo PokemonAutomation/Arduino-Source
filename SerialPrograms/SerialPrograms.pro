@@ -412,6 +412,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
@@ -627,6 +628,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
@@ -1390,6 +1392,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
@@ -1609,6 +1612,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \

@@ -20,6 +20,7 @@
 #include "Programs/NintendoSwitch_FriendDelete.h"
 
 #include "DevPrograms/BoxDraw.h"
+#include "Programs/NintendoSwitch_SnapshotDumper.h"
 #include "DevPrograms/PathMaker.h"
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
@@ -62,6 +63,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<BoxDraw_Descriptor, BoxDraw>());
+        ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
         ret.emplace_back(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());

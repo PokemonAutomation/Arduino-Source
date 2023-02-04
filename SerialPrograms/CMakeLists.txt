@@ -816,6 +816,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp
@@ -1298,6 +1300,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h
+    Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
@@ -1384,7 +1387,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
-    Source/PokemonSV/Resources/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
