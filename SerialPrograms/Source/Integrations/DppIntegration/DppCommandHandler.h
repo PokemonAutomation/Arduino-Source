@@ -28,12 +28,11 @@ private:
     AsyncDispatcher m_dispatcher = AsyncDispatcher(nullptr, 1);
     ScheduledTaskRunner m_queue = ScheduledTaskRunner(m_dispatcher);
     std::mutex m_count_lock;
-    static std::map<std::string, SlashCommand> command_map;
     static dpp::user owner;
     static Color color;
 
 protected:
-    void initialize(dpp::cluster& bot);
+    void initialize(dpp::cluster& bot, dpp::commandhandler& handler);
     bool check_if_empty(const DiscordSettingsOption& settings);
     void log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll);
     void send_message(
@@ -46,9 +45,9 @@ protected:
     );
 
 private:
-    void create_commands(dpp::cluster& bot);
+    void create_unified_commands(dpp::commandhandler& handler);
     void update_response(
-        const dpp::slashcommand_t& event,
+        const dpp::command_source& src,
         dpp::embed& embed,
         const std::string& msg,
         std::shared_ptr<PendingFileSend> file

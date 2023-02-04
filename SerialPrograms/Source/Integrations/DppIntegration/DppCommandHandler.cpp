@@ -6,8 +6,6 @@
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-//#include "CommonFramework/PersistentSettings.h"
-//#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "Integrations/IntegrationsAPI.h"
 #include "Integrations/DiscordSettingsOption.h"
@@ -19,29 +17,32 @@ namespace PokemonAutomation{
 namespace Integration{
 namespace DppCommandHandler{
 
-
-std::map<std::string, Handler::SlashCommand> Handler::command_map;
 user Handler::owner;
 Color Handler::color = COLOR_WHITE;
 
-void Handler::initialize(cluster& bot) {
+void Handler::initialize(cluster& bot, commandhandler& handler) {
     bot.on_log([this](const log_t& log) {
         log_dpp(log.message, "Internal Log", log.severity);
     });
 
     owner = bot.current_application_get_sync().owner;
-    Handler::create_commands(bot);
+    auto cmd_type = GlobalSettings::instance().DISCORD.integration.command_type.get();
+    std::string prefix = GlobalSettings::instance().DISCORD.integration.command_prefix;
 
-    bot.on_ready([&bot, this](const ready_t&) {
+    if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()) {
+        handler.add_prefix(prefix);
+    } else {
+        handler.add_prefix("/");
+    }
+
+    bot.on_ready([&bot, &handler, this](const ready_t&) {
         log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
         if (run_once<struct register_bot_commands>() && !m_initialized) {
-            // Overwrite because we can both add and remove commands. Takes an hour for removed commands to be updated.
-            log_dpp("Registering slash commands.", "Ready", ll_info);
-            std::vector<slashcommand> cmds;
-            for (auto& element : command_map) {
-                cmds.emplace_back(element.second.command);
-            }
-            bot.global_bulk_command_create(cmds);
+            /*Overwrite because we can both add and remove commands. Takes an hour for removed commands to be updated.
+              Slash commands will be deleted if switching to prefix commands. Best not to do too often.*/
+            log_dpp("Registering commands.", "Ready", ll_info);
+            Handler::create_unified_commands(handler);
+            handler.register_commands();
             m_initialized = true;
         }
     });
@@ -73,19 +74,6 @@ void Handler::initialize(cluster& bot) {
             user_counts.at(id)--;
         }
     });
-
-    bot.on_slashcommand([this](const slashcommand_t& event) {
-        auto it = command_map.find(event.command.get_command_name());
-        if (it != command_map.end()) {
-            log_dpp("Executing slash command: " + event.command.get_command_name() + ".", "Slash Command", ll_info);
-            try {
-                it->second.func(event);
-            }
-            catch (std::exception& e) {
-                log_dpp("Exception occurred while executing command: " + event.command.get_command_name() + ".\n" + e.what(), "Slash Command", ll_critical);
-            }
-        }
-    });
 }
 
 void Handler::send_message(cluster& bot, embed& embed, const std::string& channel, std::chrono::milliseconds delay, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
@@ -100,7 +88,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
                 embed.set_image("attachment://" + file->filename());
             }
             catch (dpp::exception e) {
-                log_dpp(std::format("Exception thrown while reading screenshot data: {}", e.what()), "send_message()", ll_error);
+                log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
             }
         }
 
@@ -117,7 +105,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
     log_dpp("Sending message...", "send_message()", ll_info);
 }
 
-void Handler::update_response(const dpp::slashcommand_t& event, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
+void Handler::update_response(const dpp::command_source& src, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
     message m;
     if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
         std::string data;
@@ -127,7 +115,7 @@ void Handler::update_response(const dpp::slashcommand_t& event, dpp::embed& embe
             embed.set_image("attachment://" + file->filename());
         }
         catch (dpp::exception e) {
-            log_dpp(std::format("Exception thrown while reading screenshot data: {}", e.what()), "send_message()", ll_error);
+            log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
         }
     }
 
@@ -136,7 +124,11 @@ void Handler::update_response(const dpp::slashcommand_t& event, dpp::embed& embe
     }
 
     m.add_embed(embed);
-    event.edit_response(m);
+    if (src.interaction_event.has_value()) {
+        src.interaction_event.value().edit_response(m);
+    } else {
+        src.message_event.value().reply(m);
+    }
 }
 
 void Handler::log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll) {
@@ -158,17 +150,22 @@ bool Handler::check_if_empty(const DiscordSettingsOption& settings) {
     return true;
 }
 
-void Handler::create_commands(cluster& bot) {
-    command_map.emplace("ping", SlashCommand {
-        slashcommand("ping", "Ping pong!", bot.me.id),
-        [](const slashcommand_t& event) {
-            event.reply("Pong! :ping_pong:");
-        }
-    });
+void Handler::create_unified_commands(commandhandler& handler) {
+    handler
+    .add_command(
+        "ping",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            handler.reply(message("Pong! :ping_pong:"), src);
+        },
+        "Ping pong!")
 
-    command_map.emplace("about", SlashCommand {
-        slashcommand("about", "Some info about me!", bot.me.id),
-        [](const slashcommand_t& event) {
+    .add_command(
+        "about",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             embed embed;
             embed.set_color((uint32_t)color).set_title("Here's a little bit about me!");
 
@@ -182,223 +179,403 @@ void Handler::create_commands(cluster& bot) {
             embed.add_field("Owner", owner.format_username() + "(" + std::to_string(owner.id) + ")");
             embed.add_field("Guilds", std::to_string(Utility::user_counts.size()));
             embed.add_field("Users", std::to_string(counts));
-            embed.add_field("Powered By", std::format("{} {} ([GitHub]({}/About)/[Discord]({}))", PROGRAM_NAME, PROGRAM_VERSION, PROJECT_GITHUB_URL, DISCORD_LINK_URL));
+            embed.add_field("Uptime", handler.owner->uptime().to_string());
+            embed.add_field("Powered By", PROGRAM_NAME + " " + PROGRAM_VERSION + "([GitHub](" + PROJECT_GITHUB_URL + "/About)/[Discord](" + DISCORD_LINK_URL + "))");
 
             message message;
             message.add_embed(embed);
-            event.reply(message);
-        }
-    });
+            handler.reply(message, src);
+        },
+        "Some info about me!")
 
-    command_map.emplace("hi", SlashCommand {
-        slashcommand("hi", "Hi!", bot.me.id),
-        [](const slashcommand_t& event) {
-            user usr = event.command.get_issuing_user();
-            event.reply(usr.get_mention() + " " + (std::string)GlobalSettings::instance().DISCORD.integration.hello_message);
-        }
-    });
+    .add_command(
+        "hi",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            message message;
+            message.set_content((std::string)GlobalSettings::instance().DISCORD.integration.hello_message);
+            if (src.message_event.has_value()) {
+                message.set_reference(src.message_event.value().msg.id);
+            }
+            handler.reply(message, src);
+        },
+        "Hi!")
 
-    command_map.emplace("resetserial", SlashCommand {
-        slashcommand("resetserial", "Reset the serial connection.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0)),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
+    .add_command(
+        "resetserial",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::reset_serial(id);
-
             if (!response.empty()) {
-                event.reply(response);
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
                 return;
             }
 
-            response = std::format("Reset the serial connection for console ID {}.", id);
-            event.reply(response);
-        }
-    });
+            embed.set_description("Reset the serial connection for console ID " + std::to_string(id) + ".");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Reset the serial connection.")
 
-    command_map.emplace("resetcamera", SlashCommand {
-        slashcommand("resetcamera", "Reset the camera.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0)),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
+    .add_command(
+        "resetcamera",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::reset_camera(id);
-
             if (!response.empty()) {
-                event.reply(response);
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
                 return;
             }
 
-            response = std::format("Reset the camera for console ID {}.", id);
-            event.reply(response);
-        }
-    });
+            embed.set_description("Reset the camera for console ID " + std::to_string(id) + ".");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Reset the camera.")
 
-    command_map.emplace("start", SlashCommand {
-        slashcommand("start", "Start the currently selected program.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0)),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
+    .add_command(
+        "start",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::start_program(id);
-
             if (!response.empty()) {
-                event.reply(response);
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
                 return;
             }
 
-            response = std::format("Started the program for console ID {}.", id);
-            event.reply(response);
-        }
-    });
+            embed.set_description("Started the program for console ID " + std::to_string(id) + ".");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Start the currently selected program.")
 
-    command_map.emplace("stop", SlashCommand {
-        slashcommand("stop", "Stop the currently running program.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0)),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
+    .add_command(
+        "stop",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::stop_program(id);
-
             if (!response.empty()) {
-                event.reply(response);
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
                 return;
             }
 
-            response = std::format("Stopped the program for console ID {}.", id);
-            event.reply(response);
-        }
-    });
+            embed.set_description("Stopped the program for console ID " + std::to_string(id) + ".");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Stop the currently running program.")
 
-    command_map.emplace("status", SlashCommand {
-        slashcommand("status", "Show program status.", bot.me.id),
-        [](const slashcommand_t& event) {
-            embed emb;
-            emb.set_color((uint32_t)color).set_title("Program Status").set_description(Integration::status());
+    .add_command(
+        "status",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_description(Integration::status()).set_title("Program Status");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "View program status.")
 
-            message msg;
-            msg.add_embed(emb);
-            event.reply(msg);
-        }
-    });
+    .add_command(
+        "click",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"button", param_info(pt_string, false, "Switch console button.",
+                {{"0", "Y"},
+                {"1", "B"},
+                {"2", "A"},
+                {"3", "X"},
+                {"4", "L"},
+                {"5", "R"},
+                {"6", "ZL"},
+                {"7", "ZR"},
+                {"8", "Minus"},
+                {"9", "Plus"},
+                {"10", "LStick"},
+                {"11", "RStick"},
+                {"12", "Home"},
+                {"13", "Capture"},
+                {"14", "DUP"},
+                {"15", "DDOWN"},
+                {"16", "DLEFT"},
+                {"17", "DRIGHT"},}
+            )}
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
 
-    command_map.emplace("click", SlashCommand {
-        slashcommand("click", "Click a button for the specified console.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0))
-        .add_option(command_option(command_option_type::co_integer, "button", "Switch console button.", true)
-            .add_choice(command_option_choice("Y", 0))
-            .add_choice(command_option_choice("B", 1))
-            .add_choice(command_option_choice("A", 2))
-            .add_choice(command_option_choice("X", 3))
-            .add_choice(command_option_choice("L", 4))
-            .add_choice(command_option_choice("R", 5))
-            .add_choice(command_option_choice("ZL", 6))
-            .add_choice(command_option_choice("ZR", 7))
-            .add_choice(command_option_choice("Minus", 8))
-            .add_choice(command_option_choice("Plus", 9))
-            .add_choice(command_option_choice("LStick", 10))
-            .add_choice(command_option_choice("RStick", 11))
-            .add_choice(command_option_choice("Home", 12))
-            .add_choice(command_option_choice("Capture", 13))
-            .add_choice(command_option_choice("DUP", 14))
-            .add_choice(command_option_choice("DDOWN", 15))
-            .add_choice(command_option_choice("DLEFT", 16))
-            .add_choice(command_option_choice("DRIGHT", 17))),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
-            uint16_t bt = std::get<int64_t>(event.get_parameter("button"));
-            uint16_t button = Utility::get_button(bt);
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
 
-            if (bt > 13) {
-                Integration::press_dpad(id, button, 50);
+            if (params.size() < 2) {
+                embed.set_description("Missing command arguments.");
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            int64_t id = Utility::sanitize_integer_input(params, 0);
+            std::string button_input = std::get<std::string>(params[1].second);
+
+            std::string name = "None";
+            int64_t button = Utility::get_value_from_input(handler, command, button_input, name);
+
+            if (button < 0) {
+                embed.set_description("No such button found: " + button_input);
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            std::string response;
+            if (button > 13) {
+                response = Integration::press_dpad(id, Utility::get_button(button), 50);
+            } else {
+                response = Integration::press_button(id, Utility::get_button(button), 50);
+            }
+
+            if (!response.empty()) {
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            embed.set_description("Console ID " + std::to_string(id) + " pressed button " + name + ".");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Click a button for the specified console.")
+                
+    .add_command(
+        "joystick",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"stick", param_info(pt_string, false, "Switch console joystick.",
+                {{"0", "LStick"},
+                {"1", "RStick"},}
+            )},
+            {"magnitude_x", param_info(pt_integer, false, "Movement amount in the horizontal direction. \"Left\" is 0, \"right\" is 255, \"neutral\" is 127.")},
+            {"magnitude_y", param_info(pt_integer, false, "Movement amount in the vertical direction. \"Down\" is 0, \"up\" is 255, \"neutral\" is 127.")},
+            {"ticks", param_info(pt_integer, false, "How long to hold the stick for, in ticks.")},
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command Response");
+
+            if (params.size() < 5) {
+                embed.set_description("Missing command arguments.");
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            std::string name = "None";
+            int64_t id = Utility::sanitize_integer_input(params, 0);
+            std::string stick_input = std::get<std::string>(params[1].second);
+            int64_t stick = Utility::get_value_from_input(handler, command, stick_input, name);
+
+            if (stick < 0) {
+                embed.set_description("No such joystick found: " + stick_input);
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            int64_t x = Utility::sanitize_integer_input(params, 2);
+            int64_t y = Utility::sanitize_integer_input(params, 3);
+            int64_t ticks = Utility::sanitize_integer_input(params, 4);
+
+            std::string response;
+            if (stick == 0) {
+                response = Integration::press_left_joystick(id, x, y, ticks);
             }
             else {
-                Integration::press_button(id, button, 50);
+                response = Integration::press_right_joystick(id, x, y, ticks);
             }
 
-            std::string name = command_map[event.command.get_command_name()].command.options.at(1).choices.at(bt).name;
-            std::string response = std::format("Console ID {} pressed button {}.", id, name);
-            event.reply(response);
-        }
-    });
-
-    command_map.emplace("joystick", SlashCommand {
-        slashcommand("joystick", "Move a joystick for the specified console.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0))
-        .add_option(command_option(command_option_type::co_string, "stick", "Switch console joystick.", true)
-            .add_choice(command_option_choice("Left Stick", "LStick"))
-            .add_choice(command_option_choice("Right Stick", "RStick")))
-        .add_option(command_option(command_option_type::co_integer, "magnitude_x", "Movement amount in the horizontal direction. \"Left\" is 0, \"right\" is 255, \"neutral\" is 127.", true)
-            .set_min_value(0).set_max_value(255))
-        .add_option(command_option(command_option_type::co_integer, "magnitude_y", "Movement amount in the vertical direction. \"Down\" is 0, \"up\" is 255, \"neutral\" is 127.", true)
-            .set_min_value(0).set_max_value(255))
-        .add_option(command_option(command_option_type::co_integer, "ticks", "How long to hold the stick for, in ticks.", true)
-            .set_min_value(0)),
-        [](const slashcommand_t& event) {
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
-            std::string stick = std::get<std::string>(event.get_parameter("stick"));
-            uint8_t x = std::get<int64_t>(event.get_parameter("magnitude_x"));
-            uint8_t y = std::get<int64_t>(event.get_parameter("magnitude_y"));
-            uint16_t ticks = std::get<int64_t>(event.get_parameter("ticks"));
-
-            if (stick == "LStick") {
-                Integration::press_left_joystick(id, x, y, ticks);
-            }
-            else {
-                Integration::press_left_joystick(id, x, y, ticks);
+            if (!response.empty()) {
+                embed.set_description(response);
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
             }
 
-            std::string response = std::format("Console ID {} moved {} (X: {}, Y: {}) for {} ticks.", id, stick, x, y, ticks);
-            event.reply(response);
-        }
-    });
+            embed.set_description("Console ID " + std::to_string(id) + " moved " + name + " (X: " + std::to_string(x) + ", Y: " + std::to_string(y) + ") for " + std::to_string(ticks) + " ticks.");
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "Click a button for the specified console.")
+            
+    .add_command(
+        "screenshot",
+        {
+            {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")},
+            {"format", param_info(pt_string, false, "Image format.",
+                {{"0", "png"},
+                {"1", "jpg"},}
+            )},
+        },
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
 
-    command_map.emplace("screenshot", SlashCommand {
-        slashcommand("screenshot", "Take and upload a screenshot from the specified console.", bot.me.id)
-        .add_permission(command_permission(owner.id, command_permission_type::cpt_user, true))
-        .add_option(command_option(command_option_type::co_integer, "id", "Console ID. Find yours by using the \"status\" command.", true)
-            .set_min_value(0))
-        .add_option(command_option(command_option_type::co_integer, "format", "Image format.", true)
-            .add_choice(command_option_choice("PNG", 0))
-            .add_choice(command_option_choice("JPG", 1))),
-        [this](const slashcommand_t& event) {
-            // Serves as an ack because we have to reply within 3 seconds.
-            event.thinking();
-            uint64_t id = std::get<int64_t>(event.get_parameter("id"));
-            uint8_t format = std::get<int64_t>(event.get_parameter("format"));
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Program Screenshot");
+
+            if (params.size() < 2) {
+                embed.set_description("Missing command arguments.");
+                message.add_embed(embed);
+                handler.reply(message, src);
+                return;
+            }
+
+            handler.thinking(src);
+            std::string name = "None";
+            int64_t id = Utility::sanitize_integer_input(params, 0);
+            std::string button_input = std::get<std::string>(params[1].second);
+            int64_t format = Utility::get_value_from_input(handler, command, button_input, name);
 
             std::string path;
             if (format == 0) {
                 path = "screenshot_slash.png";
-            }
-            else {
+            } else {
                 path = "screenshot_slash.jpg";
             }
 
             std::string response = Integration::screenshot(id, path.c_str());
             if (!response.empty()) {
-                event.edit_response(response);
+                embed.set_description(response);
+                Handler::update_response(src, embed, "", nullptr);
                 return;
             }
-            else {
-                std::shared_ptr<PendingFileSend> file(new PendingFileSend(path, true));
-                embed_footer footer;
-                footer.set_text(std::format("Console ID: {}", id));
 
-                embed emb;
-                emb.set_title("Program Screenshot").set_color((uint32_t)color).set_footer(footer);
-                Handler::update_response(event, emb, "", std::move(file));
+            std::shared_ptr<PendingFileSend> file(new PendingFileSend(path, true));
+            embed_footer footer;
+            footer.set_text("Console ID: " + std::to_string(id) + " (" + name + ")");
+
+            embed.set_footer(footer);
+            Handler::update_response(src, embed, "", std::move(file));
+        },
+        "Take and upload a screenshot from the specified console.")
+            
+    .add_command(
+        "help",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            message message;
+            embed embed;
+            embed.set_color((uint32_t)color).set_title("Command List");
+
+            auto& commands = handler.commands;
+            for (auto& cmd : commands) {
+                std::string name = cmd.first;
+                log_dpp(name, "help command", ll_info);
+                if (src.issuer.id != owner.id && name != "hi" && name != "ping" && name != "about" && name != "status" && name != "help") {
+                    continue;
+                }
+
+                std::string param_info;
+                for (auto& param : cmd.second.parameters) {
+                    param_info += ("\n**- " + param.first + "** - " + param.second.description);
+                    if (!param.second.choices.empty()) {
+                        param_info += " (";
+                        for (auto& choice : param.second.choices) {
+                            param_info += (choice.second + ", ");
+                        }
+                        param_info = param_info.substr(0, param_info.size() - 2);
+                        param_info += ")";
+                    }
+                }
+                embed.add_field(name, param_info);
             }
-        }
-    });
+            embed_footer footer;
+            footer.set_text("Commands are case-sensitive!");
+            embed.set_footer(footer);
+            message.add_embed(embed);
+            handler.reply(message, src);
+        },
+        "View the command list.");
 }
 
 

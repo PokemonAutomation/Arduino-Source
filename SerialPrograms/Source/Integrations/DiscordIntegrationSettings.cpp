@@ -44,6 +44,15 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockWhileRunning::LOCKED,
         Library::SleepyDiscord
     )
+    , command_type(
+        "<b>Discord Integration Command Type:</b><br>Restart the program for this to take effect.",
+        {
+            {CommandType::SlashCommands, "slash", "Slash commands"},
+            {CommandType::MessageCommands, "message", "Message (prefix) commands"},
+        },
+        LockWhileRunning::LOCKED,
+        CommandType::SlashCommands
+    )
     , token(
         true,
         "<b>Discord token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
@@ -52,7 +61,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
     , command_prefix(
         false,
-        "<b>Discord command prefix (Sleepy):</b><br>Enter a command prefix for your bot.",
+        "<b>Discord command prefix:</b><br>Enter a command prefix for your bot.",
         LockWhileRunning::LOCKED,
         "^", "^"
     )
@@ -89,6 +98,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     PA_ADD_OPTION(run_on_start);
     if (IS_BETA_VERSION){
         PA_ADD_OPTION(library);
+        PA_ADD_OPTION(command_type);
     }
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
@@ -115,6 +125,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
         library.set_visibility(state);
+        command_type.set_visibility(ConfigOptionState::HIDDEN);
         token.set_visibility(state);
         game_status.set_visibility(state);
         hello_message.set_visibility(state);
@@ -132,11 +143,12 @@ void DiscordIntegrationSettingsOption::value_changed(){
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
         library.set_visibility(state);
+        command_type.set_visibility(state);
         token.set_visibility(state);
         game_status.set_visibility(state);
         hello_message.set_visibility(state);
 
-        command_prefix.set_visibility(ConfigOptionState::HIDDEN);
+        command_prefix.set_visibility(state);
         use_suffix.set_visibility(ConfigOptionState::HIDDEN);
         sudo.set_visibility(ConfigOptionState::HIDDEN);
         owner.set_visibility(ConfigOptionState::HIDDEN);

@@ -35,6 +35,12 @@ public:
     };
     EnumDropdownOption<Library> library;
 
+    enum class CommandType {
+        SlashCommands,
+        MessageCommands,
+    };
+    EnumDropdownOption<CommandType> command_type;
+
     StringOption token;
     StringOption command_prefix;
     BooleanCheckBoxOption use_suffix;
