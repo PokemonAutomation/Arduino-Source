@@ -58,6 +58,27 @@ uint16_t Utility::get_button(const uint16_t& bt) {
     return 1 << bt;
 }
 
+int64_t Utility::get_value_from_input(const commandhandler& handler, const std::string& command_name, const std::string& input, std::string& out) {
+    auto cmd = handler.commands.find(command_name);
+    auto& choices = cmd->second.parameters[1].second.choices;
+    for (auto& choice : choices) {
+        std::string val = std::get<std::string>(choice.first);
+        if (val == input || choice.second == input) {
+            out = choice.second;
+            return std::stoi(val);
+        }
+    }
+    return -1;
+}
+
+int64_t Utility::sanitize_integer_input(const parameter_list_t& params, const uint8_t& index) {
+    int64_t val = std::get<int64_t>(params[index].second);
+    if (val < 0) {
+        return 0;
+    }
+    return val;
+}
+
 
 
 }

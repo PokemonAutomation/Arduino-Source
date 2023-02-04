@@ -38,9 +38,10 @@ void Client::connect() {
             return;
 
         std::string token = settings.integration.token;
-        uint32_t intents = intents::i_default_intents | intents::i_guild_members;
+        uint32_t intents = intents::i_default_intents | intents::i_guild_members | intents::i_message_content;
         try {
             m_bot = std::make_unique<cluster>(token, intents);
+            m_handler = std::make_unique<commandhandler>(m_bot.get());
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
             std::thread(&Client::run, this, token).detach();
         }
@@ -55,6 +56,7 @@ void Client::disconnect() {
     if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)) {
         try {
             m_bot->shutdown();
+            m_handler.reset();
             m_bot.reset();
             m_is_connected.store(false, std::memory_order_release);
         }
@@ -131,7 +133,7 @@ void Client::run(const std::string& token) {
         return;
     }
     try {
-        Handler::initialize(*m_bot.get());
+        Handler::initialize(*m_bot.get(), *m_handler.get());
         m_bot->set_websocket_protocol(websocket_protocol_t::ws_etf);
         m_bot->start(st_return);
         m_bot->set_presence(presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status));
@@ -139,6 +141,7 @@ void Client::run(const std::string& token) {
     }
     catch (std::exception& e) {
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
+        m_handler.reset();
         m_bot.reset();
         m_is_connected.store(false, std::memory_order_release);
     }

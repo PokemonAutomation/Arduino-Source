@@ -38,9 +38,9 @@ private:
 
 private:
     std::unique_ptr<dpp::cluster> m_bot = nullptr;
+    std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
     std::mutex m_client_lock;
-//    std::thread m_thread;
 };
 
 
