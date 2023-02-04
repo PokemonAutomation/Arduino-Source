@@ -124,13 +124,15 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Possible improvements to make:
     money tracking? notifs tend to backlog.
     find prize sprites - some code is there, just disabled
-    find translations for mints and tera shards
+    find translations for tera shards
+    other languages: make sure "bottle cap" isn't misread as "bottle of PP Up"
     */
 
     for(uint32_t c = 0; c < NUM_ROUNDS; c++) {
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 10, 50); //sometimes the input drops
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret < 0) {
             env.log("Dialog detected.");
@@ -151,7 +153,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
         context.wait_for_all_requests();
 
-        BlackScreenWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+        BlackScreenWatcher end_of_battle(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         bool battle_lost = false;
         for (uint16_t battles = 0; !battle_lost && battles < 4; battles++) {
             //Wait for battle - shorter than tournament start above
@@ -188,7 +190,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                         pbf_mash_button(context, BUTTON_A, 30000);
                         pbf_mash_button(context, BUTTON_A, 7500); //5 minutes should be more than enough for one battle
                     },
-                    { black_screen }
+                    { end_of_battle }
                     );
                 if (ret_black == 0) {
                     env.log("Battle finished.");
@@ -302,15 +304,15 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             }
             context.wait_for_all_requests();
 
+            stats.tournaments++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
             //Save the game if option checked, then loop again
             if (SAVE_NUM_ROUNDS != 0 && ((c + 1) % SAVE_NUM_ROUNDS) == 0) {
                 env.log("Saving game.");
                 save_game_from_overworld(env.program_info(), env.console, context);
             }
-
-            stats.tournaments++;
-            env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
         if (battle_lost) {
             env.log("Tournament lost! Navigating back to academy.");

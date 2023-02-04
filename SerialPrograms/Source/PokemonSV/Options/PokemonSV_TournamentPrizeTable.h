@@ -34,7 +34,6 @@ public:
 
     // Whether item_slug is among the selected items.
     bool find_item(const std::string& item_slug) const;
-    // Return the auction item slugs that the user has selected via the auction item table UI.
     std::vector<std::string> selected_items() const;
 
     virtual std::vector<std::string> make_header() const override;
