@@ -87,7 +87,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
             try {
                 data = utility::read_file(path);
                 m.add_file(file->filename(), data);
-                if (!path.contains(".txt")) {
+                if (path.find(".txt") == std::string::npos) {
                     embed.set_image("attachment://" + file->filename());
                 }
             }
