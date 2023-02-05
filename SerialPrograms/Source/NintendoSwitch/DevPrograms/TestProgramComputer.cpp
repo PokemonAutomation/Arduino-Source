@@ -198,6 +198,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
+    send_program_notification_with_file(
+        env,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        Color(0),
+        "Join Report",
+        {}, "",
+        "name-of-text-file.txt"
+    );
+
+
+
     ImageRGB32 image("screenshot-20230130-150721112888.png");
     SomethingInBoxSlotDetector detector(COLOR_RED);
 

@@ -387,10 +387,13 @@ bool TeraMultiFarmer::run_raid(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         try{
             if (console.index() == host_index){
-                if (HOSTING_MODE == Mode::HOST_ONLINE){
-                    connect_to_internet_from_overworld(env.program_info(), console, context);
+                TeraCardReader card_detector(COLOR_RED);
+                if (!card_detector.detect(console.video().snapshot())){
+                    if (HOSTING_MODE == Mode::HOST_ONLINE){
+                        connect_to_internet_from_overworld(env.program_info(), console, context);
+                    }
+                    open_raid(console, context);
                 }
-                open_raid(console, context);
             }else{
                 enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
             }
@@ -549,6 +552,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
                 pbf_press_button(context, BUTTON_X, 5, 5);
                 pbf_press_button(context, BUTTON_X, 20, 105);
                 save_game_from_menu(env.program_info(), console, context);
+            }else{
+                pbf_press_button(context, BUTTON_L, 5, 5);
             }
         });
     }
