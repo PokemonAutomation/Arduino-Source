@@ -37,13 +37,12 @@ void Handler::initialize(cluster& bot, commandhandler& handler) {
 
     bot.on_ready([&bot, &handler, this](const ready_t&) {
         log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
-        if (run_once<struct register_bot_commands>() && !m_initialized) {
+        Handler::create_unified_commands(handler);
+        if (run_once<struct register_bot_commands>() || !handler.slash_commands_enabled) {
             /*Overwrite because we can both add and remove commands. Takes an hour for removed commands to be updated.
               Slash commands will be deleted if switching to prefix commands. Best not to do too often.*/
             log_dpp("Registering commands.", "Ready", ll_info);
-            Handler::create_unified_commands(handler);
             handler.register_commands();
-            m_initialized = true;
         }
     });
 
