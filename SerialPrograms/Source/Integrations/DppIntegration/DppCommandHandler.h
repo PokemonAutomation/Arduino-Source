@@ -24,7 +24,6 @@ private:
         std::function<void(const dpp::slashcommand_t&)> func;
     };
 
-    bool m_initialized = false;
     AsyncDispatcher m_dispatcher = AsyncDispatcher(nullptr, 1);
     ScheduledTaskRunner m_queue = ScheduledTaskRunner(m_dispatcher);
     std::mutex m_count_lock;
