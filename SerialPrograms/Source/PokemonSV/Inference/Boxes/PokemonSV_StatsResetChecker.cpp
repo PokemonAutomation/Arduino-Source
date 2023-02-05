@@ -11,6 +11,7 @@
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_StatsResetChecker.h"
 
@@ -34,10 +35,12 @@ bool check_stats_reset_info(
     IVCheckerReaderScope iv_reader_scope(console.overlay(), language);
     VideoSnapshot screen = console.video().snapshot();
     IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    BoxNatureDetector nature_detector(console.overlay(), LANGUAGE);
+    NatureReader::Results nature = nature_detector.read(console.logger(), screen);
     const bool shiny = 0;
 
     console.log(IVs.to_string(), COLOR_GREEN);
-    action = FILTERS.get_action(shiny, IVs);
+    action = FILTERS.get_action(shiny, IVs, nature);
 
     return shiny;
 }

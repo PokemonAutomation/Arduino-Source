@@ -13,6 +13,7 @@ namespace Pokemon{
 
 StatsResetFilterRow::StatsResetFilterRow()
     : action(EggHatchAction::StopProgram)
+    , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCKED, NatureCheckerFilter::Any)
     , iv_hp(IVCheckerFilter::Anything)
     , iv_atk(IVCheckerFilter::Anything)
     , iv_def(IVCheckerFilter::Anything)
@@ -20,6 +21,7 @@ StatsResetFilterRow::StatsResetFilterRow()
     , iv_spdef(IVCheckerFilter::Anything)
     , iv_speed(IVCheckerFilter::Anything)
 {
+    PA_ADD_OPTION(nature);
     PA_ADD_OPTION(iv_hp);
     PA_ADD_OPTION(iv_atk);
     PA_ADD_OPTION(iv_def);
@@ -30,6 +32,7 @@ StatsResetFilterRow::StatsResetFilterRow()
 
 std::unique_ptr<EditableTableRow> StatsResetFilterRow::clone() const{
     std::unique_ptr<StatsResetFilterRow> ret(new StatsResetFilterRow());
+    ret->nature.set(nature);
     ret->iv_hp.set(iv_hp);
     ret->iv_atk.set(iv_atk);
     ret->iv_def.set(iv_def);
@@ -50,6 +53,7 @@ StatsResetFilterTable::StatsResetFilterTable()
 {}
 std::vector<std::string> StatsResetFilterTable::make_header() const{
     return std::vector<std::string>{
+        "Nature",
         "HP",
         "Attack",
         "Defense",
@@ -64,7 +68,7 @@ std::vector<std::unique_ptr<EditableTableRow>> StatsResetFilterTable::make_defau
     return ret;
 }
 
-EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs) const{
+EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IVCheckerReader::Results& IVs, NatureReader::Results nature) const{
     EggHatchAction action = EggHatchAction::Release;
     std::vector<std::unique_ptr<StatsResetFilterRow>> list = copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
@@ -77,6 +81,10 @@ EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IVCheckerRead
         if (!IVChecker_filter_match(filter.iv_spatk, IVs.spatk)) continue;
         if (!IVChecker_filter_match(filter.iv_spdef, IVs.spdef)) continue;
         if (!IVChecker_filter_match(filter.iv_speed, IVs.speed)) continue;
+
+        if (!NatureChecker_filter_match(filter.nature, nature.nature)) {
+            continue;
+        }
 
         EggHatchAction filter_action = filter.action;
 
