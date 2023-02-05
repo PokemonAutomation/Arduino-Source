@@ -89,16 +89,16 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     SoundType type = SOUND_TYPE;
     switch (type){
     case SoundType::Shiny:
-        detector = std::make_unique<ShinySoundDetector>(env.console.logger(), env.console, action);
+        detector = std::make_unique<ShinySoundDetector>(env.console, action);
         break;
     case SoundType::AlphaRoar:
-        detector = std::make_unique<AlphaRoarDetector>(env.console.logger(), env.console, action);
+        detector = std::make_unique<AlphaRoarDetector>(env.console, action);
         break;
     case SoundType::AlphaMusic:
-        detector = std::make_unique<AlphaMusicDetector>(env.console.logger(), env.console, action);
+        detector = std::make_unique<AlphaMusicDetector>(env.console, action);
         break;
     case SoundType::ItemDrop:
-        detector = std::make_unique<ItemDropSoundDetector>(env.console.logger(), env.console, action);
+        detector = std::make_unique<ItemDropSoundDetector>(env.console, action);
         break;
     default:
         throw InternalProgramError(

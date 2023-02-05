@@ -18,5 +18,6 @@ rd /s /q "debug\"
 rd /s /q "release\"
 rd /s /q "SerialPrograms\"
 rd /s /q "ErrorDumps\"
+rd /s /q "UserSettings\"
 
 ::rd /s /q "..\build-SerialPrograms*"

@@ -4,18 +4,11 @@
  *
  */
 
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_AlphaMusicDetector.h"
-
-#include <sstream>
-#include <cfloat>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,9 +16,9 @@ namespace PokemonLA{
 
 
 
-AlphaMusicDetector::AlphaMusicDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
+AlphaMusicDetector::AlphaMusicDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a red as the detection color because the alpha symbol is red.
-    : AudioPerSpectrumDetectorBase(logger, "AlphaMusicDetector", "Alpha music", COLOR_RED, console, detected_callback)
+    : AudioPerSpectrumDetectorBase("AlphaMusicDetector", "Alpha music", COLOR_RED, console, detected_callback)
 {}
 
 float AlphaMusicDetector::get_score_threshold() const{

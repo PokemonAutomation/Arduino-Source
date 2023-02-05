@@ -8,9 +8,7 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "AudioPerSpectrumDetectorBase.h"
@@ -23,12 +21,10 @@ namespace PokemonAutomation{
 
 
 AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
-    Logger& logger,
     std::string label, std::string audio_name, Color detection_color,
     ConsoleHandle& console, DetectedCallback detected_callback
 )
     : AudioInferenceCallback(std::move(label))
-    , m_logger(logger)
     , m_audio_name(std::move(audio_name))
     , m_detection_color(detection_color)
     , m_console(console)
@@ -40,14 +36,14 @@ AudioPerSpectrumDetectorBase::~AudioPerSpectrumDetectorBase(){
         log_results();
     }catch (...){}
 }
-void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds min_duration){
+void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds min_duration) const{
     if (m_start_timestamp + min_duration > current_time()){
         return;
     }
     if (m_lowest_error < 1.0){
         return;
     }
-    throw UserSetupError(m_logger, "No sound detected.");
+    throw UserSetupError(m_console, "No sound detected.");
 }
 
 void AudioPerSpectrumDetectorBase::log_results(){

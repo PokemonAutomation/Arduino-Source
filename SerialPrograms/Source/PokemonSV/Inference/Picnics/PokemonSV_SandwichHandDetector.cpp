@@ -26,7 +26,7 @@ namespace {
 class SandwichFreeHandMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SandwichFreeHandMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/SandwichHand-Template.png", Color(100,100,100), Color(255, 255, 255), 50
+        "PokemonSV/Picnic/SandwichHand-Template.png", Color(100,100,100), Color(255, 255, 255), 50
     ) {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
@@ -44,7 +44,7 @@ public:
 class SandwichGrabbingHandMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SandwichGrabbingHandMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/SandwichGrab-Template.png", Color(100,100,100), Color(255, 255, 255), 50
+        "PokemonSV/Picnic/SandwichGrab-Template.png", Color(100,100,100), Color(255, 255, 255), 50
     ) {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;

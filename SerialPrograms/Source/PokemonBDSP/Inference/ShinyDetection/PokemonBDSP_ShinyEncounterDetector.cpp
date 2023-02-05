@@ -272,7 +272,7 @@ void detect_shiny_battle(
     std::vector<WallClock> shiny_sound_timestamps; // the times where shiny sound is detected
     
     if (use_shiny_sound){
-        shiny_sound_detector = std::make_unique<ShinySoundDetector>(console.logger(), console, [&shiny_sound_timestamps](float error_coefficient) -> bool{
+        shiny_sound_detector = std::make_unique<ShinySoundDetector>(console, [&shiny_sound_timestamps](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             //  When this lambda function is called, a shiny sound is detected.
             //  Mark this by `shiny_sound_timestamps`.

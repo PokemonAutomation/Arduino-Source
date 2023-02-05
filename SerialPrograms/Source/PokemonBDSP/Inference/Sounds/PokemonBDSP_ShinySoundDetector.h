@@ -7,16 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 
-#include <memory>
-
 namespace PokemonAutomation{
-
-class ConsoleHandle;
-class SpectrogramMatcher;
-
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -24,7 +17,7 @@ namespace PokemonBDSP{
 class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
-    ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
+    ShinySoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

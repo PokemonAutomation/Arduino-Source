@@ -617,6 +617,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp \
+    Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
@@ -1603,6 +1604,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h \
+    Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \

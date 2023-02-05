@@ -15,12 +15,12 @@ namespace PokemonSwSh{
 
 
 BerryTreeRustlingSoundDetector::BerryTreeRustlingSoundDetector(
-    Logger& logger, ConsoleHandle& console,
+    ConsoleHandle& console,
     DetectedCallback detected_callback,
     float threshold
 )
     // Use a red as the detection color because the Levelball is made using red apricorns.
-    : AudioPerSpectrumDetectorBase(logger, "BerryTreeRustlingSoundDetector", "Berry tree rustling sound", COLOR_RED, console, detected_callback)
+    : AudioPerSpectrumDetectorBase("BerryTreeRustlingSoundDetector", "Berry tree rustling sound", COLOR_RED, console, detected_callback)
     , m_threshold(threshold)
 {}
 

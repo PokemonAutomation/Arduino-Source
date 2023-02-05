@@ -22,7 +22,7 @@ class BerryTreeRustlingSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
     BerryTreeRustlingSoundDetector(
-        Logger& logger, ConsoleHandle& console,
+        ConsoleHandle& console,
         DetectedCallback detected_callback,
         float threshold
     );

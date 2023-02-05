@@ -263,7 +263,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
     float shiny_coefficient = 1.0;
 
-    ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
+    ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
         if (!m_enable_shiny_sound.load()){
             return false;

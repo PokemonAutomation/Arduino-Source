@@ -4,18 +4,11 @@
  *
  */
 
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_AlphaRoarDetector.h"
-
-#include <sstream>
-#include <cfloat>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,10 +16,10 @@ namespace PokemonLA{
 
 
 
-AlphaRoarDetector::AlphaRoarDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
+AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a purple as the detection color because the alpha symbol is red. To differentiate with the
     // detection color of alpha music, the roar (which is loud -> heavy -> darker color) uses purple.
-    : AudioPerSpectrumDetectorBase(logger, "AlphaRoarDetector", "Alpha roar", COLOR_PURPLE, console, detected_callback)
+    : AudioPerSpectrumDetectorBase("AlphaRoarDetector", "Alpha roar", COLOR_PURPLE, console, detected_callback)
 {}
 
 float AlphaRoarDetector::get_score_threshold() const{

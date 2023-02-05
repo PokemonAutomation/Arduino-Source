@@ -4,27 +4,20 @@
  *
  */
 
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_ShinySoundDetector.h"
 
-#include <sstream>
-#include <cfloat>
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-ShinySoundDetector::ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
+ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a yellow as the detection color because the shiny animation is yellow.
-    : AudioPerSpectrumDetectorBase(logger, "ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
+    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
 {}
 
 

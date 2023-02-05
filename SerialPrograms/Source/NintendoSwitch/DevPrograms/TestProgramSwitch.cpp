@@ -83,6 +83,7 @@
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 
 
 #include <QPixmap>
@@ -295,38 +296,6 @@ void run_overworld(
 
 
 
-class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
-public:
-    //  Warning: The callback will be called from the audio inference thread.
-    ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
-
-    // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
-    virtual float get_score_threshold() const override;
-
-protected:
-    // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
-    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
-};
-
-
-ShinySoundDetector::ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
-    // Use a yellow as the detection color because the shiny animation is yellow.
-    : AudioPerSpectrumDetectorBase(logger, "ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
-{}
-float ShinySoundDetector::get_score_threshold() const{
-    return 0.85f;
-}
-std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
-    return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonSV/ShinySound", sampleRate),
-        SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
-        1000
-    );
-}
-
-
-
-
 
 
 
@@ -348,6 +317,26 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+    EncounterWatcher encounter(console);
+    int ret = wait_until(
+        console, scope, std::chrono::seconds(600),
+        {
+            static_cast<VisualInferenceCallback&>(encounter),
+            static_cast<AudioInferenceCallback&>(encounter),
+        }
+    );
+    encounter.throw_if_no_sound();
+
+    if (ret == 0){
+        logger.log("Found battle menu!");
+    }
+
+    if (encounter.shiny_screenshot()){
+        encounter.shiny_screenshot()->save("test.png");
+    }
+
+
 
 #if 0
     pbf_move_left_joystick(context, 128, 255, 300, 0);

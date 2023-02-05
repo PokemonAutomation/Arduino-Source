@@ -159,7 +159,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 
     float shiny_coefficient = 1.0;
-    ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
+    ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
         stats.enroute_shinies++;
         shiny_coefficient = error_coefficient;

@@ -4,27 +4,20 @@
  *
  */
 
-#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ItemDropSoundDetector.h"
 
-#include <sstream>
-#include <cfloat>
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-ItemDropSoundDetector::ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
+ItemDropSoundDetector::ItemDropSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
-    : AudioPerSpectrumDetectorBase(logger, "ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, detected_callback)
+    : AudioPerSpectrumDetectorBase("ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, detected_callback)
 {}
 
 

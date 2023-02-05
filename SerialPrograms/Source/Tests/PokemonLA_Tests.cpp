@@ -490,7 +490,7 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
     DummyAudioFeed audio_feed;
 
     ConsoleHandle console(0, logger, &botbase, video_feed, video_overlay, audio_feed);
-    ShinySoundDetector detector(logger, console, [&](float error_coefficient) -> bool{
+    ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
         return true;
     });
 

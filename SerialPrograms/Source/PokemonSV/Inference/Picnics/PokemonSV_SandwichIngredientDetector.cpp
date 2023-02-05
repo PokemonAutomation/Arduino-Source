@@ -30,7 +30,7 @@ namespace {
 class SandwichCondimentsPageMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SandwichCondimentsPageMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Condiments-Template.png", Color(100,100,100), Color(255, 255, 255), 50
+        "PokemonSV/Picnic/Condiments-Template.png", Color(100,100,100), Color(255, 255, 255), 50
     ) {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
@@ -47,7 +47,7 @@ public:
 class SandwichPicksPageMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SandwichPicksPageMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Picks-Template.png", Color(100,100,100), Color(255, 255, 255), 50
+        "PokemonSV/Picnic/Picks-Template.png", Color(100,100,100), Color(255, 255, 255), 50
     ) {
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;

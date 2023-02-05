@@ -149,7 +149,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     context.wait_for_all_requests();
 
     BerryTreeRustlingSoundDetector initial_rustling_detector(
-        env.console.logger(), env.console, [&](float error_coefficient) -> bool {
+        env.console, [&](float error_coefficient) -> bool {
             //  Warning: This callback will be run from a different thread than this function.
             return true;
         },
@@ -157,7 +157,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     );
 
     BerryTreeRustlingSoundDetector secondary_rustling_detector(
-        env.console.logger(), env.console, [&](float error_coefficient) -> bool {
+        env.console, [&](float error_coefficient) -> bool {
             //  Warning: This callback will be run from a different thread than this function.
             return true;
         },

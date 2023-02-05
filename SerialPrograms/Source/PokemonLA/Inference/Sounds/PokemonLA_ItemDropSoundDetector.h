@@ -8,17 +8,11 @@
 #define PokemonAutomation_PokemonLA_ItemDropSoundDetector_H
 
 #include <functional>
-#include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 
 #include <memory>
 
 namespace PokemonAutomation{
-
-class ConsoleHandle;
-class SpectrogramMatcher;
-
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -26,7 +20,7 @@ namespace PokemonLA{
 class ItemDropSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
-    ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
+    ItemDropSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

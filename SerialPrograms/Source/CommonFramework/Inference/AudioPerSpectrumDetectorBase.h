@@ -30,7 +30,6 @@
 
 #include <string>
 #include <functional>
-#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
@@ -57,14 +56,13 @@ public:
     // function. If it returns true, the inference session will stop (by returning true from 
     // AudioPerSpectrumDetectorBase::process_spectrums()).
     AudioPerSpectrumDetectorBase(
-        Logger& logger,
         std::string label, std::string audio_name, Color detection_color,
         ConsoleHandle& console, DetectedCallback detected_callback
     );
 
     virtual ~AudioPerSpectrumDetectorBase();
 
-    void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(5000));
+    void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(5000)) const;
 
     // To be implemented by derived classes:
     // The match threshold for the target audio.
@@ -83,14 +81,12 @@ public:
     // This function will always be called when the detector is destructed.
     void log_results();
 
-    float lowest_error(){ return m_lowest_error; }
+    float lowest_error() const{ return m_lowest_error; }
 
 protected:
     // To be implemented by derived classes:
     // build the actual spectrogram matcher for the target audio.
     virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) = 0;
-
-    Logger& m_logger;
 
     // Name of the target audio to be detected. Used for logging.
     std::string m_audio_name;

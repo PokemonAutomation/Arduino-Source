@@ -82,7 +82,7 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     SoundType type = SOUND_TYPE;
     switch (type){
     case SoundType::SHINY:
-        detector = std::make_shared<ShinySoundDetector>(env.console.logger(), env.console, action);
+        detector = std::make_shared<ShinySoundDetector>(env.console, action);
         break;
     default:
         throw InternalProgramError(

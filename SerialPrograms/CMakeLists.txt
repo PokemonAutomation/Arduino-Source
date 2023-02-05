@@ -1236,6 +1236,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp

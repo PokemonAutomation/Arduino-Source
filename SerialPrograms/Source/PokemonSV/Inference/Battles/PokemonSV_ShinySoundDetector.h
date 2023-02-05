@@ -16,7 +16,7 @@ namespace PokemonSV{
 
 class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
 public:
-    ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
+    ShinySoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
 
     virtual float get_score_threshold() const override;
 
