@@ -6,6 +6,7 @@
 
 #include <float.h>
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <iostream>
 #include <fstream>
