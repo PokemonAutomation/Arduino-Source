@@ -542,13 +542,22 @@ void make_two_herbs_sandwich(
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
             "Invalid sweet herb index: " + std::to_string(sweet_herb_index_last));
     }
-    if (salty_herb_index_last >= 4 || salty_herb_index_last >= sweet_herb_index_last){ // 0, 1, 2, 3
+    if (salty_herb_index_last >= 4){ // 0, 1, 2, 3
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
             "Invalid salty herb index: " + std::to_string(salty_herb_index_last));
     }
-    if (bitter_herb_index_last >= 2 || bitter_herb_index_last >= sweet_herb_index_last){ // 0, 1
+    if (bitter_herb_index_last >= 2){ // 0, 1
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
             "Invalid bitter herb index: " + std::to_string(bitter_herb_index_last));
+    }
+
+    if (sandwich_type == EggSandwichType::SALTY_SWEET_HERBS && salty_herb_index_last >= sweet_herb_index_last){
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid salty and sweet herb indices: " + std::to_string(salty_herb_index_last) + ", " + std::to_string(sweet_herb_index_last));
+    }
+    if (sandwich_type == EggSandwichType::BITTER_SWEET_HERBS && bitter_herb_index_last >= sweet_herb_index_last){
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid bitter and sweet herb indices: " + std::to_string(bitter_herb_index_last) + ", " + std::to_string(sweet_herb_index_last));
     }
 
     {
