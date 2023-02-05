@@ -618,6 +618,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp \
+    Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
@@ -689,6 +690,7 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
+    Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
@@ -1602,6 +1604,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h \
+    Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
@@ -1674,6 +1677,7 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
+    Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \

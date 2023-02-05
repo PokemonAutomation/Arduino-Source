@@ -32,8 +32,10 @@ public:
     TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
 
-    SectionDividerOption m_tera_raids;
+    SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
+    FloatingPointOption SHINY_SOUND_THRESHOLD;
+    FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
 };
 
 

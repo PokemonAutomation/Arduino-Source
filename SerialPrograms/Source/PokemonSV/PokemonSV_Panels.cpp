@@ -37,6 +37,8 @@
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
 
+#include "Programs/TestPrograms/PokemonSV_SoundListener.h"
+
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
 #endif
@@ -91,6 +93,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+    }
 
 #ifdef PA_OFFICIAL
     if (PreloadSettings::instance().DEVELOPER_MODE){

@@ -25,14 +25,14 @@ namespace PokemonAutomation{
 AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
     Logger& logger,
     std::string label, std::string audio_name, Color detection_color,
-    ConsoleHandle& console, OnShinyCallback on_shiny_callback
+    ConsoleHandle& console, DetectedCallback detected_callback
 )
     : AudioInferenceCallback(std::move(label))
     , m_logger(logger)
     , m_audio_name(std::move(audio_name))
     , m_detection_color(detection_color)
     , m_console(console)
-    , m_on_shiny_callback(std::move(on_shiny_callback))
+    , m_detected_callback(std::move(detected_callback))
     , m_start_timestamp(current_time())
 {}
 AudioPerSpectrumDetectorBase::~AudioPerSpectrumDetectorBase(){
@@ -163,12 +163,12 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     }
 
     //  No callback. Can't report.
-    if (m_on_shiny_callback == nullptr){
+    if (m_detected_callback == nullptr){
         return false;
     }
 
     m_last_reported = true;
-    return m_on_shiny_callback(m_last_error);
+    return m_detected_callback(m_last_error);
 }
 
 void AudioPerSpectrumDetectorBase::clear(){

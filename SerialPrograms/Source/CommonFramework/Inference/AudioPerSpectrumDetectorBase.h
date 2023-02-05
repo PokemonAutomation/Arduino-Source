@@ -33,7 +33,6 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -48,7 +47,7 @@ class SpectrogramMatcher;
 // - std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate)
 class AudioPerSpectrumDetectorBase : public AudioInferenceCallback{
 public:
-    using OnShinyCallback = std::function<bool(float error_coefficient)>;
+    using DetectedCallback = std::function<bool(float error_coefficient)>;
     // label: a name for this detector. Used for logging and profiling.
     // audio_name: the name of the audio to be detected (shiny sound etc). Capitalize first letter.
     // detection_color: the color to visualize the detection on audio spectrogram UI.
@@ -60,7 +59,7 @@ public:
     AudioPerSpectrumDetectorBase(
         Logger& logger,
         std::string label, std::string audio_name, Color detection_color,
-        ConsoleHandle& console, OnShinyCallback on_shiny_callback
+        ConsoleHandle& console, DetectedCallback detected_callback
     );
 
     virtual ~AudioPerSpectrumDetectorBase();
@@ -101,7 +100,7 @@ protected:
     ConsoleHandle& m_console;
     // Callback function to determine whether to stop the inference session when the target audio
     // is detected.
-    OnShinyCallback m_on_shiny_callback;
+    DetectedCallback m_detected_callback;
 
     WallClock m_start_timestamp;
 

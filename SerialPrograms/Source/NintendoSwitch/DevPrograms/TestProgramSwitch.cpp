@@ -80,6 +80,9 @@
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
+#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
+#include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/Inference/AudioTemplateCache.h"
 
 
 #include <QPixmap>
@@ -292,6 +295,41 @@ void run_overworld(
 
 
 
+class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
+public:
+    //  Warning: The callback will be called from the audio inference thread.
+    ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
+
+    // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
+    virtual float get_score_threshold() const override;
+
+protected:
+    // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
+    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
+};
+
+
+ShinySoundDetector::ShinySoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
+    // Use a yellow as the detection color because the shiny animation is yellow.
+    : AudioPerSpectrumDetectorBase(logger, "ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
+{}
+float ShinySoundDetector::get_score_threshold() const{
+    return 0.85f;
+}
+std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
+    return std::make_unique<SpectrogramMatcher>(
+        AudioTemplateCache::instance().get_throw("PokemonSV/ShinySound", sampleRate),
+        SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+        1000
+    );
+}
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -317,7 +355,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     pbf_press_button(context, BUTTON_R, 20, 0);
     pbf_move_left_joystick(context, 128, 0, 350, 0);
 #endif
-#if 1
+#if 0
     size_t count = 0;
     while (true){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);

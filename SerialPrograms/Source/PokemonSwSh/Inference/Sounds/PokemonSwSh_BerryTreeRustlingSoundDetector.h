@@ -23,7 +23,7 @@ public:
     //  Warning: The callback will be called from the audio inference thread.
     BerryTreeRustlingSoundDetector(
         Logger& logger, ConsoleHandle& console,
-        OnShinyCallback on_shiny_callback,
+        DetectedCallback detected_callback,
         float threshold
     );
 

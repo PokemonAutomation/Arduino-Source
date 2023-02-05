@@ -11,15 +11,12 @@
 #include <fstream>
 #include <sstream>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h"
@@ -28,12 +25,11 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA_SoundListener.h"
 
-#include <QMessageBox>
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 

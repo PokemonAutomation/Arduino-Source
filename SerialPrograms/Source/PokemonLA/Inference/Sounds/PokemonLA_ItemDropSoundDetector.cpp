@@ -22,9 +22,9 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-ItemDropSoundDetector::ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
+ItemDropSoundDetector::ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
-    : AudioPerSpectrumDetectorBase(logger, "ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, on_shiny_callback)
+    : AudioPerSpectrumDetectorBase(logger, "ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, detected_callback)
 {}
 
 

@@ -26,7 +26,7 @@ namespace PokemonLA{
 class ItemDropSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
-    ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

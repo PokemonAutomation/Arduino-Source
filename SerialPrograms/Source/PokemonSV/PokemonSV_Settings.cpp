@@ -55,7 +55,7 @@ GameSettings::GameSettings()
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
-    , m_tera_raids(
+    , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , RAID_SPAWN_DELAY(
@@ -64,14 +64,26 @@ GameSettings::GameSettings()
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
+    , SHINY_SOUND_THRESHOLD(
+        "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
+        LockWhileRunning::LOCKED,
+        0.85, 0, 1.0
+    )
+    , SHINY_SOUND_LOW_FREQUENCY(
+        "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
+        LockWhileRunning::LOCKED,
+        1000, 0, 48000
+    )
 {
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
     PA_ADD_OPTION(START_GAME_WAIT);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
-    PA_ADD_OPTION(m_tera_raids);
+    PA_ADD_OPTION(m_advanced_options);
     PA_ADD_OPTION(RAID_SPAWN_DELAY);
+    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
+    PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
 }
 
 
