@@ -21,6 +21,8 @@ user Handler::owner;
 Color Handler::color = COLOR_WHITE;
 
 void Handler::initialize(cluster& bot, commandhandler& handler) {
+    global_logger_tagged().log("Initializing DPP...");
+
     bot.on_log([this](const log_t& log) {
         log_dpp(log.message, "Internal Log", log.severity);
     });
