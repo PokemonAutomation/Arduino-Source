@@ -83,10 +83,13 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
         message m;
         if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
             std::string data;
+            std::string path = file->filepath();
             try {
-                data = utility::read_file(file->filepath());
+                data = utility::read_file(path);
                 m.add_file(file->filename(), data);
-                embed.set_image("attachment://" + file->filename());
+                if (!path.contains(".txt")) {
+                    embed.set_image("attachment://" + file->filename());
+                }
             }
             catch (dpp::exception e) {
                 log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
@@ -98,7 +101,6 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
         }
 
         m.allowed_mentions.parse_users = true;
-
         m.channel_id = channel;
         m.add_embed(embed);
         bot.message_create(m);
