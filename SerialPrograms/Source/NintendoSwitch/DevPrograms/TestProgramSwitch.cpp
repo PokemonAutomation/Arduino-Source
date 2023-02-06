@@ -85,6 +85,7 @@
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 
 
 #include <QPixmap>
@@ -163,138 +164,6 @@ using namespace Kernels::Waterfill;
 using namespace PokemonSV;
 
 
-enum class OverworldState{
-    None,
-    FindingSky,
-    TurningLeft,
-    TurningRight,
-};
-
-void find_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    AreaZeroSkyTracker& sky_tracker, double target_x
-){
-    AsyncCommandSession session(context, console, env.realtime_dispatcher(), context.botbase());
-    OverworldState state = OverworldState::None;
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::minutes(1)){
-            throw OperationFailedException(console, "Failed to find the sky after 1 minute.", true);
-        }
-
-        context.wait_for(std::chrono::milliseconds(200));
-
-        double sky_x, sky_y;
-        bool sky = sky_tracker.sky_location(sky_x, sky_y);
-
-        if (!sky){
-            if (!session.command_is_running() || state != OverworldState::FindingSky){
-                console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
-                session.dispatch([](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128, 0, 250, 0);
-                    pbf_move_right_joystick(context, 255, 0, 10 * TICKS_PER_SECOND, 0);
-                });
-                state = OverworldState::FindingSky;
-            }
-            continue;
-        }
-
-        cout << sky_x << " - " << sky_y << endl;
-
-        if (sky_x < target_x - 0.05){
-            if (!session.command_is_running() || state != OverworldState::TurningLeft){
-                console.log("Centering the sky... Moving left.", COLOR_BLUE);
-                uint8_t magnitude = (uint8_t)((target_x - sky_x) * 96 + 31);
-                uint16_t duration = (uint16_t)((target_x - sky_x) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
-                });
-                state = OverworldState::TurningLeft;
-            }
-            continue;
-        }
-        if (sky_x > target_x + 0.05){
-            if (!session.command_is_running() || state != OverworldState::TurningRight){
-                console.log("Centering the sky... Moving Right.", COLOR_BLUE);
-                uint8_t magnitude = (uint8_t)((sky_x - target_x) * 96 + 31);
-                uint16_t duration = (uint16_t)((sky_x - target_x) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
-                });
-                state = OverworldState::TurningRight;
-            }
-            continue;
-        }
-
-        if (session.command_is_running()){
-            session.stop_command();
-            context.wait_for(std::chrono::seconds(1));
-            continue;
-        }
-        break;
-    }
-
-    session.stop_session_and_rethrow();
-}
-
-
-void move_and_target(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t duration){
-    pbf_move_left_joystick(context, x, y, duration, 0);
-    pbf_press_button(context, BUTTON_L | BUTTON_R, 20, 105);
-//    pbf_move_left_joystick(context, 128, 255, 250, 0);
-//    pbf_move_left_joystick(context, 128, 0, 50, 0);
-//    pbf_press_button(context, BUTTON_R, 20, 0);
-//    pbf_move_left_joystick(context, 128, 0, 200, 0);
-}
-
-
-void run_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    AreaZeroSkyTracker& sky_tracker, double target_x
-){
-    console.log("Run Iteration. Target = " + std::to_string(target_x));
-    context.wait_for_all_requests();
-    context.wait_for(std::chrono::milliseconds(200));
-
-    pbf_press_button(context, BUTTON_R, 20, 0);
-    find_sky(env, console, context, sky_tracker, target_x);
-    pbf_move_right_joystick(context, 128, 255, 80, 0);
-
-    move_and_target(context, 128, 255, 50);
-    move_and_target(context, 128, 0, 2 * TICKS_PER_SECOND);
-    move_and_target(context, 128, 0, 3 * TICKS_PER_SECOND);
-    context.wait_for_all_requests();
-
-    find_sky(env, console, context, sky_tracker, 0.5);
-    pbf_move_right_joystick(context, 128, 255, 80, 0);
-
-    pbf_move_left_joystick(context, 128, 0, 50, 0);
-//        pbf_press_button(context, BUTTON_L, 20, 50);
-    pbf_press_button(context, BUTTON_R, 20, 105);
-
-#if 0
-    for (size_t c = 0; c < 2; c++){
-        context.wait_for_all_requests();
-        console.log("Let's Go Iteration: " + std::to_string(c));
-        double sky_x, sky_y;
-        if (sky_tracker.sky_location(sky_x, sky_y) && std::abs(target_x - sky_x) > 0.1){
-            find_sky(env, console, context, sky_tracker, target_x);
-            pbf_move_right_joystick(context, 128, 255, 80, 0);
-        }
-    }
-#endif
-
-    pbf_move_left_joystick(context, 128, 0, 350, 0);
-    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
-    pbf_move_left_joystick(context, 0, 128, 30, 0);
-    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
-    pbf_move_left_joystick(context, 255, 128, 30, 0);
-    pbf_press_button(context, BUTTON_R, 20, 5 * TICKS_PER_SECOND);
-}
-
-
-
-
 
 
 
@@ -321,6 +190,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+
+
+
+
+#if 0
     LetsGoKillWatcher watcher(logger, COLOR_RED, false);
 
     wait_until(
@@ -329,7 +204,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             watcher,
         }
     );
-
+#endif
 
 #if 0
     LetsGoKillDetector detector(COLOR_RED, {0.71, 0.15, 0.04, 0.30});

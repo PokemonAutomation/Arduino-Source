@@ -69,7 +69,6 @@ bool is_kill_icon(
 
 
 
-
 LetsGoKillDetector::LetsGoKillDetector(
     Color color,
     const ImageFloatBox& box
@@ -145,17 +144,37 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
     return false;
 }
 
+
+
+LetsGoKillWatcher::LetsGoKillWatcher(
+    Logger& logger,
+    Color color, bool trigger_if_detected,
+    std::function<void()> on_kill_callback,
+    std::chrono::milliseconds duration
+)
+     : DetectorToFinder("LetsGoKillWatcher", duration, color)
+     , m_logger(logger)
+     , m_trigger_if_detected(trigger_if_detected)
+     , m_on_kill_callback(on_kill_callback)
+     , m_last_detection(false)
+     , m_last_detected(WallClock::min())
+{}
 bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool result = DetectorToFinder::process_frame(frame, timestamp);
     if (!result){
+        m_last_detection = false;
         return false;
     }
 
-    if (!m_last_detected){
+    if (m_last_detected.load(std::memory_order_relaxed) == WallClock::min()){
         m_logger.log("Detected Let's Go kill icon.");
     }
-    m_last_detected = true;
+    m_last_detected.store(timestamp, std::memory_order_release);
 
+    if (!m_last_detection && m_on_kill_callback){
+        m_on_kill_callback();
+    }
+    m_last_detection = true;
     return m_trigger_if_detected;
 }
 

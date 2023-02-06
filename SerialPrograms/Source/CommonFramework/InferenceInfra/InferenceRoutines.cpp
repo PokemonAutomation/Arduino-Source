@@ -58,7 +58,9 @@ int run_until(
     );
 
     try{
-        command(subcontext);
+        if (command){
+            command(subcontext);
+        }
         subcontext.wait_for_all_requests();
     }catch (OperationCancelledException&){}
 

@@ -631,6 +631,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
@@ -683,6 +684,7 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.cpp \
@@ -1618,6 +1620,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
@@ -1671,6 +1674,7 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.h \

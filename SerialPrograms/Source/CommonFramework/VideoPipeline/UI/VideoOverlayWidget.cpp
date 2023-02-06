@@ -159,7 +159,17 @@ void VideoOverlayWidget::update_boxes(QPainter& painter){
             color
         );
 
-        painter.setPen(QColor(0xffffffff));
+        uint32_t red = ((uint32_t)item.color >> 16) & 0xff;
+        uint32_t green = ((uint32_t)item.color >> 8) & 0xff;
+        uint32_t blue = ((uint32_t)item.color >> 0) & 0xff;
+
+        double brightness = 0.299*red + 0.587*green + 0.114*blue;
+        if (brightness > 128){
+            painter.setPen(QColor(0xff000000));
+        }else{
+            painter.setPen(QColor(0xffffffff));
+        }
+
         painter.drawText(QPoint(xmin + padding_width, ymin - 2*padding_height), text);
     }
 }
