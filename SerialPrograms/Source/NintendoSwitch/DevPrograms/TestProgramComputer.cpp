@@ -202,11 +202,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 0
-    ImageRGB32 image("Screenshots/screenshot-20230205-141319486902.png");
+#if 1
+//    ImageRGB32 image("Screenshots/screenshot-20230206-023520852521.png");
+    ImageRGB32 image("Screenshots/screenshot-20230206-022329387691.png");
 //    ImageRGB32 image("LetsGoKill.png");
 
-    LetsGoKillDetector detector(COLOR_RED, {0.5, 0, 0.5, 0.5});
+    LetsGoKillDetector detector(COLOR_RED);
 //    LetsGoKillDetector detector(COLOR_RED, {0, 0, 1, 1});
     detector.detect(image);
 #endif

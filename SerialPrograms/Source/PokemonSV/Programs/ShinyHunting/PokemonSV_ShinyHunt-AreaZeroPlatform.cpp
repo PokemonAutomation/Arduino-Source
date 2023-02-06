@@ -220,7 +220,7 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
 
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         //  Move to wall.
-        pbf_move_left_joystick(context, 128, 0, 3 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
         //  Turn around.
         console.log("Turning towards sky...");

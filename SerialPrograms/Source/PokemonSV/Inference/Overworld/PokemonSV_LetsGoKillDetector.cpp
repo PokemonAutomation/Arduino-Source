@@ -34,13 +34,19 @@ bool is_kill_icon(
     WaterfillObject& object,
     const WaterfillObject& red, const WaterfillObject& white
 ){
+//    cout << red.min_x << "-" << red.max_x << ", " << white.min_y << "-" << white.max_y << endl;
+
+//    cout << "is_kill_icon" << endl;
     if (red.max_y >= white.min_y){
+//        cout << "bad y" << endl;
         return false;
     }
     if (red.min_x < white.min_x){
+//        cout << "bad min_x" << endl;
         return false;
     }
     if (red.max_x < white.max_x){
+//        cout << "bad max_x" << endl;
         return false;
     }
 
@@ -60,7 +66,7 @@ bool is_kill_icon(
     }
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
-//    cropped.save("test.png");
+    cropped.save("test.png");
     double rmsd = LETS_GO_KILL_CROPPED().rmsd(cropped);
 //    cout << rmsd << endl;
     return rmsd < 120;
@@ -90,10 +96,11 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
             {
+                {0xff802020, 0xffff7f7f},
                 {0xffc02020, 0xffff7f7f},
             }
         );
-        size_t c = 0;
+//        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
             session->set_source(matrix);
             auto iter = session->make_iterator(10);
@@ -104,7 +111,7 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
                     continue;
                 }
 //                cout << object.area << endl;
-                extract_box_reference(region, object).save("red-" + std::to_string(c++) + ".png");
+//                extract_box_reference(region, object).save("red-" + std::to_string(c++) + ".png");
                 reds.emplace_back(std::move(object));
             }
         }
@@ -116,7 +123,7 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
                 {0xffc0c0c0, 0xffffffff},
             }
         );
-        size_t c = 0;
+//        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
             session->set_source(matrix);
             auto iter = session->make_iterator(10);
@@ -127,7 +134,7 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
                     continue;
                 }
 //                cout << object.area << endl;
-                extract_box_reference(region, object).save("white-" + std::to_string(c++) + ".png");
+//                extract_box_reference(region, object).save("white-" + std::to_string(c++) + ".png");
                 whites.emplace_back(std::move(object));
             }
         }
