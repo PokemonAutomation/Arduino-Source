@@ -52,16 +52,19 @@ struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
         : tournaments(m_stats["Tournaments won"])
         , battles(m_stats["Battles fought"])
         , losses(m_stats["Losses"])
+        , matches(m_stats["Items matched"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Tournaments won");
         m_display_order.emplace_back("Battles fought");
         m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Items matched");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& tournaments;
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& losses;
+    std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> TournamentFarmer_Descriptor::make_stats() const {
@@ -80,7 +83,7 @@ TournamentFarmer::TournamentFarmer()
           false
           )
     , SAVE_NUM_ROUNDS(
-          "<b>Save every this many tournaments:</b><br>(zero disables saving)",
+          "<b>Save every this many tournaments:</b><br>Zero disables saving. Will save win or lose.",
           LockWhileRunning::UNLOCKED,
           0, 0
           )
@@ -110,6 +113,201 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+
+//Handle a single battle by mashing A until a black screen (end of battle) is detected
+void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+    //Assuming the player has a charged orb
+    if (TRY_TO_TERASTILLIZE) {
+        //Open move menu
+        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_wait(context, 100);
+        context.wait_for_all_requests();
+
+        pbf_press_button(context, BUTTON_R, 20, 50);
+    }
+
+    //Mash A until battle finished
+    BlackScreenWatcher end_of_battle(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+    int ret_black = run_until(
+        env.console, context,
+        [](BotBaseContext& context) {
+            pbf_mash_button(context, BUTTON_A, 30000);
+            pbf_mash_button(context, BUTTON_A, 7500); //5 minutes should be more than enough for one battle
+        },
+        { end_of_battle }
+        );
+    if (ret_black == 0) {
+        env.log("Battle finished.");
+        stats.battles++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+    }
+    else {
+        env.log("Timed out during battle after 5 minutes.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        throw OperationFailedException(env.console, "Timed out after 5 minutes.", true);
+    }
+    context.wait_for_all_requests();
+}
+
+
+//Check prize and notify if it matches filters after a tournament win
+void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    ImageFloatBox dialog_box(0.259, 0.734, 0.484, 0.158);
+    ImageViewRGB32 dialog_image = extract_box_reference(screen, dialog_box);
+
+    //bool replace_color_within_range = false;
+    //ImageRGB32 dialog_filtered = filter_rgb32_range(
+    //    extract_box_reference(screen, dialog_box),
+    //    combine_rgb(50, 135, 162), combine_rgb(167, 244, 255), Color(0), replace_color_within_range
+    //);
+    //dialog_filtered.save("./dialog_image.png");
+
+    const double LOG10P_THRESHOLD = -1.5;
+    OCR::StringMatchResult result = PokemonSV::TournamentPrizeNameReader::instance().read_substring(
+        env.console, LANGUAGE, dialog_image,
+        OCR::BLUE_TEXT_FILTERS()
+    );
+    result.clear_beyond_log10p(LOG10P_THRESHOLD);
+    if (result.results.empty()) {
+        env.log("No matching prize name found in dialog box.");
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+    }
+    for (const auto& r : result.results) {
+        env.console.log("Found prize: " + r.second.token);
+        if (TARGET_ITEMS.find_item(r.second.token)) {
+            env.log("Prize matched");
+
+            stats.matches++;
+            env.update_stats();
+
+            send_program_notification(
+                env, NOTIFICATION_PRIZE_MATCH,
+                COLOR_GREEN, "Prize matched",
+                {
+                    { "Item:", r.second.token },
+                }
+            , "", screen);
+            break;
+        }
+    }
+}
+
+
+//Tournament won and over
+void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    //Space out the black screen detection after the "champion" battle
+    pbf_wait(context, 700);
+    context.wait_for_all_requests();
+
+    //One more black screen when done to load the academy
+    BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+    int ret_black_won = run_until(
+        env.console, context,
+        [](BotBaseContext& context) {
+            pbf_mash_button(context, BUTTON_A, 10000);
+        },
+        { black_screen }
+        );
+    if (ret_black_won == 0) {
+        env.log("Tournament complete, waiting for academy.");
+    }
+    context.wait_for_all_requests();
+
+    //Wait for congrats dialog - wait an extra bit since the dialog appears while still loading in
+    AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
+    int ret_dialog = wait_until(env.console, context, Milliseconds(1000), { advance_detector });
+    if (ret_dialog == 0) {
+        env.log("Dialog detected.");
+    }
+    pbf_wait(context, 300);
+    context.wait_for_all_requests();
+
+    //Next dialog is prize dialog - wait until all dialog has appeared then check prize
+    pbf_press_button(context, BUTTON_A, 10, 100);
+    pbf_wait(context, 100);
+    context.wait_for_all_requests();
+
+    check_prize(env, context);
+
+    //Clear remaining dialog
+    OverworldWatcher overworld(COLOR_CYAN);
+    int ret_over = run_until(
+        env.console, context,
+        [](BotBaseContext& context) {
+            pbf_mash_button(context, BUTTON_B, 700);
+        },
+        { overworld }
+        );
+    if (ret_over != 0) {
+        env.console.log("Failed to detect overworld.", COLOR_RED);
+    }
+    context.wait_for_all_requests();
+
+    stats.tournaments++;
+    env.update_stats();
+    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+}
+
+
+//Fly to academy from west pokemon center after losing.
+void TournamentFarmer::return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    env.log("Tournament lost! Navigating back to academy.");
+    open_map_from_overworld(env.program_info(), env.console, context);
+    pbf_press_button(context, BUTTON_ZR, 50, 40);
+    pbf_move_left_joystick(context, 187, 0, 50, 0);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
+
+    pbf_wait(context, 100);
+    context.wait_for_all_requests();
+
+    env.log("At academy fly point. Heading back to doors.");
+    pbf_move_left_joystick(context, 0, 128, 8, 0);
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_PLUS, 50, 40);
+    pbf_press_button(context, BUTTON_B, 50, 40); //Trying to jump/glide over npc spawns
+    pbf_press_button(context, BUTTON_B, 50, 40);
+    pbf_move_left_joystick(context, 128, 0, 500, 0);
+    pbf_press_button(context, BUTTON_B, 50, 40);
+    pbf_press_button(context, BUTTON_B, 50, 40);
+
+    BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+    int ret_black_lost = run_until(
+        env.console, context,
+        [](BotBaseContext& context) {
+            pbf_move_left_joystick(context, 128, 0, 5000, 0);
+        },
+        { black_screen }
+        );
+    context.wait_for_all_requests();
+    if (ret_black_lost == 0) {
+        env.log("Black screen detected.");
+    }
+
+    //Wait for academy to load.
+    OverworldWatcher overworld(COLOR_CYAN);
+    int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld });
+    if (ret_academy == 0) {
+        env.log("Entered academy. Walking to tournament entry.");
+    }
+    context.wait_for_all_requests();
+
+    //Move to tournament entry
+    pbf_move_left_joystick(context, 128, 0, 500, 0);
+    pbf_move_left_joystick(context, 0, 128, 100, 0);
+    pbf_move_left_joystick(context, 255, 0, 100, 0);
+    context.wait_for_all_requests();
+}
+
+
 void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
@@ -132,7 +330,6 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, 50); //sometimes the input drops
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret < 0) {
             env.log("Dialog detected.");
@@ -153,13 +350,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
         context.wait_for_all_requests();
 
-        BlackScreenWatcher end_of_battle(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         bool battle_lost = false;
-        for (uint16_t battles = 0; !battle_lost && battles < 4; battles++) {
-            //Wait for battle - shorter than tournament start above
-            NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW);
-            OverworldWatcher overworld(COLOR_CYAN);
-
+        for (uint16_t battles = 0; battles < 4; battles++) {
+            NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW); //Next battle started
+            OverworldWatcher overworld(COLOR_CYAN); //Previous battle was lost
+            
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
@@ -168,51 +363,18 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 { battle_menu2, overworld }
                 );
             context.wait_for_all_requests();
-            int ret_black;
+
             switch (ret_battle2) {
             case 0:
                 env.log("Detected battle menu.");
-
-                //Assuming the player has a charged orb
-                if (TRY_TO_TERASTILLIZE) {
-                    //Open move menu
-                    pbf_press_button(context, BUTTON_A, 10, 50);
-                    pbf_wait(context, 100);
-                    context.wait_for_all_requests();
-
-                    pbf_press_button(context, BUTTON_R, 20, 50);
-                }
-
-                //Mash A until battle finished
-                ret_black = run_until(
-                    env.console, context,
-                    [](BotBaseContext& context) {
-                        pbf_mash_button(context, BUTTON_A, 30000);
-                        pbf_mash_button(context, BUTTON_A, 7500); //5 minutes should be more than enough for one battle
-                    },
-                    { end_of_battle }
-                    );
-                if (ret_black == 0) {
-                    env.log("Battle finished.");
-                    stats.battles++;
-                    env.update_stats();
-                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                }
-                else {
-                    env.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                    stats.errors++;
-                    env.update_stats();
-                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    throw OperationFailedException(env.console, "Timed out after 5 minutes.", true);
-                }
-                context.wait_for_all_requests();
+                run_battle(env, context);
                 break;
             case 1:
                 env.log("Detected overworld.");
+                battle_lost = true;
                 stats.losses++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                battle_lost = true;
                 break;
             default:
                 env.log("Failed to detect battle menu or dialog prompt!");
@@ -221,142 +383,22 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                 break;
             }
+
+            if (battle_lost) {
+                return_to_academy_after_loss(env, context);
+                break;
+            }
         }
-        pbf_wait(context, 700); //Space out the black screen detection a bit
-        context.wait_for_all_requests();
-        BlackScreenOverWatcher black_screen2(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+
         //Tournament won
         if (!battle_lost) {
-            //One more black screen when done to load the academy
-            int ret_black_won = run_until(
-                env.console, context,
-                [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_A, 10000);
-                },
-                { black_screen2 }
-                );
-            if (ret_black_won == 0) {
-                env.log("Tournament complete, waiting for academy.");
-            }
-            context.wait_for_all_requests();
-
-            //Wait for congrats dialog - wait an extra bit since the dialog appears while still loading in
-            AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
-            int ret_dialog = wait_until(env.console, context, Milliseconds(1000), { advance_detector2 });
-            if (ret_dialog == 0) {
-                env.log("Dialog detected.");
-            }
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_A, 10, 100);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-
-            //Detect prize
-            //bool replace_color_within_range = false;
-            VideoSnapshot screen = env.console.video().snapshot();
-            ImageFloatBox dialog_box(0.259, 0.734, 0.484, 0.158);
-            ImageViewRGB32 dialog_image = extract_box_reference(screen, dialog_box);
-
-            //ImageRGB32 dialog_filtered = filter_rgb32_range(
-            //    extract_box_reference(screen, dialog_box),
-            //    combine_rgb(50, 135, 162), combine_rgb(167, 244, 255), Color(0), replace_color_within_range
-            //);
-            //dialog_filtered.save("./dialog_image.png");
-
-            const double LOG10P_THRESHOLD = -1.5;
-            OCR::StringMatchResult result = PokemonSV::TournamentPrizeNameReader::instance().read_substring(
-                env.console, LANGUAGE, dialog_image,
-                OCR::BLUE_TEXT_FILTERS()
-            );
-            result.clear_beyond_log10p(LOG10P_THRESHOLD);
-            if (result.results.empty()) {
-                env.log("No matching prize name found in dialog box.");
-                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            }
-            for (const auto& r : result.results) {
-                env.console.log("Found prize: " + r.second.token);
-                if (TARGET_ITEMS.find_item(r.second.token)) {
-                    env.log("Prize matched");
-                    send_program_notification(
-                        env, NOTIFICATION_PRIZE_MATCH,
-                        COLOR_GREEN, "Prize matched",
-                        {
-                            { "Item:", r.second.token },
-                        }
-                    , "", screen);
-                    break;
-                }
-            }
-
-            //Clear remaining dialog and check if we need to save
-            OverworldWatcher overworld2(COLOR_CYAN);
-            int ret_over = run_until(
-                env.console, context,
-                [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 700);
-                },
-                { overworld2 }
-                );
-            if (ret_over != 0) {
-                env.console.log("Failed to detect overworld.", COLOR_RED);
-            }
-            context.wait_for_all_requests();
-
-            stats.tournaments++;
-            env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-
-            //Save the game if option checked, then loop again
-            if (SAVE_NUM_ROUNDS != 0 && ((c + 1) % SAVE_NUM_ROUNDS) == 0) {
-                env.log("Saving game.");
-                save_game_from_overworld(env.program_info(), env.console, context);
-            }
+            handle_end_of_tournament(env, context);
         }
-        if (battle_lost) {
-            env.log("Tournament lost! Navigating back to academy.");
-            open_map_from_overworld(env.program_info(), env.console, context);
-            pbf_press_button(context, BUTTON_ZR, 50, 40);
-            pbf_move_left_joystick(context, 187, 0, 50, 0);
-            fly_to_overworld_from_map(env.program_info(), env.console, context);
 
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-
-            env.log("At academy fly point. Heading back to doors.");
-            pbf_move_left_joystick(context, 0, 128, 8, 0);
-            pbf_press_button(context, BUTTON_L, 50, 40);
-            pbf_press_button(context, BUTTON_PLUS, 50, 40);
-            pbf_press_button(context, BUTTON_B, 50, 40); //Trying to jump/glide over npc spawns
-            pbf_press_button(context, BUTTON_B, 50, 40);
-            pbf_move_left_joystick(context, 128, 0, 500, 0);
-            pbf_press_button(context, BUTTON_B, 50, 40);
-            pbf_press_button(context, BUTTON_B, 50, 40);
-
-            int ret_black_lost = run_until(
-                env.console, context,
-                [](BotBaseContext& context) {
-                    pbf_move_left_joystick(context, 128, 0, 5000, 0);
-                },
-                { black_screen2 }
-                );
-            context.wait_for_all_requests();
-            if (ret_black_lost == 0) {
-                env.log("Black screen detected.");
-            }
-
-            //Wait for academy to load.
-            OverworldWatcher overworld3(COLOR_CYAN);
-            int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld3 });
-            if (ret_academy == 0) {
-                env.log("Entered academy. Walking to tournament entry.");
-            }
-            context.wait_for_all_requests();
-            pbf_move_left_joystick(context, 128, 0, 500, 0);
-            pbf_move_left_joystick(context, 0, 128, 100, 0);
-            pbf_move_left_joystick(context, 255, 0, 100, 0);
-            context.wait_for_all_requests();
+        //Save the game if option is set
+        if (SAVE_NUM_ROUNDS != 0 && ((c + 1) % SAVE_NUM_ROUNDS) == 0) {
+            env.log("Saving game.");
+            save_game_from_overworld(env.program_info(), env.console, context);
         }
     }
 
