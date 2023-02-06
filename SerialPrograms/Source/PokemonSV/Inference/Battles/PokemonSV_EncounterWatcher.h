@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_EncounterWatcher_H
 
 #include <deque>
+#include <mutex>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSV_BattleMenuDetector.h"
@@ -43,6 +44,8 @@ public:
 private:
     NormalBattleMenuWatcher m_battle_menu;
     ShinySoundDetector m_shiny_sound;
+
+    std::mutex m_lock;
     std::deque<VideoSnapshot> m_history;
     VideoSnapshot m_best_snapshot;
 };

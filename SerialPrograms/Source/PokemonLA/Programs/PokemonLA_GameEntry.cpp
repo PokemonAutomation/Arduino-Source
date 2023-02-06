@@ -30,7 +30,7 @@ bool reset_game_to_gamemenu(
     ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = console.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu

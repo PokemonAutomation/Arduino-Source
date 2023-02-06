@@ -74,7 +74,7 @@ bool reset_game_from_home(
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
-    bool video_available = console.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu

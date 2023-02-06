@@ -26,14 +26,17 @@ bool EncounterWatcher::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    //  Clear old history.
-    while (!m_history.empty() && m_history.front().timestamp + std::chrono::milliseconds(2000) < frame.timestamp){
-        m_history.pop_front();
-    }
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        //  Clear old history.
+        while (!m_history.empty() && m_history.front().timestamp + std::chrono::milliseconds(2000) < frame.timestamp){
+            m_history.pop_front();
+        }
 
-    //  Add current frame if it has been long enough since the previous.
-    if (m_history.empty() || m_history.back().timestamp + std::chrono::milliseconds(250) < frame.timestamp){
-        m_history.push_back(frame);
+        //  Add current frame if it has been long enough since the previous.
+        if (m_history.empty() || m_history.back().timestamp + std::chrono::milliseconds(250) < frame.timestamp){
+            m_history.push_back(frame);
+        }
     }
 
     return m_battle_menu.process_frame(frame, frame.timestamp);
@@ -49,6 +52,8 @@ bool EncounterWatcher::process_spectrums(
 //    cout << "detected" << endl;
 
     //  Find the brighest frame.
+    std::lock_guard<std::mutex> lg(m_lock);
+
     double best_bright_portion = 0;
     for (const VideoSnapshot& frame : m_history){
         size_t bright_pixels;

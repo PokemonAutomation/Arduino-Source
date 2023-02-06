@@ -27,7 +27,7 @@ void resume_game_no_interact(
     ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = console.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available){
         resume_game_from_home(console, context);
     }else{
@@ -38,7 +38,7 @@ void resume_game_back_out(
     ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu, uint16_t mash_B_time
 ){
-    bool video_available = console.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available){
         resume_game_from_home(console, context);
     }else{
@@ -128,7 +128,7 @@ void reset_game_from_home_with_inference(
     bool backup_save,
     uint16_t post_wait_time
 ){
-    bool video_available = console.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu

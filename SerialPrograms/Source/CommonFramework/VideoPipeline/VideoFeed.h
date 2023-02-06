@@ -32,7 +32,7 @@ struct VideoSnapshot{
     {}
 
     //  Returns true if the snapshot is valid.
-    operator bool() const{ return frame && *frame; }
+    explicit operator bool() const{ return frame && *frame; }
 
     const ImageRGB32* operator->() const{ return frame.get(); }
 

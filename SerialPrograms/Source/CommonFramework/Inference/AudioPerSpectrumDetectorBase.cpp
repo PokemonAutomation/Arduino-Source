@@ -30,6 +30,7 @@ AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
     , m_console(console)
     , m_detected_callback(std::move(detected_callback))
     , m_start_timestamp(current_time())
+    , m_spectrums_processed(0)
 {}
 AudioPerSpectrumDetectorBase::~AudioPerSpectrumDetectorBase(){
     try{
@@ -41,6 +42,9 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
         return;
     }
     if (m_lowest_error < 1.0){
+        return;
+    }
+    if (m_spectrums_processed == 0){
         return;
     }
     throw UserSetupError(m_console, "No sound detected.");
@@ -63,6 +67,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     }
 
     WallClock now = current_time();
+    m_spectrums_processed++;
 
     //  Clear last detection.
     if (m_last_timestamp + std::chrono::milliseconds(1000) <= now){

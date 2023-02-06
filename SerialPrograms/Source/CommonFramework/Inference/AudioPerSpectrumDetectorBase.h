@@ -99,6 +99,7 @@ protected:
     DetectedCallback m_detected_callback;
 
     WallClock m_start_timestamp;
+    uint64_t m_spectrums_processed;
 
     // Record lowest error coefficient (i.e best match) during the runtime of this detector.
     float m_lowest_error = 1.0f;

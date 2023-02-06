@@ -190,8 +190,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    EncounterWatcher encounter(console, COLOR_RED);
 
-
+    throw ProgramFinishedException(
+        console,
+        "test",
+        encounter.shiny_screenshot()
+    );
 
 
 
