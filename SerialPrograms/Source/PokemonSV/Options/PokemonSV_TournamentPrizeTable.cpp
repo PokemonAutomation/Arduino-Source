@@ -1,4 +1,4 @@
-/*  Tournament prize table
+/*  Tournament Prize Table
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

@@ -1,4 +1,4 @@
-/*  Tournament Prize Select
+/*  Tournament Prize Select Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

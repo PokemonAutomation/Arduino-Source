@@ -1,11 +1,11 @@
-/* Tournament prize table
+/* Tournament Prize Table
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_TournamentPrizeSelector_H
-#define PokemonAutomation_PokemonSV_TournamentPrizeSelector_H
+#ifndef PokemonAutomation_PokemonSV_TournamentPrizeTable_H
+#define PokemonAutomation_PokemonSV_TournamentPrizeTable_H
 
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonSV_TournamentPrizeSelectOption.h"

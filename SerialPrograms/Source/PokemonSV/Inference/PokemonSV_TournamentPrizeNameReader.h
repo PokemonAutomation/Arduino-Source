@@ -1,11 +1,11 @@
-/*  Tournament Prize Reader
+/*  Tournament Prize Name Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_TournamentPrizeReader_H
-#define PokemonAutomation_PokemonSV_TournamentPrizeReader_H
+#ifndef PokemonAutomation_PokemonSV_TournamentPrizeNameReader_H
+#define PokemonAutomation_PokemonSV_TournamentPrizeNameReader_H
 
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
