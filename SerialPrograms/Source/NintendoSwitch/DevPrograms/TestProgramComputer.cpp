@@ -104,6 +104,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Environment/Environment.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -198,6 +199,20 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
+
+
+
+#if 0
+    ImageRGB32 image("Screenshots/screenshot-20230205-141319486902.png");
+//    ImageRGB32 image("LetsGoKill.png");
+
+    LetsGoKillDetector detector(COLOR_RED, {0.5, 0, 0.5, 0.5});
+//    LetsGoKillDetector detector(COLOR_RED, {0, 0, 1, 1});
+    detector.detect(image);
+#endif
+
+
+#if 0
     send_program_notification_with_file(
         env,
         NOTIFICATION_ERROR_RECOVERABLE,
@@ -213,7 +228,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     SomethingInBoxSlotDetector detector(COLOR_RED);
 
     cout << detector.detect(image) << endl;
-
+#endif
 
 #if 0
     FILETIME idle_time, kernel_time, user_time;

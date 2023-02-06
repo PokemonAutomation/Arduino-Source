@@ -84,6 +84,7 @@
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 
 
 #include <QPixmap>
@@ -299,6 +300,7 @@ void run_overworld(
 
 
 
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -318,6 +320,37 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+
+    LetsGoKillWatcher watcher(logger, COLOR_RED, false);
+
+    wait_until(
+        console, scope, std::chrono::seconds(600),
+        {
+            watcher,
+        }
+    );
+
+
+#if 0
+    LetsGoKillDetector detector(COLOR_RED, {0.71, 0.15, 0.04, 0.30});
+    detector.make_overlays(overlays);
+    while (true){
+        detector.detect(feed.snapshot());
+        scope.wait_for(std::chrono::milliseconds(100));
+    }
+#endif
+
+#if 0
+//    ImageRGB32 image("Screenshots/screenshot-20230205-141319486902.png");
+    ImageRGB32 image("LetsGoKill.png");
+
+//    LetsGoKillDetector detector(COLOR_RED, {0.5, 0, 0.5, 0.5});
+    LetsGoKillDetector detector(COLOR_RED, {0, 0, 1, 1});
+    detector.detect(image);
+#endif
+
+
+#if 0
     EncounterWatcher encounter(console);
     int ret = wait_until(
         console, scope, std::chrono::seconds(600),
@@ -335,7 +368,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     if (encounter.shiny_screenshot()){
         encounter.shiny_screenshot()->save("test.png");
     }
-
+#endif
 
 
 #if 0

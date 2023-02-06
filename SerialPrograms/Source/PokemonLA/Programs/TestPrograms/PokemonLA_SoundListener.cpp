@@ -12,6 +12,8 @@
 #include <fstream>
 #include <sstream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Containers/AlignedVector.h"
+#include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
@@ -19,7 +21,6 @@
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h"

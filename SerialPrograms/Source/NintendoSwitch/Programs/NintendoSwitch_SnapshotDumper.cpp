@@ -42,7 +42,7 @@ SnapshotDumper::SnapshotDumper()
             {Format::JPG, "jpg", ".jpg"},
         },
         LockWhileRunning::UNLOCKED,
-        Format::PNG
+        Format::JPG
     )
 {
     PA_ADD_OPTION(PERIOD_MILLISECONDS);
