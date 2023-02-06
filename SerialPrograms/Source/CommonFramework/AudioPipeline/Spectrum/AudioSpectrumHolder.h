@@ -37,14 +37,14 @@ public:
 
 public:
     void push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output);
-    void add_overlay(uint64_t startingStamp, uint64_t endStamp, Color color);
+    void add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color);
 
 
 public:
     //  Asynchronous and thread-safe getters.
 
-    std::vector<AudioSpectrum> spectrums_since(uint64_t startingStamp);
-    std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
+    std::vector<AudioSpectrum> spectrums_since(uint64_t starting_stamp);
+    std::vector<AudioSpectrum> spectrums_latest(size_t num_latest_spectrums);
 
     struct SpectrumSnapshot{
         std::vector<float> values;
@@ -67,16 +67,16 @@ public:
 
 private:
     // Num frequencies to store for the output of one fft computation.
-    const size_t m_numFreqs;
+    const size_t m_num_freqs;
     // Num sliding fft windows to visualize.
-    const size_t m_numFreqWindows;
+    const size_t m_num_freq_windows;
     // Num blocks of frequencies to visualize for one sliding window.
-    const size_t m_numFreqVisBlocks;
+    const size_t m_num_freq_visualization_blocks;
 
     // The boundaries to separate each frequency vis block.
     // i-th freq vis block is made by frequencies whose indices in m_spectrums
-    // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )
-    std::vector<size_t> m_freqVisBlockBoundaries;
+    // fall inside the range: [ m_freq_visualization_block_boundaries[i], m_freq_visualization_block_boundaries[i+1] )
+    std::vector<size_t> m_freq_visualization_block_boundaries;
 
     SpectrumSnapshot m_last_spectrum;
     Spectrograph m_spectrograph;

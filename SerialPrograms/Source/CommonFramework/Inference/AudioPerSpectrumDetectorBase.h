@@ -12,7 +12,7 @@
  *  
  *  This base class is called "PerSpectrum" because it tries to match the audio template starting at
  *  each incoming spectrum in the audio stream.
- *  For example, if called with three newest unseen spectrums from the audio feed, (i.e `newSpectrums`
+ *  For example, if called with three newest unseen spectrums from the audio feed, (i.e `new_spectrums`
  *  contains three spectrums when passed to AudioPerSpectrumDetectorBase::process_spectrums(...))
  *  the detector will check whether the audio template matches the part of audio starting at the first
  *  of the three spectrums, then check starting at the second, and finally the third.
@@ -21,7 +21,7 @@
  *  algorithm needs to be very precise.
  * 
  *  This is opposite to the other design choice that only matches the audio starting at the newest
- *  spectrum in `newSpectrums` when called. That design choice is better suited to non-time-critical
+ *  spectrum in `new_spectrums` when called. That design choice is better suited to non-time-critical
  *  audio matching and the matching algorithm can tolerate a few spectrums off on time axis.
  */
 
@@ -70,8 +70,8 @@ public:
 
     // Implement AudioInferenceCallback::process_spectrums()
     virtual bool process_spectrums(
-        const std::vector<AudioSpectrum>& newSpectrums,
-        AudioFeed& audioFeed
+        const std::vector<AudioSpectrum>& new_spectrums,
+        AudioFeed& audio_feed
     ) override;
 
     // Clear internal data to be used on another audio stream.

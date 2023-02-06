@@ -232,7 +232,7 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
     console.log("Moving towards sky and killing everything...");
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
-        pbf_move_right_joystick(context, 128, 255, 75, 0);
+        pbf_move_right_joystick(context, 128, 255, 70, 0);
 
         uint8_t x = 128;
         uint16_t duration = 375;

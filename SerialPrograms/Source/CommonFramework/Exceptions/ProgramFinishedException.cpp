@@ -26,7 +26,11 @@ ProgramFinishedException::ProgramFinishedException(Logger& logger, std::string m
 ProgramFinishedException::ProgramFinishedException(ConsoleHandle& console, std::string message, bool take_screenshot)
     : ScreenshotException(console, std::move(message), take_screenshot)
 {
-    console.log(std::string(ProgramFinishedException::name()) + " (take screenshot): " + m_message, COLOR_BLUE);
+    if (take_screenshot){
+        console.log(std::string(ProgramFinishedException::name()) + " (take screenshot): " + m_message, COLOR_BLUE);
+    }else{
+        console.log(std::string(ProgramFinishedException::name()) + " (no screenshot): " + m_message, COLOR_BLUE);
+    }
 }
 
 

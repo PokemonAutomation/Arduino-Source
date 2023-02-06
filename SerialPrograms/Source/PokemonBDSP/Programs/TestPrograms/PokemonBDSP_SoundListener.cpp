@@ -152,10 +152,10 @@ void searchAlphaRoarFromAudioDump(){
 
         // match!
         float minScore = FLT_MAX;
-        std::vector<AudioSpectrum> newSpectrums;
+        std::vector<AudioSpectrum> new_spectrums;
         size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.numWindows());
         for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
-            newSpectrums.clear();
+            new_spectrums.clear();
             AlignedVector<float> freqVector(audio.numFrequencies());
             if (audioIdx < audio.numWindows()){
                 const float * freq = audio.getWindow(audioIdx);
@@ -163,11 +163,11 @@ void searchAlphaRoarFromAudioDump(){
             } else{
                 // add zero-freq window
             }
-            newSpectrums.emplace_back(
+            new_spectrums.emplace_back(
                 audioIdx, SAMPLE_RATE,
                 std::make_unique<AlignedVector<float>>(std::move(freqVector))
             );
-            float score = matcher.match(newSpectrums);
+            float score = matcher.match(new_spectrums);
             minScore = std::min(score, minScore);
         } // end audio Idx
 

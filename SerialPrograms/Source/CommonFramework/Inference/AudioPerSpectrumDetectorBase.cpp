@@ -44,8 +44,9 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
     if (m_lowest_error < 1.0){
         return;
     }
-    if (m_spectrums_processed == 0){
-        return;
+    if (m_spectrums_processed > 0){
+        //  REMOVE
+//        return;
     }
     throw UserSetupError(m_console, "No sound detected.");
 }
@@ -59,15 +60,17 @@ void AudioPerSpectrumDetectorBase::log_results(){
 }
 
 bool AudioPerSpectrumDetectorBase::process_spectrums(
-    const std::vector<AudioSpectrum>& newSpectrums,
-    AudioFeed& audioFeed
+    const std::vector<AudioSpectrum>& new_spectrums,
+    AudioFeed& audio_feed
 ){
-    if (newSpectrums.empty()){
+    if (new_spectrums.empty()){
+//        cout << "No new spectrums" << endl;
         return false;
     }
+//    cout << "New spectrums - " << new_spectrums.size() << endl;
 
     WallClock now = current_time();
-    m_spectrums_processed++;
+    m_spectrums_processed += new_spectrums.size();
 
     //  Clear last detection.
     if (m_last_timestamp + std::chrono::milliseconds(1000) <= now){
@@ -75,7 +78,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         m_last_reported = false;
     }
 
-    const size_t sampleRate = newSpectrums[0].sample_rate;
+    const size_t sampleRate = new_spectrums[0].sample_rate;
     // Lazy intialization of the spectrogram matcher.
     if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
         m_console.log("Loading spectrogram...");
@@ -83,7 +86,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     }
 
     // Feed spectrum one by one to the matcher:
-    // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
+    // new_spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
 
 
@@ -97,19 +100,22 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     
     bool found = false;
     const float threshold = get_score_threshold();
-    for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
-        std::vector<AudioSpectrum> singleSpectrum = {*it};
-        const float matcherScore = m_matcher->match(singleSpectrum);
+    for (auto it = new_spectrums.rbegin(); it != new_spectrums.rend(); it++){
+        std::vector<AudioSpectrum> single_spectrum = {*it};
+        const float matcher_score = m_matcher->match(single_spectrum);
         // std::cout << "error: " << matcherScore << std::endl;
 
-        if (matcherScore == FLT_MAX){
+        if (matcher_score == FLT_MAX){
+            //  REMOVE
+            cout << "Not enough history: " << m_lowest_error << endl;
             continue; // error or not enough spectrum history
         }
+        cout << "Matcher Score: " << matcher_score << endl;
 
         // Record the lowest error found during the run
-        m_lowest_error = std::min(m_lowest_error, matcherScore);
+        m_lowest_error = std::min(m_lowest_error, matcher_score);
 
-        found = matcherScore <= threshold;
+        found = matcher_score <= threshold;
 
         uint64_t curStamp = m_matcher->latestTimestamp();
 
@@ -127,20 +133,20 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
                 m_last_timestamp = now;
             }
             // m_last_error tracks the lowest error found by the current match.
-            m_last_error = std::min(m_last_error, matcherScore);
+            m_last_error = std::min(m_last_error, matcher_score);
 
             std::ostringstream os;
-            os << m_audio_name << " found, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
+            os << m_audio_name << " found, score " << matcher_score << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
             m_console.log(os.str(), COLOR_BLUE);
-            audioFeed.add_overlay(curStamp+1-m_matcher->numMatchedWindows(), curStamp+1, m_detection_color);
+            audio_feed.add_overlay(curStamp+1-m_matcher->numMatchedWindows(), curStamp+1, m_detection_color);
 
-            // Since the target audio is found, no need to check detection on the rest of the spectrums in `newSpectrums`.
+            // Since the target audio is found, no need to check detection on the rest of the spectrums in `new_spectrums`.
 
             // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
             // called again on a newer batch of spectrums, m_matcher is happy.
             m_matcher->skip(std::vector<AudioSpectrum>(
-                newSpectrums.begin(),
-                newSpectrums.begin() + std::distance(it + 1, newSpectrums.rend())
+                new_spectrums.begin(),
+                new_spectrums.begin() + std::distance(it + 1, new_spectrums.rend())
             ));
 
             // Skip the remaining spectrums.

@@ -37,7 +37,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
     virtual bool process_spectrums(
-        const std::vector<AudioSpectrum>& newSpectrums,
+        const std::vector<AudioSpectrum>& new_spectrums,
         AudioFeed& audioFeed
     ) override;
 

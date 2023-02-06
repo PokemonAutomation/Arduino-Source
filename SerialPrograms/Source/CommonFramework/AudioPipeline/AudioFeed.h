@@ -44,7 +44,7 @@ public:
     //  Reset the video. Note that this may return early.
     virtual void reset() = 0;
 
-    //  Return all the spectrums with stamps greater or equal to `startingStamp`
+    //  Return all the spectrums with stamps greater or equal to `starting_stamp`
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
     virtual std::vector<AudioSpectrum> spectrums_since(uint64_t starting_seqnum) = 0;
 
@@ -52,7 +52,7 @@ public:
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
     virtual std::vector<AudioSpectrum> spectrums_latest(size_t num_last_spectrums) = 0;
 
-    //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp` with `color`.
+    //  Add visual overlay to the spectrums starting at `starting_stamp` and before `end_stamp` with `color`.
     virtual void add_overlay(uint64_t starting_seqnum, size_t end_seqnum, Color color) = 0;
 };
 

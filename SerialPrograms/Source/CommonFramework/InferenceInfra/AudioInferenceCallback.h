@@ -29,8 +29,8 @@ public:
     //  Input spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
     //  If needed, access to `audioFeed` to render inference boxes.
     virtual bool process_spectrums(
-        const std::vector<AudioSpectrum>& newSpectrums,
-        AudioFeed& audioFeed
+        const std::vector<AudioSpectrum>& new_spectrums,
+        AudioFeed& audio_feed
     ) = 0;
 
 };

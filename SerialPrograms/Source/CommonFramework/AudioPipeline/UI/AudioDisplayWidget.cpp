@@ -78,7 +78,7 @@ void AudioDisplayWidget::render_bars(){
 //        cout << "barHeight = " << barHeight << endl;
 
     for (size_t i = 0; i < num_buckets; i++){
-//        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
+//        size_t curWindow = (m_nextFFTWindowIndex + m_num_freq_windows - 1) % m_num_freq_windows;
 //            // +1 here to skip the freq-0 value
 //        float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
         float value = last_spectrum.values[i];
@@ -110,7 +110,7 @@ void AudioDisplayWidget::render_spectrograph(){
 
     // Now render overlays:
 
-    // Each window has width: widgetWidth / (m_numFreqWindows-1) on the spectrogram
+    // Each window has width: widgetWidth / (m_num_freq_windows-1) on the spectrogram
     const float FFTWindowWidth = widgetWidth / float(snapshot.image.width() - 1);
 
     for (const auto& box : snapshot.overlays){

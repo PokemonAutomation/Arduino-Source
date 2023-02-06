@@ -49,17 +49,17 @@ public:
     size_t sampleRate() const{ return m_sampleRate; }
 
     // Match the newest spectrums and return a match score.
-    // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
+    // Newer (larger timestamp) spectrums at beginning of `new_spectrums` while older (smaller
     // timestamp) spectrums at the end.
     // In invalid cases (internal error or not enough windows), return FLT_MAX
-    float match(const std::vector<AudioSpectrum>& newSpectrums);
+    float match(const std::vector<AudioSpectrum>& new_spectrums);
 
     // Pass some spectrums in but don't run match on them.
     // Used for skipping some spectrums to avoid unnecessary matching.
-    // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
+    // Newer (larger timestamp) spectrums at beginning of `new_spectrums` while older (smaller
     // timestamp) spectrums at the end.
     // Return true if there is no error.
-    bool skip(const std::vector<AudioSpectrum>& newSpectrums);
+    bool skip(const std::vector<AudioSpectrum>& new_spectrums);
 
     // Clear internal data to be used on another audio stream.
     void clear();
@@ -85,13 +85,13 @@ private:
     // For a given sub-template, return its match score and scaling factor
     std::pair<float, float> matchSubTemplate(size_t subIndex) const;
 
-    // Update internal data for the next new spectrum. Called by `updateToNewSpectrums()`.
+    // Update internal data for the next new spectrum. Called by `update_to_new_spectrums()`.
     // Return true if there is no error.
-    bool updateToNewSpectrum(AudioSpectrum newSpectrum);
+    bool update_to_new_spectrum(AudioSpectrum newSpectrum);
 
     // Update internal data for the new specttrums.
     // Return true if there is no error.
-    bool updateToNewSpectrums(const std::vector<AudioSpectrum>& newSpectrums);
+    bool update_to_new_spectrums(const std::vector<AudioSpectrum>& new_spectrums);
 
 
 

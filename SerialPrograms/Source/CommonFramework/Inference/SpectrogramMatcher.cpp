@@ -189,7 +189,7 @@ std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
     return ret;
 }
 
-bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
+bool SpectrogramMatcher::update_to_new_spectrum(AudioSpectrum spectrum){
     if (m_numOriginalFrequencies != spectrum.magnitudes->size()){
         std::cout << "Error: number of frequencies don't match in SpectrogramMatcher::match() " << 
             m_numOriginalFrequencies << " " << spectrum.magnitudes->size() << std::endl;
@@ -237,9 +237,9 @@ bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
     return true;
 }
 
-bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& newSpectrums){
-    for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
-        if(!updateToNewSpectrum(*it)){
+bool SpectrogramMatcher::update_to_new_spectrums(const std::vector<AudioSpectrum>& new_spectrums){
+    for(auto it = new_spectrums.rbegin(); it != new_spectrums.rend(); it++){
+        if(!update_to_new_spectrum(*it)){
             return false;
         }
     }
@@ -326,8 +326,8 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     return std::make_pair(score, scale);
 }
 
-float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
-    if (!updateToNewSpectrums(newSpectrums)){
+float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums){
+    if (!update_to_new_spectrums(new_spectrums)){
         return FLT_MAX;
     }
 
@@ -377,13 +377,13 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
     return score;
 }
 
-bool SpectrogramMatcher::skip(const std::vector<AudioSpectrum>& newSpectrums){
+bool SpectrogramMatcher::skip(const std::vector<AudioSpectrum>& new_spectrums){
     // Note: ideally we don't want to have any computation while skipping.
-    // But updateToNewSpectrums() may still do some filtering and vector norm computation.
+    // But update_to_new_spectrums() may still do some filtering and vector norm computation.
     // Since the computation is relatively small and we won't be skipping lots of frames anyway,
     // this should be fine for now.
     // We can improve this later.
-    return updateToNewSpectrums(newSpectrums);
+    return update_to_new_spectrums(new_spectrums);
 }
 
 void SpectrogramMatcher::clear(){

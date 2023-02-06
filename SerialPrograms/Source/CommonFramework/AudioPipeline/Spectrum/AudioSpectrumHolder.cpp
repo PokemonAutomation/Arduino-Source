@@ -15,15 +15,15 @@ namespace PokemonAutomation{
 
 
 AudioSpectrumHolder::AudioSpectrumHolder()
-    : m_numFreqs(NUM_FFT_SAMPLES/2)
-    , m_numFreqWindows(1000)
-    , m_numFreqVisBlocks(96)
-    , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
-    , m_spectrograph(m_numFreqVisBlocks, m_numFreqWindows)
-    , m_freqVisStamps(m_numFreqWindows)
+    : m_num_freqs(NUM_FFT_SAMPLES/2)
+    , m_num_freq_windows(1000)
+    , m_num_freq_visualization_blocks(96)
+    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks+1)
+    , m_spectrograph(m_num_freq_visualization_blocks, m_num_freq_windows)
+    , m_freqVisStamps(m_num_freq_windows)
 {
-    m_last_spectrum.values.resize(m_numFreqVisBlocks);
-    m_last_spectrum.colors.resize(m_numFreqVisBlocks);
+    m_last_spectrum.values.resize(m_num_freq_visualization_blocks);
+    m_last_spectrum.colors.resize(m_num_freq_visualization_blocks);
 
     // We will display frequencies in log scale, so need to convert
     // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
@@ -31,48 +31,48 @@ AudioSpectrumHolder::AudioSpectrumHolder()
     // The conversion function is: linear_value = (exp(log_value * LOG_MAX) - 1) / 10
 //    const float LOG_SCALE_MAX = std::log(11.0f);
 
-    m_freqVisBlockBoundaries[0] = 1;
-    for (size_t i = 1; i < m_numFreqVisBlocks; i++){
+    m_freq_visualization_block_boundaries[0] = 1;
+    for (size_t i = 1; i < m_num_freq_visualization_blocks; i++){
 //        const float logValue = i / (float)m_numFreqVisBlocks;
 //        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
 //        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
-//        m_freqVisBlockBoundaries[i] = std::min(size_t(linearValue * m_numFreqs + 0.5), m_numFreqs);
+//        m_freq_visualization_block_boundaries[i] = std::min(size_t(linearValue * m_num_freqs + 0.5), m_num_freqs);
 
         //  (96 / 8 = 12) give us 12 bars per octave.
-        const float x = (float)i / m_numFreqVisBlocks;
+        const float x = (float)i / m_num_freq_visualization_blocks;
         float freq = std::exp2f(8.0f * x + 3);
         size_t index = (size_t)freq;
 
         index = std::max(index, (size_t)1);
-        index = std::min(index, m_numFreqs);
-        m_freqVisBlockBoundaries[i] = index;
+        index = std::min(index, m_num_freqs);
+        m_freq_visualization_block_boundaries[i] = index;
     }
-    m_freqVisBlockBoundaries[m_numFreqVisBlocks] = m_numFreqs;
+    m_freq_visualization_block_boundaries[m_num_freq_visualization_blocks] = m_num_freqs;
 
     //  Iterate buckets in reverse order and push the lower frequencies over so that everyone has
     //  a width of at least 1.
-    size_t last = m_freqVisBlockBoundaries[m_numFreqVisBlocks - 1];
-    for (size_t c = m_numFreqVisBlocks - 1; c-- > 0;){
-        size_t current = m_freqVisBlockBoundaries[c];
+    size_t last = m_freq_visualization_block_boundaries[m_num_freq_visualization_blocks - 1];
+    for (size_t c = m_num_freq_visualization_blocks - 1; c-- > 0;){
+        size_t current = m_freq_visualization_block_boundaries[c];
         if (current >= last){
             current = last - 1;
             if (current == 0){
                 current = 1;
             }
-            m_freqVisBlockBoundaries[c] = current;
+            m_freq_visualization_block_boundaries[c] = current;
         }
         last = current;
     }
 
-    for (size_t i = 1; i <= m_numFreqVisBlocks; i++){
-        assert(m_freqVisBlockBoundaries[i-1] < m_freqVisBlockBoundaries[i]);
+    for (size_t i = 1; i <= m_num_freq_visualization_blocks; i++){
+        assert(m_freq_visualization_block_boundaries[i-1] < m_freq_visualization_block_boundaries[i]);
     }
-    for (size_t i = 0; i < m_numFreqVisBlocks; i++){
-//        cout << "index = " << m_freqVisBlockBoundaries[i] << endl;
+    for (size_t i = 0; i < m_num_freq_visualization_blocks; i++){
+//        cout << "index = " << m_freq_visualization_block_boundaries[i] << endl;
     }
 
     // std::cout << "Freq vis block boundaries: ";
-    // for(const auto v : m_freqVisBlockBoundaries){
+    // for(const auto v : m_freq_visualization_block_boundaries){
     //     std::cout << v << " ";
     // }
     // std::cout << std::endl;
@@ -157,7 +157,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
             m_spectrums.pop_back();
         }
 
-        // std::cout << "Loadd FFT output , stamp " << spectrum->stamp << std::endl;
+        // std::cout << "Load FFT output , stamp " << spectrum->stamp << std::endl;
         m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
     }
 
@@ -176,13 +176,13 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 
     // For one window, use how many blocks to show all frequencies:
     float previous = 0;
-    for (size_t i = 0; i < m_numFreqVisBlocks; i++){
+    for (size_t i = 0; i < m_num_freq_visualization_blocks; i++){
         float mag = 0.0f;
-        for(size_t j = m_freqVisBlockBoundaries[i]; j < m_freqVisBlockBoundaries[i+1]; j++){
+        for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
             mag += output[j];
         }
 
-        size_t width = m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
+        size_t width = m_freq_visualization_block_boundaries[i+1] - m_freq_visualization_block_boundaries[i];
 
         if (width == 0){
             mag = previous;
@@ -207,11 +207,11 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         previous = mag;
     }
     m_spectrograph.push_spectrum(m_last_spectrum.colors.data());
-    m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_numFreqWindows;
+    m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
     // std::cout << "Computed FFT! "  << magSum << std::endl;
 
     if (m_saveFreqToDisk){
-        for(size_t i = 0; i < m_numFreqs; i++){
+        for(size_t i = 0; i < m_num_freqs; i++){
             m_freqStream << output[i] << " ";
         }
         m_freqStream << std::endl;
@@ -221,10 +221,10 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         listener->state_changed();
     }
 }
-void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp, Color color){
+void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color){
     std::lock_guard<std::mutex> lg(m_state_lock);
 
-    m_overlay.emplace_front(std::forward_as_tuple(startingStamp, endStamp, color));
+    m_overlay.emplace_front(std::forward_as_tuple(starting_stamp, end_stamp, color));
 
     // Now try to remove old overlays that are no longer showed on the spectrogram view.
 
@@ -244,13 +244,13 @@ void AudioSpectrumHolder::add_overlay(uint64_t startingStamp, uint64_t endStamp,
     }
 }
 
-std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t startingStamp){
+std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t starting_stamp){
     std::vector<AudioSpectrum> spectrums;
 
     std::lock_guard<std::mutex> lg(m_state_lock);
 
     for (const auto& ptr : m_spectrums){
-        if (ptr.stamp >= startingStamp){
+        if (ptr.stamp >= starting_stamp){
             spectrums.emplace_back(ptr);
         } else{
             break;
@@ -258,14 +258,14 @@ std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t startin
     }
     return spectrums;
 }
-std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t numLatestSpectrums){
+std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t num_latest_spectrums){
     std::vector<AudioSpectrum> spectrums;
 
     std::lock_guard<std::mutex> lg(m_state_lock);
 
     size_t i = 0;
     for (const auto& ptr : m_spectrums){
-        if (i == numLatestSpectrums){
+        if (i == num_latest_spectrums){
             break;
         }
         spectrums.push_back(ptr);
@@ -292,38 +292,38 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
     //  When the audio stream starts coming in, the history of the spectrogram
     //  is not fully filled. So the oldest stamp may not be the leftmost one on the display.
     //  Here we use the validity of the time stamp to find the real oldest one.
-    for (; oldestWindowID < m_numFreqWindows; oldestWindowID++){
+    for (; oldestWindowID < m_num_freq_windows; oldestWindowID++){
         if (oldestStamp != SIZE_MAX){
             // it's a window with valid stamp
             break;
         }
-        oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_numFreqWindows];
+        oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_num_freq_windows];
     }
     if (oldestStamp == SIZE_MAX){
         // we have no valid windows in the spectrogram, so no overlays to render:
         return ret;
     }
-    size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows];
-    // size_t newestWindowID = m_numFreqWindows - 1;
+    size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex + m_num_freq_windows - 1) % m_num_freq_windows];
+    // size_t newestWindowID = m_num_freq_windows - 1;
 
     for (const auto& box : m_overlay){
-        const size_t startingStamp = std::get<0>(box);
-        const size_t endStamp = std::get<1>(box);
+        const size_t starting_stamp = std::get<0>(box);
+        const size_t end_stamp = std::get<1>(box);
         const Color color = std::get<2>(box);
-        if (startingStamp >= endStamp){
+        if (starting_stamp >= end_stamp){
             continue;
         }
 
-        // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
+        // std::cout << "Render overlay at (" << starting_stamp << ", " << end_stamp
         //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
 
-        if (endStamp <= oldestStamp || startingStamp > newestStamp){
+        if (end_stamp <= oldestStamp || starting_stamp > newestStamp){
             continue;
         }
 
         ret.overlays.emplace_back(
-            startingStamp - oldestStamp + oldestWindowID,
-            endStamp - startingStamp,
+            starting_stamp - oldestStamp + oldestWindowID,
+            end_stamp - starting_stamp,
             color
         );
     }

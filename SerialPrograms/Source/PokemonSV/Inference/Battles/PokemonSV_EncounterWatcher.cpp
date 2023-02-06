@@ -42,10 +42,10 @@ bool EncounterWatcher::process_frame(const VideoSnapshot& frame){
     return m_battle_menu.process_frame(frame, frame.timestamp);
 }
 bool EncounterWatcher::process_spectrums(
-    const std::vector<AudioSpectrum>& newSpectrums,
-    AudioFeed& audioFeed
+    const std::vector<AudioSpectrum>& new_spectrums,
+    AudioFeed& audio_feed
 ){
-    bool detected = m_shiny_sound.process_spectrums(newSpectrums, audioFeed);
+    bool detected = m_shiny_sound.process_spectrums(new_spectrums, audio_feed);
     if (!detected){
         return false;
     }
