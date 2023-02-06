@@ -4,6 +4,7 @@
  *
  */
 
+#include <atomic>
 #include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
