@@ -13,6 +13,7 @@
 #include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 #include "Pokemon_EggHatchFilter.h"
+#include "Pokemon/Inference/Pokemon_NatureReader.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -24,6 +25,7 @@ public:
 
 public:
     EggHatchAction action;
+    EnumDropdownCell<NatureCheckerFilter> nature;
     IVCheckerFilterCell iv_hp;
     IVCheckerFilterCell iv_atk;
     IVCheckerFilterCell iv_def;
@@ -38,7 +40,7 @@ public:
     virtual std::vector<std::string> make_header() const override;
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
-    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs) const;
+    EggHatchAction get_action(bool shiny, const IVCheckerReader::Results& IVs, NatureReader::Results nature) const;
 };
 
 }
