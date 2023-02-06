@@ -19,6 +19,8 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
+#include <sstream>
+
 #include <iostream>
 using std::cout;
 using std::endl;
