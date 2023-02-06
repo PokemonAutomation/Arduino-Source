@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
@@ -19,19 +20,17 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
-#include <sstream>
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
-
 using namespace Pokemon;
+
 
 
 ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
@@ -215,7 +214,7 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
     console.log("Go back to wall...");
     find_and_center_on_sky(env, console, context);
     pbf_move_right_joystick(context, 128, 255, 80, 0);
-    pbf_move_left_joystick(context, 160, 255, 30, 0);
+    pbf_move_left_joystick(context, 176, 255, 30, 0);
     pbf_press_button(context, BUTTON_L, 20, 50);
 
     clear_in_front(env, console, context, [&](BotBaseContext& context){
@@ -232,17 +231,27 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
     console.log("Moving towards sky and killing everything...");
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
-        pbf_move_right_joystick(context, 128, 255, 60, 0);
+        pbf_move_right_joystick(context, 128, 255, 70, 0);
 
         uint8_t x = 128;
+        uint16_t duration = 375;
         switch (m_iterations % 4){
-        case 0: x = 96; break;
-        case 1: x = 112; break;
-        case 2: x = 128; break;
-        case 3: x = 112; break;
+        case 0:
+            x = 96;
+            duration = 300;
+            break;
+        case 1:
+            x = 112;
+            break;
+        case 2:
+            x = 128;
+            break;
+        case 3:
+            x = 112;
+            break;
         }
 
-        pbf_move_left_joystick(context, x, 0, 3 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, x, 0, duration, 0);
     });
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
@@ -289,6 +298,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         env.update_stats();
 
         if (encounter.shiny_screenshot()){
+
+            context.wait_for(std::chrono::seconds(5));
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+
             std::ostringstream ss;
             ss << "Detected shiny encounter! (Error Coefficient = " << encounter.lowest_error_coefficient() << ")";
             throw ProgramFinishedException(

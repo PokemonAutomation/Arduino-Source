@@ -64,10 +64,10 @@ GameSettings::GameSettings()
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
-    , SHINY_SOUND_THRESHOLD(
+    , SHINY_SOUND_THRESHOLD0(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
         LockWhileRunning::LOCKED,
-        0.85, 0, 1.0
+        0.87, 0, 1.0
     )
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
@@ -82,7 +82,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(ENTER_GAME_WAIT);
     PA_ADD_OPTION(m_advanced_options);
     PA_ADD_OPTION(RAID_SPAWN_DELAY);
-    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
+    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD0);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
 }
 
