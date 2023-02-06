@@ -298,6 +298,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         env.update_stats();
 
         if (encounter.shiny_screenshot()){
+            stats.m_shinies++;
+            env.update_stats();
 
             context.wait_for(std::chrono::seconds(5));
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
