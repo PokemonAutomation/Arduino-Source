@@ -114,15 +114,13 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_wait(context, 100);
         context.wait_for_all_requests();
         //Walk into the wall
-        pbf_move_left_joystick(context, 128, 0, 200, 0);
-        pbf_wait(context, 100);
+        pbf_move_left_joystick(context, 128, 0, 200, 100);
         context.wait_for_all_requests();
         //Press A in case there's already a chest
         //The remaining commands will run harmlessly during the battle intro if there is a chest
         pbf_press_button(context, BUTTON_A, 50, 40);
         //Turn back
-        pbf_move_left_joystick(context, 128, 255, 60, 0);
-        pbf_wait(context, 100);
+        pbf_move_left_joystick(context, 128, 255, 60, 100);
         context.wait_for_all_requests();
         //Position toward chest
         pbf_move_left_joystick(context, 128, 0, 30, 0);
@@ -185,12 +183,10 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             pbf_wait(context, 100);
             context.wait_for_all_requests();
             //Walk into the wall
-            pbf_move_left_joystick(context, 128, 0, 200, 0); 
-            pbf_wait(context, 100);
+            pbf_move_left_joystick(context, 128, 0, 200, 100);
             context.wait_for_all_requests();
             //Turn back
-            pbf_move_left_joystick(context, 128, 255, 60, 0);
-            pbf_wait(context, 100);
+            pbf_move_left_joystick(context, 128, 255, 60, 100);
             context.wait_for_all_requests();
             //Position toward chest
             pbf_move_left_joystick(context, 128, 0, 30, 0);
@@ -229,12 +225,10 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 pbf_wait(context, 100);
                 context.wait_for_all_requests();
                 //Walk into the wall
-                pbf_move_left_joystick(context, 128, 0, 200, 0);
-                pbf_wait(context, 100);
+                pbf_move_left_joystick(context, 128, 0, 200, 100);
                 context.wait_for_all_requests();
                 //Turn back
-                pbf_move_left_joystick(context, 128, 255, 60, 0);
-                pbf_wait(context, 100);
+                pbf_move_left_joystick(context, 128, 255, 60, 100);
                 context.wait_for_all_requests();
                 //Position toward chest
                 pbf_move_left_joystick(context, 128, 0, 30, 0);
