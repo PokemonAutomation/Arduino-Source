@@ -8,6 +8,7 @@
 #include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -16,10 +17,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 
@@ -68,12 +71,54 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 
 
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
-    : NOTIFICATIONS({
+    : MODE(
+        "<b>Mode:</b><br>"
+        "Over time, the number of spawns decreases as they get stuck in unknown places. "
+        "This option lets you periodically reset the game to refresh everything. "
+        "However, resetting means you lose any shinies that have spawned, but "
+        "not yet encountered.<br><br>"
+        "If you choose to reset, you must save the game on the platform. "
+        "Ideally in the middle of the platform with as many " + STRING_POKEMON +
+        " despawned as possible.",
+        {
+            {Mode::NO_RESET,        "no-reset",         "Do not reset."},
+            {Mode::PERIODIC_RESET,  "periodic-reset",   "Periodically reset."},
+        },
+        LockWhileRunning::UNLOCKED,
+        Mode::NO_RESET
+    )
+    , RESET_DURATION_MINUTES(
+        "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
+        "this many minutes.",
+        LockWhileRunning::UNLOCKED,
+        180
+    )
+    , PATH(
+        "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
+        {
+            {Path::PATH0, "path0", "Path 0"},
+            {Path::PATH1, "path1", "Path 1"},
+        },
+        LockWhileRunning::UNLOCKED,
+        Path::PATH0
+    )
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(RESET_DURATION_MINUTES);
+    PA_ADD_OPTION(PATH);
+    PA_ADD_OPTION(VIDEO_ON_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -209,9 +254,7 @@ bool ShinyHuntAreaZeroPlatform::clear_in_front(
     return kill_watcher.last_kill() != WallClock::min();
 }
 
-void ShinyHuntAreaZeroPlatform::run_iteration(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
-){
+void ShinyHuntAreaZeroPlatform::run_path0(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     //  Go back to the wall.
     console.log("Go back to wall...");
     clear_in_front(env, console, context, [&](BotBaseContext& context){
@@ -261,7 +304,81 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
+}
+void ShinyHuntAreaZeroPlatform::run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    //  Go back to the wall.
+    console.log("Go back to wall...");
+    pbf_press_button(context, BUTTON_L, 20, 50);
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+        pbf_move_left_joystick(context, 192, 255, 60, 0);
+    });
 
+    //  Clear path to the wall.
+    console.log("Clear path to the wall...");
+    pbf_press_button(context, BUTTON_L, 20, 50);
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
+
+        //  Turn right.
+        pbf_move_left_joystick(context, 255, 128, 30, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+
+    //  Clear the wall.
+    console.log("Clear the wall...");
+    uint16_t duration = 325;
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 255, 128, 125, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+        context.wait_for_all_requests();
+
+        find_and_center_on_sky(env, console, context);
+        pbf_move_left_joystick(context, 128, 0, 50, 0);
+        pbf_press_button(context, BUTTON_L, 20, 30);
+
+        //  Move forward.
+
+        uint8_t x = 128;
+        switch (m_iterations % 4){
+        case 0:
+            x = 96;
+            duration = 250;
+            break;
+        case 1:
+            x = 112;
+            break;
+        case 2:
+            x = 128;
+            break;
+        case 3:
+            x = 112;
+            break;
+        }
+
+        pbf_move_left_joystick(context, x, 0, duration, 0);
+    });
+
+    console.log("Run backwards and wait...");
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+//        pbf_move_left_joystick(context, 64, 0, 125, 0);
+//        pbf_press_button(context, BUTTON_L, 20, 105);
+        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
+//        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3 * TICKS_PER_SECOND);
+    });
+}
+void ShinyHuntAreaZeroPlatform::run_iteration(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+){
+    switch (PATH){
+    case Path::PATH0:
+        run_path0(env, console, context);
+        break;
+    case Path::PATH1:
+        run_path1(env, console, context);
+        break;
+    }
 }
 
 
@@ -272,8 +389,17 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     assert_16_9_720p_min(env.logger(), env.console);
 
+    WallClock last_reset = current_time();
     while (true){
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         m_iterations++;
+
+        WallClock now = current_time();
+        if (MODE == Mode::PERIODIC_RESET && now - last_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
+            last_reset = now;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+        }
 
         EncounterWatcher encounter(env.console, COLOR_RED);
         context.wait_for_all_requests();
@@ -300,8 +426,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             stats.m_shinies++;
             env.update_stats();
 
-            context.wait_for(std::chrono::seconds(5));
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            if (VIDEO_ON_SHINY){
+                context.wait_for(std::chrono::seconds(5));
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            }
 
             std::ostringstream ss;
             ss << "Detected shiny encounter! (Error Coefficient = " << encounter.lowest_error_coefficient() << ")";

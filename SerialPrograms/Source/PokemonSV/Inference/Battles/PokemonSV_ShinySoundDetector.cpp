@@ -20,7 +20,7 @@ ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, DetectedCallback 
     : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
 {}
 float ShinySoundDetector::get_score_threshold() const{
-    return (float)GameSettings::instance().SHINY_SOUND_THRESHOLD1;
+    return (float)GameSettings::instance().SHINY_SOUND_THRESHOLD2;
 }
 std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
     return std::make_unique<SpectrogramMatcher>(

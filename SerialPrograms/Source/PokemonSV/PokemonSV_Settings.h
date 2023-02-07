@@ -34,7 +34,7 @@ public:
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
-    FloatingPointOption SHINY_SOUND_THRESHOLD1;
+    FloatingPointOption SHINY_SOUND_THRESHOLD2;
     FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
 };
 

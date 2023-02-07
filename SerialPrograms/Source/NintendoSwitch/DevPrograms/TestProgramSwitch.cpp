@@ -190,6 +190,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    pbf_controller_state(context, 0, DPAD_NONE, 192, 255, 116, 128, 3 * TICKS_PER_SECOND);
+
+
+#if 0
     EncounterWatcher encounter(console, COLOR_RED);
 
     throw ProgramFinishedException(
@@ -197,7 +201,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         "test",
         encounter.shiny_screenshot()
     );
-
+#endif
 
 
 #if 0

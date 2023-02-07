@@ -8,6 +8,9 @@
 #define PokemonAutomation_PokemonSV_ShinyHuntAreaZeroPlatform_H
 
 #include <functional>
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -40,7 +43,27 @@ private:
         std::function<void(BotBaseContext& context)>&& command
     );
 
+    void run_path0(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+
 private:
+    enum class Mode{
+        NO_RESET,
+        PERIODIC_RESET,
+    };
+    EnumDropdownOption<Mode> MODE;
+
+    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
+
+    enum class Path{
+        PATH0,
+        PATH1,
+    };
+    EnumDropdownOption<Path> PATH;
+
+    BooleanCheckBoxOption VIDEO_ON_SHINY;
+
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
     uint64_t m_iterations = 0;
