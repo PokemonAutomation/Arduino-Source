@@ -83,7 +83,7 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
     }
 
     std::cout << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies << 
-        " frequenices from " << filename << std::endl;
+        " frequencies from " << filename << std::endl;
 
     return audio_template;
 }
