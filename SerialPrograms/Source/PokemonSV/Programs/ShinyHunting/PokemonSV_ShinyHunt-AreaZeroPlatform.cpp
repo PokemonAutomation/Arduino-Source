@@ -227,13 +227,13 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
 
         //  Turn around.
         console.log("Turning towards sky...");
-        pbf_move_left_joystick(context, 128, 255, 20, 105);
+        pbf_move_left_joystick(context, 128, 255, 30, 95);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
-    uint16_t duration = 350;
+    uint16_t duration = 325;
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
@@ -242,7 +242,7 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
         switch (m_iterations % 4){
         case 0:
             x = 96;
-            duration = 300;
+            duration = 250;
             break;
         case 1:
             x = 112;
