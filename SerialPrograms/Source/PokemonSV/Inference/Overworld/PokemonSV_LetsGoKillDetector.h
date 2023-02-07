@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_LetsGoKillDetector_H
 
 #include <functional>
+#include <atomic>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"

@@ -53,7 +53,7 @@ bool is_kill_icon(
     object = red;
     object.merge_assume_no_overlap(white);
 
-    extract_box_reference(image, object).save("test.png");
+//    extract_box_reference(image, object).save("test.png");
 
     if (object.width() < 20 || object.height() < 20){
 //        cout << "too small: " << object.width() << endl;
@@ -66,7 +66,7 @@ bool is_kill_icon(
     }
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
-    cropped.save("test.png");
+//    cropped.save("test.png");
     double rmsd = LETS_GO_KILL_CROPPED().rmsd(cropped);
 //    cout << rmsd << endl;
     return rmsd < 120;

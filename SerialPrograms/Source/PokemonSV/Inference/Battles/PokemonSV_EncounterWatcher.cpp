@@ -51,11 +51,16 @@ bool EncounterWatcher::process_spectrums(
     }
 //    cout << "detected" << endl;
 
+    WallClock threshold = current_time() - std::chrono::seconds(1);
+
     //  Find the brighest frame.
     std::lock_guard<std::mutex> lg(m_lock);
 
     double best_bright_portion = 0;
     for (const VideoSnapshot& frame : m_history){
+        if (frame.timestamp >= threshold){
+            break;
+        }
         size_t bright_pixels;
         filter_rgb32_range(bright_pixels, frame, 0xffe0e000, 0xffffffff, Color(0xff000000), false);
         double bright_portion = bright_pixels / (double)(frame->width() * frame->height());

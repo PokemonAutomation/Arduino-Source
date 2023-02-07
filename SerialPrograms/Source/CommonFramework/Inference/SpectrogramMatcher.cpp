@@ -321,7 +321,7 @@ std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index)
 
 
     float score = sqrt(sum) / m_templateNorm[0];
-    cout << "score = " << score << endl;    //  REMOVE
+//    cout << "score = " << score << endl;
     score = std::min<float>(score, 1.0);
 
     return std::make_pair(score, scale);
