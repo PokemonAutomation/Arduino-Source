@@ -45,8 +45,7 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
         return;
     }
     if (m_spectrums_processed > 0){
-        //  REMOVE
-//        return;
+        return;
     }
     throw UserSetupError(m_console, "No sound detected.");
 }
@@ -106,11 +105,10 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         // std::cout << "error: " << matcherScore << std::endl;
 
         if (matcher_score == FLT_MAX){
-            //  REMOVE
-            cout << "Not enough history: " << m_lowest_error << endl;
+//            cout << "Not enough history: " << m_lowest_error << endl;
             continue; // error or not enough spectrum history
         }
-        cout << "Matcher Score: " << matcher_score << endl;
+//        cout << "Matcher Score: " << matcher_score << endl;
 
         // Record the lowest error found during the run
         m_lowest_error = std::min(m_lowest_error, matcher_score);

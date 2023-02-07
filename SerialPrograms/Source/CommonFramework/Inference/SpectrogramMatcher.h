@@ -83,7 +83,7 @@ private:
     std::vector<float> buildTemplateNorm() const;
 
     // For a given sub-template, return its match score and scaling factor
-    std::pair<float, float> matchSubTemplate(size_t subIndex) const;
+    std::pair<float, float> match_sub_template(size_t sub_index) const;
 
     // Update internal data for the next new spectrum. Called by `update_to_new_spectrums()`.
     // Return true if there is no error.

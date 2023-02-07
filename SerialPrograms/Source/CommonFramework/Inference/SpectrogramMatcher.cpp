@@ -175,15 +175,15 @@ void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
 std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
     std::vector<float> ret(m_templateRange.size());
 
-    for (size_t subIndex = 0; subIndex < m_templateRange.size(); subIndex++){
+    for (size_t sub_index = 0; sub_index < m_templateRange.size(); sub_index++){
         float sumSqr = 0.0f;
-        for (size_t i = m_templateRange[subIndex].first; i < m_templateRange[subIndex].second; i++){
+        for (size_t i = m_templateRange[sub_index].first; i < m_templateRange[sub_index].second; i++){
             for(size_t j = m_freqStart; j < m_freqEnd; j++){
                 const float v = m_template.getWindow(i)[j];
                 sumSqr += v * v;
             }
         }
-        ret[subIndex] = std::sqrt(sumSqr);
+        ret[sub_index] = std::sqrt(sumSqr);
     }
 
     return ret;
@@ -253,18 +253,18 @@ bool SpectrogramMatcher::update_to_new_spectrums(const std::vector<AudioSpectrum
     return true;
 }
 
-std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
+std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index) const {
 #if 0
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();
     float streamSumSqr = 0.0f;
     float sumMulti = 0.0f;
 
-    const size_t templateStart = m_templateRange[subIndex].first;
-    const size_t templateEnd = m_templateRange[subIndex].second;
-    for(size_t i = templateStart; i < templateEnd; i++, iter++, iter2++){
+    const size_t template_start = m_templateRange[sub_index].first;
+    const size_t template_end = m_templateRange[sub_index].second;
+    for(size_t i = template_start; i < template_end; i++, iter++, iter2++){
         // match in order from latest window to oldest
-        const float* templateData = m_template.getWindow(templateEnd-1-i);
+        const float* templateData = m_template.getWindow(template_end-1-i);
         const float* streamData = iter->magnitudes->data();
         streamSumSqr += *iter2;
         for(size_t j = m_freqStart; j < m_freqEnd; j++){
@@ -276,9 +276,9 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
 
     iter = m_spectrums.begin();
     float sum = 0.0f;
-    for(size_t i = templateStart; i < templateEnd; i++, iter++){
+    for(size_t i = template_start; i < template_end; i++, iter++){
         // match in order from latest window to oldest
-        const float* templateData = m_template.getWindow(templateEnd-1-i);
+        const float* templateData = m_template.getWindow(template_end-1-i);
         const float* streamData = iter->magnitudes->data();
         for(size_t j = m_freqStart; j < m_freqEnd; j++){
             float d = templateData[j] - scale * streamData[j];
@@ -288,16 +288,16 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
 #else
     //  Build matrix.
     auto iter = m_spectrums.begin();
-    const size_t templateStart = m_templateRange[subIndex].first;
-    const size_t templateEnd = m_templateRange[subIndex].second;
-    size_t windows = templateEnd - templateStart;
+    const size_t template_start = m_templateRange[sub_index].first;
+    const size_t template_end = m_templateRange[sub_index].second;
+    size_t windows = template_end - template_start;
 //    cout << windows << endl;
 //    cout << m_spectrums.size() << " / " << windows << endl;
     size_t freqs = m_freqEnd - m_freqStart;
     std::vector<const float*> matrixA(windows);
     std::vector<const float*> matrixT(windows);
     for (size_t i = 0; i < windows; i++, iter++){
-//        cout << "Template: " << ((size_t)m_template.getWindow(templateEnd - 1 - i) % 64) << endl;
+//        cout << "Template: " << ((size_t)m_template.getWindow(template_end - 1 - i) % 64) << endl;
 //        cout << "Samples:  " << ((size_t)iter->magnitudes->data() % 64) << endl;
         matrixT[i] = m_freqStart + m_template.getWindow(windows - 1 - i);
         matrixA[i] = m_freqStart + iter->magnitudes->data();
@@ -321,6 +321,7 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
 
 
     float score = sqrt(sum) / m_templateNorm[0];
+    cout << "score = " << score << endl;    //  REMOVE
     score = std::min<float>(score, 1.0);
 
     return std::make_pair(score, scale);
@@ -360,16 +361,16 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
     float score = FLT_MAX; // the lower the score, the better the match
     if (m_templateRange.size() == 1){
         // Match the full template
-        std::tie(score, m_lastScale) = matchSubTemplate(0);
-    }
-    else{
+        std::tie(score, m_lastScale) = match_sub_template(0);
+    }else{
         // Match each indivdual sub-template
-        for(size_t subTemp = 0; subTemp < m_templateRange.size(); subTemp++){
-            float subTemplateScore = FLT_MAX, subTemplateScale = 1.0f;
-            std::tie(subTemplateScore, subTemplateScale) = matchSubTemplate(subTemp);
-            if (subTemplateScore < score){
-                score = subTemplateScore;
-                m_lastScale = subTemplateScale;
+        for (size_t sub_template = 0; sub_template < m_templateRange.size(); sub_template++){
+            float sub_template_score = FLT_MAX;
+            float sub_template_scale = 1.0f;
+            std::tie(sub_template_score, sub_template_scale) = match_sub_template(sub_template);
+            if (sub_template_score < score){
+                score = sub_template_score;
+                m_lastScale = sub_template_scale;
             }
         }
     }

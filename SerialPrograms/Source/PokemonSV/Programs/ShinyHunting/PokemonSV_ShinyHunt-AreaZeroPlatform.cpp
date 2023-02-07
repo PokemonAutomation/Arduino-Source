@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
@@ -114,7 +115,7 @@ void find_and_center_on_sky(
                 console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
                 session.dispatch([](BotBaseContext& context){
                     pbf_move_right_joystick(context, 128, 0, 250, 0);
-                    pbf_move_right_joystick(context, 255, 0, 10 * TICKS_PER_SECOND, 0);
+                    pbf_move_right_joystick(context, 0, 0, 10 * TICKS_PER_SECOND, 0);
                 });
                 state = OverworldState::FindingSky;
             }
@@ -213,10 +214,12 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
 ){
     //  Go back to the wall.
     console.log("Go back to wall...");
-    find_and_center_on_sky(env, console, context);
-    pbf_move_right_joystick(context, 128, 255, 80, 0);
-    pbf_move_left_joystick(context, 176, 255, 30, 0);
-    pbf_press_button(context, BUTTON_L, 20, 50);
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+        pbf_move_left_joystick(context, 176, 255, 30, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
 
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         //  Move to wall.
@@ -230,12 +233,12 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
 
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
+    uint16_t duration = 375;
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
         uint8_t x = 128;
-        uint16_t duration = 375;
         switch (m_iterations % 4){
         case 0:
             x = 96;
@@ -252,10 +255,11 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
             break;
         }
 
+        ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
     clear_in_front(env, console, context, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
+        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 
 }
@@ -268,8 +272,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     assert_16_9_720p_min(env.logger(), env.console);
 
-    bool clear_front = true;
-
     while (true){
         m_iterations++;
 
@@ -278,9 +280,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                if (clear_front){
-                    clear_in_front(env, env.console, context, nullptr);
-                }
                 run_iteration(env, env.console, context);
             },
             {
@@ -290,7 +289,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         );
         encounter.throw_if_no_sound();
         if (ret != 0){
-            clear_front = false;
             continue;
         }
 
@@ -323,7 +321,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             },
             {overworld}
         );
-        clear_front = true;
     }
 
 }
