@@ -397,7 +397,7 @@ void zero_gate_to_station(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int station //  1 - 4
 ){
-    AdvanceDialogWatcher dialog(COLOR_RED);
+    AdvanceDialogWatcher dialog(COLOR_BLUE);
     {
         int ret = run_until(
             console, context,
@@ -419,8 +419,8 @@ void zero_gate_to_station(
             throw OperationFailedException(console, "Unable to warp to station 2 after 60 seconds.", true);
         }
 
-        ZeroGateWarpPromptWatcher prompt;
-        BlackScreenOverWatcher black_screen;
+        ZeroGateWarpPromptWatcher prompt(COLOR_YELLOW);
+        BlackScreenOverWatcher black_screen(COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context, std::chrono::seconds(5),
@@ -453,7 +453,7 @@ void zero_gate_to_station(
 
     console.log("Exiting station. Waiting for black screen...");
     {
-        BlackScreenOverWatcher black_screen;
+        BlackScreenOverWatcher black_screen(COLOR_RED);
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
@@ -468,7 +468,7 @@ void zero_gate_to_station(
 
     console.log("Exiting station. Waiting for overworld...");
     {
-        OverworldWatcher overworld;
+        OverworldWatcher overworld(COLOR_RED);
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {overworld}

@@ -174,13 +174,17 @@ void ShinyHuntAreaZeroPlatform::zero_gate_to_platform(
 
     //  Navigate to platform.
 #if 0
+    //  Don't jump to avoid spawn.
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
     pbf_move_left_joystick(context, 128, 0, 625, 0);
     ssf_press_button(context, BUTTON_B, 0, 50);
     pbf_move_left_joystick(context, 128, 0, 250, 0);
     pbf_move_left_joystick(context, 160, 0, 600, 0);
     pbf_move_left_joystick(context, 128, 0, 1875, 0);
-#else
+#endif
+
+#if 0
+    //  Jump late.
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
     ssf_press_joystick(context, true, 128, 0, 315, 500);
@@ -194,11 +198,31 @@ void ShinyHuntAreaZeroPlatform::zero_gate_to_platform(
     pbf_move_left_joystick(context, 144, 0, 1150, 0);
     pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
 
-    pbf_move_left_joystick(context, 128, 0, 1375, 500);
+    pbf_move_left_joystick(context, 128, 0, 1375, 250);
+    context.wait_for_all_requests();
+#endif
+
+#if 1
+    //  Jump earlier.
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+    ssf_press_joystick(context, true, 128, 0, 280, 500);
+
+    //  Jump
+    ssf_press_button(context, BUTTON_B, 125, 100);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 50);
+
+    pbf_move_left_joystick(context, 144, 0, 1150, 0);
+    pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
+
+    pbf_move_left_joystick(context, 128, 0, 1375, 250);
     context.wait_for_all_requests();
 #endif
 
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 }
 
 
@@ -275,6 +299,7 @@ void find_and_center_on_sky(
 
         if (session.command_is_running()){
             session.stop_command();
+            state = OverworldState::None;
             context.wait_for(std::chrono::seconds(1));
             continue;
         }
@@ -517,7 +542,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
             std::vector<std::pair<std::string, std::string>> embeds;
             embeds.emplace_back(
-                "Detected Method:",
+                "Detection Method:",
                 "Shiny Sound (Error Coefficient = " + tostr_default(encounter.lowest_error_coefficient()) + ")"
             );
             send_program_notification(
