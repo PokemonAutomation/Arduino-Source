@@ -190,6 +190,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    pbf_controller_state(context, 0, DPAD_NONE, 192, 255, 116, 128, 3 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 192, 0, 20, 105);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_joystick(context, true, 128, 0, 125, 1250);
+
+    //  Jump
+    ssf_press_button(context, BUTTON_B, 125, 100);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 50);
+
+    pbf_move_left_joystick(context, 144, 0, 750, 0);
+    pbf_move_left_joystick(context, 128, 0, 1000, 0);
 
 
 #if 0
