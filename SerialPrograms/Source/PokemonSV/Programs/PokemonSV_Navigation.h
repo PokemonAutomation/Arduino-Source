@@ -45,6 +45,13 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+//  After just entering the Zero Gate, go to the specified station.
+void zero_gate_to_station(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    int station //  1 - 4
+);
+
+
 
 }
 }

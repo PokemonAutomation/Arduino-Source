@@ -4,8 +4,10 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
@@ -18,6 +20,7 @@
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
@@ -74,9 +77,10 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
         }
         else{
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToOpenMap",
-                "open_map_from_overworld(): No overworld state found after 10 seconds."
+            throw OperationFailedException(
+                console,
+                "open_map_from_overworld(): No overworld state found after 10 seconds.",
+                true
             );
         }
     }
@@ -84,9 +88,10 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToOpenMap",
-                "open_map_from_overworld(): Failed to open map after 1 minute."
+            throw OperationFailedException(
+                console,
+                "open_map_from_overworld(): Failed to open map after 1 minute.",
+                true
             );
         }
 
@@ -118,9 +123,10 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
                 continue;
             }
         default:
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToOpenMap",
-                "open_map_from_overworld(): No recognized state after 30 seconds."
+            throw OperationFailedException(
+                console,
+                "open_map_from_overworld(): No recognized state after 30 seconds.",
+                true
             );
         }
     }
@@ -134,9 +140,10 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToFly",
-                "fly_to_overworld_from_map(): Failed to open map after 1 minute."
+            throw OperationFailedException(
+                console,
+                "fly_to_overworld_from_map(): Failed to open map after 1 minute.",
+                true
             );
         }
 
@@ -175,9 +182,10 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             continue;
             
         default:
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToFly",
-                "fly_to_overworld_from_map(): No recognized state after 30 seconds."
+            throw OperationFailedException(
+                console,
+                "fly_to_overworld_from_map(): No recognized state after 30 seconds.",
+                true
             );
         }
     }
@@ -191,9 +199,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToPicnic",
-                "picnic_from_overworld(): Failed to start picnic after 3 minutes."
+            throw OperationFailedException(
+                console,
+                "picnic_from_overworld(): Failed to start picnic after 3 minutes.",
+                true
             );
         }
 
@@ -217,9 +226,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             console.log("Detected main menu.");
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
-                dump_image_and_throw_recoverable_exception(
-                    info, console, "FailToPicnic",
-                    "picnic_from_overworld(): Cannot move menu cursor to picnic."
+                throw OperationFailedException(
+                    console,
+                    "picnic_from_overworld(): Cannot move menu cursor to picnic.",
+                    true
                 );
             }
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
@@ -233,9 +243,10 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             context.wait_for_all_requests();
             return;
         default:
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToPicnic",
-                "picnic_from_overworld(): No recognized state after 30 seconds."
+            throw OperationFailedException(
+                console,
+                "picnic_from_overworld(): No recognized state after 30 seconds.",
+                true
             );
         }
     }
@@ -262,9 +273,10 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         }
 
         if (i == 4){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToLeavePicnic",
-                "leave_picnic(): Failed to leave picnic after 5 tries."
+            throw OperationFailedException(
+                console,
+                "leave_picnic(): Failed to leave picnic after 5 tries.",
+                true
             );
         }
 
@@ -285,9 +297,10 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         {overworld}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(
-            info, console, "FailToLeavePicnic",
-            "leave_picnic(): Failed to detecxt overworld after 20 seconds."
+        throw OperationFailedException(
+            console,
+            "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
+            true
         );
     }
     // Wait three more seconds to make sure the player character is free to operate:
@@ -302,9 +315,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToEnterBoxes",
-                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes."
+            throw OperationFailedException(
+                console,
+                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.",
+                true
             );
         }
 
@@ -329,9 +343,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             console.overlay().add_log("Enter box", COLOR_WHITE);
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
-                dump_image_and_throw_recoverable_exception(
-                    info, console, "FailToEnterBoxes",
-                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes."
+                throw OperationFailedException(
+                    console,
+                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.",
+                    true
                 );
             }
             pbf_press_button(context, BUTTON_A, 20, 50);
@@ -341,9 +356,10 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             context.wait_for(std::chrono::milliseconds(200));
             return;
         default:
-            dump_image_and_throw_recoverable_exception(
-                info, console, "FailToEnterBoxes",
-                "enter_box_system_from_overworld(): No recognized state after 30 seconds."
+            throw OperationFailedException(
+                console,
+                "enter_box_system_from_overworld(): No recognized state after 30 seconds.",
+                true
             );
         }
     }
@@ -365,15 +381,103 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
         {overworld}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(
-            info, console, "FailToLeaveBoxes",
-            "leave_box_system_to_overworld(): Unknown state after 10 button B presses."
+        throw OperationFailedException(
+            console,
+            "leave_box_system_to_overworld(): Unknown state after 10 button B presses.",
+            true
         );
     }
 }
 
 
 
+
+
+void zero_gate_to_station(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    int station //  1 - 4
+){
+    AdvanceDialogWatcher dialog(COLOR_RED);
+    {
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+            },
+            {dialog}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console, "Unable to find warp circle.", true);
+        }
+    }
+
+
+
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            throw OperationFailedException(console, "Unable to warp to station 2 after 60 seconds.", true);
+        }
+
+        ZeroGateWarpPromptWatcher prompt;
+        BlackScreenOverWatcher black_screen;
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context, std::chrono::seconds(5),
+            {dialog, prompt, black_screen}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        switch (ret){
+        case 0:
+            console.log("Detected dialog.");
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            continue;
+        case 1:
+            console.log("Detected prompt.");
+            prompt.move_cursor(info, console, context, 1);
+            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+            continue;
+        case 2:
+            console.log("Detected black screen.");
+
+            break;
+        default:
+            throw OperationFailedException(console, "Unable to find warp to station 2.", true);
+        }
+
+        break;
+    }
+    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(100));
+
+    console.log("Exiting station. Waiting for black screen...");
+    {
+        BlackScreenOverWatcher black_screen;
+        int ret = run_until(
+            console, context,
+            [](BotBaseContext& context){
+                pbf_move_left_joystick(context, 0, 255, 60 * TICKS_PER_SECOND, 0);
+            },
+            {black_screen}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console, "Unable to exit station after 60 seconds.", true);
+        }
+    }
+
+    console.log("Exiting station. Waiting for overworld...");
+    {
+        OverworldWatcher overworld;
+        int ret = wait_until(
+            console, context, std::chrono::seconds(30),
+            {overworld}
+        );
+        if (ret < 0){
+            throw OperationFailedException(console, "Unable to load overworld after exiting station for 30 seconds.", true);
+        }
+    }
+}
 
 
 

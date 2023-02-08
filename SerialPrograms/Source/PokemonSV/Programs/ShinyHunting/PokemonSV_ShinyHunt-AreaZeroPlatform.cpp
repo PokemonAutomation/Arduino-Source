@@ -6,6 +6,8 @@
 
 #include <atomic>
 #include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -17,12 +19,14 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 
@@ -35,6 +39,30 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+
+NavigatePlatformSettings::NavigatePlatformSettings()
+    : GroupOption("Navigate to Platform Settings", LockWhileRunning::UNLOCKED)
+    , STATION_ARRIVE_PAUSE_SECONDS(
+        "<b>Station Arrive Pause</b><br>Pause for this many seconds after leaving the station. "
+        "This allows stuff to load to reduce the chance of lag affecting the fly to platform.",
+        LockWhileRunning::UNLOCKED,
+        3
+    )
+    , MIDAIR_PAUSE_TIME(
+        "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
+        "Too small and you may crash into the wall or have reduced spawns. "
+        "Too large and you may undershoot the platform.",
+        LockWhileRunning::UNLOCKED,
+        TICKS_PER_SECOND,
+        "50"
+    )
+{
+    PA_ADD_OPTION(STATION_ARRIVE_PAUSE_SECONDS);
+    PA_ADD_OPTION(MIDAIR_PAUSE_TIME);
+}
+
 
 
 
@@ -73,19 +101,20 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : MODE(
         "<b>Mode:</b><br>"
+        "If the mode requires starting on the platform, you should stand near the center of the platform facing any direction.<br><br>"
+        "If the mode requires starting in the Zero Gate, you should be just inside the building as if you just entered.<br><br>"
+        "If the mode periodically resets, you must have saved in your starting position.<br><br>"
         "Over time, the number of spawns decreases as they get stuck in unknown places. "
         "This option lets you periodically reset the game to refresh everything. "
         "However, resetting means you lose any shinies that have spawned, but "
-        "not yet encountered.<br><br>"
-        "If you choose to reset, you must save the game on the platform. "
-        "Ideally in the middle of the platform with as many " + STRING_POKEMON +
-        " despawned as possible.",
+        "not yet encountered.",
         {
-            {Mode::NO_RESET,        "no-reset",         "Do not reset."},
-            {Mode::PERIODIC_RESET,  "periodic-reset",   "Periodically reset."},
+            {Mode::START_ON_PLATFORM_NO_RESET,          "platform-no-reset",        "Start on platform. Do not reset."},
+            {Mode::START_IN_ZERO_GATE_NO_RESET,         "zerogate-no-reset",        "Start inside Zero Gate. Do not reset."},
+            {Mode::START_IN_ZERO_GATE_PERIODIC_RESET,   "zerogate-periodic-reset",  "Start inside Zero Gate. Periodically reset."},
         },
-        LockWhileRunning::UNLOCKED,
-        Mode::NO_RESET
+        LockWhileRunning::LOCKED,
+        Mode::START_ON_PLATFORM_NO_RESET
     )
     , RESET_DURATION_MINUTES(
         "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
@@ -108,18 +137,68 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_SHINY(
+        "Shiny Encounter",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(MODE);
-    PA_ADD_OPTION(RESET_DURATION_MINUTES);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(MODE);
+        PA_ADD_OPTION(RESET_DURATION_MINUTES);
+    }
     PA_ADD_OPTION(PATH);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
+    }
     PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+
+
+
+void ShinyHuntAreaZeroPlatform::zero_gate_to_platform(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+){
+    zero_gate_to_station(info, console, context, 2);
+
+    context.wait_for(std::chrono::seconds(NAVIGATE_TO_PLATFORM.STATION_ARRIVE_PAUSE_SECONDS));
+
+    //  Navigate to platform.
+#if 0
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 625, 0);
+    ssf_press_button(context, BUTTON_B, 0, 50);
+    pbf_move_left_joystick(context, 128, 0, 250, 0);
+    pbf_move_left_joystick(context, 160, 0, 600, 0);
+    pbf_move_left_joystick(context, 128, 0, 1875, 0);
+#else
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+    ssf_press_joystick(context, true, 128, 0, 315, 500);
+
+    //  Jump
+    ssf_press_button(context, BUTTON_B, 125, 100);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 50);
+
+    pbf_move_left_joystick(context, 144, 0, 1150, 0);
+    pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
+
+    pbf_move_left_joystick(context, 128, 0, 1375, 500);
+    context.wait_for_all_requests();
+#endif
+
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
 }
 
 
@@ -319,7 +398,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(ProgramEnvironment& env, ConsoleHandle
     console.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
     clear_in_front(env, console, context, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
         pbf_move_left_joystick(context, 255, 128, 30, 0);
@@ -389,16 +468,21 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     assert_16_9_720p_min(env.logger(), env.console);
 
+    if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
+        zero_gate_to_platform(env.program_info(), env.console, context);
+    }
+
     WallClock last_reset = current_time();
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         m_iterations++;
 
         WallClock now = current_time();
-        if (MODE == Mode::PERIODIC_RESET && now - last_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
+        if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - last_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
             last_reset = now;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            zero_gate_to_platform(env.program_info(), env.console, context);
         }
 
         EncounterWatcher encounter(env.console, COLOR_RED);
@@ -431,13 +515,20 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
             }
 
-            std::ostringstream ss;
-            ss << "Detected shiny encounter! (Error Coefficient = " << encounter.lowest_error_coefficient() << ")";
-            throw ProgramFinishedException(
-                env.console,
-                ss.str(),
-                encounter.shiny_screenshot()
+            std::vector<std::pair<std::string, std::string>> embeds;
+            embeds.emplace_back(
+                "Detected Method:",
+                "Shiny Sound (Error Coefficient = " + tostr_default(encounter.lowest_error_coefficient()) + ")"
             );
+            send_program_notification(
+                env, NOTIFICATION_SHINY,
+                COLOR_STAR_SHINY,
+                "Found a Shiny!",
+                std::move(embeds), "",
+                encounter.shiny_screenshot(), true
+            );
+
+            throw ProgramFinishedException();
         }
         OverworldWatcher overworld(COLOR_GREEN);
         run_until(

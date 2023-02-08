@@ -200,9 +200,14 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
+    ImageRGB32 image("Screenshots/screenshot-20230208-012850704172.png");
+
+    OverworldDetector detector;
+    cout << detector.detect(image) << endl;
 
 
-#if 1
+
+#if 0
 //    ImageRGB32 image("Screenshots/screenshot-20230206-023520852521.png");
     ImageRGB32 image("Screenshots/screenshot-20230206-022329387691.png");
 //    ImageRGB32 image("LetsGoKill.png");

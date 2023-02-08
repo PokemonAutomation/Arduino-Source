@@ -86,6 +86,8 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 
 
 #include <QPixmap>
@@ -167,9 +169,6 @@ using namespace PokemonSV;
 
 
 
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -190,7 +189,27 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    pbf_controller_state(context, 0, DPAD_NONE, 192, 255, 116, 128, 3 * TICKS_PER_SECOND);
+//    pbf_controller_state(context, 0, DPAD_NONE, 192, 255, 116, 128, 3 * TICKS_PER_SECOND);
+
+
+#if 0
+    ZeroGateWarpPromptDetector detector;
+    auto image = feed.snapshot();
+    detector.detect(image);
+#endif
+
+
+//    zero_gate_to_platform(env.program_info(), console, context);
+
+
+#if 0
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 625, 0);
+    ssf_press_button(context, BUTTON_B, 0, 50);
+    pbf_move_left_joystick(context, 128, 0, 250, 0);
+    pbf_move_left_joystick(context, 160, 0, 600, 0);
+    pbf_move_left_joystick(context, 128, 0, 1875, 0);
+#endif
 
 
 #if 0

@@ -11,12 +11,23 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+class NavigatePlatformSettings : public GroupOption{
+public:
+    NavigatePlatformSettings();
+
+public:
+    SimpleIntegerOption<uint16_t> STATION_ARRIVE_PAUSE_SECONDS;
+    TimeExpressionOption<uint16_t> MIDAIR_PAUSE_TIME;
+};
 
 
 
@@ -37,6 +48,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    void zero_gate_to_platform(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
     void run_iteration(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     bool clear_in_front(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
@@ -46,10 +59,13 @@ private:
     void run_path0(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     void run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
+
+
 private:
     enum class Mode{
-        NO_RESET,
-        PERIODIC_RESET,
+        START_ON_PLATFORM_NO_RESET,
+        START_IN_ZERO_GATE_NO_RESET,
+        START_IN_ZERO_GATE_PERIODIC_RESET,
     };
     EnumDropdownOption<Mode> MODE;
 
@@ -63,7 +79,10 @@ private:
 
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 
+    NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
+
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
 
     uint64_t m_iterations = 0;
