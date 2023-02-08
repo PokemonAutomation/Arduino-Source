@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -23,6 +24,7 @@ SingleSwitchProgramSession::SingleSwitchProgramSession(SingleSwitchProgramOption
     : ProgramSession(option.descriptor())
     , m_option(option)
     , m_system(option.system(), instance_id(), console_number)
+    , m_scope(nullptr)
 {}
 
 SingleSwitchProgramSession::~SingleSwitchProgramSession(){
@@ -61,28 +63,30 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     start_program_video_check(env.console, m_option.descriptor().feedback());
 
-    {
-        SpinLockGuard lg(m_lock);
-        m_scope = &scope;
-    }
+    m_scope.store(&scope, std::memory_order_release);
 
     try{
         BotBaseContext context(scope, env.console.botbase());
         m_option.instance().program(env, context);
     }catch (...){
-        SpinLockGuard lg(m_lock);
-        m_scope = nullptr;
+        m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
-    SpinLockGuard lg(m_lock);
-    m_scope = nullptr;
+    m_scope.store(nullptr, std::memory_order_release);
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     SpinLockGuard lg(m_lock);
     m_system.serial_session().stop();
-    if (m_scope != nullptr){
-        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+    CancellableScope* scope = m_scope.load(std::memory_order_acquire);
+    if (scope != nullptr){
+        scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
     }
+
+    //  Wait for program thread to finish.
+    while (m_scope.load(std::memory_order_acquire) != nullptr){
+        pause();
+    }
+
     m_system.serial_session().reset();
 }
 void SingleSwitchProgramSession::internal_run_program(){

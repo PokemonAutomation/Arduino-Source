@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
@@ -36,6 +37,7 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& o
     : ProgramSession(option.descriptor())
     , m_option(option)
     , m_system(option.system(), instance_id())
+    , m_scope(nullptr)
 {
     SpinLockGuard lg(m_lock);
     m_system.add_listener(*this);
@@ -82,20 +84,15 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         start_program_video_check(env.consoles[c], m_option.descriptor().feedback());
     }
 
-    {
-        SpinLockGuard lg(m_lock);
-        m_scope = &scope;
-    }
+    m_scope.store(&scope, std::memory_order_release);
 
     try{
         m_option.instance().program(env, scope);
     }catch (...){
-        SpinLockGuard lg(m_lock);
-        m_scope = nullptr;
+        m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
-    SpinLockGuard lg(m_lock);
-    m_scope = nullptr;
+    m_scope.store(nullptr, std::memory_order_release);
 }
 void MultiSwitchProgramSession::internal_stop_program(){
     SpinLockGuard lg(m_lock);
@@ -103,9 +100,16 @@ void MultiSwitchProgramSession::internal_stop_program(){
     for (size_t c = 0; c < consoles; c++){
         m_system[c].serial_session().stop();
     }
-    if (m_scope != nullptr){
-        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+    CancellableScope* scope = m_scope.load(std::memory_order_acquire);
+    if (scope != nullptr){
+        scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
     }
+
+    //  Wait for program thread to finish.
+    while (m_scope.load(std::memory_order_acquire) != nullptr){
+        pause();
+    }
+
     for (size_t c = 0; c < consoles; c++){
         m_system[c].serial_session().reset();
     }

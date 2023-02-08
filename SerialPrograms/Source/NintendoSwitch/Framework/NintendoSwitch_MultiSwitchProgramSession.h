@@ -60,7 +60,7 @@ private:
     MultiSwitchSystemSession m_system;
 
     SpinLock m_lock;
-    CancellableScope* m_scope = nullptr;
+    std::atomic<CancellableScope*> m_scope;
 
     std::set<Listener*> m_listeners;
 };

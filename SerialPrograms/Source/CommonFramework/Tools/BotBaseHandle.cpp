@@ -21,9 +21,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "BotBaseHandle.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

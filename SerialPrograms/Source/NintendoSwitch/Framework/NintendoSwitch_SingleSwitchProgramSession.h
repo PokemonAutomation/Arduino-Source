@@ -51,7 +51,7 @@ private:
     SwitchSystemSession m_system;
 
     SpinLock m_lock;
-    CancellableScope* m_scope = nullptr;
+    std::atomic<CancellableScope*> m_scope;
 };
 
 
