@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-// Hold the sepctrogram of an audio, used as a template to
+// Hold the spectrogram of an audio, used as a template to
 // match sounds from an audio stream.
 class AudioTemplate{
 public:

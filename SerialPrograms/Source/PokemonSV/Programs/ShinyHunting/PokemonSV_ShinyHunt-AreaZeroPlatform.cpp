@@ -561,7 +561,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             [&](BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_DOWN, 250, 0);
                 pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_B, 20, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 20, 2 * TICKS_PER_SECOND);
             },
             {overworld}
         );

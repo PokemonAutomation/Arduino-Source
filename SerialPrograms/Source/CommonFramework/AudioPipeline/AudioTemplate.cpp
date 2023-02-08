@@ -4,7 +4,9 @@
  *
  */
 
+#include <sstream>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "CommonFramework/Logging/Logger.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
@@ -12,9 +14,9 @@
 #include "Tools/AudioFormatUtils.h"
 #include "IO/AudioFileLoader.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -47,6 +49,7 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
     const auto ret = loader.loadFullAudio();
     const float* data = reinterpret_cast<const float*>(std::get<0>(ret));
     size_t numSamples = std::get<1>(ret) / sizeof(float);
+//    cout << "numSamples = " << numSamples << endl;
     
     if (data == nullptr){
         return AudioTemplate();
@@ -82,8 +85,11 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
         }
     }
 
-    std::cout << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies << 
-        " frequencies from " << filename << std::endl;
+
+    std::stringstream ss;
+    ss << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies <<
+        " frequencies from " << filename;
+    global_logger_tagged().log(ss.str());
 
     return audio_template;
 }
