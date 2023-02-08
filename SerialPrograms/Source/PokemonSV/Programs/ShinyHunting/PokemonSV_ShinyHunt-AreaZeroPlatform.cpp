@@ -516,6 +516,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     }
 
     WallClock last_reset = current_time();
+    std::unique_ptr<EncounterWatcher> encounter_watcher;
+    encounter_watcher.reset(new EncounterWatcher(env.console, COLOR_RED));
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         m_iterations++;
@@ -528,7 +530,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             zero_gate_to_platform(env.program_info(), env.console, context);
         }
 
-        EncounterWatcher encounter(env.console, COLOR_RED);
         context.wait_for_all_requests();
         int ret = run_until(
             env.console, context,
@@ -536,11 +537,11 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
                 run_iteration(env, env.console, context);
             },
             {
-                static_cast<VisualInferenceCallback&>(encounter),
-                static_cast<AudioInferenceCallback&>(encounter),
+                static_cast<VisualInferenceCallback&>(*encounter_watcher),
+                static_cast<AudioInferenceCallback&>(*encounter_watcher),
             }
         );
-        encounter.throw_if_no_sound();
+        encounter_watcher->throw_if_no_sound();
         if (ret != 0){
             continue;
         }
@@ -549,7 +550,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         stats.m_encounters++;
         env.update_stats();
 
-        if (encounter.shiny_screenshot()){
+        if (encounter_watcher->shiny_screenshot()){
             stats.m_shinies++;
             env.update_stats();
 
@@ -561,25 +562,29 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             std::vector<std::pair<std::string, std::string>> embeds;
             embeds.emplace_back(
                 "Detection Method:",
-                "Shiny Sound (Error Coefficient = " + tostr_default(encounter.lowest_error_coefficient()) + ")"
+                "Shiny Sound (Error Coefficient = " + tostr_default(encounter_watcher->lowest_error_coefficient()) + ")"
             );
             send_program_notification(
                 env, NOTIFICATION_SHINY,
                 COLOR_STAR_SHINY,
                 "Found a Shiny!",
                 std::move(embeds), "",
-                encounter.shiny_screenshot(), true
+                encounter_watcher->shiny_screenshot(), true
             );
 
             throw ProgramFinishedException();
         }
+
+        //  Clear the detection history to prepare next encounter.
+        encounter_watcher.reset(new EncounterWatcher(env.console, COLOR_RED));
+
         OverworldWatcher overworld(COLOR_GREEN);
         run_until(
             env.console, context,
             [&](BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_DOWN, 250, 0);
                 pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_B, 20, 2 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 20, 5 * TICKS_PER_SECOND);
             },
             {overworld}
         );

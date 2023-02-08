@@ -87,13 +87,13 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
         }
     );
 
-    size_t c = 0;
+//    size_t c = 0;
     for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
         auto iter = session->make_iterator(50);
         WaterfillObject object;
         while (iter->find_next(object, false)){
-            c++;
+//            c++;
 //            extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
 
             //  Exclude if it touches the borders.
@@ -112,7 +112,7 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
                 continue;
             }
 
-            extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
+//            extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
             double rmsd = RADAR_BALL().rmsd(extract_box_reference(image, object));
 //            cout << "rmsd = " << rmsd << endl;
             if (rmsd < 50){
