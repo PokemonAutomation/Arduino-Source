@@ -59,6 +59,8 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
         image,
         {
+            {0xffc0a000, 0xffffff1f},
+            {0xffc0b000, 0xffffff1f},
             {0xffc0c000, 0xffffff1f},
             {0xffd0d000, 0xffffff1f},
             {0xffe0e000, 0xffffff1f},
@@ -85,14 +87,14 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
         }
     );
 
-//    size_t c = 0;
+    size_t c = 0;
     for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
         auto iter = session->make_iterator(50);
         WaterfillObject object;
         while (iter->find_next(object, false)){
-//             c++;
-//             extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
+            c++;
+//            extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
 
             //  Exclude if it touches the borders.
             if (object.min_x == 0 || object.min_y == 0 ||
@@ -101,7 +103,7 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
                 continue;
             }
             double aspect_ratio = object.aspect_ratio();
-            // cout << "object " << c << " ratio " << aspect_ratio << " area " << object.area_ratio() << endl;
+//            cout << "object " << c << " ratio " << aspect_ratio << " area " << object.area_ratio() << endl;
             if (!(0.8 < aspect_ratio && aspect_ratio < 1.2)){
                 continue;
             }
@@ -110,9 +112,9 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
                 continue;
             }
 
-            // extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
+            extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
             double rmsd = RADAR_BALL().rmsd(extract_box_reference(image, object));
-            // cout << "rmsd = " << rmsd << endl;
+//            cout << "rmsd = " << rmsd << endl;
             if (rmsd < 50){
                 return true;
             }
