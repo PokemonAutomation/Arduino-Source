@@ -77,7 +77,9 @@ void AsyncCommandSession::stop_command(){
     if (m_current){
         //  Already a task running. Cancel it.
         m_current->context.cancel_now();
-        m_cv.wait(lg, [this]{ return m_current == nullptr; });
+        m_cv.wait(lg, [this]{
+            return cancelled() || m_current == nullptr;
+        });
     }
 }
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
@@ -99,7 +101,12 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
     if (m_current){
         //  Already a task running. Cancel it.
         m_current->context.cancel_lazy();
-        m_cv.wait(lg, [this]{ return m_current == nullptr; });
+        m_cv.wait(lg, [this]{
+            return cancelled() || m_current == nullptr;
+        });
+        if (cancelled()){
+            return;
+        }
     }
 
     m_current = std::move(pending);
