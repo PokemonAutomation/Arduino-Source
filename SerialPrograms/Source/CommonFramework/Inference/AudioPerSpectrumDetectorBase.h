@@ -115,6 +115,7 @@ protected:
     
     std::unique_ptr<SpectrogramMatcher> m_matcher;
 
+//    std::vector<std::pair<float, std::string>> m_errors;
 };
 
 

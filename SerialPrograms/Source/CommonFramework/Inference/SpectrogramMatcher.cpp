@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
@@ -12,9 +12,9 @@
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "SpectrogramMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -55,6 +55,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     , m_mode(mode)
 {
     const size_t numTemplateWindows = m_template.numWindows();
+//    cout << "numTemplateWindows = " << numTemplateWindows << endl;
     m_numOriginalFrequencies = m_template.numFrequencies();
     if (m_template.numFrequencies() == 0){  // Error case, failed to load template
         std::cout << "Error: load audio template failed" << std::endl;
@@ -138,6 +139,8 @@ SpectrogramMatcher::SpectrogramMatcher(
             m_templateRange.emplace_back(windowStart, windowEnd);
         }
     }
+//    cout << "m_templateRange = " << m_templateRange.size() << endl;
+//    cout << "m_numSpectrumsNeeded = " << m_numSpectrumsNeeded << endl;
 
     m_templateNorm = buildTemplateNorm();
 }
@@ -226,7 +229,7 @@ bool SpectrogramMatcher::update_to_new_spectrum(AudioSpectrum spectrum){
     // TODO: if there will be multiple SpectrogramMatcher running on the same audio stream, can
     // move this per-spectrum computation to a shared struct for those matchers to save computation.
     float spectrumNormSqr = 0.0f;
-    for(size_t i = m_freqStart; i < m_freqEnd; i++){
+    for (size_t i = m_freqStart; i < m_freqEnd; i++){
         float mag = (*spectrum.magnitudes)[i];
         spectrumNormSqr += mag * mag;
     }
@@ -238,14 +241,14 @@ bool SpectrogramMatcher::update_to_new_spectrum(AudioSpectrum spectrum){
 }
 
 bool SpectrogramMatcher::update_to_new_spectrums(const std::vector<AudioSpectrum>& new_spectrums){
-    for(auto it = new_spectrums.rbegin(); it != new_spectrums.rend(); it++){
+    for (auto it = new_spectrums.rbegin(); it != new_spectrums.rend(); it++){
         if(!update_to_new_spectrum(*it)){
             return false;
         }
     }
 
     // pop out too old spectrums
-    while(m_spectrums.size() > m_numSpectrumsNeeded){
+    while (m_spectrums.size() > m_numSpectrumsNeeded){
         m_spectrums.pop_back();
         m_spectrumNormSqrs.pop_back();
     }
@@ -339,7 +342,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
     // Check whether the stored spectrums' timestamps are continuous:
     size_t curStamp = m_spectrums.front().stamp;
     size_t lastStamp = curStamp + 1;
-    for(const auto& s : m_spectrums){
+    for (const auto& s : m_spectrums){
         if (s.stamp != lastStamp - 1){
             std::cout << "Error: SpectrogramMatcher's spectrum timestamps are not continuous:" << std::endl;
 

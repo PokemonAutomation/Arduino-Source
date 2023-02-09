@@ -56,6 +56,19 @@ void AudioPerSpectrumDetectorBase::log_results(){
     }else{
         m_console.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
+
+#if 0
+    if (m_lowest_error >= 1){
+        std::stringstream ss;
+        ss << "AudioPerSpectrumDetectorBase ended with error of 1.0: " << endl;
+        ss << "Elapsed Time: "<< std::chrono::duration_cast<std::chrono::seconds>(current_time() - m_start_timestamp).count() << endl;
+        ss << "m_spectrums_processed = "<< m_spectrums_processed << endl;
+        for (const auto& error : m_errors){
+            ss << "[" << error.first << ":" << error.second << "]";
+        }
+        m_console.log(ss.str(), COLOR_RED);
+    }
+ #endif
 }
 
 bool AudioPerSpectrumDetectorBase::process_spectrums(
@@ -103,6 +116,8 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         std::vector<AudioSpectrum> single_spectrum = {*it};
         const float matcher_score = m_matcher->match(single_spectrum);
         // std::cout << "error: " << matcherScore << std::endl;
+
+//        m_errors.emplace_back(matcher_score, now_to_filestring());
 
         if (matcher_score == FLT_MAX){
 //            cout << "Not enough history: " << m_lowest_error << endl;
