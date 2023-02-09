@@ -136,6 +136,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::UNLOCKED,
         true
     )
+    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
@@ -159,6 +160,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     }
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -571,6 +573,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
                 std::move(embeds), "",
                 encounter_watcher->shiny_screenshot(), true
             );
+
+            GO_HOME_WHEN_DONE.run_end_of_program(context);
 
             throw ProgramFinishedException();
         }

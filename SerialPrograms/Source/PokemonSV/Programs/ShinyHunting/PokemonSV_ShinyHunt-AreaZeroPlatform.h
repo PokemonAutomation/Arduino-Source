@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -80,6 +81,8 @@ private:
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 
     NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
+
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_SHINY;
