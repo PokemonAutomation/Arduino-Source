@@ -18,6 +18,9 @@ namespace Waterfill{
     class WaterfillObject;
 }
 }
+class BotBaseContext;
+class ProgramEnvironment;
+class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -48,6 +51,11 @@ private:
     double m_center_y;
     std::unique_ptr<OverlayBoxScope> m_box;
 };
+
+
+void find_and_center_on_sky(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+);
 
 
 

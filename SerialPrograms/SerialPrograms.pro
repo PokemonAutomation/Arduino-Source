@@ -685,6 +685,7 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
@@ -1676,6 +1677,7 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \

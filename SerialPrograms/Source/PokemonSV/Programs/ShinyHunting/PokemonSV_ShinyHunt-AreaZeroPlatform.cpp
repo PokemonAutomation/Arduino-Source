@@ -8,12 +8,11 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+//#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
+//#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -26,7 +25,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+//#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 
@@ -39,30 +38,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
-
-
-
-NavigatePlatformSettings::NavigatePlatformSettings()
-    : GroupOption("Navigate to Platform Settings", LockWhileRunning::UNLOCKED)
-    , STATION_ARRIVE_PAUSE_SECONDS(
-        "<b>Station Arrive Pause</b><br>Pause for this many seconds after leaving the station. "
-        "This allows stuff to load to reduce the chance of lag affecting the fly to platform.",
-        LockWhileRunning::UNLOCKED,
-        1
-    )
-    , MIDAIR_PAUSE_TIME(
-        "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
-        "Too small and you may crash into the wall or have reduced spawns. "
-        "Too large and you may undershoot the platform.",
-        LockWhileRunning::UNLOCKED,
-        TICKS_PER_SECOND,
-        "50"
-    )
-{
-    PA_ADD_OPTION(STATION_ARRIVE_PAUSE_SECONDS);
-    PA_ADD_OPTION(MIDAIR_PAUSE_TIME);
-}
-
 
 
 
@@ -127,6 +102,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         {
             {Path::PATH0, "path0", "Path 0"},
             {Path::PATH1, "path1", "Path 1"},
+//            {Path::PATH2, "path2", "Path 2"},
         },
         LockWhileRunning::UNLOCKED,
         Path::PATH0
@@ -167,169 +143,6 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 
-void ShinyHuntAreaZeroPlatform::zero_gate_to_platform(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
-){
-    zero_gate_to_station(info, console, context, 2);
-
-    context.wait_for(std::chrono::seconds(NAVIGATE_TO_PLATFORM.STATION_ARRIVE_PAUSE_SECONDS));
-
-    //  Navigate to platform.
-#if 0
-    //  Don't jump to avoid spawn.
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_move_left_joystick(context, 128, 0, 625, 0);
-    ssf_press_button(context, BUTTON_B, 0, 50);
-    pbf_move_left_joystick(context, 128, 0, 250, 0);
-    pbf_move_left_joystick(context, 160, 0, 600, 0);
-    pbf_move_left_joystick(context, 128, 0, 1875, 0);
-#endif
-
-#if 0
-    //  Jump late.
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-
-    ssf_press_joystick(context, true, 128, 0, 315, 500);
-
-    //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
-
-    //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
-
-    pbf_move_left_joystick(context, 144, 0, 1150, 0);
-    pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
-
-    pbf_move_left_joystick(context, 128, 0, 1375, 250);
-#endif
-
-#if 0
-    //  Jump earlier.
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-
-    ssf_press_joystick(context, true, 128, 0, 280, 500);
-
-    //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
-
-    //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
-
-    pbf_move_left_joystick(context, 144, 0, 1150, 0);
-    pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
-
-    pbf_move_left_joystick(context, 128, 0, 1375, 250);
-#endif
-
-#if 1
-    //  Jump on the downhill to improve chance of clearing things.
-    pbf_move_left_joystick(context, 192, 0, 20, 105);
-    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
-    ssf_press_joystick(context, true, 128, 0, 125, 1250);
-
-    //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
-
-    //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
-
-    pbf_move_left_joystick(context, 144, 0, 700, 0);
-    pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
-    pbf_move_left_joystick(context, 128, 0, 875, 250);
-#endif
-
-//    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
-}
-
-
-
-
-enum class OverworldState{
-    None,
-    FindingSky,
-    TurningLeft,
-    TurningRight,
-};
-void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
-){
-    console.log("Looking for the sky...");
-
-    AreaZeroSkyTracker sky_tracker(console);
-    InferenceSession inference_session(
-        context, console,
-        {sky_tracker}
-    );
-
-    AsyncCommandSession session(context, console, env.realtime_dispatcher(), context.botbase());
-    OverworldState state = OverworldState::None;
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::minutes(1)){
-            throw OperationFailedException(
-                console,
-                "Failed to find the sky after 1 minute. (state = " + std::to_string((int)state) + ")",
-                true
-            );
-        }
-
-        context.wait_for(std::chrono::milliseconds(200));
-
-        if (!session.command_is_running()){
-            state = OverworldState::None;
-        }
-
-        double sky_x, sky_y;
-        bool sky = sky_tracker.sky_location(sky_x, sky_y);
-
-        if (!sky){
-            if (state != OverworldState::FindingSky){
-                console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
-                session.dispatch([](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128, 0, 250, 0);
-                    pbf_move_right_joystick(context, 0, 0, 10 * TICKS_PER_SECOND, 0);
-                });
-                state = OverworldState::FindingSky;
-            }
-            continue;
-        }
-
-//        cout << sky_x << " - " << sky_y << endl;
-
-        if (sky_x < 0.45){
-            if (state != OverworldState::TurningLeft){
-                console.log("Centering the sky... Moving left.", COLOR_BLUE);
-                uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
-                uint16_t duration = (uint16_t)((0.5 - sky_x) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
-                });
-                state = OverworldState::TurningLeft;
-            }
-            continue;
-        }
-        if (sky_x > 0.55){
-            if (state != OverworldState::TurningRight){
-                console.log("Centering the sky... Moving Right.", COLOR_BLUE);
-                uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
-                uint16_t duration = (uint16_t)((sky_x - 0.5) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
-                    pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
-                });
-                state = OverworldState::TurningRight;
-            }
-            continue;
-        }
-
-        break;
-    }
-
-    session.stop_session_and_rethrow();
-}
 
 bool ShinyHuntAreaZeroPlatform::clear_in_front(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
@@ -494,6 +307,13 @@ void ShinyHuntAreaZeroPlatform::run_path1(ProgramEnvironment& env, ConsoleHandle
 //        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3 * TICKS_PER_SECOND);
     });
 }
+void ShinyHuntAreaZeroPlatform::run_path2(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_L, 20, 50);
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+    });
+
+}
 void ShinyHuntAreaZeroPlatform::run_iteration(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
@@ -504,9 +324,43 @@ void ShinyHuntAreaZeroPlatform::run_iteration(
     case Path::PATH1:
         run_path1(env, console, context);
         break;
+    case Path::PATH2:
+        run_path2(env, console, context);
+        break;
     }
 }
 
+
+
+void ShinyHuntAreaZeroPlatform::on_shiny_encounter(
+    ProgramEnvironment& env, BotBaseContext& context,
+    const EncounterWatcher& encounter_watcher
+){
+    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
+
+    stats.m_shinies++;
+    env.update_stats();
+
+    if (VIDEO_ON_SHINY){
+        context.wait_for(std::chrono::seconds(3));
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+    }
+
+    std::vector<std::pair<std::string, std::string>> embeds;
+    embeds.emplace_back(
+        "Detection Method:",
+        "Shiny Sound (Error Coefficient = " + tostr_default(encounter_watcher.lowest_error_coefficient()) + ")"
+    );
+    send_program_notification(
+        env, NOTIFICATION_SHINY,
+        COLOR_STAR_SHINY,
+        "Found a Shiny!",
+        std::move(embeds), "",
+        encounter_watcher.shiny_screenshot(), true
+    );
+
+//    throw ProgramFinishedException();
+}
 
 
 
@@ -516,7 +370,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     assert_16_9_720p_min(env.logger(), env.console);
 
     if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
-        zero_gate_to_platform(env.program_info(), env.console, context);
+        zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
     }
 
     WallClock last_reset = current_time();
@@ -531,7 +385,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             last_reset = now;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
-            zero_gate_to_platform(env.program_info(), env.console, context);
+            zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
         }
 
         context.wait_for_all_requests();
@@ -555,30 +409,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         env.update_stats();
 
         if (encounter_watcher->shiny_screenshot()){
-            stats.m_shinies++;
-            env.update_stats();
-
-            if (VIDEO_ON_SHINY){
-                context.wait_for(std::chrono::seconds(3));
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-            }
-
-            std::vector<std::pair<std::string, std::string>> embeds;
-            embeds.emplace_back(
-                "Detection Method:",
-                "Shiny Sound (Error Coefficient = " + tostr_default(encounter_watcher->lowest_error_coefficient()) + ")"
-            );
-            send_program_notification(
-                env, NOTIFICATION_SHINY,
-                COLOR_STAR_SHINY,
-                "Found a Shiny!",
-                std::move(embeds), "",
-                encounter_watcher->shiny_screenshot(), true
-            );
-
-            GO_HOME_WHEN_DONE.run_end_of_program(context);
-
-            throw ProgramFinishedException();
+            on_shiny_encounter(env, context, *encounter_watcher);
+            break;
         }
 
         //  Clear the detection history to prepare next encounter.
@@ -596,7 +428,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         );
     }
 
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
+
+
 
 
 

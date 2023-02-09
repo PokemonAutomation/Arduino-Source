@@ -11,25 +11,16 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
-class NavigatePlatformSettings : public GroupOption{
-public:
-    NavigatePlatformSettings();
-
-public:
-    SimpleIntegerOption<uint16_t> STATION_ARRIVE_PAUSE_SECONDS;
-    TimeExpressionOption<uint16_t> MIDAIR_PAUSE_TIME;
-};
-
+class EncounterWatcher;
 
 
 
@@ -49,7 +40,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void zero_gate_to_platform(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+    void on_shiny_encounter(
+        ProgramEnvironment& env, BotBaseContext& context,
+        const EncounterWatcher& encounter_watcher
+    );
 
     void run_iteration(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     bool clear_in_front(
@@ -59,6 +53,7 @@ private:
 
     void run_path0(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     void run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void run_path2(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 
 
@@ -75,6 +70,7 @@ private:
     enum class Path{
         PATH0,
         PATH1,
+        PATH2,
     };
     EnumDropdownOption<Path> PATH;
 

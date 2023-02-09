@@ -189,6 +189,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+
+
+
+#if 0
 //    pbf_controller_state(context, 0, DPAD_NONE, 192, 255, 116, 128, 3 * TICKS_PER_SECOND);
     pbf_move_left_joystick(context, 192, 0, 20, 105);
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -204,7 +209,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     pbf_move_left_joystick(context, 144, 0, 750, 0);
     pbf_move_left_joystick(context, 128, 0, 1000, 0);
-
+#endif
 
 #if 0
     ZeroGateWarpPromptDetector detector;

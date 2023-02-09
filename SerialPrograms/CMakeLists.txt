@@ -1373,6 +1373,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp
