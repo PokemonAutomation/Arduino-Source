@@ -36,7 +36,7 @@ void zero_gate_to_platform(
 );
 
 
-void read_platform_center(
+bool read_platform_center(
     double& x, double& y,
     const ProgramInfo& info, ConsoleHandle& console
 );

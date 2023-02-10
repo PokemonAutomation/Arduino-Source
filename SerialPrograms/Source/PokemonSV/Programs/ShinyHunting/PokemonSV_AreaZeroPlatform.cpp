@@ -123,7 +123,7 @@ void zero_gate_to_platform(
 }
 
 
-void read_platform_center(
+bool read_platform_center(
     double& x, double& y,
     const ProgramInfo& info, ConsoleHandle& console
 ){
@@ -131,7 +131,7 @@ void read_platform_center(
 
     VideoSnapshot screen = console.video().snapshot();
     if (!screen){
-        throw OperationFailedException(console, "Unable to find center of platform. Video is null.", false);
+        return false;
     }
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(screen, 0xff000040, 0xff8080ff);
@@ -155,11 +155,13 @@ void read_platform_center(
     }
 
     if (biggest.area == 0){
-        throw OperationFailedException(console, "Unable to find center of platform.", screen);
+        return false;
     }
 
     x = biggest.center_of_gravity_x() / screen->width();
     y = biggest.center_of_gravity_y() / screen->height();
+
+    return true;
 }
 
 

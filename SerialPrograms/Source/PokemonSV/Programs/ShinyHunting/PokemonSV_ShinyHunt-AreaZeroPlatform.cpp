@@ -363,7 +363,10 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         context.wait_for_all_requests();
 
         console.log("Finding center of platform...");
-        read_platform_center(platform_x, platform_y, m_env->program_info(), console);
+        if (!read_platform_center(platform_x, platform_y, m_env->program_info(), console)){
+            console.log("Unable to find center of platform.", COLOR_RED);
+            return;
+        }
         console.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
 
         choose_path(console, move_x, move_y, duration, platform_x, platform_y);
