@@ -406,7 +406,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     }
 
 #if 1
-    pbf_move_left_joystick(context, 64, 0, 40, 0);
+    pbf_move_left_joystick(context, 96, 0, 40, 0);
     pbf_mash_button(context, BUTTON_L, 60);
     clear_in_front(context, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
@@ -483,6 +483,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     assert_16_9_720p_min(env.logger(), env.console);
 
+//    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+
     m_iterations = 0;
 
     if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
@@ -516,6 +518,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             last_reset = now;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
             zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
         }
 
