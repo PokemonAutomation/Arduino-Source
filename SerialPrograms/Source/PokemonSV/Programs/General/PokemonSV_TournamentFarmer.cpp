@@ -37,7 +37,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
         "PokemonSV:TournamentFarmer",
         STRING_POKEMON + " SV", "Tournament Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TournamentFarmer.md",
-        "Farm the Ace Academy Tournament for money and prizes.",
+        "Farm the Academy Ace Tournament for money and prizes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -111,7 +111,7 @@ TournamentFarmer::TournamentFarmer()
 }
 
 
-//Handle a single battle by mashing A until a black screen (end of battle) is detected
+//Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
 void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
     //Assuming the player has a charged orb
@@ -127,25 +127,34 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     //Mash A until battle finished
     AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
+    WallClock start = current_time();
     int ret_black = run_until(
         env.console, context,
         [&](BotBaseContext& context) {
             for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
+                if (current_time() - start > std::chrono::minutes(5)) {
+                    env.log("Timed out during battle after 5 minutes.", COLOR_RED);
+                    stats.errors++;
+                    env.update_stats();
+                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                    throw OperationFailedException(env.console, "Timed out during battle after 5 minutes.", true);
+                }
+
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 int ret = wait_until(
                     env.console, context,
-                    std::chrono::seconds(45), //Tera takes ~25 to 30 seconds for player/opponent
-                    { battle_menu }
+                    std::chrono::seconds(60), //Tera takes ~25 to 30 seconds for player/opponent
+                    { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 if (ret == 0) {
                     pbf_mash_button(context, BUTTON_A, 300);
                     context.wait_for_all_requests();
                 } else {
-                    env.log("Timed out during battle. Stuck, crashed, or took more than 45 seconds for a turn.", COLOR_RED);
+                    env.log("Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    throw OperationFailedException(env.console, "Timed out during battle. Stuck, crashed, or took more than 45 seconds for a turn.", true);
+                    throw OperationFailedException(env.console, "Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.", true);
                 }
             }
         },
