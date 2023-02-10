@@ -430,7 +430,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     });
     clear_in_front(context, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
-        pbf_move_right_joystick(context, 128, 0, 60, 0);
+        pbf_move_left_joystick(context, 128, 0, 60, 3 * TICKS_PER_SECOND);
     });
 #endif
 
